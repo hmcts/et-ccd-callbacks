@@ -23,8 +23,6 @@ import java.util.concurrent.ExecutorService;
  * {@link IQueueClient} implementation for use during development only.
  */
 @SuppressWarnings("ALL")
-@Component("create-updates-send-client")
-@Profile("dev")
 public class DevQueueClient implements IQueueClient {
 
     @Override

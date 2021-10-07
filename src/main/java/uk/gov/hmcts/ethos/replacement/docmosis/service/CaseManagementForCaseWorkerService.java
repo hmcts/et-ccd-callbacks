@@ -10,11 +10,17 @@ import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.ecm.common.model.ccd.items.*;
-import uk.gov.hmcts.ecm.common.model.ccd.types.*;
+import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.ecm.common.model.ccd.items.EccCounterClaimTypeItem;
+import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.EccCounterClaimType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ecc.ClerkService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -41,6 +47,7 @@ public class CaseManagementForCaseWorkerService {
 
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CcdClient ccdClient;
+    private final ClerkService clerkService;
 
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
@@ -49,9 +56,10 @@ public class CaseManagementForCaseWorkerService {
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
-                                              CcdClient ccdClient) {
+                                              CcdClient ccdClient, ClerkService clerkService) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
+        this.clerkService = clerkService;
     }
 
     public void caseDataDefaults(CaseData caseData) {
@@ -232,6 +240,8 @@ public class CaseManagementForCaseWorkerService {
                 switch (callback) {
                     case MID_EVENT_CALLBACK:
                         Helper.midRespondentECC(currentCaseData, submitEvent.getCaseData());
+                        currentCaseData.setOwningOffice(submitEvent.getCaseData().getOwningOffice());
+                        clerkService.initialiseClerkResponsible(currentCaseData);
                         break;
                     case ABOUT_TO_SUBMIT_EVENT_CALLBACK:
                         ECCHelper.createECCLogic(currentCaseData, submitEvent.getCaseData());

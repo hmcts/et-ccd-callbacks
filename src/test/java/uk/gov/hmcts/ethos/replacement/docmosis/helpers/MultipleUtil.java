@@ -131,7 +131,7 @@ public class MultipleUtil {
 
     public static CaseData getCaseData(String ethosCaseReference) {
         CaseData caseData = new CaseData();
-        caseData.setClerkResponsible("JuanFran");
+        caseData.setClerkResponsible(new DynamicFixedListType("JuanFran"));
         ClaimantType claimantType = new ClaimantType();
         Address address = new Address();
         address.setPostCode("M2 45GD");

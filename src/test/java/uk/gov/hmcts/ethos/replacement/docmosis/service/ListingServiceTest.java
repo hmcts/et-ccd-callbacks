@@ -74,7 +74,7 @@ public class ListingServiceTest {
         listingData1.setListingCollection(new ArrayList<>());
         listingData1.setHearingDateType(RANGE_HEARING_DATE_TYPE);
         listingData1.setReportType("Brought Forward Report");
-        listingData1.setClerkResponsible("Steve Jones");
+        listingData1.setClerkResponsible(new DynamicFixedListType("Steve Jones"));
         listingDetailsRange.setCaseData(listingData1);
         listingDetailsRange.setCaseTypeId(MANCHESTER_LISTING_CASE_TYPE_ID);
         listingDetailsRange.setJurisdiction("EMPLOYMENT");
@@ -197,7 +197,7 @@ public class ListingServiceTest {
                 bfActionTypeItem1, bfActionTypeItem2, bfActionTypeItem3, bfActionTypeItem4)));
         caseData.setHearingCollection(new ArrayList<>(Arrays.asList(hearingTypeItem, hearingTypeItem1)));
         caseData.setJurCodesCollection(new ArrayList<>(Collections.singleton(jurCodesTypeItem)));
-        caseData.setClerkResponsible("Steve Jones");
+        caseData.setClerkResponsible(new DynamicFixedListType("Steve Jones"));
         CasePreAcceptType casePreAcceptType = new CasePreAcceptType();
         casePreAcceptType.setDateAccepted("2019-12-12");
         caseData.setPreAcceptCase(casePreAcceptType);
@@ -715,11 +715,11 @@ public class ListingServiceTest {
                 "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, " +
                 "bfDateCollection=[], clerkResponsible=null, reportType=Brought Forward Report, documentName=null, showAll=null, localReportsSummaryHdr=null, " +
                 "localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, localReportsDetailHdr=null, localReportsDetail=null)";
-        listingDetailsRange.getCaseData().setClerkResponsible("not there");
+        listingDetailsRange.getCaseData().setClerkResponsible(new DynamicFixedListType("not there"));
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.generateReportData(listingDetailsRange, "authToken");
         assertEquals(result, listingDataResult.toString());
-        listingDetailsRange.getCaseData().setClerkResponsible("Steve Jones");
+        listingDetailsRange.getCaseData().setClerkResponsible(new DynamicFixedListType("Steve Jones"));
     }
 
     @Test

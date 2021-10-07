@@ -20,7 +20,18 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.*;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ecc.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.File;
@@ -31,15 +42,23 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @RunWith(SpringRunner.class)
@@ -78,6 +97,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String DYNAMIC_LIST_OFFICES_URL = "/dynamicListOffices";
     private static final String CREATE_CASE_TRANSFER_URL = "/createCaseTransfer";
     private static final String ABOUT_TO_START_DISPOSAL_URL = "/aboutToStartDisposal";
+    private static final String INITIALISE_AMEND_CASE_DETAILS_URL = "/initialiseAmendCaseDetails";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -114,6 +134,9 @@ public class CaseActionsForCaseWorkerControllerTest {
 
     @MockBean
     private AddSingleCaseToMultipleService addSingleCaseToMultipleService;
+
+    @MockBean
+    private ClerkService clerkService;
 
     private MockMvc mvc;
     private JsonNode requestContent;
@@ -621,6 +644,20 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", notNullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    public void initialiseAmendCaseDetails() throws Exception {
+        mvc.perform(post(INITIALISE_AMEND_CASE_DETAILS_URL)
+                .content(requestContent2.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", notNullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+
+        verify(clerkService, times(1)).initialiseClerkResponsible(isA(CaseData.class));
     }
 
     @Test
@@ -1308,4 +1345,15 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    public void initialiseAmendCaseDetailsForbidden() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(false);
+        mvc.perform(post(INITIALISE_AMEND_CASE_DETAILS_URL)
+                .content(requestContent2.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+
+        verify(clerkService, never()).initialiseClerkResponsible(isA(CaseData.class));
+    }
 }

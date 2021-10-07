@@ -11,24 +11,55 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
-import uk.gov.hmcts.ecm.common.model.ccd.*;
+import uk.gov.hmcts.ecm.common.model.ccd.Address;
+import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.types.*;
+import uk.gov.hmcts.ecm.common.model.ccd.types.CasePreAcceptType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.ClaimantIndType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.ClaimantType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.EccCounterClaimType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ecm.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ecc.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABERDEEN_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANCHESTER_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANCHESTER_DEV_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -53,6 +84,8 @@ public class CaseManagementForCaseWorkerServiceTest {
     private CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     @MockBean
     private CcdClient ccdClient;
+    @MockBean
+    private ClerkService clerkService;
 
     @Before
     public void setUp() throws Exception {
@@ -136,7 +169,8 @@ public class CaseManagementForCaseWorkerServiceTest {
         submitEvent.setCaseId(123);
         submitEvent.setCaseData(submitCaseData);
 
-        caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(caseRetrievalForCaseWorkerService, ccdClient);
+        caseManagementForCaseWorkerService = new CaseManagementForCaseWorkerService(caseRetrievalForCaseWorkerService,
+                ccdClient, clerkService);
     }
 
     @Test

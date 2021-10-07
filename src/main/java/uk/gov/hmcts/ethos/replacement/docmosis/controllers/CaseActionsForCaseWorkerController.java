@@ -15,29 +15,10 @@ import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
-
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
@@ -49,6 +30,24 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ecc.ClerkService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -69,6 +68,7 @@ public class CaseActionsForCaseWorkerController {
     private final EventValidationService eventValidationService;
     private final SingleCaseMultipleMidEventValidationService singleCaseMultipleMidEventValidationService;
     private final AddSingleCaseToMultipleService addSingleCaseToMultipleService;
+    private final ClerkService clerkService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "create a case for a caseWorker.")
@@ -229,13 +229,34 @@ public class CaseActionsForCaseWorkerController {
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
+    @PostMapping(value = "/initialiseAmendCaseDetails", consumes = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Initialise case data for amendCaseDetails and amendCaseDetailsClosed events")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Accessed successfully",
+                response = CCDCallbackResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> initialiseAmendCaseDetails(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        clerkService.initialiseClerkResponsible(ccdRequest.getCaseDetails().getCaseData());
+
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+    }
+
     @PostMapping(value = "/amendCaseDetails", consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "amend the case details for a single case and validates receipt date.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Accessed successfully",
-                    response = CCDCallbackResponse.class),
-            @ApiResponse(code = 400, message = "Bad Request"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(code = 200, message = "Accessed successfully",
+                response = CCDCallbackResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> amendCaseDetails(
             @RequestBody CCDRequest ccdRequest,
@@ -845,9 +866,11 @@ public class CaseActionsForCaseWorkerController {
         }
 
         var caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = eventValidationService.validateJurisdictionOutcome(caseData, ccdRequest.getCaseDetails().getState().equals(REJECTED_STATE));
+        List<String> errors = eventValidationService.validateJurisdictionOutcome(caseData,
+                ccdRequest.getCaseDetails().getState().equals(REJECTED_STATE));
 
         if (errors.isEmpty()) {
+            clerkService.initialiseClerkResponsible(caseData);
             Helper.updatePositionTypeToClosed(caseData);
             return getCallbackRespEntityNoErrors(caseData);
         }

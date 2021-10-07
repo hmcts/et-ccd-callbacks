@@ -20,6 +20,7 @@ import uk.gov.hmcts.ecm.common.model.bulk.BulkDetails;
 import uk.gov.hmcts.ecm.common.model.bulk.BulkDocumentInfo;
 import uk.gov.hmcts.ecm.common.model.bulk.BulkRequest;
 import uk.gov.hmcts.ecm.common.model.bulk.items.MultipleTypeItem;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
@@ -228,7 +229,7 @@ public class BulkActionsControllerTest {
 
     private List<SubmitEvent> getSubmitEvents() {
         CaseData caseData = new CaseData();
-        caseData.setClerkResponsible("JuanFran");
+        caseData.setClerkResponsible(new DynamicFixedListType("JuanFran"));
         ClaimantIndType claimantIndType = new ClaimantIndType();
         claimantIndType.setClaimantLastName("Mike");
         caseData.setClaimantIndType(claimantIndType);

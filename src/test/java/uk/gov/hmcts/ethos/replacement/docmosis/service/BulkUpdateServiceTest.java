@@ -259,7 +259,7 @@ public class BulkUpdateServiceTest {
         bulkData.setRespondentSurnameV2("Respondent");
         bulkData.setClaimantSurnameV2("Claimant");
         bulkData.setMultipleReferenceV2("1111");
-        bulkData.setClerkResponsibleV2("Juan");
+        bulkData.setClerkResponsibleV2(new DynamicFixedListType("Juan"));
         bulkData.setPositionTypeV2("Awaiting");
         bulkData.setClaimantRepV2("ClaimantRep");
         bulkData.setRespondentRepV2("RespondentRep");

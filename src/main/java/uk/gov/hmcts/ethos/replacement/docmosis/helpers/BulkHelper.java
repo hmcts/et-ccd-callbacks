@@ -71,7 +71,7 @@ public class BulkHelper {
         return bulkDetails;
     }
 
-    private static void setClaimantSurnameM(CaseData caseData, MultipleType multipleType ) {
+    private static void setClaimantSurnameM(CaseData caseData, MultipleType multipleType) {
         if (caseData.getClaimantIndType() != null && caseData.getClaimantIndType().getClaimantLastName() != null) {
             multipleType.setClaimantSurnameM(caseData.getClaimantIndType().getClaimantLastName());
         } else {
@@ -106,7 +106,11 @@ public class BulkHelper {
     private static MultipleType getMultipleTypeFromCaseData(CaseData caseData) {
         var multipleType = new MultipleType();
         multipleType.setEthosCaseReferenceM(Optional.ofNullable(caseData.getEthosCaseReference()).orElse(" "));
-        multipleType.setClerkRespM(Optional.ofNullable(caseData.getClerkResponsible()).orElse(" "));
+        if (caseData.getClerkResponsible() != null && caseData.getClerkResponsible().getValue() != null) {
+            multipleType.setClerkRespM(caseData.getClerkResponsible().getSelectedLabel());
+        } else {
+            multipleType.setClerkRespM(" ");
+        }
         setClaimantSurnameM(caseData, multipleType);
         setClaimantAddressLine1M(caseData, multipleType);
         setClaimantPostCodeM(caseData, multipleType);
@@ -183,15 +187,12 @@ public class BulkHelper {
         if (state != null) {
             if (state.equals(PENDING_STATE)) {
                 return SUBMITTED_STATE;
-            }
-            else {
+            } else {
                 return state;
             }
-        }
-        else {
+        } else {
             return " ";
         }
-
     }
 
     public static SearchType getSearchTypeFromMultipleType(MultipleType multipleType) {

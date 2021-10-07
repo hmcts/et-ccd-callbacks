@@ -127,7 +127,7 @@ public class PersistentQHelper {
 
     public static CloseDataModel getCloseDataModel(MultipleData multipleData) {
         return CloseDataModel.builder()
-                .clerkResponsible(multipleData.getClerkResponsible())
+                .clerkResponsible(multipleData.getClerkResponsibleSelectedValue().orElse(null))
                 .fileLocation(multipleData.getFileLocation())
                 .notes(multipleData.getNotes())
                 .managingOffice(multipleData.getManagingOffice())

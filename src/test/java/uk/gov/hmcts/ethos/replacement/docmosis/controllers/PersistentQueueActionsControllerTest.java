@@ -18,6 +18,7 @@ import uk.gov.hmcts.ecm.common.model.bulk.BulkData;
 import uk.gov.hmcts.ecm.common.model.bulk.BulkDetails;
 import uk.gov.hmcts.ecm.common.model.bulk.BulkRequest;
 import uk.gov.hmcts.ecm.common.model.bulk.items.MultipleTypeItem;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
@@ -104,7 +105,7 @@ public class PersistentQueueActionsControllerTest {
 
     private List<SubmitEvent> getSubmitEvents() {
         CaseData caseData = new CaseData();
-        caseData.setClerkResponsible("JuanFran");
+        caseData.setClerkResponsible(new DynamicFixedListType("JuanFran"));
         ClaimantIndType claimantIndType = new ClaimantIndType();
         claimantIndType.setClaimantLastName("Mike");
         caseData.setClaimantIndType(claimantIndType);

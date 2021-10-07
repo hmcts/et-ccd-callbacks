@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,15 +14,36 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.TribunalOfficesConfiguration;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.TribunalOffice;
 
 import java.util.ArrayList;
 import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABERDEEN_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BRISTOL_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.LEEDS_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.LONDON_CENTRAL_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.LONDON_EAST_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.LONDON_SOUTH_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANCHESTER_DEV_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIDLANDS_EAST_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIDLANDS_WEST_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEWCASTLE_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_DEV_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.WALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.WATFORD_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
@@ -113,7 +133,6 @@ public class DefaultValuesReaderServiceTest {
         watfordCaseDetails = getCaseDetails(WATFORD_CASE_TYPE_ID);
 
         postDefaultValuesManchester = DefaultValues.builder()
-                .owningOffice(TribunalOffice.MANCHESTER.name())
                 .positionType(MANUALLY_CREATED_POSITION)
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("Manchester Employment Tribunal")
@@ -127,7 +146,6 @@ public class DefaultValuesReaderServiceTest {
                 .tribunalCorrespondenceEmail("Manchesteret@justice.gov.uk")
                 .build();
         postDefaultValuesBristol = DefaultValues.builder()
-                .owningOffice(TribunalOffice.BRISTOL.name())
                 .positionType(MANUALLY_CREATED_POSITION)
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("Bristol Civil and Family Justice Centre")
@@ -140,7 +158,6 @@ public class DefaultValuesReaderServiceTest {
                 .tribunalCorrespondenceEmail("bristolet@justice.gov.uk")
                 .build();
         postDefaultValuesLeeds = DefaultValues.builder()
-                .owningOffice(TribunalOffice.LEEDS.name())
                 .positionType(MANUALLY_CREATED_POSITION)
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("4th Floor")
@@ -154,7 +171,6 @@ public class DefaultValuesReaderServiceTest {
                 .tribunalCorrespondenceEmail("LeedsET@justice.gov.uk")
                 .build();
         postDefaultValuesLondonCentral = DefaultValues.builder()
-                .owningOffice(TribunalOffice.LONDON_CENTRAL.name())
                 .positionType(MANUALLY_CREATED_POSITION)
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("Ground Floor")
@@ -168,7 +184,6 @@ public class DefaultValuesReaderServiceTest {
                 .tribunalCorrespondenceEmail("londoncentralet@justice.gov.uk")
                 .build();
         postDefaultValuesLondonEast = DefaultValues.builder()
-                .owningOffice(TribunalOffice.LONDON_EAST.name())
                 .positionType(MANUALLY_CREATED_POSITION)
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("2nd Floor")
@@ -182,7 +197,6 @@ public class DefaultValuesReaderServiceTest {
                 .tribunalCorrespondenceDX("DX 374401 East India Dock 1")
                 .build();
         postDefaultValuesLondonSouth = DefaultValues.builder()
-                .owningOffice(TribunalOffice.LONDON_SOUTH.name())
                 .positionType(MANUALLY_CREATED_POSITION)
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("Montague Court")
@@ -196,7 +210,6 @@ public class DefaultValuesReaderServiceTest {
                 .tribunalCorrespondenceEmail("londonsouthet@Justice.gov.uk")
                 .build();
         postDefaultValuesMidlandsEast = DefaultValues.builder()
-                .owningOffice(TribunalOffice.MIDLANDS_EAST.name())
                 .positionType(MANUALLY_CREATED_POSITION)
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("Nottingham Justice Centre")
@@ -208,7 +221,6 @@ public class DefaultValuesReaderServiceTest {
                 .tribunalCorrespondenceEmail("MidlandsEastET@justice.gov.uk")
                 .build();
         postDefaultValuesMidlandsWest = DefaultValues.builder()
-                .owningOffice(TribunalOffice.MIDLANDS_WEST.name())
                 .positionType(MANUALLY_CREATED_POSITION)
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("13th Floor")
@@ -222,7 +234,6 @@ public class DefaultValuesReaderServiceTest {
                 .tribunalCorrespondenceEmail("MidlandsWestET@justice.gov.uk")
                 .build();
         postDefaultValuesNewcastle = DefaultValues.builder()
-                .owningOffice(TribunalOffice.NEWCASTLE.name())
                 .positionType(MANUALLY_CREATED_POSITION)
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("Employment Tribunal")
@@ -236,7 +247,6 @@ public class DefaultValuesReaderServiceTest {
                 .tribunalCorrespondenceEmail("newcastleet@justice.gov.uk")
                 .build();
         postDefaultValuesWales = DefaultValues.builder()
-                .owningOffice(TribunalOffice.WALES.name())
                 .positionType(MANUALLY_CREATED_POSITION)
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("Wales Employment Tribunal")
@@ -250,7 +260,6 @@ public class DefaultValuesReaderServiceTest {
                 .tribunalCorrespondenceEmail("waleset@justice.gov.uk")
                 .build();
         postDefaultValuesWatford = DefaultValues.builder()
-                .owningOffice(TribunalOffice.WATFORD.name())
                 .positionType(MANUALLY_CREATED_POSITION)
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("Watford Tribunal Hearing Centre")
@@ -264,7 +273,6 @@ public class DefaultValuesReaderServiceTest {
                 .tribunalCorrespondenceEmail("watfordet@justice.gov.uk")
                 .build();
         postDefaultValuesGlasgow = DefaultValues.builder()
-                .owningOffice(TribunalOffice.GLASGOW.name())
                 .positionType(MANUALLY_CREATED_POSITION)
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("Glasgow Tribunals Centre")
@@ -278,7 +286,6 @@ public class DefaultValuesReaderServiceTest {
                 .managingOffice(GLASGOW_OFFICE)
                 .build();
         postDefaultValuesAberdeen = DefaultValues.builder()
-                .owningOffice(TribunalOffice.ABERDEEN.name())
                 .positionType(MANUALLY_CREATED_POSITION)
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("Ground Floor")
@@ -291,7 +298,6 @@ public class DefaultValuesReaderServiceTest {
                 .tribunalCorrespondenceEmail("aberdeenet@justice.gov.uk")
                 .build();
         postDefaultValuesDundee = DefaultValues.builder()
-                .owningOffice(TribunalOffice.DUNDEE.name())
                 .positionType(MANUALLY_CREATED_POSITION)
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("Ground Floor")
@@ -305,7 +311,6 @@ public class DefaultValuesReaderServiceTest {
                 .tribunalCorrespondenceEmail("dundeeet@justice.gov.uk")
                 .build();
         postDefaultValuesEdinburgh = DefaultValues.builder()
-                .owningOffice(TribunalOffice.EDINBURGH.name())
                 .positionType(MANUALLY_CREATED_POSITION)
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("54-56 Melville Street")
@@ -431,7 +436,7 @@ public class DefaultValuesReaderServiceTest {
                 + "hearingTimingStart=null, hearingTimingBreak=null, hearingTimingResume=null, "
                 + "hearingTimingFinish=null, hearingTimingDuration=null, companyPremises=null, officeCT=null, "
                 + "reasonForCT=null, relatedCaseCT=null, positionTypeCT=null, linkedCaseCT=null, stateAPI=null, "
-                + "owningOffice=GLASGOW, allocateHearingHearing=null, allocateHearingVenue=null, "
+                + "owningOffice=null, allocateHearingHearing=null, allocateHearingVenue=null, "
                 + "allocateHearingRoom=null, allocateHearingClerk=null, allocateHearingSitAlone=null, "
                 + "allocateHearingJudge=null, allocateHearingEmployerMember=null, allocateHearingEmployeeMember=null, "
                 + "allocateHearingPostponedBy=null, allocateHearingStatus=null, hearingDetailsHearing=null, "
@@ -522,7 +527,7 @@ public class DefaultValuesReaderServiceTest {
                 + "hearingTimingStart=null, hearingTimingBreak=null, hearingTimingResume=null, "
                 + "hearingTimingFinish=null, hearingTimingDuration=null, companyPremises=null, officeCT=null, "
                 + "reasonForCT=null, relatedCaseCT=null, positionTypeCT=null, linkedCaseCT=null, stateAPI=null, "
-                + "owningOffice=GLASGOW, allocateHearingHearing=null, allocateHearingVenue=null, "
+                + "owningOffice=null, allocateHearingHearing=null, allocateHearingVenue=null, "
                 + "allocateHearingRoom=null, allocateHearingClerk=null, allocateHearingSitAlone=null, "
                 + "allocateHearingJudge=null, allocateHearingEmployerMember=null, allocateHearingEmployeeMember=null, "
                 + "allocateHearingPostponedBy=null, allocateHearingStatus=null, hearingDetailsHearing=null, "

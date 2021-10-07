@@ -386,10 +386,9 @@ public class BulkUpdateService {
                 multipleReferenceUpdated = true;
                 submitEvent.getCaseData().setMultipleReference(multipleRefNewValue);
             }
-            String clerkNewValue = bulkData.getClerkResponsibleV2();
-            if (!isNullOrEmpty(clerkNewValue)) {
+            if (bulkData.getClerkResponsibleV2() != null && bulkData.getClerkResponsibleV2().getValue() != null) {
                 updated = true;
-                submitEvent.getCaseData().setClerkResponsible(clerkNewValue);
+                submitEvent.getCaseData().setClerkResponsible(bulkData.getClerkResponsibleV2());
             }
             String positionTypeNewValue = bulkData.getPositionTypeV2();
             if (!isNullOrEmpty(positionTypeNewValue)) {

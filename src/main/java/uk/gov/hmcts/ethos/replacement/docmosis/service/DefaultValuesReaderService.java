@@ -30,11 +30,7 @@ public class DefaultValuesReaderService {
 
     public DefaultValues getDefaultValues(String managingOffice, String caseTypeId) {
         ContactDetails contactDetails = tribunalOfficesService.getTribunalContactDetails(caseTypeId, managingOffice);
-        var defaultValues = createDefaultValues(contactDetails);
-        if (defaultValues.getOwningOffice() == null) {
-            defaultValues.setOwningOffice(tribunalOfficesService.getTribunalOffice(caseTypeId, managingOffice).name());
-        }
-        return defaultValues;
+        return createDefaultValues(contactDetails);
     }
 
     public String getClaimantTypeOfClaimant() {
@@ -54,9 +50,6 @@ public class DefaultValuesReaderService {
         }
         if (defaultValues.getManagingOffice() != null) {
             caseData.setManagingOffice(defaultValues.getManagingOffice());
-        }
-        if (caseData.getOwningOffice() == null) {
-            caseData.setOwningOffice(defaultValues.getOwningOffice());
         }
         if (caseData.getCaseType() == null) {
             caseData.setCaseType(defaultValues.getCaseType());

@@ -12,6 +12,7 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
         manchesterCaseDetails = new CaseDetails();
         manchesterCaseDetails.setCaseData(new CaseData());
         manchesterCaseDetails.setCaseId("123456");
-        manchesterCaseDetails.setCaseTypeId(MANCHESTER_DEV_CASE_TYPE_ID);
+        manchesterCaseDetails.setCaseTypeId(ENGLANDWALES_DEV_CASE_TYPE_ID);
         manchesterCaseDetails.setJurisdiction("TRIBUNALS");
         manchesterCcdRequest.setCaseDetails(manchesterCaseDetails);
 
@@ -95,7 +96,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
     public void caseCreationManchesterRequestException() throws IOException {
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(), anyString())).thenReturn(submitEvent);
-        when(defaultValuesReaderService.getDefaultValues( "", manchesterCaseDetails.getCaseTypeId())).thenReturn(manchesterDefaultValues);
+        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.MANCHESTER.getOfficeName())).thenReturn(manchesterDefaultValues);
         caseUpdateForCaseWorkerService.caseUpdateRequest(manchesterCcdRequest, "authToken");
     }
 
@@ -103,7 +104,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
     public void caseCreationManchesterRequest() throws IOException {
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(manchesterCcdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(), anyString())).thenReturn(submitEvent);
-        when(defaultValuesReaderService.getDefaultValues("", manchesterCaseDetails.getCaseTypeId())).thenReturn(manchesterDefaultValues);
+        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.MANCHESTER.getOfficeName())).thenReturn(manchesterDefaultValues);
         SubmitEvent submitEvent1 = caseUpdateForCaseWorkerService.caseUpdateRequest(manchesterCcdRequest, "authToken");
         assertEquals(submitEvent, submitEvent1);
     }
@@ -112,7 +113,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
     public void caseCreationGlasgowRequest() throws IOException {
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(glasgowCcdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(), anyString())).thenReturn(submitEvent);
-        when(defaultValuesReaderService.getDefaultValues( "", glasgowCaseDetails.getCaseTypeId())).thenReturn(glasgowDefaultValues);
+        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName())).thenReturn(glasgowDefaultValues);
         SubmitEvent submitEvent1 = caseUpdateForCaseWorkerService.caseUpdateRequest(glasgowCcdRequest, "authToken");
         assertEquals(submitEvent, submitEvent1);
     }

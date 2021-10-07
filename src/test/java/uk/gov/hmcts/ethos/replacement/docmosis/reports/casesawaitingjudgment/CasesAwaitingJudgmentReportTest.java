@@ -25,8 +25,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_WITH
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_COSTS_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_MEDIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEWCASTLE_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEWCASTLE_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 
 public class CasesAwaitingJudgmentReportTest {
 
@@ -48,7 +48,7 @@ public class CasesAwaitingJudgmentReportTest {
         submitEvents.clear();
 
         reportDataSource = mock(ReportDataSource.class);
-        when(reportDataSource.getData(NEWCASTLE_CASE_TYPE_ID)).thenReturn(submitEvents);
+        when(reportDataSource.getData(ENGLANDWALES_CASE_TYPE_ID)).thenReturn(submitEvents);
 
         var now = "2021-07-31T10:00:00.Z";
         var clock = Clock.fixed(Instant.parse(now), ZoneId.of("UTC"));
@@ -64,7 +64,7 @@ public class CasesAwaitingJudgmentReportTest {
 
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent(CLOSED_STATE));
 
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -87,7 +87,7 @@ public class CasesAwaitingJudgmentReportTest {
                     .withPositionType(invalidPositionType)
                     .buildAsSubmitEvent(ACCEPTED_STATE));
 
-            var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+            var reportData = casesAwaitingJudgmentReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
             assertCommonValues(reportData);
             assertTrue(reportData.getReportDetails().isEmpty());
         }
@@ -105,7 +105,7 @@ public class CasesAwaitingJudgmentReportTest {
                 .withPositionType(validPositionType)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -123,7 +123,7 @@ public class CasesAwaitingJudgmentReportTest {
                 .withHearing(LISTING_DATE, HEARING_STATUS_LISTED)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -143,7 +143,7 @@ public class CasesAwaitingJudgmentReportTest {
                 .withJudgment()
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -161,7 +161,7 @@ public class CasesAwaitingJudgmentReportTest {
                 .withHearing(LISTING_DATE, HEARING_STATUS_HEARD)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
     }
@@ -176,7 +176,7 @@ public class CasesAwaitingJudgmentReportTest {
         submitEvents.add(createValidSubmitEvent(positionType));
         submitEvents.add(createValidSubmitEvent(positionType));
 
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         assertCommonValues(reportData);
         assertEquals(3, reportData.getReportDetails().size());
         assertEquals(1, reportData.getReportSummary().getPositionTypes().size());
@@ -205,7 +205,7 @@ public class CasesAwaitingJudgmentReportTest {
         submitEvents.add(createValidSubmitEvent(positionType3));
         submitEvents.add(createValidSubmitEvent(positionType2));
 
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         assertCommonValues(reportData);
         assertEquals(6, reportData.getReportDetails().size());
         assertEquals(3, reportData.getReportSummary().getPositionTypes().size());
@@ -247,7 +247,7 @@ public class CasesAwaitingJudgmentReportTest {
                 .withHearing(listedDate, HEARING_STATUS_HEARD, hearingNumber, hearingType, judge)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
 
@@ -284,7 +284,7 @@ public class CasesAwaitingJudgmentReportTest {
                 .withHearing(listedDate, HEARING_STATUS_HEARD)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
 
@@ -319,7 +319,7 @@ public class CasesAwaitingJudgmentReportTest {
                 .withHearing("2021-07-06T10:00:00.000", HEARING_STATUS_WITHDRAWN, "4", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
 
@@ -381,7 +381,7 @@ public class CasesAwaitingJudgmentReportTest {
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         caseDataBuilder = new CaseDataBuilder();
 
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         assertCommonValues(reportData);
         assertEquals(4, reportData.getReportDetails().size());
 

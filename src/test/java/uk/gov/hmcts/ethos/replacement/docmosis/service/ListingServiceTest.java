@@ -62,7 +62,7 @@ public class ListingServiceTest {
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingData.setReportType(BROUGHT_FORWARD_REPORT);
         listingDetails.setCaseData(listingData);
-        listingDetails.setCaseTypeId(MANCHESTER_LISTING_CASE_TYPE_ID);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.setJurisdiction("EMPLOYMENT");
 
         listingDetailsRange = new ListingDetails();
@@ -76,7 +76,7 @@ public class ListingServiceTest {
         listingData1.setReportType("Brought Forward Report");
         listingData1.setClerkResponsible(new DynamicFixedListType("Steve Jones"));
         listingDetailsRange.setCaseData(listingData1);
-        listingDetailsRange.setCaseTypeId(MANCHESTER_LISTING_CASE_TYPE_ID);
+        listingDetailsRange.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetailsRange.setJurisdiction("EMPLOYMENT");
 
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
@@ -215,7 +215,7 @@ public class ListingServiceTest {
         address.setPostTown("Manchester");
         caseData.setTribunalCorrespondenceAddress(address);
         caseDetails.setCaseData(caseData);
-        caseDetails.setCaseTypeId(MANCHESTER_LISTING_CASE_TYPE_ID);
+        caseDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         caseDetails.setJurisdiction("EMPLOYMENT");
     }
 
@@ -769,7 +769,7 @@ public class ListingServiceTest {
                 "ConOpenTotal=null, ConNone26wkTotal=null, ConStd26wkTotal=null, ConFast26wkTotal=null, ConOpen26wkTotal=null, ConNone26wkTotalPerCent=null, " +
                 "ConStd26wkTotalPerCent=null, ConFast26wkTotalPerCent=null, ConOpen26wkTotalPerCent=null, xConNone26wkTotal=null, xConStd26wkTotal=null, xConFast26wkTotal=null, " +
                 "xConOpen26wkTotal=null, xConNone26wkTotalPerCent=null, xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null))])";
-        listingDetails.setCaseTypeId(MANCHESTER_LISTING_CASE_TYPE_ID);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(CLAIMS_ACCEPTED_REPORT);
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.generateReportData(listingDetails, "authToken");
@@ -924,7 +924,7 @@ public class ListingServiceTest {
                 " ConOpen26wkTotal=null, ConNone26wkTotalPerCent=null, ConStd26wkTotalPerCent=null, ConFast26wkTotalPerCent=null, " +
                 "ConOpen26wkTotalPerCent=null, xConNone26wkTotal=null, xConStd26wkTotal=null, xConFast26wkTotal=null, xConOpen26wkTotal=null, " +
                 "xConNone26wkTotalPerCent=null, xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null))])";
-        listingDetails.setCaseTypeId(MANCHESTER_LISTING_CASE_TYPE_ID);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(LIVE_CASELOAD_REPORT);
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.generateReportData(listingDetails, "authToken");
@@ -1013,7 +1013,7 @@ public class ListingServiceTest {
 
     @Test
     public void generateCasesCompletedReportDataForEnglandWithConTrackNone() throws IOException {
-        listingDetails.setCaseTypeId(MANCHESTER_LISTING_CASE_TYPE_ID);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(CASES_COMPLETED_REPORT);
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.generateReportData(listingDetails, "authToken");
@@ -1023,7 +1023,7 @@ public class ListingServiceTest {
 
     @Test
     public void generateCasesCompletedReportDataForEnglandWithConTrackFast() throws IOException {
-        listingDetails.setCaseTypeId(MANCHESTER_LISTING_CASE_TYPE_ID);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(CASES_COMPLETED_REPORT);
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         submitEvents.get(0).getCaseData().setConciliationTrack(CONCILIATION_TRACK_FAST_TRACK);
@@ -1035,7 +1035,7 @@ public class ListingServiceTest {
 
     @Test
     public void generateCasesCompletedReportDataForEnglandWithConTrackStandard() throws IOException {
-        listingDetails.setCaseTypeId(MANCHESTER_LISTING_CASE_TYPE_ID);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(CASES_COMPLETED_REPORT);
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         submitEvents.get(0).getCaseData().setConciliationTrack(CONCILIATION_TRACK_STANDARD_TRACK);
@@ -1047,7 +1047,7 @@ public class ListingServiceTest {
 
     @Test
     public void generateCasesCompletedReportDataForEnglandWithConTrackOpen() throws IOException {
-        listingDetails.setCaseTypeId(MANCHESTER_LISTING_CASE_TYPE_ID);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(CASES_COMPLETED_REPORT);
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         submitEvents.get(0).getCaseData().setConciliationTrack(CONCILIATION_TRACK_OPEN_TRACK);

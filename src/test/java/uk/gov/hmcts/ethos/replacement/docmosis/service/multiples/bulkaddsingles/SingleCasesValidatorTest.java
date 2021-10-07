@@ -17,8 +17,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEWCASTLE_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEWCASTLE_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 
@@ -33,7 +33,7 @@ public class SingleCasesValidatorTest {
         var ccdClient = mock(CcdClient.class);
         caseIds = new ArrayList<>();
         submitEvents = new ArrayList<>();
-        when(ccdClient.retrieveCasesElasticSearchForCreation(authToken, NEWCASTLE_CASE_TYPE_ID, caseIds,
+        when(ccdClient.retrieveCasesElasticSearchForCreation(authToken, ENGLANDWALES_CASE_TYPE_ID, caseIds,
                 MANUALLY_CREATED_POSITION)).thenReturn(submitEvents);
 
         singleCasesValidator = new SingleCasesValidator(ccdClient);
@@ -46,7 +46,7 @@ public class SingleCasesValidatorTest {
         caseIds.add(ethosReference);
         submitEvents.add(createSubmitEvent(ethosReference, SINGLE_CASE_TYPE, SUBMITTED_STATE, null));
 
-        var validatedCases = singleCasesValidator.getValidatedCases(caseIds, NEWCASTLE_BULK_CASE_TYPE_ID,
+        var validatedCases = singleCasesValidator.getValidatedCases(caseIds, ENGLANDWALES_BULK_CASE_TYPE_ID,
                 multipleReference, authToken);
         assertEquals(1, validatedCases.size());
         assertFalse(validatedCases.get(0).isValid());
@@ -62,7 +62,7 @@ public class SingleCasesValidatorTest {
         caseIds.add(ethosReference);
         submitEvents.add(createSubmitEvent(ethosReference, MULTIPLE_CASE_TYPE, ACCEPTED_STATE, otherMultipleReference));
 
-        var validatedCases = singleCasesValidator.getValidatedCases(caseIds, NEWCASTLE_BULK_CASE_TYPE_ID,
+        var validatedCases = singleCasesValidator.getValidatedCases(caseIds, ENGLANDWALES_BULK_CASE_TYPE_ID,
                 multipleReference, authToken);
         verify(validatedCases, ethosReference, false, "Case already assigned to " + otherMultipleReference);
     }
@@ -74,7 +74,7 @@ public class SingleCasesValidatorTest {
         caseIds.add(ethosReference);
         submitEvents.add(createSubmitEvent(ethosReference, MULTIPLE_CASE_TYPE, ACCEPTED_STATE, multipleReference));
 
-        var validatedCases = singleCasesValidator.getValidatedCases(caseIds, NEWCASTLE_BULK_CASE_TYPE_ID,
+        var validatedCases = singleCasesValidator.getValidatedCases(caseIds, ENGLANDWALES_BULK_CASE_TYPE_ID,
                 multipleReference, authToken);
         verify(validatedCases, ethosReference, true, null);
     }
@@ -85,7 +85,7 @@ public class SingleCasesValidatorTest {
         var multipleReference = "multiple1";
         caseIds.add(ethosReference);
 
-        var validatedCases = singleCasesValidator.getValidatedCases(caseIds, NEWCASTLE_BULK_CASE_TYPE_ID,
+        var validatedCases = singleCasesValidator.getValidatedCases(caseIds, ENGLANDWALES_BULK_CASE_TYPE_ID,
                 multipleReference, authToken);
         verify(validatedCases, ethosReference, false, "Case not found");
     }
@@ -97,7 +97,7 @@ public class SingleCasesValidatorTest {
         caseIds.add(ethosReference);
         submitEvents.add(createSubmitEvent(ethosReference, SINGLE_CASE_TYPE, ACCEPTED_STATE, null));
 
-        var validatedCases = singleCasesValidator.getValidatedCases(caseIds, NEWCASTLE_BULK_CASE_TYPE_ID,
+        var validatedCases = singleCasesValidator.getValidatedCases(caseIds, ENGLANDWALES_BULK_CASE_TYPE_ID,
                 multipleReference, authToken);
         verify(validatedCases, ethosReference, true, null);
     }
@@ -115,7 +115,7 @@ public class SingleCasesValidatorTest {
         caseIds.add(ethosReference);
         submitEvents.add(createSubmitEvent(ethosReference, SINGLE_CASE_TYPE, ACCEPTED_STATE, otherMultipleReference));
 
-        var validatedCases = singleCasesValidator.getValidatedCases(caseIds, NEWCASTLE_BULK_CASE_TYPE_ID,
+        var validatedCases = singleCasesValidator.getValidatedCases(caseIds, ENGLANDWALES_BULK_CASE_TYPE_ID,
                 multipleReference, authToken);
         verify(validatedCases, ethosReference, true, null);
     }
@@ -130,7 +130,7 @@ public class SingleCasesValidatorTest {
         submitEvents.add(createSubmitEvent("case3", SINGLE_CASE_TYPE, ACCEPTED_STATE, multipleReference));
         submitEvents.add(createSubmitEvent("case4", MULTIPLE_CASE_TYPE, ACCEPTED_STATE, otherMultipleReference));
 
-        var validatedCases = singleCasesValidator.getValidatedCases(caseIds, NEWCASTLE_BULK_CASE_TYPE_ID,
+        var validatedCases = singleCasesValidator.getValidatedCases(caseIds, ENGLANDWALES_BULK_CASE_TYPE_ID,
                 multipleReference, authToken);
         assertEquals(5, validatedCases.size());
         verify(validatedCases.get(0), "case1", false, "Case is in state "+ SUBMITTED_STATE);

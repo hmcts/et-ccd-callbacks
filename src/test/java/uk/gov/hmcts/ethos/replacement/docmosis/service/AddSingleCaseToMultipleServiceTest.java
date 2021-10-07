@@ -47,7 +47,7 @@ public class AddSingleCaseToMultipleServiceTest {
         multipleDetails.setCaseTypeId("Manchester_Multiple");
         multipleDetails.setCaseId("12121212");
         caseDetails = new CaseDetails();
-        caseDetails.setCaseTypeId(MANCHESTER_CASE_TYPE_ID);
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         multipleCaseTypeId = UtilHelper.getBulkCaseTypeId(caseDetails.getCaseTypeId());
         caseDetails.setCaseData(MultipleUtil.getCaseDataForSinglesToBeMoved());
         caseDetails.setCaseId("12321321");

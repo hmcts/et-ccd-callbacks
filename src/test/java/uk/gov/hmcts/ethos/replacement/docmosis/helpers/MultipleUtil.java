@@ -326,7 +326,7 @@ public class MultipleUtil {
         multipleData.setState(OPEN_STATE);
         multipleData.setCaseCounter("2");
 
-        multipleData.setOfficeMultipleCT(generateDynamicList(MANCHESTER_CASE_TYPE_ID));
+        multipleData.setOfficeMultipleCT(generateDynamicList(ENGLANDWALES_CASE_TYPE_ID));
         multipleData.setPositionTypeCT("PositionTypeCT");
         multipleData.setReasonForCT("ReasonForCT");
 

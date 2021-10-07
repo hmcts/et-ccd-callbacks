@@ -106,7 +106,7 @@ public class BulkHelper {
     private static MultipleType getMultipleTypeFromCaseData(CaseData caseData) {
         var multipleType = new MultipleType();
         multipleType.setEthosCaseReferenceM(Optional.ofNullable(caseData.getEthosCaseReference()).orElse(" "));
-        multipleType.setClerkRespM(Optional.ofNullable(caseData.getClerkResponsible()).orElse(" "));
+       // multipleType.setClerkRespM(Optional.ofNullable(caseData.getClerkResponsible()).orElse(" "));
         setClaimantSurnameM(caseData, multipleType);
         setClaimantAddressLine1M(caseData, multipleType);
         setClaimantPostCodeM(caseData, multipleType);

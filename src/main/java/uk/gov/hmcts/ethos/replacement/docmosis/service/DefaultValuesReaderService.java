@@ -31,9 +31,6 @@ public class DefaultValuesReaderService {
     public DefaultValues getDefaultValues(String owningOffice) {
         ContactDetails contactDetails = tribunalOfficesService.getTribunalContactDetails(owningOffice);
         var defaultValues = createDefaultValues(contactDetails);
-        if (defaultValues.getOwningOffice() == null) {
-            defaultValues.setOwningOffice(tribunalOfficesService.getTribunalOffice(owningOffice).name());
-        }
         return defaultValues;
     }
 
@@ -55,9 +52,7 @@ public class DefaultValuesReaderService {
         if (defaultValues.getManagingOffice() != null) {
             caseData.setManagingOffice(defaultValues.getManagingOffice());
         }
-        if (caseData.getOwningOffice() == null) {
-            caseData.setOwningOffice(defaultValues.getOwningOffice());
-        }
+
         if (caseData.getCaseType() == null) {
             caseData.setCaseType(defaultValues.getCaseType());
         }

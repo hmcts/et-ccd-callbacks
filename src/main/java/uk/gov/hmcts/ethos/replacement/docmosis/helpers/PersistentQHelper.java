@@ -126,16 +126,17 @@ public class PersistentQHelper {
     }
 
     public static CloseDataModel getCloseDataModel(MultipleData multipleData) {
-        return CloseDataModel.builder()
-                .clerkResponsible(multipleData.getClerkResponsible())
-                .fileLocation(multipleData.getFileLocation())
-                .notes(multipleData.getNotes())
-                .managingOffice(multipleData.getManagingOffice())
-                .fileLocationGlasgow(multipleData.getFileLocationGlasgow())
-                .fileLocationAberdeen(multipleData.getFileLocationAberdeen())
-                .fileLocationDundee(multipleData.getFileLocationDundee())
-                .fileLocationEdinburgh(multipleData.getFileLocationEdinburgh())
-                .build();
+//        return CloseDataModel.builder()
+//                .clerkResponsible(multipleData.getClerkResponsible())
+//                .fileLocation(multipleData.getFileLocation())
+//                .notes(multipleData.getNotes())
+//                .managingOffice(multipleData.getManagingOffice())
+//                .fileLocationGlasgow(multipleData.getFileLocationGlasgow())
+//                .fileLocationAberdeen(multipleData.getFileLocationAberdeen())
+//                .fileLocationDundee(multipleData.getFileLocationDundee())
+//                .fileLocationEdinburgh(multipleData.getFileLocationEdinburgh())
+//                .build();
+        throw new UnsupportedOperationException();
     }
 
     public static DetachDataModel getDetachDataModel() {

@@ -247,7 +247,7 @@ public class ReportHelper {
         adhocReportType.setPosition(caseData.getCurrentPosition());
         adhocReportType.setDateToPosition(caseData.getDateToPosition());
         adhocReportType.setFileLocation(getFileLocation(listingDetails, caseData));
-        adhocReportType.setClerk(caseData.getClerkResponsible());
+        //adhocReportType.setClerk(caseData.getClerkResponsible());
         adhocReportType.setCaseType(caseData.getCaseType());
     }
 

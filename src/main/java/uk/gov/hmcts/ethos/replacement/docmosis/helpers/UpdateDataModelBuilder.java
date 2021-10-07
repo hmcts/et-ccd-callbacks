@@ -26,7 +26,7 @@ public class UpdateDataModelBuilder {
                 .fileLocationAberdeen(multipleData.getFileLocationAberdeen())
                 .fileLocationDundee(multipleData.getFileLocationDundee())
                 .fileLocationEdinburgh(multipleData.getFileLocationEdinburgh())
-                .clerkResponsible(multipleData.getClerkResponsible())
+                //.clerkResponsible(multipleData.getClerkResponsible())
                 .positionType(multipleData.getPositionType())
                 .receiptDate(multipleData.getReceiptDate())
                 .hearingStage(multipleData.getHearingStage())

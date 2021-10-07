@@ -22,7 +22,7 @@ public class VenueSelectionService {
     }
 
     public void initHearingCollection(CaseData caseData) {
-        var venues = venueService.getVenues(TribunalOffice.valueOf(caseData.getOwningOffice()));
+        var venues = venueService.getVenues(TribunalOffice.valueOfOfficeName(caseData.getOwningOffice()));
         if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
             var hearingTypeItem = new HearingTypeItem();
             hearingTypeItem.setId(UUID.randomUUID().toString());
@@ -48,7 +48,8 @@ public class VenueSelectionService {
 
     public DynamicFixedListType createVenueSelection(CaseData caseData, DateListedType selectedListing) {
         var dynamicFixedListType = new DynamicFixedListType();
-        dynamicFixedListType.setListItems(venueService.getVenues(TribunalOffice.valueOf(caseData.getOwningOffice())));
+        dynamicFixedListType.setListItems(venueService.getVenues(TribunalOffice.valueOfOfficeName(
+                caseData.getOwningOffice())));
 
         if (selectedListing.hasHearingVenue()) {
             dynamicFixedListType.setValue(selectedListing.getHearingVenueDay().getValue());

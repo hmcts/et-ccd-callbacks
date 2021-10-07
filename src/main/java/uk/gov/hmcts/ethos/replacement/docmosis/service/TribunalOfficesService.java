@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import joptsimple.internal.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.TribunalOfficesConfiguration;
@@ -16,18 +15,12 @@ public class TribunalOfficesService {
         this.config = config;
     }
 
-    public TribunalOffice getTribunalOffice(String owningOffice) {
-        if (Strings.isNullOrEmpty(owningOffice)) {
-            log.warn(String.format("Unexpected owning office %s therefore defaulting to %s tribunal office", owningOffice,
-                    TribunalOffice.MANCHESTER));
-            return TribunalOffice.MANCHESTER;
-        } else {
-            return TribunalOffice.valueOf(owningOffice);
-        }
+    public TribunalOffice getTribunalOffice(String officeName) {
+        return TribunalOffice.valueOfOfficeName(officeName);
     }
 
-    public ContactDetails getTribunalContactDetails(String caseTypeId) {
-        var tribunalName = getTribunalOffice(caseTypeId);
+    public ContactDetails getTribunalContactDetails(String officeName) {
+        var tribunalName = getTribunalOffice(officeName);
         return config.getContactDetails().get(tribunalName);
     }
 

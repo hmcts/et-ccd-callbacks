@@ -7,6 +7,6 @@ import javax.persistence.Table;
 
 @Entity
 @NoArgsConstructor
-@Table(name = "multipleReferenceManchester")
-public class MultipleReferenceManchester extends MultipleReference {
+@Table(name = "multipleReferenceEnglandWales")
+public class MultipleReferenceEnglandWales extends MultipleReference {
 }

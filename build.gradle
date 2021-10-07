@@ -40,7 +40,7 @@ jacocoTestCoverageVerification {
 }
 
 checkstyle {
-    maxWarnings = 511
+    maxWarnings = 536
     sourceSets = [project.sourceSets.main]
     toolVersion = '8.29'
 }
@@ -175,7 +175,6 @@ dependencyCheck {
     suppressionFile = 'config/owasp/suppressions.xml'
     analyzers.assemblyEnabled = false
 }
-
 repositories {
     mavenLocal()
     mavenCentral()

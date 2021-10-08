@@ -7,6 +7,6 @@ import javax.persistence.Table;
 
 @Entity
 @NoArgsConstructor
-@Table(name = "subMultipleReferenceLeeds")
-public class SubMultipleReferenceLeeds extends SubMultipleReference {
+@Table(name = "subMultipleReferenceEnglandWales")
+public class SubMultipleReferenceEnglandWales extends SubMultipleReference {
 }

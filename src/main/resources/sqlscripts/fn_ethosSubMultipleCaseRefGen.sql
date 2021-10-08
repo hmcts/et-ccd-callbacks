@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION fn_ethosSubMultipleCaseRefGen ( p_multref INT, p_numo
 -- Author:		Mohammed Hafejee
 
 -- TEST :		SELECT fn_ethosSubMultipleCaseRefGen(243, 1, 'Manchester');
---				
+--
 -- Create date: 14-APR-2020
 -- Description:	Function to generate Ethos case reference numbers for submultiple cases
 -- VERSION	:	14-APR-2020		1.0  - Initial
@@ -17,70 +17,70 @@ CREATE OR REPLACE FUNCTION fn_ethosSubMultipleCaseRefGen ( p_multref INT, p_numo
   DECLARE c_submultrefstr varchar(200);
   DECLARE c_multrefstr varchar(20);
 
-BEGIN 
+BEGIN
 
-  CASE 
+  CASE
 
-/***********   1. Manchester   ************/  
+/***********   1. Manchester   ************/
 
-    WHEN office = 'Manchester' THEN 
+    WHEN office = 'Manchester' THEN
 
-    -- Acquire Lock on subMultipleReferenceManchester table 
+    -- Acquire Lock on subMultipleReferenceManchester table
 
     SELECT submultref INTO c_submultref FROM subMultipleReferenceManchester WHERE multref  = p_multref FOR UPDATE ;
-    
+
     CASE WHEN c_submultref IS NULL THEN
-    
+
     INSERT INTO subMultipleReferenceManchester VALUES  (p_multref, p_numofcases);
 
     c_multrefstr = p_multref;
     c_submultref = 1;
 
-    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);  
-
-    ELSE 
-    
-    UPDATE subMultipleReferenceManchester SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
-    
-    c_submultref = c_submultref + 1;
-    
-    c_multrefstr = p_multref;
-    
     c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
-    
+
+    ELSE
+
+    UPDATE subMultipleReferenceManchester SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
+
+    c_submultref = c_submultref + 1;
+
+    c_multrefstr = p_multref;
+
+    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
+
     END CASE;
 
     RETURN c_submultrefstr;
-      
+
 
 
 /***********   2. Scotland   ************/
 
-   WHEN office = 'Scotland' THEN 
+   WHEN office = 'Scotland' THEN
 
-    -- Acquire Lock on subMultipleReferenceScotland table 
+    -- Acquire Lock on subMultipleReferenceScotland table
 
     SELECT submultref INTO c_submultref FROM subMultipleReferenceScotland WHERE multref  = p_multref FOR UPDATE ;
-    
+
     CASE WHEN c_submultref IS NULL THEN
-    
+
     INSERT INTO subMultipleReferenceScotland VALUES  (p_multref, p_numofcases);
 
     c_multrefstr = p_multref;
     c_submultref = 1;
 
-    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);  
-
-    ELSE 
-    
-    UPDATE subMultipleReferenceScotland SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
-    
-    c_submultref = c_submultref + 1;
-    
-    c_multrefstr = p_multref;
-    
     c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
-    
+
+    ELSE
+
+    UPDATE subMultipleReferenceScotland SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
+
+    c_submultref = c_submultref + 1;
+
+    c_multrefstr = p_multref;
+
+    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
+
     END CASE;
 
     RETURN c_submultrefstr;
@@ -89,31 +89,31 @@ BEGIN
 
 /***********   3. Bristol   ************/
 
-  WHEN office = 'Bristol' THEN 
+  WHEN office = 'Bristol' THEN
 
-    -- Acquire Lock on subMultipleReferenceBristol table 
+    -- Acquire Lock on subMultipleReferenceBristol table
 
     SELECT submultref INTO c_submultref FROM subMultipleReferenceBristol WHERE multref  = p_multref FOR UPDATE ;
-    
+
     CASE WHEN c_submultref IS NULL THEN
-    
+
     INSERT INTO subMultipleReferenceBristol VALUES  (p_multref, p_numofcases);
 
     c_multrefstr = p_multref;
     c_submultref = 1;
 
-    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);  
-
-    ELSE 
-    
-    UPDATE subMultipleReferenceBristol SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
-    
-    c_submultref = c_submultref + 1;
-    
-    c_multrefstr = p_multref;
-    
     c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
-    
+
+    ELSE
+
+    UPDATE subMultipleReferenceBristol SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
+
+    c_submultref = c_submultref + 1;
+
+    c_multrefstr = p_multref;
+
+    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
+
     END CASE;
 
     RETURN c_submultrefstr;
@@ -124,31 +124,31 @@ BEGIN
 
 /***********   4. Leeds   ************/
 
-   WHEN office = 'Leeds' THEN 
+   WHEN office = 'Leeds' THEN
 
-    -- Acquire Lock on subMultipleReferenceLeeds table 
+    -- Acquire Lock on subMultipleReferenceLeeds table
 
     SELECT submultref INTO c_submultref FROM subMultipleReferenceLeeds WHERE multref  = p_multref FOR UPDATE ;
-    
+
     CASE WHEN c_submultref IS NULL THEN
-    
+
     INSERT INTO subMultipleReferenceLeeds VALUES  (p_multref, p_numofcases);
 
     c_multrefstr = p_multref;
     c_submultref = 1;
 
-    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);  
-
-    ELSE 
-    
-    UPDATE subMultipleReferenceLeeds SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
-    
-    c_submultref = c_submultref + 1;
-    
-    c_multrefstr = p_multref;
-    
     c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
-    
+
+    ELSE
+
+    UPDATE subMultipleReferenceLeeds SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
+
+    c_submultref = c_submultref + 1;
+
+    c_multrefstr = p_multref;
+
+    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
+
     END CASE;
 
     RETURN c_submultrefstr;
@@ -159,31 +159,31 @@ BEGIN
 
 /***********   5. LondonCentral   ************/
 
-   WHEN office = 'LondonCentral' THEN 
+   WHEN office = 'LondonCentral' THEN
 
-    -- Acquire Lock on subMultipleReferenceLondonCentral table 
+    -- Acquire Lock on subMultipleReferenceLondonCentral table
 
     SELECT submultref INTO c_submultref FROM subMultipleReferenceLondonCentral WHERE multref  = p_multref FOR UPDATE ;
-    
+
     CASE WHEN c_submultref IS NULL THEN
-    
+
     INSERT INTO subMultipleReferenceLondonCentral VALUES  (p_multref, p_numofcases);
 
     c_multrefstr = p_multref;
     c_submultref = 1;
 
-    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);  
-
-    ELSE 
-    
-    UPDATE subMultipleReferenceLondonCentral SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
-    
-    c_submultref = c_submultref + 1;
-    
-    c_multrefstr = p_multref;
-    
     c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
-    
+
+    ELSE
+
+    UPDATE subMultipleReferenceLondonCentral SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
+
+    c_submultref = c_submultref + 1;
+
+    c_multrefstr = p_multref;
+
+    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
+
     END CASE;
 
     RETURN c_submultrefstr;
@@ -193,31 +193,31 @@ BEGIN
 
 /***********   6. LondonEast   ************/
 
-   WHEN office = 'LondonEast' THEN 
+   WHEN office = 'LondonEast' THEN
 
-    -- Acquire Lock on subMultipleReferenceLondonEast table 
+    -- Acquire Lock on subMultipleReferenceLondonEast table
 
     SELECT submultref INTO c_submultref FROM subMultipleReferenceLondonEast WHERE multref  = p_multref FOR UPDATE ;
-    
+
     CASE WHEN c_submultref IS NULL THEN
-    
+
     INSERT INTO subMultipleReferenceLondonEast VALUES  (p_multref, p_numofcases);
 
     c_multrefstr = p_multref;
     c_submultref = 1;
 
-    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);  
-
-    ELSE 
-    
-    UPDATE subMultipleReferenceLondonEast SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
-    
-    c_submultref = c_submultref + 1;
-    
-    c_multrefstr = p_multref;
-    
     c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
-    
+
+    ELSE
+
+    UPDATE subMultipleReferenceLondonEast SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
+
+    c_submultref = c_submultref + 1;
+
+    c_multrefstr = p_multref;
+
+    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
+
     END CASE;
 
     RETURN c_submultrefstr;
@@ -227,31 +227,31 @@ BEGIN
 
   /***********   7. LondonSouth   ************/
 
-   WHEN office = 'LondonSouth' THEN 
+   WHEN office = 'LondonSouth' THEN
 
-    -- Acquire Lock on subMultipleReferenceLondonSouth table 
+    -- Acquire Lock on subMultipleReferenceLondonSouth table
 
     SELECT submultref INTO c_submultref FROM subMultipleReferenceLondonSouth WHERE multref  = p_multref FOR UPDATE ;
-    
+
     CASE WHEN c_submultref IS NULL THEN
-    
+
     INSERT INTO subMultipleReferenceLondonSouth VALUES  (p_multref, p_numofcases);
 
     c_multrefstr = p_multref;
     c_submultref = 1;
 
-    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);  
-
-    ELSE 
-    
-    UPDATE subMultipleReferenceLondonSouth SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
-    
-    c_submultref = c_submultref + 1;
-    
-    c_multrefstr = p_multref;
-    
     c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
-    
+
+    ELSE
+
+    UPDATE subMultipleReferenceLondonSouth SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
+
+    c_submultref = c_submultref + 1;
+
+    c_multrefstr = p_multref;
+
+    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
+
     END CASE;
 
     RETURN c_submultrefstr;
@@ -261,31 +261,31 @@ BEGIN
 
   /***********   8. MidlandsEast   ************/
 
-    WHEN office = 'MidlandsEast' THEN 
+    WHEN office = 'MidlandsEast' THEN
 
-    -- Acquire Lock on subMultipleReferenceMidlandsEast table 
+    -- Acquire Lock on subMultipleReferenceMidlandsEast table
 
     SELECT submultref INTO c_submultref FROM subMultipleReferenceMidlandsEast WHERE multref  = p_multref FOR UPDATE ;
-    
+
     CASE WHEN c_submultref IS NULL THEN
-    
+
     INSERT INTO subMultipleReferenceMidlandsEast VALUES  (p_multref, p_numofcases);
 
     c_multrefstr = p_multref;
     c_submultref = 1;
 
-    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);  
-
-    ELSE 
-    
-    UPDATE subMultipleReferenceMidlandsEast SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
-    
-    c_submultref = c_submultref + 1;
-    
-    c_multrefstr = p_multref;
-    
     c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
-    
+
+    ELSE
+
+    UPDATE subMultipleReferenceMidlandsEast SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
+
+    c_submultref = c_submultref + 1;
+
+    c_multrefstr = p_multref;
+
+    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
+
     END CASE;
 
     RETURN c_submultrefstr;
@@ -296,31 +296,31 @@ BEGIN
 
   /***********   9. MidlandsWest   ************/
 
-   WHEN office = 'MidlandsWest' THEN 
+   WHEN office = 'MidlandsWest' THEN
 
-    -- Acquire Lock on subMultipleReferenceMidlandsWest table 
+    -- Acquire Lock on subMultipleReferenceMidlandsWest table
 
     SELECT submultref INTO c_submultref FROM subMultipleReferenceMidlandsWest WHERE multref  = p_multref FOR UPDATE ;
-    
+
     CASE WHEN c_submultref IS NULL THEN
-    
+
     INSERT INTO subMultipleReferenceMidlandsWest VALUES  (p_multref, p_numofcases);
 
     c_multrefstr = p_multref;
     c_submultref = 1;
 
-    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);  
-
-    ELSE 
-    
-    UPDATE subMultipleReferenceMidlandsWest SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
-    
-    c_submultref = c_submultref + 1;
-    
-    c_multrefstr = p_multref;
-    
     c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
-    
+
+    ELSE
+
+    UPDATE subMultipleReferenceMidlandsWest SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
+
+    c_submultref = c_submultref + 1;
+
+    c_multrefstr = p_multref;
+
+    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
+
     END CASE;
 
     RETURN c_submultrefstr;
@@ -330,31 +330,31 @@ BEGIN
 
   /***********   10. Newcastle   ************/
 
-   WHEN office = 'Newcastle' THEN 
+   WHEN office = 'Newcastle' THEN
 
-    -- Acquire Lock on subMultipleReferenceNewcastle table 
+    -- Acquire Lock on subMultipleReferenceNewcastle table
 
     SELECT submultref INTO c_submultref FROM subMultipleReferenceNewcastle WHERE multref  = p_multref FOR UPDATE ;
-    
+
     CASE WHEN c_submultref IS NULL THEN
-    
+
     INSERT INTO subMultipleReferenceNewcastle VALUES  (p_multref, p_numofcases);
 
     c_multrefstr = p_multref;
     c_submultref = 1;
 
-    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);  
-
-    ELSE 
-    
-    UPDATE subMultipleReferenceNewcastle SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
-    
-    c_submultref = c_submultref + 1;
-    
-    c_multrefstr = p_multref;
-    
     c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
-    
+
+    ELSE
+
+    UPDATE subMultipleReferenceNewcastle SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
+
+    c_submultref = c_submultref + 1;
+
+    c_multrefstr = p_multref;
+
+    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
+
     END CASE;
 
     RETURN c_submultrefstr;
@@ -365,31 +365,31 @@ BEGIN
 
 /***********   11. Wales   ************/
 
-   WHEN office = 'Wales' THEN 
+   WHEN office = 'Wales' THEN
 
-    -- Acquire Lock on subMultipleReferenceWales table 
+    -- Acquire Lock on subMultipleReferenceWales table
 
     SELECT submultref INTO c_submultref FROM subMultipleReferenceWales WHERE multref  = p_multref FOR UPDATE ;
-    
+
     CASE WHEN c_submultref IS NULL THEN
-    
+
     INSERT INTO subMultipleReferenceWales VALUES  (p_multref, p_numofcases);
 
     c_multrefstr = p_multref;
     c_submultref = 1;
 
-    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);  
-
-    ELSE 
-    
-    UPDATE subMultipleReferenceWales SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
-    
-    c_submultref = c_submultref + 1;
-    
-    c_multrefstr = p_multref;
-    
     c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
-    
+
+    ELSE
+
+    UPDATE subMultipleReferenceWales SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
+
+    c_submultref = c_submultref + 1;
+
+    c_multrefstr = p_multref;
+
+    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
+
     END CASE;
 
     RETURN c_submultrefstr;
@@ -399,37 +399,55 @@ BEGIN
 
   /***********  12. Watford   ************/
 
-   WHEN office = 'Watford' THEN 
+   WHEN office = 'Watford' THEN
 
-    -- Acquire Lock on subMultipleReferenceWatford table 
+    -- Acquire Lock on subMultipleReferenceWatford table
 
     SELECT submultref INTO c_submultref FROM subMultipleReferenceWatford WHERE multref  = p_multref FOR UPDATE ;
-    
+
     CASE WHEN c_submultref IS NULL THEN
-    
+
     INSERT INTO subMultipleReferenceWatford VALUES  (p_multref, p_numofcases);
 
     c_multrefstr = p_multref;
     c_submultref = 1;
 
-    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);  
-
-    ELSE 
-    
-    UPDATE subMultipleReferenceWatford SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
-    
-    c_submultref = c_submultref + 1;
-    
-    c_multrefstr = p_multref;
-    
     c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
-    
+
+    ELSE
+
+    UPDATE subMultipleReferenceWatford SET submultref  = c_submultref + p_numofcases WHERE multref  = p_multref;
+
+    c_submultref = c_submultref + 1;
+
+    c_multrefstr = p_multref;
+
+    c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
+
     END CASE;
 
     RETURN c_submultrefstr;
 
+    /***********   EnglandWales   ************/
 
+    WHEN office = 'EnglandWales' THEN
+        -- Acquire Lock on table
+        SELECT submultref INTO c_submultref FROM subMultipleReferenceEnglandWales WHERE multref  = p_multref FOR UPDATE;
+        CASE WHEN c_submultref IS NULL THEN
+            INSERT INTO subMultipleReferenceEnglandWales VALUES  (p_multref, p_numofcases);
 
+            c_multrefstr = p_multref;
+            c_submultref = 1;
+            c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
+        ELSE
+            UPDATE subMultipleReferenceEnglandWales SET submultref = c_submultref + p_numofcases WHERE multref  = p_multref;
+
+            c_submultref = c_submultref + 1;
+            c_multrefstr = p_multref;
+            c_submultrefstr = CONCAT(c_multrefstr,'/', c_submultref::text);
+        END CASE;
+
+        RETURN c_submultrefstr;
 
 END CASE ;
 

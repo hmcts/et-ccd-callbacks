@@ -24,26 +24,23 @@ public class CaseUpdateForCaseWorkerService {
     }
 
     public SubmitEvent caseUpdateRequest(CCDRequest ccdRequest, String authToken) {
-//        var caseDetails = ccdRequest.getCaseDetails();
-//        log.info("EventId: " + ccdRequest.getEventId());
-//
-//        try {
-//            String caseId = ccdRequest.getCaseDetails().getCaseId();
-//            CCDRequest returnedRequest = ccdClient.startEventForCase(authToken,
-//                    caseDetails.getCaseTypeId(), caseDetails.getJurisdiction(), caseId);
-//            String managingOffice = caseDetails.getCaseData().getManagingOffice() != null
-//                    ? caseDetails.getCaseData().getManagingOffice()
-//                    : "";
-//            var defaultValues = defaultValuesReaderService.getDefaultValues(
-//                    managingOffice, caseDetails.getCaseTypeId());
-//            ccdRequest.getCaseDetails().getCaseData().setPositionType(defaultValues.getPositionType());
-//
-//            log.info("Post Default values added to the case: " + defaultValues);
-//            return ccdClient.submitEventForCase(authToken, caseDetails.getCaseData(),
-//                    caseDetails.getCaseTypeId(), caseDetails.getJurisdiction(), returnedRequest, caseId);
-//        } catch (Exception ex) {
-//            throw new CaseCreationException(MESSAGE + caseDetails.getCaseId() + ex.getMessage());
-//        }
-        throw new UnsupportedOperationException();
+        var caseDetails = ccdRequest.getCaseDetails();
+        log.info("EventId: " + ccdRequest.getEventId());
+
+        try {
+            String caseId = ccdRequest.getCaseDetails().getCaseId();
+            CCDRequest returnedRequest = ccdClient.startEventForCase(authToken,
+                    caseDetails.getCaseTypeId(), caseDetails.getJurisdiction(), caseId);
+            var owningOffice = caseDetails.getCaseData().getOwningOffice();
+            var defaultValues = defaultValuesReaderService.getDefaultValues(owningOffice);
+
+            ccdRequest.getCaseDetails().getCaseData().setPositionType(defaultValues.getPositionType());
+
+            log.info("Post Default values added to the case: " + defaultValues);
+            return ccdClient.submitEventForCase(authToken, caseDetails.getCaseData(),
+                    caseDetails.getCaseTypeId(), caseDetails.getJurisdiction(), returnedRequest, caseId);
+        } catch (Exception ex) {
+            throw new CaseCreationException(MESSAGE + caseDetails.getCaseId() + ex.getMessage());
+        }
     }
 }

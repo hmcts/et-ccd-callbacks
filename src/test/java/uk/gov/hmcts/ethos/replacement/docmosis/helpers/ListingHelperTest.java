@@ -241,7 +241,7 @@ public class ListingHelperTest {
         listingDetails.getCaseData().getListingCollection().get(0).getValue().setHearingNotes("Notes with \n new line");
         assertEquals(expected, ListingHelper.buildListingDocumentContent(listingDetails.getCaseData(),
                 "", PUBLIC_CASE_CAUSE_LIST_ROOM_TEMPLATE, userDetails,
-                MANCHESTER_LISTING_CASE_TYPE_ID).toString());
+                ENGLANDWALES_LISTING_CASE_TYPE_ID).toString());
     }
 
     @Test
@@ -272,7 +272,7 @@ public class ListingHelperTest {
                 + "}\n"
                 + "}\n";
         assertEquals(expected, ListingHelper.buildListingDocumentContent(listingDetails.getCaseData(),
-                "", "", userDetails, LONDON_CENTRAL_LISTING_CASE_TYPE_ID).toString());
+                "", "", userDetails, ENGLANDWALES_LISTING_CASE_TYPE_ID).toString());
     }
 
     @Test
@@ -495,7 +495,7 @@ public class ListingHelperTest {
                 + "}\n"
                 + "}\n";
         assertEquals(expected, ListingHelper.buildListingDocumentContent(listingDetails.getCaseData(), "",
-                PUBLIC_CASE_CAUSE_LIST_TEMPLATE, userDetails, MANCHESTER_LISTING_CASE_TYPE_ID).toString());
+                PUBLIC_CASE_CAUSE_LIST_TEMPLATE, userDetails, ENGLANDWALES_LISTING_CASE_TYPE_ID).toString());
     }
 
     @Test
@@ -647,7 +647,7 @@ public class ListingHelperTest {
                 + "}\n"
                 + "}\n";
         assertEquals(expected, ListingHelper.buildListingDocumentContent(listingDetails2.getCaseData(), "",
-                PUBLIC_CASE_CAUSE_LIST_TEMPLATE, userDetails, MANCHESTER_LISTING_CASE_TYPE_ID).toString());
+                PUBLIC_CASE_CAUSE_LIST_TEMPLATE, userDetails, ENGLANDWALES_LISTING_CASE_TYPE_ID).toString());
     }
 
     @Test
@@ -787,7 +787,7 @@ public class ListingHelperTest {
                 + "}\n"
                 + "}\n";
         assertEquals(expected, ListingHelper.buildListingDocumentContent(listingDetails2.getCaseData(), "",
-                IT56_TEMPLATE, userDetails, MANCHESTER_LISTING_CASE_TYPE_ID).toString());
+                IT56_TEMPLATE, userDetails, ENGLANDWALES_LISTING_CASE_TYPE_ID).toString());
     }
 
     @Test
@@ -933,83 +933,23 @@ public class ListingHelperTest {
                 + "}\n"
                 + "}\n";
         assertEquals(expected, ListingHelper.buildListingDocumentContent(listingDetails3.getCaseData(), "",
-                PRESS_LIST_CAUSE_LIST_SINGLE_TEMPLATE, userDetails, MANCHESTER_LISTING_CASE_TYPE_ID).toString());
+                PRESS_LIST_CAUSE_LIST_SINGLE_TEMPLATE, userDetails, ENGLANDWALES_LISTING_CASE_TYPE_ID).toString());
     }
 
     @Test
     public void getListingCaseTypeId() {
-        assertEquals(MANCHESTER_DEV_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(MANCHESTER_DEV_LISTING_CASE_TYPE_ID));
-        assertEquals(MANCHESTER_USERS_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(MANCHESTER_USERS_LISTING_CASE_TYPE_ID));
-        assertEquals(MANCHESTER_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(MANCHESTER_LISTING_CASE_TYPE_ID));
-        assertEquals(LEEDS_DEV_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(LEEDS_DEV_LISTING_CASE_TYPE_ID));
-        assertEquals(LEEDS_USERS_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(LEEDS_USERS_LISTING_CASE_TYPE_ID));
-        assertEquals(LEEDS_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(LEEDS_LISTING_CASE_TYPE_ID));
+        assertEquals(ENGLANDWALES_DEV_CASE_TYPE_ID,
+                UtilHelper.getListingCaseTypeId(ENGLANDWALES_DEV_LISTING_CASE_TYPE_ID));
+        assertEquals(ENGLANDWALES_USERS_CASE_TYPE_ID,
+                UtilHelper.getListingCaseTypeId(ENGLANDWALES_USERS_LISTING_CASE_TYPE_ID));
+        assertEquals(ENGLANDWALES_CASE_TYPE_ID,
+                UtilHelper.getListingCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID));
         assertEquals(SCOTLAND_DEV_CASE_TYPE_ID,
                 UtilHelper.getListingCaseTypeId(SCOTLAND_DEV_LISTING_CASE_TYPE_ID));
         assertEquals(SCOTLAND_USERS_CASE_TYPE_ID,
                 UtilHelper.getListingCaseTypeId(SCOTLAND_USERS_LISTING_CASE_TYPE_ID));
         assertEquals(SCOTLAND_CASE_TYPE_ID,
                 UtilHelper.getListingCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID));
-        assertEquals(BRISTOL_DEV_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(BRISTOL_DEV_LISTING_CASE_TYPE_ID));
-        assertEquals(BRISTOL_USERS_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(BRISTOL_USERS_LISTING_CASE_TYPE_ID));
-        assertEquals(BRISTOL_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(BRISTOL_LISTING_CASE_TYPE_ID));
-        assertEquals(LONDON_CENTRAL_DEV_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(LONDON_CENTRAL_DEV_LISTING_CASE_TYPE_ID));
-        assertEquals(LONDON_CENTRAL_USERS_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(LONDON_CENTRAL_USERS_LISTING_CASE_TYPE_ID));
-        assertEquals(LONDON_CENTRAL_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(LONDON_CENTRAL_LISTING_CASE_TYPE_ID));
-        assertEquals(LONDON_EAST_DEV_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(LONDON_EAST_DEV_LISTING_CASE_TYPE_ID));
-        assertEquals(LONDON_EAST_USERS_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(LONDON_EAST_USERS_LISTING_CASE_TYPE_ID));
-        assertEquals(LONDON_EAST_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(LONDON_EAST_LISTING_CASE_TYPE_ID));
-        assertEquals(LONDON_SOUTH_DEV_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(LONDON_SOUTH_DEV_LISTING_CASE_TYPE_ID));
-        assertEquals(LONDON_SOUTH_USERS_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(LONDON_SOUTH_USERS_LISTING_CASE_TYPE_ID));
-        assertEquals(LONDON_SOUTH_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(LONDON_SOUTH_LISTING_CASE_TYPE_ID));
-        assertEquals(MIDLANDS_EAST_DEV_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(MIDLANDS_EAST_DEV_LISTING_CASE_TYPE_ID));
-        assertEquals(MIDLANDS_EAST_USERS_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(MIDLANDS_EAST_USERS_LISTING_CASE_TYPE_ID));
-        assertEquals(MIDLANDS_EAST_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(MIDLANDS_EAST_LISTING_CASE_TYPE_ID));
-        assertEquals(MIDLANDS_WEST_DEV_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(MIDLANDS_WEST_DEV_LISTING_CASE_TYPE_ID));
-        assertEquals(MIDLANDS_WEST_USERS_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(MIDLANDS_WEST_USERS_LISTING_CASE_TYPE_ID));
-        assertEquals(MIDLANDS_WEST_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(MIDLANDS_WEST_LISTING_CASE_TYPE_ID));
-        assertEquals(NEWCASTLE_DEV_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(NEWCASTLE_DEV_LISTING_CASE_TYPE_ID));
-        assertEquals(NEWCASTLE_USERS_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(NEWCASTLE_USERS_LISTING_CASE_TYPE_ID));
-        assertEquals(NEWCASTLE_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(NEWCASTLE_LISTING_CASE_TYPE_ID));
-        assertEquals(WALES_DEV_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(WALES_DEV_LISTING_CASE_TYPE_ID));
-        assertEquals(WALES_USERS_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(WALES_USERS_LISTING_CASE_TYPE_ID));
-        assertEquals(WALES_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(WALES_LISTING_CASE_TYPE_ID));
-        assertEquals(WATFORD_DEV_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(WATFORD_DEV_LISTING_CASE_TYPE_ID));
-        assertEquals(WATFORD_USERS_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(WATFORD_USERS_LISTING_CASE_TYPE_ID));
-        assertEquals(WATFORD_CASE_TYPE_ID,
-                UtilHelper.getListingCaseTypeId(WATFORD_LISTING_CASE_TYPE_ID));
     }
 
     @Test

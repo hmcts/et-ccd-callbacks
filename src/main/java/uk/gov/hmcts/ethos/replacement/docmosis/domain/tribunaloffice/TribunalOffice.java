@@ -36,6 +36,10 @@ public enum TribunalOffice {
         return officeName;
     }
 
+    public String getOfficeNumber() {
+        return officeNumber;
+    }
+
     public static Optional<TribunalOffice> valueOfOfficeNumber(String officeNumber) {
         return Arrays.stream(values())
                 .filter(t -> t.officeNumber != null && t.officeNumber.equals(officeNumber))

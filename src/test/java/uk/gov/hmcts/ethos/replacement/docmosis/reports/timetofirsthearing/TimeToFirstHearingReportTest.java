@@ -22,7 +22,7 @@ public class TimeToFirstHearingReportTest {
     public void testReportHeaderTotalsAreZeroIfNoCasesExist() {
 
         ListingDetails listingDetails = new ListingDetails();
-        listingDetails.setCaseTypeId(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData caseData = new ListingData();
         listingDetails.setCaseData(caseData);
         List<SubmitEvent> submitEvents = new ArrayList<>();
@@ -43,7 +43,7 @@ public class TimeToFirstHearingReportTest {
     @Test
     public void testIgnoreCaseIfItContainsNoHearings() {
         ListingDetails listingDetails = new ListingDetails();
-        listingDetails.setCaseTypeId(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData caseData = new ListingData();
 
         listingDetails.setCaseData(caseData);
@@ -60,7 +60,7 @@ public class TimeToFirstHearingReportTest {
     public void testIgnoreCaseIfHearingTypeInvalid() {
 
         ListingDetails listingDetails = new ListingDetails();
-        listingDetails.setCaseTypeId(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
         listingDetails.setCaseData(listingData);
 
@@ -81,7 +81,7 @@ public class TimeToFirstHearingReportTest {
     public void testConsiderCaseIfHearingTypeValid() {
 
         ListingDetails listingDetails = new ListingDetails();
-        listingDetails.setCaseTypeId(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
         listingDetails.setCaseData(listingData);
 
@@ -107,7 +107,7 @@ public class TimeToFirstHearingReportTest {
     public void testFirstHearingNotWithin26Weeks() {
 
         ListingDetails listingDetails = new ListingDetails();
-        listingDetails.setCaseTypeId(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
         listingDetails.setCaseData(listingData);
 

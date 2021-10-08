@@ -1,23 +1,16 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.bulk.*;
+import uk.gov.hmcts.ecm.common.model.bulk.BulkData;
+import uk.gov.hmcts.ecm.common.model.bulk.BulkDetails;
+import uk.gov.hmcts.ecm.common.model.bulk.MultRefComplexType;
+import uk.gov.hmcts.ecm.common.model.bulk.SubmitBulkEvent;
+import uk.gov.hmcts.ecm.common.model.bulk.SubmitBulkEventSubmitEventType;
 import uk.gov.hmcts.ecm.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.ecm.common.model.bulk.items.MultipleTypeItem;
 import uk.gov.hmcts.ecm.common.model.bulk.items.SearchTypeItem;
@@ -30,13 +23,32 @@ import uk.gov.hmcts.ecm.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ecm.common.model.helper.BulkRequestPayload;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PersistentQHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 import uk.gov.hmcts.ethos.replacement.docmosis.tasks.BulkPreAcceptTask;
 import uk.gov.hmcts.ethos.replacement.docmosis.tasks.BulkUpdateBulkTask;
 import uk.gov.hmcts.ethos.replacement.docmosis.tasks.BulkUpdateTask;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_SELECT_ALL_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NUMBER_THREADS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @Service("bulkUpdateService")
@@ -261,163 +273,160 @@ public class BulkUpdateService {
     SubmitBulkEventSubmitEventType caseUpdateFieldsRequest(BulkDetails bulkDetails, SearchTypeItem searchTypeItem,
                                                            String authToken,
                                                            SubmitBulkEvent submitBulkEvent) {
-//        try {
-//            var bulkData = bulkDetails.getCaseData();
-//            String jurCodeSelected = bulkData.getJurCodesDynamicList().getValue().getCode();
-//            var updated = false;
-//            var multipleReferenceUpdated = false;
-//            String respondentNameNewValue = bulkData.getRespondentSurnameV2();
-//            String caseId = searchTypeItem.getId();
-//            var submitEvent = ccdClient.retrieveCase(authToken,
-//                    UtilHelper.getCaseTypeId(bulkDetails.getCaseTypeId()), bulkDetails.getJurisdiction(), caseId);
-//            if (!isNullOrEmpty(respondentNameNewValue)) {
-//                updated = true;
-//                if (submitEvent.getCaseData().getRespondentCollection() != null
-//                        && !submitEvent.getCaseData().getRespondentCollection().isEmpty()) {
-//                    var respondentSumTypeItem =
-//                            submitEvent.getCaseData().getRespondentCollection().get(0);
-//                    respondentSumTypeItem.getValue().setRespondentName(respondentNameNewValue);
-//                    submitEvent.getCaseData().getRespondentCollection().set(0, respondentSumTypeItem);
-//                } else {
-//                    List<RespondentSumTypeItem> respondentSumTypeItems = new ArrayList<>();
-//                    var respondentSumTypeItem = new RespondentSumTypeItem();
-//                    var respondentSumType = new RespondentSumType();
-//                    respondentSumType.setRespondentName(respondentNameNewValue);
-//                    respondentSumTypeItem.setValue(respondentSumType);
-//                    respondentSumTypeItems.add(respondentSumTypeItem);
-//                    submitEvent.getCaseData().setRespondentCollection(respondentSumTypeItems);
-//                }
-//            }
-//            String outcomeNewValue = bulkData.getOutcomeUpdate();
-//            if (!isNullOrEmpty(jurCodeSelected) && !jurCodeSelected.equals(SELECT_NONE_VALUE)
-//                    && !isNullOrEmpty(outcomeNewValue)) {
-//                List<JurCodesTypeItem> jurCodesTypeItems = new ArrayList<>();
-//                if (submitEvent.getCaseData().getJurCodesCollection() != null
-//                        && !submitEvent.getCaseData().getJurCodesCollection().isEmpty()) {
-//                    for (JurCodesTypeItem jurCodesTypeItem : submitEvent.getCaseData().getJurCodesCollection()) {
-//                        if (jurCodesTypeItem.getValue().getJuridictionCodesList().equals(jurCodeSelected)) {
-//                            var jurCodesType = jurCodesTypeItem.getValue();
-//                            jurCodesType.setJudgmentOutcome(outcomeNewValue);
-//                            jurCodesTypeItem.setValue(jurCodesType);
-//                            updated = true;
-//                        }
-//                        jurCodesTypeItems.add(jurCodesTypeItem);
-//                    }
-//                }
-//                submitEvent.getCaseData().setJurCodesCollection(jurCodesTypeItems);
-//            }
-//
-//            String fileLocationNewValue = bulkData.getFileLocationV2();
-//            if (!isNullOrEmpty(fileLocationNewValue)) {
-//                updated = true;
-//                submitEvent.getCaseData().setFileLocation(fileLocationNewValue);
-//            }
-//            String fileLocationGlasgowNewValue = bulkData.getFileLocationGlasgow();
-//            if (!isNullOrEmpty(fileLocationGlasgowNewValue)) {
-//                updated = true;
-//                submitEvent.getCaseData().setFileLocationGlasgow(fileLocationGlasgowNewValue);
-//            }
-//            String fileLocationAberdeenNewValue = bulkData.getFileLocationAberdeen();
-//            if (!isNullOrEmpty(fileLocationAberdeenNewValue)) {
-//                updated = true;
-//                submitEvent.getCaseData().setFileLocationAberdeen(fileLocationAberdeenNewValue);
-//            }
-//            String fileLocationDundeeNewValue = bulkData.getFileLocationDundee();
-//            if (!isNullOrEmpty(fileLocationDundeeNewValue)) {
-//                updated = true;
-//                submitEvent.getCaseData().setFileLocationDundee(fileLocationDundeeNewValue);
-//            }
-//            String fileLocationEdinburghNewValue = bulkData.getFileLocationEdinburgh();
-//            if (!isNullOrEmpty(fileLocationEdinburghNewValue)) {
-//                updated = true;
-//                submitEvent.getCaseData().setFileLocationEdinburgh(fileLocationEdinburghNewValue);
-//            }
-//            String managingOfficeNewValue = bulkData.getManagingOffice();
-//            if (!isNullOrEmpty(managingOfficeNewValue)) {
-//                updated = true;
-//                submitEvent.getCaseData().setManagingOffice(managingOfficeNewValue);
-//            }
-//            String claimantRepNewValue = bulkData.getClaimantRepV2();
-//            if (!isNullOrEmpty(claimantRepNewValue)) {
-//                updated = true;
-//                RepresentedTypeC representedTypeC;
-//                if (submitEvent.getCaseData().getRepresentativeClaimantType() != null) {
-//                    representedTypeC = submitEvent.getCaseData().getRepresentativeClaimantType();
-//                    representedTypeC.setNameOfRepresentative(claimantRepNewValue);
-//                    submitEvent.getCaseData().setRepresentativeClaimantType(representedTypeC);
-//                } else {
-//                    representedTypeC = new RepresentedTypeC();
-//                    representedTypeC.setNameOfRepresentative(claimantRepNewValue);
-//                    submitEvent.getCaseData().setRepresentativeClaimantType(representedTypeC);
-//                    submitEvent.getCaseData().setClaimantRepresentedQuestion(YES);
-//                }
-//                submitEvent.getCaseData().setRepresentativeClaimantType(representedTypeC);
-//            }
-//            String respondentRepNewValue = bulkData.getRespondentRepV2();
-//            if (!isNullOrEmpty(respondentRepNewValue)) {
-//                updated = true;
-//                if (submitEvent.getCaseData().getRepCollection() != null
-//                        && !submitEvent.getCaseData().getRepCollection().isEmpty()) {
-//                    var representedTypeRItem = submitEvent.getCaseData().getRepCollection().get(0);
-//                    RepresentedTypeR representedTypeR;
-//                    if (representedTypeRItem != null) {
-//                        representedTypeR = representedTypeRItem.getValue();
-//                        representedTypeR.setNameOfRepresentative(respondentRepNewValue);
-//                    } else {
-//                        representedTypeRItem = new RepresentedTypeRItem();
-//                        representedTypeR = new RepresentedTypeR();
-//                        representedTypeR.setNameOfRepresentative(respondentRepNewValue);
-//                    }
-//                    representedTypeRItem.setValue(representedTypeR);
-//                    submitEvent.getCaseData().getRepCollection().set(0, representedTypeRItem);
-//                } else {
-//                    var representedTypeRItem = new RepresentedTypeRItem();
-//                    var representedTypeR = new RepresentedTypeR();
-//                    representedTypeR.setNameOfRepresentative(respondentRepNewValue);
-//                    representedTypeRItem.setValue(representedTypeR);
-//                    List<RepresentedTypeRItem> repCollection =
-//                            new ArrayList<>(Collections.singletonList(representedTypeRItem));
-//                    submitEvent.getCaseData().setRepCollection(repCollection);
-//                }
-//            }
-//            String multipleRefNewValue = bulkData.getMultipleReferenceV2();
-//            if (!isNullOrEmpty(multipleRefNewValue)) {
-//                updated = true;
-//                multipleReferenceUpdated = true;
-//                submitEvent.getCaseData().setMultipleReference(multipleRefNewValue);
-//            }
-//            String clerkNewValue = bulkData.getClerkResponsibleV2();
-//            if (!isNullOrEmpty(clerkNewValue)) {
-//                updated = true;
-//                submitEvent.getCaseData().setClerkResponsible(clerkNewValue);
-//            }
-//            String positionTypeNewValue = bulkData.getPositionTypeV2();
-//            if (!isNullOrEmpty(positionTypeNewValue)) {
-//                updated = true;
-//                submitEvent.getCaseData().setPositionType(positionTypeNewValue);
-//            }
-//            String flag1NewValue = bulkData.getFlag1Update();
-//            if (!isNullOrEmpty(flag1NewValue)) {
-//                updated = true;
-//                submitEvent.getCaseData().setFlag1(flag1NewValue);
-//            }
-//            String flag2NewValue = bulkData.getFlag2Update();
-//            if (!isNullOrEmpty(flag2NewValue)) {
-//                updated = true;
-//                submitEvent.getCaseData().setFlag2(flag2NewValue);
-//            }
-//            String eqpNewValue = bulkData.getEQPUpdate();
-//            if (!isNullOrEmpty(eqpNewValue)) {
-//                updated = true;
-//                submitEvent.getCaseData().setEQP(eqpNewValue);
-//            }
-//            return updateOldSubmitBulk(updated, multipleReferenceUpdated, submitBulkEvent,
-//                    submitEvent, new SubmitBulkEventSubmitEventType());
-//        } catch (Exception ex) {
-//            throw new CaseCreationException(MESSAGE + searchTypeItem.getId() + ex.getMessage());
-//        }
-        throw new UnsupportedOperationException();
+        try {
+            var bulkData = bulkDetails.getCaseData();
+            String jurCodeSelected = bulkData.getJurCodesDynamicList().getValue().getCode();
+            var updated = false;
+            var multipleReferenceUpdated = false;
+            String respondentNameNewValue = bulkData.getRespondentSurnameV2();
+            String caseId = searchTypeItem.getId();
+            var submitEvent = ccdClient.retrieveCase(authToken,
+                    UtilHelper.getCaseTypeId(bulkDetails.getCaseTypeId()), bulkDetails.getJurisdiction(), caseId);
+            if (!isNullOrEmpty(respondentNameNewValue)) {
+                updated = true;
+                if (submitEvent.getCaseData().getRespondentCollection() != null
+                        && !submitEvent.getCaseData().getRespondentCollection().isEmpty()) {
+                    var respondentSumTypeItem =
+                            submitEvent.getCaseData().getRespondentCollection().get(0);
+                    respondentSumTypeItem.getValue().setRespondentName(respondentNameNewValue);
+                    submitEvent.getCaseData().getRespondentCollection().set(0, respondentSumTypeItem);
+                } else {
+                    List<RespondentSumTypeItem> respondentSumTypeItems = new ArrayList<>();
+                    var respondentSumTypeItem = new RespondentSumTypeItem();
+                    var respondentSumType = new RespondentSumType();
+                    respondentSumType.setRespondentName(respondentNameNewValue);
+                    respondentSumTypeItem.setValue(respondentSumType);
+                    respondentSumTypeItems.add(respondentSumTypeItem);
+                    submitEvent.getCaseData().setRespondentCollection(respondentSumTypeItems);
+                }
+            }
+            String outcomeNewValue = bulkData.getOutcomeUpdate();
+            if (!isNullOrEmpty(jurCodeSelected) && !jurCodeSelected.equals(SELECT_NONE_VALUE)
+                    && !isNullOrEmpty(outcomeNewValue)) {
+                List<JurCodesTypeItem> jurCodesTypeItems = new ArrayList<>();
+                if (submitEvent.getCaseData().getJurCodesCollection() != null
+                        && !submitEvent.getCaseData().getJurCodesCollection().isEmpty()) {
+                    for (JurCodesTypeItem jurCodesTypeItem : submitEvent.getCaseData().getJurCodesCollection()) {
+                        if (jurCodesTypeItem.getValue().getJuridictionCodesList().equals(jurCodeSelected)) {
+                            var jurCodesType = jurCodesTypeItem.getValue();
+                            jurCodesType.setJudgmentOutcome(outcomeNewValue);
+                            jurCodesTypeItem.setValue(jurCodesType);
+                            updated = true;
+                        }
+                        jurCodesTypeItems.add(jurCodesTypeItem);
+                    }
+                }
+                submitEvent.getCaseData().setJurCodesCollection(jurCodesTypeItems);
+            }
 
+            String fileLocationNewValue = bulkData.getFileLocationV2();
+            if (!isNullOrEmpty(fileLocationNewValue)) {
+                updated = true;
+                submitEvent.getCaseData().setFileLocation(fileLocationNewValue);
+            }
+            String fileLocationGlasgowNewValue = bulkData.getFileLocationGlasgow();
+            if (!isNullOrEmpty(fileLocationGlasgowNewValue)) {
+                updated = true;
+                submitEvent.getCaseData().setFileLocationGlasgow(fileLocationGlasgowNewValue);
+            }
+            String fileLocationAberdeenNewValue = bulkData.getFileLocationAberdeen();
+            if (!isNullOrEmpty(fileLocationAberdeenNewValue)) {
+                updated = true;
+                submitEvent.getCaseData().setFileLocationAberdeen(fileLocationAberdeenNewValue);
+            }
+            String fileLocationDundeeNewValue = bulkData.getFileLocationDundee();
+            if (!isNullOrEmpty(fileLocationDundeeNewValue)) {
+                updated = true;
+                submitEvent.getCaseData().setFileLocationDundee(fileLocationDundeeNewValue);
+            }
+            String fileLocationEdinburghNewValue = bulkData.getFileLocationEdinburgh();
+            if (!isNullOrEmpty(fileLocationEdinburghNewValue)) {
+                updated = true;
+                submitEvent.getCaseData().setFileLocationEdinburgh(fileLocationEdinburghNewValue);
+            }
+            String managingOfficeNewValue = bulkData.getManagingOffice();
+            if (!isNullOrEmpty(managingOfficeNewValue)) {
+                updated = true;
+                submitEvent.getCaseData().setManagingOffice(managingOfficeNewValue);
+            }
+            String claimantRepNewValue = bulkData.getClaimantRepV2();
+            if (!isNullOrEmpty(claimantRepNewValue)) {
+                updated = true;
+                RepresentedTypeC representedTypeC;
+                if (submitEvent.getCaseData().getRepresentativeClaimantType() != null) {
+                    representedTypeC = submitEvent.getCaseData().getRepresentativeClaimantType();
+                    representedTypeC.setNameOfRepresentative(claimantRepNewValue);
+                    submitEvent.getCaseData().setRepresentativeClaimantType(representedTypeC);
+                } else {
+                    representedTypeC = new RepresentedTypeC();
+                    representedTypeC.setNameOfRepresentative(claimantRepNewValue);
+                    submitEvent.getCaseData().setRepresentativeClaimantType(representedTypeC);
+                    submitEvent.getCaseData().setClaimantRepresentedQuestion(YES);
+                }
+                submitEvent.getCaseData().setRepresentativeClaimantType(representedTypeC);
+            }
+            String respondentRepNewValue = bulkData.getRespondentRepV2();
+            if (!isNullOrEmpty(respondentRepNewValue)) {
+                updated = true;
+                if (submitEvent.getCaseData().getRepCollection() != null
+                        && !submitEvent.getCaseData().getRepCollection().isEmpty()) {
+                    var representedTypeRItem = submitEvent.getCaseData().getRepCollection().get(0);
+                    RepresentedTypeR representedTypeR;
+                    if (representedTypeRItem != null) {
+                        representedTypeR = representedTypeRItem.getValue();
+                        representedTypeR.setNameOfRepresentative(respondentRepNewValue);
+                    } else {
+                        representedTypeRItem = new RepresentedTypeRItem();
+                        representedTypeR = new RepresentedTypeR();
+                        representedTypeR.setNameOfRepresentative(respondentRepNewValue);
+                    }
+                    representedTypeRItem.setValue(representedTypeR);
+                    submitEvent.getCaseData().getRepCollection().set(0, representedTypeRItem);
+                } else {
+                    var representedTypeRItem = new RepresentedTypeRItem();
+                    var representedTypeR = new RepresentedTypeR();
+                    representedTypeR.setNameOfRepresentative(respondentRepNewValue);
+                    representedTypeRItem.setValue(representedTypeR);
+                    List<RepresentedTypeRItem> repCollection =
+                            new ArrayList<>(Collections.singletonList(representedTypeRItem));
+                    submitEvent.getCaseData().setRepCollection(repCollection);
+                }
+            }
+            String multipleRefNewValue = bulkData.getMultipleReferenceV2();
+            if (!isNullOrEmpty(multipleRefNewValue)) {
+                updated = true;
+                multipleReferenceUpdated = true;
+                submitEvent.getCaseData().setMultipleReference(multipleRefNewValue);
+            }
+            if (bulkData.getClerkResponsibleV2() != null && bulkData.getClerkResponsibleV2().getValue() != null) {
+                updated = true;
+                submitEvent.getCaseData().setClerkResponsible(bulkData.getClerkResponsibleV2());
+            }
+            String positionTypeNewValue = bulkData.getPositionTypeV2();
+            if (!isNullOrEmpty(positionTypeNewValue)) {
+                updated = true;
+                submitEvent.getCaseData().setPositionType(positionTypeNewValue);
+            }
+            String flag1NewValue = bulkData.getFlag1Update();
+            if (!isNullOrEmpty(flag1NewValue)) {
+                updated = true;
+                submitEvent.getCaseData().setFlag1(flag1NewValue);
+            }
+            String flag2NewValue = bulkData.getFlag2Update();
+            if (!isNullOrEmpty(flag2NewValue)) {
+                updated = true;
+                submitEvent.getCaseData().setFlag2(flag2NewValue);
+            }
+            String eqpNewValue = bulkData.getEQPUpdate();
+            if (!isNullOrEmpty(eqpNewValue)) {
+                updated = true;
+                submitEvent.getCaseData().setEQP(eqpNewValue);
+            }
+            return updateOldSubmitBulk(updated, multipleReferenceUpdated, submitBulkEvent,
+                    submitEvent, new SubmitBulkEventSubmitEventType());
+        } catch (Exception ex) {
+            throw new CaseCreationException(MESSAGE + searchTypeItem.getId() + ex.getMessage());
+        }
     }
 
     private SubmitBulkEventSubmitEventType updateOldSubmitBulk(boolean updated, boolean multipleReferenceUpdated,

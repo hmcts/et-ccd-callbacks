@@ -184,6 +184,10 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 def versions = [
         springfoxSwagger: '2.9.2',
         logging         : '5.1.7',

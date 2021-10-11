@@ -4,6 +4,7 @@ import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.TribunalOffice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +16,9 @@ public class SelectionServiceTestUtils {
 
     final static int DEFAULT_LIST_SIZE = 3;
 
-    public static CaseData createCaseData(String tribunalOffice) {
+    public static CaseData createCaseData(TribunalOffice tribunalOffice) {
         var caseData = new CaseData();
-        caseData.setOwningOffice(tribunalOffice);
+        caseData.setOwningOffice(tribunalOffice.getOfficeName());
         return caseData;
     }
 

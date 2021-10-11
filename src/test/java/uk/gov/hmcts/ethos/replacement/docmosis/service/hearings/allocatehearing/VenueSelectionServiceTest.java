@@ -25,7 +25,7 @@ public class VenueSelectionServiceTest {
     public void testInitHearingCollectionNoHearings() {
         var tribunalOffice = TribunalOffice.ABERDEEN;
         var venueService = mockVenueService(tribunalOffice);
-        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice.name());
+        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
 
         var venueSelectionService = new VenueSelectionService(venueService);
         venueSelectionService.initHearingCollection(caseData);
@@ -39,7 +39,7 @@ public class VenueSelectionServiceTest {
     public void testInitHearingCollectionWithHearings() {
         var tribunalOffice = TribunalOffice.ABERDEEN;
         var venueService = mockVenueService(tribunalOffice);
-        var caseData = createCaseDataWithHearings(tribunalOffice.name(), null);
+        var caseData = createCaseDataWithHearings(tribunalOffice, null);
 
         var venueSelectionService = new VenueSelectionService(venueService);
         venueSelectionService.initHearingCollection(caseData);
@@ -54,7 +54,7 @@ public class VenueSelectionServiceTest {
         var tribunalOffice = TribunalOffice.ABERDEEN;
         var venueService = mockVenueService(tribunalOffice);
         var selectedVenue = DynamicValueType.create("venue2", "Venue 2");
-        var caseData = createCaseDataWithHearings(tribunalOffice.name(), selectedVenue);
+        var caseData = createCaseDataWithHearings(tribunalOffice, selectedVenue);
 
         var venueSelectionService = new VenueSelectionService(venueService);
         venueSelectionService.initHearingCollection(caseData);
@@ -68,7 +68,7 @@ public class VenueSelectionServiceTest {
     public void testCreateVenueSelectionNoSelectedVenue() {
         var tribunalOffice = TribunalOffice.ABERDEEN;
         var venueService = mockVenueService(tribunalOffice);
-        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice.name());
+        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         var selectedListing = createSelectedListing(null);
 
         var venueSelectionService = new VenueSelectionService(venueService);
@@ -81,7 +81,7 @@ public class VenueSelectionServiceTest {
     public void testCreateVenueSelectionWithSelectedVenue() {
         var tribunalOffice = TribunalOffice.ABERDEEN;
         var venueService = mockVenueService(tribunalOffice);
-        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice.name());
+        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         var selectedVenue = DynamicValueType.create("venue2", "Venue 2");
         var selectedListing = createSelectedListing(selectedVenue);
 
@@ -108,7 +108,7 @@ public class VenueSelectionServiceTest {
         return dateListedType;
     }
 
-    private CaseData createCaseDataWithHearings(String tribunalOffice, DynamicValueType selectedVenue) {
+    private CaseData createCaseDataWithHearings(TribunalOffice tribunalOffice, DynamicValueType selectedVenue) {
         var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         caseData.setHearingCollection(new ArrayList<>());
         for (var i = 0; i < 3; i++) {

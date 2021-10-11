@@ -18,7 +18,7 @@ public class ClerkServiceTest {
     @Test
     public void testInitialiseClerkResponsibleNoClerkSelected() {
         var courtWorkerService = mockCourtWorkerService();
-        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice.name());
+        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
 
         var clerkService = new ClerkService(courtWorkerService);
         clerkService.initialiseClerkResponsible(caseData);
@@ -29,14 +29,15 @@ public class ClerkServiceTest {
     @Test
     public void testInitialiseClerkResponsibleWithClerkSelected() {
         var courtWorkerService = mockCourtWorkerService();
-        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice.name());
+        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         var selectedClerk = DynamicValueType.create("clerk2", "Clerk 2");
         caseData.setClerkResponsible(DynamicFixedListType.of(selectedClerk));
 
         var clerkService = new ClerkService(courtWorkerService);
         clerkService.initialiseClerkResponsible(caseData);
 
-        SelectionServiceTestUtils.verifyDynamicFixedListSelected(caseData.getClerkResponsible(), "clerk", "Clerk ", selectedClerk);
+        SelectionServiceTestUtils.verifyDynamicFixedListSelected(caseData.getClerkResponsible(), "clerk", "Clerk ",
+                selectedClerk);
     }
 
     private CourtWorkerService mockCourtWorkerService() {

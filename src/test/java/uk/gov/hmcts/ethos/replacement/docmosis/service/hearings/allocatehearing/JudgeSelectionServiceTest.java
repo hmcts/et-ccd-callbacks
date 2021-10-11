@@ -17,7 +17,7 @@ public class JudgeSelectionServiceTest {
     public void testCreateJudgeSelectionNoSelectedJudge() {
         var tribunalOffice = TribunalOffice.ABERDEEN;
         var judgeService = mockJudgeService(tribunalOffice);
-        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice.name());
+        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         var selectedHearing = mockHearing(null);
 
         var judgeSelectionService = new JudgeSelectionService(judgeService);
@@ -30,7 +30,7 @@ public class JudgeSelectionServiceTest {
     public void testCreateJudgeSelectionWithSelectedJudge() {
         var tribunalOffice = TribunalOffice.ABERDEEN;
         var judgeService = mockJudgeService(tribunalOffice);
-        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice.name());
+        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         var selectedJudge = DynamicValueType.create("judge2", "Judge 2");
         var selectedHearing = mockHearing(selectedJudge);
 

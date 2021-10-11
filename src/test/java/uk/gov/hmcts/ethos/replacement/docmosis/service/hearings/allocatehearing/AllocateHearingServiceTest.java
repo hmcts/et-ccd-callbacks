@@ -177,8 +177,7 @@ public class AllocateHearingServiceTest {
     }
 
     private CaseData createCaseData() {
-        var caseData = new CaseData();
-        caseData.setOwningOffice(tribunalOffice.name());
+        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         caseData.setAllocateHearingHearing(new DynamicFixedListType());
 
         selectedHearing = new HearingType();

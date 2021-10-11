@@ -17,7 +17,7 @@ public class FileLocationSelectionServiceTest {
     @Test
     public void testInitialiseFileLocationNoFileLocationSelected() {
         var fileLocationService = mockFileLocationService();
-        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice.getOfficeName());
+        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
 
         var fileLocationSelectionService = new FileLocationSelectionService(fileLocationService);
         fileLocationSelectionService.initialiseFileLocation(caseData);
@@ -29,7 +29,7 @@ public class FileLocationSelectionServiceTest {
     @Test
     public void testInitialiseFileLocationWithFileLocationSelected() {
         var fileLocationService = mockFileLocationService();
-        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice.getOfficeName());
+        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         var selectedFileLocation = DynamicValueType.create("fileLocation2", "File Location 2");
         caseData.setFileLocation(DynamicFixedListType.of(selectedFileLocation));
 
@@ -43,7 +43,7 @@ public class FileLocationSelectionServiceTest {
     @Test
     public void testInitialiseFileLocationMultipleDataNoFileLocationSelected() {
         var fileLocationService = mockFileLocationService();
-        var multipleData = SelectionServiceTestUtils.createCaseData(tribunalOffice.getOfficeName());
+        var multipleData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
 
         var fileLocationSelectionService = new FileLocationSelectionService(fileLocationService);
         fileLocationSelectionService.initialiseFileLocation(multipleData);

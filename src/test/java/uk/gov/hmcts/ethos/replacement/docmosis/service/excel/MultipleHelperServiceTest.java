@@ -458,9 +458,8 @@ public class MultipleHelperServiceTest {
 
     @Test
     public void sendCloseToSinglesWithConfirmation() {
-
         multipleDetails.getCaseData().setClerkResponsible(new DynamicFixedListType("Clerk"));
-        multipleDetails.getCaseData().setFileLocation("FileLocation");
+        multipleDetails.getCaseData().setFileLocation(new DynamicFixedListType("FileLocation"));
         multipleDetails.getCaseData().setNotes("Notes");
 
         multipleHelperService.sendCloseToSinglesWithoutConfirmation(
@@ -471,7 +470,6 @@ public class MultipleHelperServiceTest {
 
         verify(userService).getUserDetails(userToken);
         verifyNoMoreInteractions(userService);
-
     }
 
     @Test

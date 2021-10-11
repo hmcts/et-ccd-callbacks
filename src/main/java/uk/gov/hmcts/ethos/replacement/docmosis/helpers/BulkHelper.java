@@ -8,6 +8,7 @@ import uk.gov.hmcts.ecm.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.ecm.common.model.bulk.items.MultipleTypeItem;
 import uk.gov.hmcts.ecm.common.model.bulk.items.SearchTypeItem;
 import uk.gov.hmcts.ecm.common.model.bulk.items.SubMultipleTypeItem;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.bulk.types.MultipleType;
 import uk.gov.hmcts.ecm.common.model.bulk.types.SearchType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
@@ -149,7 +150,8 @@ public class BulkHelper {
             multipleType.setRespondentRepM(" ");
             multipleType.setRespondentRepOrgM(" ");
         }
-        multipleType.setFileLocM(Optional.ofNullable(caseData.getFileLocation()).orElse(" "));
+
+        multipleType.setFileLocM(DynamicFixedListType.getSelectedLabel(caseData.getFileLocation()).orElse(" "));
         multipleType.setReceiptDateM(Optional.ofNullable(caseData.getReceiptDate()).orElse(" "));
         multipleType.setPositionTypeM(Optional.ofNullable(caseData.getPositionType()).orElse(" "));
         multipleType.setFeeGroupReferenceM(Optional.ofNullable(caseData.getFeeGroupReference()).orElse(" "));

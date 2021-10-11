@@ -27,6 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -69,6 +70,7 @@ public class CaseActionsForCaseWorkerController {
     private final SingleCaseMultipleMidEventValidationService singleCaseMultipleMidEventValidationService;
     private final AddSingleCaseToMultipleService addSingleCaseToMultipleService;
     private final ClerkService clerkService;
+    private final FileLocationSelectionService fileLocationSelectionService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "create a case for a caseWorker.")
@@ -245,9 +247,11 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        clerkService.initialiseClerkResponsible(ccdRequest.getCaseDetails().getCaseData());
+        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        clerkService.initialiseClerkResponsible(caseData);
+        fileLocationSelectionService.initialiseFileLocation(caseData);
 
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/amendCaseDetails", consumes = APPLICATION_JSON_VALUE)
@@ -871,6 +875,7 @@ public class CaseActionsForCaseWorkerController {
 
         if (errors.isEmpty()) {
             clerkService.initialiseClerkResponsible(caseData);
+            fileLocationSelectionService.initialiseFileLocation(caseData);
             Helper.updatePositionTypeToClosed(caseData);
             return getCallbackRespEntityNoErrors(caseData);
         }

@@ -255,7 +255,7 @@ public class BulkUpdateServiceTest {
     private BulkDetails getBulkDetailsWithValues() {
         BulkDetails bulkDetails = new BulkDetails();
         BulkData bulkData = new BulkData();
-        bulkData.setFileLocationV2("Glasgow");
+        bulkData.setFileLocationV2(new DynamicFixedListType("Glasgow"));
         bulkData.setRespondentSurnameV2("Respondent");
         bulkData.setClaimantSurnameV2("Claimant");
         bulkData.setMultipleReferenceV2("1111");

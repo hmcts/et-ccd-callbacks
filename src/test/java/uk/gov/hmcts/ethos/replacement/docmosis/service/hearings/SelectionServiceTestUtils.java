@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
+import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,12 @@ public class SelectionServiceTestUtils {
         var caseData = new CaseData();
         caseData.setOwningOffice(tribunalOffice);
         return caseData;
+    }
+
+    public static MultipleData createMultipleData(String tribunalOffice) {
+        var multipleData = new MultipleData();
+        multipleData.setManagingOffice(tribunalOffice);
+        return multipleData;
     }
 
     public static List<DynamicValueType> createListItems(String codeBase, String labelBase) {

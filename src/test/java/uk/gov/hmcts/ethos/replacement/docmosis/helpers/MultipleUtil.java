@@ -160,7 +160,7 @@ public class MultipleUtil {
         representedTypeRItem.setValue(representedTypeR);
         representedTypeRItem.setId("1");
         caseData.setRepCollection(new ArrayList<>(Collections.singletonList(representedTypeRItem)));
-        caseData.setFileLocation("Manchester");
+        caseData.setFileLocation(new DynamicFixedListType("Manchester"));
         caseData.setEthosCaseReference(ethosCaseReference);
         return caseData;
     }

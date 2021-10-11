@@ -15,6 +15,7 @@ import uk.gov.hmcts.ecm.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.ecm.common.model.bulk.items.MultipleTypeItem;
 import uk.gov.hmcts.ecm.common.model.bulk.items.SearchTypeItem;
 import uk.gov.hmcts.ecm.common.model.bulk.types.CaseType;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.RepresentedTypeRItem;
@@ -85,7 +86,7 @@ public class BulkUpdateService {
             // 2) Check if new multiple reference exists or it has the same as the current bulk
             if (!isNullOrEmpty(multipleReferenceV2) && (!multRefComplexType.isExist()
                     || multipleReferenceV2.equals(bulkDetails.getCaseData().getMultipleReference()))) {
-                    errors.add("Multiple reference does not exist or it is the same as the current multiple case");
+                errors.add("Multiple reference does not exist or it is the same as the current multiple case");
             }
             if (errors.isEmpty()) {
                 // 3) Update fields to the searched cases
@@ -319,8 +320,8 @@ public class BulkUpdateService {
                 submitEvent.getCaseData().setJurCodesCollection(jurCodesTypeItems);
             }
 
-            String fileLocationNewValue = bulkData.getFileLocationV2();
-            if (!isNullOrEmpty(fileLocationNewValue)) {
+            DynamicFixedListType fileLocationNewValue = bulkData.getFileLocationV2();
+            if (fileLocationNewValue != null && fileLocationNewValue.getValue() != null) {
                 updated = true;
                 submitEvent.getCaseData().setFileLocation(fileLocationNewValue);
             }

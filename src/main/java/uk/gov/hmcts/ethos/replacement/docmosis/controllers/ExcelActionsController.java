@@ -18,6 +18,7 @@ import uk.gov.hmcts.ecm.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleAmendService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationMidEventValidationService;
@@ -34,6 +35,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SubMultipleMidEvent
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SubMultipleUpdateService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -65,6 +67,7 @@ public class ExcelActionsController {
     private final EventValidationService eventValidationService;
     private final MultipleHelperService multipleHelperService;
     private final MultipleTransferService multipleTransferService;
+    private final FileLocationSelectionService fileLocationSelectionService;
 
     @PostMapping(value = "/createMultiple", consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Creates a multiple case. Retrieves cases by ethos case reference. Creates an Excel")
@@ -191,6 +194,33 @@ public class ExcelActionsController {
         var multipleDetails = multipleRequest.getCaseDetails();
 
         multiplePreAcceptService.bulkPreAcceptLogic(userToken, multipleDetails, errors);
+
+        return getMultipleCallbackRespEntity(errors, multipleDetails);
+    }
+
+    @PostMapping(value = "/initialiseBatchUpdate", consumes = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Initialises multiple case data for batch update event")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Accessed successfully",
+                    response = MultipleCallbackResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request"),
+            @ApiResponse(code = 500, message = "Internal Server Error")
+    })
+    public ResponseEntity<MultipleCallbackResponse> initialiseBatchUpdate(
+            @RequestBody MultipleRequest multipleRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        List<String> errors = new ArrayList<>();
+        var multipleDetails = multipleRequest.getCaseDetails();
+
+        multipleDynamicListFlagsService.populateDynamicListFlagsLogic(userToken, multipleDetails, errors);
+        if (errors.isEmpty()) {
+            fileLocationSelectionService.initialiseFileLocation(multipleDetails.getCaseData());
+        }
 
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
@@ -459,6 +489,27 @@ public class ExcelActionsController {
         );
 
         return getListingCallbackRespEntity(errors, caseData);
+    }
+
+    @PostMapping(value = "/initialiseCloseMultiple", consumes = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Initialises multiple case data for close event")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Accessed successfully",
+                response = MultipleCallbackResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
+    })
+    public ResponseEntity<MultipleCallbackResponse> initialiseCloseMultiple(
+            @RequestBody MultipleRequest multipleRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        fileLocationSelectionService.initialiseFileLocation(multipleRequest.getCaseDetails().getCaseData());
+
+        return getMultipleCallbackRespEntity(Collections.emptyList(), multipleRequest.getCaseDetails());
     }
 
     @PostMapping(value = "/closeMultiple", consumes = APPLICATION_JSON_VALUE)

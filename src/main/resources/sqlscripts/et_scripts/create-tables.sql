@@ -26,3 +26,12 @@ CREATE TABLE court_worker (
   name VARCHAR(100),
   venue_code VARCHAR(100)
 );
+
+DROP TABLE IF EXISTS file_location;
+
+CREATE TABLE file_location (
+  id SERIAL PRIMARY KEY,
+  tribunal_office VARCHAR(100),
+  code VARCHAR(100),
+  name VARCHAR(100)
+);

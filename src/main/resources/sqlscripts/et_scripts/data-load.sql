@@ -117,3 +117,15 @@ values ('LEEDS', 'EMPLOYER_MEMBER', 'Mrs LEEDS ER', 'Mrs LEEDS ER');
 
 insert into court_worker (tribunal_office, type, code, name)
 values ('LEEDS', 'EMPLOYER_MEMBER', 'Miss LEEDS ER', 'Miss LEEDS ER');
+
+insert into file_location (tribunal_office, code, name)
+values ('LEEDS', 'A/W ET3', 'A/W ET3');
+
+insert into file_location (tribunal_office, code, name)
+values ('LEEDS', 'A/W Listing', 'A/W Listing');
+
+insert into file_location (tribunal_office, code, name)
+values ('LEEDS', 'B/F Casework', 'B/F Casework');
+
+insert into file_location (tribunal_office, code, name)
+values ('LEEDS', 'B/F Listing', 'B/F Listing');

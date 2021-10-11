@@ -261,7 +261,8 @@ public class ReportHelper {
     private static String getFileLocation(ListingDetails listingDetails, CaseData caseData) {
         String caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
         if (!caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
-            return caseData.getFileLocation();
+            var fileLocation = caseData.getFileLocation();
+            return fileLocation != null && fileLocation.getValue() != null ? fileLocation.getSelectedLabel() : null;
         } else {
             switch (caseData.getManagingOffice()) {
                 case DUNDEE_OFFICE:

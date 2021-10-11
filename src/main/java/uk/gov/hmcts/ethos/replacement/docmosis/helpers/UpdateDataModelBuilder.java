@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.JurCodesTypeItem;
@@ -25,12 +26,13 @@ public class UpdateDataModelBuilder {
     public static UpdateDataModel build(MultipleData multipleData, CaseData caseData) {
         return UpdateDataModel.builder()
                 .managingOffice(multipleData.getManagingOffice())
-                .fileLocation(multipleData.getFileLocation())
+                .fileLocation(DynamicFixedListType.getSelectedValue(multipleData.getFileLocation()).orElse(null))
                 .fileLocationGlasgow(multipleData.getFileLocationGlasgow())
                 .fileLocationAberdeen(multipleData.getFileLocationAberdeen())
                 .fileLocationDundee(multipleData.getFileLocationDundee())
                 .fileLocationEdinburgh(multipleData.getFileLocationEdinburgh())
-                .clerkResponsible(multipleData.getClerkResponsibleSelectedValue().orElse(null))
+                .clerkResponsible(DynamicFixedListType.getSelectedValue(
+                        multipleData.getClerkResponsible()).orElse(null))
                 .positionType(multipleData.getPositionType())
                 .receiptDate(multipleData.getReceiptDate())
                 .hearingStage(multipleData.getHearingStage())

@@ -239,7 +239,7 @@ public class BulkActionsControllerTest {
         respondentSumTypeItem.setValue(respondentSumType);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(respondentSumTypeItem)));
 
-        caseData.setFileLocation("Manchester");
+        caseData.setFileLocation(new DynamicFixedListType("Manchester"));
         SubmitEvent submitEvent1 = new SubmitEvent();
         submitEvent1.setCaseData(caseData);
         SubmitEvent submitEvent2 = new SubmitEvent();

@@ -65,7 +65,7 @@ public class BulkHelperTest {
         respondentSumTypeItem.setValue(respondentSumType);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(respondentSumTypeItem)));
 
-        caseData.setFileLocation("Manchester");
+        caseData.setFileLocation(new DynamicFixedListType("Manchester"));
         JurCodesType jurCodesType = new JurCodesType();
         jurCodesType.setJuridictionCodesList("AA");
         JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
@@ -160,7 +160,7 @@ public class BulkHelperTest {
         CaseData caseData = new CaseData();
         caseData.setClaimantIndType(claimantIndType);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(respondentSumTypeItem)));
-        caseData.setFileLocation("Manchester");
+        caseData.setFileLocation(new DynamicFixedListType("Manchester"));
         caseData.setFeeGroupReference("11111");
         submitEvent.setCaseData(caseData);
         return submitEvent;

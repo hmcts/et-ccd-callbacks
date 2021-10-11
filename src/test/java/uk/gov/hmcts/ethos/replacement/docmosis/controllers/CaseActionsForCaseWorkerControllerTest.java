@@ -28,6 +28,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -137,6 +138,9 @@ public class CaseActionsForCaseWorkerControllerTest {
 
     @MockBean
     private ClerkService clerkService;
+
+    @MockBean
+    private FileLocationSelectionService fileLocationSelectionService;
 
     private MockMvc mvc;
     private JsonNode requestContent;
@@ -629,6 +633,8 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(clerkService, times(1)).initialiseClerkResponsible(isA(CaseData.class));
+        verify(fileLocationSelectionService, times(1)).initialiseFileLocation(isA(CaseData.class));
     }
 
     @Test
@@ -648,16 +654,18 @@ public class CaseActionsForCaseWorkerControllerTest {
 
     @Test
     public void initialiseAmendCaseDetails() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(INITIALISE_AMEND_CASE_DETAILS_URL)
                 .content(requestContent2.toString())
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
 
         verify(clerkService, times(1)).initialiseClerkResponsible(isA(CaseData.class));
+        verify(fileLocationSelectionService, times(1)).initialiseFileLocation(isA(CaseData.class));
     }
 
     @Test
@@ -979,8 +987,10 @@ public class CaseActionsForCaseWorkerControllerTest {
 
     @Test
     public void postDefaultValuesError500() throws Exception {
-        when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
+        when(eventValidationService.validateReceiptDate(isA(CaseData.class))).thenThrow(
+                new InternalException(ERROR_MESSAGE));
+
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -990,9 +1000,9 @@ public class CaseActionsForCaseWorkerControllerTest {
 
     @Test
     public void amendCaseDetailsError500() throws Exception {
-        when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
-        when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenReturn(true);
+        when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenThrow(
+                new InternalException(ERROR_MESSAGE));
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -1343,6 +1353,8 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
+        verify(clerkService, never()).initialiseClerkResponsible(isA(CaseData.class));
+        verify(fileLocationSelectionService, never()).initialiseFileLocation(isA(CaseData.class));
     }
 
     @Test
@@ -1355,5 +1367,6 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(status().isForbidden());
 
         verify(clerkService, never()).initialiseClerkResponsible(isA(CaseData.class));
+        verify(fileLocationSelectionService, never()).initialiseFileLocation(isA(CaseData.class));
     }
 }

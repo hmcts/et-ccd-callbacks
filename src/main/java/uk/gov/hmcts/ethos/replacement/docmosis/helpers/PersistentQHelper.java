@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ecm.common.model.bulk.BulkDetails;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
@@ -127,8 +128,9 @@ public class PersistentQHelper {
 
     public static CloseDataModel getCloseDataModel(MultipleData multipleData) {
         return CloseDataModel.builder()
-                .clerkResponsible(multipleData.getClerkResponsibleSelectedValue().orElse(null))
-                .fileLocation(multipleData.getFileLocation())
+                .clerkResponsible(
+                        DynamicFixedListType.getSelectedValue(multipleData.getClerkResponsible()).orElse(null))
+                .fileLocation(DynamicFixedListType.getSelectedValue(multipleData.getFileLocation()).orElse(null))
                 .notes(multipleData.getNotes())
                 .managingOffice(multipleData.getManagingOffice())
                 .fileLocationGlasgow(multipleData.getFileLocationGlasgow())

@@ -400,6 +400,6 @@ public class CasesAwaitingJudgmentReportTest {
 
     private void assertCommonValues(CasesAwaitingJudgmentReportData reportData) {
         assertNotNull(reportData);
-        assertEquals("Newcastle", reportData.getReportSummary().getOffice());
+        assertEquals("EnglandWales", reportData.getReportSummary().getOffice());
     }
 }

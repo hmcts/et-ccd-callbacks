@@ -12,6 +12,7 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.IOException;
@@ -20,7 +21,11 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_DEV_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_DEV_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -32,36 +37,36 @@ public class CaseUpdateForCaseWorkerServiceTest {
     private DefaultValuesReaderService defaultValuesReaderService;
     @Mock
     private CcdClient ccdClient;
-    private CCDRequest manchesterCcdRequest;
-    private CCDRequest glasgowCcdRequest;
+    private CCDRequest englandWalesCcdRequest;
+    private CCDRequest scotlandCcdRequest;
     private SubmitEvent submitEvent;
-    private DefaultValues manchesterDefaultValues;
-    private DefaultValues glasgowDefaultValues;
-    private CaseDetails manchesterCaseDetails;
-    private CaseDetails glasgowCaseDetails;
+    private DefaultValues englandWalesDefaultValues;
+    private DefaultValues scotlandDefaultValues;
 
     @Before
     public void setUp() {
         submitEvent = new SubmitEvent();
 
-        manchesterCcdRequest = new CCDRequest();
-        manchesterCaseDetails = new CaseDetails();
-        manchesterCaseDetails.setCaseData(new CaseData());
-        manchesterCaseDetails.setCaseId("123456");
-        manchesterCaseDetails.setCaseTypeId(MANCHESTER_DEV_CASE_TYPE_ID);
-        manchesterCaseDetails.setJurisdiction("TRIBUNALS");
-        manchesterCcdRequest.setCaseDetails(manchesterCaseDetails);
+        englandWalesCcdRequest = new CCDRequest();
+        var englandWalesCaseDetails = new CaseDetails();
+        englandWalesCaseDetails.setCaseData(new CaseData());
+        englandWalesCaseDetails.getCaseData().setOwningOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        englandWalesCaseDetails.setCaseId("123456");
+        englandWalesCaseDetails.setCaseTypeId(ENGLANDWALES_DEV_CASE_TYPE_ID);
+        englandWalesCaseDetails.setJurisdiction("TRIBUNALS");
+        englandWalesCcdRequest.setCaseDetails(englandWalesCaseDetails);
 
-        glasgowCcdRequest = new CCDRequest();
-        glasgowCaseDetails = new CaseDetails();
-        glasgowCaseDetails.setCaseData(new CaseData());
-        glasgowCaseDetails.setCaseId("123456");
-        glasgowCaseDetails.setCaseTypeId(SCOTLAND_DEV_CASE_TYPE_ID);
-        glasgowCaseDetails.setJurisdiction("TRIBUNALS");
-        glasgowCcdRequest.setCaseDetails(glasgowCaseDetails);
+        scotlandCcdRequest = new CCDRequest();
+        var scotlandCaseDetails = new CaseDetails();
+        scotlandCaseDetails.setCaseData(new CaseData());
+        scotlandCaseDetails.getCaseData().setOwningOffice(TribunalOffice.GLASGOW.getOfficeName());
+        scotlandCaseDetails.setCaseId("123456");
+        scotlandCaseDetails.setCaseTypeId(SCOTLAND_DEV_CASE_TYPE_ID);
+        scotlandCaseDetails.setJurisdiction("TRIBUNALS");
+        scotlandCcdRequest.setCaseDetails(scotlandCaseDetails);
 
         caseUpdateForCaseWorkerService = new CaseUpdateForCaseWorkerService(ccdClient, defaultValuesReaderService);
-        manchesterDefaultValues = DefaultValues.builder()
+        englandWalesDefaultValues = DefaultValues.builder()
                 .positionType("Awaiting ET3")
                 .claimantTypeOfClaimant(INDIVIDUAL_TYPE_CLAIMANT)
                 .caseType(SINGLE_CASE_TYPE)
@@ -75,7 +80,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
                 .tribunalCorrespondenceDX("123456")
                 .tribunalCorrespondenceEmail("manchester@gmail.com")
                 .build();
-        glasgowDefaultValues = DefaultValues.builder()
+        scotlandDefaultValues = DefaultValues.builder()
                 .positionType("Awaiting ET3")
                 .claimantTypeOfClaimant(INDIVIDUAL_TYPE_CLAIMANT)
                 .managingOffice(GLASGOW_OFFICE)
@@ -92,28 +97,28 @@ public class CaseUpdateForCaseWorkerServiceTest {
     }
 
     @Test(expected = Exception.class)
-    public void caseCreationManchesterRequestException() throws IOException {
+    public void caseCreationEnglandWalesRequestException() throws IOException {
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(), anyString())).thenReturn(submitEvent);
-        when(defaultValuesReaderService.getDefaultValues( "", manchesterCaseDetails.getCaseTypeId())).thenReturn(manchesterDefaultValues);
-        caseUpdateForCaseWorkerService.caseUpdateRequest(manchesterCcdRequest, "authToken");
+        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.MANCHESTER.getOfficeName())).thenReturn(englandWalesDefaultValues);
+        caseUpdateForCaseWorkerService.caseUpdateRequest(englandWalesCcdRequest, "authToken");
     }
 
     @Test
-    public void caseCreationManchesterRequest() throws IOException {
-        when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(manchesterCcdRequest);
+    public void caseCreationEnglandWalesRequest() throws IOException {
+        when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(englandWalesCcdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(), anyString())).thenReturn(submitEvent);
-        when(defaultValuesReaderService.getDefaultValues("", manchesterCaseDetails.getCaseTypeId())).thenReturn(manchesterDefaultValues);
-        SubmitEvent submitEvent1 = caseUpdateForCaseWorkerService.caseUpdateRequest(manchesterCcdRequest, "authToken");
+        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.MANCHESTER.getOfficeName())).thenReturn(englandWalesDefaultValues);
+        SubmitEvent submitEvent1 = caseUpdateForCaseWorkerService.caseUpdateRequest(englandWalesCcdRequest, "authToken");
         assertEquals(submitEvent, submitEvent1);
     }
 
     @Test
-    public void caseCreationGlasgowRequest() throws IOException {
-        when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(glasgowCcdRequest);
+    public void caseCreationScotlandRequest() throws IOException {
+        when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(scotlandCcdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(), anyString())).thenReturn(submitEvent);
-        when(defaultValuesReaderService.getDefaultValues( "", glasgowCaseDetails.getCaseTypeId())).thenReturn(glasgowDefaultValues);
-        SubmitEvent submitEvent1 = caseUpdateForCaseWorkerService.caseUpdateRequest(glasgowCcdRequest, "authToken");
+        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName())).thenReturn(scotlandDefaultValues);
+        SubmitEvent submitEvent1 = caseUpdateForCaseWorkerService.caseUpdateRequest(scotlandCcdRequest, "authToken");
         assertEquals(submitEvent, submitEvent1);
     }
 }

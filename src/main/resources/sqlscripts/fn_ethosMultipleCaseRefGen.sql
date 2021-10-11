@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION fn_ethosMultipleCaseRefGen (numofcases INT, office va
 -- Author:		Mohammed Hafejee
 
 -- TEST :		SELECT fn_ethosMultipleCaseRefGen(2,'Manchester');
---				
+--
 -- Create date: 14-APR-2020
 -- Description:	Function to generate Ethos case reference numbers for multiple cases
 -- VERSION	:	14-MAR-2020		1.0  - Initial
@@ -17,39 +17,39 @@ CREATE OR REPLACE FUNCTION fn_ethosMultipleCaseRefGen (numofcases INT, office va
   DECLARE currentvalstr Varchar(200);
 
 
-BEGIN 
+BEGIN
 
-  CASE 
+  CASE
 
-/***********   1. Manchester   ************/  
+/***********   1. Manchester   ************/
 
-    WHEN office = 'Manchester' THEN 
+    WHEN office = 'Manchester' THEN
 
-    -- Acquire Lock on multipleReferenceManchester table 
+    -- Acquire Lock on multipleReferenceManchester table
 
     SELECT counter INTO currentval FROM multipleReferenceManchester FOR UPDATE ;
-    
-      
-    CASE 
-    
-    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN    
-   
+
+
+    CASE
+
+    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN
+
     currentval = NULL;
 
-    ELSE  
-    
+    ELSE
+
     UPDATE  multipleReferenceManchester SET counter = counter + numofcases ;
 
     END CASE;
-        
-  
-   
+
+
+
     IF currentval IS NOT NULL THEN
 
     currentval = currentval + 1 ;
     currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
 
-    ELSE 
+    ELSE
     currentvalstr = CONCAT ('Exception - Not enough multiple reference numbers available in index multipleReference', Office, ' to service requests');
 
     END IF;
@@ -60,33 +60,33 @@ BEGIN
 
 /***********   2. Scotland   ************/
 
-   WHEN office = 'Scotland' THEN 
+   WHEN office = 'Scotland' THEN
 
-    -- Acquire Lock on multipleReferenceScotland table 
+    -- Acquire Lock on multipleReferenceScotland table
 
     SELECT counter INTO currentval FROM multipleReferenceScotland FOR UPDATE ;
-    
-      
-    CASE 
-    
-    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN    
-   
+
+
+    CASE
+
+    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN
+
     currentval = NULL;
 
-    ELSE  
-    
+    ELSE
+
     UPDATE  multipleReferenceScotland SET counter = counter + numofcases ;
 
     END CASE;
-        
-  
-   
+
+
+
     IF currentval IS NOT NULL THEN
 
     currentval = currentval + 1 ;
     currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
 
-    ELSE 
+    ELSE
     currentvalstr = CONCAT ('Exception - Not enough multiple reference numbers available in index multipleReference', Office, ' to service requests');
 
     END IF;
@@ -98,33 +98,33 @@ BEGIN
 
 /***********   3. Bristol   ************/
 
-   WHEN office = 'Bristol' THEN 
+   WHEN office = 'Bristol' THEN
 
-    -- Acquire Lock on multipleReferenceBristol table 
+    -- Acquire Lock on multipleReferenceBristol table
 
     SELECT counter INTO currentval FROM multipleReferenceBristol FOR UPDATE ;
-    
-      
-    CASE 
-    
-    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN    
-   
+
+
+    CASE
+
+    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN
+
     currentval = NULL;
 
-    ELSE  
-    
+    ELSE
+
     UPDATE  multipleReferenceBristol SET counter = counter + numofcases ;
 
     END CASE;
-        
-  
-   
+
+
+
     IF currentval IS NOT NULL THEN
 
     currentval = currentval + 1 ;
     currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
 
-    ELSE 
+    ELSE
     currentvalstr = CONCAT ('Exception - Not enough multiple reference numbers available in index multipleReference', Office, ' to service requests');
 
     END IF;
@@ -138,33 +138,33 @@ BEGIN
 
 /***********   4. Leeds   ************/
 
-    WHEN office = 'Leeds' THEN 
+    WHEN office = 'Leeds' THEN
 
-    -- Acquire Lock on multipleReferenceLeeds table 
+    -- Acquire Lock on multipleReferenceLeeds table
 
     SELECT counter INTO currentval FROM multipleReferenceLeeds FOR UPDATE ;
-    
-      
-    CASE 
-    
-    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN    
-   
+
+
+    CASE
+
+    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN
+
     currentval = NULL;
 
-    ELSE  
-    
+    ELSE
+
     UPDATE  multipleReferenceLeeds SET counter = counter + numofcases ;
 
     END CASE;
-        
-  
-   
+
+
+
     IF currentval IS NOT NULL THEN
 
     currentval = currentval + 1 ;
     currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
 
-    ELSE 
+    ELSE
     currentvalstr = CONCAT ('Exception - Not enough multiple reference numbers available in index multipleReference', Office, ' to service requests');
 
     END IF;
@@ -178,33 +178,33 @@ BEGIN
 
 /***********   5. LondonCentral   ************/
 
-   WHEN office = 'LondonCentral' THEN 
+   WHEN office = 'LondonCentral' THEN
 
-    -- Acquire Lock on multipleReferenceLondonCentral table 
+    -- Acquire Lock on multipleReferenceLondonCentral table
 
     SELECT counter INTO currentval FROM multipleReferenceLondonCentral FOR UPDATE ;
-    
-      
-    CASE 
-    
-    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN    
-   
+
+
+    CASE
+
+    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN
+
     currentval = NULL;
 
-    ELSE  
-    
+    ELSE
+
     UPDATE  multipleReferenceLondonCentral SET counter = counter + numofcases ;
 
     END CASE;
-        
-  
-   
+
+
+
     IF currentval IS NOT NULL THEN
 
     currentval = currentval + 1 ;
     currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
 
-    ELSE 
+    ELSE
     currentvalstr = CONCAT ('Exception - Not enough multiple reference numbers available in index multipleReference', Office, ' to service requests');
 
     END IF;
@@ -217,33 +217,33 @@ BEGIN
 
 /***********   6. LondonEast   ************/
 
-   WHEN office = 'LondonEast' THEN 
+   WHEN office = 'LondonEast' THEN
 
-    -- Acquire Lock on multipleReferenceLondonEast table 
+    -- Acquire Lock on multipleReferenceLondonEast table
 
     SELECT counter INTO currentval FROM multipleReferenceLondonEast FOR UPDATE ;
-    
-      
-    CASE 
-    
-    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN    
-   
+
+
+    CASE
+
+    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN
+
     currentval = NULL;
 
-    ELSE  
-    
+    ELSE
+
     UPDATE  multipleReferenceLondonEast SET counter = counter + numofcases ;
 
     END CASE;
-        
-  
-   
+
+
+
     IF currentval IS NOT NULL THEN
 
     currentval = currentval + 1 ;
     currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
 
-    ELSE 
+    ELSE
     currentvalstr = CONCAT ('Exception - Not enough multiple reference numbers available in index multipleReference', Office, ' to service requests');
 
     END IF;
@@ -257,33 +257,33 @@ BEGIN
 
   /***********   7. LondonSouth   ************/
 
-   WHEN office = 'LondonSouth' THEN 
+   WHEN office = 'LondonSouth' THEN
 
-    -- Acquire Lock on multipleReferenceLondonSouth table 
+    -- Acquire Lock on multipleReferenceLondonSouth table
 
     SELECT counter INTO currentval FROM multipleReferenceLondonSouth FOR UPDATE ;
-    
-      
-    CASE 
-    
-    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN    
-   
+
+
+    CASE
+
+    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN
+
     currentval = NULL;
 
-    ELSE  
-    
+    ELSE
+
     UPDATE  multipleReferenceLondonSouth SET counter = counter + numofcases ;
 
     END CASE;
-        
-  
-   
+
+
+
     IF currentval IS NOT NULL THEN
 
     currentval = currentval + 1 ;
     currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
 
-    ELSE 
+    ELSE
     currentvalstr = CONCAT ('Exception - Not enough multiple reference numbers available in index multipleReference', Office, ' to service requests');
 
     END IF;
@@ -296,33 +296,33 @@ BEGIN
 
   /***********   8. MidlandsEast   ************/
 
-    WHEN office = 'MidlandsEast' THEN 
+    WHEN office = 'MidlandsEast' THEN
 
-    -- Acquire Lock on multipleReferenceMidlandsEast table 
+    -- Acquire Lock on multipleReferenceMidlandsEast table
 
     SELECT counter INTO currentval FROM multipleReferenceMidlandsEast FOR UPDATE ;
-    
-      
-    CASE 
-    
-    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN    
-   
+
+
+    CASE
+
+    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN
+
     currentval = NULL;
 
-    ELSE  
-    
+    ELSE
+
     UPDATE  multipleReferenceMidlandsEast SET counter = counter + numofcases ;
 
     END CASE;
-        
-  
-   
+
+
+
     IF currentval IS NOT NULL THEN
 
     currentval = currentval + 1 ;
     currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
 
-    ELSE 
+    ELSE
     currentvalstr = CONCAT ('Exception - Not enough multiple reference numbers available in index multipleReference', Office, ' to service requests');
 
     END IF;
@@ -336,33 +336,33 @@ BEGIN
 
   /***********   9. MidlandsWest   ************/
 
-    WHEN office = 'MidlandsWest' THEN 
+    WHEN office = 'MidlandsWest' THEN
 
-    -- Acquire Lock on multipleReferenceMidlandsWest table 
+    -- Acquire Lock on multipleReferenceMidlandsWest table
 
     SELECT counter INTO currentval FROM multipleReferenceMidlandsWest FOR UPDATE ;
-    
-      
-    CASE 
-    
-    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN    
-   
+
+
+    CASE
+
+    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN
+
     currentval = NULL;
 
-    ELSE  
-    
+    ELSE
+
     UPDATE  multipleReferenceMidlandsWest SET counter = counter + numofcases ;
 
     END CASE;
-        
-  
-   
+
+
+
     IF currentval IS NOT NULL THEN
 
     currentval = currentval + 1 ;
     currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
 
-    ELSE 
+    ELSE
     currentvalstr = CONCAT ('Exception - Not enough multiple reference numbers available in index multipleReference', Office, ' to service requests');
 
     END IF;
@@ -375,33 +375,33 @@ BEGIN
 
   /***********   10. Newcastle   ************/
 
-   WHEN office = 'Newcastle' THEN 
+   WHEN office = 'Newcastle' THEN
 
-    -- Acquire Lock on multipleReferenceNewcastle table 
+    -- Acquire Lock on multipleReferenceNewcastle table
 
     SELECT counter INTO currentval FROM multipleReferenceNewcastle FOR UPDATE ;
-    
-      
-    CASE 
-    
-    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN    
-   
+
+
+    CASE
+
+    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN
+
     currentval = NULL;
 
-    ELSE  
-    
+    ELSE
+
     UPDATE  multipleReferenceNewcastle SET counter = counter + numofcases ;
 
     END CASE;
-        
-  
-   
+
+
+
     IF currentval IS NOT NULL THEN
 
     currentval = currentval + 1 ;
     currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
 
-    ELSE 
+    ELSE
     currentvalstr = CONCAT ('Exception - Not enough multiple reference numbers available in index multipleReference', Office, ' to service requests');
 
     END IF;
@@ -415,33 +415,33 @@ BEGIN
 
 /***********   11. Wales   ************/
 
-   WHEN office = 'Wales' THEN 
+   WHEN office = 'Wales' THEN
 
-    -- Acquire Lock on multipleReferenceWales table 
+    -- Acquire Lock on multipleReferenceWales table
 
     SELECT counter INTO currentval FROM multipleReferenceWales FOR UPDATE ;
-    
-      
-    CASE 
-    
-    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN    
-   
+
+
+    CASE
+
+    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN
+
     currentval = NULL;
 
-    ELSE  
-    
+    ELSE
+
     UPDATE  multipleReferenceWales SET counter = counter + numofcases ;
 
     END CASE;
-        
-  
-   
+
+
+
     IF currentval IS NOT NULL THEN
 
     currentval = currentval + 1 ;
     currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
 
-    ELSE 
+    ELSE
     currentvalstr = CONCAT ('Exception - Not enough multiple reference numbers available in index multipleReference', Office, ' to service requests');
 
     END IF;
@@ -454,33 +454,33 @@ BEGIN
 
   /***********  12. Watford   ************/
 
-   WHEN office = 'Watford' THEN 
+   WHEN office = 'Watford' THEN
 
-    -- Acquire Lock on multipleReferenceWatford table 
+    -- Acquire Lock on multipleReferenceWatford table
 
     SELECT counter INTO currentval FROM multipleReferenceWatford FOR UPDATE ;
-    
-      
-    CASE 
-    
-    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN    
-   
+
+
+    CASE
+
+    WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN
+
     currentval = NULL;
 
-    ELSE  
-    
+    ELSE
+
     UPDATE  multipleReferenceWatford SET counter = counter + numofcases ;
 
     END CASE;
-        
-  
-   
+
+
+
     IF currentval IS NOT NULL THEN
 
     currentval = currentval + 1 ;
     currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
 
-    ELSE 
+    ELSE
     currentvalstr = CONCAT ('Exception - Not enough multiple reference numbers available in index multipleReference', Office, ' to service requests');
 
     END IF;
@@ -488,9 +488,24 @@ BEGIN
 
     RETURN  currentvalstr;
 
+    WHEN office = 'EnglandWales' THEN
+        -- Acquire Lock on table
+        SELECT counter INTO currentval FROM multipleReferenceEnglandWales FOR UPDATE;
+        CASE
+            WHEN currentval = 99999 OR (currentval + numofcases) > 99999 THEN
+            currentval = NULL;
+        ELSE
+            UPDATE  multipleReferenceEnglandWales SET counter = counter + numofcases ;
+        END CASE;
 
+        IF currentval IS NOT NULL THEN
+            currentval = currentval + 1 ;
+            currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
+        ELSE
+            currentvalstr = CONCAT ('Exception - Not enough multiple reference numbers available in index multipleReference', Office, ' to service requests');
+        END IF;
 
-
+        RETURN  currentvalstr;
 
 END CASE ;
 

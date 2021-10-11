@@ -11,6 +11,7 @@ import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.listing.items.ListingTypeItem;
 import uk.gov.hmcts.ecm.common.model.listing.types.ListingType;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
@@ -38,8 +39,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_STAFF;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LETTER_ADDRESS_ALLOCATED_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIST_CASES_CONFIG;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANCHESTER_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANCHESTER_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
@@ -68,7 +69,7 @@ public class TornadoServiceTest {
         var caseData = new CaseData();
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
-        tornadoService.documentGeneration(authToken, caseData, MANCHESTER_CASE_TYPE_ID,
+        tornadoService.documentGeneration(authToken, caseData, ENGLANDWALES_CASE_TYPE_ID,
                 caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null);
     }
 
@@ -76,7 +77,7 @@ public class TornadoServiceTest {
     public void listingGenerationNoTornadoConnectionShouldThrowException() throws IOException {
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
-        tornadoService.listingGeneration(authToken, createListingData(), MANCHESTER_LISTING_CASE_TYPE_ID);
+        tornadoService.listingGeneration(authToken, createListingData(), ENGLANDWALES_LISTING_CASE_TYPE_ID);
     }
 
     @Test(expected = IOException.class)
@@ -91,7 +92,7 @@ public class TornadoServiceTest {
         mockConnectionError();
         var caseData = new CaseData();
 
-        tornadoService.documentGeneration(authToken, caseData, MANCHESTER_CASE_TYPE_ID,
+        tornadoService.documentGeneration(authToken, caseData, ENGLANDWALES_CASE_TYPE_ID,
                 caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null);
     }
 
@@ -100,7 +101,7 @@ public class TornadoServiceTest {
         mockConnectionSuccess();
         var caseData = new CaseData();
 
-        var documentInfo = tornadoService.documentGeneration(authToken, caseData, MANCHESTER_CASE_TYPE_ID,
+        var documentInfo = tornadoService.documentGeneration(authToken, caseData, ENGLANDWALES_CASE_TYPE_ID,
                 caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null);
 
         verifyDocumentInfo(documentInfo);
@@ -110,7 +111,8 @@ public class TornadoServiceTest {
     public void shouldCreateDocumentInfoForDocumentGenerationAllocatedOffice() throws IOException {
         mockConnectionSuccess();
         var defaultValues = mock(DefaultValues.class);
-        when(defaultValuesReaderService.getDefaultValues(GLASGOW_OFFICE, SCOTLAND_CASE_TYPE_ID)).thenReturn(defaultValues);
+        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName()))
+                .thenReturn(defaultValues);
         var caseData = new CaseData();
         caseData.setAllocatedOffice(GLASGOW_OFFICE);
         var correspondenceScotType = new CorrespondenceScotType();
@@ -128,7 +130,8 @@ public class TornadoServiceTest {
     public void shouldCreateDocumentInfoForDocumentGenerationAllocatedOfficeMultiples() throws IOException {
         mockConnectionSuccess();
         var defaultValues = mock(DefaultValues.class);
-        when(defaultValuesReaderService.getDefaultValues(GLASGOW_OFFICE, SCOTLAND_CASE_TYPE_ID)).thenReturn(defaultValues);
+        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName()))
+                .thenReturn(defaultValues);
         var caseData = new CaseData();
         caseData.setAllocatedOffice(GLASGOW_OFFICE);
         var correspondenceScotType = new CorrespondenceScotType();
@@ -147,7 +150,7 @@ public class TornadoServiceTest {
         mockConnectionSuccess();
         var listingData = createListingData();
 
-        var documentInfo = tornadoService.listingGeneration(authToken, listingData, MANCHESTER_LISTING_CASE_TYPE_ID);
+        var documentInfo = tornadoService.listingGeneration(authToken, listingData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
 
         verifyDocumentInfo(documentInfo);
     }
@@ -171,7 +174,7 @@ public class TornadoServiceTest {
         listingData.setReportType(CLAIMS_ACCEPTED_REPORT);
 
         var documentInfo = tornadoService.listingGeneration(authToken, listingData,
-                MANCHESTER_LISTING_CASE_TYPE_ID);
+                ENGLANDWALES_LISTING_CASE_TYPE_ID);
 
         verifyDocumentInfo(documentInfo);
     }

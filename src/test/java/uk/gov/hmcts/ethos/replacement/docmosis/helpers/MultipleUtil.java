@@ -131,7 +131,7 @@ public class MultipleUtil {
 
     public static CaseData getCaseData(String ethosCaseReference) {
         CaseData caseData = new CaseData();
-        caseData.setClerkResponsible("JuanFran");
+        caseData.setClerkResponsible(new DynamicFixedListType("JuanFran"));
         ClaimantType claimantType = new ClaimantType();
         Address address = new Address();
         address.setPostCode("M2 45GD");
@@ -160,7 +160,7 @@ public class MultipleUtil {
         representedTypeRItem.setValue(representedTypeR);
         representedTypeRItem.setId("1");
         caseData.setRepCollection(new ArrayList<>(Collections.singletonList(representedTypeRItem)));
-        caseData.setFileLocation("Manchester");
+        caseData.setFileLocation(new DynamicFixedListType("Manchester"));
         caseData.setEthosCaseReference(ethosCaseReference);
         return caseData;
     }
@@ -326,7 +326,7 @@ public class MultipleUtil {
         multipleData.setState(OPEN_STATE);
         multipleData.setCaseCounter("2");
 
-        multipleData.setOfficeMultipleCT(generateDynamicList(MANCHESTER_CASE_TYPE_ID));
+        multipleData.setOfficeMultipleCT(generateDynamicList(ENGLANDWALES_CASE_TYPE_ID));
         multipleData.setPositionTypeCT("PositionTypeCT");
         multipleData.setReasonForCT("ReasonForCT");
 

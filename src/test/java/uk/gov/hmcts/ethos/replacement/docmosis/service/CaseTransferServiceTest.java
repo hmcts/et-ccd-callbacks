@@ -54,7 +54,7 @@ public class CaseTransferServiceTest {
         caseData.setPositionTypeCT("PositionTypeCT");
         DynamicFixedListType officeCT = new DynamicFixedListType();
         DynamicValueType valueType = new DynamicValueType();
-        valueType.setCode(LEEDS_CASE_TYPE_ID);
+        valueType.setCode(ENGLANDWALES_CASE_TYPE_ID);
         officeCT.setValue(valueType);
         caseData.setOfficeCT(officeCT);
         caseDetails.setCaseData(caseData);
@@ -73,7 +73,7 @@ public class CaseTransferServiceTest {
         List<String> errors = new ArrayList<>();
         caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
         assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
-        assertEquals("Transferred to " + LEEDS_CASE_TYPE_ID, ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
+        assertEquals("Transferred to " + ENGLANDWALES_CASE_TYPE_ID, ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
     }
 
     @Test
@@ -83,7 +83,7 @@ public class CaseTransferServiceTest {
         caseData.setCaseRefNumberCount("2");
         DynamicFixedListType officeCT = new DynamicFixedListType();
         DynamicValueType valueType = new DynamicValueType();
-        valueType.setCode(LEEDS_CASE_TYPE_ID);
+        valueType.setCode(ENGLANDWALES_CASE_TYPE_ID);
         officeCT.setValue(valueType);
         caseData.setOfficeCT(officeCT);
         SubmitEvent submitEvent1 = new SubmitEvent();
@@ -104,9 +104,9 @@ public class CaseTransferServiceTest {
         when(ccdClient.startEventForCase(authToken, "Manchester", "Employment", "12345")).thenReturn(ccdRequest);
         caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
         assertEquals("PositionTypeCT", submitEvent.getCaseData().getPositionType());
-        assertEquals("Transferred to " + LEEDS_CASE_TYPE_ID, submitEvent.getCaseData().getLinkedCaseCT());
+        assertEquals("Transferred to " + ENGLANDWALES_CASE_TYPE_ID, submitEvent.getCaseData().getLinkedCaseCT());
         assertEquals("PositionTypeCT", submitEvent1.getCaseData().getPositionType());
-        assertEquals("Transferred to " + LEEDS_CASE_TYPE_ID, submitEvent1.getCaseData().getLinkedCaseCT());
+        assertEquals("Transferred to " + ENGLANDWALES_CASE_TYPE_ID, submitEvent1.getCaseData().getLinkedCaseCT());
     }
 
     @Test
@@ -115,7 +115,7 @@ public class CaseTransferServiceTest {
         ccdRequest.getCaseDetails().getCaseData().setStateAPI(MULTIPLE);
         caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
         assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
-        assertEquals("Transferred to " + LEEDS_CASE_TYPE_ID, ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
+        assertEquals("Transferred to " + ENGLANDWALES_CASE_TYPE_ID, ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
     }
 
     @Test

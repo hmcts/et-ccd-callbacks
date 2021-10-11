@@ -40,7 +40,7 @@ jacocoTestCoverageVerification {
 }
 
 checkstyle {
-    maxWarnings = 511
+    maxWarnings = 536
     sourceSets = [project.sourceSets.main]
     toolVersion = '8.29'
 }
@@ -175,7 +175,6 @@ dependencyCheck {
     suppressionFile = 'config/owasp/suppressions.xml'
     analyzers.assemblyEnabled = false
 }
-
 repositories {
     mavenLocal()
     mavenCentral()
@@ -183,6 +182,10 @@ repositories {
     maven { url "https://repo.maven.apache.org/maven2" }
     maven { url 'https://repo.spring.io/libs-milestone' }
     maven { url "https://jitpack.io" }
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 def versions = [
@@ -193,7 +196,7 @@ def versions = [
 ]
 
 dependencies {
-    implementation 'com.github.hmcts:ecm-common:0.1.132'
+    implementation 'com.github.hmcts:ecm-common:ret56-SNAPSHOT'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
@@ -264,8 +267,6 @@ dependencies {
     }
     testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
     testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
-
-    testImplementation 'com.github.hmcts:fortify-client:1.2.1:all'
 
     // Contract Tests
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version

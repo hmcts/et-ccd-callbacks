@@ -70,7 +70,7 @@ public class DocumentGenerationServiceTest {
 
         ccdRequest = new CCDRequest();
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseTypeId(MANCHESTER_CASE_TYPE_ID);
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         CaseData caseData = new CaseData();
         caseDetails.setCaseData(caseData);
         ccdRequest.setCaseDetails(caseDetails);
@@ -83,7 +83,7 @@ public class DocumentGenerationServiceTest {
         searchTypeItem.setValue(searchType);
         bulkData.setSearchCollection(new ArrayList<>(Collections.singletonList(searchTypeItem)));
         bulkDetails.setCaseData(bulkData);
-        bulkDetails.setCaseTypeId(MANCHESTER_DEV_BULK_CASE_TYPE_ID);
+        bulkDetails.setCaseTypeId(ENGLANDWALES_DEV_BULK_CASE_TYPE_ID);
         bulkRequest.setCaseDetails(bulkDetails);
         documentGenerationService = new DocumentGenerationService(tornadoService, ccdClient);
         documentInfo = DocumentInfo.builder().description("resources/exampleV1.json").build();

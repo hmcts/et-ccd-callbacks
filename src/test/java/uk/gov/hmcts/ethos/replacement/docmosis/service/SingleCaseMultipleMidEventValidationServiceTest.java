@@ -34,7 +34,7 @@ public class SingleCaseMultipleMidEventValidationServiceTest {
     public void setUp() {
         caseDetails = new CaseDetails();
         caseDetails.setState(ACCEPTED_STATE);
-        caseDetails.setCaseTypeId(MANCHESTER_CASE_TYPE_ID);
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         multipleCaseTypeId = UtilHelper.getBulkCaseTypeId(caseDetails.getCaseTypeId());
         caseDetails.setCaseData(MultipleUtil.getCaseDataForSinglesToBeMoved());
         userToken = "authString";

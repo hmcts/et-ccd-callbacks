@@ -8,6 +8,7 @@ import uk.gov.hmcts.ecm.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.ecm.common.model.bulk.items.MultipleTypeItem;
 import uk.gov.hmcts.ecm.common.model.bulk.items.SearchTypeItem;
 import uk.gov.hmcts.ecm.common.model.bulk.items.SubMultipleTypeItem;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.bulk.types.MultipleType;
 import uk.gov.hmcts.ecm.common.model.bulk.types.SearchType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
@@ -71,7 +72,7 @@ public class BulkHelper {
         return bulkDetails;
     }
 
-    private static void setClaimantSurnameM(CaseData caseData, MultipleType multipleType ) {
+    private static void setClaimantSurnameM(CaseData caseData, MultipleType multipleType) {
         if (caseData.getClaimantIndType() != null && caseData.getClaimantIndType().getClaimantLastName() != null) {
             multipleType.setClaimantSurnameM(caseData.getClaimantIndType().getClaimantLastName());
         } else {
@@ -106,7 +107,11 @@ public class BulkHelper {
     private static MultipleType getMultipleTypeFromCaseData(CaseData caseData) {
         var multipleType = new MultipleType();
         multipleType.setEthosCaseReferenceM(Optional.ofNullable(caseData.getEthosCaseReference()).orElse(" "));
-        multipleType.setClerkRespM(Optional.ofNullable(caseData.getClerkResponsible()).orElse(" "));
+        if (caseData.getClerkResponsible() != null && caseData.getClerkResponsible().getValue() != null) {
+            multipleType.setClerkRespM(caseData.getClerkResponsible().getSelectedLabel());
+        } else {
+            multipleType.setClerkRespM(" ");
+        }
         setClaimantSurnameM(caseData, multipleType);
         setClaimantAddressLine1M(caseData, multipleType);
         setClaimantPostCodeM(caseData, multipleType);
@@ -145,7 +150,8 @@ public class BulkHelper {
             multipleType.setRespondentRepM(" ");
             multipleType.setRespondentRepOrgM(" ");
         }
-        multipleType.setFileLocM(Optional.ofNullable(caseData.getFileLocation()).orElse(" "));
+
+        multipleType.setFileLocM(DynamicFixedListType.getSelectedLabel(caseData.getFileLocation()).orElse(" "));
         multipleType.setReceiptDateM(Optional.ofNullable(caseData.getReceiptDate()).orElse(" "));
         multipleType.setPositionTypeM(Optional.ofNullable(caseData.getPositionType()).orElse(" "));
         multipleType.setFeeGroupReferenceM(Optional.ofNullable(caseData.getFeeGroupReference()).orElse(" "));
@@ -183,15 +189,12 @@ public class BulkHelper {
         if (state != null) {
             if (state.equals(PENDING_STATE)) {
                 return SUBMITTED_STATE;
-            }
-            else {
+            } else {
                 return state;
             }
-        }
-        else {
+        } else {
             return " ";
         }
-
     }
 
     public static SearchType getSearchTypeFromMultipleType(MultipleType multipleType) {

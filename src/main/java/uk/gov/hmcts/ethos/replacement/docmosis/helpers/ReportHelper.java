@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.ccd.items.BFActionTypeItem;
@@ -229,13 +230,17 @@ public class ReportHelper {
     }
 
     private static boolean validateClerkResponsible(ListingData listingData, CaseData caseData) {
-        if (listingData.getClerkResponsible() != null) {
-            if (caseData.getClerkResponsible() != null) {
-                return listingData.getClerkResponsible().equals(caseData.getClerkResponsible());
-            }
-            return false;
+        var listingClerkCode = getClerkCode(listingData.getClerkResponsible());
+        var caseDataClerkCode = getClerkCode(caseData.getClerkResponsible());
+        if (listingClerkCode != null) {
+            return listingClerkCode.equals(caseDataClerkCode);
+        } else {
+            return true;
         }
-        return true;
+    }
+
+    private static String getClerkCode(DynamicFixedListType dynamicFixedListType) {
+        return dynamicFixedListType != null ? dynamicFixedListType.getSelectedCode() : null;
     }
 
     private static void getCommonReportDetailFields(ListingDetails listingDetails, CaseData caseData,
@@ -247,14 +252,17 @@ public class ReportHelper {
         adhocReportType.setPosition(caseData.getCurrentPosition());
         adhocReportType.setDateToPosition(caseData.getDateToPosition());
         adhocReportType.setFileLocation(getFileLocation(listingDetails, caseData));
-        adhocReportType.setClerk(caseData.getClerkResponsible());
+        if (caseData.getClerkResponsible() != null && caseData.getClerkResponsible().getValue() != null) {
+            adhocReportType.setClerk(caseData.getClerkResponsible().getSelectedLabel());
+        }
         adhocReportType.setCaseType(caseData.getCaseType());
     }
 
     private static String getFileLocation(ListingDetails listingDetails, CaseData caseData) {
         String caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
         if (!caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
-            return caseData.getFileLocation();
+            var fileLocation = caseData.getFileLocation();
+            return fileLocation != null && fileLocation.getValue() != null ? fileLocation.getSelectedLabel() : null;
         } else {
             switch (caseData.getManagingOffice()) {
                 case DUNDEE_OFFICE:

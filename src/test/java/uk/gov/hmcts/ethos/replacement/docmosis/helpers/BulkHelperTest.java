@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.bulk.BulkDetails;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.bulk.types.MultipleType;
 import uk.gov.hmcts.ecm.common.model.bulk.types.SearchType;
 import uk.gov.hmcts.ecm.common.model.ccd.Address;
@@ -46,7 +47,7 @@ public class BulkHelperTest {
         bulkDetailsListCases = generateBulkDetails("bulkDetailsTest1.json");
         bulkDetailsScheduleDetailed = generateBulkDetails("bulkDetailsTest2.json");
         CaseData caseData = new CaseData();
-        caseData.setClerkResponsible("JuanFran");
+        caseData.setClerkResponsible(new DynamicFixedListType("JuanFran"));
         caseData.setEthosCaseReference("111");
         ClaimantIndType claimantIndType = new ClaimantIndType();
         claimantIndType.setClaimantLastName("Mike");
@@ -64,7 +65,7 @@ public class BulkHelperTest {
         respondentSumTypeItem.setValue(respondentSumType);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(respondentSumTypeItem)));
 
-        caseData.setFileLocation("Manchester");
+        caseData.setFileLocation(new DynamicFixedListType("Manchester"));
         JurCodesType jurCodesType = new JurCodesType();
         jurCodesType.setJuridictionCodesList("AA");
         JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
@@ -159,7 +160,7 @@ public class BulkHelperTest {
         CaseData caseData = new CaseData();
         caseData.setClaimantIndType(claimantIndType);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(respondentSumTypeItem)));
-        caseData.setFileLocation("Manchester");
+        caseData.setFileLocation(new DynamicFixedListType("Manchester"));
         caseData.setFeeGroupReference("11111");
         submitEvent.setCaseData(caseData);
         return submitEvent;

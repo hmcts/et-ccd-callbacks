@@ -19,7 +19,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -88,12 +91,11 @@ public class TornadoService {
     }
 
     private DefaultValues getAllocatedCourtAddress(CaseData caseData, String caseTypeId, MultipleData multipleData) {
-//        if ((multipleData != null && isAllocatedOffice(caseTypeId, multipleData.getCorrespondenceScotType()))
-//                || isAllocatedOffice(caseTypeId, caseData.getCorrespondenceScotType())) {
-//            return defaultValuesReaderService.getDefaultValues(caseData.getAllocatedOffice(), caseTypeId);
-//        }
-//        return null;
-        throw new UnsupportedOperationException();
+        if ((multipleData != null && isAllocatedOffice(caseTypeId, multipleData.getCorrespondenceScotType()))
+                || isAllocatedOffice(caseTypeId, caseData.getCorrespondenceScotType())) {
+            return defaultValuesReaderService.getDefaultValues(caseData.getAllocatedOffice());
+        }
+        return null;
     }
 
     private boolean isAllocatedOffice(String caseTypeId, CorrespondenceScotType correspondenceScotType) {

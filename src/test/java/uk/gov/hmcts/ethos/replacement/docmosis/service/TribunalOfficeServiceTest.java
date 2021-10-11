@@ -13,12 +13,12 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.TribunalOfficesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.TribunalOffice;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 
 @RunWith(Parameterized.class)
 @SpringBootTest(classes = {
@@ -34,35 +34,28 @@ public class TribunalOfficeServiceTest {
     TribunalOfficesService tribunalOfficesService;
 
     private final static Object[][] TEST_CASES = new Object[][] {
-            { ENGLANDWALES_DEV_CASE_TYPE_ID, null, "M3 2JA" },
-            { ENGLANDWALES_USERS_CASE_TYPE_ID, null, "M3 2JA" },
-            { ENGLANDWALES_CASE_TYPE_ID, null, "M3 2JA" },
-            { SCOTLAND_DEV_CASE_TYPE_ID, null, "G2 8GT" },
-            { SCOTLAND_USERS_CASE_TYPE_ID, null, "G2 8GT" },
-            { SCOTLAND_CASE_TYPE_ID, null, "G2 8GT" },
-            { SCOTLAND_DEV_CASE_TYPE_ID, "Unknown office", "G2 8GT" },
-            { SCOTLAND_USERS_CASE_TYPE_ID, "Unknown office", "G2 8GT" },
-            { SCOTLAND_CASE_TYPE_ID, "Unknown office", "G2 8GT" },
-            { SCOTLAND_DEV_CASE_TYPE_ID, GLASGOW_OFFICE, "G2 8GT" },
-            { SCOTLAND_USERS_CASE_TYPE_ID, GLASGOW_OFFICE, "G2 8GT" },
-            { SCOTLAND_CASE_TYPE_ID, GLASGOW_OFFICE, "G2 8GT" },
-            { SCOTLAND_DEV_CASE_TYPE_ID, ABERDEEN_OFFICE, "AB10 1SH" },
-            { SCOTLAND_USERS_CASE_TYPE_ID, ABERDEEN_OFFICE, "AB10 1SH" },
-            { SCOTLAND_CASE_TYPE_ID, ABERDEEN_OFFICE, "AB10 1SH" },
-            { SCOTLAND_DEV_CASE_TYPE_ID, DUNDEE_OFFICE, "DD1 4QB" },
-            { SCOTLAND_USERS_CASE_TYPE_ID, DUNDEE_OFFICE, "DD1 4QB" },
-            { SCOTLAND_CASE_TYPE_ID, DUNDEE_OFFICE, "DD1 4QB" },
-            { SCOTLAND_DEV_CASE_TYPE_ID, EDINBURGH_OFFICE, "EH3 7HF" },
-            { SCOTLAND_USERS_CASE_TYPE_ID, EDINBURGH_OFFICE, "EH3 7HF" },
-            { SCOTLAND_CASE_TYPE_ID, EDINBURGH_OFFICE, "EH3 7HF" },
-            { "UNKNOWN_CASE_TYPE_ID", null, "M3 2JA" },
+            { TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA" },
+            { TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA" },
+            { TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA" },
+            { TribunalOffice.GLASGOW.getOfficeName(), "G2 8GT" },
+            { TribunalOffice.GLASGOW.getOfficeName(), "G2 8GT" },
+            { TribunalOffice.GLASGOW.getOfficeName(), "G2 8GT" },
+            { TribunalOffice.ABERDEEN.getOfficeName(), "AB10 1SH" },
+            { TribunalOffice.ABERDEEN.getOfficeName(), "AB10 1SH" },
+            { TribunalOffice.ABERDEEN.getOfficeName(), "AB10 1SH" },
+            { TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB" },
+            { TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB" },
+            { TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB" },
+            { TribunalOffice.EDINBURGH.getOfficeName(), "EH3 7HF" },
+            { TribunalOffice.EDINBURGH.getOfficeName(), "EH3 7HF" },
+            { TribunalOffice.EDINBURGH.getOfficeName(), "EH3 7HF" }
     };
 
-    private String caseTypeId;
-    private String expectedPostcode;
+    private final String owningOffice;
+    private final String expectedPostcode;
 
-    public TribunalOfficeServiceTest(String caseTypeId, String managingOffice, String expectedPostcode) {
-        this.caseTypeId = caseTypeId;
+    public TribunalOfficeServiceTest(String owningOffice, String expectedPostcode) {
+        this.owningOffice = owningOffice;
         this.expectedPostcode = expectedPostcode;
     }
 
@@ -73,7 +66,7 @@ public class TribunalOfficeServiceTest {
 
     @Test
     public void testGetsCorrectTribunalContactDetails() {
-        ContactDetails contactDetails = tribunalOfficesService.getTribunalContactDetails(caseTypeId);
+        ContactDetails contactDetails = tribunalOfficesService.getTribunalContactDetails(owningOffice);
         assertEquals(expectedPostcode, contactDetails.getPostcode());
     }
 }

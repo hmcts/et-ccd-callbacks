@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ecm.common.model.multiples.SubmitMultipleEvent;
@@ -15,13 +14,19 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesReadin
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleHelperService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class AddSingleCaseToMultipleServiceTest {
@@ -34,33 +39,30 @@ public class AddSingleCaseToMultipleServiceTest {
     private AddSingleCaseToMultipleService addSingleCaseToMultipleService;
 
     private CaseDetails caseDetails;
-    private String userToken;
-    private String multipleCaseTypeId;
+    private final String userToken = "authString";
+    private final String multipleCaseTypeId = ENGLANDWALES_BULK_CASE_TYPE_ID;
     private MultipleDetails multipleDetails;
     private List<SubmitMultipleEvent> submitMultipleEvents;
-    private List<String> caseIdCollection;
+    private final List<String> caseIdCollection = List.of("21006/2020", "245000/2020", "245001/2020");
 
     @Before
     public void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
-        multipleDetails.setCaseTypeId("Manchester_Multiple");
+        multipleDetails.setCaseTypeId(multipleCaseTypeId);
         multipleDetails.setCaseId("12121212");
+
         caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
-        multipleCaseTypeId = UtilHelper.getBulkCaseTypeId(caseDetails.getCaseTypeId());
         caseDetails.setCaseData(MultipleUtil.getCaseDataForSinglesToBeMoved());
         caseDetails.setCaseId("12321321");
+
         submitMultipleEvents = MultipleUtil.getSubmitMultipleEvents();
         submitMultipleEvents.get(0).setCaseId(12121212);
-        caseIdCollection = new ArrayList<>(Arrays.asList("21006/2020", "245000/2020", "245001/2020"));
-        userToken = "authString";
-
     }
 
     @Test
     public void addSingleCaseToMultipleLogicLead() {
-
         List<String> errors = new ArrayList<>();
         String updatedSubMultipleName = caseDetails.getCaseData().getSubMultipleName();
 

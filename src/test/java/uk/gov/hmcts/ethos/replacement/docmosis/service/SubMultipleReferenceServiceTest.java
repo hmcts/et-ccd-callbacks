@@ -1,19 +1,21 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SubMultipleRefEnglandWalesRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SubMultipleRefScotlandRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.TribunalOffice;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_OFFICE_NUMBER;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_DEV_BULK_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_OFFICE_NUMBER;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SubMultipleReferenceServiceTest {
@@ -21,32 +23,29 @@ public class SubMultipleReferenceServiceTest {
     @InjectMocks
     private SubMultipleReferenceService subMultipleReferenceService;
     @Mock
+    private SubMultipleRefEnglandWalesRepository subMultipleRefEnglandWalesRepository;
+    @Mock
     private SubMultipleRefScotlandRepository subMultipleRefScotlandRepository;
-
-    private String manchesterMultipleReference;
-    private String scotlandMultipleReference;
-    private String multipleRef;
-
-    @Before
-    public void setUp() {
-        multipleRef = "10000";
-        manchesterMultipleReference = TribunalOffice.MANCHESTER.getOfficeNumber() + multipleRef;
-        scotlandMultipleReference = TribunalOffice.GLASGOW.getOfficeNumber() + multipleRef;
-    }
 
     @Test
     public void createManchesterReference() {
-        fail("Implement EnglandWales test");
+        var multipleRef = ENGLANDWALES_OFFICE_NUMBER + "1000";
+        when(subMultipleRefEnglandWalesRepository.ethosSubMultipleCaseRefGen(Integer.parseInt(multipleRef), 1,
+                ENGLANDWALES_CASE_TYPE_ID)).thenReturn(multipleRef + "/1");
+        var expectedRef = multipleRef + "/1";
+
+        assertEquals(expectedRef, subMultipleReferenceService.createReference(ENGLANDWALES_BULK_CASE_TYPE_ID,
+                multipleRef, 1));
     }
 
     @Test
     public void createScotlandReference() {
-        when(subMultipleRefScotlandRepository.ethosSubMultipleCaseRefGen(Integer.parseInt(scotlandMultipleReference), 1,
-                SCOTLAND_CASE_TYPE_ID)).thenReturn(scotlandMultipleReference + "/1");
-        String scotlandRef = TribunalOffice.GLASGOW.getOfficeNumber() + multipleRef + "/1";
-        assertEquals(subMultipleReferenceService.createReference(SCOTLAND_DEV_BULK_CASE_TYPE_ID, scotlandMultipleReference, 1), scotlandRef);
+        var multipleRef = SCOTLAND_OFFICE_NUMBER + "1000";
+        when(subMultipleRefScotlandRepository.ethosSubMultipleCaseRefGen(Integer.parseInt(multipleRef), 1,
+                SCOTLAND_CASE_TYPE_ID)).thenReturn(multipleRef + "/1");
+        var expectedRef = multipleRef + "/1";
+
+        assertEquals(expectedRef, subMultipleReferenceService.createReference(SCOTLAND_BULK_CASE_TYPE_ID,
+                multipleRef, 1));
     }
-
-
-
 }

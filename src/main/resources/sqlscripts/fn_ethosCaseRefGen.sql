@@ -82,7 +82,7 @@ BEGIN
 
             WHEN (currentval + numofcases) > 99999  THEN
                 UPDATE  "singlereferenceEnglandWales" SET counter = (numofcases + currentval) - 99999,
-                                                      cyear = RIGHT(currentyr, 2);
+                                                          cyear = RIGHT(currentyr, 2);
 
                 IF (currentval + 1)  > 99999 THEN
                     currentval := 0;

@@ -24,6 +24,47 @@ BEGIN
 
   CASE
 
+/***********   EnglandWales   ************/
+
+    WHEN office = 'EnglandWales' THEN
+
+    -- Acquire Lock on singleReferenceManchester table
+
+SELECT counter, cyear INTO currentval,currentyr FROM singlereferenceEnglandWales FOR UPDATE ;
+
+
+CASE
+
+    WHEN currentyr <> yr::text AND RIGHT(currentyr, 2) <> RIGHT(yr::text, 2) THEN
+UPDATE  singlereferenceEnglandWales SET counter = numofcases, cyear = yr ;
+currentval := 0;
+    currentyr = yr;
+
+
+WHEN (currentval + numofcases) > 99999  THEN
+UPDATE  singlereferenceEnglandWales SET counter = (numofcases + currentval) - 99999,
+                                        cyear = RIGHT(currentyr, 2);
+
+IF (currentval + 1)  > 99999 THEN
+                currentval := 0;
+                currentyr = CONCAT('00',RIGHT(currentyr, 2));
+END IF;
+ELSE
+
+UPDATE  singlereferenceEnglandWales SET counter = counter + numofcases ;
+
+END CASE;
+
+
+    currentval = currentval + 1 ;
+    currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
+
+    currentyr =  RIGHT(CONCAT('00',currentyr),4);
+
+    currentvalstr = CONCAT(currentvalstr,'/',currentyr);
+
+RETURN  currentvalstr;
+
 /***********   1. Manchester   ************/
 
     WHEN office = 'Manchester' THEN

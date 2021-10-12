@@ -15,6 +15,12 @@ plugins {
 group = 'uk.gov.hmcts.ethos.replacement'
 version = '0.0.1'
 
+// For CCD consolidation work
+// Can be removed once complete
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 allprojects {
     sourceCompatibility = '11.0'
     targetCompatibility = '11.0'

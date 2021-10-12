@@ -1,11 +1,11 @@
 insert into judge (code, name, tribunal_office, employment_status)
-values ('001', 'Judge Yellow', 'BRISTOL', 'SALARIED');
+values ('001', 'Judge Bristol 1', 'BRISTOL', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('002', 'Judge Brown', 'BRISTOL', 'SALARIED');
+values ('002', 'Judge Bristol 2', 'BRISTOL', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('003', 'Judge Pink', 'BRISTOL', 'FEE_PAID');
+values ('003', 'Judge Bristol 3', 'BRISTOL', 'FEE_PAID');
 
 insert into venue (tribunal_office, code, name)
 values ('BRISTOL', 'Barnstaple', 'Barnstaple');
@@ -65,13 +65,13 @@ insert into court_worker (tribunal_office, type, code, name)
 values ('BRISTOL', 'EMPLOYER_MEMBER', 'Miss BRISTOL ER', 'Miss BRISTOL ER');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('001', 'Judge Cream', 'LEEDS', 'SALARIED');
+values ('001', 'Judge Leeds 1', 'LEEDS', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('002', 'Judge Blue', 'LEEDS', 'SALARIED');
+values ('002', 'Judge Leeds 2', 'LEEDS', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('003', 'Judge Red', 'LEEDS', 'FEE_PAID');
+values ('003', 'Judge Leeds 3', 'LEEDS', 'FEE_PAID');
 
 insert into venue (tribunal_office, code, name)
 values ('LEEDS', 'Hull', 'Hull');
@@ -119,13 +119,19 @@ insert into court_worker (tribunal_office, type, code, name)
 values ('LEEDS', 'EMPLOYER_MEMBER', 'Miss LEEDS ER', 'Miss LEEDS ER');
 
 insert into file_location (tribunal_office, code, name)
-values ('LEEDS', 'A/W ET3', 'A/W ET3');
+values ('LEEDS', 'Leeds Desk 1', 'Leeds Desk 1');
 
 insert into file_location (tribunal_office, code, name)
-values ('LEEDS', 'A/W Listing', 'A/W Listing');
+values ('LEEDS', 'Leeds Desk 2', 'Leeds Desk 2');
 
 insert into file_location (tribunal_office, code, name)
-values ('LEEDS', 'B/F Casework', 'B/F Casework');
+values ('LEEDS', 'Leeds Desk 3', 'Leeds Desk 3');
 
 insert into file_location (tribunal_office, code, name)
-values ('LEEDS', 'B/F Listing', 'B/F Listing');
+values ('BRISTOL', 'Bristol Desk 1', 'Bristol Desk 1');
+
+insert into file_location (tribunal_office, code, name)
+values ('BRISTOL', 'Bristol Desk 2', 'Bristol Desk 2');
+
+insert into file_location (tribunal_office, code, name)
+values ('BRISTOL', 'Bristol Desk 3', 'Bristol Desk 3');

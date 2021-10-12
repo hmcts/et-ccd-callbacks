@@ -19,6 +19,17 @@ CREATE TABLE singleReferenceManchester
 DELETE FROM singleReferenceManchester ; -- remove any existing values in case the script is ran more than once
 INSERT INTO singleReferenceManchester VALUES (0,EXTRACT(YEAR FROM CURRENT_DATE));
 
+/***********   EnglandWales   ************/
+
+DROP TABLE IF EXISTS singleReferenceEnglandWales;
+CREATE TABLE singleReferenceEnglandWales
+(
+    counter int,
+    cyear varchar(10)
+);
+DELETE FROM singleReferenceEnglandWales ; -- remove any existing values in case the script is ran more than once
+INSERT INTO singleReferenceEnglandWales VALUES (0,EXTRACT(YEAR FROM CURRENT_DATE));
+
 /***********   2. Scotland   ************/  
 
 DROP TABLE IF EXISTS singleReferenceScotland;

@@ -2,8 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.FileLocationRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.FileLocationService;
 
 import java.util.List;

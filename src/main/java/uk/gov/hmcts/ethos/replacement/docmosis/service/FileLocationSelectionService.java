@@ -3,8 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.FileLocationService;
 
 @Service
@@ -20,7 +20,7 @@ public class FileLocationSelectionService {
     }
 
     public void initialiseFileLocation(MultipleData multipleData) {
-        multipleData.setFileLocation(createFileLocations(multipleData.getManagingOffice(),
+        multipleData.setFileLocation(createFileLocations(multipleData.getOwningOffice(),
                 multipleData.getFileLocation()));
     }
 

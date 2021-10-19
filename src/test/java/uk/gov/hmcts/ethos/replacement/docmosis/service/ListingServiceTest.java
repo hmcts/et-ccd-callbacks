@@ -688,7 +688,7 @@ public class ListingServiceTest {
                 "broughtForwardDateReason=null))], clerkResponsible=null, reportType=Brought Forward Report, documentName=null, showAll=null, " +
                 "localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, " +
                 "localReportsDetailHdr=null, localReportsDetail=null, owningOffice=Leeds)";
-        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
        listingDetails.getCaseData().setOwningOffice("Leeds");
         ListingData listingDataResult = listingService.generateReportData(listingDetails, "authToken");
         assertEquals(result, listingDataResult.toString());
@@ -705,7 +705,7 @@ public class ListingServiceTest {
                 "localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, localReportsDetailHdr=null, localReportsDetail=null, owningOffice=Leeds)";
         listingDetails.getCaseData().setListingDate("2019-12-30");
         listingDetails.getCaseData().setOwningOffice("Leeds");
-        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.generateReportData(listingDetails, "authToken");
         assertEquals(result, listingDataResult.toString());
         listingDetails.getCaseData().setListingDate("2019-12-12");
@@ -724,7 +724,7 @@ public class ListingServiceTest {
                 "clerkResponsible=null, reportType=Brought Forward Report, documentName=null, showAll=null, localReportsSummaryHdr=null, " +
                 "localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, localReportsDetailHdr=null, " +
                 "localReportsDetail=null, owningOffice=Leeds)";
-        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         listingDetailsRange.getCaseData().setOwningOffice("Leeds");
         ListingData listingDataResult = listingService.generateReportData(listingDetailsRange, "authToken");
         assertEquals(result, listingDataResult.toString());
@@ -741,7 +741,7 @@ public class ListingServiceTest {
                 "localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, localReportsDetailHdr=null, localReportsDetail=null, owningOffice=Leeds)";
         listingDetailsRange.getCaseData().setClerkResponsible(new DynamicFixedListType("not there"));
         listingDetailsRange.getCaseData().setOwningOffice("Leeds");
-        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.generateReportData(listingDetailsRange, "authToken");
         assertEquals(result, listingDataResult.toString());
         listingDetailsRange.getCaseData().setClerkResponsible(new DynamicFixedListType("Steve Jones"));
@@ -798,7 +798,7 @@ public class ListingServiceTest {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(CLAIMS_ACCEPTED_REPORT);
         listingDetails.getCaseData().setOwningOffice("Leeds");
-        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.generateReportData(listingDetails, "authToken");
         assertEquals(result, listingDataResult.toString());
     }
@@ -854,7 +854,7 @@ public class ListingServiceTest {
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(CLAIMS_ACCEPTED_REPORT);
         listingDetails.getCaseData().setOwningOffice("Leeds");
-        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         submitEvents.get(0).getCaseData().setManagingOffice("Glasgow");
         ListingData listingDataResult = listingService.generateReportData(listingDetails, "authToken");
         assertEquals(result, listingDataResult.toString());
@@ -956,7 +956,7 @@ public class ListingServiceTest {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(LIVE_CASELOAD_REPORT);
         listingDetails.getCaseData().setOwningOffice("Leeds");
-        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.generateReportData(listingDetails, "authToken");
         assertEquals(result, listingDataResult.toString());
     }
@@ -1034,7 +1034,7 @@ public class ListingServiceTest {
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(LIVE_CASELOAD_REPORT);
         listingDetails.getCaseData().setOwningOffice("Aberdeen");
-        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         submitEvents.get(0).getCaseData().setManagingOffice("Aberdeen");
         submitEvents.get(0).getCaseData().setPositionType(POSITION_TYPE_CASE_CLOSED);
         ListingData listingDataResult = listingService.generateReportData(listingDetails, "authToken");
@@ -1047,7 +1047,7 @@ public class ListingServiceTest {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(CASES_COMPLETED_REPORT);
         listingDetails.getCaseData().setOwningOffice("Leeds");
-        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.generateReportData(listingDetails, "authToken");
         assertNotNull(listingDataResult.getLocalReportsDetailHdr());
         assertEquals(1, listingDataResult.getLocalReportsDetail().size());
@@ -1058,7 +1058,7 @@ public class ListingServiceTest {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(CASES_COMPLETED_REPORT);
         listingDetails.getCaseData().setOwningOffice("Leeds");
-        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         submitEvents.get(0).getCaseData().setConciliationTrack(CONCILIATION_TRACK_FAST_TRACK);
         ListingData listingDataResult = listingService.generateReportData(listingDetails, "authToken");
         assertNotNull(listingDataResult.getLocalReportsDetailHdr());
@@ -1071,7 +1071,7 @@ public class ListingServiceTest {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(CASES_COMPLETED_REPORT);
         listingDetails.getCaseData().setOwningOffice("Leeds");
-        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         submitEvents.get(0).getCaseData().setConciliationTrack(CONCILIATION_TRACK_STANDARD_TRACK);
         ListingData listingDataResult = listingService.generateReportData(listingDetails, "authToken");
         assertNotNull(listingDataResult.getLocalReportsDetailHdr());
@@ -1084,7 +1084,7 @@ public class ListingServiceTest {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(CASES_COMPLETED_REPORT);
         listingDetails.getCaseData().setOwningOffice("Leeds");
-        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         submitEvents.get(0).getCaseData().setConciliationTrack(CONCILIATION_TRACK_OPEN_TRACK);
         ListingData listingDataResult = listingService.generateReportData(listingDetails, "authToken");
         assertNotNull(listingDataResult.getLocalReportsDetailHdr());
@@ -1094,7 +1094,7 @@ public class ListingServiceTest {
 
     @Test(expected = Exception.class)
     public void generateReportDataWithException() throws IOException {
-        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), any(), anyString(), anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
         listingService.generateReportData(listingDetails, "authToken");
     }
 

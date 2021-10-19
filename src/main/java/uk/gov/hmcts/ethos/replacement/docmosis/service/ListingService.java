@@ -234,13 +234,13 @@ public class ListingService {
         boolean isRangeHearingDateType = listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE);
         if (!isRangeHearingDateType) {
             var dateToSearch = LocalDate.parse(listingData.getListingDate(), OLD_DATE_TIME_PATTERN2).toString();
-            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, TribunalOffice.valueOfOfficeName(listingData.getOwningOffice())
+            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, listingDetails.getCaseTypeId(), TribunalOffice.valueOfOfficeName(listingData.getOwningOffice())
                     , dateToSearch, dateToSearch, listingData.getReportType());
         } else {
             var dateToSearchFrom = LocalDate.parse(listingData.getListingDateFrom(),
                     OLD_DATE_TIME_PATTERN2).toString();
             var dateToSearchTo = LocalDate.parse(listingData.getListingDateTo(), OLD_DATE_TIME_PATTERN2).toString();
-            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, TribunalOffice.valueOfOfficeName(listingData.getOwningOffice())
+            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, listingDetails.getCaseTypeId(), TribunalOffice.valueOfOfficeName(listingData.getOwningOffice())
                     , dateToSearchFrom, dateToSearchTo, listingData.getReportType());
         }
     }

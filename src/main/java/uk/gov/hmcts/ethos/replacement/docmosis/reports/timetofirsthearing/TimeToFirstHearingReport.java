@@ -89,8 +89,8 @@ public class TimeToFirstHearingReport {
     }
 
     private void executeReport(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
-        log.info(String.format("Time to first hearing report case type id %s search results: %d",
-                listingDetails.getCaseTypeId(), submitEvents.size()));
+        log.info(String.format("Time to first hearing report case type id %s for office %s with search results: %d",
+                listingDetails.getCaseTypeId(), listingDetails.getCaseData().getOwningOffice(), submitEvents.size()));
         populateLocalReportSummary(listingDetails.getCaseData(), submitEvents);
         populateLocalReportSummaryHdr(listingDetails);
         populateLocalReportSummaryDetail(listingDetails, submitEvents);

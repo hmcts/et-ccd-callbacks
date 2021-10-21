@@ -199,9 +199,9 @@ public class ListingService {
 
     private CasesAwaitingJudgmentReportData getCasesAwaitingJudgmentReport(
             ListingDetails listingDetails, String authToken) {
-        log.info("Cases Awaiting Judgment for {}", listingDetails.getCaseTypeId());
+        log.info("Cases Awaiting Judgment for {}, Office {}", listingDetails.getCaseTypeId(),
+                listingDetails.getCaseData().getOwningOffice());
         var reportDataSource = new CcdReportDataSource(authToken, ccdClient);
-
         var casesAwaitingJudgmentReport = new CasesAwaitingJudgmentReport(reportDataSource);
         var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         reportData.setDocumentName(listingDetails.getCaseData().getDocumentName());

@@ -6,6 +6,7 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
+import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CaseData;
 import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
 
@@ -65,23 +66,23 @@ public class CasesAwaitingJudgmentReport {
         this.clock = clock;
     }
 
-    public CasesAwaitingJudgmentReportData runReport(String caseTypeId) {
-        var submitEvents = getCases(caseTypeId);
+    public CasesAwaitingJudgmentReportData runReport(ListingDetails listingDetails) {
+        var submitEvents = getCases(listingDetails.getCaseTypeId(),
+                listingDetails.getCaseData().getOwningOffice());
 
-        var reportData = initReport(caseTypeId);
+        var reportData = initReport(listingDetails.getCaseData().getOwningOffice());
         populateData(reportData, submitEvents);
 
         return reportData;
     }
 
-    private CasesAwaitingJudgmentReportData initReport(String caseTypeId) {
-        var office = UtilHelper.getListingCaseTypeId(caseTypeId);
-        var reportSummary = new ReportSummary(office);
+    private CasesAwaitingJudgmentReportData initReport(String owningOffice) {
+        var reportSummary = new ReportSummary(owningOffice);
         return new CasesAwaitingJudgmentReportData(reportSummary);
     }
 
-    private List<CasesAwaitingJudgmentSubmitEvent> getCases(String caseTypeId) {
-        return reportDataSource.getData(UtilHelper.getListingCaseTypeId(caseTypeId));
+    private List<CasesAwaitingJudgmentSubmitEvent> getCases(String caseTypeId, String owningOffice) {
+        return reportDataSource.getData(UtilHelper.getListingCaseTypeId(caseTypeId), owningOffice);
     }
 
     private void populateData(CasesAwaitingJudgmentReportData reportData,
@@ -96,8 +97,8 @@ public class CasesAwaitingJudgmentReport {
             log.info("Adding case {} to Cases Awaiting Judgment report", caseData.getEthosCaseReference());
 
             var heardHearing = getLatestHeardHearing(caseData.getHearingCollection());
-            LocalDate today = LocalDate.now(clock);
-            LocalDate listedDate = LocalDate.parse(heardHearing.listedDate, OLD_DATE_TIME_PATTERN);
+            var today = LocalDate.now(clock);
+            var listedDate = LocalDate.parse(heardHearing.listedDate, OLD_DATE_TIME_PATTERN);
 
             reportDetail.setPositionType(caseData.getPositionType());
             reportDetail.setWeeksSinceHearing(getWeeksSinceHearing(listedDate, today));

@@ -203,7 +203,7 @@ public class ListingService {
         var reportDataSource = new CcdReportDataSource(authToken, ccdClient);
 
         var casesAwaitingJudgmentReport = new CasesAwaitingJudgmentReport(reportDataSource);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails.getCaseTypeId());
+        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         reportData.setDocumentName(listingDetails.getCaseData().getDocumentName());
         reportData.setReportType(listingDetails.getCaseData().getReportType());
         return reportData;

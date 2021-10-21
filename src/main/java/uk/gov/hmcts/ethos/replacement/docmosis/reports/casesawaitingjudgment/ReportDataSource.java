@@ -5,5 +5,5 @@ import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CasesAwaiting
 import java.util.List;
 
 public interface ReportDataSource {
-    List<CasesAwaitingJudgmentSubmitEvent> getData(String caseTypeId);
+    List<CasesAwaitingJudgmentSubmitEvent> getData(String caseTypeId, String owningOffice);
 }

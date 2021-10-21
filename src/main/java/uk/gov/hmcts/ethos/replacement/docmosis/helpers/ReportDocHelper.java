@@ -183,8 +183,15 @@ public class ReportDocHelper {
 
     private static StringBuilder getTimeToFirstHearingReport(ListingData listingData) {
         var sb = new StringBuilder();
-        AdhocReportType localReportDetailHdr = listingData.getLocalReportsDetailHdr();
-        AdhocReportType localReportSummary = listingData.getLocalReportsSummary().get(0).getValue();
+        AdhocReportType localReportDetailHdr = null;
+        AdhocReportType localReportSummary = null;
+        if (listingData != null && listingData.getLocalReportsDetailHdr() != null) {
+            localReportDetailHdr = listingData.getLocalReportsDetailHdr();
+        }
+        if (listingData != null && listingData.getLocalReportsSummary() != null
+                && listingData.getLocalReportsSummary().size() > 0) {
+            localReportSummary = listingData.getLocalReportsSummary().get(0).getValue();
+        }
 
         if (localReportDetailHdr != null) {
             sb.append("\"Total_Cases\":\"").append(
@@ -197,6 +204,8 @@ public class ReportDocHelper {
                     nullCheck(localReportDetailHdr.getTotalx26wk())).append(NEW_LINE);
             sb.append("\"Total_Percent_Not_Within_26Weeks\":\"").append(
                     nullCheck(localReportDetailHdr.getTotalx26wkPerCent())).append(NEW_LINE);
+        }
+        if (localReportSummary != null) {
             sb.append("\"ConNone_Total\":\"").append(
                     nullCheck(localReportSummary.getConNoneTotal())).append(NEW_LINE);
             sb.append("\"ConNone_Total_26_Week\":\"").append(

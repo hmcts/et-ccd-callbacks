@@ -17,15 +17,18 @@ public class HearingSelectionService {
     public List<DynamicValueType> getHearingSelection(CaseData caseData) {
         var values = new ArrayList<DynamicValueType>();
 
-        for (var hearing : caseData.getHearingCollection()) {
-            for (var listing : hearing.getValue().getHearingDateCollection()) {
-                var code = listing.getId();
+        if (caseData.getHearingCollection() != null && caseData.getHearingCollection().size() > 0) {
+            for (var hearing : caseData.getHearingCollection()) {
+                for (var listing : hearing.getValue().getHearingDateCollection()) {
+                    var code = listing.getId();
 
-                var date = UtilHelper.formatLocalDateTime(listing.getValue().getListedDate());
-                var label = String.format("Hearing %s, %s", hearing.getValue().getHearingNumber(), date);
-                values.add(DynamicValueType.create(code, label));
+                    var date = UtilHelper.formatLocalDateTime(listing.getValue().getListedDate());
+                    var label = String.format("Hearing %s, %s", hearing.getValue().getHearingNumber(), date);
+                    values.add(DynamicValueType.create(code, label));
+                }
             }
         }
+
 
         return values;
     }

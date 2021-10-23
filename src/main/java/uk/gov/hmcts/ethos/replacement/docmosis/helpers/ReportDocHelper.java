@@ -249,7 +249,7 @@ public class ReportDocHelper {
 
         }
 
-        if (!CollectionUtils.isEmpty(listingData.getLocalReportsDetail())) {
+        if (listingData != null && !CollectionUtils.isEmpty(listingData.getLocalReportsDetail())) {
             var adhocReportTypeItems = listingData.getLocalReportsDetail();
             sb.append(REPORT_LIST);
             for (var i = 0; i < adhocReportTypeItems.size(); i++) {

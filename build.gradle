@@ -12,7 +12,7 @@ plugins {
     id 'io.freefair.lombok' version '5.3.0'
 }
 
-group = 'uk.gov.hmcts.ethos.replacement'
+group = 'uk.gov.hmcts.et'
 version = '0.0.1'
 
 allprojects {
@@ -54,7 +54,7 @@ def sonarExclusions = ['**/uk/gov/hmcts/ethos/replacement/docmosis/config/**',
 sonarqube {
     properties {
         property "sonar.exclusions", sonarExclusions.join(', ')
-        property "sonar.projectKey", "ethos-repl-docmosis-service"
+        property "sonar.projectKey", "et-ccd-callbacks"
         property "sonar.dynamicAnalysis", "reuseReports"
         property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
@@ -195,7 +195,7 @@ def versions = [
 
 dependencies {
 
-    implementation 'com.github.hmcts:ecm-common:ret56-SNAPSHOT'
+    implementation 'com.github.hmcts:et-common:0.1.140'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
@@ -284,7 +284,7 @@ dependencies {
 
 bootJar {
     getArchiveFileName().set(provider {
-        'ethos-repl-docmosis-service.jar'
+        'et-ccd-callbacks.jar'
     })
 
     manifest {

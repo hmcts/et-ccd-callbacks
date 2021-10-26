@@ -1,5 +1,5 @@
 variable "product" {
-  default = "ethos"
+  default = "et"
 }
 
 variable "location" {
@@ -58,7 +58,7 @@ variable "s2s_url" {
 }
 
 variable "micro_service" {
-  default = "ethos_repl_service"
+  default = "et_ccd_callbacks"
 }
 
 variable "ccd_gateway_url" {

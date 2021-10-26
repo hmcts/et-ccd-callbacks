@@ -1,6 +1,7 @@
-# Ethos Replacement Doc Generation Service
+# et-ccd-callbacks
 
-This application generates documents from templates using Docmosis -> Tornado.
+## Employment Tribunals CCD Callbacks Service
+This application is responsible for handling all CCD callback requests
 
 ## Getting started
 

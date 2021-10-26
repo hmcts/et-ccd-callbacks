@@ -22,8 +22,8 @@ module "db" {
   product            = "${var.product}-et-ccd-callbacks-postgres-db"
   location           = var.location_api
   env                = var.env
-  database_name      = "et-ccd-callbacks"
-  postgresql_user    = "et-ccd-callbacks"
+  database_name      = "et_ccd_callbacks"
+  postgresql_user    = "et_ccd_callbacks"
   postgresql_version = "10"
   sku_name           = "GP_Gen5_2"
   sku_tier           = "GeneralPurpose"

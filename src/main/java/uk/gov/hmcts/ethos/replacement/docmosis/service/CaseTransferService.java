@@ -16,12 +16,12 @@ import uk.gov.hmcts.ecm.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -44,7 +44,7 @@ public class CaseTransferService {
             var caseData = caseDetails.getCaseData();
             if (!Strings.isNullOrEmpty(caseData.getCounterClaim())) {
                 List<SubmitEvent> submitEvents =  ccdClient.retrieveCasesElasticSearch(userToken,
-                        caseDetails.getCaseTypeId(), Arrays.asList(caseData.getCounterClaim()));
+                        caseDetails.getCaseTypeId(), Collections.singletonList(caseData.getCounterClaim()));
                 return submitEvents.get(0).getCaseData();
             }
             else {
@@ -83,20 +83,26 @@ public class CaseTransferService {
 
     public void createCaseTransferEvent(CaseData caseData, List<String> errors, String userToken) {
 
-        persistentQHelperService.sendCreationEventToSingles(
-                userToken,
-                caseTypeId,
-                jurisdiction,
-                errors,
-                new ArrayList<>(Collections.singletonList(caseData.getEthosCaseReference())),
-                officeCT,
-                positionTypeCT,
-                ccdGatewayBaseUrl,
-                reasonForCT,
-                SINGLE_CASE_TYPE,
-                NO,
-                null
-        );
+        if (interCountryCaseTransfer(caseData, caseTypeId)) {
+            persistentQHelperService.sendCreationEventToSingles(
+                    userToken,
+                    caseTypeId,
+                    jurisdiction,
+                    errors,
+                    new ArrayList<>(Collections.singletonList(caseData.getEthosCaseReference())),
+                    officeCT,
+                    positionTypeCT,
+                    ccdGatewayBaseUrl,
+                    reasonForCT,
+                    SINGLE_CASE_TYPE,
+                    NO,
+                    null
+            );
+        }
+        else {
+            caseData.setOwningOffice(caseData.getOfficeCT().getValue().getCode());
+        }
+
         caseData.setLinkedCaseCT("Transferred to " + officeCT);
         caseData.setPositionType(positionTypeCT);
         log.info("Clearing the CT payload for case: " + caseData.getEthosCaseReference());
@@ -105,6 +111,18 @@ public class CaseTransferService {
         caseData.setStateAPI(null);
     }
 
+    public boolean interCountryCaseTransfer(CaseData caseData, String caseTypeId) {
+        List<String> scotOffices = List.of(TribunalOffice.ABERDEEN.getOfficeName(), TribunalOffice.DUNDEE.getOfficeName()
+                , TribunalOffice.EDINBURGH.getOfficeName(), TribunalOffice.GLASGOW.getOfficeName());
+        boolean isScottishDestinationOffice = scotOffices.contains(
+                caseData.getOfficeCT().getValue().getCode());
+        if ((isScottishDestinationOffice && SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) ||
+                (!isScottishDestinationOffice && ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId))) {
+            return false;
+        }  else {
+            return true;
+        }
+    }
     public void createCaseTransfer(CaseDetails caseDetails, List<String> errors, String userToken) {
 
         caseTypeId = caseDetails.getCaseTypeId();

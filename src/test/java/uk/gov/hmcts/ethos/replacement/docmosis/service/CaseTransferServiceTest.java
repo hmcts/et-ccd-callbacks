@@ -19,6 +19,7 @@ import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 
@@ -54,11 +55,11 @@ public class CaseTransferServiceTest {
         caseData.setPositionTypeCT("PositionTypeCT");
         DynamicFixedListType officeCT = new DynamicFixedListType();
         DynamicValueType valueType = new DynamicValueType();
-        valueType.setCode(ENGLANDWALES_CASE_TYPE_ID);
+        valueType.setCode(TribunalOffice.LEEDS.getOfficeName());
         officeCT.setValue(valueType);
         caseData.setOfficeCT(officeCT);
         caseDetails.setCaseData(caseData);
-        caseDetails.setCaseTypeId("Manchester");
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setJurisdiction("Employment");
         caseDetails.setState(ACCEPTED_STATE);
         ccdRequest.setCaseDetails(caseDetails);
@@ -73,7 +74,27 @@ public class CaseTransferServiceTest {
         List<String> errors = new ArrayList<>();
         caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
         assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
-        assertEquals("Transferred to " + ENGLANDWALES_CASE_TYPE_ID, ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
+        assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
+    }
+
+    @Test
+    public void InterCountryCaseTransfer() {
+        List<String> errors = new ArrayList<>();
+        ccdRequest.getCaseDetails().setCaseTypeId(SCOTLAND_CASE_TYPE_ID);
+        ccdRequest.getCaseDetails().getCaseData().setOwningOffice(TribunalOffice.GLASGOW.getOfficeName());
+        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
+        assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
+        assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
+    }
+
+    @Test
+    public void IntraCountryCaseTransfer() {
+        List<String> errors = new ArrayList<>();
+        ccdRequest.getCaseDetails().getCaseData().setOwningOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
+        assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
+        assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
+        assertEquals(TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getOwningOffice());
     }
 
     @Test

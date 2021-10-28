@@ -30,6 +30,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender
 import uk.gov.hmcts.ethos.replacement.docmosis.tasks.BulkPreAcceptTask;
 import uk.gov.hmcts.ethos.replacement.docmosis.tasks.BulkUpdateBulkTask;
 import uk.gov.hmcts.ethos.replacement.docmosis.tasks.BulkUpdateTask;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -59,6 +61,8 @@ public class BulkUpdateService {
     private final CcdClient ccdClient;
     private final UserService userService;
     private final CreateUpdatesBusSender createUpdatesBusSender;
+    @Value("${ccd_gateway_base_url}")
+    private String ccdGatewayBaseUrl;
 
     @Autowired
     public BulkUpdateService(CcdClient ccdClient, UserService userService,
@@ -549,7 +553,9 @@ public class BulkUpdateService {
                         bulkDetails.getCaseData().getMultipleReference(),
                         createUpdatesBusSender,
                         String.valueOf(ethosCaseRefCollection.size()),
-                        null);
+                        MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl,
+                                bulkDetails.getCaseId(),
+                                bulkDetails.getCaseData().getMultipleReference()));
             }
 
             bulkRequestPayload.setBulkDetails(bulkDetails);

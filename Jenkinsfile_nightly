@@ -21,9 +21,10 @@ withNightlyPipeline(type, product, component) {
 
     env.Rules = params.SecurityRules
 
-    enableFortifyScan()
+    // uncomment once Fortify id acquired
+    // enableFortifyScan()
 
-    after('fortify-scan') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-    }
+    //after('fortify-scan') {
+    //    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+    //}
 }

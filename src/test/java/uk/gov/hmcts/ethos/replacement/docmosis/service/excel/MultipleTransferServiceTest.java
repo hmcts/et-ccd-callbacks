@@ -6,13 +6,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import lombok.RequiredArgsConstructor;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ecm.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ecm.common.model.multiples.items.CaseMultipleTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PersistentQHelperService;
-
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -29,8 +30,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOUR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@RequiredArgsConstructor
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleTransferServiceTest {
+
+    private String ccdGatewayBaseUrl;
 
     @Mock
     private ExcelReadingService excelReadingService;
@@ -41,7 +45,6 @@ public class MultipleTransferServiceTest {
 
     @InjectMocks
     private MultipleTransferService multipleTransferService;
-
     private TreeMap<String, Object> multipleObjects;
     private MultipleDetails multipleDetails;
     private List<SubmitMultipleEvent> submitMultipleEvents;
@@ -49,8 +52,10 @@ public class MultipleTransferServiceTest {
 
     @Before
     public void setUp() {
+        ccdGatewayBaseUrl = null;
         multipleObjects = MultipleUtil.getMultipleObjectsAll();
         multipleDetails = new MultipleDetails();
+        multipleDetails.setCaseId("1559817606275162");
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
         submitMultipleEvents = MultipleUtil.getSubmitMultipleEvents();
         userToken = "authString";
@@ -62,11 +67,14 @@ public class MultipleTransferServiceTest {
 
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
+
         multipleTransferService.multipleTransferLogic(userToken,
                 multipleDetails,
                 new ArrayList<>());
+
         assertEquals(UPDATING_STATE, multipleDetails.getCaseData().getState());
-        verify(persistentQHelperService, times(1)).sendCreationEventToSingles(
+        verify(persistentQHelperService,
+                times(1)).sendCreationEventToSingles(
                 userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getJurisdiction(),
@@ -74,11 +82,15 @@ public class MultipleTransferServiceTest {
                 new ArrayList<>(multipleObjects.keySet()),
                 "Manchester",
                 "PositionTypeCT",
-                null,
+                ccdGatewayBaseUrl,
                 multipleDetails.getCaseData().getReasonForCT(),
                 multipleDetails.getCaseData().getMultipleReference(),
                 YES,
-                multipleDetails.getCaseId());
+                MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl,
+                        multipleDetails.getCaseId(),
+                        multipleDetails.getCaseData().getMultipleReference())
+                );
+
         verifyNoMoreInteractions(persistentQHelperService);
 
     }

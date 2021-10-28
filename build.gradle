@@ -12,7 +12,7 @@ plugins {
     id 'io.freefair.lombok' version '5.3.0'
 }
 
-group = 'uk.gov.hmcts.ethos.replacement'
+group = 'uk.gov.hmcts.et'
 version = '0.0.1'
 
 // For CCD consolidation work
@@ -46,7 +46,7 @@ jacocoTestCoverageVerification {
 }
 
 checkstyle {
-    maxWarnings = 536
+    maxWarnings = 383
     sourceSets = [project.sourceSets.main]
     toolVersion = '8.29'
 }
@@ -60,7 +60,7 @@ def sonarExclusions = ['**/uk/gov/hmcts/ethos/replacement/docmosis/config/**',
 sonarqube {
     properties {
         property "sonar.exclusions", sonarExclusions.join(', ')
-        property "sonar.projectKey", "ethos-repl-docmosis-service"
+        property "sonar.projectKey", "et-ccd-callbacks"
         property "sonar.dynamicAnalysis", "reuseReports"
         property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
@@ -99,6 +99,7 @@ configurations {
 
 test {
     exclude '**/*ComponentTest*'
+    useJUnitPlatform()
 }
 
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
@@ -181,17 +182,14 @@ dependencyCheck {
     suppressionFile = 'config/owasp/suppressions.xml'
     analyzers.assemblyEnabled = false
 }
+
 repositories {
     mavenLocal()
     mavenCentral()
     jcenter()
     maven { url "https://repo.maven.apache.org/maven2" }
     maven { url 'https://repo.spring.io/libs-milestone' }
-    maven { url 'https://jitpack.io' }
-}
-
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    maven { url "https://jitpack.io" }
 }
 
 def versions = [
@@ -217,10 +215,8 @@ dependencies {
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.21'
-
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.48'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.48'
-
 
 // For pdfbox and elasticsearch CVEs
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.24'
@@ -237,14 +233,12 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.0-alpha2'
     implementation group: 'io.netty', name: 'netty-codec-http2', version: '4.1.66.Final'
 
-
     //To Remove vulnerability CVE-2021-21295
     implementation group: 'io.netty', name: 'netty-all', version: '4.1.61.Final'
     implementation group: 'io.netty', name: 'netty-codec-http', version: '4.1.61.Final'
 
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.6'
-
 
     implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.6'
     implementation group: 'io.github.openfeign', name: 'feign-core', version: '11.6'
@@ -274,6 +268,8 @@ dependencies {
     testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: versions.serenity
     testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: versions.serenity
 
+    testImplementation 'com.github.hmcts:fortify-client:1.2.1:all'
+
     // Contract Tests
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
@@ -293,7 +289,7 @@ dependencies {
 
 bootJar {
     getArchiveFileName().set(provider {
-        'ethos-repl-docmosis-service.jar'
+        'et-ccd-callbacks.jar'
     })
 
     manifest {
@@ -304,3 +300,4 @@ bootJar {
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
+

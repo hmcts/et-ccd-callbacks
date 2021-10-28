@@ -9,7 +9,6 @@ psql postgresql://localhost:5050 -v ON_ERROR_STOP=1 -U postgres <<-EOSQL
     WITH OWNER = et_ccd_callbacks
     ENCODING = 'UTF-8'
     CONNECTION LIMIT = -1;
-
 EOSQL
 
 set -e
@@ -31,3 +30,12 @@ psql postgresql://localhost:5050/et_ccd_callbacks -U et_ccd_callbacks -f ./fn_et
 
 echo "Running fn_ethosSubMultipleCaseRefGen.sql"
 psql postgresql://localhost:5050/et_ccd_callbacks -U et_ccd_callbacks -f ./fn_ethosSubMultipleCaseRefGen.sql
+
+echo "Running et_scripts/judge.sql"
+psql postgresql://localhost:5050/et_ccd_callbacks -U et_ccd_callbacks -f ./et_scripts/judge.sql
+
+echo "Running et_scripts/create-tables.sql"
+psql postgresql://localhost:5050/et_ccd_callbacks -U et_ccd_callbacks -f ./et_scripts/create-tables.sql
+
+echo "Running ET dataload"
+psql postgresql://localhost:5050/et_ccd_callbacks -U et_ccd_callbacks -f ./et_scripts/data-load.sql

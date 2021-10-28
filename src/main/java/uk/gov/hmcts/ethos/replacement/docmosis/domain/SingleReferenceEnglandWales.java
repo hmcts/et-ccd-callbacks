@@ -7,6 +7,6 @@ import javax.persistence.Table;
 
 @Entity
 @NoArgsConstructor
-@Table(name = "singleReferenceEnglandWales")
+@Table(name = "single_reference_englandwales")
 public class SingleReferenceEnglandWales extends SingleReference {
 }

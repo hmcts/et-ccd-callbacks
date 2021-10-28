@@ -105,7 +105,6 @@ public class CaseTransferServiceTest {
         assertEquals(TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getOwningOffice());
     }
 
-    @Ignore("Fix as part of case transfer work")
     @Test
     public void createCaseTransferECC() throws IOException {
         List<String> errors = new ArrayList<>();
@@ -134,19 +133,18 @@ public class CaseTransferServiceTest {
         when(ccdClient.startEventForCase(authToken, "Manchester", "Employment", "12345")).thenReturn(ccdRequest);
         caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
         assertEquals("PositionTypeCT", submitEvent.getCaseData().getPositionType());
-        assertEquals("Transferred to " + ENGLANDWALES_CASE_TYPE_ID, submitEvent.getCaseData().getLinkedCaseCT());
+        assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), submitEvent.getCaseData().getLinkedCaseCT());
         assertEquals("PositionTypeCT", submitEvent1.getCaseData().getPositionType());
-        assertEquals("Transferred to " + ENGLANDWALES_CASE_TYPE_ID, submitEvent1.getCaseData().getLinkedCaseCT());
+        assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), submitEvent1.getCaseData().getLinkedCaseCT());
     }
 
-    @Ignore("Fix as part of case transfer work")
     @Test
     public void createCaseTransferMultiples() {
         List<String> errors = new ArrayList<>();
         ccdRequest.getCaseDetails().getCaseData().setStateAPI(MULTIPLE);
         caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
         assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
-        assertEquals("Transferred to " + ENGLANDWALES_CASE_TYPE_ID, ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
+        assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
     }
 
     @Test

@@ -1,7 +1,6 @@
-# et-ccd-callbacks
+# Employment Tribunals CCD Callbacks Service
 
-## Employment Tribunals CCD Callbacks Service
-This application is responsible for handling all CCD callback requests
+This application is responsible for handling all CCD callback requests.
 
 ## Getting started
 

@@ -9,12 +9,12 @@ java:
     ETHOS_REPL_DB_CONN_OPTIONS: ""
   keyVaults:
     ethos:
-      resourceGroup: ethos-repl-docmosis-backend
+      resourceGroup: et-ccd-callbacks
       secrets:
         - tornado-access-key
-        - ethos-repl-service-s2s-secret
+        - et-ccd-callbacks-s2s-secret
     ethos-shared:
-      resourceGroup: ethos
+      resourceGroup: et
       secrets:
         - create-updates-queue-send-connection-string
   postgresql:

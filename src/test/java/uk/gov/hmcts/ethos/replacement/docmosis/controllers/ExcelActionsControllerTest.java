@@ -2,20 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import static org.hamcrest.Matchers.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -23,9 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ecm.common.model.ccd.DocumentInfo;
@@ -35,8 +21,43 @@ import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.*;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleAmendService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCloseEventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationMidEventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleDynamicListFlagsService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleHelperService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleMidEventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultiplePreAcceptService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleSingleMidEventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleTransferService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUpdateService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SubMultipleMidEventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SubMultipleUpdateService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @RunWith(SpringRunner.class)
@@ -120,18 +141,21 @@ public class ExcelActionsControllerTest {
     @MockBean
     private FileLocationSelectionService fileLocationSelectionService;
 
+    @MockBean
+    private MultipleCloseEventValidationService multipleCloseEventValidationService;
+
     private MockMvc mvc;
     private JsonNode requestContent;
     private JsonNode listingsValidationRequestContent;
 
     private void doRequestSetUp() throws IOException, URISyntaxException {
         ObjectMapper objectMapper = new ObjectMapper();
-        requestContent = objectMapper.readTree(new File(getClass()
-                .getResource("/exampleMultiplesV1.json").toURI()));
+        requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
+                .getResource("/exampleMultiplesV1.json")).toURI()));
 
         ObjectMapper dateValidationObjectMapper = new ObjectMapper();
-        listingsValidationRequestContent = dateValidationObjectMapper.readTree(new File(getClass()
-                .getResource("/exampleListingV3.json").toURI()));
+        listingsValidationRequestContent = dateValidationObjectMapper.readTree(new File(Objects.requireNonNull(getClass()
+                .getResource("/exampleListingV3.json")).toURI()));
     }
 
     @Before
@@ -355,6 +379,8 @@ public class ExcelActionsControllerTest {
     @Test
     public void closeMultiple() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(multipleCloseEventValidationService.validateJurisdictionCollections(eq(AUTH_TOKEN),
+                isA(MultipleDetails.class))).thenReturn(new ArrayList<>());
         mvc.perform(post(CLOSE_MULTIPLE_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -362,6 +388,21 @@ public class ExcelActionsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", hasSize(0)))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    public void closeMultipleValidationErrors() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(multipleCloseEventValidationService.validateJurisdictionCollections(eq(AUTH_TOKEN),
+                isA(MultipleDetails.class))).thenReturn(List.of("some error"));
+        mvc.perform(post(CLOSE_MULTIPLE_URL)
+                        .content(requestContent.toString())
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(1)))
                 .andExpect(jsonPath("$.warnings", nullValue()));
     }
 

@@ -361,7 +361,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = ccdRequest11.getCaseDetails().getCaseData();
         FlagsImageHelper.buildFlagsImageFileName(caseData);
         assertEquals("", caseData.getFlagsImageAltText());
-        assertEquals("EMP-TRIB-00000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-000000000.jpg", caseData.getFlagsImageFileName());
     }
 
     @Test
@@ -369,7 +369,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = ccdRequest12.getCaseDetails().getCaseData();
         FlagsImageHelper.buildFlagsImageFileName(caseData);
         assertEquals("", caseData.getFlagsImageAltText());
-        assertEquals("EMP-TRIB-00000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-000000000.jpg", caseData.getFlagsImageFileName());
     }
 
     @Test
@@ -377,7 +377,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
         FlagsImageHelper.buildFlagsImageFileName(caseData);
         assertEquals("", caseData.getFlagsImageAltText());
-        assertEquals("EMP-TRIB-00000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-000000000.jpg", caseData.getFlagsImageFileName());
     }
 
     @Test
@@ -385,7 +385,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = ccdRequest14.getCaseDetails().getCaseData();
         FlagsImageHelper.buildFlagsImageFileName(caseData);
         assertEquals("", caseData.getFlagsImageAltText());
-        assertEquals("EMP-TRIB-00000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-000000000.jpg", caseData.getFlagsImageFileName());
     }
 
     @Test
@@ -405,9 +405,11 @@ public class CaseManagementForCaseWorkerServiceTest {
                 "<font size='5'> - </font>" +
                 "<font color='Purple' size='5'> RESERVED </font>" +
                 "<font size='5'> - </font>" +
-                "<font color='Olive' size='5'> ECC </font>";
+                "<font color='Olive' size='5'> ECC </font>" +
+                "<font size='5'> - </font>" +
+                "<font color='SlateGray' size='5'> DIGITAL FILE </font>";
         assertEquals(expected, caseData.getFlagsImageAltText());
-        assertEquals("EMP-TRIB-01111111.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-011111111.jpg", caseData.getFlagsImageFileName());
     }
 
     @Test
@@ -416,7 +418,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         FlagsImageHelper.buildFlagsImageFileName(caseData);
         String expected = "<font color='DeepPink' size='5'> WITH OUTSTATION </font>";
         assertEquals(expected, caseData.getFlagsImageAltText());
-        assertEquals("EMP-TRIB-10000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-100000000.jpg", caseData.getFlagsImageFileName());
     }
 
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {

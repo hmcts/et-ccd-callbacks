@@ -100,7 +100,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
     public void caseCreationEnglandWalesRequestException() throws IOException {
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(), anyString())).thenReturn(submitEvent);
-        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.MANCHESTER.getOfficeName())).thenReturn(englandWalesDefaultValues);
+        when(defaultValuesReaderService.getDefaultValues("", TribunalOffice.MANCHESTER.getOfficeName())).thenReturn(englandWalesDefaultValues);
         caseUpdateForCaseWorkerService.caseUpdateRequest(englandWalesCcdRequest, "authToken");
     }
 
@@ -108,7 +108,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
     public void caseCreationEnglandWalesRequest() throws IOException {
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(englandWalesCcdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(), anyString())).thenReturn(submitEvent);
-        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.MANCHESTER.getOfficeName())).thenReturn(englandWalesDefaultValues);
+        when(defaultValuesReaderService.getDefaultValues("", TribunalOffice.MANCHESTER.getOfficeName())).thenReturn(englandWalesDefaultValues);
         SubmitEvent submitEvent1 = caseUpdateForCaseWorkerService.caseUpdateRequest(englandWalesCcdRequest, "authToken");
         assertEquals(submitEvent, submitEvent1);
     }
@@ -117,7 +117,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
     public void caseCreationScotlandRequest() throws IOException {
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(scotlandCcdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(), anyString())).thenReturn(submitEvent);
-        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName())).thenReturn(scotlandDefaultValues);
+        when(defaultValuesReaderService.getDefaultValues("", TribunalOffice.GLASGOW.getOfficeName())).thenReturn(scotlandDefaultValues);
         SubmitEvent submitEvent1 = caseUpdateForCaseWorkerService.caseUpdateRequest(scotlandCcdRequest, "authToken");
         assertEquals(submitEvent, submitEvent1);
     }

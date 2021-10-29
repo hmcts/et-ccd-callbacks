@@ -56,14 +56,14 @@ public class DefaultValuesReaderServiceTest {
         contactDetails.setManagingOffice("TestManagingOffice");
 
         var officeName = TribunalOffice.MANCHESTER.getOfficeName();
-        when(tribunalOfficesService.getTribunalContactDetails(officeName)).thenReturn(contactDetails);
+        when(tribunalOfficesService.getTribunalContactDetails(officeName, "")).thenReturn(contactDetails);
         var caseType = MULTIPLE_CASE_TYPE;
         when(config.getCaseType()).thenReturn(caseType);
         var positionType = Constants.POSITION_TYPE_CASE_CLOSED;
         when(config.getPositionType()).thenReturn(positionType);
 
         // Act
-        var defaultValues = defaultValuesReaderService.getDefaultValues(officeName);
+        var defaultValues = defaultValuesReaderService.getDefaultValues("", officeName);
 
         // Assert
         assertEquals(positionType, defaultValues.getPositionType());

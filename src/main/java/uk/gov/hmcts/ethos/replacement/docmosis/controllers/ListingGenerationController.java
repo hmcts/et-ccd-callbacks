@@ -129,8 +129,8 @@ public class ListingGenerationController {
 
             String managingOffice = listingRequest.getCaseDetails().getCaseData().getListingVenue() != null
                     ? listingRequest.getCaseDetails().getCaseData().getListingVenue() : "";
-            var defaultValues = defaultValuesReaderService.getDefaultValues(
-                    UtilHelper.getListingCaseTypeId(listingRequest.getCaseDetails().getCaseTypeId()));
+            var defaultValues = defaultValuesReaderService.getDefaultValues(managingOffice,
+                    listingRequest.getCaseDetails().getCaseData().getOwningOffice());
             log.info("Post Default values loaded: " + defaultValues);
             listingData = defaultValuesReaderService.getListingData(listingData, defaultValues);
 

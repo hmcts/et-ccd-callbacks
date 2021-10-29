@@ -28,8 +28,8 @@ public class DefaultValuesReaderService {
         this.tribunalOfficesService = tribunalOfficesService;
     }
 
-    public DefaultValues getDefaultValues(String officeName) {
-        ContactDetails contactDetails = tribunalOfficesService.getTribunalContactDetails(officeName);
+    public DefaultValues getDefaultValues(String managingOffice, String officeName) {
+        ContactDetails contactDetails = tribunalOfficesService.getTribunalContactDetails(officeName, managingOffice);
         return createDefaultValues(contactDetails);
     }
 

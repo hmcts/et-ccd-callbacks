@@ -889,7 +889,7 @@ public class CaseActionsForCaseWorkerController {
 
         String managingOffice = caseDetails.getCaseData().getManagingOffice() != null
                 ? caseDetails.getCaseData().getManagingOffice() : "";
-        return defaultValuesReaderService.getDefaultValues(owningOffice);
+        return defaultValuesReaderService.getDefaultValues(managingOffice, owningOffice);
     }
 
     private void generateEthosCaseReference(CaseData caseData, CCDRequest ccdRequest) {

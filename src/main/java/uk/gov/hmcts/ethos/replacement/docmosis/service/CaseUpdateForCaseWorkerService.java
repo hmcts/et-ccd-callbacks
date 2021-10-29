@@ -32,7 +32,9 @@ public class CaseUpdateForCaseWorkerService {
             CCDRequest returnedRequest = ccdClient.startEventForCase(authToken,
                     caseDetails.getCaseTypeId(), caseDetails.getJurisdiction(), caseId);
             var owningOffice = caseDetails.getCaseData().getOwningOffice();
-            var defaultValues = defaultValuesReaderService.getDefaultValues(owningOffice);
+            String managingOffice = caseDetails.getCaseData().getManagingOffice() != null
+                    ? caseDetails.getCaseData().getManagingOffice() : "";
+            var defaultValues = defaultValuesReaderService.getDefaultValues(managingOffice, owningOffice);
 
             ccdRequest.getCaseDetails().getCaseData().setPositionType(defaultValues.getPositionType());
 

@@ -111,7 +111,7 @@ public class TornadoServiceTest {
     public void shouldCreateDocumentInfoForDocumentGenerationAllocatedOffice() throws IOException {
         mockConnectionSuccess();
         var defaultValues = mock(DefaultValues.class);
-        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName()))
+        when(defaultValuesReaderService.getDefaultValues("", TribunalOffice.GLASGOW.getOfficeName()))
                 .thenReturn(defaultValues);
         var caseData = new CaseData();
         caseData.setAllocatedOffice(GLASGOW_OFFICE);
@@ -130,7 +130,7 @@ public class TornadoServiceTest {
     public void shouldCreateDocumentInfoForDocumentGenerationAllocatedOfficeMultiples() throws IOException {
         mockConnectionSuccess();
         var defaultValues = mock(DefaultValues.class);
-        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName()))
+        when(defaultValuesReaderService.getDefaultValues("", TribunalOffice.GLASGOW.getOfficeName()))
                 .thenReturn(defaultValues);
         var caseData = new CaseData();
         caseData.setAllocatedOffice(GLASGOW_OFFICE);

@@ -9,14 +9,14 @@
 --          :   28-OCT-2021     2.0  - CCD Consolidation
 -- =============================================
 
-DROP TABLE IF EXISTS multiple_reference_england_wales;
-CREATE TABLE multiple_reference_england_wales
+DROP TABLE IF EXISTS multiple_reference_englandwales;
+CREATE TABLE multiple_reference_englandwales
 (
     counter int
 
 );
-DELETE FROM multiple_reference_england_wales ; -- remove any existing values in case the script is ran more than once
-INSERT INTO multiple_reference_england_wales VALUES (0);
+DELETE FROM multiple_reference_englandwales ; -- remove any existing values in case the script is ran more than once
+INSERT INTO multiple_reference_englandwales VALUES (0);
 
 DROP TABLE IF EXISTS multiple_reference_scotland;
 CREATE TABLE multiple_reference_scotland

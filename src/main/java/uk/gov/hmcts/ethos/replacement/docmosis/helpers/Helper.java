@@ -15,6 +15,7 @@ import uk.gov.hmcts.ecm.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -266,8 +267,18 @@ public class Helper {
     public static List<String> getAllOffices() {
 
         return new ArrayList<>(Arrays.asList(
-                ENGLANDWALES_CASE_TYPE_ID,
-                SCOTLAND_CASE_TYPE_ID
+                TribunalOffice.BRISTOL.getOfficeName(),
+                TribunalOffice.LEEDS.getOfficeName(),
+                TribunalOffice.MANCHESTER.getOfficeName(),
+                TribunalOffice.LONDON_CENTRAL.getOfficeName(),
+                TribunalOffice.LONDON_EAST.getOfficeName(),
+                TribunalOffice.LONDON_SOUTH.getOfficeName(),
+                TribunalOffice.MIDLANDS_EAST.getOfficeName(),
+                TribunalOffice.MIDLANDS_WEST.getOfficeName(),
+                TribunalOffice.WALES.getOfficeName(),
+                TribunalOffice.WATFORD.getOfficeName(),
+                TribunalOffice.NEWCASTLE.getOfficeName(),
+                SCOTLAND_CASE_TYPE_ID // to do: whether this needs to be removed by individual offices?
         ));
     }
 

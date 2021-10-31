@@ -302,7 +302,7 @@ public class Helper {
         log.info("Populating dynamic list with offices");
 
         var dynamicFixedListType = new DynamicFixedListType();
-        dynamicFixedListType.setListItems(getAvailableOffices(caseTypeId));
+        dynamicFixedListType.setListItems(getAvailableOffices(caseData.getOwningOffice()));
 
         caseData.setOfficeCT(dynamicFixedListType);
 

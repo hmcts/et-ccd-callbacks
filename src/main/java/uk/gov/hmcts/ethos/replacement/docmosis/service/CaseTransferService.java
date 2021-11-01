@@ -83,25 +83,26 @@ public class CaseTransferService {
 
     public void createCaseTransferEvent(CaseData caseData, List<String> errors, String userToken) {
 
-        if (interCountryCaseTransfer(caseData, caseTypeId)) {
-            persistentQHelperService.sendCreationEventToSingles(
-                    userToken,
-                    caseTypeId,
-                    jurisdiction,
-                    errors,
-                    new ArrayList<>(Collections.singletonList(caseData.getEthosCaseReference())),
-                    officeCT,
-                    positionTypeCT,
-                    ccdGatewayBaseUrl,
-                    reasonForCT,
-                    SINGLE_CASE_TYPE,
-                    NO,
-                    null
-            );
-        }
-        else {
+        //to do: uncomment following code once scotland caseType is ready
+//        if (interCountryCaseTransfer(caseData, caseTypeId)) {
+//            persistentQHelperService.sendCreationEventToSingles(
+//                    userToken,
+//                    caseTypeId,
+//                    jurisdiction,
+//                    errors,
+//                    new ArrayList<>(Collections.singletonList(caseData.getEthosCaseReference())),
+//                    officeCT,
+//                    positionTypeCT,
+//                    ccdGatewayBaseUrl,
+//                    reasonForCT,
+//                    SINGLE_CASE_TYPE,
+//                    NO,
+//                    null
+//            );
+//        }
+       // else {
             caseData.setOwningOffice(caseData.getOfficeCT().getValue().getCode());
-        }
+        //}
 
         caseData.setLinkedCaseCT("Transferred to " + officeCT);
         caseData.setPositionType(positionTypeCT);

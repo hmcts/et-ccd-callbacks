@@ -1,6 +1,7 @@
 {
   "case_details": {
     "case_data": {
+      "owningOffice": "Manchester",
       "tribunalCorrespondenceAddress": {
         "AddressLine1": "Manchester Employment Tribunal,",
         "AddressLine2": "Alexandra House,",

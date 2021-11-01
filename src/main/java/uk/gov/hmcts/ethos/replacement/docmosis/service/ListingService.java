@@ -25,6 +25,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompl
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CcdReportDataSource;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.timetofirsthearing.TimeToFirstHearingReport;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -33,9 +34,32 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper.CASES_SEARCHED;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.timetofirsthearing.TimeToFirstHearingReport;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_AWAITING_JUDGMENT_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_COMPLETED_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_STAFF;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_SETTLED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_WITHDRAWN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_MEDIATION;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_MEDIATION_TCC;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING_CM;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING_CM_TCC;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PRIVATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIVE_CASELOAD_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TIME_TO_FIRST_HEARING_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+
 
 @RequiredArgsConstructor
 @Slf4j
@@ -211,7 +235,7 @@ public class ListingService {
 
     private ListingData getDateRangeReport(ListingDetails listingDetails, String authToken) throws IOException {
         List<SubmitEvent> submitEvents = getDateRangeReportSearch(listingDetails, authToken);
-
+        log.info("Number of cases found: " + String.valueOf(submitEvents.size()));
         switch (listingDetails.getCaseData().getReportType()) {
             case BROUGHT_FORWARD_REPORT:
                 return ReportHelper.processBroughtForwardDatesRequest(listingDetails, submitEvents);
@@ -231,16 +255,17 @@ public class ListingService {
     private List<SubmitEvent> getDateRangeReportSearch(ListingDetails listingDetails, String authToken)
             throws IOException {
         var listingData = listingDetails.getCaseData();
+        var caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
         boolean isRangeHearingDateType = listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE);
         if (!isRangeHearingDateType) {
             var dateToSearch = LocalDate.parse(listingData.getListingDate(), OLD_DATE_TIME_PATTERN2).toString();
-            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, listingDetails.getCaseTypeId(), TribunalOffice.valueOfOfficeName(listingData.getOwningOffice())
+            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, caseTypeId, TribunalOffice.valueOfOfficeName(listingData.getOwningOffice())
                     , dateToSearch, dateToSearch, listingData.getReportType());
         } else {
             var dateToSearchFrom = LocalDate.parse(listingData.getListingDateFrom(),
                     OLD_DATE_TIME_PATTERN2).toString();
             var dateToSearchTo = LocalDate.parse(listingData.getListingDateTo(), OLD_DATE_TIME_PATTERN2).toString();
-            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, listingDetails.getCaseTypeId(), TribunalOffice.valueOfOfficeName(listingData.getOwningOffice())
+            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, caseTypeId, TribunalOffice.valueOfOfficeName(listingData.getOwningOffice())
                     , dateToSearchFrom, dateToSearchTo, listingData.getReportType());
         }
     }

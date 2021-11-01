@@ -113,7 +113,7 @@ public class CaseTransferService {
 
     public boolean interCountryCaseTransfer(CaseData caseData, String caseTypeId) {
         List<String> scotOffices = List.of(TribunalOffice.ABERDEEN.getOfficeName(), TribunalOffice.DUNDEE.getOfficeName()
-                , TribunalOffice.EDINBURGH.getOfficeName(), TribunalOffice.GLASGOW.getOfficeName());
+                , TribunalOffice.EDINBURGH.getOfficeName(), TribunalOffice.GLASGOW.getOfficeName(), TribunalOffice.SCOTLAND.getOfficeName());
         boolean isScottishDestinationOffice = scotOffices.contains(
                 caseData.getOfficeCT().getValue().getCode());
         if ((isScottishDestinationOffice && SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) ||

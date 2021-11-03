@@ -812,7 +812,7 @@ public class ListingServiceTest {
                 "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, " +
                 "clerkResponsible=null, reportType=Claims Accepted, documentName=null, showAll=null, localReportsSummaryHdr=null, " +
                 "localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, " +
-                "localReportsDetailHdr=AdhocReportType(reportDate=null, reportOffice=Scotland, receiptDate=null, hearingDate=null, date=null, " +
+                "localReportsDetailHdr=AdhocReportType(reportDate=null, reportOffice=Leeds, receiptDate=null, hearingDate=null, date=null, " +
                 "full=null, half=null, mins=null, total=1, eeMember=null, erMember=null, caseReference=null, multipleRef=null, multSub=null, " +
                 "hearingNumber=null, hearingType=null, hearingTelConf=null, hearingDuration=null, hearingClerk=null, clerk=null, hearingSitAlone=null, " +
                 "hearingJudge=null, judgeType=null, judgementDateSent=null, position=null, dateToPosition=null, fileLocation=null, fileLocationGlasgow=null, " +
@@ -1001,7 +1001,7 @@ public class ListingServiceTest {
                 + "xConFast26wkTotalPerCent=null, xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null), localReportsSummary=null, "
                 + "localReportsSummaryHdr2=null, "
                 + "localReportsSummary2=null, localReportsDetailHdr=AdhocReportType(reportDate=null, "
-                + "reportOffice=Scotland, receiptDate=null, "
+                + "reportOffice=Aberdeen, receiptDate=null, "
                 + "hearingDate=null, date=null, full=null, half=null, mins=null, total=null, eeMember=null, "
                 + "erMember=null, caseReference=null, multipleRef=null, multSub=null, hearingNumber=null, "
                 + "hearingType=null, hearingTelConf=null, hearingDuration=null, hearingClerk=null, clerk=null, "

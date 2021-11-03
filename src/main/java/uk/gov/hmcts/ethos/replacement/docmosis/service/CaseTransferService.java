@@ -81,28 +81,31 @@ public class CaseTransferService {
         }
     }
 
-    public void createCaseTransferEvent(CaseData caseData, List<String> errors, String userToken) {
+    public void createCaseTransferEvent(CaseData caseData, List<String> errors, String userToken, int caseListSize) {
 
         //to do: uncomment following code once scotland caseType is ready
-//        if (interCountryCaseTransfer(caseData, caseTypeId)) {
-//            persistentQHelperService.sendCreationEventToSingles(
-//                    userToken,
-//                    caseTypeId,
-//                    jurisdiction,
-//                    errors,
-//                    new ArrayList<>(Collections.singletonList(caseData.getEthosCaseReference())),
-//                    officeCT,
-//                    positionTypeCT,
-//                    ccdGatewayBaseUrl,
-//                    reasonForCT,
-//                    SINGLE_CASE_TYPE,
-//                    NO,
-//                    null
-//            );
-//        }
-       // else {
-            caseData.setOwningOffice(caseData.getOfficeCT().getValue().getCode());
-        //}
+       if (interCountryCaseTransfer(caseData, caseTypeId) || caseListSize > 1) {
+           persistentQHelperService.sendCreationEventToSingles(
+                    userToken,
+                    caseTypeId,
+                   jurisdiction,
+                    errors,
+                    new ArrayList<>(Collections.singletonList(caseData.getEthosCaseReference())),
+                    officeCT,
+                   positionTypeCT,
+                  ccdGatewayBaseUrl,
+                    reasonForCT,
+                   SINGLE_CASE_TYPE,
+                    NO,
+                    null
+           );
+     }
+        else {
+            caseData.setOwningOffice(officeCT);
+        }
+
+
+
 
         caseData.setLinkedCaseCT("Transferred to " + officeCT);
         caseData.setPositionType(positionTypeCT);
@@ -116,7 +119,7 @@ public class CaseTransferService {
         List<String> scotOffices = List.of(TribunalOffice.ABERDEEN.getOfficeName(), TribunalOffice.DUNDEE.getOfficeName()
                 , TribunalOffice.EDINBURGH.getOfficeName(), TribunalOffice.GLASGOW.getOfficeName(), TribunalOffice.SCOTLAND.getOfficeName());
         boolean isScottishDestinationOffice = scotOffices.contains(
-                caseData.getOfficeCT().getValue().getCode());
+                officeCT);
         if ((isScottishDestinationOffice && SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) ||
                 (!isScottishDestinationOffice && ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId))) {
             return false;
@@ -153,7 +156,7 @@ public class CaseTransferService {
         }
 
         for (CaseData caseData : caseDataList) {
-            createCaseTransferEvent(caseData, errors, userToken);
+            createCaseTransferEvent(caseData, errors, userToken, caseDataList.size());
         }
 
     }

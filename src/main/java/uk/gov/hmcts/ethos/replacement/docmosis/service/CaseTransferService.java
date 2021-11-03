@@ -82,9 +82,8 @@ public class CaseTransferService {
     }
 
     public void createCaseTransferEvent(CaseData caseData, List<String> errors, String userToken, int caseListSize) {
-
-        //to do: uncomment following code once scotland caseType is ready
-       if (interCountryCaseTransfer(caseData, caseTypeId) || caseListSize > 1) {
+        caseData.setOwningOffice(officeCT);
+       if (interCountryCaseTransfer() || caseListSize > 1) {
            persistentQHelperService.sendCreationEventToSingles(
                     userToken,
                     caseTypeId,
@@ -100,12 +99,6 @@ public class CaseTransferService {
                     null
            );
      }
-        else {
-            caseData.setOwningOffice(officeCT);
-        }
-
-
-
 
         caseData.setLinkedCaseCT("Transferred to " + officeCT);
         caseData.setPositionType(positionTypeCT);
@@ -115,7 +108,7 @@ public class CaseTransferService {
         caseData.setStateAPI(null);
     }
 
-    public boolean interCountryCaseTransfer(CaseData caseData, String caseTypeId) {
+    public boolean interCountryCaseTransfer() {
         List<String> scotOffices = List.of(TribunalOffice.ABERDEEN.getOfficeName(), TribunalOffice.DUNDEE.getOfficeName()
                 , TribunalOffice.EDINBURGH.getOfficeName(), TribunalOffice.GLASGOW.getOfficeName(), TribunalOffice.SCOTLAND.getOfficeName());
         boolean isScottishDestinationOffice = scotOffices.contains(

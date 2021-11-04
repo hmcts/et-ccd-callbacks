@@ -46,13 +46,11 @@ public class CaseTransferService {
                 List<SubmitEvent> submitEvents =  ccdClient.retrieveCasesElasticSearch(userToken,
                         caseDetails.getCaseTypeId(), Collections.singletonList(caseData.getCounterClaim()));
                 return submitEvents.get(0).getCaseData();
-            }
-            else {
+            } else {
                 return caseDetails.getCaseData();
             }
 
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new CaseCreationException("Error getting original case number: " + caseDetails.getCaseData().getEthosCaseReference() + " " + ex.getMessage());
         }
     }
@@ -75,34 +73,28 @@ public class CaseTransferService {
             }
 
             return cases;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new CaseCreationException("Error getting all cases to be transferred for case number: " + caseDetails.getCaseData().getEthosCaseReference() + " " + ex.getMessage());
         }
     }
 
-    public void createCaseTransferEvent(CaseData caseData, List<String> errors, String userToken) {
-
-        //to do: uncomment following code once scotland caseType is ready
-//        if (interCountryCaseTransfer(caseData, caseTypeId)) {
-//            persistentQHelperService.sendCreationEventToSingles(
-//                    userToken,
-//                    caseTypeId,
-//                    jurisdiction,
-//                    errors,
-//                    new ArrayList<>(Collections.singletonList(caseData.getEthosCaseReference())),
-//                    officeCT,
-//                    positionTypeCT,
-//                    ccdGatewayBaseUrl,
-//                    reasonForCT,
-//                    SINGLE_CASE_TYPE,
-//                    NO,
-//                    null
-//            );
-//        }
-       // else {
-            caseData.setManagingOffice(caseData.getOfficeCT().getValue().getCode());
-        //}
+    public void createCaseTransferEvent(CaseData caseData, List<String> errors, String userToken, int caseListSize) {
+        caseData.setManagingOffice(officeCT);
+        if (interCountryCaseTransfer() || caseListSize > 1) {
+           persistentQHelperService.sendCreationEventToSingles(
+                    userToken,
+                    caseTypeId,
+                   jurisdiction,
+                    errors,
+                    new ArrayList<>(Collections.singletonList(caseData.getEthosCaseReference())),
+                    officeCT,
+                   positionTypeCT,
+                  ccdGatewayBaseUrl,
+                    reasonForCT,
+                   SINGLE_CASE_TYPE,
+                    NO,
+                    null);
+        }
 
         caseData.setLinkedCaseCT("Transferred to " + officeCT);
         caseData.setPositionType(positionTypeCT);
@@ -112,11 +104,11 @@ public class CaseTransferService {
         caseData.setStateAPI(null);
     }
 
-    public boolean interCountryCaseTransfer(CaseData caseData, String caseTypeId) {
+    public boolean interCountryCaseTransfer() {
         List<String> scotOffices = List.of(TribunalOffice.ABERDEEN.getOfficeName(), TribunalOffice.DUNDEE.getOfficeName()
                 , TribunalOffice.EDINBURGH.getOfficeName(), TribunalOffice.GLASGOW.getOfficeName(), TribunalOffice.SCOTLAND.getOfficeName());
         boolean isScottishDestinationOffice = scotOffices.contains(
-                caseData.getOfficeCT().getValue().getCode());
+                officeCT);
         if ((isScottishDestinationOffice && SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) ||
                 (!isScottishDestinationOffice && ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId))) {
             return false;
@@ -153,7 +145,7 @@ public class CaseTransferService {
         }
 
         for (CaseData caseData : caseDataList) {
-            createCaseTransferEvent(caseData, errors, userToken);
+            createCaseTransferEvent(caseData, errors, userToken, caseDataList.size());
         }
 
     }

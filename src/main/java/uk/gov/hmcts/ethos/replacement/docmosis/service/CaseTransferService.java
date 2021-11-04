@@ -46,13 +46,11 @@ public class CaseTransferService {
                 List<SubmitEvent> submitEvents =  ccdClient.retrieveCasesElasticSearch(userToken,
                         caseDetails.getCaseTypeId(), Collections.singletonList(caseData.getCounterClaim()));
                 return submitEvents.get(0).getCaseData();
-            }
-            else {
+            } else {
                 return caseDetails.getCaseData();
             }
 
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new CaseCreationException("Error getting original case number: " + caseDetails.getCaseData().getEthosCaseReference() + " " + ex.getMessage());
         }
     }
@@ -75,15 +73,14 @@ public class CaseTransferService {
             }
 
             return cases;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new CaseCreationException("Error getting all cases to be transferred for case number: " + caseDetails.getCaseData().getEthosCaseReference() + " " + ex.getMessage());
         }
     }
 
     public void createCaseTransferEvent(CaseData caseData, List<String> errors, String userToken, int caseListSize) {
-        caseData.setOwningOffice(officeCT);
-       if (interCountryCaseTransfer() || caseListSize > 1) {
+        caseData.setManagingOffice(officeCT);
+        if (interCountryCaseTransfer() || caseListSize > 1) {
            persistentQHelperService.sendCreationEventToSingles(
                     userToken,
                     caseTypeId,
@@ -96,9 +93,8 @@ public class CaseTransferService {
                     reasonForCT,
                    SINGLE_CASE_TYPE,
                     NO,
-                    null
-           );
-     }
+                    null);
+        }
 
         caseData.setLinkedCaseCT("Transferred to " + officeCT);
         caseData.setPositionType(positionTypeCT);

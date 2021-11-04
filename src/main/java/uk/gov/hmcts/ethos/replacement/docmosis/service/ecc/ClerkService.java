@@ -16,7 +16,7 @@ public class ClerkService {
     }
 
     public void initialiseClerkResponsible(CaseData caseData) {
-        var tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getOwningOffice());
+        var tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
         var clerks = courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
                 CourtWorkerType.CLERK);
         var dynamicFixedListType = new DynamicFixedListType();

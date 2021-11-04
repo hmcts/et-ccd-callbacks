@@ -202,7 +202,7 @@ public class ListingService {
     private CasesAwaitingJudgmentReportData getCasesAwaitingJudgmentReport(
             ListingDetails listingDetails, String authToken) {
         log.info("Cases Awaiting Judgment for {}, Office {}", listingDetails.getCaseTypeId(),
-                listingDetails.getCaseData().getOwningOffice());
+                listingDetails.getCaseData().getManagingOffice());
         var reportDataSource = new CcdReportDataSource(authToken, ccdClient);
         var casesAwaitingJudgmentReport = new CasesAwaitingJudgmentReport(reportDataSource);
         var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
@@ -213,7 +213,7 @@ public class ListingService {
 
     private ListingData getDateRangeReport(ListingDetails listingDetails, String authToken) throws IOException {
         List<SubmitEvent> submitEvents = getDateRangeReportSearch(listingDetails, authToken);
-        log.info("Number of cases found: " + String.valueOf(submitEvents.size()));
+        log.info("Number of cases found: " + submitEvents.size());
         switch (listingDetails.getCaseData().getReportType()) {
             case BROUGHT_FORWARD_REPORT:
                 return ReportHelper.processBroughtForwardDatesRequest(listingDetails, submitEvents);
@@ -237,13 +237,15 @@ public class ListingService {
         boolean isRangeHearingDateType = listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE);
         if (!isRangeHearingDateType) {
             var dateToSearch = LocalDate.parse(listingData.getListingDate(), OLD_DATE_TIME_PATTERN2).toString();
-            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, caseTypeId, TribunalOffice.valueOfOfficeName(listingData.getOwningOffice())
+            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, caseTypeId,
+                    TribunalOffice.valueOfOfficeName(listingData.getManagingOffice())
                     , dateToSearch, dateToSearch, listingData.getReportType());
         } else {
             var dateToSearchFrom = LocalDate.parse(listingData.getListingDateFrom(),
                     OLD_DATE_TIME_PATTERN2).toString();
             var dateToSearchTo = LocalDate.parse(listingData.getListingDateTo(), OLD_DATE_TIME_PATTERN2).toString();
-            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, caseTypeId, TribunalOffice.valueOfOfficeName(listingData.getOwningOffice())
+            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, caseTypeId,
+                    TribunalOffice.valueOfOfficeName(listingData.getManagingOffice())
                     , dateToSearchFrom, dateToSearchTo, listingData.getReportType());
         }
     }

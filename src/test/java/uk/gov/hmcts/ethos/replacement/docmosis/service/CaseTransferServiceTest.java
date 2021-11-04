@@ -89,7 +89,7 @@ public class CaseTransferServiceTest {
     public void InterCountryCaseTransfer() {
         List<String> errors = new ArrayList<>();
         ccdRequest.getCaseDetails().setCaseTypeId(SCOTLAND_CASE_TYPE_ID);
-        ccdRequest.getCaseDetails().getCaseData().setOwningOffice(TribunalOffice.GLASGOW.getOfficeName());
+        ccdRequest.getCaseDetails().getCaseData().setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
         caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
         assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
         assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
@@ -98,11 +98,11 @@ public class CaseTransferServiceTest {
     @Test
     public void IntraCountryCaseTransfer() {
         List<String> errors = new ArrayList<>();
-        ccdRequest.getCaseDetails().getCaseData().setOwningOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        ccdRequest.getCaseDetails().getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
         assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
         assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
-        assertEquals(TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getOwningOffice());
+        assertEquals(TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getManagingOffice());
     }
 
     @Test

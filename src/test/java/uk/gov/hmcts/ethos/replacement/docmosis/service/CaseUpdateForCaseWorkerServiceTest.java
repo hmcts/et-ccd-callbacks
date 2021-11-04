@@ -50,7 +50,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
         englandWalesCcdRequest = new CCDRequest();
         var englandWalesCaseDetails = new CaseDetails();
         englandWalesCaseDetails.setCaseData(new CaseData());
-        englandWalesCaseDetails.getCaseData().setOwningOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        englandWalesCaseDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         englandWalesCaseDetails.setCaseId("123456");
         englandWalesCaseDetails.setCaseTypeId(ENGLANDWALES_DEV_CASE_TYPE_ID);
         englandWalesCaseDetails.setJurisdiction("TRIBUNALS");
@@ -59,7 +59,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
         scotlandCcdRequest = new CCDRequest();
         var scotlandCaseDetails = new CaseDetails();
         scotlandCaseDetails.setCaseData(new CaseData());
-        scotlandCaseDetails.getCaseData().setOwningOffice(TribunalOffice.GLASGOW.getOfficeName());
+        scotlandCaseDetails.getCaseData().setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
         scotlandCaseDetails.setCaseId("123456");
         scotlandCaseDetails.setCaseTypeId(SCOTLAND_DEV_CASE_TYPE_ID);
         scotlandCaseDetails.setJurisdiction("TRIBUNALS");
@@ -100,7 +100,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
     public void caseCreationEnglandWalesRequestException() throws IOException {
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(), anyString())).thenReturn(submitEvent);
-        when(defaultValuesReaderService.getDefaultValues("", TribunalOffice.MANCHESTER.getOfficeName())).thenReturn(englandWalesDefaultValues);
+        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.MANCHESTER.getOfficeName())).thenReturn(englandWalesDefaultValues);
         caseUpdateForCaseWorkerService.caseUpdateRequest(englandWalesCcdRequest, "authToken");
     }
 
@@ -108,7 +108,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
     public void caseCreationEnglandWalesRequest() throws IOException {
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(englandWalesCcdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(), anyString())).thenReturn(submitEvent);
-        when(defaultValuesReaderService.getDefaultValues("", TribunalOffice.MANCHESTER.getOfficeName())).thenReturn(englandWalesDefaultValues);
+        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.MANCHESTER.getOfficeName())).thenReturn(englandWalesDefaultValues);
         SubmitEvent submitEvent1 = caseUpdateForCaseWorkerService.caseUpdateRequest(englandWalesCcdRequest, "authToken");
         assertEquals(submitEvent, submitEvent1);
     }
@@ -117,7 +117,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
     public void caseCreationScotlandRequest() throws IOException {
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(scotlandCcdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(), anyString())).thenReturn(submitEvent);
-        when(defaultValuesReaderService.getDefaultValues("", TribunalOffice.GLASGOW.getOfficeName())).thenReturn(scotlandDefaultValues);
+        when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName())).thenReturn(scotlandDefaultValues);
         SubmitEvent submitEvent1 = caseUpdateForCaseWorkerService.caseUpdateRequest(scotlandCcdRequest, "authToken");
         assertEquals(submitEvent, submitEvent1);
     }

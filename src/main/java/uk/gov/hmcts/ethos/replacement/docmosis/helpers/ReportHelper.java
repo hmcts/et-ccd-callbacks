@@ -109,7 +109,7 @@ public class ReportHelper {
             localReportsDetailHdr.setTotal(Integer.toString(totalCases));
             localReportsDetailHdr.setSinglesTotal(Integer.toString(totalSingles));
             localReportsDetailHdr.setMultiplesTotal(Integer.toString(totalMultiples));
-            localReportsDetailHdr.setReportOffice(listingDetails.getCaseData().getOwningOffice());
+            localReportsDetailHdr.setReportOffice(listingDetails.getCaseData().getManagingOffice());
             listingDetails.getCaseData().setLocalReportsDetailHdr(localReportsDetailHdr);
             listingDetails.getCaseData().setLocalReportsDetail(localReportsDetailList);
         }
@@ -132,7 +132,7 @@ public class ReportHelper {
             }
 
             var localReportsDetailHdr = new AdhocReportType();
-            localReportsDetailHdr.setReportOffice(listingDetails.getCaseData().getOwningOffice());
+            localReportsDetailHdr.setReportOffice(listingDetails.getCaseData().getManagingOffice());
             listingDetails.getCaseData().setLocalReportsDetailHdr(localReportsDetailHdr);
             listingDetails.getCaseData().setLocalReportsDetail(localReportsDetailList);
 
@@ -281,7 +281,8 @@ public class ReportHelper {
 
     private static String getTribunalOffice(ListingDetails listingDetails, CaseData caseData) {
         String caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
-        return caseTypeId.equals(SCOTLAND_CASE_TYPE_ID) ? caseData.getManagingOffice() : listingDetails.getCaseData().getOwningOffice();
+        return caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)
+            ? caseData.getManagingOffice() : listingDetails.getCaseData().getManagingOffice();
     }
 
     private static boolean liveCaseloadIsValid(CaseData caseData) {

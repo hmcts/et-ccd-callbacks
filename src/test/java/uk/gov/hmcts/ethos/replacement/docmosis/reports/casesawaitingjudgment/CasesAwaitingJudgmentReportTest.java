@@ -69,7 +69,7 @@ public class CasesAwaitingJudgmentReportTest {
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent(CLOSED_STATE));
         var listingDetails = new ListingDetails();
         var caseData = new ListingData();
-        caseData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
@@ -96,7 +96,7 @@ public class CasesAwaitingJudgmentReportTest {
                     .buildAsSubmitEvent(ACCEPTED_STATE));
             var listingDetails = new ListingDetails();
             var caseData = new ListingData();
-            caseData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+            caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
             listingDetails.setCaseData(caseData);
             listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
             var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
@@ -118,7 +118,7 @@ public class CasesAwaitingJudgmentReportTest {
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         var listingDetails = new ListingDetails();
         var caseData = new ListingData();
-        caseData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
@@ -140,7 +140,7 @@ public class CasesAwaitingJudgmentReportTest {
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         var listingDetails = new ListingDetails();
         var caseData = new ListingData();
-        caseData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
@@ -164,7 +164,7 @@ public class CasesAwaitingJudgmentReportTest {
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         var listingDetails = new ListingDetails();
         var caseData = new ListingData();
-        caseData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
@@ -186,7 +186,7 @@ public class CasesAwaitingJudgmentReportTest {
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         var listingDetails = new ListingDetails();
         var caseData = new ListingData();
-        caseData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
@@ -205,7 +205,7 @@ public class CasesAwaitingJudgmentReportTest {
         submitEvents.add(createValidSubmitEvent(positionType));
         var listingDetails = new ListingDetails();
         var caseData = new ListingData();
-        caseData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
@@ -238,7 +238,7 @@ public class CasesAwaitingJudgmentReportTest {
         submitEvents.add(createValidSubmitEvent(positionType2));
         var listingDetails = new ListingDetails();
         var caseData = new ListingData();
-        caseData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
@@ -284,7 +284,7 @@ public class CasesAwaitingJudgmentReportTest {
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         var listingDetails = new ListingDetails();
         var caseData = new ListingData();
-        caseData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
@@ -325,7 +325,7 @@ public class CasesAwaitingJudgmentReportTest {
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         var listingDetails = new ListingDetails();
         var caseData = new ListingData();
-        caseData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
@@ -364,7 +364,7 @@ public class CasesAwaitingJudgmentReportTest {
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         var listingDetails = new ListingDetails();
         var caseData = new ListingData();
-        caseData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
@@ -430,7 +430,7 @@ public class CasesAwaitingJudgmentReportTest {
         caseDataBuilder = new CaseDataBuilder();
         var listingDetails = new ListingDetails();
         var caseData = new ListingData();
-        caseData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);

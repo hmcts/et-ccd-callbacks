@@ -240,7 +240,7 @@ public class CaseManagementForCaseWorkerService {
                 switch (callback) {
                     case MID_EVENT_CALLBACK:
                         Helper.midRespondentECC(currentCaseData, submitEvent.getCaseData());
-                        currentCaseData.setOwningOffice(submitEvent.getCaseData().getOwningOffice());
+                        currentCaseData.setManagingOffice(submitEvent.getCaseData().getManagingOffice());
                         clerkService.initialiseClerkResponsible(currentCaseData);
                         break;
                     case ABOUT_TO_SUBMIT_EVENT_CALLBACK:

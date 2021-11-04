@@ -51,23 +51,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
-
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -899,11 +882,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     private DefaultValues getPostDefaultValues(CaseDetails caseDetails) {
-        String owningOffice = caseDetails.getCaseData().getOwningOffice();
-
-        String managingOffice = caseDetails.getCaseData().getManagingOffice() != null
-                ? caseDetails.getCaseData().getManagingOffice() : "";
-        return defaultValuesReaderService.getDefaultValues(managingOffice, owningOffice);
+        return defaultValuesReaderService.getDefaultValues(caseDetails.getCaseData().getManagingOffice());
     }
 
     private void generateEthosCaseReference(CaseData caseData, CCDRequest ccdRequest) {

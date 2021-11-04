@@ -90,7 +90,7 @@ public class TimeToFirstHearingReport {
 
     private void executeReport(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
         log.info(String.format("Time to first hearing report case type id %s for office %s with search results: %d",
-                listingDetails.getCaseTypeId(), listingDetails.getCaseData().getOwningOffice(), submitEvents.size()));
+                listingDetails.getCaseTypeId(), listingDetails.getCaseData().getManagingOffice(), submitEvents.size()));
         populateLocalReportSummary(listingDetails.getCaseData(), submitEvents);
         populateLocalReportSummaryHdr(listingDetails);
         populateLocalReportSummaryDetail(listingDetails, submitEvents);
@@ -117,7 +117,7 @@ public class TimeToFirstHearingReport {
         }
         var adhocReportType = new AdhocReportType();
         adhocReportType.setHearingDate(firstHearingDate.toString());
-        adhocReportType.setReportOffice(listingDetails.getCaseData().getOwningOffice());
+        adhocReportType.setReportOffice(listingDetails.getCaseData().getManagingOffice());
         adhocReportType.setCaseReference(caseData.getEthosCaseReference());
         adhocReportType.setConciliationTrack(getConciliationTrack(caseData));
         if (!Strings.isNullOrEmpty(caseData.getReceiptDate())) {
@@ -137,7 +137,7 @@ public class TimeToFirstHearingReport {
 
         var listingData = listingDetails.getCaseData();
         var adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
-        adhocReportType.setReportOffice(listingDetails.getCaseData().getOwningOffice());
+        adhocReportType.setReportOffice(listingDetails.getCaseData().getManagingOffice());
         int totalCases = Integer.parseInt(adhocReportType.getConOpenTotal())
                 + Integer.parseInt(adhocReportType.getConStdTotal())
                 + Integer.parseInt(adhocReportType.getConFastTotal())

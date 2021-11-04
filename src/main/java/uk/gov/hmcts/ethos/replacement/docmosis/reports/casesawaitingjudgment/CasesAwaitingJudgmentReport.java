@@ -67,10 +67,10 @@ public class CasesAwaitingJudgmentReport {
     }
 
     public CasesAwaitingJudgmentReportData runReport(ListingDetails listingDetails) {
-        var submitEvents = getCases(listingDetails.getCaseTypeId(),
-                listingDetails.getCaseData().getOwningOffice());
+        var managingOffice = listingDetails.getCaseData().getManagingOffice();
+        var submitEvents = getCases(listingDetails.getCaseTypeId(), managingOffice);
+        var reportData = initReport(managingOffice);
 
-        var reportData = initReport(listingDetails.getCaseData().getOwningOffice());
         populateData(reportData, submitEvents);
 
         return reportData;

@@ -93,7 +93,7 @@ public class TornadoService {
     private DefaultValues getAllocatedCourtAddress(CaseData caseData, String caseTypeId, MultipleData multipleData) {
         if ((multipleData != null && isAllocatedOffice(caseTypeId, multipleData.getCorrespondenceScotType()))
                 || isAllocatedOffice(caseTypeId, caseData.getCorrespondenceScotType())) {
-            return defaultValuesReaderService.getDefaultValues(caseData.getAllocatedOffice(), caseData.getOwningOffice());
+            return defaultValuesReaderService.getDefaultValues(caseData.getAllocatedOffice());
         }
         return null;
     }

@@ -89,7 +89,7 @@ public class CasesCompletedReport {
         adhocReportType.setConOpenCasesCompletedHearing(ZERO);
         adhocReportType.setConOpenSessionDays(ZERO);
         adhocReportType.setConOpenCompletedPerSession(ZERO_DECIMAL);
-        adhocReportType.setReportOffice(listingDetails.getCaseData().getOwningOffice());
+        adhocReportType.setReportOffice(listingDetails.getCaseData().getManagingOffice());
 
         var listingData = listingDetails.getCaseData();
         listingData.setLocalReportsDetailHdr(adhocReportType);

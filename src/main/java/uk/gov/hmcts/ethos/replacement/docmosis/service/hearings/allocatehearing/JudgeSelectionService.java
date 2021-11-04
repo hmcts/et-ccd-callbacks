@@ -18,7 +18,8 @@ public class JudgeSelectionService {
 
     public DynamicFixedListType createJudgeSelection(CaseData caseData, HearingType selectedHearing) {
         var dynamicFixedListType = new DynamicFixedListType();
-        dynamicFixedListType.setListItems(judgeService.getJudges(TribunalOffice.valueOfOfficeName(caseData.getOwningOffice())));
+        dynamicFixedListType.setListItems(judgeService.getJudges(TribunalOffice.valueOfOfficeName(
+                caseData.getManagingOffice())));
 
         if (selectedHearing.hasHearingJudge()) {
             dynamicFixedListType.setValue(selectedHearing.getJudge().getValue());

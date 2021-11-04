@@ -1,7 +1,7 @@
 {
   "case_details": {
     "case_data": {
-      "owningOffice": "Manchester",
+      "managingOffice": "Manchester",
       "tribunalCorrespondenceAddress": {
         "AddressLine1": "Manchester Employment Tribunal,",
         "AddressLine2": "Alexandra House,",
@@ -191,7 +191,7 @@
     },
     "id": "232323232",
     "jurisdiction": "Nothing",
-    "case_type_id" : "Manchester_Dev",
+    "case_type_id" : "EnglandWales",
     "state": "Accepted"
   },
   "event_id": "1212121",

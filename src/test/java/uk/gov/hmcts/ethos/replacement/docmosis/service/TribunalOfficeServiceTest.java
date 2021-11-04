@@ -51,11 +51,11 @@ public class TribunalOfficeServiceTest {
             { TribunalOffice.EDINBURGH.getOfficeName(), "EH3 7HF" }
     };
 
-    private final String owningOffice;
+    private final String managingOffice;
     private final String expectedPostcode;
 
-    public TribunalOfficeServiceTest(String owningOffice, String expectedPostcode) {
-        this.owningOffice = owningOffice;
+    public TribunalOfficeServiceTest(String officeName, String expectedPostcode) {
+        this.managingOffice = officeName;
         this.expectedPostcode = expectedPostcode;
     }
 
@@ -66,7 +66,7 @@ public class TribunalOfficeServiceTest {
 
     @Test
     public void testGetsCorrectTribunalContactDetails() {
-        ContactDetails contactDetails = tribunalOfficesService.getTribunalContactDetails(owningOffice, "");
+        ContactDetails contactDetails = tribunalOfficesService.getTribunalContactDetails(managingOffice);
         assertEquals(expectedPostcode, contactDetails.getPostcode());
     }
 }

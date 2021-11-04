@@ -101,7 +101,7 @@ public class CaseTransferService {
 //            );
 //        }
        // else {
-            caseData.setOwningOffice(caseData.getOfficeCT().getValue().getCode());
+            caseData.setManagingOffice(caseData.getOfficeCT().getValue().getCode());
         //}
 
         caseData.setLinkedCaseCT("Transferred to " + officeCT);

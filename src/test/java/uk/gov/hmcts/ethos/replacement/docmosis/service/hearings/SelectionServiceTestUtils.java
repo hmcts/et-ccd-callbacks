@@ -18,13 +18,13 @@ public class SelectionServiceTestUtils {
 
     public static CaseData createCaseData(TribunalOffice tribunalOffice) {
         var caseData = new CaseData();
-        caseData.setOwningOffice(tribunalOffice.getOfficeName());
+        caseData.setManagingOffice(tribunalOffice.getOfficeName());
         return caseData;
     }
 
     public static MultipleData createMultipleData(String tribunalOffice) {
         var multipleData = new MultipleData();
-        multipleData.setOwningOffice(tribunalOffice);
+        multipleData.setManagingOffice(tribunalOffice);
         return multipleData;
     }
 

@@ -32,7 +32,7 @@ public class CaseCompletedReportTest {
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData caseData = new ListingData();
-        caseData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         List<SubmitEvent> submitEvents = new ArrayList<>();
 
@@ -51,7 +51,7 @@ public class CaseCompletedReportTest {
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData caseData = new ListingData();
-        caseData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         List<SubmitEvent> submitEvents = new ArrayList<>();
         submitEvents.add(createSubmitEvent(SUBMITTED_STATE));
@@ -71,7 +71,7 @@ public class CaseCompletedReportTest {
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
-        listingData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
         List<SubmitEvent> submitEvents = new ArrayList<>();
         submitEvents.add(createSubmitEvent(CLOSED_STATE));
@@ -100,7 +100,7 @@ public class CaseCompletedReportTest {
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
-        listingData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
         List<SubmitEvent> submitEvents = new ArrayList<>();
         submitEvents.add(createSubmitEvent(CLOSED_STATE));
@@ -131,7 +131,7 @@ public class CaseCompletedReportTest {
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData caseData = new ListingData();
-        caseData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         List<SubmitEvent> submitEvents = new ArrayList<>();
         submitEvents.add(createSubmitEvent(CLOSED_STATE, JURISDICTION_OUTCOME_DISMISSED_AT_HEARING,
@@ -155,7 +155,7 @@ public class CaseCompletedReportTest {
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
-        listingData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
 
         List<SubmitEvent> submitEvents = new ArrayList<>();
@@ -189,7 +189,7 @@ public class CaseCompletedReportTest {
         ListingData listingData = new ListingData();
         listingData.setListingDate(searchDate);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
-        listingData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
 
         List<SubmitEvent> submitEvents = new ArrayList<>();
@@ -222,7 +222,7 @@ public class CaseCompletedReportTest {
         ListingData listingData = new ListingData();
         listingData.setListingDate(searchDate);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
-        listingData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
 
         List<SubmitEvent> submitEvents = new ArrayList<>();
@@ -257,7 +257,7 @@ public class CaseCompletedReportTest {
         ListingData listingData = new ListingData();
         listingData.setListingDate(searchDate);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
-        listingData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
 
         List<SubmitEvent> submitEvents = new ArrayList<>();
@@ -299,7 +299,7 @@ public class CaseCompletedReportTest {
         ListingData listingData = new ListingData();
         listingData.setListingDate(searchDate);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
-        listingData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
 
         List<SubmitEvent> submitEvents = new ArrayList<>();
@@ -340,7 +340,7 @@ public class CaseCompletedReportTest {
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
-        listingData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingData.setListingDate(searchDate);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingDetails.setCaseData(listingData);
@@ -383,7 +383,7 @@ public class CaseCompletedReportTest {
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
-        listingData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingData.setListingDate(searchDate);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingDetails.setCaseData(listingData);
@@ -426,7 +426,7 @@ public class CaseCompletedReportTest {
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
-        listingData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingData.setListingDate(searchDate);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingDetails.setCaseData(listingData);
@@ -465,7 +465,7 @@ public class CaseCompletedReportTest {
         ListingData listingData = new ListingData();
         listingData.setListingDate(searchDate);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
-        listingData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
 
         List<SubmitEvent> submitEvents = new ArrayList<>();
@@ -509,7 +509,7 @@ public class CaseCompletedReportTest {
         ListingData listingData = new ListingData();
         listingData.setListingDate(searchDate);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
-        listingData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
 
         List<SubmitEvent> submitEvents = new ArrayList<>();
@@ -550,7 +550,7 @@ public class CaseCompletedReportTest {
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
-        listingData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingData.setListingDate(searchDate);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingDetails.setCaseData(listingData);
@@ -594,7 +594,7 @@ public class CaseCompletedReportTest {
         ListingData listingData = new ListingData();
         listingData.setListingDate(searchDate);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
-        listingData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
 
         List<SubmitEvent> submitEvents = new ArrayList<>();
@@ -663,7 +663,7 @@ public class CaseCompletedReportTest {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
         listingData.setListingDate(searchDate);
-        listingData.setOwningOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingDetails.setCaseData(listingData);
 

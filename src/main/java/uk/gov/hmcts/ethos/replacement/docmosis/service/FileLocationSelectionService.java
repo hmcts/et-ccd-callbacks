@@ -16,11 +16,11 @@ public class FileLocationSelectionService {
     }
 
     public void initialiseFileLocation(CaseData caseData) {
-        caseData.setFileLocation(createFileLocations(caseData.getOwningOffice(), caseData.getFileLocation()));
+        caseData.setFileLocation(createFileLocations(caseData.getManagingOffice(), caseData.getFileLocation()));
     }
 
     public void initialiseFileLocation(MultipleData multipleData) {
-        multipleData.setFileLocation(createFileLocations(multipleData.getOwningOffice(),
+        multipleData.setFileLocation(createFileLocations(multipleData.getManagingOffice(),
                 multipleData.getFileLocation()));
     }
 

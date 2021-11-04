@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import lombok.RequiredArgsConstructor;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ecm.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ecm.common.model.multiples.items.CaseMultipleTypeItem;
@@ -88,7 +89,8 @@ public class MultipleTransferServiceTest {
                 YES,
                 MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl,
                         multipleDetails.getCaseId(),
-                        multipleDetails.getCaseData().getMultipleReference())
+                        multipleDetails.getCaseData().getMultipleReference()),
+                Constants.SCOPE_OF_TRANSFER_INTRA_COUNTRY
                 );
 
         verifyNoMoreInteractions(persistentQHelperService);

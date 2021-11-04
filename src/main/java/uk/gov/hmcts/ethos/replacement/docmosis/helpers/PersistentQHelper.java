@@ -9,6 +9,7 @@ import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CloseDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreationDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreationSingleDataModel;
+import static uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreationSingleDataModel.*;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DataModelParent;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DetachDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.PreAcceptDataModel;
@@ -151,12 +152,13 @@ public class PersistentQHelper {
     }
 
     public static CreationSingleDataModel getCreationSingleDataModel(String ccdGatewayBaseUrl, String officeCT,
-                                                                     String positionTypeCT, String reasonForCT) {
-        return CreationSingleDataModel.builder()
+                                                                     String positionTypeCT, String reasonForCT, String scopeOfTransfer) {
+        return builder()
                 .officeCT(officeCT)
                 .positionTypeCT(positionTypeCT)
                 .ccdGatewayBaseUrl(ccdGatewayBaseUrl)
                 .reasonForCT(reasonForCT)
+                .scopeOfTransfer(scopeOfTransfer)
                 .build();
     }
 

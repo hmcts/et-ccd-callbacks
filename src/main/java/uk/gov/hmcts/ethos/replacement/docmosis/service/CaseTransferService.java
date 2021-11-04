@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
@@ -80,7 +81,8 @@ public class CaseTransferService {
 
     public void createCaseTransferEvent(CaseData caseData, List<String> errors, String userToken, int caseListSize) {
         caseData.setManagingOffice(officeCT);
-        if (interCountryCaseTransfer() || caseListSize > 1) {
+        boolean interCountryCaseTransfer = interCountryCaseTransfer();
+        if (interCountryCaseTransfer || caseListSize > 1) {
            persistentQHelperService.sendCreationEventToSingles(
                     userToken,
                     caseTypeId,
@@ -93,7 +95,8 @@ public class CaseTransferService {
                     reasonForCT,
                    SINGLE_CASE_TYPE,
                     NO,
-                    null);
+                    null,
+                   (interCountryCaseTransfer? SCOPE_OF_TRANSFER_INTER_COUNTRY: SCOPE_OF_TRANSFER_INTRA_COUNTRY));
         }
 
         caseData.setLinkedCaseCT("Transferred to " + officeCT);

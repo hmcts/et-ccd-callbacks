@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ecm.common.model.multiples.SubmitMultipleEvent;
@@ -69,7 +70,7 @@ public class MultipleTransferService {
 
         List<String> ethosCaseRefCollection = new ArrayList<>(multipleObjects.keySet());
         var multipleData = multipleDetails.getCaseData();
-
+        boolean interCountryCaseTransfer = interCountryCaseTransfer(multipleDetails.getCaseTypeId(),multipleData.getOfficeMultipleCT().getValue().getCode());
         persistentQHelperService.sendCreationEventToSingles(
                 userToken,
                 multipleDetails.getCaseTypeId(),
@@ -84,9 +85,23 @@ public class MultipleTransferService {
                 YES,
                 MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl,
                         multipleDetails.getCaseId(),
-                        multipleData.getMultipleReference())
+                        multipleData.getMultipleReference()),
+                interCountryCaseTransfer? SCOPE_OF_TRANSFER_INTER_COUNTRY:SCOPE_OF_TRANSFER_INTRA_COUNTRY
                 );
 
+    }
+
+    public boolean interCountryCaseTransfer(String caseTypeId, String officeMultipleCT) {
+        List<String> scotOffices = List.of(TribunalOffice.ABERDEEN.getOfficeName(), TribunalOffice.DUNDEE.getOfficeName()
+                , TribunalOffice.EDINBURGH.getOfficeName(), TribunalOffice.GLASGOW.getOfficeName(), TribunalOffice.SCOTLAND.getOfficeName());
+        boolean isScottishDestinationOffice = scotOffices.contains(
+                officeMultipleCT);
+        if ((isScottishDestinationOffice && SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId)) ||
+                (!isScottishDestinationOffice && ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId))) {
+            return false;
+        }  else {
+            return true;
+        }
     }
 
     public void populateDataIfComingFromCT(String userToken, MultipleDetails multipleDetails, List<String> errors) {

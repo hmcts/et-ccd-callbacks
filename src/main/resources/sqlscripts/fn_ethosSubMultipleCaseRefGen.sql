@@ -41,7 +41,7 @@ WHEN office = 'EnglandWales' THEN
 
     RETURN c_submultrefstr;
 
-WHEN office = 'Scotland' THEN
+WHEN office = 'ET_Scotland' THEN
     SELECT submultref INTO c_submultref FROM submultiple_reference_scotland WHERE multref  = p_multref FOR UPDATE ;
 
     CASE WHEN c_submultref IS NULL THEN

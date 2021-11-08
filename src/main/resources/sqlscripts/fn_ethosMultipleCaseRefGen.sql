@@ -38,7 +38,7 @@ CASE
 
         RETURN  currentvalstr;
 
-    WHEN office = 'Scotland' THEN
+    WHEN office = 'ET_Scotland' THEN
         SELECT counter INTO currentval FROM multiple_reference_scotland FOR UPDATE ;
 
         CASE

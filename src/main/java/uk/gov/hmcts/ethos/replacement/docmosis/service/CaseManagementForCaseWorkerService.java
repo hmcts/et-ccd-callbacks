@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -33,6 +35,7 @@ import java.util.stream.Stream;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
@@ -129,6 +132,7 @@ public class CaseManagementForCaseWorkerService {
             respondentSumTypeItem.getValue().getResponseRespondentAddress().setPostTown("");
         }
     }
+
     private void struckOutDefaults(CaseData caseData) {
         if (caseData.getRespondentCollection() != null && !caseData.getRespondentCollection().isEmpty()) {
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
@@ -183,19 +187,19 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void amendHearing(CaseData caseData, String caseTypeId) {
-        if (caseData.getHearingCollection() != null && !caseData.getHearingCollection().isEmpty()) {
-            for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-                var hearingType =  hearingTypeItem.getValue();
-                if (hearingTypeItem.getValue().getHearingDateCollection() != null
-                        && !hearingTypeItem.getValue().getHearingDateCollection().isEmpty()) {
-                    for (DateListedTypeItem dateListedTypeItem
-                            : hearingTypeItem.getValue().getHearingDateCollection()) {
-                        var dateListedType = dateListedTypeItem.getValue();
-                        if (dateListedType.getHearingStatus() == null) {
-                            dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
-                        }
-                        populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
+        if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
+            return;
+        }
+
+        for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
+            var hearingType =  hearingTypeItem.getValue();
+            if (CollectionUtils.isNotEmpty(hearingType.getHearingDateCollection())) {
+                for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
+                    var dateListedType = dateListedTypeItem.getValue();
+                    if (dateListedType.getHearingStatus() == null) {
+                        dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
                     }
+                    populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
                 }
             }
         }
@@ -203,31 +207,52 @@ public class CaseManagementForCaseWorkerService {
 
     private void populateHearingVenueFromHearingLevelToDayLevel(DateListedType dateListedType, HearingType hearingType,
                                                                 String caseTypeId) {
-        if (caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
-            if (hearingType.getHearingAberdeen() != null) {
-                if (dateListedType.getHearingAberdeen() == null) {
-                    log.info("Adding hearing day level Aberdeen");
-                    dateListedType.setHearingAberdeen(hearingType.getHearingAberdeen());
-                }
-            } else if (hearingType.getHearingDundee() != null) {
-                if (dateListedType.getHearingDundee() == null) {
-                    log.info("Adding hearing day level Dundee");
-                    dateListedType.setHearingDundee(hearingType.getHearingDundee());
-                }
-            } else if (hearingType.getHearingEdinburgh() != null) {
-                if (dateListedType.getHearingEdinburgh() == null) {
-                    log.info("Adding hearing day level Edinburgh");
-                    dateListedType.setHearingEdinburgh(hearingType.getHearingEdinburgh());
-                }
-            } else {
-                if (dateListedType.getHearingGlasgow() == null) {
-                    log.info("Adding hearing day level Glasgow");
-                    dateListedType.setHearingGlasgow(hearingType.getHearingGlasgow());
-                }
-            }
+        switch (caseTypeId) {
+            case ENGLANDWALES_CASE_TYPE_ID:
+                populateHearingVenueEnglandWales(dateListedType, hearingType);
+                break;
+            case SCOTLAND_CASE_TYPE_ID:
+                populateHearingVenueScotland(dateListedType, hearingType);
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
         }
+    }
+
+    private void populateHearingVenueEnglandWales(DateListedType dateListedType, HearingType hearingType) {
         if (!dateListedType.hasHearingVenue()) {
             dateListedType.setHearingVenueDay(hearingType.getHearingVenue());
+        }
+    }
+
+    private void populateHearingVenueScotland(DateListedType dateListedType, HearingType hearingType) {
+        dateListedType.setHearingVenueDayScotland(hearingType.getHearingVenueScotland());
+        dateListedType.setHearingGlasgow(null);
+        dateListedType.setHearingAberdeen(null);
+        dateListedType.setHearingDundee(null);
+        dateListedType.setHearingEdinburgh(null);
+
+        var hearingVenue = hearingType.getHearingVenueScotland();
+        if (TribunalOffice.GLASGOW.getOfficeName().equals(hearingVenue)) {
+            dateListedType.setHearingGlasgow(hearingType.getHearingGlasgow());
+            hearingType.setHearingAberdeen(null);
+            hearingType.setHearingDundee(null);
+            hearingType.setHearingEdinburgh(null);
+        } else if (TribunalOffice.ABERDEEN.getOfficeName().equals(hearingVenue)) {
+            dateListedType.setHearingAberdeen(hearingType.getHearingAberdeen());
+            hearingType.setHearingGlasgow(null);
+            hearingType.setHearingDundee(null);
+            hearingType.setHearingEdinburgh(null);
+        } else if (TribunalOffice.DUNDEE.getOfficeName().equals(hearingVenue)) {
+            dateListedType.setHearingDundee(hearingType.getHearingDundee());
+            hearingType.setHearingGlasgow(null);
+            hearingType.setHearingAberdeen(null);
+            hearingType.setHearingEdinburgh(null);
+        } else if (TribunalOffice.EDINBURGH.getOfficeName().equals(hearingVenue)) {
+            dateListedType.setHearingEdinburgh(hearingType.getHearingEdinburgh());
+            hearingType.setHearingGlasgow(null);
+            hearingType.setHearingAberdeen(null);
+            hearingType.setHearingDundee(null);
         }
     }
 

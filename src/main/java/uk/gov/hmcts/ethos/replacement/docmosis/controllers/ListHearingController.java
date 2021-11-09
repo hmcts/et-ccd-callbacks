@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.ScotlandVenueSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.VenueSelectionService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @RestController
@@ -25,10 +28,13 @@ public class ListHearingController {
 
     private final VerifyTokenService verifyTokenService;
     private final VenueSelectionService venueSelectionService;
+    private final ScotlandVenueSelectionService scotlandVenueSelectionService;
 
-    public ListHearingController(VerifyTokenService verifyTokenService, VenueSelectionService venueSelectionService) {
+    public ListHearingController(VerifyTokenService verifyTokenService, VenueSelectionService venueSelectionService,
+                                 ScotlandVenueSelectionService scotlandVenueSelectionService) {
         this.verifyTokenService = verifyTokenService;
         this.venueSelectionService = venueSelectionService;
+        this.scotlandVenueSelectionService = scotlandVenueSelectionService;
     }
 
     @PostMapping(value = "/initialiseHearings")
@@ -47,8 +53,15 @@ public class ListHearingController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
+        var caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
         var caseData = ccdRequest.getCaseDetails().getCaseData();
-        venueSelectionService.initHearingCollection(caseData);
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            venueSelectionService.initHearingCollection(caseData);
+        } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            scotlandVenueSelectionService.initHearingCollection(caseData);
+        } else {
+            throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
+        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }

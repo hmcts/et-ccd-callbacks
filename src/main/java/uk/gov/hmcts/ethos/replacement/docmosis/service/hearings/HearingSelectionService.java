@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
@@ -17,7 +18,7 @@ public class HearingSelectionService {
     public List<DynamicValueType> getHearingSelection(CaseData caseData) {
         var values = new ArrayList<DynamicValueType>();
 
-        if (caseData.getHearingCollection() != null && caseData.getHearingCollection().size() > 0) {
+        if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
             for (var hearing : caseData.getHearingCollection()) {
                 for (var listing : hearing.getValue().getHearingDateCollection()) {
                     var code = listing.getId();
@@ -28,7 +29,6 @@ public class HearingSelectionService {
                 }
             }
         }
-
 
         return values;
     }

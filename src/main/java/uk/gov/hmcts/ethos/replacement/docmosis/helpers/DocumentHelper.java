@@ -1,36 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.google.common.base.Strings;
-import java.io.InputStream;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABERDEEN_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_PAGE_SIZE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.COMPANY_TYPE_CLAIMANT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FILE_EXTENSION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LABEL;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LBL;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.VENUE_ADDRESS_VALUES_FILE_PATH;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -56,6 +26,38 @@ import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
+
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABERDEEN_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_PAGE_SIZE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.COMPANY_TYPE_CLAIMANT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.FILE_EXTENSION;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.LABEL;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.LBL;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.VENUE_ADDRESS_VALUES_FILE_PATH;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
 public class DocumentHelper {
@@ -553,20 +555,29 @@ public class DocumentHelper {
     }
 
     private static String getHearingVenue(HearingType hearingType, String caseTypeId) {
-        String hearingVenueToSearch = hearingType.getHearingVenue().getValue().getLabel();
-        if (caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
-            switch (hearingVenueToSearch) {
-                case ABERDEEN_OFFICE:
-                    return hearingType.getHearingAberdeen();
-                case DUNDEE_OFFICE:
-                    return hearingType.getHearingDundee();
-                case EDINBURGH_OFFICE:
-                    return hearingType.getHearingEdinburgh();
-                default:
-                    return hearingType.getHearingGlasgow();
-            }
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            return hearingType.getHearingVenue().getValue().getLabel();
+        } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            return getHearingVenueScotland(hearingType);
         } else {
-            return hearingVenueToSearch;
+            throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
+        }
+    }
+
+    private static String getHearingVenueScotland(HearingType hearingType) {
+        var venue = hearingType.getHearingVenueScotland();
+        switch (venue) {
+            case GLASGOW_OFFICE:
+                return hearingType.getHearingGlasgow().getSelectedLabel();
+            case ABERDEEN_OFFICE:
+                return hearingType.getHearingAberdeen().getSelectedLabel();
+            case DUNDEE_OFFICE:
+                return hearingType.getHearingDundee().getSelectedLabel();
+            case EDINBURGH_OFFICE:
+                return hearingType.getHearingEdinburgh().getSelectedLabel();
+            default:
+                log.error("No {} venue found", venue);
+                return null;
         }
     }
 

@@ -129,8 +129,8 @@ public class ListingServiceTest {
         DateListedType dateListedType = new DateListedType();
         dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType.setHearingClerk(new DynamicFixedListType("Clerk"));
-        dateListedType.setHearingRoomGlasgow("Tribunal 4");
-        dateListedType.setHearingAberdeen("AberdeenVenue");
+        dateListedType.setHearingRoom(new DynamicFixedListType("Tribunal 4"));
+        dateListedType.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue"));
         dateListedType.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
         dateListedType.setListedDate("2019-12-12T12:11:00.000");
         dateListedTypeItem.setId("123");
@@ -140,8 +140,8 @@ public class ListingServiceTest {
         DateListedType dateListedType1 = new DateListedType();
         dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType1.setHearingClerk(new DynamicFixedListType("Clerk"));
-        dateListedType1.setHearingRoomGlasgow("Tribunal 4");
-        dateListedType1.setHearingAberdeen("AberdeenVenue");
+        dateListedType1.setHearingRoom(new DynamicFixedListType("Tribunal 4"));
+        dateListedType1.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue"));
         dateListedType1.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
         dateListedType1.setListedDate("2019-12-10T12:11:00.000");
         dateListedTypeItem1.setId("124");
@@ -152,8 +152,8 @@ public class ListingServiceTest {
         dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType2.setHearingClerk(new DynamicFixedListType("Clerk1"));
         dateListedType2.setHearingCaseDisposed(YES);
-        dateListedType2.setHearingRoomGlasgow("Tribunal 5");
-        dateListedType2.setHearingAberdeen("AberdeenVenue2");
+        dateListedType2.setHearingRoom(new DynamicFixedListType("Tribunal 5"));
+        dateListedType2.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue2"));
         dateListedType2.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
         dateListedType2.setListedDate("2019-12-12T12:11:30.000");
         dateListedTypeItem2.setId("124");
@@ -164,8 +164,8 @@ public class ListingServiceTest {
         dateListedType3.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType3.setHearingClerk(new DynamicFixedListType("Clerk3"));
         dateListedType3.setHearingCaseDisposed(YES);
-        dateListedType3.setHearingRoomGlasgow("Tribunal 5");
-        dateListedType3.setHearingAberdeen("AberdeenVenue2");
+        dateListedType3.setHearingRoom(new DynamicFixedListType("Tribunal 5"));
+        dateListedType3.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue2"));
         dateListedType3.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
         dateListedType3.setListedDate("2019-12-12T12:11:55.000");
         dateListedTypeItem3.setId("124");

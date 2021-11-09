@@ -711,20 +711,38 @@ public class ListingHelper {
     }
 
     public static String getVenueFromDateListedType(DateListedType dateListedType) {
+        // EnglandWales
         if (dateListedType.hasHearingVenue()) {
-            switch (dateListedType.getHearingVenueDay().getValue().getLabel()) {
-                case GLASGOW_OFFICE:
-                    return dateListedType.getHearingGlasgow() != null ? dateListedType.getHearingGlasgow() : " ";
-                case DUNDEE_OFFICE:
-                    return dateListedType.getHearingDundee() != null ? dateListedType.getHearingDundee() : " ";
-                case EDINBURGH_OFFICE:
-                    return dateListedType.getHearingEdinburgh() != null ? dateListedType.getHearingEdinburgh() : " ";
-                case ABERDEEN_OFFICE:
-                    return dateListedType.getHearingAberdeen() != null ? dateListedType.getHearingAberdeen() : " ";
-                default:
-                    return dateListedType.getHearingVenueDay().getValue().getLabel();
-            }
+            return dateListedType.getHearingVenueDay().getValue().getLabel();
         }
+
+        // Scotland
+        var hearingVenueScotland = dateListedType.getHearingVenueDayScotland();
+        switch (hearingVenueScotland) {
+            case GLASGOW_OFFICE:
+                if (dateListedType.hasHearingGlasgow()) {
+                    return dateListedType.getHearingGlasgow().getSelectedLabel();
+                }
+                break;
+            case ABERDEEN_OFFICE:
+                if (dateListedType.hasHearingAberdeen()) {
+                    return dateListedType.getHearingAberdeen().getSelectedLabel();
+                }
+                break;
+            case DUNDEE_OFFICE:
+                if (dateListedType.hasHearingDundee()) {
+                    return dateListedType.getHearingDundee().getSelectedLabel();
+                }
+                break;
+            case EDINBURGH_OFFICE:
+                if (dateListedType.hasHearingEdinburgh()) {
+                    return dateListedType.getHearingEdinburgh().getSelectedLabel();
+                }
+                break;
+            default:
+                break;
+        }
+
         return " ";
     }
 

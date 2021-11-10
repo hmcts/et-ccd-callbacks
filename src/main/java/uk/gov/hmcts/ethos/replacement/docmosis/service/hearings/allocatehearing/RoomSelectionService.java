@@ -17,15 +17,9 @@ public class RoomSelectionService {
     public DynamicFixedListType createRoomSelection(CaseData caseData, DateListedType selectedListing) {
         var selectedVenue = caseData.getAllocateHearingVenue();
         var venueId = selectedVenue.getValue().getCode();
-        var dynamicFixedListType = new DynamicFixedListType();
-        dynamicFixedListType.setListItems(roomService.getRooms(venueId));
 
-        if (selectedListing.hasHearingRoom()) {
-            var code = selectedListing.getHearingRoom().getSelectedCode();
-            if (dynamicFixedListType.isValidCodeForList(code)) {
-                dynamicFixedListType.setValue(selectedListing.getHearingRoom().getValue());
-            }
-        }
-        return dynamicFixedListType;
+        var listItems = roomService.getRooms(venueId);
+        var selectedRoom = selectedListing.getHearingRoom();
+        return DynamicFixedListType.from(listItems, selectedRoom);
     }
 }

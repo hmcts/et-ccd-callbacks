@@ -68,11 +68,10 @@ public class VenueSelectionServiceTest {
     public void testCreateVenueSelectionNoSelectedVenue() {
         var tribunalOffice = TribunalOffice.ABERDEEN;
         var venueService = mockVenueService(tribunalOffice);
-        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         var selectedListing = createSelectedListing(null);
 
         var venueSelectionService = new VenueSelectionService(venueService);
-        var actualResult = venueSelectionService.createVenueSelection(caseData, selectedListing);
+        var actualResult = venueSelectionService.createVenueSelection(tribunalOffice, selectedListing);
 
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(actualResult, "venue", "Venue ");
     }
@@ -81,12 +80,11 @@ public class VenueSelectionServiceTest {
     public void testCreateVenueSelectionWithSelectedVenue() {
         var tribunalOffice = TribunalOffice.ABERDEEN;
         var venueService = mockVenueService(tribunalOffice);
-        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         var selectedVenue = DynamicValueType.create("venue2", "Venue 2");
         var selectedListing = createSelectedListing(selectedVenue);
 
         var venueSelectionService = new VenueSelectionService(venueService);
-        var actualResult = venueSelectionService.createVenueSelection(caseData, selectedListing);
+        var actualResult = venueSelectionService.createVenueSelection(tribunalOffice, selectedListing);
 
         SelectionServiceTestUtils.verifyDynamicFixedListSelected(actualResult, "venue", "Venue ", selectedVenue);
     }

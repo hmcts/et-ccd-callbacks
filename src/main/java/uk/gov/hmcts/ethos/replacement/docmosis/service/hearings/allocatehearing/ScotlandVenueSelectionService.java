@@ -6,11 +6,12 @@ import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.VenueService;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,6 +30,38 @@ public class ScotlandVenueSelectionService {
         } else {
             updateHearingTypeItems(caseData.getHearingCollection());
         }
+    }
+
+    public DynamicFixedListType createVenueSelection(TribunalOffice tribunalOffice, DateListedType selectedListing) {
+        var dynamicFixedListType = new DynamicFixedListType();
+        dynamicFixedListType.setListItems(venueService.getVenues(tribunalOffice));
+
+        switch (tribunalOffice) {
+            case ABERDEEN:
+                if (selectedListing.hasHearingAberdeen()) {
+                    dynamicFixedListType.setValue(selectedListing.getHearingAberdeen().getValue());
+                }
+                break;
+            case DUNDEE:
+                if (selectedListing.hasHearingDundee()) {
+                    dynamicFixedListType.setValue(selectedListing.getHearingDundee().getValue());
+                }
+                break;
+            case GLASGOW:
+                if (selectedListing.hasHearingGlasgow()) {
+                    dynamicFixedListType.setValue(selectedListing.getHearingGlasgow().getValue());
+                }
+                break;
+            case EDINBURGH:
+                if (selectedListing.hasHearingEdinburgh()) {
+                    dynamicFixedListType.setValue(selectedListing.getHearingEdinburgh().getValue());
+                }
+                break;
+            default:
+                break;
+        }
+
+        return dynamicFixedListType;
     }
 
     private HearingTypeItem createNewHearingTypeItem() {
@@ -65,7 +98,7 @@ public class ScotlandVenueSelectionService {
     }
 
     private Map<TribunalOffice, List<DynamicValueType>> getOfficeVenues() {
-        var officeVenues = new HashMap<TribunalOffice, List<DynamicValueType>>();
+        EnumMap<TribunalOffice, List<DynamicValueType>> officeVenues = new EnumMap<>(TribunalOffice.class);
         officeVenues.put(TribunalOffice.ABERDEEN, venueService.getVenues(TribunalOffice.ABERDEEN));
         officeVenues.put(TribunalOffice.DUNDEE, venueService.getVenues(TribunalOffice.DUNDEE));
         officeVenues.put(TribunalOffice.EDINBURGH, venueService.getVenues(TribunalOffice.EDINBURGH));

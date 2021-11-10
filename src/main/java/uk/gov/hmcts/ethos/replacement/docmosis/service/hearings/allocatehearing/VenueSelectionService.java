@@ -46,15 +46,9 @@ public class VenueSelectionService {
         }
     }
 
-    public DynamicFixedListType createVenueSelection(CaseData caseData, DateListedType selectedListing) {
-        var dynamicFixedListType = new DynamicFixedListType();
-        dynamicFixedListType.setListItems(venueService.getVenues(TribunalOffice.valueOfOfficeName(
-                caseData.getManagingOffice())));
-
-        if (selectedListing.hasHearingVenue()) {
-            dynamicFixedListType.setValue(selectedListing.getHearingVenueDay().getValue());
-        }
-
-        return dynamicFixedListType;
+    public DynamicFixedListType createVenueSelection(TribunalOffice tribunalOffice, DateListedType selectedListing) {
+        var listItems = venueService.getVenues(tribunalOffice);
+        var selectedVenue = selectedListing.getHearingVenueDay();
+        return DynamicFixedListType.from(listItems, selectedVenue);
     }
 }

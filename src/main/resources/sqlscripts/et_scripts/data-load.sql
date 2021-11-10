@@ -2,13 +2,13 @@
 -- BRISTOL
 ------------------------------------------------------------
 insert into judge (code, name, tribunal_office, employment_status)
-values ('001', 'Judge Bristol 1', 'BRISTOL', 'SALARIED');
+values ('BRISTOL001', 'Judge Bristol 1', 'BRISTOL', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('002', 'Judge Bristol 2', 'BRISTOL', 'SALARIED');
+values ('BRISTOL002', 'Judge Bristol 2', 'BRISTOL', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('003', 'Judge Bristol 3', 'BRISTOL', 'FEE_PAID');
+values ('BRISTOL003', 'Judge Bristol 3', 'BRISTOL', 'FEE_PAID');
 
 insert into venue (tribunal_office, code, name)
 values ('BRISTOL', 'Barnstaple', 'Barnstaple');
@@ -80,13 +80,13 @@ values ('BRISTOL', 'Bristol Desk 3', 'Bristol Desk 3');
 -- LEEDS
 ------------------------------------------------------------
 insert into judge (code, name, tribunal_office, employment_status)
-values ('001', 'Judge Leeds 1', 'LEEDS', 'SALARIED');
+values ('LEEDS001', 'Judge Leeds 1', 'LEEDS', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('002', 'Judge Leeds 2', 'LEEDS', 'SALARIED');
+values ('LEEDS002', 'Judge Leeds 2', 'LEEDS', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('003', 'Judge Leeds 3', 'LEEDS', 'FEE_PAID');
+values ('LEEDS003', 'Judge Leeds 3', 'LEEDS', 'FEE_PAID');
 
 insert into venue (tribunal_office, code, name)
 values ('LEEDS', 'Hull', 'Hull');
@@ -146,13 +146,13 @@ values ('LEEDS', 'Leeds Desk 3', 'Leeds Desk 3');
 -- GLASGOW
 ------------------------------------------------------------
 insert into judge (code, name, tribunal_office, employment_status)
-values ('001', 'Judge Glasgow 1', 'GLASGOW', 'SALARIED');
+values ('GLASGOW001', 'Judge Glasgow 1', 'GLASGOW', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('002', 'Judge Glasgow 2', 'GLASGOW', 'SALARIED');
+values ('GLASGOW002', 'Judge Glasgow 2', 'GLASGOW', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('003', 'Judge Glasgow 3', 'GLASGOW', 'FEE_PAID');
+values ('GLASGOW003', 'Judge Glasgow 3', 'GLASGOW', 'FEE_PAID');
 
 insert into court_worker (tribunal_office, type, code, name)
 values ('GLASGOW', 'CLERK', 'Mr GLASGOW Clerk', 'Mr GLASGOW Clerk');
@@ -212,13 +212,13 @@ values ('202', '202', 'GTC');
 -- ABERDEEN
 ------------------------------------------------------------
 insert into judge (code, name, tribunal_office, employment_status)
-values ('001', 'Judge Aberdeen 1', 'ABERDEEN', 'SALARIED');
+values ('ABERDEEN001', 'Judge Aberdeen 1', 'ABERDEEN', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('002', 'Judge Aberdeen 2', 'ABERDEEN', 'SALARIED');
+values ('ABERDEEN002', 'Judge Aberdeen 2', 'ABERDEEN', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('003', 'Judge Aberdeen 3', 'ABERDEEN', 'FEE_PAID');
+values ('ABERDEEN003', 'Judge Aberdeen 3', 'ABERDEEN', 'FEE_PAID');
 
 insert into court_worker (tribunal_office, type, code, name)
 values ('ABERDEEN', 'CLERK', 'Mr ABERDEEN Clerk', 'Mr ABERDEEN Clerk');
@@ -275,13 +275,13 @@ values ('1', '1', 'I J C');
 -- DUNDEE
 ------------------------------------------------------------
 insert into judge (code, name, tribunal_office, employment_status)
-values ('001', 'Judge DUNDEE 1', 'DUNDEE', 'SALARIED');
+values ('DUNDEE001', 'Judge DUNDEE 1', 'DUNDEE', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('002', 'Judge DUNDEE 2', 'DUNDEE', 'SALARIED');
+values ('DUNDEE002', 'Judge DUNDEE 2', 'DUNDEE', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('003', 'Judge DUNDEE 3', 'DUNDEE', 'FEE_PAID');
+values ('DUNDEE003', 'Judge DUNDEE 3', 'DUNDEE', 'FEE_PAID');
 
 insert into court_worker (tribunal_office, type, code, name)
 values ('DUNDEE', 'CLERK', 'Mr DUNDEE Clerk', 'Mr DUNDEE Clerk');
@@ -335,22 +335,22 @@ insert into venue (tribunal_office, code, name)
 values ('DUNDEE', 'Dundee Tribunal', 'Tribunal');
 
 insert into room (code, name, venue_code)
-values ('1', '1', 'Dundee Tribunal');
+values ('D1', '1', 'Dundee Tribunal');
 
 insert into room (code, name, venue_code)
-values ('2', '2', 'Dundee Tribunal');
+values ('D2', '2', 'Dundee Tribunal');
 
 ------------------------------------------------------------
 -- EDINBURGH
 ------------------------------------------------------------
 insert into judge (code, name, tribunal_office, employment_status)
-values ('001', 'Judge EDINBURGH 1', 'EDINBURGH', 'SALARIED');
+values ('EDINBURGH001', 'Judge EDINBURGH 1', 'EDINBURGH', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('002', 'Judge EDINBURGH 2', 'EDINBURGH', 'SALARIED');
+values ('EDINBURGH002', 'Judge EDINBURGH 2', 'EDINBURGH', 'SALARIED');
 
 insert into judge (code, name, tribunal_office, employment_status)
-values ('003', 'Judge EDINBURGH 3', 'EDINBURGH', 'FEE_PAID');
+values ('EDINBURGH003', 'Judge EDINBURGH 3', 'EDINBURGH', 'FEE_PAID');
 
 insert into court_worker (tribunal_office, type, code, name)
 values ('EDINBURGH', 'CLERK', 'Mr EDINBURGH Clerk', 'Mr EDINBURGH Clerk');
@@ -392,16 +392,16 @@ insert into venue (tribunal_office, code, name)
 values ('EDINBURGH', 'Edinburgh', 'Edinburgh');
 
 insert into room (code, name, venue_code)
-values ('1', '1', 'Edinburgh');
+values ('E1', '1', 'Edinburgh');
 
 insert into room (code, name, venue_code)
-values ('2', '2', 'Edinburgh');
+values ('E2', '2', 'Edinburgh');
 
 insert into room (code, name, venue_code)
-values ('3', '3', 'Edinburgh');
+values ('E3', '3', 'Edinburgh');
 
 insert into room (code, name, venue_code)
-values ('4', '4', 'Edinburgh');
+values ('E4', '4', 'Edinburgh');
 
 insert into room (code, name, venue_code)
 values ('Judges Own Room', 'Judges Own Room', 'EDINBURGH');

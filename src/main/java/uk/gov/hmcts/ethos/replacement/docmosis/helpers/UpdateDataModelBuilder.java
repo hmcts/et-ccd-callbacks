@@ -27,10 +27,14 @@ public class UpdateDataModelBuilder {
         return UpdateDataModel.builder()
                 .managingOffice(multipleData.getManagingOffice())
                 .fileLocation(DynamicFixedListType.getSelectedValue(multipleData.getFileLocation()).orElse(null))
-                .fileLocationGlasgow(multipleData.getFileLocationGlasgow())
-                .fileLocationAberdeen(multipleData.getFileLocationAberdeen())
-                .fileLocationDundee(multipleData.getFileLocationDundee())
-                .fileLocationEdinburgh(multipleData.getFileLocationEdinburgh())
+                .fileLocationGlasgow(DynamicFixedListType.getSelectedValue(
+                        multipleData.getFileLocationGlasgow()).orElse(null))
+                .fileLocationAberdeen(DynamicFixedListType.getSelectedValue(
+                        multipleData.getFileLocationAberdeen()).orElse(null))
+                .fileLocationDundee(DynamicFixedListType.getSelectedValue(
+                        multipleData.getFileLocationDundee()).orElse(null))
+                .fileLocationEdinburgh(DynamicFixedListType.getSelectedValue(
+                        multipleData.getFileLocationEdinburgh()).orElse(null))
                 .clerkResponsible(DynamicFixedListType.getSelectedValue(
                         multipleData.getClerkResponsible()).orElse(null))
                 .positionType(multipleData.getPositionType())

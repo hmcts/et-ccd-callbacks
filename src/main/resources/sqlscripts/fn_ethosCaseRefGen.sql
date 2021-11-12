@@ -47,7 +47,7 @@ CASE
 
         RETURN  currentvalstr;
 
-    WHEN office = 'Scotland' THEN
+    WHEN office = 'ET_Scotland' THEN
         SELECT counter, cyear INTO currentval,currentyr FROM single_reference_scotland FOR UPDATE ;
 
         CASE

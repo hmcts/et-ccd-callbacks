@@ -210,7 +210,7 @@ public class AllocateHearingServiceTest {
         var judges = SelectionServiceTestUtils.createListItems("judge", "Judge ");
         var dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(judges);
-        when(judgeSelectionService.createJudgeSelection(isA(CaseData.class),
+        when(judgeSelectionService.createJudgeSelection(isA(TribunalOffice.class),
                 isA(HearingType.class))).thenReturn(dynamicFixedListType);
 
         return judgeSelectionService;
@@ -221,7 +221,7 @@ public class AllocateHearingServiceTest {
         var venues = SelectionServiceTestUtils.createListItems("venue", "Venue ");
         var dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(venues);
-        when(venueSelectionService.createVenueSelection(isA(CaseData.class),
+        when(venueSelectionService.createVenueSelection(isA(TribunalOffice.class),
                 isA(DateListedType.class))).thenReturn(dynamicFixedListType);
 
         return venueSelectionService;

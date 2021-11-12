@@ -40,10 +40,11 @@ public class AllocateHearingService {
 
     public void handleListingSelected(CaseData caseData) {
         var selectedHearing = getSelectedHearing(caseData);
-        caseData.setAllocateHearingJudge(judgeSelectionService.createJudgeSelection(caseData, selectedHearing));
+        var managingOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
+        caseData.setAllocateHearingJudge(judgeSelectionService.createJudgeSelection(managingOffice, selectedHearing));
 
         var selectedListing = getSelectedListing(caseData);
-        caseData.setAllocateHearingVenue(venueSelectionService.createVenueSelection(caseData, selectedListing));
+        caseData.setAllocateHearingVenue(venueSelectionService.createVenueSelection(managingOffice, selectedListing));
         caseData.setAllocateHearingSitAlone(selectedHearing.getHearingSitAlone());
         caseData.setAllocateHearingStatus(selectedListing.getHearingStatus());
         caseData.setAllocateHearingPostponedBy(selectedListing.getPostponedBy());

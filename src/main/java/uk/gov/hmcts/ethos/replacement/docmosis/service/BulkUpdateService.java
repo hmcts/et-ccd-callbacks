@@ -329,23 +329,23 @@ public class BulkUpdateService {
                 updated = true;
                 submitEvent.getCaseData().setFileLocation(fileLocationNewValue);
             }
-            String fileLocationGlasgowNewValue = bulkData.getFileLocationGlasgow();
-            if (!isNullOrEmpty(fileLocationGlasgowNewValue)) {
+            DynamicFixedListType fileLocationGlasgowNewValue = bulkData.getFileLocationGlasgow();
+            if (fileLocationGlasgowNewValue != null && fileLocationGlasgowNewValue.getValue() != null) {
                 updated = true;
                 submitEvent.getCaseData().setFileLocationGlasgow(fileLocationGlasgowNewValue);
             }
-            String fileLocationAberdeenNewValue = bulkData.getFileLocationAberdeen();
-            if (!isNullOrEmpty(fileLocationAberdeenNewValue)) {
+            DynamicFixedListType fileLocationAberdeenNewValue = bulkData.getFileLocationAberdeen();
+            if (fileLocationAberdeenNewValue != null && fileLocationAberdeenNewValue.getValue() != null) {
                 updated = true;
                 submitEvent.getCaseData().setFileLocationAberdeen(fileLocationAberdeenNewValue);
             }
-            String fileLocationDundeeNewValue = bulkData.getFileLocationDundee();
-            if (!isNullOrEmpty(fileLocationDundeeNewValue)) {
+            DynamicFixedListType fileLocationDundeeNewValue = bulkData.getFileLocationDundee();
+            if (fileLocationDundeeNewValue != null && fileLocationDundeeNewValue.getValue() != null) {
                 updated = true;
                 submitEvent.getCaseData().setFileLocationDundee(fileLocationDundeeNewValue);
             }
-            String fileLocationEdinburghNewValue = bulkData.getFileLocationEdinburgh();
-            if (!isNullOrEmpty(fileLocationEdinburghNewValue)) {
+            DynamicFixedListType fileLocationEdinburghNewValue = bulkData.getFileLocationEdinburgh();
+            if (fileLocationEdinburghNewValue != null && fileLocationEdinburghNewValue.getValue() != null) {
                 updated = true;
                 submitEvent.getCaseData().setFileLocationEdinburgh(fileLocationEdinburghNewValue);
             }

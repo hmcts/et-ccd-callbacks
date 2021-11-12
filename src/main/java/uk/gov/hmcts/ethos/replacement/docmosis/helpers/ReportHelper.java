@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABERDEEN_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
@@ -31,8 +32,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_REJEC
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Slf4j
 public class ReportHelper {
@@ -260,23 +259,29 @@ public class ReportHelper {
 
     private static String getFileLocation(ListingDetails listingDetails, CaseData caseData) {
         String caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
-        if (!caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
-            var fileLocation = caseData.getFileLocation();
-            return fileLocation != null && fileLocation.getValue() != null ? fileLocation.getSelectedLabel() : null;
-        } else {
+        DynamicFixedListType fileLocation = null;
+        if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
             switch (caseData.getManagingOffice()) {
                 case DUNDEE_OFFICE:
-                    return caseData.getFileLocationDundee();
+                    fileLocation = caseData.getFileLocationDundee();
+                    break;
                 case GLASGOW_OFFICE:
-                    return caseData.getFileLocationGlasgow();
+                    fileLocation = caseData.getFileLocationGlasgow();
+                    break;
                 case ABERDEEN_OFFICE:
-                    return caseData.getFileLocationAberdeen();
+                    fileLocation = caseData.getFileLocationAberdeen();
+                    break;
                 case EDINBURGH_OFFICE:
-                    return caseData.getFileLocationEdinburgh();
+                    fileLocation = caseData.getFileLocationEdinburgh();
+                    break;
                 default:
-                    return "";
+                    break;
             }
+        } else {
+            fileLocation = caseData.getFileLocation();
         }
+
+        return fileLocation != null && fileLocation.getValue() != null ? fileLocation.getSelectedLabel() : null;
     }
 
     private static String getTribunalOffice(ListingDetails listingDetails, CaseData caseData) {

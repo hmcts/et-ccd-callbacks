@@ -19,7 +19,9 @@ import uk.gov.hmcts.ecm.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ecc.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleAmendService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCloseEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationMidEventValidationService;
@@ -41,7 +43,9 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getListingCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getMultipleCallbackRespEntity;
 
@@ -70,6 +74,8 @@ public class ExcelActionsController {
     private final MultipleHelperService multipleHelperService;
     private final MultipleTransferService multipleTransferService;
     private final FileLocationSelectionService fileLocationSelectionService;
+    private final ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
+    private final ClerkService clerkService;
 
     @PostMapping(value = "/createMultiple", consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Creates a multiple case. Retrieves cases by ethos case reference. Creates an Excel")
@@ -221,7 +227,12 @@ public class ExcelActionsController {
 
         multipleDynamicListFlagsService.populateDynamicListFlagsLogic(userToken, multipleDetails, errors);
         if (errors.isEmpty()) {
-            fileLocationSelectionService.initialiseFileLocation(multipleDetails.getCaseData());
+            var caseTypeId = multipleDetails.getCaseTypeId();
+            if (ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
+                fileLocationSelectionService.initialiseFileLocation(multipleDetails.getCaseData());
+            } else if (SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
+                scotlandFileLocationSelectionService.initialiseFileLocation(multipleDetails.getCaseData());
+            }
         }
 
         return getMultipleCallbackRespEntity(errors, multipleDetails);
@@ -509,7 +520,14 @@ public class ExcelActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        fileLocationSelectionService.initialiseFileLocation(multipleRequest.getCaseDetails().getCaseData());
+        var caseTypeId = multipleRequest.getCaseDetails().getCaseTypeId();
+        var multipleData = multipleRequest.getCaseDetails().getCaseData();
+        if (ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
+            fileLocationSelectionService.initialiseFileLocation(multipleData);
+        } else if (SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
+            scotlandFileLocationSelectionService.initialiseFileLocation(multipleData);
+            clerkService.initialiseClerkResponsible(multipleData);
+        }
 
         return getMultipleCallbackRespEntity(Collections.emptyList(), multipleRequest.getCaseDetails());
     }

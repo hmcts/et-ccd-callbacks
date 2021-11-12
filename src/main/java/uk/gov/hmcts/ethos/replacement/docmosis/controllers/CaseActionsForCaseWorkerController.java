@@ -29,6 +29,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerSe
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -41,10 +42,12 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
@@ -72,6 +75,7 @@ public class CaseActionsForCaseWorkerController {
     private final AddSingleCaseToMultipleService addSingleCaseToMultipleService;
     private final ClerkService clerkService;
     private final FileLocationSelectionService fileLocationSelectionService;
+    private final ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "create a case for a caseWorker.")
@@ -245,7 +249,12 @@ public class CaseActionsForCaseWorkerController {
 
         var caseData = ccdRequest.getCaseDetails().getCaseData();
         clerkService.initialiseClerkResponsible(caseData);
-        fileLocationSelectionService.initialiseFileLocation(caseData);
+
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
+            fileLocationSelectionService.initialiseFileLocation(caseData);
+        } else if (SCOTLAND_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
+            scotlandFileLocationSelectionService.initialiseFileLocation(caseData);
+        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -871,8 +880,14 @@ public class CaseActionsForCaseWorkerController {
                 ccdRequest.getCaseDetails().getState().equals(REJECTED_STATE), false, errors);
 
         if (errors.isEmpty()) {
+            var caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
+            if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+                fileLocationSelectionService.initialiseFileLocation(caseData);
+            } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+                scotlandFileLocationSelectionService.initialiseFileLocation(caseData);
+            }
+
             clerkService.initialiseClerkResponsible(caseData);
-            fileLocationSelectionService.initialiseFileLocation(caseData);
             Helper.updatePositionTypeToClosed(caseData);
             return getCallbackRespEntityNoErrors(caseData);
         }

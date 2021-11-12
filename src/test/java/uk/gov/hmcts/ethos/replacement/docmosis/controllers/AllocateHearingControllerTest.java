@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +9,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.AllocateHearingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.ScotlandAllocateHearingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -22,6 +25,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({AllocateHearingController.class, JsonMapper.class})
@@ -33,6 +37,9 @@ public class AllocateHearingControllerTest {
     @MockBean
     private AllocateHearingService allocateHearingService;
 
+    @MockBean
+    private ScotlandAllocateHearingService scotlandAllocateHearingService;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -41,7 +48,9 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testInitialiseHearingDynamicList() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        var ccdRequest = CCDRequestBuilder.builder()
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+                .build();
         var token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
@@ -59,7 +68,9 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testInitialiseHearingDynamicListInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        var ccdRequest = CCDRequestBuilder.builder()
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+                .build();
         var token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
@@ -74,7 +85,9 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testHandleListingSelected() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        var ccdRequest = CCDRequestBuilder.builder()
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+                .build();
         var token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
@@ -92,7 +105,9 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testHandleListingSelectedInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        var ccdRequest = CCDRequestBuilder.builder()
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+                .build();
         var token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
@@ -107,7 +122,9 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testPopulateRooms() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        var ccdRequest = CCDRequestBuilder.builder()
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+                .build();
         var token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
@@ -125,7 +142,9 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testPopulateRoomsInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        var ccdRequest = CCDRequestBuilder.builder()
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+                .build();
         var token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
@@ -140,7 +159,9 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testAboutToSubmit() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        var ccdRequest = CCDRequestBuilder.builder()
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+                .build();
         var token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
@@ -158,7 +179,9 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testAboutToSubmitInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        var ccdRequest = CCDRequestBuilder.builder()
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+                .build();
         var token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 

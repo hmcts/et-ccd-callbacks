@@ -450,19 +450,26 @@ public class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.amendHearing(caseData, SCOTLAND_CASE_TYPE_ID);
         assertEquals(HEARING_STATUS_LISTED, caseData.getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().getHearingStatus());
+
         assertEquals(ABERDEEN_OFFICE, caseData.getHearingCollection().get(0).getValue()
-                .getHearingDateCollection().get(0).getValue().getHearingAberdeen());
-        assertNull(caseData.getHearingCollection().get(0).getValue().getHearingDateCollection().get(0).getValue().getHearingGlasgow());
-        assertEquals(GLASGOW_OFFICE, caseData.getHearingCollection().get(1).getValue()
+                .getHearingDateCollection().get(0).getValue().getHearingAberdeen().getSelectedLabel());
+        assertNull(caseData.getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().getHearingGlasgow());
-        assertNull(caseData.getHearingCollection().get(1).getValue().getHearingDateCollection().get(0).getValue().getHearingAberdeen());
+
+        assertEquals(GLASGOW_OFFICE, caseData.getHearingCollection().get(1).getValue()
+                .getHearingDateCollection().get(0).getValue().getHearingGlasgow().getSelectedLabel());
+        assertNull(caseData.getHearingCollection().get(1).getValue()
+                .getHearingDateCollection().get(0).getValue().getHearingAberdeen());
+
         assertEquals(EDINBURGH_OFFICE, caseData.getHearingCollection().get(2).getValue()
-                .getHearingDateCollection().get(0).getValue().getHearingEdinburgh());
-        assertNull(caseData.getHearingCollection().get(0).getValue().getHearingDateCollection().get(0).getValue().getHearingGlasgow());
+                .getHearingDateCollection().get(0).getValue().getHearingEdinburgh().getSelectedLabel());
+        assertNull(caseData.getHearingCollection().get(0).getValue()
+                .getHearingDateCollection().get(0).getValue().getHearingGlasgow());
+
         assertEquals(DUNDEE_OFFICE, caseData.getHearingCollection().get(3).getValue()
-                .getHearingDateCollection().get(0).getValue().getHearingDundee());
+                .getHearingDateCollection().get(0).getValue().getHearingDundee().getSelectedLabel());
         assertEquals(DUNDEE_OFFICE, caseData.getHearingCollection().get(3).getValue()
-                .getHearingDateCollection().get(0).getValue().getHearingVenueDay().getSelectedLabel());
+                .getHearingDateCollection().get(0).getValue().getHearingVenueDayScotland());
     }
 
     @Test

@@ -29,6 +29,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerSe
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -143,6 +144,9 @@ public class CaseActionsForCaseWorkerControllerTest {
 
     @MockBean
     private FileLocationSelectionService fileLocationSelectionService;
+
+    @MockBean
+    private ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
 
     private MockMvc mvc;
     private JsonNode requestContent;

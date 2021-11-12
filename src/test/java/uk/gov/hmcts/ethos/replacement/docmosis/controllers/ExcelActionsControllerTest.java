@@ -20,7 +20,9 @@ import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ecc.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleAmendService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCloseEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationMidEventValidationService;
@@ -142,7 +144,13 @@ public class ExcelActionsControllerTest {
     private FileLocationSelectionService fileLocationSelectionService;
 
     @MockBean
+    private ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
+
+    @MockBean
     private MultipleCloseEventValidationService multipleCloseEventValidationService;
+
+    @MockBean
+    private ClerkService clerkService;
 
     private MockMvc mvc;
     private JsonNode requestContent;

@@ -37,7 +37,6 @@ public class ReferenceServiceTest {
     private ReferenceService referenceService;
 
     private CaseDetails caseDetails;
-    private ReferenceDetails referenceDetails;
 
     private List<ReferenceSubmitEvent> referenceSubmitEvents;
     private List<ReferenceSubmitEvent> referenceSubmitEventsNoVenues;
@@ -117,7 +116,7 @@ public class ReferenceServiceTest {
         referenceSubmitEventsNoJudges.add(referenceSubmitEvent4);
         referenceSubmitEventsNoJudges.add(referenceSubmitEvent5);
 
-        referenceDetails = new ReferenceDetails();
+        var referenceDetails = new ReferenceDetails();
         referenceDetails.setCaseData(referenceData6);
         referenceDetails.setJurisdiction("EMPLOYMENT");
     }
@@ -160,11 +159,11 @@ public class ReferenceServiceTest {
                 + "hearingTimingStart=null, hearingTimingBreak=null, hearingTimingResume=null, "
                 + "hearingTimingFinish=null, hearingTimingDuration=null, companyPremises=null, "
                 + "officeCT=null, reasonForCT=null, relatedCaseCT=null, positionTypeCT=null, "
-                + "linkedCaseCT=null, stateAPI=null, allocateHearingHearing=null, "
+                + "linkedCaseCT=null, stateAPI=null, allocateHearingHearing=null, allocateHearingManagingOffice=null, "
                 + "allocateHearingVenue=null, allocateHearingRoom=null, "
                 + "allocateHearingClerk=null, allocateHearingSitAlone=null, allocateHearingJudge=null, "
                 + "allocateHearingEmployerMember=null, allocateHearingEmployeeMember=null, "
-                + "allocateHearingPostponedBy=null, allocateHearingStatus=null, hearingDetailsHearing=null, "
+                + "allocateHearingPostponedBy=null, allocateHearingStatus=null, allocateHearingReadingDeliberation=null, hearingDetailsHearing=null, "
                 + "hearingDetailsStatus=null, hearingDetailsPostponedBy=null, hearingDetailsCaseDisposed=null, "
                 + "hearingDetailsPartHeard=null, hearingDetailsReservedJudgment=null, "
                 + "hearingDetailsAttendeeClaimant=null, hearingDetailsAttendeeNonAttendees=null, "
@@ -213,11 +212,12 @@ public class ReferenceServiceTest {
                 + "hearingTimingResume=null, hearingTimingFinish=null, hearingTimingDuration=null, "
                 + "companyPremises=null, officeCT=null, reasonForCT=null, relatedCaseCT=null, "
                 + "positionTypeCT=null, "
-                + "linkedCaseCT=null, stateAPI=null, allocateHearingHearing=null, "
+                + "linkedCaseCT=null, stateAPI=null, allocateHearingHearing=null, allocateHearingManagingOffice=null, "
                 + "allocateHearingVenue=null, allocateHearingRoom=null, "
                 + "allocateHearingClerk=null, allocateHearingSitAlone=null, allocateHearingJudge=null, "
                 + "allocateHearingEmployerMember=null, allocateHearingEmployeeMember=null, "
-                + "allocateHearingPostponedBy=null, allocateHearingStatus=null, hearingDetailsHearing=null, "
+                + "allocateHearingPostponedBy=null, allocateHearingStatus=null, "
+                + "allocateHearingReadingDeliberation=null, hearingDetailsHearing=null, "
                 + "hearingDetailsStatus=null, hearingDetailsPostponedBy=null, hearingDetailsCaseDisposed=null, "
                 + "hearingDetailsPartHeard=null, hearingDetailsReservedJudgment=null, "
                 + "hearingDetailsAttendeeClaimant=null, hearingDetailsAttendeeNonAttendees=null, "
@@ -256,11 +256,11 @@ public class ReferenceServiceTest {
                 "hearingReservedJudgement=null, attendeeClaimant=null, attendeeNonAttendees=null, attendeeRespNoRep=null, attendeeRespAndRep=null, " +
                 "attendeeRepOnly=null, hearingTimingStart=null, hearingTimingBreak=null, hearingTimingResume=null, hearingTimingFinish=null, " +
                 "hearingTimingDuration=null, companyPremises=null, officeCT=null, reasonForCT=null, relatedCaseCT=null, positionTypeCT=null, linkedCaseCT=null, stateAPI=null, " +
-                "allocateHearingHearing=null, allocateHearingVenue=null, allocateHearingRoom=null, " +
+                "allocateHearingHearing=null, allocateHearingManagingOffice=null, allocateHearingVenue=null, allocateHearingRoom=null, " +
                 "allocateHearingClerk=null, allocateHearingSitAlone=null, allocateHearingJudge=null, " +
                 "allocateHearingEmployerMember=null, allocateHearingEmployeeMember=null, " +
-                "allocateHearingPostponedBy=null, allocateHearingStatus=null, hearingDetailsHearing=null, " +
-                "hearingDetailsStatus=null, hearingDetailsPostponedBy=null, hearingDetailsCaseDisposed=null, " +
+                "allocateHearingPostponedBy=null, allocateHearingStatus=null, allocateHearingReadingDeliberation=null, " +
+                "hearingDetailsHearing=null, hearingDetailsStatus=null, hearingDetailsPostponedBy=null, hearingDetailsCaseDisposed=null, " +
                 "hearingDetailsPartHeard=null, hearingDetailsReservedJudgment=null, " +
                 "hearingDetailsAttendeeClaimant=null, hearingDetailsAttendeeNonAttendees=null, " +
                 "hearingDetailsAttendeeRespNoRep=null, hearingDetailsAttendeeRespAndRep=null, " +
@@ -312,11 +312,11 @@ public class ReferenceServiceTest {
                 "hearingReservedJudgement=null, attendeeClaimant=null, attendeeNonAttendees=null, attendeeRespNoRep=null, attendeeRespAndRep=null, " +
                 "attendeeRepOnly=null, hearingTimingStart=null, hearingTimingBreak=null, hearingTimingResume=null, hearingTimingFinish=null, " +
                 "hearingTimingDuration=null, companyPremises=null, officeCT=null, reasonForCT=null, relatedCaseCT=null, positionTypeCT=null, linkedCaseCT=null, stateAPI=null, " +
-                "allocateHearingHearing=null, allocateHearingVenue=null, allocateHearingRoom=null, " +
+                "allocateHearingHearing=null, allocateHearingManagingOffice=null, allocateHearingVenue=null, allocateHearingRoom=null, " +
                 "allocateHearingClerk=null, allocateHearingSitAlone=null, allocateHearingJudge=null, " +
                 "allocateHearingEmployerMember=null, allocateHearingEmployeeMember=null, " +
-                "allocateHearingPostponedBy=null, allocateHearingStatus=null, hearingDetailsHearing=null, " +
-                "hearingDetailsStatus=null, hearingDetailsPostponedBy=null, hearingDetailsCaseDisposed=null, " +
+                "allocateHearingPostponedBy=null, allocateHearingStatus=null, allocateHearingReadingDeliberation=null, " +
+                "hearingDetailsHearing=null, hearingDetailsStatus=null, hearingDetailsPostponedBy=null, hearingDetailsCaseDisposed=null, " +
                 "hearingDetailsPartHeard=null, hearingDetailsReservedJudgment=null, " +
                 "hearingDetailsAttendeeClaimant=null, hearingDetailsAttendeeNonAttendees=null, " +
                 "hearingDetailsAttendeeRespNoRep=null, hearingDetailsAttendeeRespAndRep=null, " +
@@ -358,11 +358,11 @@ public class ReferenceServiceTest {
                 "hearingReservedJudgement=null, attendeeClaimant=null, attendeeNonAttendees=null, attendeeRespNoRep=null, attendeeRespAndRep=null, " +
                 "attendeeRepOnly=null, hearingTimingStart=null, hearingTimingBreak=null, hearingTimingResume=null, hearingTimingFinish=null, " +
                 "hearingTimingDuration=null, companyPremises=null, officeCT=null, reasonForCT=null, relatedCaseCT=null, positionTypeCT=null, linkedCaseCT=null, stateAPI=null, " +
-                "allocateHearingHearing=null, allocateHearingVenue=null, allocateHearingRoom=null, " +
+                "allocateHearingHearing=null, allocateHearingManagingOffice=null, allocateHearingVenue=null, allocateHearingRoom=null, " +
                 "allocateHearingClerk=null, allocateHearingSitAlone=null, allocateHearingJudge=null, " +
                 "allocateHearingEmployerMember=null, allocateHearingEmployeeMember=null, " +
-                "allocateHearingPostponedBy=null, allocateHearingStatus=null, hearingDetailsHearing=null, " +
-                "hearingDetailsStatus=null, hearingDetailsPostponedBy=null, hearingDetailsCaseDisposed=null, " +
+                "allocateHearingPostponedBy=null, allocateHearingStatus=null, allocateHearingReadingDeliberation=null, " +
+                "hearingDetailsHearing=null, hearingDetailsStatus=null, hearingDetailsPostponedBy=null, hearingDetailsCaseDisposed=null, " +
                 "hearingDetailsPartHeard=null, hearingDetailsReservedJudgment=null, " +
                 "hearingDetailsAttendeeClaimant=null, hearingDetailsAttendeeNonAttendees=null, " +
                 "hearingDetailsAttendeeRespNoRep=null, hearingDetailsAttendeeRespAndRep=null, " +
@@ -410,10 +410,11 @@ public class ReferenceServiceTest {
                 "hearingReservedJudgement=null, attendeeClaimant=null, attendeeNonAttendees=null, attendeeRespNoRep=null, attendeeRespAndRep=null, " +
                 "attendeeRepOnly=null, hearingTimingStart=null, hearingTimingBreak=null, hearingTimingResume=null, hearingTimingFinish=null, " +
                 "hearingTimingDuration=null, companyPremises=null, officeCT=null, reasonForCT=null, relatedCaseCT=null, positionTypeCT=null, linkedCaseCT=null, stateAPI=null, " +
-                "allocateHearingHearing=null, allocateHearingVenue=null, allocateHearingRoom=null, " +
+                "allocateHearingHearing=null, allocateHearingManagingOffice=null, allocateHearingVenue=null, allocateHearingRoom=null, " +
                 "allocateHearingClerk=null, allocateHearingSitAlone=null, allocateHearingJudge=null, " +
                 "allocateHearingEmployerMember=null, allocateHearingEmployeeMember=null, " +
-                "allocateHearingPostponedBy=null, allocateHearingStatus=null, hearingDetailsHearing=null, " +
+                "allocateHearingPostponedBy=null, allocateHearingStatus=null, " +
+                "allocateHearingReadingDeliberation=null, hearingDetailsHearing=null, " +
                 "hearingDetailsStatus=null, hearingDetailsPostponedBy=null, hearingDetailsCaseDisposed=null, " +
                 "hearingDetailsPartHeard=null, hearingDetailsReservedJudgment=null, " +
                 "hearingDetailsAttendeeClaimant=null, hearingDetailsAttendeeNonAttendees=null, " +
@@ -460,10 +461,10 @@ public class ReferenceServiceTest {
                 "hearingReservedJudgement=null, attendeeClaimant=null, attendeeNonAttendees=null, attendeeRespNoRep=null, attendeeRespAndRep=null, " +
                 "attendeeRepOnly=null, hearingTimingStart=null, hearingTimingBreak=null, hearingTimingResume=null, hearingTimingFinish=null, " +
                 "hearingTimingDuration=null, companyPremises=null, officeCT=null, reasonForCT=null, relatedCaseCT=null, positionTypeCT=null, linkedCaseCT=null, stateAPI=null, " +
-                "allocateHearingHearing=null, allocateHearingVenue=null, allocateHearingRoom=null, " +
+                "allocateHearingHearing=null, allocateHearingManagingOffice=null, allocateHearingVenue=null, allocateHearingRoom=null, " +
                 "allocateHearingClerk=null, allocateHearingSitAlone=null, allocateHearingJudge=null, " +
                 "allocateHearingEmployerMember=null, allocateHearingEmployeeMember=null, " +
-                "allocateHearingPostponedBy=null, allocateHearingStatus=null, hearingDetailsHearing=null, " +
+                "allocateHearingPostponedBy=null, allocateHearingStatus=null, allocateHearingReadingDeliberation=null, hearingDetailsHearing=null, " +
                 "hearingDetailsStatus=null, hearingDetailsPostponedBy=null, hearingDetailsCaseDisposed=null, " +
                 "hearingDetailsPartHeard=null, hearingDetailsReservedJudgment=null, " +
                 "hearingDetailsAttendeeClaimant=null, hearingDetailsAttendeeNonAttendees=null, " +
@@ -503,10 +504,10 @@ public class ReferenceServiceTest {
                 "hearingReservedJudgement=null, attendeeClaimant=null, attendeeNonAttendees=null, attendeeRespNoRep=null, attendeeRespAndRep=null, " +
                 "attendeeRepOnly=null, hearingTimingStart=null, hearingTimingBreak=null, hearingTimingResume=null, hearingTimingFinish=null, " +
                 "hearingTimingDuration=null, companyPremises=null, officeCT=null, reasonForCT=null, relatedCaseCT=null, positionTypeCT=null, linkedCaseCT=null, stateAPI=null, " +
-                "allocateHearingHearing=null, allocateHearingVenue=null, allocateHearingRoom=null, " +
+                "allocateHearingHearing=null, allocateHearingManagingOffice=null, allocateHearingVenue=null, allocateHearingRoom=null, " +
                 "allocateHearingClerk=null, allocateHearingSitAlone=null, allocateHearingJudge=null, " +
                 "allocateHearingEmployerMember=null, allocateHearingEmployeeMember=null, " +
-                "allocateHearingPostponedBy=null, allocateHearingStatus=null, hearingDetailsHearing=null, " +
+                "allocateHearingPostponedBy=null, allocateHearingStatus=null, allocateHearingReadingDeliberation=null, hearingDetailsHearing=null, " +
                 "hearingDetailsStatus=null, hearingDetailsPostponedBy=null, hearingDetailsCaseDisposed=null, " +
                 "hearingDetailsPartHeard=null, hearingDetailsReservedJudgment=null, " +
                 "hearingDetailsAttendeeClaimant=null, hearingDetailsAttendeeNonAttendees=null, " +

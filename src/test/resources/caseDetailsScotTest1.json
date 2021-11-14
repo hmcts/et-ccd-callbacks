@@ -196,5 +196,6 @@
   },
   "id": "123456789",
   "jurisdiction": "English",
+  "case_type_id": "ET_Scotland",
   "state": "UK"
 }

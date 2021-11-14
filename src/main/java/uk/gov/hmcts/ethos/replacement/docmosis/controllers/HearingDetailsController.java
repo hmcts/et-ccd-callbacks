@@ -94,9 +94,8 @@ public class HearingDetailsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
-        hearingDetailsService.updateCase(caseData);
+        hearingDetailsService.updateCase(ccdRequest.getCaseDetails());
 
-        return getCallbackRespEntityNoErrors(caseData);
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 }

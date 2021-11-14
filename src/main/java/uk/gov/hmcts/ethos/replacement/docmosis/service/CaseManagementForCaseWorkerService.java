@@ -269,7 +269,7 @@ public class CaseManagementForCaseWorkerService {
                         clerkService.initialiseClerkResponsible(currentCaseData);
                         break;
                     case ABOUT_TO_SUBMIT_EVENT_CALLBACK:
-                        ECCHelper.createECCLogic(currentCaseData, submitEvent.getCaseData());
+                        ECCHelper.createECCLogic(caseDetails, submitEvent.getCaseData());
                         currentCaseData.setRespondentECC(null);
                         break;
                     default:
@@ -306,7 +306,7 @@ public class CaseManagementForCaseWorkerService {
                 originalCaseData.setEccCases(
                         new ArrayList<>(Collections.singletonList(eccCounterClaimTypeItem)));
             }
-            FlagsImageHelper.buildFlagsImageFileName(originalCaseData);
+            FlagsImageHelper.buildFlagsImageFileName(currentCaseDetails.getCaseTypeId(), originalCaseData);
             CCDRequest returnedRequest = ccdClient.startEventForCase(authToken, currentCaseDetails.getCaseTypeId(),
                     currentCaseDetails.getJurisdiction(), caseIdToLink);
             ccdClient.submitEventForCase(authToken, originalCaseData, currentCaseDetails.getCaseTypeId(),

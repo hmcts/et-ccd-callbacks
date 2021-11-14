@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -44,8 +45,10 @@ public class HearingDetailsService {
         caseData.setHearingDetailsHearingNotes2(selectedListing.getHearingNotes2());
     }
 
-    public void updateCase(CaseData caseData) {
+    public void updateCase(CaseDetails caseDetails) {
+        var caseData = caseDetails.getCaseData();
         var selectedListing = getSelectedListing(caseData);
+
         selectedListing.setHearingStatus(caseData.getHearingDetailsStatus());
         selectedListing.setPostponedBy(caseData.getHearingDetailsPostponedBy());
         selectedListing.setHearingCaseDisposed(caseData.getHearingDetailsCaseDisposed());
@@ -64,7 +67,7 @@ public class HearingDetailsService {
         selectedListing.setHearingNotes2(caseData.getHearingDetailsHearingNotes2());
 
         Helper.updatePostponedDate(caseData);
-        FlagsImageHelper.buildFlagsImageFileName(caseData);
+        FlagsImageHelper.buildFlagsImageFileName(caseDetails);
     }
 
     private DateListedType getSelectedListing(CaseData caseData) {

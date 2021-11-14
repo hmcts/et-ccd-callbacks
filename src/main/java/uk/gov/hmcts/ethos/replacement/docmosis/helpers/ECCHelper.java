@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.RepresentedTypeRItem;
@@ -42,7 +43,8 @@ public class ECCHelper {
     private ECCHelper() {
     }
 
-    public static void createECCLogic(CaseData caseData, CaseData originalCaseData) {
+    public static void createECCLogic(CaseDetails caseDetails, CaseData originalCaseData) {
+        var caseData = caseDetails.getCaseData();
         if (originalCaseData.getRespondentCollection() != null) {
             Optional<RespondentSumTypeItem> respondentChosen = originalCaseData.getRespondentCollection()
                     .stream()
@@ -60,7 +62,7 @@ public class ECCHelper {
         populateCaseDataDetails(caseData, originalCaseData);
         populateRepresentativeClaimantDetails(caseData, originalCaseData);
         populateRepCollectionDetails(caseData, originalCaseData);
-        FlagsImageHelper.buildFlagsImageFileName(caseData);
+        FlagsImageHelper.buildFlagsImageFileName(caseDetails);
     }
 
     public static boolean validCaseForECC(SubmitEvent submitEvent, List<String> errors) {

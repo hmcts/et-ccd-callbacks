@@ -22,7 +22,7 @@ BEGIN
 
 CASE
 
-WHEN office = 'EnglandWales' THEN
+WHEN office = 'ET_EnglandWales' THEN
     SELECT submultref INTO c_submultref FROM submultiple_reference_englandwales WHERE multref  = p_multref FOR UPDATE;
 
     CASE WHEN c_submultref IS NULL THEN

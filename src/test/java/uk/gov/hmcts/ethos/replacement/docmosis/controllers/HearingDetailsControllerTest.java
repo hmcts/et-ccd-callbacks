@@ -120,7 +120,7 @@ public class HearingDetailsControllerTest {
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(hearingDetailsService, times(1)).updateCase(ccdRequest.getCaseDetails().getCaseData());
+        verify(hearingDetailsService, times(1)).updateCase(ccdRequest.getCaseDetails());
     }
 
     @Test
@@ -135,6 +135,6 @@ public class HearingDetailsControllerTest {
                 .content(jsonMapper.toJson(ccdRequest)))
 
                 .andExpect(status().isForbidden());
-        verify(hearingDetailsService, never()).updateCase(ccdRequest.getCaseDetails().getCaseData());
+        verify(hearingDetailsService, never()).updateCase(ccdRequest.getCaseDetails());
     }
 }

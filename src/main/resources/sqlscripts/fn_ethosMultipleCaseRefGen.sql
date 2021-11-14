@@ -19,7 +19,7 @@ CREATE OR REPLACE FUNCTION fn_ethosMultipleCaseRefGen (numofcases INT, office va
 BEGIN
 
 CASE
-    WHEN office = 'EnglandWales' THEN
+    WHEN office = 'ET_EnglandWales' THEN
         SELECT counter INTO currentval FROM multiple_reference_englandwales FOR UPDATE;
 
         CASE

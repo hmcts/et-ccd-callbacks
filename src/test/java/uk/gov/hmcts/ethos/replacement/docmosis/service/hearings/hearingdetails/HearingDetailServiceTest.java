@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
@@ -125,8 +126,10 @@ public class HearingDetailServiceTest {
         caseData.setHearingDetailsTimingDuration(duration);
         var notes = "Some notes";
         caseData.setHearingDetailsHearingNotes2(notes);
+        var caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
 
-        hearingDetailsService.updateCase(caseData);
+        hearingDetailsService.updateCase(caseDetails);
 
         assertEquals(hearingStatus, selectedListing.getHearingStatus());
         assertEquals(postponedBy, selectedListing.getPostponedBy());

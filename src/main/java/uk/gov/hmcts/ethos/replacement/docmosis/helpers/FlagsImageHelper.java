@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
 
@@ -19,6 +21,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.IMAGE_FILE_EXTENSION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.IMAGE_FILE_PRECEDING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ONE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ZERO;
 
@@ -39,20 +42,24 @@ public class FlagsImageHelper {
     private FlagsImageHelper() {
     }
 
-    public static void buildFlagsImageFileName(CaseData caseData) {
+    public static void buildFlagsImageFileName(CaseDetails caseDetails) {
+        buildFlagsImageFileName(caseDetails.getCaseTypeId(), caseDetails.getCaseData());
+    }
+
+    public static void buildFlagsImageFileName(String caseTypeId, CaseData caseData) {
         var flagsImageFileName = new StringBuilder();
         var flagsImageAltText = new StringBuilder();
 
         flagsImageFileName.append(IMAGE_FILE_PRECEDING);
-        setFlagImageFor(FLAG_WITH_OUTSTATION, flagsImageFileName, flagsImageAltText, caseData);
-        setFlagImageFor(FLAG_DO_NOT_POSTPONE, flagsImageFileName, flagsImageAltText, caseData);
-        setFlagImageFor(FLAG_LIVE_APPEAL, flagsImageFileName, flagsImageAltText, caseData);
-        setFlagImageFor(FLAG_RULE_503B, flagsImageFileName, flagsImageAltText, caseData);
-        setFlagImageFor(FLAG_REPORTING, flagsImageFileName, flagsImageAltText, caseData);
-        setFlagImageFor(FLAG_SENSITIVE, flagsImageFileName, flagsImageAltText, caseData);
-        setFlagImageFor(FLAG_RESERVED, flagsImageFileName, flagsImageAltText, caseData);
-        setFlagImageFor(FLAG_ECC, flagsImageFileName, flagsImageAltText, caseData);
-        setFlagImageFor(FLAG_DIGITAL_FILE, flagsImageFileName, flagsImageAltText, caseData);
+        setFlagImageFor(FLAG_WITH_OUTSTATION, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
+        setFlagImageFor(FLAG_DO_NOT_POSTPONE, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
+        setFlagImageFor(FLAG_LIVE_APPEAL, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
+        setFlagImageFor(FLAG_RULE_503B, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
+        setFlagImageFor(FLAG_REPORTING, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
+        setFlagImageFor(FLAG_SENSITIVE, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
+        setFlagImageFor(FLAG_RESERVED, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
+        setFlagImageFor(FLAG_ECC, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
+        setFlagImageFor(FLAG_DIGITAL_FILE, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
         flagsImageFileName.append(IMAGE_FILE_EXTENSION);
 
         caseData.setFlagsImageAltText(flagsImageAltText.toString());
@@ -60,13 +67,13 @@ public class FlagsImageHelper {
     }
 
     private static void setFlagImageFor(String flagName, StringBuilder flagsImageFileName,
-                                        StringBuilder flagsImageAltText, CaseData caseData) {
+                                        StringBuilder flagsImageAltText, CaseData caseData, String caseTypeId) {
         boolean flagRequired;
         String flagColor;
 
         switch (flagName) {
             case FLAG_WITH_OUTSTATION:
-                flagRequired = withOutstation(caseData);
+                flagRequired = withOutstation(caseData, caseTypeId);
                 flagColor = COLOR_DEEP_PINK;
                 break;
             case FLAG_DO_NOT_POSTPONE:
@@ -148,22 +155,22 @@ public class FlagsImageHelper {
     }
 
     private static boolean reservedJudgement(CaseData caseData) {
-        if (caseData.getHearingCollection() != null && !caseData.getHearingCollection().isEmpty()) {
-            for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-                if (hearingTypeItem.getValue().getHearingDateCollection() != null
-                        && !hearingTypeItem.getValue().getHearingDateCollection().isEmpty()) {
-                    for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue()
-                            .getHearingDateCollection()) {
-                        String hearingReservedJudgement = dateListedTypeItem.getValue().getHearingReservedJudgement();
-                        if (!isNullOrEmpty(hearingReservedJudgement) && hearingReservedJudgement.equals(YES))  {
-                            return true;
-                        }
+        if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
+            return false;
+        }
+
+        for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
+            var hearingType = hearingTypeItem.getValue();
+            if (!CollectionUtils.isEmpty(hearingType.getHearingDateCollection())) {
+                for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
+                    String hearingReservedJudgement = dateListedTypeItem.getValue().getHearingReservedJudgement();
+                    if (YES.equals(hearingReservedJudgement)) {
+                        return true;
                     }
                 }
             }
-        } else {
-            return false;
         }
+
         return false;
     }
 
@@ -205,8 +212,8 @@ public class FlagsImageHelper {
         }
     }
 
-    private static boolean withOutstation(CaseData caseData) {
-        return !isNullOrEmpty(caseData.getManagingOffice()) && !caseData.getManagingOffice().equals(GLASGOW_OFFICE);
+    private static boolean withOutstation(CaseData caseData, String caseTypeId) {
+        return SCOTLAND_CASE_TYPE_ID.equals(caseTypeId) && !GLASGOW_OFFICE.equals(caseData.getManagingOffice());
     }
 
 }

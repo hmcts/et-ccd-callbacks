@@ -20,7 +20,7 @@ CREATE OR REPLACE FUNCTION fn_ethosCaseRefGen (numofcases INT, yr INT , office v
 BEGIN
 
 CASE
-    WHEN office = 'EnglandWales' THEN
+    WHEN office = 'ET_EnglandWales' THEN
         SELECT counter, cyear INTO currentval,currentyr FROM single_reference_englandwales FOR UPDATE ;
 
         CASE

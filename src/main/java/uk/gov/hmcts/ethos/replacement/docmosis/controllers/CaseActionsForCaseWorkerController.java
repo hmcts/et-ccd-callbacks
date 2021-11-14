@@ -221,7 +221,7 @@ public class CaseActionsForCaseWorkerController {
             defaultValuesReaderService.getCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.caseDataDefaults(caseData);
             generateEthosCaseReference(caseData, ccdRequest);
-            FlagsImageHelper.buildFlagsImageFileName(caseData);
+            FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
             caseData.setMultipleFlag(caseData.getCaseType() != null
                     && caseData.getCaseType().equals(MULTIPLE_CASE_TYPE) ? YES : NO);
         }
@@ -295,7 +295,7 @@ public class CaseActionsForCaseWorkerController {
             log.info("Post Default values loaded: " + defaultValues);
             defaultValuesReaderService.getCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
-            FlagsImageHelper.buildFlagsImageFileName(caseData);
+            FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
 
             addSingleCaseToMultipleService.addSingleCaseToMultipleLogic(
                     userToken, caseData, caseDetails.getCaseTypeId(),
@@ -426,7 +426,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         var caseDetails = ccdRequest.getCaseDetails();
-        FlagsImageHelper.buildFlagsImageFileName(caseDetails.getCaseData());
+        FlagsImageHelper.buildFlagsImageFileName(caseDetails);
 
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
@@ -471,10 +471,9 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
-        FlagsImageHelper.buildFlagsImageFileName(caseData);
+        FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
 
-        return getCallbackRespEntityNoErrors(caseData);
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @PostMapping(value = "/amendHearing", consumes = APPLICATION_JSON_VALUE)

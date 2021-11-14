@@ -191,7 +191,7 @@
     },
     "id": "232323232",
     "jurisdiction": "Nothing",
-    "case_type_id" : "EnglandWales",
+    "case_type_id" : "ET_EnglandWales",
     "state": "Accepted"
   },
   "event_id": "1212121",

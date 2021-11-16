@@ -1,9 +1,0 @@
-apiVersion: v2
-name: et-ccd-callbacks
-home: https://github.com/hmcts/et-ccd-callbacks
-version: 0.2.8
-description: HMCTS Employment Tribunals CCD Callbacks Service
-dependencies:
-  - name: java
-    version: 3.6.0
-    repository: https://hmctspublic.azurecr.io/helm/v1/repo/

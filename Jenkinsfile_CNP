@@ -11,7 +11,7 @@ def branchesToSync = ['demo']
 
 withPipeline(type, product, component) {
   env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
-  enableAksStagingDeployment()
+  //enableAksStagingDeployment()
   onMaster {
     disableLegacyDeployment()
   }

@@ -6,7 +6,7 @@ import uk.gov.hmcts.contino.AppPipelineDsl
 
 def type = "java"
 def product = "et"
-def component = "et-ccd-callbacks"
+def component = "ccd-callbacks"
 def branchesToSync = ['demo']
 
 withPipeline(type, product, component) {

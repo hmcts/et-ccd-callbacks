@@ -3,7 +3,7 @@ variable "product" {
 }
 
 variable "component" {
-  default = "et-ccd-callbacks"
+  default = "ccd-callbacks"
 }
 
 variable "location" {

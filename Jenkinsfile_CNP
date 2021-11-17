@@ -6,7 +6,7 @@ import uk.gov.hmcts.contino.AppPipelineDsl
 
 def type = "java"
 def product = "et"
-def component = "et-ccd-callbacks"
+def component = "ccd-callbacks"
 def branchesToSync = ['demo']
 
 withPipeline(type, product, component) {
@@ -24,11 +24,6 @@ withPipeline(type, product, component) {
   onPerftest {
     disableLegacyDeployment()
   }
-  onEthosldata {
-    disableLegacyDeployment()
-    env.TF_STATE_STORAGE_TEMPLATE = 'statestore'
-    env.TF_STATE_CONTAINER_TEMPLATE = 'statectr'
-  }
   onMaster() {
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
   }
@@ -36,7 +31,7 @@ withPipeline(type, product, component) {
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
   }
   syncBranchesWithMaster(branchesToSync)
-  enableSlackNotifications('#ethos-repl-service')
+  enableSlackNotifications('#et-builds')
 
   after('functional') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'

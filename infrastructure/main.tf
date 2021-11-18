@@ -46,19 +46,3 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   value        = module.db.postgresql_database
   key_vault_id = module.key-vault.key_vault_id
 }
-
-resource "azurerm_key_vault_secret" "et_ccd_callbacks_s2s_secret" {
-  name         = "et-ccd-callbacks-s2s-secret"
-  value        = "microservicekey_et_ccd_callbacks"
-  key_vault_id = module.key-vault.key_vault_id
-}
-
-resource "azurerm_key_vault_secret" "tornado-access-key" {
-  name         = "tornado-access-key"
-  value        = "change-me"
-  key_vault_id = module.key-vault.key_vault_id
-
-  lifecycle {
-    ignore_changes = [ value ]
-  }
-}

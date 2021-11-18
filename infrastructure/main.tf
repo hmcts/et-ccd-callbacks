@@ -3,18 +3,13 @@ provider "azurerm" {
 }
 
 locals {
+  resource_group_name = "${var.product}-${var.component}-${var.env}"
+
   common_tags = {
     "environment"  = var.env
     "managedBy"    = var.team_name
     "Team Contact" = var.team_contact
   }
-}
-
-resource "azurerm_resource_group" "rg" {
-  name     = "${var.product}-${var.component}-${var.env}"
-  location = var.location
-
-  tags = local.common_tags
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {

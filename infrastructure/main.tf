@@ -12,6 +12,11 @@ locals {
   }
 }
 
+data "azurerm_user_assigned_identity" "et-identity" {
+  name                = "${var.product}-${var.env}-mi"
+  resource_group_name = "managed-identities-${var.env}-rg"
+}
+
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {
   name         = "${var.product}-${var.component}-POSTGRES-USER"
   value        = module.db.user_name

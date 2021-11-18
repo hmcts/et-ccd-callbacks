@@ -1,6 +1,6 @@
 module "db" {
   source             = "git@github.com:hmcts/cnp-module-postgres?ref=master"
-  product            = "${var.product}-${var.component}-postgres-db"
+  product            = var.product
   component          = var.component
   location           = var.location_db
   env                = var.env

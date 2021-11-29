@@ -7,5 +7,10 @@ java:
     ET_CCD_CALLBACKS_DB_USER_NAME: "{{ .Values.postgresql.postgresqlUsername}}"
     ET_CCD_CALLBACKS_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
     ET_CCD_CALLBACKS_DB_CONN_OPTIONS: ""
+  keyVaults:
+    et:
+      resourceGroup: et
+      secrets:
+        - create-updates-queue-send-connection-string
   postgresql:
     enabled: true

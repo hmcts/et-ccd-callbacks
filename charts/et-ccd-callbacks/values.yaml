@@ -11,10 +11,7 @@ java:
         - et-ccd-callbacks-POSTGRES-PASS
     et:
       secrets:
-        - name: AppInsightsInstrumentationKey
-          alias: azure.application-insights.instrumentation-key
-        - name: create-updates-queue-send-connection-string
-          alias: CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING
+        - create-updates-queue-send-connection-string
   aadIdentityName: et
   environment:
     SERVER_PORT: 8081

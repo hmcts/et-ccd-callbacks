@@ -4,17 +4,17 @@ java:
   ingressHost: et-ccd-callbacks-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   keyVaults:
     et-ccd-callbacks:
-      resourceGroup: et-ccd-callbacks
       secrets:
 # uncomment once key vault setup
 #        - tornado-access-key
 #        - et-ccd-callbacks-s2s-secret
         - et-ccd-callbacks-POSTGRES-PASS
     et:
-      resourceGroup: et
       secrets:
-        - AppInsightsInstrumentationKey
-        - create-updates-queue-send-connection-string
+        - name: AppInsightsInstrumentationKey
+          alias: azure.application-insights.instrumentation-key
+        - name: create-updates-queue-send-connection-string
+          alias: CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING
   aadIdentityName: et
   environment:
     SERVER_PORT: 8081

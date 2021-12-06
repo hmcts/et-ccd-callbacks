@@ -10,4 +10,5 @@ import org.springframework.stereotype.Component;
 public class TornadoConfiguration {
     private String url;
     private String accessKey;
+    private String createUpdates;
 }

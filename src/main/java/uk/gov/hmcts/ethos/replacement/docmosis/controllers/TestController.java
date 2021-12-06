@@ -11,5 +11,6 @@ public class TestController {
     public TestController(TornadoConfiguration tornadoConfiguration) {
         log.info("Tornado key " + tornadoConfiguration.getAccessKey());
         log.info("Tornado URL " + tornadoConfiguration.getUrl());
+        log.info("Create Updates " + tornadoConfiguration.getCreateUpdates());
     }
 }

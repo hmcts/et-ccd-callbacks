@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.ecm.common.servicebus.ServiceBusSender;
 
-@AutoConfigureAfter(QueueClientConfiguration.class)
+@AutoConfigureAfter(DevQueueClient.class)
 @Configuration
 public class ServiceBusSenderConfiguration {
 

@@ -4,16 +4,13 @@ java:
   ingressHost: et-ccd-callbacks-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   keyVaults:
     et-ccd-callbacks:
-      resourceGroup: et-ccd-callbacks
       secrets:
 # uncomment once key vault setup
 #        - tornado-access-key
 #        - et-ccd-callbacks-s2s-secret
         - et-ccd-callbacks-POSTGRES-PASS
-    et-shared:
-      resourceGroup: et
+    et:
       secrets:
-        - AppInsightsInstrumentationKey
         - create-updates-queue-send-connection-string
   aadIdentityName: et
   environment:

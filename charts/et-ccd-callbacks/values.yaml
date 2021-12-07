@@ -29,7 +29,7 @@ java:
     CCD_GATEWAY_BASE_URL: "https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net"
     MICRO_SERVICE: "et_ccd_callbacks"
     ET_CCD_CALLBACKS_DB_CONN_OPTIONS: ?sslmode=require
-    ET_CCD_CALLBACKS_DB_HOST: et-ccd-callbacks-postgres-db-{{ .Values.global.environment }}.postgres.database.azure.com
+    ET_CCD_CALLBACKS_DB_HOST: et-ccd-callbacks-{{ .Values.global.environment }}.postgres.database.azure.com
     ET_CCD_CALLBACKS_DB_NAME: et_ccd_callbacks
     ET_CCD_CALLBACKS_DB_PORT: '5432'
-    ET_CCD_CALLBACKS_DB_USER_NAME: et_ccd_callbacks@et-ccd-callbacks-postgres-db-{{ .Values.global.environment }}
+    ET_CCD_CALLBACKS_DB_USER_NAME: et_ccd_callbacks@et-ccd-callbacks-{{ .Values.global.environment }}

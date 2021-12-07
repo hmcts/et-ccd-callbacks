@@ -6,3 +6,4 @@ spring:
       aliases:
         tornado-access-key: TORNADO_ACCESS_KEY
         create-updates-queue-send-connection-string: CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING
+        et-ccd-callbacks-POSTGRES-PASS: ET_CCD_CALLBACKS_DB_PASSWORD

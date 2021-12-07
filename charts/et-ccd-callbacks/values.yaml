@@ -2,17 +2,15 @@ java:
   image: 'hmctspublic.azurecr.io/et/et-ccd-callbacks:latest'
   applicationPort: 8081
   ingressHost: et-ccd-callbacks-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  aadIdentityName: et
   keyVaults:
     et-ccd-callbacks:
       secrets:
-# uncomment once key vault setup
-#        - tornado-access-key
-#        - et-ccd-callbacks-s2s-secret
+        - tornado-access-key
         - et-ccd-callbacks-POSTGRES-PASS
     et:
       secrets:
         - create-updates-queue-send-connection-string
-  aadIdentityName: et
   environment:
     SERVER_PORT: 8081
     REFORM_TEAM: et

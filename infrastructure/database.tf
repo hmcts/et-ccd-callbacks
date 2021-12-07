@@ -7,6 +7,6 @@ module "db" {
   database_name      = "et_ccd_callbacks"
   postgresql_user    = "et_ccd_callbacks"
   postgresql_version = "11"
-  common_tags        = var.common_tags
+  common_tags        = local.tags
   subscription       = var.subscription
 }

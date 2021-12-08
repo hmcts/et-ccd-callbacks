@@ -8,10 +8,10 @@ java:
       secrets:
         - tornado-access-key
         - et-ccd-callbacks-POSTGRES-PASS
-        - AppInsightsInstrumentationKey
     et:
       secrets:
         - create-updates-queue-send-connection-string
+        - AppInsightsInstrumentationKey
   environment:
     SERVER_PORT: 8081
     REFORM_TEAM: et

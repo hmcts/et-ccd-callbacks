@@ -72,5 +72,5 @@ data "azurerm_key_vault_secret" "et_ccd_callbacks_s2s_key" {
 resource "azurerm_key_vault_secret" "et_ccd_callbacks_s2s_secret" {
   name         = "et-ccd-callbacks-s2s-secret"
   value        = data.azurerm_key_vault_secret.et_ccd_callbacks_s2s_key.value
-  key_vault_id = data.azurerm_key_vault.et_shared_key_vault.id
+  key_vault_id = module.key-vault.key_vault_id
 }

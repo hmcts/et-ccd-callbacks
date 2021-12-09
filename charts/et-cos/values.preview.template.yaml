@@ -8,8 +8,8 @@ java:
     ET_COS_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
     ET_COS_DB_CONN_OPTIONS: ""
   keyVaults:
-    et-cos:
-      secrets:
+ #   et-cos:
+ #     secrets:
  #       - tornado-access-key
     et:
       secrets:

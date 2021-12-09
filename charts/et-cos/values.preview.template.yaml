@@ -10,7 +10,7 @@ java:
   keyVaults:
     et-cos:
       secrets:
-        - tornado-access-key
+ #       - tornado-access-key
     et:
       secrets:
         - create-updates-queue-send-connection-string

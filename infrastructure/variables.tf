@@ -3,7 +3,7 @@ variable "product" {
 }
 
 variable "component" {
-  default = "ccd-callbacks"
+  default = "ccd-cos"
 }
 
 variable "location" {

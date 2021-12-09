@@ -1,5 +1,5 @@
 {
-  "name": "ET-CCD-Callbacks",
+  "name": "ET-COS",
   "description": "End to End test for ET CCD Callbacks Service",
   "version": "1.0.0",
   "private": true,

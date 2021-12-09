@@ -3,7 +3,7 @@ FROM hmctspublic.azurecr.io/base/java:openjdk-11-distroless-1.4 as base
 LABEL maintainer="https://github.com/hmcts/et-ccd-callbacks"
 
 COPY lib/AI-Agent.xml /opt/app/
-COPY build/libs/et-ccd-callbacks.jar /opt/app/
+COPY build/libs/et-cos.jar /opt/app/
 
 FROM debian:10 AS builder
 
@@ -21,4 +21,4 @@ COPY --from=builder /lib/x86_64-linux-gnu/libpcre.so.3 /lib/x86_64-linux-gnu/lib
 
 EXPOSE 8081
 
-CMD ["et-ccd-callbacks.jar"]
+CMD ["et-cos.jar"]

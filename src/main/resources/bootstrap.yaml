@@ -2,10 +2,10 @@ spring:
   cloud:
     propertiesvolume:
       prefixed: false
-      paths: /mnt/secrets/et-ccd-callbacks,/mnt/secrets/et
+      paths: /mnt/secrets/et-cos,/mnt/secrets/et
       aliases:
         tornado-access-key: TORNADO_ACCESS_KEY
         create-updates-queue-send-connection-string: CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING
-        et-ccd-callbacks-POSTGRES-PASS: ET_CCD_CALLBACKS_DB_PASSWORD
+        et-cos-POSTGRES-PASS: ET_COS_DB_PASSWORD
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
-        et-ccd-callbacks-s2s-secret: ET_CCD_CALLBACKS_S2S_SECRET
+#        et-cos-s2s-secret: ET_COS_S2S_SECRET

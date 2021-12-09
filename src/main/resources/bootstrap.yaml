@@ -2,9 +2,9 @@ spring:
   cloud:
     propertiesvolume:
       prefixed: false
-      paths: /mnt/secrets/et
+      paths: /mnt/secrets/et-cos,/mnt/secrets/et
       aliases:
-#        tornado-access-key: TORNADO_ACCESS_KEY
+        tornado-access-key: TORNADO_ACCESS_KEY
         create-updates-queue-send-connection-string: CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING
         et-cos-POSTGRES-PASS: ET_COS_DB_PASSWORD
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key

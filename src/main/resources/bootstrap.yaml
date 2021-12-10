@@ -8,4 +8,4 @@ spring:
         create-updates-queue-send-connection-string: CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING
         et-cos-POSTGRES-PASS: ET_COS_DB_PASSWORD
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
-#        et-cos-s2s-secret: ET_COS_S2S_SECRET
+        et-cos-s2s-secret: ET_COS_S2S_SECRET

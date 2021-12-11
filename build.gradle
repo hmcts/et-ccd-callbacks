@@ -293,7 +293,7 @@ dependencies {
 
 bootJar {
     getArchiveFileName().set(provider {
-        'et-ccd-callbacks.jar'
+        'et-cos.jar'
     })
 
     manifest {

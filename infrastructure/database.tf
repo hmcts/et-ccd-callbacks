@@ -1,12 +1,12 @@
 module "db" {
   source             = "git@github.com:hmcts/cnp-module-postgres?ref=master"
-  product            = "${var.product}-${var.component}-postgres-db"
+  product            = var.product
   component          = var.component
   location           = var.location_db
   env                = var.env
-  database_name      = "et_ccd_callbacks"
-  postgresql_user    = "et_ccd_callbacks"
+  database_name      = "et_cos"
+  postgresql_user    = "et_cos"
   postgresql_version = "11"
-  common_tags        = var.common_tags
+  common_tags        = local.tags
   subscription       = var.subscription
 }

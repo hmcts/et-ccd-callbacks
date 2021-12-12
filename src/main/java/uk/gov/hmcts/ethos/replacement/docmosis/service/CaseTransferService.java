@@ -14,15 +14,20 @@ import uk.gov.hmcts.ecm.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import uk.gov.hmcts.ecm.common.model.helper.Constants;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOPE_OF_TRANSFER_INTER_COUNTRY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOPE_OF_TRANSFER_INTRA_COUNTRY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -112,15 +117,12 @@ public class CaseTransferService {
                 , TribunalOffice.EDINBURGH.getOfficeName(), TribunalOffice.GLASGOW.getOfficeName(), TribunalOffice.SCOTLAND.getOfficeName());
         boolean isScottishDestinationOffice = scotOffices.contains(
                 officeCT);
-        if ((isScottishDestinationOffice && SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) ||
-                (!isScottishDestinationOffice && ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId))) {
-            return false;
-        }  else {
-            return true;
-        }
-    }
-    public void createCaseTransfer(CaseDetails caseDetails, List<String> errors, String userToken) {
 
+        return ((isScottishDestinationOffice && ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId))
+                || (!isScottishDestinationOffice && SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)));
+    }
+
+    public void createCaseTransfer(CaseDetails caseDetails, List<String> errors, String userToken) {
         caseTypeId = caseDetails.getCaseTypeId();
         officeCT = caseDetails.getCaseData().getOfficeCT().getValue().getCode();
         positionTypeCT = caseDetails.getCaseData().getPositionTypeCT();
@@ -150,7 +152,6 @@ public class CaseTransferService {
         for (CaseData caseData : caseDataList) {
             createCaseTransferEvent(caseData, errors, userToken, caseDataList.size());
         }
-
     }
 
 

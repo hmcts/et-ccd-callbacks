@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.listing.ListingData;
@@ -19,7 +19,14 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_AWAITING_JUDGMENT_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_COMPLETED_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.FILE_EXTENSION;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIVE_CASELOAD_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TIME_TO_FIRST_HEARING_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
@@ -85,7 +92,8 @@ public class ReportDocHelper {
         return sb;
     }
 
-    private static StringBuilder getCasesAwaitingJudgmentReport(ListingData listingData) throws JsonProcessingException {
+    private static StringBuilder getCasesAwaitingJudgmentReport(ListingData listingData)
+            throws JsonProcessingException {
         if (!(listingData instanceof CasesAwaitingJudgmentReportData)) {
             throw new IllegalStateException(("ListingData is not instanceof CasesAwaitingJudgmentReportData"));
         }
@@ -185,12 +193,14 @@ public class ReportDocHelper {
         var sb = new StringBuilder();
         AdhocReportType localReportDetailHdr = null;
         AdhocReportType localReportSummary = null;
-        if (listingData != null && listingData.getLocalReportsDetailHdr() != null) {
-            localReportDetailHdr = listingData.getLocalReportsDetailHdr();
-        }
-        if (listingData != null && listingData.getLocalReportsSummary() != null
-                && listingData.getLocalReportsSummary().size() > 0) {
-            localReportSummary = listingData.getLocalReportsSummary().get(0).getValue();
+
+        if (listingData != null) {
+            if (listingData.getLocalReportsDetailHdr() != null) {
+                localReportDetailHdr = listingData.getLocalReportsDetailHdr();
+            }
+            if (CollectionUtils.isNotEmpty(listingData.getLocalReportsSummary())) {
+                localReportSummary = listingData.getLocalReportsSummary().get(0).getValue();
+            }
         }
 
         if (localReportDetailHdr != null) {
@@ -262,6 +272,7 @@ public class ReportDocHelper {
         }
         return sb;
     }
+
     private static StringBuilder getCasesCompletedReport(ListingData listingData) {
         var sb = new StringBuilder();
         AdhocReportType localReportDetailHdr = listingData.getLocalReportsDetailHdr();

@@ -70,7 +70,8 @@ public class MultipleTransferService {
 
         List<String> ethosCaseRefCollection = new ArrayList<>(multipleObjects.keySet());
         var multipleData = multipleDetails.getCaseData();
-        boolean interCountryCaseTransfer = interCountryCaseTransfer(multipleDetails.getCaseTypeId(),multipleData.getOfficeMultipleCT().getValue().getCode());
+        boolean interCountryCaseTransfer = interCountryCaseTransfer(multipleDetails.getCaseTypeId(),
+                multipleData.getOfficeMultipleCT().getValue().getCode());
         persistentQHelperService.sendCreationEventToSingles(
                 userToken,
                 multipleDetails.getCaseTypeId(),
@@ -92,16 +93,13 @@ public class MultipleTransferService {
     }
 
     public boolean interCountryCaseTransfer(String caseTypeId, String officeMultipleCT) {
-        List<String> scotOffices = List.of(TribunalOffice.ABERDEEN.getOfficeName(), TribunalOffice.DUNDEE.getOfficeName()
-                , TribunalOffice.EDINBURGH.getOfficeName(), TribunalOffice.GLASGOW.getOfficeName(), TribunalOffice.SCOTLAND.getOfficeName());
-        boolean isScottishDestinationOffice = scotOffices.contains(
-                officeMultipleCT);
-        if ((isScottishDestinationOffice && SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId)) ||
-                (!isScottishDestinationOffice && ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId))) {
-            return false;
-        }  else {
-            return true;
-        }
+        List<String> scotOffices = List.of(TribunalOffice.ABERDEEN.getOfficeName(),
+                TribunalOffice.DUNDEE.getOfficeName(), TribunalOffice.EDINBURGH.getOfficeName(),
+                TribunalOffice.GLASGOW.getOfficeName(), TribunalOffice.SCOTLAND.getOfficeName());
+        boolean isScottishDestinationOffice = scotOffices.contains(officeMultipleCT);
+
+        return ((isScottishDestinationOffice && ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId))
+                || (!isScottishDestinationOffice && SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId)));
     }
 
     public void populateDataIfComingFromCT(String userToken, MultipleDetails multipleDetails, List<String> errors) {

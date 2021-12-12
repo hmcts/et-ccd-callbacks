@@ -828,7 +828,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         var caseData = ccdRequest.getCaseDetails().getCaseData();
-        Helper.populateDynamicListOffices(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
+        Helper.populateDynamicListOffices(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice;
 
-import org.docx4j.wml.Tr;
 import org.junit.Test;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;

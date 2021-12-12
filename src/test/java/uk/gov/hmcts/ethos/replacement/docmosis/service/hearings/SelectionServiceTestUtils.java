@@ -37,6 +37,15 @@ public class SelectionServiceTestUtils {
         return listItems;
     }
 
+    public static DynamicFixedListType createSelectedDynamicList(String codeBase, String labelBase, int selectedIndex) {
+        var listItems = createListItems(codeBase, labelBase);
+        var selectedItem = listItems.get(selectedIndex);
+        var dynamicFixedListType = DynamicFixedListType
+                .of(DynamicValueType.create(selectedItem.getCode(), selectedItem.getLabel()));
+        dynamicFixedListType.setListItems(listItems);
+        return dynamicFixedListType;
+    }
+
     public static void verifyDynamicFixedListNoneSelected(DynamicFixedListType dynamicFixedListType,
                                                    String codeBase, String labelBase) {
         assertEquals(DEFAULT_LIST_SIZE, dynamicFixedListType.getListItems().size());

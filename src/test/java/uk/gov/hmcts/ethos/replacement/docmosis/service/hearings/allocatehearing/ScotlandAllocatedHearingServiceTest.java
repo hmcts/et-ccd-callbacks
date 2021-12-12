@@ -24,9 +24,9 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AllocateHearingServiceTest {
+public class ScotlandAllocatedHearingServiceTest {
 
-    private AllocateHearingService allocateHearingService;
+    private ScotlandAllocateHearingService scotlandAllocateHearingService;
 
     private CaseData caseData;
     private final TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
@@ -39,34 +39,37 @@ public class AllocateHearingServiceTest {
 
         var hearingSelectionService = mockHearingSelectionService();
         var judgeSelectionService = mockJudgeSelectionService();
-        var venueSelectionService = mockVenueSelectionService();
-        var roomSelectionService = mockRoomSelectionService();
+        var scotlandVenueSelectionService = mockScotlandVenueSelectionService();
         var courtWorkerService = mockCourtWorkerService();
-        allocateHearingService = new AllocateHearingService(hearingSelectionService, judgeSelectionService,
-                venueSelectionService, roomSelectionService, courtWorkerService);
+        scotlandAllocateHearingService = new ScotlandAllocateHearingService(hearingSelectionService,
+                judgeSelectionService, scotlandVenueSelectionService, courtWorkerService);
     }
 
     @Test
-    public void testInitialiseAllocatedHearing() {
-        allocateHearingService.initialiseAllocateHearing(caseData);
+    public void testHandleListingSelected() {
+        var selectedHearingVenue = tribunalOffice.getOfficeName();
+        selectedListing.setHearingVenueDayScotland(selectedHearingVenue);
 
-        var hearings = caseData.getAllocateHearingHearing();
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(hearings, "hearing", "Hearing ");
+        scotlandAllocateHearingService.handleListingSelected(caseData);
+
+        assertEquals(selectedHearingVenue, caseData.getAllocateHearingManagingOffice());
     }
 
     @Test
-    public void testHandleListingSelectedNoExistingSelections() {
+    public void testHandleManagingOfficeSelected() {
         // Arrange
         var hearingSitAlone = String.valueOf(Boolean.TRUE);
         selectedHearing.setHearingSitAlone(hearingSitAlone);
-
+        var readingDeliberation = "Reading Day";
+        selectedListing.setHearingTypeReadingDeliberation(readingDeliberation);
         var hearingStatus = Constants.HEARING_STATUS_HEARD;
         var postponedBy = "Barney";
         selectedListing.setHearingStatus(hearingStatus);
         selectedListing.setPostponedBy(postponedBy);
+        caseData.setAllocateHearingManagingOffice(tribunalOffice.getOfficeName());
 
         // Act
-        allocateHearingService.handleListingSelected(caseData);
+        scotlandAllocateHearingService.handleManagingOfficeSelected(caseData);
 
         // Assert
         var judges = caseData.getAllocateHearingJudge();
@@ -76,60 +79,16 @@ public class AllocateHearingServiceTest {
         var clerks = caseData.getAllocateHearingClerk();
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(clerks, "clerk", "Clerk ");
         var employerMembers = caseData.getAllocateHearingEmployerMember();
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(employerMembers, "employerMember", "Employer Member ");
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(employerMembers,
+                "employerMember", "Employer Member ");
         var employeeMembers = caseData.getAllocateHearingEmployeeMember();
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(employeeMembers, "employeeMember", "Employee Member ");
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(employeeMembers,
+                "employeeMember", "Employee Member ");
 
         assertEquals(hearingSitAlone, caseData.getAllocateHearingSitAlone());
+        assertEquals(readingDeliberation, caseData.getAllocateHearingReadingDeliberation());
         assertEquals(postponedBy, caseData.getAllocateHearingPostponedBy());
         assertEquals(hearingStatus, caseData.getAllocateHearingStatus());
-    }
-
-    @Test
-    public void testHandleListingSelectedWithExistingSelections() {
-        // Arrange
-        var hearingSitAlone = String.valueOf(Boolean.TRUE);
-        selectedHearing.setHearingSitAlone(hearingSitAlone);
-        var selectedEmployerMember = DynamicValueType.create("employerMember2", "Employer Member 2");
-        selectedHearing.setHearingERMember(DynamicFixedListType.of(selectedEmployerMember));
-        var selectedEmployeeMember = DynamicValueType.create("employeeMember2", "Employee Member 2");
-        selectedHearing.setHearingEEMember(DynamicFixedListType.of(selectedEmployeeMember));
-
-        var hearingStatus = Constants.HEARING_STATUS_HEARD;
-        var postponedBy = "Barney";
-        selectedListing.setHearingStatus(hearingStatus);
-        selectedListing.setPostponedBy(postponedBy);
-        var selectedClerk = DynamicValueType.create("clerk2", "Clerk 2");
-        selectedListing.setHearingClerk(DynamicFixedListType.of(selectedClerk));
-
-        // Act
-        allocateHearingService.handleListingSelected(caseData);
-
-        // Assert
-        var judges = caseData.getAllocateHearingJudge();
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(judges, "judge", "Judge ");
-        var venues = caseData.getAllocateHearingVenue();
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(venues, "venue", "Venue ");
-        var clerks = caseData.getAllocateHearingClerk();
-        SelectionServiceTestUtils.verifyDynamicFixedListSelected(clerks, "clerk", "Clerk ", selectedClerk);
-        var employerMembers = caseData.getAllocateHearingEmployerMember();
-        SelectionServiceTestUtils.verifyDynamicFixedListSelected(employerMembers, "employerMember", "Employer Member ",
-                selectedEmployerMember);
-        var employeeMembers = caseData.getAllocateHearingEmployeeMember();
-        SelectionServiceTestUtils.verifyDynamicFixedListSelected(employeeMembers, "employeeMember", "Employee Member ",
-                selectedEmployeeMember);
-
-        assertEquals(hearingSitAlone, caseData.getAllocateHearingSitAlone());
-        assertEquals(postponedBy, caseData.getAllocateHearingPostponedBy());
-        assertEquals(hearingStatus, caseData.getAllocateHearingStatus());
-    }
-
-    @Test
-    public void testPopulateRooms() {
-        allocateHearingService.populateRooms(caseData);
-
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(caseData.getAllocateHearingRoom(),
-                "room", "Room ");
     }
 
     @Test
@@ -139,6 +98,7 @@ public class AllocateHearingServiceTest {
         var judge = DynamicFixedListType.of(DynamicValueType.create("judge2", "Judge 2"));
         var employerMember = DynamicFixedListType.of(DynamicValueType.create("employerMember2", "Employer Member 2"));
         var employeeMember = DynamicFixedListType.of(DynamicValueType.create("employeeMember2", "Employee Member 2"));
+        var readingDeliberation = "Reading Day";
         var hearingStatus = Constants.HEARING_STATUS_POSTPONED;
         var postponedBy = "Doris";
         var venue = DynamicFixedListType.of(DynamicValueType.create("venue2", "Venue 2"));
@@ -148,37 +108,68 @@ public class AllocateHearingServiceTest {
         caseData.setAllocateHearingJudge(judge);
         caseData.setAllocateHearingEmployerMember(employerMember);
         caseData.setAllocateHearingEmployeeMember(employeeMember);
+        caseData.setAllocateHearingReadingDeliberation(readingDeliberation);
         caseData.setAllocateHearingStatus(hearingStatus);
         caseData.setAllocateHearingPostponedBy(postponedBy);
         caseData.setAllocateHearingVenue(venue);
         caseData.setAllocateHearingRoom(room);
         caseData.setAllocateHearingClerk(clerk);
 
-        // Act
-        allocateHearingService.updateCase(caseData);
+        for (TribunalOffice scotlandTribunalOffice : TribunalOffice.SCOTLAND_OFFICES) {
+            caseData.setAllocateHearingManagingOffice(scotlandTribunalOffice.getOfficeName());
 
-        // Assert
-        assertEquals(sitAlone, selectedHearing.getHearingSitAlone());
-        assertEquals(judge.getSelectedCode(), selectedHearing.getJudge().getSelectedCode());
-        assertEquals(judge.getSelectedLabel(), selectedHearing.getJudge().getSelectedLabel());
-        assertEquals(employerMember.getSelectedCode(), selectedHearing.getHearingERMember().getSelectedCode());
-        assertEquals(employerMember.getSelectedLabel(), selectedHearing.getHearingERMember().getSelectedLabel());
-        assertEquals(employeeMember.getSelectedCode(), selectedHearing.getHearingEEMember().getSelectedCode());
-        assertEquals(employeeMember.getSelectedLabel(), selectedHearing.getHearingEEMember().getSelectedLabel());
-        assertEquals(hearingStatus, selectedListing.getHearingStatus());
-        assertEquals(postponedBy, selectedListing.getPostponedBy());
-        assertEquals(venue.getSelectedCode(), selectedListing.getHearingVenueDay().getSelectedCode());
-        assertEquals(venue.getSelectedLabel(), selectedListing.getHearingVenueDay().getSelectedLabel());
-        assertEquals(room.getSelectedCode(), selectedListing.getHearingRoom().getSelectedCode());
-        assertEquals(room.getSelectedLabel(), selectedListing.getHearingRoom().getSelectedLabel());
-        assertEquals(clerk.getSelectedCode(), selectedListing.getHearingClerk().getSelectedCode());
-        assertEquals(clerk.getSelectedLabel(), selectedListing.getHearingClerk().getSelectedLabel());
-        assertNotNull(selectedListing.getPostponedDate());
+            // Act
+            scotlandAllocateHearingService.updateCase(caseData);
+
+            // Assert
+            assertEquals(sitAlone, selectedHearing.getHearingSitAlone());
+            assertEquals(judge.getSelectedCode(), selectedHearing.getJudge().getSelectedCode());
+            assertEquals(judge.getSelectedLabel(), selectedHearing.getJudge().getSelectedLabel());
+            assertEquals(employerMember.getSelectedCode(), selectedHearing.getHearingERMember().getSelectedCode());
+            assertEquals(employerMember.getSelectedLabel(), selectedHearing.getHearingERMember().getSelectedLabel());
+            assertEquals(employeeMember.getSelectedCode(), selectedHearing.getHearingEEMember().getSelectedCode());
+            assertEquals(employeeMember.getSelectedLabel(), selectedHearing.getHearingEEMember().getSelectedLabel());
+            assertEquals(readingDeliberation, selectedListing.getHearingTypeReadingDeliberation());
+            assertEquals(hearingStatus, selectedListing.getHearingStatus());
+            assertEquals(postponedBy, selectedListing.getPostponedBy());
+
+            switch (scotlandTribunalOffice) {
+                case ABERDEEN:
+                    verifyVenue(venue, selectedHearing.getHearingAberdeen(), selectedListing.getHearingAberdeen());
+                    break;
+                case DUNDEE:
+                    verifyVenue(venue, selectedHearing.getHearingDundee(), selectedListing.getHearingDundee());
+                    break;
+                case EDINBURGH:
+                    verifyVenue(venue, selectedHearing.getHearingEdinburgh(), selectedListing.getHearingEdinburgh());
+                    break;
+                case GLASGOW:
+                    verifyVenue(venue, selectedHearing.getHearingGlasgow(), selectedListing.getHearingGlasgow());
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unexpected Scotland Tribunal Office " + scotlandTribunalOffice);
+            }
+
+            assertEquals(room.getSelectedCode(), selectedListing.getHearingRoom().getSelectedCode());
+            assertEquals(room.getSelectedLabel(), selectedListing.getHearingRoom().getSelectedLabel());
+            assertEquals(clerk.getSelectedCode(), selectedListing.getHearingClerk().getSelectedCode());
+            assertEquals(clerk.getSelectedLabel(), selectedListing.getHearingClerk().getSelectedLabel());
+            assertNotNull(selectedListing.getPostponedDate());
+        }
+    }
+
+    private void verifyVenue(DynamicFixedListType expectedValue, DynamicFixedListType hearingVenue,
+                             DynamicFixedListType listingVenue) {
+        assertEquals(expectedValue.getSelectedCode(), hearingVenue.getSelectedCode());
+        assertEquals(expectedValue.getSelectedLabel(), hearingVenue.getSelectedLabel());
+        assertEquals(expectedValue.getSelectedCode(), listingVenue.getSelectedCode());
+        assertEquals(expectedValue.getSelectedLabel(), listingVenue.getSelectedLabel());
     }
 
     private CaseData createCaseData() {
         var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
-        caseData.setAllocateHearingHearing(new DynamicFixedListType());
+        caseData.setAllocateHearingHearing(
+                SelectionServiceTestUtils.createSelectedDynamicList("hearing ", "Hearing ", 1));
 
         selectedHearing = new HearingType();
         selectedListing = new DateListedType();
@@ -216,8 +207,8 @@ public class AllocateHearingServiceTest {
         return judgeSelectionService;
     }
 
-    private VenueSelectionService mockVenueSelectionService() {
-        var venueSelectionService = mock(VenueSelectionService.class);
+    private ScotlandVenueSelectionService mockScotlandVenueSelectionService() {
+        var venueSelectionService = mock(ScotlandVenueSelectionService.class);
         var venues = SelectionServiceTestUtils.createListItems("venue", "Venue ");
         var dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(venues);
@@ -225,17 +216,6 @@ public class AllocateHearingServiceTest {
                 isA(DateListedType.class))).thenReturn(dynamicFixedListType);
 
         return venueSelectionService;
-    }
-
-    private RoomSelectionService mockRoomSelectionService() {
-        var roomSelectionService = mock(RoomSelectionService.class);
-        var rooms = SelectionServiceTestUtils.createListItems("room", "Room ");
-        var dynamicFixedListType = new DynamicFixedListType();
-        dynamicFixedListType.setListItems(rooms);
-        when(roomSelectionService.createRoomSelection(isA(CaseData.class),
-                isA(DateListedType.class))).thenReturn(dynamicFixedListType);
-
-        return roomSelectionService;
     }
 
     private CourtWorkerService mockCourtWorkerService() {

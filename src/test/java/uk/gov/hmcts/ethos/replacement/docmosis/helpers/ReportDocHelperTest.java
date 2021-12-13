@@ -6,6 +6,7 @@ import org.junit.Test;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
+import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.PositionTypeSummary;
@@ -193,6 +194,14 @@ public class ReportDocHelperTest {
         var reportData = getCasesAwaitingJudgementReportData();
         var actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "", "EM-TRB-SCO-ENG-00749", userDetails).toString();
         assertEquals(expectedJson, actualJson);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testCasesAwaitingJudgementInvalidListingData() {
+        var listingData = new ListingData();
+        listingData.setReportType(Constants.CASES_AWAITING_JUDGMENT_REPORT);
+
+        ReportDocHelper.buildReportDocumentContent(listingData, "access-key", "template-name", userDetails);
     }
 
     @Test

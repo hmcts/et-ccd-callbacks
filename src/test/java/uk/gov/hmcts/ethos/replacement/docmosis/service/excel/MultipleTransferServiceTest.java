@@ -1,20 +1,20 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import lombok.RequiredArgsConstructor;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ecm.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ecm.common.model.multiples.items.CaseMultipleTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.PersistentQHelperService;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.PersistentQHelperService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -62,7 +62,6 @@ public class MultipleTransferServiceTest {
         userToken = "authString";
     }
 
-    @Ignore("Fix as part of case transfer work")
     @Test
     public void multipleTransferLogic() {
 
@@ -81,7 +80,7 @@ public class MultipleTransferServiceTest {
                 multipleDetails.getJurisdiction(),
                 new ArrayList<>(),
                 new ArrayList<>(multipleObjects.keySet()),
-                "Manchester",
+                "ET_EnglandWales",
                 "PositionTypeCT",
                 ccdGatewayBaseUrl,
                 multipleDetails.getCaseData().getReasonForCT(),

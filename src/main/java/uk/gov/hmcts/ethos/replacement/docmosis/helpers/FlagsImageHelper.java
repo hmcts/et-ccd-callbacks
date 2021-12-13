@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
@@ -161,7 +161,7 @@ public class FlagsImageHelper {
 
         for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
             var hearingType = hearingTypeItem.getValue();
-            if (!CollectionUtils.isEmpty(hearingType.getHearingDateCollection())) {
+            if (CollectionUtils.isNotEmpty(hearingType.getHearingDateCollection())) {
                 for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
                     String hearingReservedJudgement = dateListedTypeItem.getValue().getHearingReservedJudgement();
                     if (YES.equals(hearingReservedJudgement)) {

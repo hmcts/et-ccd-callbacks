@@ -57,7 +57,8 @@ public class CaseTransferService {
             }
 
         } catch (Exception ex) {
-            throw new CaseCreationException("Error getting original case number: " + caseDetails.getCaseData().getEthosCaseReference() + " " + ex.getMessage());
+            throw new CaseCreationException("Error getting original case number: "
+                    + caseDetails.getCaseData().getEthosCaseReference() + " " + ex.getMessage());
         }
     }
 
@@ -71,7 +72,8 @@ public class CaseTransferService {
 
                 for (EccCounterClaimTypeItem counterClaimItem:originalCaseData.getEccCases()) {
                     counterClaim =  counterClaimItem.getValue().getCounterClaim();
-                    List<SubmitEvent>   submitEvents = ccdClient.retrieveCasesElasticSearch(userToken,caseDetails.getCaseTypeId(),new ArrayList<>(Collections.singleton(counterClaim)));
+                    List<SubmitEvent>   submitEvents = ccdClient.retrieveCasesElasticSearch(userToken,
+                            caseDetails.getCaseTypeId(), new ArrayList<>(Collections.singleton(counterClaim)));
                     if (submitEvents != null && !submitEvents.isEmpty()) {
                         cases.add(submitEvents.get(0).getCaseData());
                     }
@@ -80,7 +82,8 @@ public class CaseTransferService {
 
             return cases;
         } catch (Exception ex) {
-            throw new CaseCreationException("Error getting all cases to be transferred for case number: " + caseDetails.getCaseData().getEthosCaseReference() + " " + ex.getMessage());
+            throw new CaseCreationException("Error getting all cases to be transferred for case number: "
+                    + caseDetails.getCaseData().getEthosCaseReference() + " " + ex.getMessage());
         }
     }
 
@@ -88,20 +91,20 @@ public class CaseTransferService {
         caseData.setManagingOffice(officeCT);
         boolean interCountryCaseTransfer = interCountryCaseTransfer();
         if (interCountryCaseTransfer || caseListSize > 1) {
-           persistentQHelperService.sendCreationEventToSingles(
+            persistentQHelperService.sendCreationEventToSingles(
                     userToken,
                     caseTypeId,
-                   jurisdiction,
+                    jurisdiction,
                     errors,
                     new ArrayList<>(Collections.singletonList(caseData.getEthosCaseReference())),
                     officeCT,
-                   positionTypeCT,
-                  ccdGatewayBaseUrl,
+                    positionTypeCT,
+                    ccdGatewayBaseUrl,
                     reasonForCT,
-                   SINGLE_CASE_TYPE,
+                    SINGLE_CASE_TYPE,
                     NO,
                     null,
-                   (interCountryCaseTransfer? SCOPE_OF_TRANSFER_INTER_COUNTRY: SCOPE_OF_TRANSFER_INTRA_COUNTRY));
+                    (interCountryCaseTransfer ? SCOPE_OF_TRANSFER_INTER_COUNTRY : SCOPE_OF_TRANSFER_INTRA_COUNTRY));
         }
 
         caseData.setLinkedCaseCT("Transferred to " + officeCT);
@@ -113,8 +116,9 @@ public class CaseTransferService {
     }
 
     public boolean interCountryCaseTransfer() {
-        List<String> scotOffices = List.of(TribunalOffice.ABERDEEN.getOfficeName(), TribunalOffice.DUNDEE.getOfficeName()
-                , TribunalOffice.EDINBURGH.getOfficeName(), TribunalOffice.GLASGOW.getOfficeName(), TribunalOffice.SCOTLAND.getOfficeName());
+        List<String> scotOffices = List.of(TribunalOffice.ABERDEEN.getOfficeName(),
+                TribunalOffice.DUNDEE.getOfficeName(), TribunalOffice.EDINBURGH.getOfficeName(),
+                TribunalOffice.GLASGOW.getOfficeName(), TribunalOffice.SCOTLAND.getOfficeName());
         boolean isScottishDestinationOffice = scotOffices.contains(
                 officeCT);
 
@@ -139,9 +143,9 @@ public class CaseTransferService {
             }
 
             if (!checkHearingsNotListed(caseData)) {
-                errors.add(
-                        "There are one or more hearings that have the status Listed. These must be updated before the case "
-                                + caseData.getEthosCaseReference() + " can be transferred");
+                errors.add("There are one or more hearings that have the status Listed. "
+                        + "These must be updated before the case "
+                        + caseData.getEthosCaseReference() + " can be transferred");
             }
         }
 
@@ -153,7 +157,6 @@ public class CaseTransferService {
             createCaseTransferEvent(caseData, errors, userToken, caseDataList.size());
         }
     }
-
 
     private boolean checkBfActionsCleared(CaseData caseData) {
         if (caseData.getBfActions() != null) {
@@ -180,8 +183,8 @@ public class CaseTransferService {
                 }
             }
         }
+
         return true;
     }
-
 }
 

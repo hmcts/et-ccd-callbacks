@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ecm.common.model.bulk.BulkDetails;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
@@ -17,6 +18,8 @@ import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.UpdateDataModel;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
 import java.util.List;
+
+import static uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreationSingleDataModel.builder;
 
 @Slf4j
 public class PersistentQHelper {
@@ -127,14 +130,19 @@ public class PersistentQHelper {
 
     public static CloseDataModel getCloseDataModel(MultipleData multipleData) {
         return CloseDataModel.builder()
-                .clerkResponsible(multipleData.getClerkResponsible())
-                .fileLocation(multipleData.getFileLocation())
+                .clerkResponsible(
+                        DynamicFixedListType.getSelectedValue(multipleData.getClerkResponsible()).orElse(null))
+                .fileLocation(DynamicFixedListType.getSelectedValue(multipleData.getFileLocation()).orElse(null))
                 .notes(multipleData.getNotes())
                 .managingOffice(multipleData.getManagingOffice())
-                .fileLocationGlasgow(multipleData.getFileLocationGlasgow())
-                .fileLocationAberdeen(multipleData.getFileLocationAberdeen())
-                .fileLocationDundee(multipleData.getFileLocationDundee())
-                .fileLocationEdinburgh(multipleData.getFileLocationEdinburgh())
+                .fileLocationGlasgow(DynamicFixedListType.getSelectedValue(
+                        multipleData.getFileLocationGlasgow()).orElse(null))
+                .fileLocationAberdeen(DynamicFixedListType.getSelectedValue(
+                        multipleData.getFileLocationAberdeen()).orElse(null))
+                .fileLocationDundee(DynamicFixedListType.getSelectedValue(
+                        multipleData.getFileLocationDundee()).orElse(null))
+                .fileLocationEdinburgh(DynamicFixedListType.getSelectedValue(
+                        multipleData.getFileLocationEdinburgh()).orElse(null))
                 .build();
     }
 
@@ -149,12 +157,14 @@ public class PersistentQHelper {
     }
 
     public static CreationSingleDataModel getCreationSingleDataModel(String ccdGatewayBaseUrl, String officeCT,
-                                                                     String positionTypeCT, String reasonForCT) {
-        return CreationSingleDataModel.builder()
+                                                                     String positionTypeCT, String reasonForCT,
+                                                                     String scopeOfTransfer) {
+        return builder()
                 .officeCT(officeCT)
                 .positionTypeCT(positionTypeCT)
                 .ccdGatewayBaseUrl(ccdGatewayBaseUrl)
                 .reasonForCT(reasonForCT)
+                .scopeOfTransfer(scopeOfTransfer)
                 .build();
     }
 

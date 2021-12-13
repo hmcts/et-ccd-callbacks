@@ -81,7 +81,7 @@
           "hearingEstLengthNumType": "days",
           "Hearing_type": "Single",
           "hearingNumber": "1",
-          "Hearing_venue": "Aberdeen",
+          "Hearing_venue_Scotland": "Aberdeen",
           "Hearing_Aberdeen": "Aberdeen",
           "hearingDateCollection": [
             {
@@ -102,7 +102,7 @@
           "hearingEstLengthNumType": "days",
           "Hearing_type": "Single",
           "hearingNumber": "2",
-          "Hearing_venue": "Glasgow",
+          "Hearing_venue_Scotland": "Glasgow",
           "Hearing_Glasgow": "Glasgow",
           "hearingDateCollection": [
             {
@@ -122,7 +122,7 @@
           "hearingEstLengthNumType": "days",
           "Hearing_type": "Single",
           "hearingNumber": "3",
-          "Hearing_venue": "Edinburgh",
+          "Hearing_venue_Scotland": "Edinburgh",
           "Hearing_Edinburgh": "Edinburgh",
           "hearingDateCollection": [
             {
@@ -142,7 +142,7 @@
           "hearingEstLengthNumType": "days",
           "Hearing_type": "Single",
           "hearingNumber": "4",
-          "Hearing_venue": "Dundee",
+          "Hearing_venue_Scotland": "Dundee",
           "Hearing_Dundee": "Dundee",
           "hearingDateCollection": [
             {
@@ -177,5 +177,6 @@
   },
   "id": "123456789",
   "jurisdiction": "English",
+  "case_type_id": "ET_Scotland",
   "state": "UK"
 }

@@ -12,7 +12,7 @@
     "id": "232323232",
     "state": "Accepted",
     "jurisdiction": "Nothing",
-    "case_type_id" : "Manchester_Dev"
+    "case_type_id" : "ET_EnglandWales"
   },
   "event_id": "1212121",
   "token": "string"

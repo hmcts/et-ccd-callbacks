@@ -89,7 +89,7 @@ public class CasesCompletedReport {
         adhocReportType.setConOpenCasesCompletedHearing(ZERO);
         adhocReportType.setConOpenSessionDays(ZERO);
         adhocReportType.setConOpenCompletedPerSession(ZERO_DECIMAL);
-        adhocReportType.setReportOffice(UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()));
+        adhocReportType.setReportOffice(listingDetails.getCaseData().getManagingOffice());
 
         var listingData = listingDetails.getCaseData();
         listingData.setLocalReportsDetailHdr(adhocReportType);
@@ -178,8 +178,12 @@ public class CasesCompletedReport {
         adhocReportType.setHearingNumber(hearingType.getHearingNumber());
         adhocReportType.setHearingDate(latestSession.getListedDate());
         adhocReportType.setHearingType(hearingType.getHearingType());
-        adhocReportType.setHearingJudge(hearingType.getJudge());
-        adhocReportType.setHearingClerk(latestSession.getHearingClerk());
+        if (hearingType.hasHearingJudge()) {
+            adhocReportType.setHearingJudge(hearingType.getJudge().getSelectedLabel());
+        }
+        if (latestSession.hasHearingClerk()) {
+            adhocReportType.setHearingClerk(latestSession.getHearingClerk().getSelectedLabel());
+        }
 
         return adhocReportType;
     }

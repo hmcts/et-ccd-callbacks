@@ -195,10 +195,6 @@ public class DocumentGenerationController {
                 .build());
     }
     private DefaultValues getPostDefaultValues(CaseDetails caseDetails) {
-        String caseTypeId = caseDetails.getCaseTypeId();
-        String managingOffice = caseDetails.getCaseData().getManagingOffice() != null
-                ? caseDetails.getCaseData().getManagingOffice() : "";
-
-        return defaultValuesReaderService.getDefaultValues(managingOffice, caseTypeId);
+        return defaultValuesReaderService.getDefaultValues(caseDetails.getCaseData().getManagingOffice());
     }
 }

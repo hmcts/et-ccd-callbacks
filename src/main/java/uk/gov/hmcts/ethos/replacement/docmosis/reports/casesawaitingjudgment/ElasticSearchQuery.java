@@ -15,11 +15,12 @@ class ElasticSearchQuery {
         // Access through static methods
     }
 
-    static String create() {
+    static String create(String managingOffice) {
         var boolQueryBuilder = boolQuery()
                 .mustNot(new MatchQueryBuilder("state.keyword", "Closed"))
                 .mustNot(new ExistsQueryBuilder("data.judgementCollection"))
                 .must(new ExistsQueryBuilder("data.hearingCollection"))
+                .must(new MatchQueryBuilder("data.managingOffice", managingOffice))
                 .filter(new TermsQueryBuilder("data.positionType.keyword", VALID_POSITION_TYPES));
 
         return new SearchSourceBuilder()

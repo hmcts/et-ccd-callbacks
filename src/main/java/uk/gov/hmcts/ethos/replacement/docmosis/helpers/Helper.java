@@ -14,7 +14,9 @@ import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,21 +39,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_POSTPONEM
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_REFER_CHAIRMAN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_REPLY_TO_ENQUIRY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_STRIKING_OUT_WARNING;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.BRISTOL_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_CLOSED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LEEDS_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LONDON_CENTRAL_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LONDON_EAST_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LONDON_SOUTH_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANCHESTER_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIDLANDS_EAST_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIDLANDS_WEST_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEWCASTLE_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.WALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.WATFORD_CASE_TYPE_ID;
 
 @Slf4j
 public class Helper {
@@ -296,18 +287,18 @@ public class Helper {
     public static List<String> getAllOffices() {
 
         return new ArrayList<>(Arrays.asList(
-                BRISTOL_CASE_TYPE_ID,
-                LEEDS_CASE_TYPE_ID,
-                LONDON_CENTRAL_CASE_TYPE_ID,
-                LONDON_EAST_CASE_TYPE_ID,
-                LONDON_SOUTH_CASE_TYPE_ID,
-                MANCHESTER_CASE_TYPE_ID,
-                MIDLANDS_EAST_CASE_TYPE_ID,
-                MIDLANDS_WEST_CASE_TYPE_ID,
-                NEWCASTLE_CASE_TYPE_ID,
-                WALES_CASE_TYPE_ID,
-                WATFORD_CASE_TYPE_ID,
-                SCOTLAND_CASE_TYPE_ID
+                TribunalOffice.BRISTOL.getOfficeName(),
+                TribunalOffice.LEEDS.getOfficeName(),
+                TribunalOffice.MANCHESTER.getOfficeName(),
+                TribunalOffice.LONDON_CENTRAL.getOfficeName(),
+                TribunalOffice.LONDON_EAST.getOfficeName(),
+                TribunalOffice.LONDON_SOUTH.getOfficeName(),
+                TribunalOffice.MIDLANDS_EAST.getOfficeName(),
+                TribunalOffice.MIDLANDS_WEST.getOfficeName(),
+                TribunalOffice.WALES.getOfficeName(),
+                TribunalOffice.WATFORD.getOfficeName(),
+                TribunalOffice.NEWCASTLE.getOfficeName(),
+                SCOTLAND_CASE_TYPE_ID // to do: whether this needs to be removed by individual offices?
         ));
     }
 
@@ -326,15 +317,11 @@ public class Helper {
         return offices;
     }
 
-    public static void populateDynamicListOffices(CaseData caseData, String caseTypeId) {
-
-        log.info("Populating dynamic list with offices");
-
+    public static void populateDynamicListOffices(CaseData caseData) {
         var dynamicFixedListType = new DynamicFixedListType();
-        dynamicFixedListType.setListItems(getAvailableOffices(caseTypeId));
+        dynamicFixedListType.setListItems(getAvailableOffices(caseData.getManagingOffice()));
 
         caseData.setOfficeCT(dynamicFixedListType);
-
     }
 
     public static List<String> getJurCodesCollection(List<JurCodesTypeItem> jurCodesCollection) {

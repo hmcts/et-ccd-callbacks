@@ -28,9 +28,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ecc.ClerkService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,10 +42,12 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
@@ -68,6 +73,9 @@ public class CaseActionsForCaseWorkerController {
     private final EventValidationService eventValidationService;
     private final SingleCaseMultipleMidEventValidationService singleCaseMultipleMidEventValidationService;
     private final AddSingleCaseToMultipleService addSingleCaseToMultipleService;
+    private final ClerkService clerkService;
+    private final FileLocationSelectionService fileLocationSelectionService;
+    private final ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "create a case for a caseWorker.")
@@ -213,7 +221,7 @@ public class CaseActionsForCaseWorkerController {
             defaultValuesReaderService.getCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.caseDataDefaults(caseData);
             generateEthosCaseReference(caseData, ccdRequest);
-            FlagsImageHelper.buildFlagsImageFileName(caseData);
+            FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
             caseData.setMultipleFlag(caseData.getCaseType() != null
                     && caseData.getCaseType().equals(MULTIPLE_CASE_TYPE) ? YES : NO);
         }
@@ -221,6 +229,34 @@ public class CaseActionsForCaseWorkerController {
         log.info("PostDefaultValues for case: " + caseData.getEthosCaseReference());
 
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = "/initialiseAmendCaseDetails", consumes = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Initialise case data for amendCaseDetails and amendCaseDetailsClosed events")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Accessed successfully",
+                response = CCDCallbackResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> initialiseAmendCaseDetails(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        clerkService.initialiseClerkResponsible(caseData);
+
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
+            fileLocationSelectionService.initialiseFileLocation(caseData);
+        } else if (SCOTLAND_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
+            scotlandFileLocationSelectionService.initialiseFileLocation(caseData);
+        }
+
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/amendCaseDetails", consumes = APPLICATION_JSON_VALUE)
@@ -259,7 +295,7 @@ public class CaseActionsForCaseWorkerController {
             log.info("Post Default values loaded: " + defaultValues);
             defaultValuesReaderService.getCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
-            FlagsImageHelper.buildFlagsImageFileName(caseData);
+            FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
 
             addSingleCaseToMultipleService.addSingleCaseToMultipleLogic(
                     userToken, caseData, caseDetails.getCaseTypeId(),
@@ -390,7 +426,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         var caseDetails = ccdRequest.getCaseDetails();
-        FlagsImageHelper.buildFlagsImageFileName(caseDetails.getCaseData());
+        FlagsImageHelper.buildFlagsImageFileName(caseDetails);
 
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
@@ -435,10 +471,9 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
-        FlagsImageHelper.buildFlagsImageFileName(caseData);
+        FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
 
-        return getCallbackRespEntityNoErrors(caseData);
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @PostMapping(value = "/amendHearing", consumes = APPLICATION_JSON_VALUE)
@@ -793,7 +828,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         var caseData = ccdRequest.getCaseDetails().getCaseData();
-        Helper.populateDynamicListOffices(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
+        Helper.populateDynamicListOffices(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -844,6 +879,14 @@ public class CaseActionsForCaseWorkerController {
                 ccdRequest.getCaseDetails().getState().equals(REJECTED_STATE), false, errors);
 
         if (errors.isEmpty()) {
+            var caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
+            if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+                fileLocationSelectionService.initialiseFileLocation(caseData);
+            } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+                scotlandFileLocationSelectionService.initialiseFileLocation(caseData);
+            }
+
+            clerkService.initialiseClerkResponsible(caseData);
             Helper.updatePositionTypeToClosed(caseData);
             return getCallbackRespEntityNoErrors(caseData);
         }
@@ -853,11 +896,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     private DefaultValues getPostDefaultValues(CaseDetails caseDetails) {
-        String caseTypeId = caseDetails.getCaseTypeId();
-        String managingOffice = caseDetails.getCaseData().getManagingOffice() != null
-                ? caseDetails.getCaseData().getManagingOffice() : "";
-
-        return defaultValuesReaderService.getDefaultValues(managingOffice, caseTypeId);
+        return defaultValuesReaderService.getDefaultValues(caseDetails.getCaseData().getManagingOffice());
     }
 
     private void generateEthosCaseReference(CaseData caseData, CCDRequest ccdRequest) {

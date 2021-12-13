@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.ccd.items.BFActionTypeItem;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABERDEEN_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
@@ -30,8 +32,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_REJEC
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Slf4j
 public class ReportHelper {
@@ -108,7 +108,7 @@ public class ReportHelper {
             localReportsDetailHdr.setTotal(Integer.toString(totalCases));
             localReportsDetailHdr.setSinglesTotal(Integer.toString(totalSingles));
             localReportsDetailHdr.setMultiplesTotal(Integer.toString(totalMultiples));
-            localReportsDetailHdr.setReportOffice(UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()));
+            localReportsDetailHdr.setReportOffice(listingDetails.getCaseData().getManagingOffice());
             listingDetails.getCaseData().setLocalReportsDetailHdr(localReportsDetailHdr);
             listingDetails.getCaseData().setLocalReportsDetail(localReportsDetailList);
         }
@@ -131,7 +131,7 @@ public class ReportHelper {
             }
 
             var localReportsDetailHdr = new AdhocReportType();
-            localReportsDetailHdr.setReportOffice(UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()));
+            localReportsDetailHdr.setReportOffice(listingDetails.getCaseData().getManagingOffice());
             listingDetails.getCaseData().setLocalReportsDetailHdr(localReportsDetailHdr);
             listingDetails.getCaseData().setLocalReportsDetail(localReportsDetailList);
 
@@ -229,13 +229,17 @@ public class ReportHelper {
     }
 
     private static boolean validateClerkResponsible(ListingData listingData, CaseData caseData) {
-        if (listingData.getClerkResponsible() != null) {
-            if (caseData.getClerkResponsible() != null) {
-                return listingData.getClerkResponsible().equals(caseData.getClerkResponsible());
-            }
-            return false;
+        var listingClerkCode = getClerkCode(listingData.getClerkResponsible());
+        var caseDataClerkCode = getClerkCode(caseData.getClerkResponsible());
+        if (listingClerkCode != null) {
+            return listingClerkCode.equals(caseDataClerkCode);
+        } else {
+            return true;
         }
-        return true;
+    }
+
+    private static String getClerkCode(DynamicFixedListType dynamicFixedListType) {
+        return dynamicFixedListType != null ? dynamicFixedListType.getSelectedCode() : null;
     }
 
     private static void getCommonReportDetailFields(ListingDetails listingDetails, CaseData caseData,
@@ -247,33 +251,43 @@ public class ReportHelper {
         adhocReportType.setPosition(caseData.getCurrentPosition());
         adhocReportType.setDateToPosition(caseData.getDateToPosition());
         adhocReportType.setFileLocation(getFileLocation(listingDetails, caseData));
-        adhocReportType.setClerk(caseData.getClerkResponsible());
+        if (caseData.getClerkResponsible() != null && caseData.getClerkResponsible().getValue() != null) {
+            adhocReportType.setClerk(caseData.getClerkResponsible().getSelectedLabel());
+        }
         adhocReportType.setCaseType(caseData.getCaseType());
     }
 
     private static String getFileLocation(ListingDetails listingDetails, CaseData caseData) {
         String caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
-        if (!caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
-            return caseData.getFileLocation();
-        } else {
+        DynamicFixedListType fileLocation = null;
+        if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
             switch (caseData.getManagingOffice()) {
                 case DUNDEE_OFFICE:
-                    return caseData.getFileLocationDundee();
+                    fileLocation = caseData.getFileLocationDundee();
+                    break;
                 case GLASGOW_OFFICE:
-                    return caseData.getFileLocationGlasgow();
+                    fileLocation = caseData.getFileLocationGlasgow();
+                    break;
                 case ABERDEEN_OFFICE:
-                    return caseData.getFileLocationAberdeen();
+                    fileLocation = caseData.getFileLocationAberdeen();
+                    break;
                 case EDINBURGH_OFFICE:
-                    return caseData.getFileLocationEdinburgh();
+                    fileLocation = caseData.getFileLocationEdinburgh();
+                    break;
                 default:
-                    return "";
+                    break;
             }
+        } else {
+            fileLocation = caseData.getFileLocation();
         }
+
+        return fileLocation != null && fileLocation.getValue() != null ? fileLocation.getSelectedLabel() : null;
     }
 
     private static String getTribunalOffice(ListingDetails listingDetails, CaseData caseData) {
         String caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
-        return caseTypeId.equals(SCOTLAND_CASE_TYPE_ID) ? caseData.getManagingOffice() : caseTypeId;
+        return caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)
+            ? caseData.getManagingOffice() : listingDetails.getCaseData().getManagingOffice();
     }
 
     private static boolean liveCaseloadIsValid(CaseData caseData) {

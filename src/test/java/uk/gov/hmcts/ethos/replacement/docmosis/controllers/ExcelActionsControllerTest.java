@@ -15,11 +15,28 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ecm.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.*;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ecc.ClerkService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleAmendService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCloseEventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationMidEventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleDynamicListFlagsService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleHelperService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleMidEventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultiplePreAcceptService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleSingleMidEventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleTransferService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUpdateService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SubMultipleMidEventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.SubMultipleUpdateService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.File;
@@ -36,6 +53,9 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -68,6 +88,8 @@ public class ExcelActionsControllerTest {
     private static final String DYNAMIC_LIST_OFFICES_MULTIPLE_URL = "/dynamicListOfficesMultiple";
     private static final String MULTIPLE_TRANSFER_URL = "/multipleTransfer";
     private static final String LISTINGS_DATE_RANGE_MID_EVENT_VALIDATION_URL = "/listingsDateRangeMidEventValidation";
+    private static final String INITIALISE_BATCH_UPDATE_URL = "/initialiseBatchUpdate";
+    private static final String INITIALISE_CLOSE_MULTIPLE_URL = "/initialiseCloseMultiple";
 
 
     @Autowired
@@ -119,7 +141,16 @@ public class ExcelActionsControllerTest {
     private MultipleTransferService multipleTransferService;
 
     @MockBean
+    private FileLocationSelectionService fileLocationSelectionService;
+
+    @MockBean
+    private ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
+
+    @MockBean
     private MultipleCloseEventValidationService multipleCloseEventValidationService;
+
+    @MockBean
+    private ClerkService clerkService;
 
     private MockMvc mvc;
     private JsonNode requestContent;
@@ -206,6 +237,20 @@ public class ExcelActionsControllerTest {
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", hasSize(0)))
                 .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    public void initialiseBatchUpdate() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(INITIALISE_BATCH_UPDATE_URL)
+                .content(requestContent.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(0)))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(fileLocationSelectionService, times(1)).initialiseFileLocation(isA(MultipleData.class));
     }
 
     @Test
@@ -323,6 +368,20 @@ public class ExcelActionsControllerTest {
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", hasSize(0)))
                 .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    public void initialiseCloseMultiple() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(INITIALISE_CLOSE_MULTIPLE_URL)
+                .content(requestContent.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(0)))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(fileLocationSelectionService, times(1)).initialiseFileLocation(isA(MultipleData.class));
     }
 
     @Test
@@ -783,6 +842,17 @@ public class ExcelActionsControllerTest {
     }
 
     @Test
+    public void initialiseBatchUpdateForbidden() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(INITIALISE_BATCH_UPDATE_URL)
+                .content(requestContent.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+        verify(fileLocationSelectionService, never()).initialiseFileLocation(isA(MultipleData.class));
+    }
+
+    @Test
     public void updateSubMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
@@ -860,6 +930,17 @@ public class ExcelActionsControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void initialiseCloseMultipleForbidden() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(INITIALISE_CLOSE_MULTIPLE_URL)
+                .content(requestContent.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+        verify(fileLocationSelectionService, never()).initialiseFileLocation(isA(MultipleData.class));
     }
 
     @Test

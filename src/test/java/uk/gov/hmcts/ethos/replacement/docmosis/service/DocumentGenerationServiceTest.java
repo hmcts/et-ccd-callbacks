@@ -70,7 +70,7 @@ public class DocumentGenerationServiceTest {
 
         ccdRequest = new CCDRequest();
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseTypeId(MANCHESTER_CASE_TYPE_ID);
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         CaseData caseData = new CaseData();
         caseDetails.setCaseData(caseData);
         ccdRequest.setCaseDetails(caseDetails);
@@ -83,7 +83,7 @@ public class DocumentGenerationServiceTest {
         searchTypeItem.setValue(searchType);
         bulkData.setSearchCollection(new ArrayList<>(Collections.singletonList(searchTypeItem)));
         bulkDetails.setCaseData(bulkData);
-        bulkDetails.setCaseTypeId(MANCHESTER_DEV_BULK_CASE_TYPE_ID);
+        bulkDetails.setCaseTypeId(ENGLANDWALES_DEV_BULK_CASE_TYPE_ID);
         bulkRequest.setCaseDetails(bulkDetails);
         documentGenerationService = new DocumentGenerationService(tornadoService, ccdClient);
         documentInfo = DocumentInfo.builder().description("resources/exampleV1.json").build();
@@ -312,7 +312,7 @@ public class DocumentGenerationServiceTest {
     @Test
     public void clearUserChoicesScotland() {
         CaseDetails caseDetails = caseDetailsScot1;
-        caseDetails.setCaseTypeId("Scotland");
+        caseDetails.setCaseTypeId(SCOTLAND_CASE_TYPE_ID);
         documentGenerationService.clearUserChoices(caseDetails);
         assertNull(caseDetails.getCaseData().getCorrespondenceScotType());
         assertNull(caseDetails.getCaseData().getAddressLabelsSelectionType());
@@ -323,7 +323,7 @@ public class DocumentGenerationServiceTest {
     @Test
     public void clearUserChoicesEngland() {
         CaseDetails caseDetails = caseDetails9;
-        caseDetails.setCaseTypeId("Not Scotland");
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         documentGenerationService.clearUserChoices(caseDetails);
         assertNull(caseDetails.getCaseData().getCorrespondenceType());
         assertNull(caseDetails.getCaseData().getAddressLabelsSelectionType());
@@ -334,7 +334,7 @@ public class DocumentGenerationServiceTest {
     @Test
     public void clearUserChoicesForMultiplesScotland() {
         BulkDetails bulkDetails = bulkRequest.getCaseDetails();
-        bulkDetails.setCaseTypeId("Scotland_Multiple");
+        bulkDetails.setCaseTypeId(SCOTLAND_BULK_CASE_TYPE_ID);
         documentGenerationService.clearUserChoicesForMultiples (bulkDetails);
         assertNull(bulkDetails.getCaseData().getCorrespondenceScotType());
     }
@@ -342,7 +342,7 @@ public class DocumentGenerationServiceTest {
     @Test
     public void clearUserChoicesForMultiplesEngland() {
         BulkDetails bulkDetails = bulkRequest.getCaseDetails();
-        bulkDetails.setCaseTypeId("Not Scotland Multiple");
+        bulkDetails.setCaseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID);
         documentGenerationService.clearUserChoicesForMultiples (bulkDetails);
         assertNull(bulkDetails.getCaseData().getCorrespondenceType());
     }

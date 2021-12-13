@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.DocumentInfo;
@@ -127,14 +126,10 @@ public class ListingGenerationController {
             listingData = listingService.processListingHearingsRequest(
                     listingRequest.getCaseDetails(), userToken);
 
-            String managingOffice = listingRequest.getCaseDetails().getCaseData().getListingVenue() != null
-                    ? listingRequest.getCaseDetails().getCaseData().getListingVenue() : "";
             var defaultValues = defaultValuesReaderService.getDefaultValues(
-                    managingOffice,
-                    UtilHelper.getListingCaseTypeId(listingRequest.getCaseDetails().getCaseTypeId()));
+                    listingRequest.getCaseDetails().getCaseData().getManagingOffice());
             log.info("Post Default values loaded: " + defaultValues);
             listingData = defaultValuesReaderService.getListingData(listingData, defaultValues);
-
         }
 
         return getListingCallbackRespEntityErrors(errors, listingData);

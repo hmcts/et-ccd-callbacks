@@ -14,7 +14,11 @@ import uk.gov.hmcts.ecm.common.model.bulk.SubmitBulkEvent;
 import uk.gov.hmcts.ecm.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.ecm.common.model.bulk.items.MultipleTypeItem;
 import uk.gov.hmcts.ecm.common.model.bulk.items.SearchTypeItem;
-import uk.gov.hmcts.ecm.common.model.bulk.types.*;
+import uk.gov.hmcts.ecm.common.model.bulk.types.CaseType;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.ecm.common.model.bulk.types.MultipleType;
+import uk.gov.hmcts.ecm.common.model.bulk.types.SearchType;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
@@ -41,7 +45,12 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_DEV_BULK_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_DEV_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -85,7 +94,7 @@ public class BulkUpdateServiceTest {
 
         bulkDetails.setJurisdiction("TRIBUNALS");
         bulkDetails.setCaseData(bulkData);
-        bulkDetails.setCaseTypeId(MANCHESTER_DEV_BULK_CASE_TYPE_ID);
+        bulkDetails.setCaseTypeId(ENGLANDWALES_DEV_BULK_CASE_TYPE_ID);
         bulkDetails.setCaseId("2300001/2019");
         bulkRequest.setCaseDetails(bulkDetails);
 
@@ -126,7 +135,7 @@ public class BulkUpdateServiceTest {
 
     @Test(expected = Exception.class)
     public void caseUpdateFieldsRequestException() throws IOException {
-        when(ccdClient.retrieveCase("authToken", MANCHESTER_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenThrow(new InternalException(ERROR_MESSAGE));
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(ccdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(), anyString())).thenReturn(submitEvent);
         bulkUpdateService.caseUpdateFieldsRequest(bulkRequest.getCaseDetails(), searchTypeItem, "authToken",
@@ -135,7 +144,7 @@ public class BulkUpdateServiceTest {
 
     @Test
     public void caseUpdateFieldsRequest() throws IOException {
-        when(ccdClient.retrieveCase("authToken", MANCHESTER_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
+        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(ccdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(), anyString())).thenReturn(submitEvent);
         bulkUpdateService.caseUpdateFieldsRequest(bulkRequest.getCaseDetails(), searchTypeItem, "authToken",
@@ -144,7 +153,7 @@ public class BulkUpdateServiceTest {
 
     @Test
     public void caseUpdateFieldsWithNewValuesRequest() throws IOException {
-        when(ccdClient.retrieveCase("authToken", MANCHESTER_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
+        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenReturn(ccdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(), anyString(), any(), anyString())).thenReturn(submitEvent);
         bulkUpdateService.caseUpdateFieldsRequest(getBulkDetailsWithValues(), searchTypeItem, "authToken",
@@ -160,10 +169,10 @@ public class BulkUpdateServiceTest {
         List<SubmitBulkEvent> submitBulkEventList = new ArrayList<>(Collections.singletonList(submitBulkEvent));
         BulkCasesPayload bulkCasesPayload = new BulkCasesPayload();
         bulkCasesPayload.setSubmitEvents(new ArrayList<>(Collections.singleton(submitEvent)));
-        when(ccdClient.retrieveBulkCases("authToken", MANCHESTER_DEV_BULK_CASE_TYPE_ID, bulkDetails.getJurisdiction())).thenReturn(submitBulkEventList);
-        when(ccdClient.retrieveCase("authToken", MANCHESTER_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
-        when(ccdClient.retrieveCase("authToken", MANCHESTER_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), null)).thenReturn(submitEvent);
-        when(ccdClient.retrieveBulkCasesElasticSearch("authToken", MANCHESTER_DEV_BULK_CASE_TYPE_ID, bulkData.getMultipleReference())).thenReturn(submitBulkEventList);
+        when(ccdClient.retrieveBulkCases("authToken", ENGLANDWALES_DEV_BULK_CASE_TYPE_ID, bulkDetails.getJurisdiction())).thenReturn(submitBulkEventList);
+        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
+        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), null)).thenReturn(submitEvent);
+        when(ccdClient.retrieveBulkCasesElasticSearch("authToken", ENGLANDWALES_DEV_BULK_CASE_TYPE_ID, bulkData.getMultipleReference())).thenReturn(submitBulkEventList);
         assert(bulkUpdateService.bulkUpdateLogic(getBulkDetailsCompleteWithValues(getBulkDetailsWithValues()),
                 "authToken").getBulkDetails() != null);
     }
@@ -187,9 +196,9 @@ public class BulkUpdateServiceTest {
         multipleTypeItem.setValue(multipleTypeLead);
         bulkDetails.getCaseData().getMultipleCollection().add(0, multipleTypeItem);
         bulkCasesPayload.setSubmitEvents(new ArrayList<>(Collections.singleton(submitEvent)));
-        when(ccdClient.retrieveBulkCases("authToken", MANCHESTER_DEV_BULK_CASE_TYPE_ID, bulkDetails.getJurisdiction())).thenReturn(submitBulkEventList);
-        when(ccdClient.retrieveCase("authToken", MANCHESTER_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
-        when(ccdClient.retrieveCase("authToken", MANCHESTER_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), "1234")).thenReturn(submitEvent);
+        when(ccdClient.retrieveBulkCases("authToken", ENGLANDWALES_DEV_BULK_CASE_TYPE_ID, bulkDetails.getJurisdiction())).thenReturn(submitBulkEventList);
+        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
+        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), "1234")).thenReturn(submitEvent);
         assert (bulkUpdateService.bulkUpdateLogic(bulkDetails,
                 "authToken").getBulkDetails() != null);
     }
@@ -203,10 +212,10 @@ public class BulkUpdateServiceTest {
         List<SubmitBulkEvent> submitBulkEventList = new ArrayList<>(Collections.singletonList(submitBulkEvent));
         BulkCasesPayload bulkCasesPayload = new BulkCasesPayload();
         bulkCasesPayload.setSubmitEvents(new ArrayList<>(Collections.singleton(submitEvent)));
-        when(ccdClient.retrieveBulkCases("authToken", MANCHESTER_DEV_BULK_CASE_TYPE_ID, bulkDetails.getJurisdiction())).thenReturn(submitBulkEventList);
-        when(ccdClient.retrieveCase("authToken", MANCHESTER_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
-        when(ccdClient.retrieveCase("authToken", MANCHESTER_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), null)).thenReturn(submitEvent);
-        when(ccdClient.retrieveBulkCasesElasticSearch("authToken", MANCHESTER_DEV_BULK_CASE_TYPE_ID, bulkData.getMultipleReference())).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(ccdClient.retrieveBulkCases("authToken", ENGLANDWALES_DEV_BULK_CASE_TYPE_ID, bulkDetails.getJurisdiction())).thenReturn(submitBulkEventList);
+        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
+        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), null)).thenReturn(submitEvent);
+        when(ccdClient.retrieveBulkCasesElasticSearch("authToken", ENGLANDWALES_DEV_BULK_CASE_TYPE_ID, bulkData.getMultipleReference())).thenThrow(new InternalException(ERROR_MESSAGE));
         bulkUpdateService.bulkUpdateLogic(getBulkDetailsCompleteWithValues(getBulkDetailsWithValues()), "authToken");
     }
 
@@ -217,8 +226,8 @@ public class BulkUpdateServiceTest {
         bulkData.setMultipleReference("1111");
         submitBulkEvent.setCaseData(bulkData);
         List<SubmitBulkEvent> submitBulkEventList = new ArrayList<>(Collections.singletonList(submitBulkEvent));
-        when(ccdClient.retrieveBulkCases("authToken", MANCHESTER_DEV_BULK_CASE_TYPE_ID, bulkDetails.getJurisdiction())).thenReturn(submitBulkEventList);
-        when(ccdClient.retrieveCase("authToken", MANCHESTER_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
+        when(ccdClient.retrieveBulkCases("authToken", ENGLANDWALES_DEV_BULK_CASE_TYPE_ID, bulkDetails.getJurisdiction())).thenReturn(submitBulkEventList);
+        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
         assert(!bulkUpdateService.bulkUpdateLogic(getBulkDetailsWithValues(), "authToken").getErrors().isEmpty());
     }
 
@@ -232,9 +241,9 @@ public class BulkUpdateServiceTest {
         BulkCasesPayload bulkCasesPayload = new BulkCasesPayload();
         bulkCasesPayload.setSubmitEvents(new ArrayList<>(Collections.singleton(submitEvent)));
         when(ccdClient.startEventForCase(anyString(), anyString(), anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
-        when(ccdClient.retrieveBulkCases("authToken", MANCHESTER_DEV_BULK_CASE_TYPE_ID, bulkDetails.getJurisdiction())).thenReturn(submitBulkEventList);
-        when(ccdClient.retrieveCase("authToken", MANCHESTER_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
-        when(ccdClient.retrieveCase("authToken", MANCHESTER_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), null)).thenReturn(submitEvent);
+        when(ccdClient.retrieveBulkCases("authToken", ENGLANDWALES_DEV_BULK_CASE_TYPE_ID, bulkDetails.getJurisdiction())).thenReturn(submitBulkEventList);
+        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
+        when(ccdClient.retrieveCase("authToken", ENGLANDWALES_DEV_CASE_TYPE_ID, bulkDetails.getJurisdiction(), null)).thenReturn(submitEvent);
         assertEquals("[Multiple reference does not exist or it is the same as the current multiple case]", bulkUpdateService.bulkUpdateLogic(getBulkDetailsCompleteWithValues(getBulkDetailsWithValues()),
                 "authToken").getErrors().toString());
     }
@@ -255,27 +264,27 @@ public class BulkUpdateServiceTest {
     private BulkDetails getBulkDetailsWithValues() {
         BulkDetails bulkDetails = new BulkDetails();
         BulkData bulkData = new BulkData();
-        bulkData.setFileLocationV2("Glasgow");
+        bulkData.setFileLocationV2(new DynamicFixedListType("Glasgow"));
         bulkData.setRespondentSurnameV2("Respondent");
         bulkData.setClaimantSurnameV2("Claimant");
         bulkData.setMultipleReferenceV2("1111");
-        bulkData.setClerkResponsibleV2("Juan");
+        bulkData.setClerkResponsibleV2(new DynamicFixedListType("Juan"));
         bulkData.setPositionTypeV2("Awaiting");
         bulkData.setClaimantRepV2("ClaimantRep");
         bulkData.setRespondentRepV2("RespondentRep");
         bulkData.setFlag1Update("Flag1");
         bulkData.setFlag2Update("Flag2");
         bulkData.setEQPUpdate("EQP");
-        bulkData.setFileLocationAberdeen("Aberdeen");
-        bulkData.setFileLocationDundee("Dundee");
-        bulkData.setFileLocationEdinburgh("Edinburgh");
-        bulkData.setFileLocationGlasgow("Glasgow");
+        bulkData.setFileLocationAberdeen(new DynamicFixedListType("Aberdeen"));
+        bulkData.setFileLocationDundee(new DynamicFixedListType("Dundee"));
+        bulkData.setFileLocationEdinburgh(new DynamicFixedListType("Edinburgh"));
+        bulkData.setFileLocationGlasgow(new DynamicFixedListType("Glasgow"));
         bulkData.setJurCodesDynamicList(getJurCodesDynamicList());
         bulkData.setOutcomeUpdate("OutcomeNew");
         bulkData.setManagingOffice(GLASGOW_OFFICE);
         bulkDetails.setCaseData(bulkData);
         bulkDetails.setJurisdiction("TRIBUNALS");
-        bulkDetails.setCaseTypeId(MANCHESTER_DEV_BULK_CASE_TYPE_ID);
+        bulkDetails.setCaseTypeId(ENGLANDWALES_DEV_BULK_CASE_TYPE_ID);
         return bulkDetails;
     }
 

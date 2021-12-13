@@ -20,7 +20,7 @@ public class PersistentQHelperService {
                                            List<String> errors, List<String> ethosCaseRefCollection, String officeCT,
                                            String positionTypeCT, String ccdGatewayBaseUrl,
                                            String reasonForCT, String multipleRef, String confirmation,
-                                           String multipleReferenceLinkMarkUp) {
+                                           String multipleReferenceLinkMarkUp, String scopeOfTransfer) {
 
         String username = userService.getUserDetails(userToken).getEmail();
 
@@ -28,7 +28,7 @@ public class PersistentQHelperService {
                 jurisdiction,
                 username,
                 ethosCaseRefCollection,
-                PersistentQHelper.getCreationSingleDataModel(ccdGatewayBaseUrl, officeCT, positionTypeCT, reasonForCT),
+                PersistentQHelper.getCreationSingleDataModel(ccdGatewayBaseUrl, officeCT, positionTypeCT, reasonForCT, scopeOfTransfer),
                 errors,
                 multipleRef,
                 confirmation,

@@ -15,6 +15,7 @@ import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ecm.common.model.listing.items.ListingTypeItem;
@@ -35,6 +36,8 @@ import java.util.Map;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper.CASES_SEARCHED;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.timetofirsthearing.TimeToFirstHearingReport;
+
+
 
 @RequiredArgsConstructor
 @Slf4j
@@ -198,11 +201,11 @@ public class ListingService {
 
     private CasesAwaitingJudgmentReportData getCasesAwaitingJudgmentReport(
             ListingDetails listingDetails, String authToken) {
-        log.info("Cases Awaiting Judgment for {}", listingDetails.getCaseTypeId());
+        log.info("Cases Awaiting Judgment for {}, Office {}", listingDetails.getCaseTypeId(),
+                listingDetails.getCaseData().getManagingOffice());
         var reportDataSource = new CcdReportDataSource(authToken, ccdClient);
-
         var casesAwaitingJudgmentReport = new CasesAwaitingJudgmentReport(reportDataSource);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails.getCaseTypeId());
+        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         reportData.setDocumentName(listingDetails.getCaseData().getDocumentName());
         reportData.setReportType(listingDetails.getCaseData().getReportType());
         return reportData;
@@ -210,7 +213,7 @@ public class ListingService {
 
     private ListingData getDateRangeReport(ListingDetails listingDetails, String authToken) throws IOException {
         List<SubmitEvent> submitEvents = getDateRangeReportSearch(listingDetails, authToken);
-
+        log.info("Number of cases found: " + submitEvents.size());
         switch (listingDetails.getCaseData().getReportType()) {
             case BROUGHT_FORWARD_REPORT:
                 return ReportHelper.processBroughtForwardDatesRequest(listingDetails, submitEvents);
@@ -230,17 +233,20 @@ public class ListingService {
     private List<SubmitEvent> getDateRangeReportSearch(ListingDetails listingDetails, String authToken)
             throws IOException {
         var listingData = listingDetails.getCaseData();
+        var caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
         boolean isRangeHearingDateType = listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE);
         if (!isRangeHearingDateType) {
             var dateToSearch = LocalDate.parse(listingData.getListingDate(), OLD_DATE_TIME_PATTERN2).toString();
-            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, UtilHelper.getListingCaseTypeId(
-                    listingDetails.getCaseTypeId()), dateToSearch, dateToSearch, listingData.getReportType());
+            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, caseTypeId,
+                    TribunalOffice.valueOfOfficeName(listingData.getManagingOffice())
+                    , dateToSearch, dateToSearch, listingData.getReportType());
         } else {
             var dateToSearchFrom = LocalDate.parse(listingData.getListingDateFrom(),
                     OLD_DATE_TIME_PATTERN2).toString();
             var dateToSearchTo = LocalDate.parse(listingData.getListingDateTo(), OLD_DATE_TIME_PATTERN2).toString();
-            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, UtilHelper.getListingCaseTypeId(
-                    listingDetails.getCaseTypeId()), dateToSearchFrom, dateToSearchTo, listingData.getReportType());
+            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, caseTypeId,
+                    TribunalOffice.valueOfOfficeName(listingData.getManagingOffice())
+                    , dateToSearchFrom, dateToSearchTo, listingData.getReportType());
         }
     }
 
@@ -253,8 +259,8 @@ public class ListingService {
             log.info("VENUE TO SEARCH: " + venueToSearch);
 
             if (ListingHelper.isAllScottishVenues(listingData)) {
-                venueSearched = dateListedTypeItem.getValue().getHearingVenueDay() != null
-                        ? dateListedTypeItem.getValue().getHearingVenueDay()
+                venueSearched = dateListedTypeItem.getValue().hasHearingVenue()
+                        ? dateListedTypeItem.getValue().getHearingVenueDay().getValue().getLabel()
                         : " ";
                 log.info("Checking venue for all scottish level (HearingVenueDay): " + venueSearched);
             } else {

@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.JurCodesTypeItem;
@@ -457,9 +458,8 @@ public class MultipleHelperServiceTest {
 
     @Test
     public void sendCloseToSinglesWithConfirmation() {
-
-        multipleDetails.getCaseData().setClerkResponsible("Clerk");
-        multipleDetails.getCaseData().setFileLocation("FileLocation");
+        multipleDetails.getCaseData().setClerkResponsible(new DynamicFixedListType("Clerk"));
+        multipleDetails.getCaseData().setFileLocation(new DynamicFixedListType("FileLocation"));
         multipleDetails.getCaseData().setNotes("Notes");
 
         multipleHelperService.sendCloseToSinglesWithoutConfirmation(
@@ -470,7 +470,6 @@ public class MultipleHelperServiceTest {
 
         verify(userService).getUserDetails(userToken);
         verifyNoMoreInteractions(userService);
-
     }
 
     @Test

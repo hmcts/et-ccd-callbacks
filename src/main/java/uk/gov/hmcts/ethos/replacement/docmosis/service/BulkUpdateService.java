@@ -1,6 +1,38 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.bulk.BulkData;
+import uk.gov.hmcts.ecm.common.model.bulk.BulkDetails;
+import uk.gov.hmcts.ecm.common.model.bulk.MultRefComplexType;
+import uk.gov.hmcts.ecm.common.model.bulk.SubmitBulkEvent;
+import uk.gov.hmcts.ecm.common.model.bulk.SubmitBulkEventSubmitEventType;
+import uk.gov.hmcts.ecm.common.model.bulk.items.CaseIdTypeItem;
+import uk.gov.hmcts.ecm.common.model.bulk.items.MultipleTypeItem;
+import uk.gov.hmcts.ecm.common.model.bulk.items.SearchTypeItem;
+import uk.gov.hmcts.ecm.common.model.bulk.types.CaseType;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ecm.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.ecm.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.ecm.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ecm.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ecm.common.model.helper.BulkRequestPayload;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PersistentQHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
+import uk.gov.hmcts.ethos.replacement.docmosis.tasks.BulkPreAcceptTask;
+import uk.gov.hmcts.ethos.replacement.docmosis.tasks.BulkUpdateBulkTask;
+import uk.gov.hmcts.ethos.replacement.docmosis.tasks.BulkUpdateTask;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+import org.springframework.beans.factory.annotation.Value;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
@@ -11,34 +43,15 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.bulk.*;
-import uk.gov.hmcts.ecm.common.model.bulk.items.CaseIdTypeItem;
-import uk.gov.hmcts.ecm.common.model.bulk.items.MultipleTypeItem;
-import uk.gov.hmcts.ecm.common.model.bulk.items.SearchTypeItem;
-import uk.gov.hmcts.ecm.common.model.bulk.types.CaseType;
-import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.ecm.common.model.ccd.items.JurCodesTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.items.RepresentedTypeRItem;
-import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.types.RepresentedTypeC;
-import uk.gov.hmcts.ecm.common.model.ccd.types.RepresentedTypeR;
-import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ecm.common.model.helper.BulkRequestPayload;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PersistentQHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
-import uk.gov.hmcts.ethos.replacement.docmosis.tasks.BulkPreAcceptTask;
-import uk.gov.hmcts.ethos.replacement.docmosis.tasks.BulkUpdateBulkTask;
-import uk.gov.hmcts.ethos.replacement.docmosis.tasks.BulkUpdateTask;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
-import org.springframework.beans.factory.annotation.Value;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_SELECT_ALL_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NUMBER_THREADS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @Service("bulkUpdateService")
@@ -77,7 +90,7 @@ public class BulkUpdateService {
             // 2) Check if new multiple reference exists or it has the same as the current bulk
             if (!isNullOrEmpty(multipleReferenceV2) && (!multRefComplexType.isExist()
                     || multipleReferenceV2.equals(bulkDetails.getCaseData().getMultipleReference()))) {
-                    errors.add("Multiple reference does not exist or it is the same as the current multiple case");
+                errors.add("Multiple reference does not exist or it is the same as the current multiple case");
             }
             if (errors.isEmpty()) {
                 // 3) Update fields to the searched cases
@@ -311,28 +324,28 @@ public class BulkUpdateService {
                 submitEvent.getCaseData().setJurCodesCollection(jurCodesTypeItems);
             }
 
-            String fileLocationNewValue = bulkData.getFileLocationV2();
-            if (!isNullOrEmpty(fileLocationNewValue)) {
+            DynamicFixedListType fileLocationNewValue = bulkData.getFileLocationV2();
+            if (fileLocationNewValue != null && fileLocationNewValue.getValue() != null) {
                 updated = true;
                 submitEvent.getCaseData().setFileLocation(fileLocationNewValue);
             }
-            String fileLocationGlasgowNewValue = bulkData.getFileLocationGlasgow();
-            if (!isNullOrEmpty(fileLocationGlasgowNewValue)) {
+            DynamicFixedListType fileLocationGlasgowNewValue = bulkData.getFileLocationGlasgow();
+            if (fileLocationGlasgowNewValue != null && fileLocationGlasgowNewValue.getValue() != null) {
                 updated = true;
                 submitEvent.getCaseData().setFileLocationGlasgow(fileLocationGlasgowNewValue);
             }
-            String fileLocationAberdeenNewValue = bulkData.getFileLocationAberdeen();
-            if (!isNullOrEmpty(fileLocationAberdeenNewValue)) {
+            DynamicFixedListType fileLocationAberdeenNewValue = bulkData.getFileLocationAberdeen();
+            if (fileLocationAberdeenNewValue != null && fileLocationAberdeenNewValue.getValue() != null) {
                 updated = true;
                 submitEvent.getCaseData().setFileLocationAberdeen(fileLocationAberdeenNewValue);
             }
-            String fileLocationDundeeNewValue = bulkData.getFileLocationDundee();
-            if (!isNullOrEmpty(fileLocationDundeeNewValue)) {
+            DynamicFixedListType fileLocationDundeeNewValue = bulkData.getFileLocationDundee();
+            if (fileLocationDundeeNewValue != null && fileLocationDundeeNewValue.getValue() != null) {
                 updated = true;
                 submitEvent.getCaseData().setFileLocationDundee(fileLocationDundeeNewValue);
             }
-            String fileLocationEdinburghNewValue = bulkData.getFileLocationEdinburgh();
-            if (!isNullOrEmpty(fileLocationEdinburghNewValue)) {
+            DynamicFixedListType fileLocationEdinburghNewValue = bulkData.getFileLocationEdinburgh();
+            if (fileLocationEdinburghNewValue != null && fileLocationEdinburghNewValue.getValue() != null) {
                 updated = true;
                 submitEvent.getCaseData().setFileLocationEdinburgh(fileLocationEdinburghNewValue);
             }
@@ -390,10 +403,9 @@ public class BulkUpdateService {
                 multipleReferenceUpdated = true;
                 submitEvent.getCaseData().setMultipleReference(multipleRefNewValue);
             }
-            String clerkNewValue = bulkData.getClerkResponsibleV2();
-            if (!isNullOrEmpty(clerkNewValue)) {
+            if (bulkData.getClerkResponsibleV2() != null && bulkData.getClerkResponsibleV2().getValue() != null) {
                 updated = true;
-                submitEvent.getCaseData().setClerkResponsible(clerkNewValue);
+                submitEvent.getCaseData().setClerkResponsible(bulkData.getClerkResponsibleV2());
             }
             String positionTypeNewValue = bulkData.getPositionTypeV2();
             if (!isNullOrEmpty(positionTypeNewValue)) {

@@ -2,6 +2,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment;
 
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.ecm.common.model.listing.ListingData;
+import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
 
 import java.time.Clock;
@@ -25,8 +29,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_WITH
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_COSTS_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_MEDIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEWCASTLE_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEWCASTLE_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 
 public class CasesAwaitingJudgmentReportTest {
 
@@ -48,7 +52,7 @@ public class CasesAwaitingJudgmentReportTest {
         submitEvents.clear();
 
         reportDataSource = mock(ReportDataSource.class);
-        when(reportDataSource.getData(NEWCASTLE_CASE_TYPE_ID)).thenReturn(submitEvents);
+        when(reportDataSource.getData(ENGLANDWALES_CASE_TYPE_ID, TribunalOffice.LEEDS.getOfficeName())).thenReturn(submitEvents);
 
         var now = "2021-07-31T10:00:00.Z";
         var clock = Clock.fixed(Instant.parse(now), ZoneId.of("UTC"));
@@ -63,8 +67,12 @@ public class CasesAwaitingJudgmentReportTest {
         // Then the case should not be in the report data
 
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent(CLOSED_STATE));
-
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var listingDetails = new ListingDetails();
+        var caseData = new ListingData();
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingDetails.setCaseData(caseData);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -86,8 +94,12 @@ public class CasesAwaitingJudgmentReportTest {
             submitEvents.add(caseDataBuilder
                     .withPositionType(invalidPositionType)
                     .buildAsSubmitEvent(ACCEPTED_STATE));
-
-            var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+            var listingDetails = new ListingDetails();
+            var caseData = new ListingData();
+            caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+            listingDetails.setCaseData(caseData);
+            listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+            var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
             assertCommonValues(reportData);
             assertTrue(reportData.getReportDetails().isEmpty());
         }
@@ -104,8 +116,12 @@ public class CasesAwaitingJudgmentReportTest {
         submitEvents.add(caseDataBuilder
                 .withPositionType(validPositionType)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
-
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var listingDetails = new ListingDetails();
+        var caseData = new ListingData();
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingDetails.setCaseData(caseData);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -122,8 +138,12 @@ public class CasesAwaitingJudgmentReportTest {
                 .withPositionType(validPositionType)
                 .withHearing(LISTING_DATE, HEARING_STATUS_LISTED)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
-
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var listingDetails = new ListingDetails();
+        var caseData = new ListingData();
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingDetails.setCaseData(caseData);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -142,8 +162,12 @@ public class CasesAwaitingJudgmentReportTest {
                 .withHearing(LISTING_DATE, HEARING_STATUS_HEARD)
                 .withJudgment()
                 .buildAsSubmitEvent(ACCEPTED_STATE));
-
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var listingDetails = new ListingDetails();
+        var caseData = new ListingData();
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingDetails.setCaseData(caseData);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -160,8 +184,12 @@ public class CasesAwaitingJudgmentReportTest {
                 .withPositionType(validPositionType)
                 .withHearing(LISTING_DATE, HEARING_STATUS_HEARD)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
-
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var listingDetails = new ListingDetails();
+        var caseData = new ListingData();
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingDetails.setCaseData(caseData);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
     }
@@ -175,8 +203,12 @@ public class CasesAwaitingJudgmentReportTest {
         submitEvents.add(createValidSubmitEvent(positionType));
         submitEvents.add(createValidSubmitEvent(positionType));
         submitEvents.add(createValidSubmitEvent(positionType));
-
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var listingDetails = new ListingDetails();
+        var caseData = new ListingData();
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingDetails.setCaseData(caseData);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals(3, reportData.getReportDetails().size());
         assertEquals(1, reportData.getReportSummary().getPositionTypes().size());
@@ -204,8 +236,12 @@ public class CasesAwaitingJudgmentReportTest {
         submitEvents.add(createValidSubmitEvent(positionType1));
         submitEvents.add(createValidSubmitEvent(positionType3));
         submitEvents.add(createValidSubmitEvent(positionType2));
-
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var listingDetails = new ListingDetails();
+        var caseData = new ListingData();
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingDetails.setCaseData(caseData);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals(6, reportData.getReportDetails().size());
         assertEquals(3, reportData.getReportSummary().getPositionTypes().size());
@@ -246,8 +282,12 @@ public class CasesAwaitingJudgmentReportTest {
                 .withConciliationTrack(conciliationTrack)
                 .withHearing(listedDate, HEARING_STATUS_HEARD, hearingNumber, hearingType, judge)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
-
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var listingDetails = new ListingDetails();
+        var caseData = new ListingData();
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingDetails.setCaseData(caseData);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
 
@@ -283,8 +323,12 @@ public class CasesAwaitingJudgmentReportTest {
                 .withMultipleCaseType(multipleReference)
                 .withHearing(listedDate, HEARING_STATUS_HEARD)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
-
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var listingDetails = new ListingDetails();
+        var caseData = new ListingData();
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingDetails.setCaseData(caseData);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
 
@@ -318,8 +362,12 @@ public class CasesAwaitingJudgmentReportTest {
                 .withHearing("2021-07-05T10:00:00.000", HEARING_STATUS_HEARD, "3", HEARING_TYPE_JUDICIAL_MEDIATION, judge)
                 .withHearing("2021-07-06T10:00:00.000", HEARING_STATUS_WITHDRAWN, "4", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
                 .buildAsSubmitEvent(ACCEPTED_STATE));
-
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var listingDetails = new ListingDetails();
+        var caseData = new ListingData();
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingDetails.setCaseData(caseData);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
 
@@ -380,8 +428,12 @@ public class CasesAwaitingJudgmentReportTest {
                 .withHearing("2021-07-01T10:00:00.000", HEARING_STATUS_HEARD, "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         caseDataBuilder = new CaseDataBuilder();
-
-        var reportData = casesAwaitingJudgmentReport.runReport(NEWCASTLE_LISTING_CASE_TYPE_ID);
+        var listingDetails = new ListingDetails();
+        var caseData = new ListingData();
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingDetails.setCaseData(caseData);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals(4, reportData.getReportDetails().size());
 
@@ -400,6 +452,6 @@ public class CasesAwaitingJudgmentReportTest {
 
     private void assertCommonValues(CasesAwaitingJudgmentReportData reportData) {
         assertNotNull(reportData);
-        assertEquals("Newcastle", reportData.getReportSummary().getOffice());
+        assertEquals(TribunalOffice.LEEDS.getOfficeName(), reportData.getReportSummary().getOffice());
     }
 }

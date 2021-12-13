@@ -16,9 +16,9 @@ public class CcdReportDataSource implements ReportDataSource {
     private final CcdClient ccdClient;
 
     @Override
-    public List<CasesAwaitingJudgmentSubmitEvent> getData(String caseTypeId) {
+    public List<CasesAwaitingJudgmentSubmitEvent> getData(String caseTypeId, String owningOffice) {
         try {
-            var query = ElasticSearchQuery.create();
+            var query = ElasticSearchQuery.create(owningOffice);
             return ccdClient.casesAwaitingJudgmentSearch(authToken, caseTypeId, query);
         } catch (Exception e) {
             throw new ReportException(String.format(

@@ -1,11 +1,16 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.types.*;
+import uk.gov.hmcts.ecm.common.model.ccd.types.JudgementType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.JurCodesType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ecm.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.UpdateDataModel;
 
@@ -21,12 +26,17 @@ public class UpdateDataModelBuilder {
     public static UpdateDataModel build(MultipleData multipleData, CaseData caseData) {
         return UpdateDataModel.builder()
                 .managingOffice(multipleData.getManagingOffice())
-                .fileLocation(multipleData.getFileLocation())
-                .fileLocationGlasgow(multipleData.getFileLocationGlasgow())
-                .fileLocationAberdeen(multipleData.getFileLocationAberdeen())
-                .fileLocationDundee(multipleData.getFileLocationDundee())
-                .fileLocationEdinburgh(multipleData.getFileLocationEdinburgh())
-                .clerkResponsible(multipleData.getClerkResponsible())
+                .fileLocation(DynamicFixedListType.getSelectedValue(multipleData.getFileLocation()).orElse(null))
+                .fileLocationGlasgow(DynamicFixedListType.getSelectedValue(
+                        multipleData.getFileLocationGlasgow()).orElse(null))
+                .fileLocationAberdeen(DynamicFixedListType.getSelectedValue(
+                        multipleData.getFileLocationAberdeen()).orElse(null))
+                .fileLocationDundee(DynamicFixedListType.getSelectedValue(
+                        multipleData.getFileLocationDundee()).orElse(null))
+                .fileLocationEdinburgh(DynamicFixedListType.getSelectedValue(
+                        multipleData.getFileLocationEdinburgh()).orElse(null))
+                .clerkResponsible(DynamicFixedListType.getSelectedValue(
+                        multipleData.getClerkResponsible()).orElse(null))
                 .positionType(multipleData.getPositionType())
                 .receiptDate(multipleData.getReceiptDate())
                 .hearingStage(multipleData.getHearingStage())

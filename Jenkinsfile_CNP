@@ -12,6 +12,7 @@ def branchesToSync = ['demo', 'perftest']
 withPipeline(type, product, component) {
   env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
   enableAksStagingDeployment()
+  enableDbMigration(component)
   onMaster {
     disableLegacyDeployment()
   }

@@ -45,48 +45,6 @@ public class CaseTransferService {
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
 
-    private CaseData getOriginalCase(CaseDetails caseDetails, String userToken) {
-        try {
-            var caseData = caseDetails.getCaseData();
-            if (!Strings.isNullOrEmpty(caseData.getCounterClaim())) {
-                List<SubmitEvent> submitEvents =  ccdClient.retrieveCasesElasticSearch(userToken,
-                        caseDetails.getCaseTypeId(), Collections.singletonList(caseData.getCounterClaim()));
-                return submitEvents.get(0).getCaseData();
-            } else {
-                return caseDetails.getCaseData();
-            }
-
-        } catch (Exception ex) {
-            throw new CaseCreationException("Error getting original case number: "
-                    + caseDetails.getCaseData().getEthosCaseReference() + " " + ex.getMessage());
-        }
-    }
-
-    private List<CaseData> getAllCasesToBeTransferred(CaseDetails caseDetails, String userToken) {
-        try {
-            var originalCaseData = getOriginalCase(caseDetails, userToken);
-            List<CaseData> cases = new ArrayList<>();
-            String counterClaim;
-            cases.add(originalCaseData);
-            if (originalCaseData.getEccCases() != null && !originalCaseData.getEccCases().isEmpty()) {
-
-                for (EccCounterClaimTypeItem counterClaimItem:originalCaseData.getEccCases()) {
-                    counterClaim =  counterClaimItem.getValue().getCounterClaim();
-                    List<SubmitEvent>   submitEvents = ccdClient.retrieveCasesElasticSearch(userToken,
-                            caseDetails.getCaseTypeId(), new ArrayList<>(Collections.singleton(counterClaim)));
-                    if (submitEvents != null && !submitEvents.isEmpty()) {
-                        cases.add(submitEvents.get(0).getCaseData());
-                    }
-                }
-            }
-
-            return cases;
-        } catch (Exception ex) {
-            throw new CaseCreationException("Error getting all cases to be transferred for case number: "
-                    + caseDetails.getCaseData().getEthosCaseReference() + " " + ex.getMessage());
-        }
-    }
-
     public void createCaseTransferEvent(CaseData caseData, List<String> errors, String userToken, int caseListSize) {
         caseData.setManagingOffice(officeCT);
         boolean interCountryCaseTransfer = interCountryCaseTransfer();
@@ -155,6 +113,48 @@ public class CaseTransferService {
 
         for (CaseData caseData : caseDataList) {
             createCaseTransferEvent(caseData, errors, userToken, caseDataList.size());
+        }
+    }
+
+    private CaseData getOriginalCase(CaseDetails caseDetails, String userToken) {
+        try {
+            var caseData = caseDetails.getCaseData();
+            if (!Strings.isNullOrEmpty(caseData.getCounterClaim())) {
+                List<SubmitEvent> submitEvents =  ccdClient.retrieveCasesElasticSearch(userToken,
+                        caseDetails.getCaseTypeId(), Collections.singletonList(caseData.getCounterClaim()));
+                return submitEvents.get(0).getCaseData();
+            } else {
+                return caseDetails.getCaseData();
+            }
+
+        } catch (Exception ex) {
+            throw new CaseCreationException("Error getting original case number: "
+                    + caseDetails.getCaseData().getEthosCaseReference() + " " + ex.getMessage());
+        }
+    }
+
+    private List<CaseData> getAllCasesToBeTransferred(CaseDetails caseDetails, String userToken) {
+        try {
+            var originalCaseData = getOriginalCase(caseDetails, userToken);
+            List<CaseData> cases = new ArrayList<>();
+            String counterClaim;
+            cases.add(originalCaseData);
+            if (originalCaseData.getEccCases() != null && !originalCaseData.getEccCases().isEmpty()) {
+
+                for (EccCounterClaimTypeItem counterClaimItem:originalCaseData.getEccCases()) {
+                    counterClaim =  counterClaimItem.getValue().getCounterClaim();
+                    List<SubmitEvent>   submitEvents = ccdClient.retrieveCasesElasticSearch(userToken,
+                            caseDetails.getCaseTypeId(), new ArrayList<>(Collections.singleton(counterClaim)));
+                    if (submitEvents != null && !submitEvents.isEmpty()) {
+                        cases.add(submitEvents.get(0).getCaseData());
+                    }
+                }
+            }
+
+            return cases;
+        } catch (Exception ex) {
+            throw new CaseCreationException("Error getting all cases to be transferred for case number: "
+                    + caseDetails.getCaseData().getEthosCaseReference() + " " + ex.getMessage());
         }
     }
 

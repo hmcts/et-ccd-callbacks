@@ -1,13 +1,15 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
@@ -26,12 +28,14 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -85,6 +89,59 @@ public class CaseTransferServiceTest {
         assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
     }
 
+    @Test(expected = CaseCreationException.class)
+    public void testCreateCaseTransferOriginalCaseException() throws IOException {
+        when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), anyList())).thenThrow(new IOException());
+        var caseData = new CaseData();
+        caseData.setCounterClaim("1000/2021");
+        caseData.setOfficeCT(DynamicFixedListType.of(DynamicValueType.create("Test Office", "Test Office")));
+        var caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseData(caseData);
+        List<String> errors = new ArrayList<>();
+
+        caseTransferService.createCaseTransfer(caseDetails, errors, authToken);
+
+        fail("CaseCreationException expected to be thrown by createCaseTransfer");
+    }
+
+    @Test(expected = CaseCreationException.class)
+    public void testCreateCaseTransferAllCasesToBeTransferredException() throws IOException {
+        var eccCaseData = new CaseData();
+        var eccCounterClaimTypeItem = new EccCounterClaimTypeItem();
+        var eccCounterClaimType = new EccCounterClaimType();
+        eccCounterClaimType.setCounterClaim("counter-claim");
+        eccCounterClaimTypeItem.setValue(eccCounterClaimType);
+        eccCaseData.setEccCases(List.of(eccCounterClaimTypeItem));
+        var submitEvent = new SubmitEvent();
+        submitEvent.setCaseData(eccCaseData);
+
+        var submitEvents = List.of(submitEvent);
+        when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), anyList())).thenAnswer(new Answer<>() {
+            int count = 0;
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                if (count == 0) {
+                    count++;
+                    return submitEvents;
+                } else {
+                    throw new IOException();
+                }
+            }
+        });
+        var caseData = new CaseData();
+        caseData.setCounterClaim("1000/2021");
+        caseData.setOfficeCT(DynamicFixedListType.of(DynamicValueType.create("Test Office", "Test Office")));
+        var caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseData(caseData);
+        List<String> errors = new ArrayList<>();
+
+        caseTransferService.createCaseTransfer(caseDetails, errors, authToken);
+
+        fail("CaseCreationException expected to be thrown by createCaseTransfer");
+    }
+
     @Test
     public void InterCountryCaseTransfer() {
         List<String> errors = new ArrayList<>();
@@ -126,10 +183,10 @@ public class CaseTransferServiceTest {
         type.setCounterClaim("2123456/2020");
         item.setId(UUID.randomUUID().toString());
         item.setValue(type);
-        caseData.setEccCases(Arrays.asList(item));
+        caseData.setEccCases(List.of(item));
         submitEvent1.setCaseData(caseData);
-        when(ccdClient.retrieveCasesElasticSearch(authToken,ccdRequest.getCaseDetails().getCaseTypeId(), Arrays.asList("3434232323"))).thenReturn(submitEventList1);
-        when(ccdClient.retrieveCasesElasticSearch(authToken,ccdRequest.getCaseDetails().getCaseTypeId(), Arrays.asList("2123456/2020"))).thenReturn(submitEventList);
+        when(ccdClient.retrieveCasesElasticSearch(authToken,ccdRequest.getCaseDetails().getCaseTypeId(), List.of("3434232323"))).thenReturn(submitEventList1);
+        when(ccdClient.retrieveCasesElasticSearch(authToken,ccdRequest.getCaseDetails().getCaseTypeId(), List.of("2123456/2020"))).thenReturn(submitEventList);
         when(ccdClient.startEventForCase(authToken, "Manchester", "Employment", "12345")).thenReturn(ccdRequest);
         caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
         assertEquals("PositionTypeCT", submitEvent.getCaseData().getPositionType());

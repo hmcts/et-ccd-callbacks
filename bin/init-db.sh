@@ -4,7 +4,7 @@
 set -e
 
 if [ -z "$DB_URL" ] || [ -z "$ET_COS_DB_PASSWORD" ]; then
-  echo "ERROR: Missing environment variables. Set value for 'DB_URL' and 'ET_COS_HANDLER_DB_PASSWORD'."
+  echo "ERROR: Missing environment variables. Set value for 'DB_URL' and 'ET_COS_DB_PASSWORD'."
   exit 1
 fi
 

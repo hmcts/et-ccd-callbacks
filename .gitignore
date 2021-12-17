@@ -34,3 +34,10 @@ example.docx
 document.docx
 target
 
+functional-output/
+package-lock.json
+yarn.lock
+yarn-error.log
+*.log
+yarn-error.log*
+

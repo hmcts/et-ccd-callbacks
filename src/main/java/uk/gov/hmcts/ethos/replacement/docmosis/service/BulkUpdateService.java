@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
@@ -25,13 +26,32 @@ import uk.gov.hmcts.ecm.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ecm.common.model.helper.BulkRequestPayload;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PersistentQHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 import uk.gov.hmcts.ethos.replacement.docmosis.tasks.BulkPreAcceptTask;
 import uk.gov.hmcts.ethos.replacement.docmosis.tasks.BulkUpdateBulkTask;
 import uk.gov.hmcts.ethos.replacement.docmosis.tasks.BulkUpdateTask;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
-import org.springframework.beans.factory.annotation.Value;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_SELECT_ALL_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NUMBER_THREADS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 import java.io.IOException;
 import java.time.Duration;

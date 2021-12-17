@@ -1,13 +1,13 @@
 'use strict';
+const testConfig = require('../../../config');
+const commonConfig = require('../../data/commonConfig.json');
 
-const commonConfig = require('src/test/end-to-end/pages/common/commonConfig');
-
-module.exports = function (nextStep) {
+module.exports = async function (nextStep, webDriverWait) {
 
     const I = this;
 
-    I.selectOption('#next-step', nextStep);
-    I.wait(1);
-    I.waitForNavigationToComplete(commonConfig.goButton);
-
+    await I.waitForEnabled({css: '#next-step'}, testConfig.TestTimeToWaitForText || 60);
+    await I.retry(5).selectOption('#next-step', nextStep);
+    await I.waitForEnabled(commonConfig.goButton, testConfig.TestTimeToWaitForText || 60);
+    await I.waitForNavigationToComplete(commonConfig.goButton, webDriverWait);
 };

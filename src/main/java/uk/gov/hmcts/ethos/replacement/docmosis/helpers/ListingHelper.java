@@ -37,11 +37,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_AWAITING_JUDGMENT_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_COMPLETED_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_SOURCE_LOCAL_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FILE_EXTENSION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_BY_HEARING_TYPE_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_IT56;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_IT57;
@@ -68,21 +71,26 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.PUBLIC_CASE_CAUSE_L
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RULE_50_APPLIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SERVING_CLAIMS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.STAFF_CASE_CAUSE_LIST_ROOM_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.STAFF_CASE_CAUSE_LIST_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TIME_TO_FIRST_HEARING_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleHelper.NOT_ALLOCATED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
 
 @Slf4j
 public class ListingHelper {
 
     private static final String ROOM_NOT_ALLOCATED = "* Not Allocated";
+    private static final String NO_DOCUMENT_FOUND = "No document found";
     private static final int NUMBER_CHAR_PARSING_DATE = 20;
-
+    private static final String LISTING_NEWLINE = "\"listing\":[\n";
     static final List<String> REPORTS = Arrays.asList(BROUGHT_FORWARD_REPORT, CLAIMS_ACCEPTED_REPORT,
-        LIVE_CASELOAD_REPORT, CASES_COMPLETED_REPORT, CASES_AWAITING_JUDGMENT_REPORT, TIME_TO_FIRST_HEARING_REPORT);
+        LIVE_CASELOAD_REPORT, CASES_COMPLETED_REPORT, CASES_AWAITING_JUDGMENT_REPORT, TIME_TO_FIRST_HEARING_REPORT,
+        SERVING_CLAIMS_REPORT, CASE_SOURCE_LOCAL_REPORT, HEARINGS_TO_JUDGEMENTS_REPORT,
+            HEARINGS_BY_HEARING_TYPE_REPORT, NO_CHANGE_IN_CURRENT_POSITION_REPORT);
 
     private ListingHelper() {
     }
@@ -99,9 +107,10 @@ public class ListingHelper {
             listingType.setCauseListDate(!isNullOrEmpty(listedDate) ? UtilHelper.formatLocalDate(listedDate) : " ");
             listingType.setCauseListTime(!isNullOrEmpty(listedDate) ? UtilHelper.formatLocalTime(listedDate) : " ");
             log.info("getJurCodesCollection");
-            listingType.setJurisdictionCodesList(BulkHelper.getJurCodesCollection(caseData.getJurCodesCollection()));
-            listingType
-                    .setHearingType(!isNullOrEmpty(hearingType.getHearingType()) ? hearingType.getHearingType() : " ");
+            listingType.setJurisdictionCodesList(BulkHelper.getJurCodesCollectionWithHide(
+                    caseData.getJurCodesCollection()));
+            listingType.setHearingType(!isNullOrEmpty(
+                    hearingType.getHearingType()) ? hearingType.getHearingType() : " ");
             listingType.setPositionType(!isNullOrEmpty(caseData.getPositionType()) ? caseData.getPositionType() : " ");
 
             if (hearingType.hasHearingJudge()) {
@@ -361,7 +370,7 @@ public class ListingHelper {
                 .stream()
                 .filter(listingTypeItem -> !isEmptyHearingDate(listingTypeItem.getValue()))
                 .collect(Collectors.groupingBy(listingTypeItem -> listingTypeItem.getValue().getCauseListDate(),
-                () -> new TreeMap<>(getDateComparator()), Collectors.toList()));
+                    () -> new TreeMap<>(getDateComparator()), Collectors.toList()));
     }
 
     private static Iterator<Map.Entry<String, List<ListingTypeItem>>> getEntriesByDate(StringBuilder sb,
@@ -378,7 +387,7 @@ public class ListingHelper {
             Map.Entry<String, List<ListingTypeItem>> listingEntry = entries.next();
             sb.append("{\"date\":\"").append(listingEntry.getKey()).append(NEW_LINE);
             sb.append("\"case_total\":\"").append(listingEntry.getValue().size()).append(NEW_LINE);
-            sb.append("\"listing\":[\n");
+            sb.append(LISTING_NEWLINE);
             for (var i = 0; i < listingEntry.getValue().size(); i++) {
                 sb.append(getListingTypeRow(listingEntry.getValue().get(i).getValue(), caseType, listingData));
                 if (i != listingEntry.getValue().size() - 1) {
@@ -413,8 +422,11 @@ public class ListingHelper {
 
     public static StringBuilder getListingDate(ListingData listingData) {
         var sb = new StringBuilder();
-        if (listingData.getHearingDateType() != null
-                && listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE)) {
+        if (RANGE_HEARING_DATE_TYPE.equals(listingData.getHearingDateType())
+                && SERVING_CLAIMS_REPORT.equals(listingData.getReportType())) {
+            return getServedClaimsReportPeriod(listingData);
+
+        } else if (RANGE_HEARING_DATE_TYPE.equals(listingData.getHearingDateType())) {
             sb.append("\"Listed_date_from\":\"")
                     .append(UtilHelper.listingFormatLocalDate(listingData.getListingDateFrom())).append(NEW_LINE);
             sb.append("\"Listed_date_to\":\"")
@@ -426,6 +438,22 @@ public class ListingHelper {
         return sb;
     }
 
+    private static StringBuilder getServedClaimsReportPeriod(ListingData listingData) {
+        String listedDate;
+        var sb = new StringBuilder();
+
+        if (listingData.getListingDateFrom() != null && listingData.getListingDateTo() != null) {
+            listedDate = " Between " + UtilHelper.listingFormatLocalDate(listingData.getListingDateFrom())
+                    + " and " + UtilHelper.listingFormatLocalDate(listingData.getListingDateTo());
+        } else {
+            listedDate = " On " + UtilHelper.listingFormatLocalDate(listingData.getListingDate());
+        }
+
+        sb.append("\"Listed_date\":\"").append(listedDate).append(NEW_LINE);
+
+        return sb;
+    }
+
     private static boolean isEmptyHearingRoom(ListingType listingType) {
         if (listingType.getHearingRoom() != null) {
             return listingType.getHearingRoom().trim().isEmpty();
@@ -433,13 +461,13 @@ public class ListingHelper {
         return true;
     }
 
-    private static TreeMap<String, List<ListingTypeItem>> getListHearingsByRoomWithNotAllocated (
+    private static TreeMap<String, List<ListingTypeItem>> getListHearingsByRoomWithNotAllocated(
             List<ListingTypeItem> listingSubCollection) {
         TreeMap<String, List<ListingTypeItem>> sortedMap = listingSubCollection
                 .stream()
                 .filter(listingTypeItem -> !isEmptyHearingRoom(listingTypeItem.getValue()))
                 .collect(Collectors.groupingBy(listingTypeItem -> listingTypeItem.getValue().getHearingRoom(),
-                        () -> new TreeMap<>(getVenueComparator()), Collectors.toList()));
+                    () -> new TreeMap<>(getVenueComparator()), Collectors.toList()));
         List<ListingTypeItem> notAllocated = listingSubCollection
                 .stream()
                 .filter(listingTypeItem -> isEmptyHearingRoom(listingTypeItem.getValue()))
@@ -464,7 +492,7 @@ public class ListingHelper {
                 .stream()
                 .filter(listingTypeItem -> !isEmptyHearingVenue(listingTypeItem.getValue()))
                 .collect(Collectors.groupingBy(listingTypeItem -> listingTypeItem.getValue().getCauseListVenue(),
-                 () -> new TreeMap<>(getVenueComparator()), Collectors.toList()));
+                    () -> new TreeMap<>(getVenueComparator()), Collectors.toList()));
         List<ListingTypeItem> notAllocated = listingData.getListingCollection()
                 .stream()
                 .filter(listingTypeItem -> isEmptyHearingVenue(listingTypeItem.getValue()))
@@ -488,7 +516,7 @@ public class ListingHelper {
             Map.Entry<String, List<ListingTypeItem>> listingEntry = entries.next();
             String hearingRoomOrVenue = byRoom ? "Hearing_room" : "Hearing_venue";
             sb.append("{\"").append(hearingRoomOrVenue).append("\":\"").append(listingEntry.getKey()).append(NEW_LINE);
-            sb.append("\"listing\":[\n");
+            sb.append(LISTING_NEWLINE);
             for (var i = 0; i < listingEntry.getValue().size(); i++) {
                 sb.append(getListingTypeRow(listingEntry.getValue().get(i).getValue(), caseType, listingData));
                 if (i != listingEntry.getValue().size() - 1) {
@@ -508,7 +536,7 @@ public class ListingHelper {
     private static StringBuilder getCaseCauseList(ListingData listingData, String caseType) {
         List<ListingTypeItem> listingTypeItems = listingData.getListingCollection();
         var sb = new StringBuilder();
-        sb.append("\"listing\":[\n");
+        sb.append(LISTING_NEWLINE);
         for (var i = 0; i < listingTypeItems.size(); i++) {
             sb.append(getListingTypeRow(listingTypeItems.get(i).getValue(), caseType, listingData));
             if (i != listingTypeItems.size() - 1) {
@@ -605,56 +633,12 @@ public class ListingHelper {
     }
 
     public static String getListingDocName(ListingData listingData) {
-        String roomOrNoRoom = !isNullOrEmpty(listingData.getRoomOrNoRoom()) ? listingData.getRoomOrNoRoom() : "";
         if (listingData.getHearingDocType() != null) {
-            if (listingData.getHearingDocType().equals(HEARING_DOC_ETCL)
-                    && listingData.getHearingDocETCL().equals(HEARING_ETCL_STAFF)
-                    && roomOrNoRoom.equals(NO)) {
-                return STAFF_CASE_CAUSE_LIST_TEMPLATE;
-            } else if (listingData.getHearingDocType().equals(HEARING_DOC_ETCL)
-                    && listingData.getHearingDocETCL().equals(HEARING_ETCL_STAFF)
-                    && roomOrNoRoom.equals(YES)) {
-                return STAFF_CASE_CAUSE_LIST_ROOM_TEMPLATE;
-            } else if (listingData.getHearingDocType().equals(HEARING_DOC_ETCL)
-                    && listingData.getHearingDocETCL().equals(HEARING_ETCL_PUBLIC)
-                    && roomOrNoRoom.equals(NO)) {
-                return PUBLIC_CASE_CAUSE_LIST_TEMPLATE;
-            } else if (listingData.getHearingDocType().equals(HEARING_DOC_ETCL)
-                    && listingData.getHearingDocETCL().equals(HEARING_ETCL_PUBLIC)
-                    && roomOrNoRoom.equals(YES)) {
-                return PUBLIC_CASE_CAUSE_LIST_ROOM_TEMPLATE;
-            } else if (listingData.getHearingDocType().equals(HEARING_DOC_ETCL)
-                    && listingData.getHearingDocETCL().equals(HEARING_ETCL_PRESS_LIST)
-                    && listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE)) {
-                return PRESS_LIST_CAUSE_LIST_RANGE_TEMPLATE;
-            } else if (listingData.getHearingDocType().equals(HEARING_DOC_ETCL)
-                    && listingData.getHearingDocETCL().equals(HEARING_ETCL_PRESS_LIST)
-                    && !listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE)) {
-                return PRESS_LIST_CAUSE_LIST_SINGLE_TEMPLATE;
-            } else if (listingData.getHearingDocType().equals(HEARING_DOC_IT56)) {
-                return IT56_TEMPLATE;
-            } else if (listingData.getHearingDocType().equals(HEARING_DOC_IT57)) {
-                return IT57_TEMPLATE;
-            }
+            return getHearingDocTemplateName(listingData);
         } else if (listingData.getReportType() != null) {
-            switch (listingData.getReportType()) {
-                case BROUGHT_FORWARD_REPORT:
-                    return "EM-TRB-SCO-ENG-00218";
-                case CLAIMS_ACCEPTED_REPORT:
-                    return "EM-TRB-SCO-ENG-00219";
-                case LIVE_CASELOAD_REPORT:
-                    return "EM-TRB-SCO-ENG-00220";
-                case CASES_COMPLETED_REPORT:
-                    return "EM-TRB-SCO-ENG-00221";
-                case CASES_AWAITING_JUDGMENT_REPORT:
-                    return "EM-TRB-SCO-ENG-00749";
-                case TIME_TO_FIRST_HEARING_REPORT:
-                    return "EM-TRB-SCO-ENG-00751";
-                default:
-                    return "No document found";
-            }
+            return getReportDocTemplateName(listingData.getReportType());
         }
-        return "No document found";
+        return NO_DOCUMENT_FOUND;
     }
 
     public static Map<String, String> createMap(String key, String value) {
@@ -856,6 +840,69 @@ public class ListingHelper {
 
     public static boolean isReportType(String reportType) {
         return REPORTS.contains(reportType);
+    }
+
+    private static String getReportDocTemplateName(String reportType) {
+        switch (reportType) {
+            case BROUGHT_FORWARD_REPORT:
+                return "EM-TRB-SCO-ENG-00218";
+            case CLAIMS_ACCEPTED_REPORT:
+                return "EM-TRB-SCO-ENG-00219";
+            case LIVE_CASELOAD_REPORT:
+                return "EM-TRB-SCO-ENG-00220";
+            case CASES_COMPLETED_REPORT:
+                return "EM-TRB-SCO-ENG-00221";
+            case CASES_AWAITING_JUDGMENT_REPORT:
+                return "EM-TRB-SCO-ENG-00749";
+            case TIME_TO_FIRST_HEARING_REPORT:
+                return "EM-TRB-SCO-ENG-00751";
+            case SERVING_CLAIMS_REPORT:
+                return "EM-TRB-SCO-ENG-00781";
+            case CASE_SOURCE_LOCAL_REPORT:
+                return "EM-TRB-SCO-ENG-00783";
+            case HEARINGS_BY_HEARING_TYPE_REPORT:
+                return "EM-TRB-SCO-ENG-00785";
+            case HEARINGS_TO_JUDGEMENTS_REPORT:
+                return "EM-TRB-SCO-ENG-00786";
+            case NO_CHANGE_IN_CURRENT_POSITION_REPORT:
+                return "EM-TRB-SCO-ENG-00794";
+            default:
+                return NO_DOCUMENT_FOUND;
+        }
+    }
+
+    private static String getHearingDocTemplateName(ListingData listingData) {
+        String roomOrNoRoom = !isNullOrEmpty(listingData.getRoomOrNoRoom()) ? listingData.getRoomOrNoRoom() : "";
+        if (listingData.getHearingDocType().equals(HEARING_DOC_ETCL)
+                && listingData.getHearingDocETCL().equals(HEARING_ETCL_STAFF)
+                && roomOrNoRoom.equals(NO)) {
+            return STAFF_CASE_CAUSE_LIST_TEMPLATE;
+        } else if (listingData.getHearingDocType().equals(HEARING_DOC_ETCL)
+                && listingData.getHearingDocETCL().equals(HEARING_ETCL_STAFF)
+                && roomOrNoRoom.equals(YES)) {
+            return STAFF_CASE_CAUSE_LIST_ROOM_TEMPLATE;
+        } else if (listingData.getHearingDocType().equals(HEARING_DOC_ETCL)
+                && listingData.getHearingDocETCL().equals(HEARING_ETCL_PUBLIC)
+                && roomOrNoRoom.equals(NO)) {
+            return PUBLIC_CASE_CAUSE_LIST_TEMPLATE;
+        } else if (listingData.getHearingDocType().equals(HEARING_DOC_ETCL)
+                && listingData.getHearingDocETCL().equals(HEARING_ETCL_PUBLIC)
+                && roomOrNoRoom.equals(YES)) {
+            return PUBLIC_CASE_CAUSE_LIST_ROOM_TEMPLATE;
+        } else if (listingData.getHearingDocType().equals(HEARING_DOC_ETCL)
+                && listingData.getHearingDocETCL().equals(HEARING_ETCL_PRESS_LIST)
+                && listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE)) {
+            return PRESS_LIST_CAUSE_LIST_RANGE_TEMPLATE;
+        } else if (listingData.getHearingDocType().equals(HEARING_DOC_ETCL)
+                && listingData.getHearingDocETCL().equals(HEARING_ETCL_PRESS_LIST)
+                && !listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE)) {
+            return PRESS_LIST_CAUSE_LIST_SINGLE_TEMPLATE;
+        } else if (listingData.getHearingDocType().equals(HEARING_DOC_IT56)) {
+            return IT56_TEMPLATE;
+        } else if (listingData.getHearingDocType().equals(HEARING_DOC_IT57)) {
+            return IT57_TEMPLATE;
+        }
+        return NO_DOCUMENT_FOUND;
     }
 }
 

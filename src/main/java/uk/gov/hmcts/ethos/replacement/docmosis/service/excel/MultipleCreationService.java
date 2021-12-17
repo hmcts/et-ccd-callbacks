@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
@@ -28,6 +29,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @RequiredArgsConstructor
 @Service("multipleCreationService")
 public class MultipleCreationService {
+
+    @Value("${ccd_gateway_base_url}")
+    private String ccdGatewayBaseUrl;
 
     private final ExcelDocManagementService excelDocManagementService;
     private final MultipleReferenceService multipleReferenceService;
@@ -90,7 +94,7 @@ public class MultipleCreationService {
 
         List<String> ethosCaseRefCollection = MultiplesHelper.getCaseIds(multipleData);
 
-        excelDocManagementService.generateAndUploadExcel(ethosCaseRefCollection, userToken, multipleData);
+        excelDocManagementService.generateAndUploadExcel(ethosCaseRefCollection, userToken, multipleDetails);
 
         log.info("Send updates to single cases");
 
@@ -117,7 +121,7 @@ public class MultipleCreationService {
             excelDocManagementService.writeAndUploadExcelDocument(
                     multipleObjectList,
                     userToken,
-                    multipleDetails.getCaseData(),
+                    multipleDetails,
                     new ArrayList<>(subMultipleNames));
 
         } else {
@@ -129,7 +133,7 @@ public class MultipleCreationService {
             excelDocManagementService.writeAndUploadExcelDocument(
                     MultiplesHelper.getCaseIds(multipleDetails.getCaseData()),
                     userToken,
-                    multipleDetails.getCaseData(),
+                    multipleDetails,
                     new ArrayList<>());
 
         }
@@ -264,6 +268,9 @@ public class MultipleCreationService {
 
         log.info("Ethos case ref collection: " + ethosCaseRefCollection);
 
+        var refMarkup = MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl, multipleDetails.getCaseId(),
+                multipleDetails.getCaseData().getMultipleReference());
+
         if (!ethosCaseRefCollection.isEmpty()) {
 
             multipleHelperService.sendCreationUpdatesToSinglesWithoutConfirmation(userToken,
@@ -273,7 +280,7 @@ public class MultipleCreationService {
                     errors,
                     ethosCaseRefCollection,
                     ethosCaseRefCollection.get(0),
-                    multipleDetails.getCaseId());
+                    refMarkup);
 
         } else {
 

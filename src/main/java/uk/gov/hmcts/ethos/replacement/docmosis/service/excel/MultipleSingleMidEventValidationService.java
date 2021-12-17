@@ -1,21 +1,22 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
-
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DynamicListHelper;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 
 @Slf4j
 @Service("multipleSingleMidEventValidationService")
@@ -113,7 +114,7 @@ public class MultipleSingleMidEventValidationService {
         if (hasRepresentativeClaimant(submitEvent.getCaseData())) {
 
             claimantDynamicList = new ArrayList<>(Collections.singletonList(
-                    Helper.getDynamicValue(
+                    DynamicListHelper.getDynamicValue(
                             submitEvent.getCaseData().getRepresentativeClaimantType().getNameOfRepresentative())));
 
         }
@@ -128,7 +129,7 @@ public class MultipleSingleMidEventValidationService {
 
             jurCodesCollection = submitEvent.getCaseData().getJurCodesCollection().stream()
                     .map(jurCodesTypeItem ->
-                            Helper.getDynamicValue(jurCodesTypeItem.getValue().getJuridictionCodesList()))
+                            DynamicListHelper.getDynamicValue(jurCodesTypeItem.getValue().getJuridictionCodesList()))
                     .collect(Collectors.toList());
 
         }
@@ -143,7 +144,7 @@ public class MultipleSingleMidEventValidationService {
 
             respondentCollection = submitEvent.getCaseData().getRespondentCollection().stream()
                     .map(respondentSumTypeItem ->
-                            Helper.getDynamicValue(respondentSumTypeItem.getValue().getRespondentName()))
+                            DynamicListHelper.getDynamicValue(respondentSumTypeItem.getValue().getRespondentName()))
                     .collect(Collectors.toList());
 
         }
@@ -159,7 +160,7 @@ public class MultipleSingleMidEventValidationService {
 
             for (var i = 0; i < submitEvent.getCaseData().getJudgementCollection().size(); i++) {
                 var judgementTypeItem = submitEvent.getCaseData().getJudgementCollection().get(i);
-                judgementCollection.add(Helper.getDynamicCodeLabel(
+                judgementCollection.add(DynamicListHelper.getDynamicCodeLabel(
                         judgementTypeItem.getId(), i
                                 + " - " + judgementTypeItem.getValue().getJudgementType()
                                 + " - " + judgementTypeItem.getValue().getDateJudgmentMade()));
@@ -176,11 +177,11 @@ public class MultipleSingleMidEventValidationService {
 
             repCollection = submitEvent.getCaseData().getRepCollection().stream()
                     .map(representedTypeRItem ->
-                            Helper.getDynamicCodeLabel(representedTypeRItem.getId(),
+                            DynamicListHelper.getDynamicCodeLabel(representedTypeRItem.getId(),
                                     representedTypeRItem.getValue().getNameOfRepresentative()
                                             + " ("
                                             + representedTypeRItem.getValue().getRespRepName()
-                                            + ")" ))
+                                            + ")"))
                     .collect(Collectors.toList());
 
         }
@@ -196,13 +197,13 @@ public class MultipleSingleMidEventValidationService {
 
     private DynamicFixedListType populateDynamicList(List<DynamicValueType> listItems) {
 
-        listItems.add(0, Helper.getDynamicValue(SELECT_NONE_VALUE));
+        listItems.add(0, DynamicListHelper.getDynamicValue(SELECT_NONE_VALUE));
 
         var dynamicFixedListType = new DynamicFixedListType();
 
         dynamicFixedListType.setListItems(listItems);
 
-        dynamicFixedListType.setValue(Helper.getDynamicValue(SELECT_NONE_VALUE));
+        dynamicFixedListType.setValue(DynamicListHelper.getDynamicValue(SELECT_NONE_VALUE));
 
         return dynamicFixedListType;
 

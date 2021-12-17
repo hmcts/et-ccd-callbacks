@@ -36,6 +36,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
@@ -181,6 +182,29 @@ public class CaseManagementForCaseWorkerService {
         return caseData;
     }
 
+    public CaseData continuingRespondent(CCDRequest ccdRequest) {
+        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        if (CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            List<RespondentSumTypeItem> continuingRespondent = new ArrayList<>();
+            List<RespondentSumTypeItem> notContinuingRespondent = new ArrayList<>();
+            for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
+                var respondentSumType = respondentSumTypeItem.getValue();
+                if (YES.equals(respondentSumType.getResponseContinue())) {
+                    continuingRespondent.add(respondentSumTypeItem);
+                } else if (NO.equals(respondentSumType.getResponseContinue())) {
+                    notContinuingRespondent.add(respondentSumTypeItem);
+                } else {
+                    respondentSumType.setResponseContinue(YES);
+                    continuingRespondent.add(respondentSumTypeItem);
+                }
+            }
+            caseData.setRespondentCollection(Stream.concat(continuingRespondent.stream(),
+                    notContinuingRespondent.stream()).collect(Collectors.toList()));
+            respondentDefaults(caseData);
+        }
+        return caseData;
+    }
+
     private boolean positionChanged(CaseData caseData) {
         return (isNullOrEmpty(caseData.getCurrentPosition())
                 || !caseData.getPositionType().equals(caseData.getCurrentPosition()));
@@ -197,7 +221,12 @@ public class CaseManagementForCaseWorkerService {
                 for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
                     var dateListedType = dateListedTypeItem.getValue();
                     if (dateListedType.getHearingStatus() == null) {
+                        var listedDateWithZeroTime = dateListedType.getListedDate().split("T")[0] + "T00:00:00";
                         dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
+                        dateListedType.setHearingTimingStart(dateListedType.getListedDate());
+                        dateListedType.setHearingTimingBreak(listedDateWithZeroTime);
+                        dateListedType.setHearingTimingResume(listedDateWithZeroTime);
+                        dateListedType.setHearingTimingFinish(listedDateWithZeroTime);
                     }
                     populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
                 }
@@ -271,6 +300,7 @@ public class CaseManagementForCaseWorkerService {
                     case ABOUT_TO_SUBMIT_EVENT_CALLBACK:
                         ECCHelper.createECCLogic(caseDetails, submitEvent.getCaseData());
                         currentCaseData.setRespondentECC(null);
+                        currentCaseData.setCaseSource(FLAG_ECC);
                         break;
                     default:
                         sendUpdateSingleCaseECC(authToken, caseDetails, submitEvent.getCaseData(),

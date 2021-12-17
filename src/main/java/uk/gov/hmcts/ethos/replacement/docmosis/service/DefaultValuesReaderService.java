@@ -71,6 +71,9 @@ public class DefaultValuesReaderService {
                                 .filter(respondentSumTypeItem ->
                                     respondentSumTypeItem.getValue().getRespondentName().equals(respondentName))
                                 .findFirst();
+                        caseData.getRespondentCollection().stream().filter(respondentSumTypeItem ->
+                                respondentSumTypeItem.getValue().getRespondentName()
+                                        .equals(respondentName)).findFirst();
                 respondentChosen.ifPresent(respondentSumTypeItem ->
                         claimantWorkAddressType.setClaimantWorkAddress(
                                 respondentSumTypeItem.getValue().getRespondentAddress()));

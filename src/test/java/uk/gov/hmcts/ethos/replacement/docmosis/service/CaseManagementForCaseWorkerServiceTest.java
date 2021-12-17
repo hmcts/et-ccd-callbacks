@@ -53,6 +53,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_DEV_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
@@ -357,6 +358,27 @@ public class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
+    public void continuingRespondentFirstToLast() {
+        CaseData caseData = caseManagementForCaseWorkerService.continuingRespondent(scotlandCcdRequest1);
+
+        assertEquals(3, caseData.getRespondentCollection().size());
+
+        assertEquals("Antonio Vazquez", caseData.getRespondentCollection().get(0).getValue().getRespondentName());
+        assertEquals(YES, caseData.getRespondentCollection().get(0).getValue().getResponseContinue());
+        assertEquals("Juan Garcia", caseData.getRespondentCollection().get(1).getValue().getRespondentName());
+        assertEquals(YES, caseData.getRespondentCollection().get(1).getValue().getResponseContinue());
+        assertEquals("Roberto Dondini", caseData.getRespondentCollection().get(2).getValue().getRespondentName());
+        assertEquals(NO, caseData.getRespondentCollection().get(2).getValue().getResponseContinue());
+    }
+
+    @Test
+    public void continuingRespondentNull() {
+        CaseData caseData = caseManagementForCaseWorkerService.continuingRespondent(scotlandCcdRequest3);
+        assertEquals(1, caseData.getRespondentCollection().size());
+        assertEquals(YES, caseData.getRespondentCollection().get(0).getValue().getResponseContinue());
+    }
+
+    @Test
     public void buildFlagsImageFileNameForNullFlagsTypes() {
         var caseDetails = ccdRequest11.getCaseDetails();
         FlagsImageHelper.buildFlagsImageFileName(caseDetails);
@@ -442,6 +464,14 @@ public class CaseManagementForCaseWorkerServiceTest {
                 .getHearingDateCollection().get(0).getValue().getHearingStatus());
         assertEquals("Manchester", caseData.getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().getHearingVenueDay().getSelectedLabel());
+        assertEquals("2019-11-01T12:11:00.000", caseData.getHearingCollection().get(0).getValue()
+                .getHearingDateCollection().get(0).getValue().getHearingTimingStart());
+        assertEquals("2019-11-01T00:00:00", caseData.getHearingCollection().get(0).getValue()
+                .getHearingDateCollection().get(0).getValue().getHearingTimingFinish());
+        assertEquals("2019-11-01T00:00:00", caseData.getHearingCollection().get(0).getValue()
+                .getHearingDateCollection().get(0).getValue().getHearingTimingResume());
+        assertEquals("2019-11-01T00:00:00", caseData.getHearingCollection().get(0).getValue()
+                .getHearingDateCollection().get(0).getValue().getHearingTimingBreak());
     }
 
     @Test
@@ -513,8 +543,10 @@ public class CaseManagementForCaseWorkerServiceTest {
     public void createECC() {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
                 .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
-        assertEquals("11111", caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
-                new ArrayList<>(), ABOUT_TO_SUBMIT_EVENT_CALLBACK).getCaseRefECC());
+        var casedata = caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
+                new ArrayList<>(), ABOUT_TO_SUBMIT_EVENT_CALLBACK);
+        assertEquals("11111", casedata.getCaseRefECC());
+        assertEquals(FLAG_ECC, casedata.getCaseSource());
     }
 
     @Test

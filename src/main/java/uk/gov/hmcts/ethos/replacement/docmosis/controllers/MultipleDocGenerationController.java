@@ -45,10 +45,10 @@ public class MultipleDocGenerationController {
     @PostMapping(value = "/printSchedule", consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "generate a multiple schedule.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Accessed successfully",
-                    response = MultipleCallbackResponse.class),
-            @ApiResponse(code = 400, message = "Bad Request"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(code = 200, message = "Accessed successfully",
+                response = MultipleCallbackResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> printSchedule(
             @RequestBody MultipleRequest multipleRequest,
@@ -71,10 +71,10 @@ public class MultipleDocGenerationController {
     @PostMapping(value = "/printLetter", consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "generate a letter for the first case in the filtered collection.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Accessed successfully",
-                    response = MultipleCallbackResponse.class),
-            @ApiResponse(code = 400, message = "Bad Request"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(code = 200, message = "Accessed successfully",
+                response = MultipleCallbackResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> printLetter(
             @RequestBody MultipleRequest multipleRequest,
@@ -98,10 +98,10 @@ public class MultipleDocGenerationController {
     @PostMapping(value = "/printDocumentConfirmation", consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "generate a confirmation with a link to the document generated.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Accessed successfully",
-                    response = MultipleCallbackResponse.class),
-            @ApiResponse(code = 400, message = "Bad Request"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(code = 200, message = "Accessed successfully",
+                response = MultipleCallbackResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> printDocumentConfirmation(
             @RequestBody MultipleRequest multipleRequest,
@@ -124,10 +124,10 @@ public class MultipleDocGenerationController {
     @PostMapping(value = "/midSelectedAddressLabelsMultiple", consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "populates the address labels list with the user selected addresses to be printed.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Accessed successfully",
-                    response = MultipleCallbackResponse.class),
-            @ApiResponse(code = 400, message = "Bad Request"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(code = 200, message = "Accessed successfully",
+                response = MultipleCallbackResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> midSelectedAddressLabelsMultiple(
             @RequestBody MultipleRequest multipleRequest,
@@ -152,10 +152,10 @@ public class MultipleDocGenerationController {
     @PostMapping(value = "/midValidateAddressLabelsMultiple", consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "validates the address labels collection and print attributes before printing.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Accessed successfully",
-                    response = CCDCallbackResponse.class),
-            @ApiResponse(code = 400, message = "Bad Request"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(code = 200, message = "Accessed successfully",
+                response = CCDCallbackResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> midValidateAddressLabelsMultiple(
             @RequestBody MultipleRequest multipleRequest,
@@ -172,6 +172,30 @@ public class MultipleDocGenerationController {
                 multipleRequest.getCaseDetails().getCaseData().getAddressLabelsAttributesType(), MULTIPLE_CASE_TYPE);
 
         return getMultipleCallbackRespEntity(errors, multipleRequest.getCaseDetails());
+    }
+
+    @PostMapping(value = "/dynamicMultipleLetters", consumes = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "populate flags in dynamic lists with all flags values are in the excel.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Accessed successfully",
+                response = MultipleCallbackResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
+    })
+    public ResponseEntity<MultipleCallbackResponse> dynamicMultipleLetters(
+            @RequestBody MultipleRequest multipleRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        log.info("DYNAMIC MULTIPLE LETTERS ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        List<String> errors = new ArrayList<>();
+        var multipleDetails = multipleRequest.getCaseDetails();
+        multipleLetterService.dynamicMultipleLetters(userToken, multipleDetails, errors);
+        return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
 }

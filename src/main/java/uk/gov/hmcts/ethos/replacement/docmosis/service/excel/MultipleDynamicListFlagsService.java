@@ -1,20 +1,26 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
-import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.*;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ecm.common.model.multiples.types.MoveCasesType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DynamicListHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+
+import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_2;
+import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_3;
+import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_4;
+import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_5;
+import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_6;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.SELECT_ALL;
 
 @Slf4j
@@ -61,7 +67,7 @@ public class MultipleDynamicListFlagsService {
         Set<String> values = (Set<String>) multipleObjects.get(key);
         List<DynamicValueType> listItems = new ArrayList<>();
 
-        listItems.add(Helper.getDynamicValue(SELECT_ALL));
+        listItems.add(DynamicListHelper.getDynamicValue(SELECT_ALL));
 
         if (values != null && !values.isEmpty()) {
 
@@ -69,7 +75,7 @@ public class MultipleDynamicListFlagsService {
 
                 if (!flag.isEmpty()) {
 
-                    listItems.add(Helper.getDynamicValue(flag));
+                    listItems.add(DynamicListHelper.getDynamicValue(flag));
                 }
             }
         }
@@ -82,12 +88,12 @@ public class MultipleDynamicListFlagsService {
 
         if (dynamicListFlag != null) {
             dynamicListFlag.setListItems(listItems);
-            dynamicListFlag.setValue(Helper.getDynamicValue(SELECT_ALL));
+            dynamicListFlag.setValue(DynamicListHelper.getDynamicValue(SELECT_ALL));
             return dynamicListFlag;
         } else {
             var dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(listItems);
-            dynamicFixedListType.setValue(Helper.getDynamicValue(SELECT_ALL));
+            dynamicFixedListType.setValue(DynamicListHelper.getDynamicValue(SELECT_ALL));
             return dynamicFixedListType;
         }
 

@@ -1,12 +1,12 @@
 'use strict';
-const testConfig = require('src/test/config');
-const createCaseConfig = require('src/test/end-to-end/pages/createCase/createCaseConfig');
+const testConfig = require('../../config');
+const createCaseConfig = require('../pages/createCase/createCaseConfig');
 Feature('Manchester individual Journey').retry(testConfig.TestRetryFeatures);
 
-Scenario('01 BO Caveat E2E - Order summons', async function (I) {
+Scenario('01 BO Caveat E2E - Order summons', async ({ I }) =>  {
 
     // IdAM
-    I.authenticateWithIdamIfAvailable();
+    I.authenticateWithIdam();
     I.selectNewCase();
     I.selectCaseTypeOptions(createCaseConfig.list1_text, createCaseConfig.list2_text_case_type_manchester, createCaseConfig.list3_text_event);
     I.enterCreateCasePage1();

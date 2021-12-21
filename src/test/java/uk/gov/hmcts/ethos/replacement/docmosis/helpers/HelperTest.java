@@ -7,6 +7,7 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -14,7 +15,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_SETTLED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.HEARING_CREATION_DAY_ERROR;
@@ -24,7 +27,6 @@ public class HelperTest {
 
     private CaseDetails caseDetails1;
     private CaseDetails caseDetails4;
-    private CaseDetails caseDetails6;
     private CaseDetails caseDetailsScot1;
     private CaseDetails caseDetailsScot2;
 
@@ -32,7 +34,6 @@ public class HelperTest {
     public void setUp() throws Exception {
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
         caseDetails4 = generateCaseDetails("caseDetailsTest4.json");
-        caseDetails6 = generateCaseDetails("caseDetailsTest6.json");
         caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
         caseDetailsScot2 = generateCaseDetails("caseDetailsScotTest2.json");
     }
@@ -56,7 +57,7 @@ public class HelperTest {
 
     @Test
     public void nullCheck() {
-        assertEquals("Value ' example ' ", Helper.nullCheck( "Value \" example \" "));
+        assertEquals("Value ' example ' ", Helper.nullCheck("Value \" example \" "));
         assertEquals("", Helper.nullCheck(null));
         assertEquals("Value example", Helper.nullCheck("Value example"));
         assertEquals("Value ' example '", Helper.nullCheck("Value ' example '"));
@@ -103,13 +104,15 @@ public class HelperTest {
 
         assertEquals(1, Helper.hearingMidEventValidation(caseDetails1.getCaseData()).size());
 
-        assertEquals(HEARING_CREATION_NUMBER_ERROR, Helper.hearingMidEventValidation(caseDetails1.getCaseData()).get(0));
+        assertEquals(HEARING_CREATION_NUMBER_ERROR,
+                Helper.hearingMidEventValidation(caseDetails1.getCaseData()).get(0));
 
         caseDetails1.getCaseData().getHearingCollection().get(0).getValue().setHearingNumber("");
 
         assertEquals(1, Helper.hearingMidEventValidation(caseDetails1.getCaseData()).size());
 
-        assertEquals(HEARING_CREATION_NUMBER_ERROR, Helper.hearingMidEventValidation(caseDetails1.getCaseData()).get(0));
+        assertEquals(HEARING_CREATION_NUMBER_ERROR,
+                Helper.hearingMidEventValidation(caseDetails1.getCaseData()).get(0));
 
     }
 
@@ -155,28 +158,6 @@ public class HelperTest {
 
         assertNull(caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().getPostponedDate());
-    }
-
-    @Test
-    public void createDynamicListForRespondentRepresentative() {
-        DynamicListHelper.dynamicRespondentRepresentativeNames(caseDetails1.getCaseData());
-        assertNotNull(caseDetails1.getCaseData().getRepCollection());
-        var dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode("Antonio Vazquez");
-        dynamicValueType.setLabel("Antonio Vazquez");
-        assertEquals(dynamicValueType, caseDetails1.getCaseData().getRepCollection().get(0)
-                .getValue().getDynamicRespRepName().getListItems().get(0));
-    }
-
-    @Test
-    public void populateDynamicRespondentRepList() {
-        DynamicListHelper.dynamicRespondentRepresentativeNames(caseDetails6.getCaseData());
-        assertNotNull(caseDetails6.getCaseData().getRepCollection().get(0).getValue().getDynamicRespRepName());
-        var dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode("Antonio Vazquez");
-        dynamicValueType.setLabel("Antonio Vazquez");
-        assertEquals(dynamicValueType, caseDetails6.getCaseData().getRepCollection().get(0)
-                .getValue().getDynamicRespRepName().getListItems().get(0));
     }
 
 }

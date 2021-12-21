@@ -8,7 +8,6 @@ import uk.gov.hmcts.ecm.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.types.BFActionType;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -73,7 +72,7 @@ public class BFHelper {
 
             var dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(Helper.getDefaultBfListItems());
-            dynamicFixedListType.setValue(Helper.getDynamicValue(BF_ACTION_ACAS));
+            dynamicFixedListType.setValue(DynamicListHelper.getDynamicValue(BF_ACTION_ACAS));
 
             var bfActionTypeItem = new BFActionTypeItem();
             var bfActionType = new BFActionType();

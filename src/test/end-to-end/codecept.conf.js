@@ -1,54 +1,83 @@
-const testConfig = require('src/test/config.js');
+const config = require('../config.js');
 
 exports.config = {
-    'tests': testConfig.TestPathToRun,
-    'output': testConfig.TestOutputDir,
-    'helpers': {
-        'Puppeteer': {
-            'url': testConfig.TestFrontendUrl,
-            'waitForTimeout': 40000,
-            'getPageTimeout': 30000,
-            'waitForAction': 1000,
-            'show': testConfig.TestShowBrowserWindow,
-            'chrome': {
-                'ignoreHTTPSErrors': true,
+    tests: config.TestPathToRun,
+    output: `${process.cwd()}/${config.TestOutputDir}`,
+    helpers: {
+        Puppeteer: {
+            url: config.TestUrl,
+            waitForTimeout: 60000,
+            getPageTimeout: 40000,
+            // waitForAction: 1000,
+            show: config.TestShowBrowserWindow,
+            waitForNavigation: ['domcontentloaded'],
+            restart: true,
+            keepCookies: false,
+            keepBrowserState: false,
+            chrome: {
+                ignoreHTTPSErrors: true,
                 'ignore-certificate-errors': true,
                 'defaultViewport': {
                     'width': 1280,
                     'height': 960
                 },
                 args: [
+                    '--headless',
+                    '--disable-gpu',
                     '--no-sandbox',
-                    '--proxy-server=proxyout.reform.hmcts.net:8080',
-                    '--proxy-bypass-list=*beta*LB.reform.hmcts.net',
+                    '--allow-running-insecure-content',
+                    '--ignore-certificate-errors',
                     '--window-size=1440,1400'
                 ]
             },
         },
-        'PuppeteerHelper': {
-            'require': './helpers/PuppeteerHelper.js'
+        PuppeteerHelper: {
+            require: './helpers/PuppeteerHelper.js'
         },
+        JSWait: {require: './helpers/JSWait.js'},
     },
-    'include': {
-        'I': './pages/steps.js'
+    include: {
+        I: './pages/steps.js'
     },
-    'plugins': {
-        'autoDelay': {
-            'enabled': true
+    plugins: {
+        screenshotOnFail: {
+            enabled: true,
+            fullPageScreenshots: true
+        },
+        retryFailedStep: {
+            enabled: true,
+            retries: 1
+        },
+        autoDelay: {
+            enabled: true
         }
     },
-    'multiple': {
-        'parallel': {
-            // Splits tests into 2 chunks
-            'chunks': 2
+    mocha: {
+        reporterOptions: {
+            'codeceptjs-cli-reporter': {
+                stdout: '-',
+                options: {steps: true}
+            },
+            'mocha-junit-reporter': {
+                stdout: '-',
+                options: {mochaFile: './functional-output/result.xml'}
+            },
+            mochawesome: {
+                stdout: './functional-output/ecm-e2e-mochawesome-stdout.log',
+                options: {
+                    reportDir: config.TestOutputDir || './functional-output',
+                    reportFilename: 'ecm-e2e-result',
+                    inlineAssets: true,
+                    reportTitle: 'ECM CCD E2E Tests'
+                }
+            }
         }
     },
-    'mocha': {
-        'reporterOptions': {
-            'reportDir': testConfig.TestOutputDir,
-            'reportName': 'index',
-            'inlineAssets': true
+    multiple: {
+        parallel: {
+            chunks: 2,
+            browsers: ['chrome']
         }
     },
-    'name': 'Codecept Tests'
+    'name': 'ecm-ccd-e2e-tests'
 };

@@ -1,26 +1,30 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.LabelsHelper;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.LabelsHelper.MAX_NUMBER_LABELS;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicLetters;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.LabelsHelper.MAX_NUMBER_LABELS;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,6 +39,7 @@ public class MultipleLetterService {
     private final ExcelReadingService excelReadingService;
     private final SingleCasesReadingService singleCasesReadingService;
     private final EventValidationService eventValidationService;
+    private final MultipleDynamicListFlagsService multipleDynamicListFlagsService;
 
     public DocumentInfo bulkLetterLogic(String userToken, MultipleDetails multipleDetails, List<String> errors,
                                         boolean validation) {
@@ -192,6 +197,38 @@ public class MultipleLetterService {
 
         return documentInfo;
 
+    }
+
+    public void dynamicMultipleLetters(String userToken, MultipleDetails multipleDetails,
+                                       List<String> errors) {
+        log.info("Read excel for letter logic");
+        var multipleData = multipleDetails.getCaseData();
+
+        multipleDynamicListFlagsService.populateDynamicListFlagsLogic(userToken, multipleDetails, errors);
+        SortedMap<String, Object> multipleObjects =
+                excelReadingService.readExcel(
+                        userToken,
+                        MultiplesHelper.getExcelBinaryUrl(multipleData),
+                        errors,
+                        multipleData,
+                        FilterExcelType.FLAGS);
+
+        if (!multipleObjects.keySet().isEmpty()) {
+            log.info("Cases in multiple: " + multipleObjects.keySet());
+            List<DynamicValueType> listItems = new ArrayList<>();
+            for (String key : multipleObjects.keySet()) {
+                var submitEvent = singleCasesReadingService.retrieveSingleCase(userToken,
+                        multipleDetails.getCaseTypeId(), key,
+                        multipleData.getMultipleSource());
+                if (submitEvent != null) {
+                    DynamicLetters.dynamicMultipleLetters(submitEvent, multipleData,
+                            multipleDetails.getCaseTypeId(), listItems);
+                }
+
+            }
+        } else {
+            errors.add(NO_CASES_SEARCHED);
+        }
     }
 
 }

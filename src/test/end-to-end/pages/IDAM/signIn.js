@@ -1,15 +1,14 @@
 'use strict';
 
-const testConfig = require('src/test/config.js');
+const testConfig = require('../../../config');
 
-module.exports = function () {
+module.exports = async function () {
 
     const I = this;
-
-    I.amOnPage('/');
-    I.see('Sign in');
-    I.waitForText('Sign in',testConfig.TestWaitForTextToAppear);
-    I.fillField('username', testConfig.TestEnvUser);
-    I.fillField('password', testConfig.TestEnvPassword);
-    I.waitForNavigationToComplete('input[value="Sign in"]');
+    I.amOnPage('/', 60);
+    I.waitForText('Sign in');
+    I.fillField('username', testConfig.TestEnvCWUser);
+    I.fillField('password', testConfig.TestEnvCWPassword);
+    I.click('input[value="Sign in"]');
+    I.waitForText('Case list');
 };

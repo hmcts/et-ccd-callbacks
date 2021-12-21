@@ -1,8 +1,8 @@
 
-const testConfig = require('src/test/config');
+const testConfig = require('../../../config');
 const assert = require('assert');
 const createCaseConfig = require('./createCaseConfig');
-const commonConfig = require('src/test/end-to-end/pages/common/commonConfig');
+const commonConfig = require('../../data/commonConfig.json');
 
 module.exports = function () {
     const I = this;

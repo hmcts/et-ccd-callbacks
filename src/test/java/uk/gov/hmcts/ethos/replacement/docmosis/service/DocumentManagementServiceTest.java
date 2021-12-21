@@ -18,6 +18,8 @@ import uk.gov.hmcts.ecm.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClient;
+import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 
@@ -29,13 +31,17 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService.APPLICATION_DOCX_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.successfulDocStoreUpload;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.successfulDocumentManagementUploadResponse;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.unsuccessfulDocumentManagementUploadResponse;
 
@@ -50,6 +56,8 @@ public class DocumentManagementServiceTest {
     private UserService userService;
     @Mock
     private DocumentDownloadClientApi documentDownloadClientApi;
+    @Mock
+    private CaseDocumentClient caseDocumentClient;
     @InjectMocks
     private DocumentManagementService documentManagementService;
     @Rule
@@ -68,6 +76,7 @@ public class DocumentManagementServiceTest {
         UserDetails userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);
         ReflectionTestUtils.setField(documentManagementService, "ccdDMStoreBaseUrl", "http://dm-store:8080");
+        ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", false);
     }
 
     @Test
@@ -75,7 +84,7 @@ public class DocumentManagementServiceTest {
         when(documentUploadClient.upload(anyString(), anyString(), anyString(), anyList(), any(), anyList()))
                 .thenReturn(successfulDocumentManagementUploadResponse());
         URI documentSelfPath = documentManagementService.uploadDocument("authString", Files.readAllBytes(file.toPath()),
-                OUTPUT_FILE_NAME, APPLICATION_DOCX_VALUE);
+                OUTPUT_FILE_NAME, APPLICATION_DOCX_VALUE, anyString());
         String documentDownloadableURL = documentManagementService.generateDownloadableURL(documentSelfPath);
         assertEquals(documentManagementService.generateMarkupDocument(documentDownloadableURL), markup);
         assertNotNull(documentSelfPath);
@@ -89,7 +98,7 @@ public class DocumentManagementServiceTest {
         when(documentUploadClient.upload(anyString(), anyString(), anyString(), anyList()))
                 .thenReturn(unsuccessfulDocumentManagementUploadResponse());
         documentManagementService.uploadDocument("authString", Files.readAllBytes(file.toPath()),
-                OUTPUT_FILE_NAME, APPLICATION_DOCX_VALUE);
+                OUTPUT_FILE_NAME, APPLICATION_DOCX_VALUE, anyString());
     }
 
     private File createTestFile() {
@@ -109,13 +118,13 @@ public class DocumentManagementServiceTest {
 
         UploadedDocument uploadedDocument = documentManagementService.downloadFile("authString",
                 "http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
-        assertEquals(uploadedDocument.getName(), "fileName");
-        assertEquals(uploadedDocument.getContentType(), "xslx");
+        assertEquals("fileName", uploadedDocument.getName());
+        assertEquals("xslx", uploadedDocument.getContentType());
 
         uploadedDocument = documentManagementService.downloadFile("authString",
                 "documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
-        assertEquals(uploadedDocument.getName(), "fileName");
-        assertEquals(uploadedDocument.getContentType(), "xslx");
+        assertEquals("fileName", uploadedDocument.getName());
+        assertEquals("xslx", uploadedDocument.getContentType());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -124,5 +133,41 @@ public class DocumentManagementServiceTest {
                 .thenReturn(new ResponseEntity<>(HttpStatus.BAD_GATEWAY));
         documentManagementService.downloadFile("authString",
                 "documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
+    }
+
+    @Test
+    public void getDocumentUUID() {
+        var urlString = "http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary";
+        assertEquals("85d97996-22a5-40d7-882e-3a382c8ae1b4", documentManagementService.getDocumentUUID(urlString));
+    }
+
+    @Test
+    public void downloadFileSecureDocStoreTrue() {
+        ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", true);
+        when(caseDocumentClient.getDocumentBinary(anyString(), anyString(), anyString()))
+                .thenReturn(responseEntity);
+        UploadedDocument uploadedDocument = documentManagementService.downloadFile("authString",
+                "http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
+        assertEquals("fileName", uploadedDocument.getName());
+        assertEquals("xslx", uploadedDocument.getContentType());
+
+        uploadedDocument = documentManagementService.downloadFile("authString",
+                "documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
+        assertEquals("fileName", uploadedDocument.getName());
+        assertEquals("xslx", uploadedDocument.getContentType());
+    }
+
+    @Test
+    public void uploadFileSecureDocStoreTrue() throws URISyntaxException, IOException {
+        ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", true);
+        when(caseDocumentClient.uploadDocuments(anyString(), anyString(), anyString(), anyString(), anyList(), any()))
+                .thenReturn(successfulDocStoreUpload());
+        URI documentSelfPath = documentManagementService.uploadDocument("authString",
+                Files.readAllBytes(file.toPath()), OUTPUT_FILE_NAME, APPLICATION_DOCX_VALUE, "LondonSouth");
+        String documentDownloadableURL = documentManagementService.generateDownloadableURL(documentSelfPath);
+        assertEquals(documentManagementService.generateMarkupDocument(documentDownloadableURL), markup);
+        assertNotNull(documentSelfPath);
+        assertEquals("/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4", documentSelfPath.getPath());
+
     }
 }

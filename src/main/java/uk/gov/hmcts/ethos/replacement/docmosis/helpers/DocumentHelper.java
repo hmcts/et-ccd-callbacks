@@ -2,12 +2,12 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.Address;
@@ -180,17 +180,17 @@ public class DocumentHelper {
             sb.append("\"claimant_reference\":\"").append(nullCheck(representedTypeC.getRepresentativeReference()))
                     .append(NEW_LINE);
             Optional<String> claimantTypeOfClaimant = Optional.ofNullable(caseData.getClaimantTypeOfClaimant());
-            if (claimantIndType.isPresent()) {
-                sb.append("\"claimant_full_name\":\"").append(nullCheck(claimantIndType.get().claimantFullName()))
-                        .append(NEW_LINE);
-                sb.append("\"Claimant\":\"").append(nullCheck(claimantIndType.get().claimantFullName()))
-                        .append(NEW_LINE);
-            } else if (claimantTypeOfClaimant.isPresent() && caseData.getClaimantTypeOfClaimant()
+            if (claimantTypeOfClaimant.isPresent() && caseData.getClaimantTypeOfClaimant()
                     .equals(COMPANY_TYPE_CLAIMANT)) {
                 log.info("Claimant Company");
                 sb.append("\"claimant_full_name\":\"").append(nullCheck(caseData.getClaimantCompany()))
                         .append(NEW_LINE);
                 sb.append("\"Claimant\":\"").append(nullCheck(caseData.getClaimantCompany())).append(NEW_LINE);
+            } else if (claimantIndType.isPresent()) {
+                sb.append("\"claimant_full_name\":\"").append(nullCheck(claimantIndType.get().claimantFullName()))
+                        .append(NEW_LINE);
+                sb.append("\"Claimant\":\"").append(nullCheck(claimantIndType.get().claimantFullName()))
+                        .append(NEW_LINE);
             } else {
                 sb.append("\"claimant_full_name\":\"").append(NEW_LINE);
                 sb.append("\"Claimant\":\"").append(NEW_LINE);
@@ -267,8 +267,9 @@ public class DocumentHelper {
     private static StringBuilder getRespondentData(CaseData caseData) {
         log.info("Respondent Data");
         var sb = new StringBuilder();
-        List<RespondentSumTypeItem> respondentSumTypeItemList = !CollectionUtils.isEmpty(caseData.getRespondentCollection())
-                ? caseData.getRespondentCollection(): new ArrayList<>();
+        List<RespondentSumTypeItem> respondentSumTypeItemList = CollectionUtils.isNotEmpty(
+                caseData.getRespondentCollection())
+                ? caseData.getRespondentCollection() : new ArrayList<>();
 
         if (CollectionUtils.isEmpty(respondentSumTypeItemList)) {
             log.error("No respondents present for case: " + caseData.getEthosCaseReference());
@@ -293,11 +294,13 @@ public class DocumentHelper {
         }
 
         if (!responseContinue) {
-            log.error("Atleast one respondent should have response continuing for case: " + caseData.getEthosCaseReference());
+            log.error("Atleast one respondent should have response continuing for case: "
+                    + caseData.getEthosCaseReference());
         }
 
         if (!responseNotStruckOut) {
-            log.error("Atleast one respondent should have response not struck out for case: " + caseData.getEthosCaseReference());
+            log.error("Atleast one respondent should have response not struck out for case: "
+                    + caseData.getEthosCaseReference());
         }
 
         if (respondentToBeShown.equals(new RespondentSumType())) {
@@ -309,9 +312,11 @@ public class DocumentHelper {
         RespondentSumType finalRespondentToBeShown = respondentToBeShown;
         Optional<RepresentedTypeRItem> representedTypeRItem = Optional.empty();
 
-        if (!CollectionUtils.isEmpty(representedTypeRList) && responseNotStruckOut && responseContinue && !finalRespondentToBeShown.equals(new RespondentSumType())) {
+        if (CollectionUtils.isNotEmpty(representedTypeRList) && responseNotStruckOut && responseContinue
+                && !finalRespondentToBeShown.equals(new RespondentSumType())) {
             representedTypeRItem = representedTypeRList.stream()
-                    .filter(a -> a.getValue().getRespRepName().equals(finalRespondentToBeShown.getRespondentName())).findFirst();
+                    .filter(a -> a.getValue().getRespRepName().equals(
+                            finalRespondentToBeShown.getRespondentName())).findFirst();
         }
 
         if (representedTypeRItem.isPresent()) {
@@ -331,7 +336,7 @@ public class DocumentHelper {
 
         } else {
             log.info("Respondent not represented");
-            if (!CollectionUtils.isEmpty(caseData.getRespondentCollection())
+            if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())
                     && responseNotStruckOut && responseContinue
                     && !finalRespondentToBeShown.equals(new RespondentSumType())) {
                 sb.append("\"respondent_or_rep_full_name\":\"").append(nullCheck(finalRespondentToBeShown
@@ -343,9 +348,9 @@ public class DocumentHelper {
                 sb.append(getRespondentOrRepAddressUK(new Address()));
             }
         }
-        if (!CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+        if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
             log.info("Respondent collection");
-            sb.append("\"respondent_full_name\":\"").append (
+            sb.append("\"respondent_full_name\":\"").append(
                     nullCheck((Strings.isNullOrEmpty(finalRespondentToBeShown.getResponseContinue())
                             || YES.equals(finalRespondentToBeShown.getResponseContinue()))
                             ? finalRespondentToBeShown.getRespondentName()
@@ -453,15 +458,14 @@ public class DocumentHelper {
 
     public static String getCorrespondenceHearingNumber(CorrespondenceType correspondenceType,
                                                         CorrespondenceScotType correspondenceScotType) {
-        if (correspondenceType != null) {
-            return correspondenceType.getHearingNumber();
+        if (correspondenceType != null && correspondenceType.getDynamicHearingNumber() != null) {
+            return correspondenceType.getDynamicHearingNumber().getValue().getCode();
+        } else if (correspondenceScotType != null && correspondenceScotType.getDynamicHearingNumber() != null) {
+            return correspondenceScotType.getDynamicHearingNumber().getValue().getCode();
         } else {
-            if (correspondenceScotType != null) {
-                return correspondenceScotType.getHearingNumber();
-            } else {
-                return "";
-            }
+            return null;
         }
+
     }
 
     public static HearingType getHearingByNumber(List<HearingTypeItem> hearingCollection,

@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 
@@ -29,24 +28,25 @@ public class MultipleCloseEventValidationService {
         this.eventValidationService = eventValidationService;
     }
 
-    public List<String> validateJurisdictionCollections(String userToken, MultipleDetails multipleDetails) {
+    public List<String> validateCasesBeforeCloseEvent(String userToken, MultipleDetails multipleDetails) {
         List<String> errors = new ArrayList<>();
-        var multipleData = multipleDetails.getCaseData();
-
-        List<String> ethosCaseRefCollection = multipleHelperService.getEthosCaseRefCollection(userToken, multipleData,
-                errors);
+        var ethosCaseRefCollection = multipleHelperService.getEthosCaseRefCollection(userToken,
+                multipleDetails.getCaseData(), errors);
 
         if (ethosCaseRefCollection.isEmpty()) {
             return errors;
         }
 
-        List<SubmitEvent> submitEvents = singleCasesReadingService.retrieveSingleCases(userToken,
-                multipleDetails.getCaseTypeId(), ethosCaseRefCollection, multipleData.getMultipleSource());
+        var submitEvents = singleCasesReadingService.retrieveSingleCases(userToken,
+                multipleDetails.getCaseTypeId(), ethosCaseRefCollection,
+                multipleDetails.getCaseData().getMultipleSource());
 
-        for (SubmitEvent event : submitEvents) {
-            var caseData = event.getCaseData();
-            eventValidationService.validateJurisdictionOutcome(caseData, event.getState().equals(REJECTED_STATE),
-                    true, errors);
+        for (var submitEvent : submitEvents) {
+            eventValidationService.validateCaseBeforeCloseEvent(submitEvent.getCaseData(),
+                    submitEvent.getState().equals(REJECTED_STATE), true, errors);
+            if (!errors.isEmpty()) {
+                break;
+            }
         }
 
         return errors;

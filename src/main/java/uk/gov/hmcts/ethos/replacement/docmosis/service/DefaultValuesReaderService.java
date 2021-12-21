@@ -67,10 +67,6 @@ public class DefaultValuesReaderService {
             String respondentName = caseData.getClaimantWorkAddressQRespondent().getValue().getCode();
             if (caseData.getRespondentCollection() != null) {
                 Optional<RespondentSumTypeItem> respondentChosen =
-                        caseData.getRespondentCollection().stream()
-                                .filter(respondentSumTypeItem ->
-                                    respondentSumTypeItem.getValue().getRespondentName().equals(respondentName))
-                                .findFirst();
                         caseData.getRespondentCollection().stream().filter(respondentSumTypeItem ->
                                 respondentSumTypeItem.getValue().getRespondentName()
                                         .equals(respondentName)).findFirst();

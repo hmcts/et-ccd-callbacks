@@ -13,8 +13,7 @@ def secrets = [
         'et-${env}': [
                 secret('ccd-user-email', 'CCD_CASEWORKER_E2E_EMAIL'),
                 secret('ccd-user-password', 'CCD_CASEWORKER_E2E_PASSWORD'),
-                secret('et-cos-s2s-secret', 'SERVICE_SECRET'),
-                secret('idam-client-secret', 'IDAM_CLIENT_SECRET')
+                secret('et-cos-s2s-secret', 'SERVICE_SECRET')
         ]
 ]
 

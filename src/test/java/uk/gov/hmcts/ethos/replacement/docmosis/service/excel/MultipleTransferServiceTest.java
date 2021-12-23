@@ -7,7 +7,11 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ecm.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ecm.common.model.multiples.items.CaseMultipleTypeItem;
@@ -16,10 +20,13 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PersistentQHelperService;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
@@ -137,4 +144,65 @@ public class MultipleTransferServiceTest {
 
     }
 
+    @Test
+    public void testPopulateCaseTransferOfficesIgnoresMissingManagingOffice() {
+        var multipleData = new MultipleData();
+        var tribunalOffices = List.of(TribunalOffice.LEEDS, TribunalOffice.MANCHESTER);
+        var caseTransferOffices = createOfficeList(tribunalOffices);
+        multipleData.setOfficeMultipleCT(caseTransferOffices);
+        var missingManagingOfficeValues = new String[] { null, "", " "};
+        for (String managingOffice : missingManagingOfficeValues) {
+            multipleData.setManagingOffice(managingOffice);
+            multipleTransferService.populateCaseTransferOffices(multipleData);
+            verifyTribunalOffices(tribunalOffices, multipleData.getOfficeMultipleCT().getListItems());
+        }
+    }
+
+    @Test
+    public void testPopulateCaseTransferOfficesScotland() {
+        var multipleData = new MultipleData();
+        multipleData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
+        var tribunalOffices = List.of(TribunalOffice.LEEDS, TribunalOffice.MANCHESTER);
+        var caseTransferOffices = createOfficeList(tribunalOffices);
+        multipleData.setOfficeMultipleCT(caseTransferOffices);
+        multipleTransferService.populateCaseTransferOffices(multipleData);
+        assertTrue(multipleData.getOfficeMultipleCT().getListItems().isEmpty());
+        assertNull(multipleData.getOfficeMultipleCT().getValue());
+    }
+
+    @Test
+    public void testPopulateCaseTransferOfficesEnglandWales() {
+        var multipleData = new MultipleData();
+        var tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
+        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        tribunalOffices.remove(TribunalOffice.MANCHESTER);
+        var caseTransferOffices = createOfficeList(tribunalOffices);
+        multipleData.setManagingOffice(managingOffice);
+        multipleData.setOfficeMultipleCT(caseTransferOffices);
+
+        multipleTransferService.populateCaseTransferOffices(multipleData);
+
+        verifyTribunalOffices(tribunalOffices, multipleData.getOfficeMultipleCT().getListItems());
+    }
+
+    private DynamicFixedListType createOfficeList(List<TribunalOffice> tribunalOffices) {
+        var listItems = new ArrayList<DynamicValueType>();
+        for (TribunalOffice tribunalOffice : tribunalOffices) {
+            listItems.add(DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()));
+        }
+
+        return DynamicFixedListType.from(listItems);
+    }
+
+    private void verifyTribunalOffices(List<TribunalOffice> expected, List<DynamicValueType> listItems) {
+        assertEquals(expected.size(), listItems.size());
+        Iterator<TribunalOffice> expectedItr = expected.listIterator();
+        Iterator<DynamicValueType> listItemsItr = listItems.listIterator();
+        while (expectedItr.hasNext() && listItemsItr.hasNext()) {
+            var tribunalOffice = expectedItr.next();
+            var dynamicValueType = listItemsItr.next();
+            assertEquals(tribunalOffice.getOfficeName(), dynamicValueType.getCode());
+            assertEquals(tribunalOffice.getOfficeName(), dynamicValueType.getLabel());
+        }
+    }
 }

@@ -29,10 +29,13 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -248,6 +251,47 @@ public class CaseTransferServiceTest {
         assertEquals(0, errors.size());
     }
 
+    @Test
+    public void testPopulateCaseTransferOfficesIgnoresMissingManagingOffice() {
+        var caseData = new CaseData();
+        var tribunalOffices = List.of(TribunalOffice.LEEDS, TribunalOffice.MANCHESTER);
+        var caseTransferOffices = createOfficeList(tribunalOffices);
+        caseData.setOfficeCT(caseTransferOffices);
+        var missingManagingOfficeValues = new String[] { null, "", " "};
+        for (String managingOffice : missingManagingOfficeValues) {
+            caseData.setManagingOffice(managingOffice);
+            caseTransferService.populateCaseTransferOffices(caseData);
+            verifyTribunalOffices(tribunalOffices, caseData.getOfficeCT().getListItems());
+        }
+    }
+
+    @Test
+    public void testPopulateCaseTransferOfficesScotland() {
+        var caseData = new CaseData();
+        caseData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
+        var tribunalOffices = List.of(TribunalOffice.LEEDS, TribunalOffice.MANCHESTER);
+        var caseTransferOffices = createOfficeList(tribunalOffices);
+        caseData.setOfficeCT(caseTransferOffices);
+        caseTransferService.populateCaseTransferOffices(caseData);
+        assertTrue(caseData.getOfficeCT().getListItems().isEmpty());
+        assertNull(caseData.getOfficeCT().getValue());
+    }
+
+    @Test
+    public void testPopulateCaseTransferOfficesEnglandWales() {
+        var caseData = new CaseData();
+        var tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
+        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        tribunalOffices.remove(TribunalOffice.MANCHESTER);
+        var caseTransferOffices = createOfficeList(tribunalOffices);
+        caseData.setManagingOffice(managingOffice);
+        caseData.setOfficeCT(caseTransferOffices);
+
+        caseTransferService.populateCaseTransferOffices(caseData);
+
+        verifyTribunalOffices(tribunalOffices, caseData.getOfficeCT().getListItems());
+    }
+
     private List<HearingTypeItem> getHearingTypeCollection(String hearingState){
         HearingType hearingType = new HearingType();
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
@@ -261,5 +305,26 @@ public class CaseTransferServiceTest {
         hearingTypeItem.setId("1234");
         hearingTypeItem.setValue(hearingType);
         return new ArrayList<>(Collections.singletonList(hearingTypeItem));
+    }
+
+    private DynamicFixedListType createOfficeList(List<TribunalOffice> tribunalOffices) {
+        var listItems = new ArrayList<DynamicValueType>();
+        for (TribunalOffice tribunalOffice : tribunalOffices) {
+            listItems.add(DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()));
+        }
+
+        return DynamicFixedListType.from(listItems);
+    }
+
+    private void verifyTribunalOffices(List<TribunalOffice> expected, List<DynamicValueType> listItems) {
+        assertEquals(expected.size(), listItems.size());
+        Iterator<TribunalOffice> expectedItr = expected.listIterator();
+        Iterator<DynamicValueType> listItemsItr = listItems.listIterator();
+        while (expectedItr.hasNext() && listItemsItr.hasNext()) {
+            var tribunalOffice = expectedItr.next();
+            var dynamicValueType = listItemsItr.next();
+            assertEquals(tribunalOffice.getOfficeName(), dynamicValueType.getCode());
+            assertEquals(tribunalOffice.getOfficeName(), dynamicValueType.getLabel());
+        }
     }
 }

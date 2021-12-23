@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.ecm.common.model.listing.ListingCallbackResponse;
 import uk.gov.hmcts.ecm.common.model.listing.ListingRequest;
@@ -209,10 +208,10 @@ public class ExcelActionsController {
     @PostMapping(value = "/initialiseBatchUpdate", consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Initialises multiple case data for batch update event")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Accessed successfully",
-                    response = MultipleCallbackResponse.class),
-            @ApiResponse(code = 400, message = "Bad Request"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(code = 200, message = "Accessed successfully",
+                response = MultipleCallbackResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> initialiseBatchUpdate(
             @RequestBody MultipleRequest multipleRequest,
@@ -639,13 +638,11 @@ public class ExcelActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var multipleDetails = multipleRequest.getCaseDetails();
-
-        MultiplesHelper.populateDynamicListOfficesMultiple(multipleDetails.getCaseData(),
-                UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()));
+        var multipleData = multipleRequest.getCaseDetails().getCaseData();
+        multipleTransferService.populateCaseTransferOffices(multipleData);
 
         return ResponseEntity.ok(MultipleCallbackResponse.builder()
-                .data(multipleDetails.getCaseData())
+                .data(multipleData)
                 .build());
     }
 

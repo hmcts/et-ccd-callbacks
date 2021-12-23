@@ -14,7 +14,6 @@ import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
 
 import java.time.LocalDate;
@@ -42,7 +41,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_STRIKING_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_CLOSED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @Slf4j
 public class Helper {
@@ -262,46 +260,6 @@ public class Helper {
     private static boolean isHearingStatusPostponed(DateListedType dateListedType) {
         return dateListedType.getHearingStatus() != null
                 && dateListedType.getHearingStatus().equals(HEARING_STATUS_POSTPONED);
-    }
-
-    public static List<String> getAllOffices() {
-
-        return new ArrayList<>(Arrays.asList(
-                TribunalOffice.BRISTOL.getOfficeName(),
-                TribunalOffice.LEEDS.getOfficeName(),
-                TribunalOffice.MANCHESTER.getOfficeName(),
-                TribunalOffice.LONDON_CENTRAL.getOfficeName(),
-                TribunalOffice.LONDON_EAST.getOfficeName(),
-                TribunalOffice.LONDON_SOUTH.getOfficeName(),
-                TribunalOffice.MIDLANDS_EAST.getOfficeName(),
-                TribunalOffice.MIDLANDS_WEST.getOfficeName(),
-                TribunalOffice.WALES.getOfficeName(),
-                TribunalOffice.WATFORD.getOfficeName(),
-                TribunalOffice.NEWCASTLE.getOfficeName(),
-                SCOTLAND_CASE_TYPE_ID // to do: whether this needs to be removed by individual offices?
-        ));
-    }
-
-    public static List<DynamicValueType> getAvailableOffices(String currentOffice) {
-
-        List<DynamicValueType> offices = new ArrayList<>();
-
-        for (String office : getAllOffices()) {
-
-            if (!currentOffice.equals(office)) {
-
-                offices.add(DynamicListHelper.getDynamicValue(office));
-            }
-        }
-
-        return offices;
-    }
-
-    public static void populateDynamicListOffices(CaseData caseData) {
-        var dynamicFixedListType = new DynamicFixedListType();
-        dynamicFixedListType.setListItems(getAvailableOffices(caseData.getManagingOffice()));
-
-        caseData.setOfficeCT(dynamicFixedListType);
     }
 
     public static List<String> getJurCodesCollection(List<JurCodesTypeItem> jurCodesCollection) {

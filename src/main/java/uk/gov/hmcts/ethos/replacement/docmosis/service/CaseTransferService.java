@@ -3,10 +3,13 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
@@ -19,6 +22,7 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -44,6 +48,28 @@ public class CaseTransferService {
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
+
+    public void populateCaseTransferOffices(CaseData caseData) {
+        var managingOffice = caseData.getManagingOffice();
+        if (StringUtils.isBlank(managingOffice)) {
+            return;
+        }
+
+        var officeCT = new DynamicFixedListType();
+        if (TribunalOffice.isEnglandWalesOffice(managingOffice)) {
+            var tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
+                    .filter(tribunalOffice -> !tribunalOffice.getOfficeName().equals(managingOffice))
+                    .map(tribunalOffice ->
+                            DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
+                    .collect(Collectors.toList());
+            officeCT.setListItems(tribunalOffices);
+        }
+        else if (TribunalOffice.isScotlandOffice(managingOffice)) {
+            officeCT.setListItems(Collections.emptyList());
+        }
+
+        caseData.setOfficeCT(officeCT);
+    }
 
     public void createCaseTransferEvent(CaseData caseData, List<String> errors, String userToken, int caseListSize) {
         caseData.setManagingOffice(officeCT);

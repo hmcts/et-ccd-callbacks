@@ -881,7 +881,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         var caseData = ccdRequest.getCaseDetails().getCaseData();
-        Helper.populateDynamicListOffices(caseData);
+        caseTransferService.populateCaseTransferOffices(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

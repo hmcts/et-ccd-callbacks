@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import uk.gov.hmcts.ecm.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.ecm.common.model.bulk.types.CaseType;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleObject;
@@ -317,17 +316,6 @@ public class MultiplesHelper {
                 && multipleData.getPreAcceptCase() == null) {
             multipleData.setPreAcceptDone(YES);
         }
-    }
-
-    public static void populateDynamicListOfficesMultiple(MultipleData multipleData, String caseTypeId) {
-
-        log.info("Populating dynamic list with offices multiple");
-
-        var dynamicFixedListType = new DynamicFixedListType();
-        dynamicFixedListType.setListItems(Helper.getAvailableOffices(caseTypeId));
-
-        multipleData.setOfficeMultipleCT(dynamicFixedListType);
-
     }
 
     public static SortedMap<String, SortedMap<String, Object>> createCollectionOrderedByCaseRef(List<?> list) {

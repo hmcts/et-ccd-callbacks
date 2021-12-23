@@ -16,7 +16,7 @@ plugins {
     id 'org.sonarqube' version '3.3'
     id 'au.com.dius.pact' version '4.2.9'
     id 'io.freefair.lombok' version '5.3.0'
-    id 'org.flywaydb.flyway' version '8.2.1'
+    id 'org.flywaydb.flyway' version '8.3.0'
 }
 
 group = 'uk.gov.hmcts.et'
@@ -47,7 +47,7 @@ jacocoTestCoverageVerification {
 }
 
 checkstyle {
-    maxWarnings = 285
+    maxWarnings = 37
     sourceSets = [project.sourceSets.main]
     toolVersion = '8.29'
 }
@@ -215,7 +215,7 @@ ext {
 }
 
 dependencies {
-    implementation 'com.github.hmcts:et-common:0.0.7'
+    implementation 'com.github.hmcts:et-common:0.0.8'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'

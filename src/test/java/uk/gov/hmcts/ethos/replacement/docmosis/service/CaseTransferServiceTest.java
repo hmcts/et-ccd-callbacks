@@ -86,8 +86,7 @@ public class CaseTransferServiceTest {
 
     @Test
     public void createCaseTransfer() {
-        List<String> errors = new ArrayList<>();
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
+        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
         assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
         assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
     }
@@ -101,9 +100,8 @@ public class CaseTransferServiceTest {
         var caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseData(caseData);
-        List<String> errors = new ArrayList<>();
 
-        caseTransferService.createCaseTransfer(caseDetails, errors, authToken);
+        caseTransferService.createCaseTransfer(caseDetails, authToken);
 
         fail("CaseCreationException expected to be thrown by createCaseTransfer");
     }
@@ -138,28 +136,25 @@ public class CaseTransferServiceTest {
         var caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseData(caseData);
-        List<String> errors = new ArrayList<>();
 
-        caseTransferService.createCaseTransfer(caseDetails, errors, authToken);
+        caseTransferService.createCaseTransfer(caseDetails, authToken);
 
         fail("CaseCreationException expected to be thrown by createCaseTransfer");
     }
 
     @Test
     public void InterCountryCaseTransfer() {
-        List<String> errors = new ArrayList<>();
         ccdRequest.getCaseDetails().setCaseTypeId(SCOTLAND_CASE_TYPE_ID);
         ccdRequest.getCaseDetails().getCaseData().setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
+        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
         assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
         assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
     }
 
     @Test
     public void IntraCountryCaseTransfer() {
-        List<String> errors = new ArrayList<>();
         ccdRequest.getCaseDetails().getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
+        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
         assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
         assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
         assertEquals(TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getManagingOffice());
@@ -167,7 +162,6 @@ public class CaseTransferServiceTest {
 
     @Test
     public void createCaseTransferECC() throws IOException {
-        List<String> errors = new ArrayList<>();
         CaseData caseData = MultipleUtil.getCaseData("3434232323");
         caseData.setCaseRefNumberCount("2");
         DynamicFixedListType officeCT = new DynamicFixedListType();
@@ -191,7 +185,7 @@ public class CaseTransferServiceTest {
         when(ccdClient.retrieveCasesElasticSearch(authToken,ccdRequest.getCaseDetails().getCaseTypeId(), List.of("3434232323"))).thenReturn(submitEventList1);
         when(ccdClient.retrieveCasesElasticSearch(authToken,ccdRequest.getCaseDetails().getCaseTypeId(), List.of("2123456/2020"))).thenReturn(submitEventList);
         when(ccdClient.startEventForCase(authToken, "Manchester", "Employment", "12345")).thenReturn(ccdRequest);
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
+        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
         assertEquals("PositionTypeCT", submitEvent.getCaseData().getPositionType());
         assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), submitEvent.getCaseData().getLinkedCaseCT());
         assertEquals("PositionTypeCT", submitEvent1.getCaseData().getPositionType());
@@ -200,9 +194,8 @@ public class CaseTransferServiceTest {
 
     @Test
     public void createCaseTransferMultiples() {
-        List<String> errors = new ArrayList<>();
         ccdRequest.getCaseDetails().getCaseData().setStateAPI(MULTIPLE);
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
+        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
         assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
         assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
     }
@@ -211,21 +204,21 @@ public class CaseTransferServiceTest {
     public void createCaseTransferBfNotCleared() {
         ccdRequest.getCaseDetails().getCaseData().setBfActions(BFHelperTest.generateBFActionTypeItems());
         ccdRequest.getCaseDetails().getCaseData().getBfActions().get(0).getValue().setCleared(null);
-        List<String> errors = new ArrayList<>();
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
+        var errors = caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
         assertEquals(1, errors.size());
-        assertEquals("There are one or more open Brought Forward actions that must be cleared before the "
-                + "case " + ccdRequest.getCaseDetails().getCaseData().getEthosCaseReference() + " can be transferred", errors.get(0));
+        var expectedBfActionsError = String.format(CaseTransferService.BF_ACTIONS_ERROR_MSG,
+                ccdRequest.getCaseDetails().getCaseData().getEthosCaseReference());
+        assertEquals(expectedBfActionsError, errors.get(0));
     }
 
     @Test
     public void createCaseTransferHearingListed() {
         ccdRequest.getCaseDetails().getCaseData().setHearingCollection(getHearingTypeCollection(HEARING_STATUS_LISTED));
-        List<String> errors = new ArrayList<>();
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
+        var errors = caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
         assertEquals(1, errors.size());
-        assertEquals("There are one or more hearings that have the status Listed. These must be updated "
-                + "before the case " + ccdRequest.getCaseDetails().getCaseData().getEthosCaseReference() + " can be transferred", errors.get(0));
+        var expectedHearingsError = String.format(CaseTransferService.HEARINGS_ERROR_MSG,
+                ccdRequest.getCaseDetails().getCaseData().getEthosCaseReference());
+        assertEquals(expectedHearingsError, errors.get(0));
     }
 
     @Test
@@ -233,21 +226,23 @@ public class CaseTransferServiceTest {
         ccdRequest.getCaseDetails().getCaseData().setBfActions(BFHelperTest.generateBFActionTypeItems());
         ccdRequest.getCaseDetails().getCaseData().getBfActions().get(0).getValue().setCleared(null);
         ccdRequest.getCaseDetails().getCaseData().setHearingCollection(getHearingTypeCollection(HEARING_STATUS_LISTED));
-        List<String> errors = new ArrayList<>();
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
+
+        List<String> errors = caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
+
         assertEquals(2, errors.size());
-        assertEquals("There are one or more open Brought Forward actions that must be cleared before the "
-                + "case " +  ccdRequest.getCaseDetails().getCaseData().getEthosCaseReference() + " can be transferred", errors.get(0));
-        assertEquals("There are one or more hearings that have the status Listed. These must be updated "
-                + "before the case " + ccdRequest.getCaseDetails().getCaseData().getEthosCaseReference() + " can be transferred", errors.get(1));
+        var expectedBfActionsError = String.format(CaseTransferService.BF_ACTIONS_ERROR_MSG,
+                ccdRequest.getCaseDetails().getCaseData().getEthosCaseReference());
+        assertEquals(expectedBfActionsError, errors.get(0));
+        var expectedHearingsError = String.format(CaseTransferService.HEARINGS_ERROR_MSG,
+                ccdRequest.getCaseDetails().getCaseData().getEthosCaseReference());
+        assertEquals(expectedHearingsError, errors.get(1));
     }
 
     @Test
     public void createCaseTransferBfClearedAndNotHearingListed() {
         ccdRequest.getCaseDetails().getCaseData().setBfActions(BFHelperTest.generateBFActionTypeItems());
         ccdRequest.getCaseDetails().getCaseData().setHearingCollection(getHearingTypeCollection(HEARING_STATUS_HEARD));
-        List<String> errors = new ArrayList<>();
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, authToken);
+        List<String> errors = caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
         assertEquals(0, errors.size());
     }
 

@@ -26,7 +26,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleSe
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
@@ -65,7 +64,6 @@ public class CaseActionsForCaseWorkerController {
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String EVENT_FIELDS_VALIDATION = "Event fields validation: ";
-    private final CaseTransferService caseTransferService;
     private final CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CaseUpdateForCaseWorkerService caseUpdateForCaseWorkerService;
@@ -861,52 +859,6 @@ public class CaseActionsForCaseWorkerController {
         var caseData = ccdRequest.getCaseDetails().getCaseData();
         DynamicDepositOrder.dynamicDepositOrder(caseData);
         return getCallbackRespEntityNoErrors(caseData);
-    }
-
-    @PostMapping(value = "/dynamicListOffices", consumes = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "populates all offices except the current one in dynamic lists.")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 500, message = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> dynamicListOffices(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
-        log.info("DYNAMIC LIST OFFICES ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseTransferService.populateCaseTransferOffices(caseData);
-
-        return getCallbackRespEntityNoErrors(caseData);
-    }
-
-    @PostMapping(value = "/createCaseTransfer", consumes = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "create a new Case in a different office.")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 500, message = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> createCaseTransfer(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
-        log.info("CREATE CASE TRANSFER ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        List<String> errors = new ArrayList<>();
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, userToken);
-
-        return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
     @PostMapping(value = "/aboutToStartDisposal", consumes = APPLICATION_JSON_VALUE)

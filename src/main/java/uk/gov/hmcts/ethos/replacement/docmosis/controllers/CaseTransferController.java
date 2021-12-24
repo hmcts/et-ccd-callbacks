@@ -14,7 +14,6 @@ import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -77,8 +76,7 @@ public class CaseTransferController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        List<String> errors = new ArrayList<>();
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), errors, userToken);
+        List<String> errors = caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), userToken);
 
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }

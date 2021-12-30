@@ -1,16 +1,19 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
+import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.ecm.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.JudgementType;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
@@ -21,6 +24,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 public class CaseDataBuilder {
 
     private final CaseData caseData = new CaseData();
+
+    public static CaseDataBuilder builder() {
+        return new CaseDataBuilder();
+    }
 
     public CaseDataBuilder withEthosCaseReference(String ethosCaseReference) {
         caseData.setEthosCaseReference(ethosCaseReference);
@@ -70,7 +77,8 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withHearingSession(int hearingIndex, String number, String listedDate, String hearingStatus, boolean disposed) {
+    public CaseDataBuilder withHearingSession(int hearingIndex, String number, String listedDate, String hearingStatus,
+                                              boolean disposed) {
         var hearing = caseData.getHearingCollection().get(hearingIndex);
 
         var dateListedType = new DateListedType();
@@ -107,6 +115,38 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withManagingOffice(String managingOffice) {
+        caseData.setManagingOffice(managingOffice);
+        return this;
+    }
+
+    public CaseDataBuilder withEccCase(String ethosCaseReference) {
+        if (caseData.getEccCases() == null) {
+            caseData.setEccCases(new ArrayList<>());
+        }
+        var eccCases = caseData.getEccCases();
+        var eccCase = new EccCounterClaimType();
+        eccCase.setCounterClaim(ethosCaseReference);
+        var eccCaseItem = new EccCounterClaimTypeItem();
+        eccCaseItem.setValue(eccCase);
+        eccCases.add(eccCaseItem);
+
+        return this;
+    }
+
+    public CaseDataBuilder withCaseTransfer(String office, String positionType, String reason) {
+        caseData.setOfficeCT(DynamicFixedListType.of(DynamicValueType.create(office, office)));
+        caseData.setPositionTypeCT(positionType);
+        caseData.setReasonForCT(reason);
+
+        return this;
+    }
+
+    public CaseDataBuilder withCounterClaim(String counterClaim) {
+        caseData.setCounterClaim(counterClaim);
+        return this;
+    }
+
     public CaseData build() {
         return caseData;
     }
@@ -117,6 +157,15 @@ public class CaseDataBuilder {
         submitEvent.setState(state);
 
         return submitEvent;
+    }
+
+    public CaseDetails buildAsCaseDetails(String caseTypeId, String jurisdiction) {
+        var caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(caseTypeId);
+        caseDetails.setJurisdiction(jurisdiction);
+        caseDetails.setCaseData(caseData);
+
+        return caseDetails;
     }
 }
 

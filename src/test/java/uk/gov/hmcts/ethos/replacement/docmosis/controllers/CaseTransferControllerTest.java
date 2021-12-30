@@ -32,8 +32,10 @@ public class CaseTransferControllerTest {
 
     private static final String DYNAMIC_LIST_OFFICES_URL = "/caseTransfer/dynamicListOffices";
     private static final String CASE_TRANSFER_SAME_COUNTRY_URL = "/caseTransfer/transferSameCountry";
+    private static final String CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL =
+            "/caseTransfer/transferSameCountryEccLinkedCase";
     private static final String CASE_TRANSFER_DIFFERENT_COUNTRY_URL = "/caseTransfer/transferDifferentCountry";
-
+    
     @MockBean
     VerifyTokenService verifyTokenService;
 
@@ -124,6 +126,53 @@ public class CaseTransferControllerTest {
                 .andExpect(status().isForbidden());
 
         verify(caseTransferService, never()).caseTransferSameCountry(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+    }
+
+    @Test
+    public void testTransferSameCountryEccLinkedCase() throws Exception {
+        var ccdRequest = CCDRequestBuilder.builder().build();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL)
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(0)))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+
+        verify(caseTransferService, times(1)).caseTransferSameCountryEccLinkedCase(ccdRequest.getCaseDetails(),
+                AUTH_TOKEN);
+    }
+
+    @Test
+    public void testTransferSameCountryEccLinkedCaseError400() throws Exception {
+        var ccdRequest = CCDRequestBuilder.builder().build();
+
+        mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL)
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("error"))
+                .andExpect(status().isBadRequest());
+
+        verify(caseTransferService, never()).caseTransferSameCountryEccLinkedCase(ccdRequest.getCaseDetails(),
+                AUTH_TOKEN);
+    }
+
+    @Test
+    public void testTransferSameCountryEccLinkedCaseForbidden() throws Exception {
+        var ccdRequest = CCDRequestBuilder.builder().build();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+
+        mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL)
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
+
+        verify(caseTransferService, never()).caseTransferSameCountryEccLinkedCase(ccdRequest.getCaseDetails(),
+                AUTH_TOKEN);
     }
 
     @Test

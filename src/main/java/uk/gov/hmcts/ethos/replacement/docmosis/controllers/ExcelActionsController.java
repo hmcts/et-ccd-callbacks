@@ -16,6 +16,7 @@ import uk.gov.hmcts.ecm.common.model.listing.ListingRequest;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferOfficeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
@@ -639,7 +640,7 @@ public class ExcelActionsController {
         }
 
         var multipleData = multipleRequest.getCaseDetails().getCaseData();
-        multipleTransferService.populateCaseTransferOffices(multipleData);
+        CaseTransferOfficeService.populateOfficeOptions(multipleData);
 
         return ResponseEntity.ok(MultipleCallbackResponse.builder()
                 .data(multipleData)

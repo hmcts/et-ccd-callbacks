@@ -158,13 +158,15 @@ public class PersistentQHelper {
 
     public static CreationSingleDataModel getCreationSingleDataModel(String ccdGatewayBaseUrl, String officeCT,
                                                                      String positionTypeCT, String reasonForCT,
-                                                                     String scopeOfTransfer) {
+                                                                     boolean transferSameCountry,
+                                                                     String sourceEthosCaseReference) {
         return builder()
                 .officeCT(officeCT)
                 .positionTypeCT(positionTypeCT)
                 .ccdGatewayBaseUrl(ccdGatewayBaseUrl)
                 .reasonForCT(reasonForCT)
-                .scopeOfTransfer(scopeOfTransfer)
+                .transferSameCountry(transferSameCountry)
+                .sourceEthosCaseReference(sourceEthosCaseReference)
                 .build();
     }
 

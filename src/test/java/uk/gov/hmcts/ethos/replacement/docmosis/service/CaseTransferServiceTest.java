@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
@@ -10,28 +11,16 @@ import org.mockito.stubbing.Answer;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
-import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.items.EccCounterClaimTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
-import uk.gov.hmcts.ecm.common.model.ccd.types.EccCounterClaimType;
-import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.ecm.common.model.ccd.items.BFActionTypeItem;
+import uk.gov.hmcts.ecm.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -39,84 +28,252 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferService.BF_ACTIONS_ERROR_MSG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferService.HEARINGS_ERROR_MSG;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class CaseTransferServiceTest {
 
     @InjectMocks
     private CaseTransferService caseTransferService;
+
     @Mock
     private CcdClient ccdClient;
-    private CCDRequest ccdRequest;
-    private SubmitEvent submitEvent;
-    private String authToken;
 
     @Mock
-    private PersistentQHelperService persistentQHelperService;
+    private CaseTransferEventService caseTransferEventService;
 
-    @Before
-    public void setUp() {
-        ccdRequest = new CCDRequest();
-        CaseDetails caseDetails = new CaseDetails();
-        CaseData caseData = MultipleUtil.getCaseData("2123456/2020");
-        caseData.setCaseRefNumberCount("2");
-        caseData.setPositionTypeCT("PositionTypeCT");
-        DynamicFixedListType officeCT = new DynamicFixedListType();
-        DynamicValueType valueType = new DynamicValueType();
-        valueType.setCode(TribunalOffice.LEEDS.getOfficeName());
-        officeCT.setValue(valueType);
-        caseData.setOfficeCT(officeCT);
-        caseDetails.setCaseData(caseData);
-        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
-        caseDetails.setJurisdiction("Employment");
-        caseDetails.setState(ACCEPTED_STATE);
-        ccdRequest.setCaseDetails(caseDetails);
-        submitEvent = new SubmitEvent();
-        submitEvent.setCaseData(caseData);
-        submitEvent.setCaseId(12345);
-        authToken = "authToken";
+    @Captor
+    private ArgumentCaptor<CaseTransferEventParams> caseTransferEventParamsArgumentCaptor;
+
+    private final String claimantEthosCaseReference = "120001/2021";
+    private final String caseTypeId = ENGLANDWALES_CASE_TYPE_ID;
+    private final String jurisdiction = "EMPLOYMENT";
+    private final String userToken = "my-test-token";
+    private final String reasonCT = "Just a test";
+
+    @Test
+    public void caseTransferSameCountry() {
+        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), Collections.emptyList(),
+                officeCT, null);
+
+        var errors = caseTransferService.caseTransferSameCountry(caseDetails, userToken);
+
+        assertTrue(errors.isEmpty());
+        verify(caseTransferEventService, never()).transfer(isA(CaseTransferEventParams.class));
+
+        assertEquals(officeCT, caseDetails.getCaseData().getManagingOffice());
+        assertNull(caseDetails.getCaseData().getOfficeCT());
+        assertNull(caseDetails.getCaseData().getPositionTypeCT());
+        assertNull(caseDetails.getCaseData().getStateAPI());
     }
 
     @Test
-    public void createCaseTransfer() {
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
-        assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
-        assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
+    public void caseTransferSameCountryWithBfActionClearedAndHearingHeard() {
+        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), Collections.emptyList(),
+                officeCT, HEARING_STATUS_HEARD);
+        addBfAction(caseDetails.getCaseData(), YES);
+
+        var errors = caseTransferService.caseTransferSameCountry(caseDetails, userToken);
+
+        assertTrue(errors.isEmpty());
+        verify(caseTransferEventService, never()).transfer(isA(CaseTransferEventParams.class));
+
+        assertEquals(officeCT, caseDetails.getCaseData().getManagingOffice());
+        assertNull(caseDetails.getCaseData().getOfficeCT());
+        assertNull(caseDetails.getCaseData().getPositionTypeCT());
+        assertNull(caseDetails.getCaseData().getStateAPI());
+    }
+
+    @Test
+    public void caseTransferSameCountryWithBfAction() {
+        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), Collections.emptyList(),
+                officeCT, null);
+        addBfAction(caseDetails.getCaseData(), null);
+        var expectedError = String.format(BF_ACTIONS_ERROR_MSG, claimantEthosCaseReference);
+
+        var errors = caseTransferService.caseTransferSameCountry(caseDetails, userToken);
+
+        assertEquals(1, errors.size());
+        assertEquals(expectedError, errors.get(0));
+        verify(caseTransferEventService, never()).transfer(isA(CaseTransferEventParams.class));
+
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), caseDetails.getCaseData().getManagingOffice());
+        assertEquals(officeCT, caseDetails.getCaseData().getOfficeCT().getSelectedCode());
+    }
+
+    @Test
+    public void caseTransferSameCountryWithHearingListed() {
+        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), Collections.emptyList(),
+                officeCT, HEARING_STATUS_LISTED);
+        var expectedError = String.format(HEARINGS_ERROR_MSG, claimantEthosCaseReference);
+
+        var errors = caseTransferService.caseTransferSameCountry(caseDetails, userToken);
+
+        assertEquals(1, errors.size());
+        assertEquals(expectedError, errors.get(0));
+        verify(caseTransferEventService, never()).transfer(isA(CaseTransferEventParams.class));
+
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), caseDetails.getCaseData().getManagingOffice());
+        assertEquals(officeCT, caseDetails.getCaseData().getOfficeCT().getSelectedCode());
+    }
+
+    @Test
+    public void caseTransferSameCountryWithBfActionAndHearingListed() {
+        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), Collections.emptyList(),
+                officeCT, HEARING_STATUS_LISTED);
+        addBfAction(caseDetails.getCaseData(), null);
+        var expectedErrors = List.of(String.format(BF_ACTIONS_ERROR_MSG, claimantEthosCaseReference),
+                String.format(HEARINGS_ERROR_MSG, claimantEthosCaseReference));
+
+        var errors = caseTransferService.caseTransferSameCountry(caseDetails, userToken);
+
+        assertEquals(2, errors.size());
+        assertEquals(expectedErrors.get(0), errors.get(0));
+        assertEquals(expectedErrors.get(1), errors.get(1));
+        verify(caseTransferEventService, never()).transfer(isA(CaseTransferEventParams.class));
+
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), caseDetails.getCaseData().getManagingOffice());
+        assertEquals(officeCT, caseDetails.getCaseData().getOfficeCT().getSelectedCode());
+    }
+
+    @Test
+    public void caseTransferSameCountryWithEccCase() throws IOException {
+        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        var eccCaseReference = "120002/2021";
+        var eccCases = List.of(eccCaseReference);
+        var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), eccCases, officeCT, null);
+
+        mockEccCaseSearch(eccCases);
+
+        var errors = caseTransferService.caseTransferSameCountry(caseDetails, userToken);
+
+        assertTrue(errors.isEmpty());
+
+        assertEquals(officeCT, caseDetails.getCaseData().getManagingOffice());
+        assertNull(caseDetails.getCaseData().getOfficeCT());
+        assertNull(caseDetails.getCaseData().getPositionTypeCT());
+        assertNull(caseDetails.getCaseData().getStateAPI());
+
+        verify(caseTransferEventService, times(1)).transfer(caseTransferEventParamsArgumentCaptor.capture());
+        var params = caseTransferEventParamsArgumentCaptor.getValue();
+        verifyCaseTransferEventParams(eccCaseReference,claimantEthosCaseReference, officeCT, params);
+    }
+
+    @Test
+    public void caseTransferSameCountryWithEccCases() throws IOException {
+        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        var eccCases = List.of("120002/2021", "120003/2021");
+        var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), eccCases, officeCT, null);
+
+        mockEccCaseSearch(eccCases);
+
+        var errors = caseTransferService.caseTransferSameCountry(caseDetails, userToken);
+
+        assertTrue(errors.isEmpty());
+
+        assertEquals(officeCT, caseDetails.getCaseData().getManagingOffice());
+        assertNull(caseDetails.getCaseData().getOfficeCT());
+        assertNull(caseDetails.getCaseData().getPositionTypeCT());
+        assertNull(caseDetails.getCaseData().getStateAPI());
+
+        verify(caseTransferEventService, times(2)).transfer(caseTransferEventParamsArgumentCaptor.capture());
+        var allParams = caseTransferEventParamsArgumentCaptor.getAllValues();
+        verifyCaseTransferEventParams(eccCases.get(0), claimantEthosCaseReference, officeCT, allParams.get(0));
+        verifyCaseTransferEventParams(eccCases.get(1), claimantEthosCaseReference, officeCT, allParams.get(1));
+    }
+
+    @Test
+    public void caseTransferSameCountryWithEccCaseAsSource() throws IOException {
+        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        var eccCaseReference = "120009/2021";
+        var eccCaseDetails = createEccCase(eccCaseReference, officeCT);
+        mockEccCaseSearch(List.of(eccCaseReference));
+
+        var errors = caseTransferService.caseTransferSameCountry(eccCaseDetails, userToken);
+
+        assertTrue(errors.isEmpty());
+        assertEquals(officeCT, eccCaseDetails.getCaseData().getManagingOffice());
+        assertNull(eccCaseDetails.getCaseData().getOfficeCT());
+        assertNull(eccCaseDetails.getCaseData().getPositionTypeCT());
+        assertNull(eccCaseDetails.getCaseData().getStateAPI());
+        verify(caseTransferEventService, times(1)).transfer(caseTransferEventParamsArgumentCaptor.capture());
+        var params = caseTransferEventParamsArgumentCaptor.getValue();
+        verifyCaseTransferEventParams(claimantEthosCaseReference, eccCaseReference, officeCT, params);
+    }
+
+    @Test
+    public void caseTransferSameCountryWithEccCaseReturnsTransferError() throws IOException {
+        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        var eccCases = List.of("120002/2021");
+        var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), eccCases, officeCT, null);
+
+        mockEccCaseSearch(eccCases);
+        var caseTransferError = "A transfer error";
+        when(caseTransferEventService.transfer(isA(CaseTransferEventParams.class))).thenReturn(
+                List.of(caseTransferError));
+
+        var errors = caseTransferService.caseTransferSameCountry(caseDetails, userToken);
+
+        assertEquals(1, errors.size());
+        assertEquals(caseTransferError, errors.get(0));
+        assertEquals(officeCT, caseDetails.getCaseData().getManagingOffice());
+        assertNull(caseDetails.getCaseData().getOfficeCT());
+        assertNull(caseDetails.getCaseData().getPositionTypeCT());
+        assertNull(caseDetails.getCaseData().getStateAPI());
+        verify(caseTransferEventService, times(1)).transfer(isA(CaseTransferEventParams.class));
+    }
+
+    @Test
+    public void caseTransferSameCountryEccLinkedCase() throws IOException {
+        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), Collections.emptyList(),
+                officeCT, null);
+        var eccCases = List.of("120002/2021");
+        mockEccCaseSearch(eccCases);
+
+        var errors = caseTransferService.caseTransferSameCountryEccLinkedCase(caseDetails, userToken);
+
+        assertTrue(errors.isEmpty());
+        verify(caseTransferEventService, never()).transfer(isA(CaseTransferEventParams.class));
+
+        assertEquals(officeCT, caseDetails.getCaseData().getManagingOffice());
+        assertNull(caseDetails.getCaseData().getOfficeCT());
+        assertNull(caseDetails.getCaseData().getPositionTypeCT());
+        assertNull(caseDetails.getCaseData().getStateAPI());
     }
 
     @Test(expected = CaseCreationException.class)
-    public void testCreateCaseTransferOriginalCaseException() throws IOException {
+    public void getOriginalCaseException() throws IOException {
         when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), anyList())).thenThrow(new IOException());
-        var caseData = new CaseData();
-        caseData.setCounterClaim("1000/2021");
-        caseData.setOfficeCT(DynamicFixedListType.of(DynamicValueType.create("Test Office", "Test Office")));
-        var caseDetails = new CaseDetails();
-        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
-        caseDetails.setCaseData(caseData);
 
-        caseTransferService.createCaseTransfer(caseDetails, authToken);
+        caseTransferService.caseTransferSameCountry(createEccCase("120009/2021",
+                TribunalOffice.NEWCASTLE.getOfficeName()), userToken);
 
-        fail("CaseCreationException expected to be thrown by createCaseTransfer");
+        fail("CaseCreationException expected to be thrown by caseTransferSameCountry");
     }
 
     @Test(expected = CaseCreationException.class)
-    public void testCreateCaseTransferAllCasesToBeTransferredException() throws IOException {
-        var eccCaseData = new CaseData();
-        var eccCounterClaimTypeItem = new EccCounterClaimTypeItem();
-        var eccCounterClaimType = new EccCounterClaimType();
-        eccCounterClaimType.setCounterClaim("counter-claim");
-        eccCounterClaimTypeItem.setValue(eccCounterClaimType);
-        eccCaseData.setEccCases(List.of(eccCounterClaimTypeItem));
-        var submitEvent = new SubmitEvent();
-        submitEvent.setCaseData(eccCaseData);
-
+    public void getAllCasesToBeTransferredException() throws IOException {
+        var submitEvent = CaseDataBuilder.builder()
+                .withEccCase("120009/2021")
+                .buildAsSubmitEvent(ACCEPTED_STATE);
         var submitEvents = List.of(submitEvent);
         when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), anyList())).thenAnswer(new Answer<>() {
             int count = 0;
@@ -130,196 +287,77 @@ public class CaseTransferServiceTest {
                 }
             }
         });
-        var caseData = new CaseData();
-        caseData.setCounterClaim("1000/2021");
-        caseData.setOfficeCT(DynamicFixedListType.of(DynamicValueType.create("Test Office", "Test Office")));
-        var caseDetails = new CaseDetails();
-        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
-        caseDetails.setCaseData(caseData);
 
-        caseTransferService.createCaseTransfer(caseDetails, authToken);
+        caseTransferService.caseTransferSameCountry(
+                createEccCase("120009/2021", TribunalOffice.NEWCASTLE.getOfficeName()), userToken);
 
-        fail("CaseCreationException expected to be thrown by createCaseTransfer");
+        fail("CaseCreationException expected to be thrown by caseTransferSameCountry");
     }
 
-    @Test
-    public void InterCountryCaseTransfer() {
-        ccdRequest.getCaseDetails().setCaseTypeId(SCOTLAND_CASE_TYPE_ID);
-        ccdRequest.getCaseDetails().getCaseData().setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
-        assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
-        assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
+    private void verifyCaseTransferEventParams(String expectedEthosCaseReference,
+                                               String expectedSourceEthosCaseReference, String expectedManagingOffice,
+                                               CaseTransferEventParams params) {
+        assertEquals(userToken, params.getUserToken());
+        assertEquals(caseTypeId, params.getCaseTypeId());
+        assertEquals(jurisdiction, params.getJurisdiction());
+        assertEquals(expectedEthosCaseReference, params.getEthosCaseReference());
+        assertEquals(expectedSourceEthosCaseReference, params.getSourceEthosCaseReference());
+        assertEquals(expectedManagingOffice, params.getNewManagingOffice());
+        assertNull(params.getPositionType());
+        assertEquals(reasonCT, params.getReason());
+        assertEquals(SINGLE_CASE_TYPE, params.getEcmCaseType());
+        assertTrue(params.isTransferSameCountry());
     }
 
-    @Test
-    public void IntraCountryCaseTransfer() {
-        ccdRequest.getCaseDetails().getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
-        assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
-        assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
-        assertEquals(TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getManagingOffice());
-    }
-
-    @Test
-    public void createCaseTransferECC() throws IOException {
-        CaseData caseData = MultipleUtil.getCaseData("3434232323");
-        caseData.setCaseRefNumberCount("2");
-        DynamicFixedListType officeCT = new DynamicFixedListType();
-        DynamicValueType valueType = new DynamicValueType();
-        valueType.setCode(ENGLANDWALES_CASE_TYPE_ID);
-        officeCT.setValue(valueType);
-        caseData.setOfficeCT(officeCT);
-        SubmitEvent submitEvent1 = new SubmitEvent();
-        submitEvent1.setCaseId(12345);
-        submitEvent.getCaseData().setReasonForCT("New Reason");
-        List<SubmitEvent> submitEventList = new ArrayList<>(Collections.singletonList(submitEvent));
-        List<SubmitEvent> submitEventList1 = new ArrayList<>(Collections.singletonList(submitEvent1));
-        ccdRequest.getCaseDetails().getCaseData().setCounterClaim("3434232323");
-        EccCounterClaimTypeItem item = new EccCounterClaimTypeItem();
-        EccCounterClaimType type = new EccCounterClaimType();
-        type.setCounterClaim("2123456/2020");
-        item.setId(UUID.randomUUID().toString());
-        item.setValue(type);
-        caseData.setEccCases(List.of(item));
-        submitEvent1.setCaseData(caseData);
-        when(ccdClient.retrieveCasesElasticSearch(authToken,ccdRequest.getCaseDetails().getCaseTypeId(), List.of("3434232323"))).thenReturn(submitEventList1);
-        when(ccdClient.retrieveCasesElasticSearch(authToken,ccdRequest.getCaseDetails().getCaseTypeId(), List.of("2123456/2020"))).thenReturn(submitEventList);
-        when(ccdClient.startEventForCase(authToken, "Manchester", "Employment", "12345")).thenReturn(ccdRequest);
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
-        assertEquals("PositionTypeCT", submitEvent.getCaseData().getPositionType());
-        assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), submitEvent.getCaseData().getLinkedCaseCT());
-        assertEquals("PositionTypeCT", submitEvent1.getCaseData().getPositionType());
-        assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), submitEvent1.getCaseData().getLinkedCaseCT());
-    }
-
-    @Test
-    public void createCaseTransferMultiples() {
-        ccdRequest.getCaseDetails().getCaseData().setStateAPI(MULTIPLE);
-        caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
-        assertEquals("PositionTypeCT", ccdRequest.getCaseDetails().getCaseData().getPositionType());
-        assertEquals("Transferred to " + TribunalOffice.LEEDS.getOfficeName(), ccdRequest.getCaseDetails().getCaseData().getLinkedCaseCT());
-    }
-
-    @Test
-    public void createCaseTransferBfNotCleared() {
-        ccdRequest.getCaseDetails().getCaseData().setBfActions(BFHelperTest.generateBFActionTypeItems());
-        ccdRequest.getCaseDetails().getCaseData().getBfActions().get(0).getValue().setCleared(null);
-        var errors = caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
-        assertEquals(1, errors.size());
-        var expectedBfActionsError = String.format(CaseTransferService.BF_ACTIONS_ERROR_MSG,
-                ccdRequest.getCaseDetails().getCaseData().getEthosCaseReference());
-        assertEquals(expectedBfActionsError, errors.get(0));
-    }
-
-    @Test
-    public void createCaseTransferHearingListed() {
-        ccdRequest.getCaseDetails().getCaseData().setHearingCollection(getHearingTypeCollection(HEARING_STATUS_LISTED));
-        var errors = caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
-        assertEquals(1, errors.size());
-        var expectedHearingsError = String.format(CaseTransferService.HEARINGS_ERROR_MSG,
-                ccdRequest.getCaseDetails().getCaseData().getEthosCaseReference());
-        assertEquals(expectedHearingsError, errors.get(0));
-    }
-
-    @Test
-    public void createCaseTransferHearingListedAndBfNotCleared() {
-        ccdRequest.getCaseDetails().getCaseData().setBfActions(BFHelperTest.generateBFActionTypeItems());
-        ccdRequest.getCaseDetails().getCaseData().getBfActions().get(0).getValue().setCleared(null);
-        ccdRequest.getCaseDetails().getCaseData().setHearingCollection(getHearingTypeCollection(HEARING_STATUS_LISTED));
-
-        List<String> errors = caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
-
-        assertEquals(2, errors.size());
-        var expectedBfActionsError = String.format(CaseTransferService.BF_ACTIONS_ERROR_MSG,
-                ccdRequest.getCaseDetails().getCaseData().getEthosCaseReference());
-        assertEquals(expectedBfActionsError, errors.get(0));
-        var expectedHearingsError = String.format(CaseTransferService.HEARINGS_ERROR_MSG,
-                ccdRequest.getCaseDetails().getCaseData().getEthosCaseReference());
-        assertEquals(expectedHearingsError, errors.get(1));
-    }
-
-    @Test
-    public void createCaseTransferBfClearedAndNotHearingListed() {
-        ccdRequest.getCaseDetails().getCaseData().setBfActions(BFHelperTest.generateBFActionTypeItems());
-        ccdRequest.getCaseDetails().getCaseData().setHearingCollection(getHearingTypeCollection(HEARING_STATUS_HEARD));
-        List<String> errors = caseTransferService.createCaseTransfer(ccdRequest.getCaseDetails(), authToken);
-        assertEquals(0, errors.size());
-    }
-
-    @Test
-    public void testPopulateCaseTransferOfficesIgnoresMissingManagingOffice() {
-        var caseData = new CaseData();
-        var tribunalOffices = List.of(TribunalOffice.LEEDS, TribunalOffice.MANCHESTER);
-        var caseTransferOffices = createOfficeList(tribunalOffices);
-        caseData.setOfficeCT(caseTransferOffices);
-        var missingManagingOfficeValues = new String[] { null, "", " "};
-        for (String managingOffice : missingManagingOfficeValues) {
-            caseData.setManagingOffice(managingOffice);
-            caseTransferService.populateCaseTransferOffices(caseData);
-            verifyTribunalOffices(tribunalOffices, caseData.getOfficeCT().getListItems());
-        }
-    }
-
-    @Test
-    public void testPopulateCaseTransferOfficesScotland() {
-        var caseData = new CaseData();
-        caseData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
-        var tribunalOffices = List.of(TribunalOffice.LEEDS, TribunalOffice.MANCHESTER);
-        var caseTransferOffices = createOfficeList(tribunalOffices);
-        caseData.setOfficeCT(caseTransferOffices);
-        caseTransferService.populateCaseTransferOffices(caseData);
-        assertTrue(caseData.getOfficeCT().getListItems().isEmpty());
-        assertNull(caseData.getOfficeCT().getValue());
-    }
-
-    @Test
-    public void testPopulateCaseTransferOfficesEnglandWales() {
-        var caseData = new CaseData();
-        var tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        tribunalOffices.remove(TribunalOffice.MANCHESTER);
-        var caseTransferOffices = createOfficeList(tribunalOffices);
-        caseData.setManagingOffice(managingOffice);
-        caseData.setOfficeCT(caseTransferOffices);
-
-        caseTransferService.populateCaseTransferOffices(caseData);
-
-        verifyTribunalOffices(tribunalOffices, caseData.getOfficeCT().getListItems());
-    }
-
-    private List<HearingTypeItem> getHearingTypeCollection(String hearingState){
-        HearingType hearingType = new HearingType();
-        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
-        DateListedType dateListedType = new DateListedType();
-        dateListedType.setHearingStatus(hearingState);
-        dateListedTypeItem.setId("123");
-        dateListedTypeItem.setValue(dateListedType);
-        hearingType.setHearingDateCollection(new ArrayList<>(Collections.singleton(dateListedTypeItem)));
-
-        HearingTypeItem hearingTypeItem = new HearingTypeItem();
-        hearingTypeItem.setId("1234");
-        hearingTypeItem.setValue(hearingType);
-        return new ArrayList<>(Collections.singletonList(hearingTypeItem));
-    }
-
-    private DynamicFixedListType createOfficeList(List<TribunalOffice> tribunalOffices) {
-        var listItems = new ArrayList<DynamicValueType>();
-        for (TribunalOffice tribunalOffice : tribunalOffices) {
-            listItems.add(DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()));
+    private CaseDetails createCaseDetails(String managingOffice, List<String> eccCases, String office,
+                                          String hearingStatus) {
+        CaseDataBuilder builder = CaseDataBuilder.builder()
+                .withEthosCaseReference(claimantEthosCaseReference)
+                .withManagingOffice(managingOffice)
+                .withCaseTransfer(office, null, reasonCT);
+        for (String eccCase : eccCases) {
+            builder.withEccCase(eccCase);
         }
 
-        return DynamicFixedListType.from(listItems);
+        if (hearingStatus != null) {
+            builder.withHearing("1", null, null)
+                    .withHearingSession(0, "1", "2021-12-25", hearingStatus, false);
+        }
+
+        return builder.buildAsCaseDetails(caseTypeId, jurisdiction);
     }
 
-    private void verifyTribunalOffices(List<TribunalOffice> expected, List<DynamicValueType> listItems) {
-        assertEquals(expected.size(), listItems.size());
-        Iterator<TribunalOffice> expectedItr = expected.listIterator();
-        Iterator<DynamicValueType> listItemsItr = listItems.listIterator();
-        while (expectedItr.hasNext() && listItemsItr.hasNext()) {
-            var tribunalOffice = expectedItr.next();
-            var dynamicValueType = listItemsItr.next();
-            assertEquals(tribunalOffice.getOfficeName(), dynamicValueType.getCode());
-            assertEquals(tribunalOffice.getOfficeName(), dynamicValueType.getLabel());
+    private void addBfAction(CaseData caseData, String cleared) {
+        var bfAction = new BFActionType();
+        bfAction.setCleared(cleared);
+        var bfActionItem = new BFActionTypeItem();
+        bfActionItem.setValue(bfAction);
+
+        caseData.setBfActions(List.of(bfActionItem));
+    }
+
+    private void mockEccCaseSearch(List<String> ethosCaseReferences) throws IOException {
+        var builder = CaseDataBuilder.builder().withEthosCaseReference(claimantEthosCaseReference);
+        for (String ethosCaseReference : ethosCaseReferences) {
+            builder.withEccCase(ethosCaseReference);
+
+            var submitEvent = CaseDataBuilder.builder()
+                    .withEthosCaseReference(ethosCaseReference)
+                    .buildAsSubmitEvent(ACCEPTED_STATE);
+            when(ccdClient.retrieveCasesElasticSearch(userToken, caseTypeId, List.of(ethosCaseReference)))
+                    .thenReturn(List.of(submitEvent));
         }
+
+        var submitEvent = builder.buildAsSubmitEvent(ACCEPTED_STATE);
+        when(ccdClient.retrieveCasesElasticSearch(userToken, caseTypeId, List.of(claimantEthosCaseReference)))
+                .thenReturn(List.of(submitEvent));
+    }
+
+    private CaseDetails createEccCase(String ethosCaseReference, String office) {
+        return CaseDataBuilder.builder()
+                .withEthosCaseReference(ethosCaseReference)
+                .withCounterClaim(claimantEthosCaseReference)
+                .withCaseTransfer(office, null, reasonCT)
+                .buildAsCaseDetails(caseTypeId, jurisdiction);
     }
 }

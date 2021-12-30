@@ -4,13 +4,9 @@ import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
@@ -18,7 +14,6 @@ import uk.gov.hmcts.ecm.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,7 +23,6 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
 @Slf4j
@@ -42,45 +36,8 @@ public class CaseTransferService {
     static final String HEARINGS_ERROR_MSG = "There are one or more hearings that have the status Listed. "
             + "These must be updated before the case %s can be transferred";
 
-    private final PersistentQHelperService persistentQHelperService;
     private final CcdClient ccdClient;
-
-    @Value("${ccd_gateway_base_url}")
-    private String ccdGatewayBaseUrl;
-
-    public void populateCaseTransferOffices(CaseData caseData) {
-        var managingOffice = caseData.getManagingOffice();
-        if (StringUtils.isBlank(managingOffice)) {
-            return;
-        }
-
-        var officeCT = new DynamicFixedListType();
-        if (TribunalOffice.isEnglandWalesOffice(managingOffice)) {
-            var tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
-                    .filter(tribunalOffice -> !tribunalOffice.getOfficeName().equals(managingOffice))
-                    .map(tribunalOffice ->
-                            DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
-                    .collect(Collectors.toList());
-            officeCT.setListItems(tribunalOffices);
-        } else if (TribunalOffice.isScotlandOffice(managingOffice)) {
-            officeCT.setListItems(Collections.emptyList());
-        }
-
-        caseData.setOfficeCT(officeCT);
-    }
-
-    public List<String> createCaseTransfer(CaseDetails caseDetails, String userToken) {
-        var errors = new ArrayList<String>();
-        var caseDataList = getAllCasesToBeTransferred(caseDetails, userToken);
-
-        caseDataList.forEach(caseData -> validateCase(caseData, errors));
-
-        if (!errors.isEmpty()) {
-            return errors;
-        }
-
-        return transferCases(caseDetails, caseDataList, userToken);
-    }
+    private final CaseTransferEventService caseTransferEventService;
 
     public List<String> caseTransferSameCountry(CaseDetails caseDetails, String userToken) {
         var errors = new ArrayList<String>();
@@ -92,23 +49,24 @@ public class CaseTransferService {
             return errors;
         }
 
-        var newManagingOffice = caseDetails.getCaseData().getOfficeCT().getSelectedCode();
-        caseDetails.getCaseData().setManagingOffice(newManagingOffice);
-        caseDetails.getCaseData().setOfficeCT(null);
+        return transferCases(caseDetails, caseDataList, userToken, true);
+    }
 
-        for (var caseData : caseDataList) {
-            if (caseData.getEthosCaseReference().equals(caseDetails.getCaseData().getEthosCaseReference())) {
-                continue;
-            }
-
-            caseData.setManagingOffice(newManagingOffice);
-        }
-        return errors;
-        //return transferCases(caseDetails, caseDataList, userToken);
+    public List<String> caseTransferSameCountryEccLinkedCase(CaseDetails caseDetails, String userToken) {
+        return transferCases(caseDetails, Collections.emptyList(), userToken, true);
     }
 
     public List<String> caseTransferDifferentCountry(CaseDetails caseDetails, String userToken) {
-        throw new UnsupportedOperationException();
+        var errors = new ArrayList<String>();
+        var caseDataList = getAllCasesToBeTransferred(caseDetails, userToken);
+
+        caseDataList.forEach(caseData -> validateCase(caseData, errors));
+
+        if (!errors.isEmpty()) {
+            return errors;
+        }
+
+        return transferCases(caseDetails, caseDataList, userToken, false);
     }
 
     private List<CaseData> getAllCasesToBeTransferred(CaseDetails caseDetails, String userToken) {
@@ -163,6 +121,16 @@ public class CaseTransferService {
         return eccCases;
     }
 
+    private void validateCase(CaseData caseData, List<String> errors) {
+        if (!checkBfActionsCleared(caseData)) {
+            errors.add(String.format(BF_ACTIONS_ERROR_MSG, caseData.getEthosCaseReference()));
+        }
+
+        if (!checkHearingsNotListed(caseData)) {
+            errors.add(String.format(HEARINGS_ERROR_MSG, caseData.getEthosCaseReference()));
+        }
+    }
+
     private boolean checkBfActionsCleared(CaseData caseData) {
         if (caseData.getBfActions() != null) {
             for (BFActionTypeItem bfActionTypeItem : caseData.getBfActions()) {
@@ -192,48 +160,43 @@ public class CaseTransferService {
         return true;
     }
 
-    private void validateCase(CaseData caseData, List<String> errors) {
-        if (!checkBfActionsCleared(caseData)) {
-            errors.add(String.format(BF_ACTIONS_ERROR_MSG, caseData.getEthosCaseReference()));
-        }
-
-        if (!checkHearingsNotListed(caseData)) {
-            errors.add(String.format(HEARINGS_ERROR_MSG, caseData.getEthosCaseReference()));
-        }
-    }
-
-    private List<String> transferCases(CaseDetails caseDetails, List<CaseData> caseDataList, String userToken) {
+    private List<String> transferCases(CaseDetails caseDetails, List<CaseData> caseDataList, String userToken,
+                                       boolean sameCountry) {
         var errors = new ArrayList<String>();
-        for (CaseData caseData : caseDataList) {
-            createCaseTransferEvent(caseDetails, caseData, userToken, errors);
+
+        // Remove source case as we will be updating this directly rather than sending it to the event queue
+        var sourceCaseData = caseDetails.getCaseData();
+        var casesToSubmitTransferEvent = caseDataList.stream()
+                .filter(caseData -> !caseData.getEthosCaseReference().equals(sourceCaseData.getEthosCaseReference()))
+                .collect(Collectors.toList());
+
+        var newManagingOffice = caseDetails.getCaseData().getOfficeCT().getSelectedCode();
+
+        for (CaseData caseData : casesToSubmitTransferEvent) {
+            var params = CaseTransferEventParams.builder()
+                    .userToken(userToken)
+                    .caseTypeId(caseDetails.getCaseTypeId())
+                    .jurisdiction(caseDetails.getJurisdiction())
+                    .ethosCaseReference(caseData.getEthosCaseReference())
+                    .sourceEthosCaseReference(sourceCaseData.getEthosCaseReference())
+                    .newManagingOffice(newManagingOffice)
+                    .positionType(caseDetails.getCaseData().getPositionTypeCT())
+                    .reason(caseDetails.getCaseData().getReasonForCT())
+                    .ecmCaseType(SINGLE_CASE_TYPE)
+                    .transferSameCountry(sameCountry)
+                    .build();
+
+            var transferErrors = caseTransferEventService.transfer(params);
+            if (!transferErrors.isEmpty()) {
+                errors.addAll(transferErrors);
+            }
         }
+
+        sourceCaseData.setManagingOffice(newManagingOffice);
+        sourceCaseData.setOfficeCT(null);
+        sourceCaseData.setPositionTypeCT(null);
+        sourceCaseData.setStateAPI(null);
 
         return errors;
-    }
-
-    private void createCaseTransferEvent(CaseDetails caseDetails, CaseData caseData, String userToken,
-                                         List<String> errors) {
-        persistentQHelperService.sendCreationEventToSingles(
-                userToken,
-                caseDetails.getCaseTypeId(),
-                caseDetails.getJurisdiction(),
-                errors,
-                List.of(caseData.getEthosCaseReference()),
-                caseDetails.getCaseData().getOfficeCT().getValue().getCode(),
-                caseDetails.getCaseData().getPositionTypeCT(),
-                ccdGatewayBaseUrl,
-                caseDetails.getCaseData().getReasonForCT(),
-                SINGLE_CASE_TYPE,
-                NO,
-                null,
-                null
-        );
-
-        caseData.setLinkedCaseCT("Transferred to " + caseDetails.getCaseData().getOfficeCT().getValue().getCode());
-        caseData.setPositionType(caseDetails.getCaseData().getPositionTypeCT());
-        log.info("Clearing the CT payload for case: " + caseData.getEthosCaseReference());
-        caseData.setOfficeCT(null);
-        caseData.setPositionTypeCT(null);
-        caseData.setStateAPI(null);
     }
 }

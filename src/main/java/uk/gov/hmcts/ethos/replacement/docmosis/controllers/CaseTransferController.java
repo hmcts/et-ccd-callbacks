@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferOfficeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -54,7 +55,7 @@ public class CaseTransferController {
         }
 
         var caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseTransferService.populateCaseTransferOffices(caseData);
+        CaseTransferOfficeService.populateOfficeOptions(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -77,6 +78,29 @@ public class CaseTransferController {
         }
 
         List<String> errors = caseTransferService.caseTransferSameCountry(ccdRequest.getCaseDetails(), userToken);
+
+        return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @PostMapping(value = "/transferSameCountryEccLinkedCase", consumes = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Transfer a ECC linked case to another office within the same country")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> transferSameCountryEccLinkedCase(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        log.info(LOG_MESSAGE, "CASE TRANSFER SAME COUNTRY ECC LINKED CASE ---> ",
+                ccdRequest.getCaseDetails().getCaseId());
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        var errors = caseTransferService.caseTransferSameCountryEccLinkedCase(ccdRequest.getCaseDetails(), userToken);
 
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }

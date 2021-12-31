@@ -8,7 +8,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferDifferentCountryService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferSameCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -40,7 +41,10 @@ public class CaseTransferControllerTest {
     VerifyTokenService verifyTokenService;
 
     @MockBean
-    CaseTransferService caseTransferService;
+    CaseTransferSameCountryService caseTransferSameCountryService;
+
+    @MockBean
+    CaseTransferDifferentCountryService caseTransferDifferentCountryService;
 
     @Autowired
     JsonMapper jsonMapper;
@@ -98,7 +102,7 @@ public class CaseTransferControllerTest {
                 .andExpect(jsonPath("$.errors", hasSize(0)))
                 .andExpect(jsonPath("$.warnings", nullValue()));
 
-        verify(caseTransferService, times(1)).caseTransferSameCountry(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(caseTransferSameCountryService, times(1)).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
     }
 
     @Test
@@ -111,7 +115,7 @@ public class CaseTransferControllerTest {
                         .content("error"))
                 .andExpect(status().isBadRequest());
 
-        verify(caseTransferService, never()).caseTransferSameCountry(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(caseTransferSameCountryService, never()).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
     }
 
     @Test
@@ -125,7 +129,7 @@ public class CaseTransferControllerTest {
                 .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
 
-        verify(caseTransferService, never()).caseTransferSameCountry(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(caseTransferSameCountryService, never()).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
     }
 
     @Test
@@ -142,8 +146,7 @@ public class CaseTransferControllerTest {
                 .andExpect(jsonPath("$.errors", hasSize(0)))
                 .andExpect(jsonPath("$.warnings", nullValue()));
 
-        verify(caseTransferService, times(1)).caseTransferSameCountryEccLinkedCase(ccdRequest.getCaseDetails(),
-                AUTH_TOKEN);
+        verify(caseTransferSameCountryService, times(1)).updateEccLinkedCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
     }
 
     @Test
@@ -156,8 +159,7 @@ public class CaseTransferControllerTest {
                         .content("error"))
                 .andExpect(status().isBadRequest());
 
-        verify(caseTransferService, never()).caseTransferSameCountryEccLinkedCase(ccdRequest.getCaseDetails(),
-                AUTH_TOKEN);
+        verify(caseTransferSameCountryService, never()).updateEccLinkedCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
     }
 
     @Test
@@ -171,8 +173,7 @@ public class CaseTransferControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
 
-        verify(caseTransferService, never()).caseTransferSameCountryEccLinkedCase(ccdRequest.getCaseDetails(),
-                AUTH_TOKEN);
+        verify(caseTransferSameCountryService, never()).updateEccLinkedCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
     }
 
     @Test
@@ -189,7 +190,7 @@ public class CaseTransferControllerTest {
                 .andExpect(jsonPath("$.errors", hasSize(0)))
                 .andExpect(jsonPath("$.warnings", nullValue()));
 
-        verify(caseTransferService, times(1)).caseTransferDifferentCountry(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(caseTransferDifferentCountryService, times(1)).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
     }
 
     @Test
@@ -202,7 +203,7 @@ public class CaseTransferControllerTest {
                         .content("error"))
                 .andExpect(status().isBadRequest());
 
-        verify(caseTransferService, never()).caseTransferDifferentCountry(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(caseTransferDifferentCountryService, never()).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
     }
 
     @Test
@@ -216,6 +217,6 @@ public class CaseTransferControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
 
-        verify(caseTransferService, never()).caseTransferDifferentCountry(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(caseTransferDifferentCountryService, never()).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
     }
 }

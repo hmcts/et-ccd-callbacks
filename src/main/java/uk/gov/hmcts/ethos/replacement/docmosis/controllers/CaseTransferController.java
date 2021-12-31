@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferOfficeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferSameCountryService;
 
 import java.util.List;
 
@@ -32,11 +33,15 @@ public class CaseTransferController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
     private final VerifyTokenService verifyTokenService;
-    private final CaseTransferService caseTransferService;
+    private final CaseTransferSameCountryService caseTransferSameCountryService;
+    private final CaseTransferDifferentCountryService caseTransferDifferentCountryService;
 
-    public CaseTransferController(VerifyTokenService verifyTokenService, CaseTransferService caseTransferService) {
+    public CaseTransferController(VerifyTokenService verifyTokenService,
+                                  CaseTransferSameCountryService caseTransferSameCountryService,
+                                  CaseTransferDifferentCountryService caseTransferDifferentCountryService) {
         this.verifyTokenService = verifyTokenService;
-        this.caseTransferService = caseTransferService;
+        this.caseTransferSameCountryService = caseTransferSameCountryService;
+        this.caseTransferDifferentCountryService = caseTransferDifferentCountryService;
     }
 
     @PostMapping(value = "/dynamicListOffices", consumes = APPLICATION_JSON_VALUE)
@@ -77,7 +82,7 @@ public class CaseTransferController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        List<String> errors = caseTransferService.caseTransferSameCountry(ccdRequest.getCaseDetails(), userToken);
+        List<String> errors = caseTransferSameCountryService.transferCase(ccdRequest.getCaseDetails(), userToken);
 
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
@@ -100,7 +105,7 @@ public class CaseTransferController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var errors = caseTransferService.caseTransferSameCountryEccLinkedCase(ccdRequest.getCaseDetails(), userToken);
+        var errors = caseTransferSameCountryService.updateEccLinkedCase(ccdRequest.getCaseDetails(), userToken);
 
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
@@ -122,9 +127,8 @@ public class CaseTransferController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        List<String> errors = caseTransferService.caseTransferDifferentCountry(ccdRequest.getCaseDetails(), userToken);
+        List<String> errors = caseTransferDifferentCountryService.transferCase(ccdRequest.getCaseDetails(), userToken);
 
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
-
 }

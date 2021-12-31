@@ -5,16 +5,19 @@ import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ecm.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem;
+import uk.gov.hmcts.ecm.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.JudgementType;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -147,6 +150,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withBfAction(String cleared) {
+        var bfAction = new BFActionType();
+        bfAction.setCleared(cleared);
+        var bfActionItem = new BFActionTypeItem();
+        bfActionItem.setValue(bfAction);
+
+        caseData.setBfActions(List.of(bfActionItem));
+        return this;
+    }
+
     public CaseData build() {
         return caseData;
     }
@@ -157,6 +170,10 @@ public class CaseDataBuilder {
         submitEvent.setState(state);
 
         return submitEvent;
+    }
+
+    public CaseDetails buildAsCaseDetails(String caseTypeId) {
+        return buildAsCaseDetails(caseTypeId, null);
     }
 
     public CaseDetails buildAsCaseDetails(String caseTypeId, String jurisdiction) {

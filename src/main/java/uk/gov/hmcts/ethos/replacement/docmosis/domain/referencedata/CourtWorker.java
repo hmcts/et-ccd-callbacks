@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata;
 
 import lombok.Data;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,8 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
-
 
 @Entity()
 @Table(name = "court_worker")
@@ -26,4 +25,3 @@ public class CourtWorker {
     private String code;
     private String name;
 }
-

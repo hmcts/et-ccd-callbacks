@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,8 +39,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEAR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferService.BF_ACTIONS_ERROR_MSG;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferService.HEARINGS_ERROR_MSG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferService.BF_ACTIONS_ERROR_MSG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferService.HEARINGS_ERROR_MSG;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class CaseTransferServiceTest {

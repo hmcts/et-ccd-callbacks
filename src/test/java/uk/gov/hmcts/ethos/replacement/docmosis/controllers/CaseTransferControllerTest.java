@@ -8,7 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -35,7 +35,7 @@ public class CaseTransferControllerTest {
     private static final String CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL =
             "/caseTransfer/transferSameCountryEccLinkedCase";
     private static final String CASE_TRANSFER_DIFFERENT_COUNTRY_URL = "/caseTransfer/transferDifferentCountry";
-    
+
     @MockBean
     VerifyTokenService verifyTokenService;
 

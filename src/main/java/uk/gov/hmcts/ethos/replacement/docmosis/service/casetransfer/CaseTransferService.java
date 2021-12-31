@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer;
 
 import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;

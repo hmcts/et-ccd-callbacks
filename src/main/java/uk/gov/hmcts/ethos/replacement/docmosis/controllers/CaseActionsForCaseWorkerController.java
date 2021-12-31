@@ -27,6 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorker
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
@@ -35,7 +36,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelec
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.ecc.ClerkService;
 
 import java.util.ArrayList;
 import java.util.List;

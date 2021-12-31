@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferOfficeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseTransferService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferOfficeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferService;
 
 import java.util.List;
 

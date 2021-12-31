@@ -33,7 +33,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelec
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.ecc.ClerkService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.File;

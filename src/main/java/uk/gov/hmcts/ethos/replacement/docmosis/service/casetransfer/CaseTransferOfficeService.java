@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer;
 
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;

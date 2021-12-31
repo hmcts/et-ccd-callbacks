@@ -1,7 +1,8 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.PersistentQHelperService;
 
 import java.util.ArrayList;
 import java.util.List;

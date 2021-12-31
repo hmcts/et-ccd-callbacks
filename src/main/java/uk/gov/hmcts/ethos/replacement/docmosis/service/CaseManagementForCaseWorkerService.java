@@ -22,7 +22,6 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.ecc.ClerkService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer;
 
 import org.junit.Test;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service.ecc;
+package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;

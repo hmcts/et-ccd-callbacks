@@ -3,7 +3,7 @@ variable "product" {
 }
 
 variable "component" {
-  default = "ccd-cos"
+  default = "cos"
 }
 
 variable "location" {

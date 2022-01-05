@@ -137,10 +137,10 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withCaseTransfer(String office, String positionType, String reason) {
-        caseData.setOfficeCT(DynamicFixedListType.of(DynamicValueType.create(office, office)));
-        caseData.setPositionTypeCT(positionType);
-        caseData.setReasonForCT(reason);
+    public CaseDataBuilder withCaseTransfer(String officeCT, String positionTypeCT, String reasonForCT) {
+        caseData.setOfficeCT(DynamicFixedListType.of(DynamicValueType.create(officeCT, officeCT)));
+        caseData.setPositionTypeCT(positionTypeCT);
+        caseData.setReasonForCT(reasonForCT);
 
         return this;
     }

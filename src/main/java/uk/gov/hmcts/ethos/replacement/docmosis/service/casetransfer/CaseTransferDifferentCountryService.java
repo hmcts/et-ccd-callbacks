@@ -16,8 +16,15 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 @Slf4j
 public class CaseTransferDifferentCountryService {
 
+    public static final String POSITION_TYPE = "Case transferred - other country";
+
     private final CaseTransferUtils caseTransferUtils;
     private final CaseTransferEventService caseTransferEventService;
+
+    public void initTransferToScotland(CaseData caseData) {
+        CaseTransferOfficeService.populateTransferToScotlandOfficeOptions(caseData);
+        caseData.setPositionTypeCT(POSITION_TYPE);
+    }
 
     public List<String> transferCase(CaseDetails caseDetails, String userToken) {
         var caseDataList = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken);
@@ -66,7 +73,7 @@ public class CaseTransferDifferentCountryService {
                     .transferSameCountry(false)
                     .build();
 
-            log.info("Creating Case Transfer event for {}", sourceCaseData.getEthosCaseReference());
+            log.info("Creating Case Transfer event for {}", caseData.getEthosCaseReference());
             var transferErrors = caseTransferEventService.transfer(params);
             if (!transferErrors.isEmpty()) {
                 errors.addAll(transferErrors);

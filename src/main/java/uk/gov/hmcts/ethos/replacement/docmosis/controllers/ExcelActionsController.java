@@ -640,7 +640,7 @@ public class ExcelActionsController {
         }
 
         var multipleData = multipleRequest.getCaseDetails().getCaseData();
-        CaseTransferOfficeService.populateOfficeOptions(multipleData);
+        CaseTransferOfficeService.populateTransferToEnglandWalesOfficeOptions(multipleData);
 
         return ResponseEntity.ok(MultipleCallbackResponse.builder()
                 .data(multipleData)

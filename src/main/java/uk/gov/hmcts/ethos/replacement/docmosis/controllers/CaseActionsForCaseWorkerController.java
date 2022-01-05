@@ -228,7 +228,8 @@ public class CaseActionsForCaseWorkerController {
                     && caseData.getCaseType().equals(MULTIPLE_CASE_TYPE) ? YES : NO);
         }
 
-        log.info("PostDefaultValues for case: " + caseData.getEthosCaseReference());
+        log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
+                caseData.getEthosCaseReference());
 
         return getCallbackRespEntityErrors(errors, caseData);
     }

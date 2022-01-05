@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
@@ -12,8 +13,9 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
-@RequiredArgsConstructor
 @Service("caseTransferService")
+@RequiredArgsConstructor
+@Slf4j
 public class CaseTransferSameCountryService {
 
     private final CaseTransferUtils caseTransferUtils;
@@ -76,6 +78,7 @@ public class CaseTransferSameCountryService {
                     .transferSameCountry(true)
                     .build();
 
+            log.info("Creating Case Transfer event for {}", caseData.getEthosCaseReference());
             var transferErrors = caseTransferEventService.transfer(params);
             if (!transferErrors.isEmpty()) {
                 errors.addAll(transferErrors);

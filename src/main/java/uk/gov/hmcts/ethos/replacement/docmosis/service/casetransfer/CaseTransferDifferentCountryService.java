@@ -16,15 +16,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 @Slf4j
 public class CaseTransferDifferentCountryService {
 
-    public static final String POSITION_TYPE = "Case transferred - other country";
+    public static final String CASE_TRANSFERRED_POSITION_TYPE = "Case transferred - other country";
 
     private final CaseTransferUtils caseTransferUtils;
     private final CaseTransferEventService caseTransferEventService;
-
-    public void initTransferToScotland(CaseData caseData) {
-        CaseTransferOfficeService.populateTransferToScotlandOfficeOptions(caseData);
-        caseData.setPositionTypeCT(POSITION_TYPE);
-    }
 
     public List<String> transferCase(CaseDetails caseDetails, String userToken) {
         var caseDataList = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken);
@@ -64,12 +59,13 @@ public class CaseTransferDifferentCountryService {
                     .userToken(userToken)
                     .caseTypeId(caseDetails.getCaseTypeId())
                     .jurisdiction(caseDetails.getJurisdiction())
-                    .ethosCaseReference(caseData.getEthosCaseReference())
+                    .ethosCaseReferences(List.of(caseData.getEthosCaseReference()))
                     .sourceEthosCaseReference(sourceCaseData.getEthosCaseReference())
                     .newManagingOffice(newManagingOffice)
-                    .positionType(sourceCaseData.getPositionTypeCT())
+                    .positionType(CASE_TRANSFERRED_POSITION_TYPE)
                     .reason(sourceCaseData.getReasonForCT())
-                    .ecmCaseType(SINGLE_CASE_TYPE)
+                    .multipleReference(SINGLE_CASE_TYPE)
+                    .confirmationRequired(false)
                     .transferSameCountry(false)
                     .build();
 
@@ -81,9 +77,8 @@ public class CaseTransferDifferentCountryService {
         }
 
         sourceCaseData.setLinkedCaseCT("Transferred to " + newManagingOffice);
-        sourceCaseData.setPositionType(sourceCaseData.getPositionTypeCT());
+        sourceCaseData.setPositionType(CASE_TRANSFERRED_POSITION_TYPE);
         sourceCaseData.setOfficeCT(null);
-        sourceCaseData.setPositionTypeCT(null);
         sourceCaseData.setStateAPI(null);
 
         return errors;

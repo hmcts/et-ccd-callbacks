@@ -18,8 +18,10 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -268,19 +270,32 @@ public class CaseTransferSameCountryServiceTest {
         assertNull(caseDetails.getCaseData().getStateAPI());
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void transferCaseNoCasesFoundThrowsException() {
+        var caseDetails = CaseDataBuilder.builder()
+                .withEthosCaseReference(claimantEthosCaseReference)
+                .buildAsCaseDetails(caseTypeId, jurisdiction);
+        when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken)).thenReturn(Collections.emptyList());
+
+        caseTransferSameCountryService.transferCase(caseDetails, userToken);
+
+        fail("transferCase should have thrown IllegalStateException");
+    }
+
     private void verifyCaseTransferEventParams(String expectedEthosCaseReference,
                                                String expectedSourceEthosCaseReference, String expectedManagingOffice,
                                                CaseTransferEventParams params) {
         assertEquals(userToken, params.getUserToken());
         assertEquals(caseTypeId, params.getCaseTypeId());
         assertEquals(jurisdiction, params.getJurisdiction());
-        assertEquals(expectedEthosCaseReference, params.getEthosCaseReference());
+        assertEquals(List.of(expectedEthosCaseReference), params.getEthosCaseReferences());
         assertEquals(expectedSourceEthosCaseReference, params.getSourceEthosCaseReference());
         assertEquals(expectedManagingOffice, params.getNewManagingOffice());
         assertNull(params.getPositionType());
         assertEquals(reasonCT, params.getReason());
-        assertEquals(SINGLE_CASE_TYPE, params.getEcmCaseType());
+        assertEquals(SINGLE_CASE_TYPE, params.getMultipleReference());
         assertTrue(params.isTransferSameCountry());
+        assertFalse(params.isConfirmationRequired());
     }
 
     private CaseDetails createCaseDetails(String managingOffice, String officeCT, String hearingStatus) {
@@ -292,7 +307,7 @@ public class CaseTransferSameCountryServiceTest {
         CaseDataBuilder builder = CaseDataBuilder.builder()
                 .withEthosCaseReference(claimantEthosCaseReference)
                 .withManagingOffice(managingOffice)
-                .withCaseTransfer(officeCT, null, reasonCT);
+                .withCaseTransfer(officeCT, reasonCT);
         for (String eccCase : eccCases) {
             builder.withEccCase(eccCase);
         }
@@ -327,7 +342,7 @@ public class CaseTransferSameCountryServiceTest {
                 .withEthosCaseReference(ethosCaseReference)
                 .withManagingOffice(managingOffice)
                 .withCounterClaim(claimantEthosCaseReference)
-                .withCaseTransfer(officeCT, null, reasonCT)
+                .withCaseTransfer(officeCT, reasonCT)
                 .buildAsCaseDetails(caseTypeId, jurisdiction);
     }
 }

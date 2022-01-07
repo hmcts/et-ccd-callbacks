@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
@@ -381,13 +382,15 @@ public class MultipleHelperService {
     private void sendUpdatesToSinglesLogicCheckingLead(String userToken, MultipleDetails multipleDetails,
                                                        List<String> errors, String newLeadCase,
                                                        SortedMap<String, Object> multipleObjects) {
-
+        var multipleRef = multipleDetails.getCaseData().getMultipleReference();
         String oldLeadCase = MultiplesHelper.getCurrentLead(multipleDetails.getCaseData().getLeadCase());
+        var leadCaseChanged = !oldLeadCase.equals(newLeadCase);
 
-        if (!oldLeadCase.equals(newLeadCase)) {
+        if (leadCaseChanged && StringUtils.isNotBlank(oldLeadCase)) {
+            log.info("Multiple {}: Sending update to {} as this is no longer the lead case", multipleRef, oldLeadCase);
 
-            log.info("Sending update to old lead case as not lead any more: " + oldLeadCase);
-
+            var multipleReferenceLink = getFullLinkMarkUp(multipleDetails.getCaseId(),
+                    multipleDetails.getCaseData().getMultipleReference());
             sendCreationUpdatesToSinglesWithoutConfirmation(userToken,
                     multipleDetails.getCaseTypeId(),
                     multipleDetails.getJurisdiction(),
@@ -395,19 +398,13 @@ public class MultipleHelperService {
                     errors,
                     new ArrayList<>(Collections.singletonList(oldLeadCase)),
                     newLeadCase,
-                    getFullLinkMarkUp(multipleDetails.getCaseId(),
-                            multipleDetails.getCaseData().getMultipleReference()));
-
+                    multipleReferenceLink);
         }
 
-        if (multipleObjects.keySet().isEmpty() || !oldLeadCase.equals(newLeadCase)) {
-
-            log.info("Adding new lead: " + newLeadCase);
-
-            addLeadMarkUp(userToken, multipleDetails.getCaseTypeId(),
-                    multipleDetails.getCaseData(), newLeadCase, "");
+        if (multipleObjects.keySet().isEmpty() || leadCaseChanged) {
+            log.info("Multiple {}: Sending update to {} as this is the new lead case", multipleRef, newLeadCase);
+            addLeadMarkUp(userToken, multipleDetails.getCaseTypeId(), multipleDetails.getCaseData(), newLeadCase, "");
         }
-
     }
 
     private String getFullLinkMarkUp(String caseId, String multipleReference) {
@@ -426,5 +423,4 @@ public class MultipleHelperService {
                 newEthosCaseRefCollection, newLeadCase,
                 getFullLinkMarkUp(multipleDetails.getCaseId(), multipleData.getMultipleReference()));
     }
-
 }

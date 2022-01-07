@@ -137,9 +137,8 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withCaseTransfer(String officeCT, String positionTypeCT, String reasonForCT) {
+    public CaseDataBuilder withCaseTransfer(String officeCT, String reasonForCT) {
         caseData.setOfficeCT(DynamicFixedListType.of(DynamicValueType.create(officeCT, officeCT)));
-        caseData.setPositionTypeCT(positionTypeCT);
         caseData.setReasonForCT(reasonForCT);
 
         return this;

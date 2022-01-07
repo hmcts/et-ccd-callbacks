@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Service
 public class CaseTransferEventService {
@@ -29,14 +30,14 @@ public class CaseTransferEventService {
                 params.getCaseTypeId(),
                 params.getJurisdiction(),
                 errors,
-                List.of(params.getEthosCaseReference()),
+                params.getEthosCaseReferences(),
                 params.getNewManagingOffice(),
                 params.getPositionType(),
                 ccdGatewayBaseUrl,
                 params.getReason(),
-                params.getEcmCaseType(),
-                NO,
-                null,
+                params.getMultipleReference(),
+                params.isConfirmationRequired() ? YES : NO,
+                params.getMultipleReferenceLink(),
                 params.isTransferSameCountry(),
                 params.getSourceEthosCaseReference()
         );

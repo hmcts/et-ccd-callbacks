@@ -44,16 +44,42 @@ public class CaseTransferController {
         this.caseTransferDifferentCountryService = caseTransferDifferentCountryService;
     }
 
-    @PostMapping(value = "/dynamicListOffices", consumes = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "populates all offices except the current one in dynamic lists.")
+    @PostMapping(value = "/initTransferToScotland", consumes = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Initialise case for transfer to Scotland")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
         @ApiResponse(code = 400, message = "Bad Request"),
         @ApiResponse(code = 500, message = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> dynamicListOffices(
+    public ResponseEntity<CCDCallbackResponse> initTransferToScotland(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
+        log.info(LOG_MESSAGE, "CASE TRANSFER INIT TRANSFER TO SCOTLAND ---> ", ccdRequest.getCaseDetails().getCaseId());
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseTransferOfficeService.populateTransferToScotlandOfficeOptions(caseData);
+
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/initTransferToEnglandWales", consumes = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Initialise case for transfer to England/Wales")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> initTransferToEnglandWales(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        log.info(LOG_MESSAGE, "CASE TRANSFER INIT TRANSFER TO ENGLAND/WALES---> ",
+                ccdRequest.getCaseDetails().getCaseId());
+
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -130,28 +156,5 @@ public class CaseTransferController {
         List<String> errors = caseTransferDifferentCountryService.transferCase(ccdRequest.getCaseDetails(), userToken);
 
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @PostMapping(value = "/initTransferToScotland", consumes = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Initialise case for transfer to Scotland")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 500, message = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> initTransferToScotland(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
-        log.info(LOG_MESSAGE, "CASE TRANSFER INIT TRANSFER TO SCOTLAND ---> ", ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseTransferDifferentCountryService.initTransferToScotland(caseData);
-
-        return getCallbackRespEntityNoErrors(caseData);
     }
 }

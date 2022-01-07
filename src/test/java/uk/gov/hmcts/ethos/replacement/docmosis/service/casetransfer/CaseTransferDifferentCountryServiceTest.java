@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -54,18 +55,7 @@ class CaseTransferDifferentCountryServiceTest {
     private final String jurisdiction = "EMPLOYMENT";
     private final String userToken = "my-test-token";
     private final String reasonCT = "Just a test";
-    private final String positionTypeCT = "Test Position Type";
-
-    @Test
-    void testInitTransferToScotland() {
-        var caseData = new CaseData();
-
-        caseTransferDifferentCountryService.initTransferToScotland(caseData);
-
-        assertEquals(TribunalOffice.GLASGOW.getOfficeName(), caseData.getOfficeCT().getSelectedCode());
-        assertEquals(TribunalOffice.SCOTLAND_OFFICES.size(), caseData.getOfficeCT().getListItems().size());
-        assertEquals(CaseTransferDifferentCountryService.POSITION_TYPE, caseData.getPositionTypeCT());
-    }
+    private final String expectedPositionType = CaseTransferDifferentCountryService.CASE_TRANSFERRED_POSITION_TYPE;
 
     @Test
     void testCaseTransfer() {
@@ -78,18 +68,16 @@ class CaseTransferDifferentCountryServiceTest {
         var errors = caseTransferDifferentCountryService.transferCase(caseDetails, userToken);
 
         assertTrue(errors.isEmpty());
-        verify(caseTransferEventService, times(1)).transfer(isA(CaseTransferEventParams.class));
+        verify(caseTransferEventService, times(1)).transfer(caseTransferEventParamsArgumentCaptor.capture());
 
-        assertEquals(managingOffice, caseDetails.getCaseData().getManagingOffice());
-        assertEquals("Transferred to " + officeCT, caseDetails.getCaseData().getLinkedCaseCT());
-        assertEquals(positionTypeCT, caseDetails.getCaseData().getPositionType());
-        assertNull(caseDetails.getCaseData().getOfficeCT());
-        assertNull(caseDetails.getCaseData().getPositionTypeCT());
-        assertNull(caseDetails.getCaseData().getStateAPI());
+        verifyCaseTransferEventParams(claimantEthosCaseReference, claimantEthosCaseReference, officeCT,
+                caseTransferEventParamsArgumentCaptor.getValue());
+
+        verifyCaseDataAfterTransfer(caseDetails, managingOffice, officeCT);
     }
 
     @Test
-    void caseTransferWithBfActionClearedAndHearingHeard() {
+    void caseTransferSuccessWithBfActionClearedAndHearingHeard() {
         var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
         var caseDetails = createCaseDetails(managingOffice, officeCT, HEARING_STATUS_HEARD);
@@ -100,20 +88,18 @@ class CaseTransferDifferentCountryServiceTest {
         var errors = caseTransferDifferentCountryService.transferCase(caseDetails, userToken);
 
         assertTrue(errors.isEmpty());
-        verify(caseTransferEventService, times(1)).transfer(isA(CaseTransferEventParams.class));
+        verify(caseTransferEventService, times(1)).transfer(caseTransferEventParamsArgumentCaptor.capture());
+        verifyCaseTransferEventParams(claimantEthosCaseReference, claimantEthosCaseReference, officeCT,
+                caseTransferEventParamsArgumentCaptor.getValue());
 
-        assertEquals(managingOffice, caseDetails.getCaseData().getManagingOffice());
-        assertEquals("Transferred to " + officeCT, caseDetails.getCaseData().getLinkedCaseCT());
-        assertEquals(positionTypeCT, caseDetails.getCaseData().getPositionType());
-        assertNull(caseDetails.getCaseData().getOfficeCT());
-        assertNull(caseDetails.getCaseData().getPositionTypeCT());
-        assertNull(caseDetails.getCaseData().getStateAPI());
+        verifyCaseDataAfterTransfer(caseDetails, managingOffice, officeCT);
     }
 
     @Test
-    void caseTransferWithBfAction() {
+    void caseTransferFailsWithBfAction() {
+        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
-        var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), officeCT, null);
+        var caseDetails = createCaseDetails(managingOffice, officeCT, null);
         addBfAction(caseDetails.getCaseData(), null);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken))
                 .thenReturn(List.of(caseDetails.getCaseData()));
@@ -126,15 +112,14 @@ class CaseTransferDifferentCountryServiceTest {
         assertEquals(expectedError, errors.get(0));
         verify(caseTransferEventService, never()).transfer(isA(CaseTransferEventParams.class));
 
-        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), caseDetails.getCaseData().getManagingOffice());
-        assertEquals(officeCT, caseDetails.getCaseData().getOfficeCT().getSelectedCode());
-        assertNull(caseDetails.getCaseData().getPositionType());
+        verifyCaseDataAfterTransferFails(caseDetails, managingOffice, officeCT);
     }
 
     @Test
-    void caseTransferSameCountryWithHearingListed() {
+    void caseTransferFailsWithHearingListed() {
+        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
-        var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), officeCT, HEARING_STATUS_LISTED);
+        var caseDetails = createCaseDetails(managingOffice, officeCT, HEARING_STATUS_LISTED);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken))
                 .thenReturn(List.of(caseDetails.getCaseData()));
         var expectedError = String.format(HEARINGS_ERROR_MSG, claimantEthosCaseReference);
@@ -146,15 +131,14 @@ class CaseTransferDifferentCountryServiceTest {
         assertEquals(expectedError, errors.get(0));
         verify(caseTransferEventService, never()).transfer(isA(CaseTransferEventParams.class));
 
-        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), caseDetails.getCaseData().getManagingOffice());
-        assertEquals(officeCT, caseDetails.getCaseData().getOfficeCT().getSelectedCode());
-        assertNull(caseDetails.getCaseData().getPositionType());
+        verifyCaseDataAfterTransferFails(caseDetails, managingOffice, officeCT);
     }
 
     @Test
-    void caseTransferWithBfActionAndHearingListed() {
+    void caseTransferFailsWithBfActionAndHearingListed() {
+        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
-        var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), officeCT, HEARING_STATUS_LISTED);
+        var caseDetails = createCaseDetails(managingOffice, officeCT, HEARING_STATUS_LISTED);
         addBfAction(caseDetails.getCaseData(), null);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken))
                 .thenReturn(List.of(caseDetails.getCaseData()));
@@ -169,9 +153,7 @@ class CaseTransferDifferentCountryServiceTest {
         assertEquals(expectedErrors.get(1), errors.get(1));
         verify(caseTransferEventService, never()).transfer(isA(CaseTransferEventParams.class));
 
-        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), caseDetails.getCaseData().getManagingOffice());
-        assertEquals(officeCT, caseDetails.getCaseData().getOfficeCT().getSelectedCode());
-        assertNull(caseDetails.getCaseData().getPositionType());
+        verifyCaseDataAfterTransferFails(caseDetails, managingOffice, officeCT);
     }
 
     @Test
@@ -189,12 +171,7 @@ class CaseTransferDifferentCountryServiceTest {
 
         assertTrue(errors.isEmpty());
 
-        assertEquals(managingOffice, caseDetails.getCaseData().getManagingOffice());
-        assertEquals("Transferred to " + officeCT, caseDetails.getCaseData().getLinkedCaseCT());
-        assertEquals(positionTypeCT, caseDetails.getCaseData().getPositionType());
-        assertNull(caseDetails.getCaseData().getOfficeCT());
-        assertNull(caseDetails.getCaseData().getPositionTypeCT());
-        assertNull(caseDetails.getCaseData().getStateAPI());
+        verifyCaseDataAfterTransfer(caseDetails, managingOffice, officeCT);
 
         verify(caseTransferEventService, times(2)).transfer(caseTransferEventParamsArgumentCaptor.capture());
         var params = caseTransferEventParamsArgumentCaptor.getAllValues();
@@ -217,12 +194,7 @@ class CaseTransferDifferentCountryServiceTest {
 
         assertTrue(errors.isEmpty());
 
-        assertEquals(managingOffice, caseDetails.getCaseData().getManagingOffice());
-        assertEquals("Transferred to " + officeCT, caseDetails.getCaseData().getLinkedCaseCT());
-        assertEquals(positionTypeCT, caseDetails.getCaseData().getPositionType());
-        assertNull(caseDetails.getCaseData().getOfficeCT());
-        assertNull(caseDetails.getCaseData().getPositionTypeCT());
-        assertNull(caseDetails.getCaseData().getStateAPI());
+        verifyCaseDataAfterTransfer(caseDetails, managingOffice, officeCT);
 
         verify(caseTransferEventService, times(3)).transfer(caseTransferEventParamsArgumentCaptor.capture());
         var params = caseTransferEventParamsArgumentCaptor.getAllValues();
@@ -245,12 +217,7 @@ class CaseTransferDifferentCountryServiceTest {
 
         assertTrue(errors.isEmpty());
 
-        assertEquals(managingOffice, eccCaseDetails.getCaseData().getManagingOffice());
-        assertEquals("Transferred to " + officeCT, eccCaseDetails.getCaseData().getLinkedCaseCT());
-        assertEquals(positionTypeCT, eccCaseDetails.getCaseData().getPositionType());
-        assertNull(eccCaseDetails.getCaseData().getOfficeCT());
-        assertNull(eccCaseDetails.getCaseData().getPositionTypeCT());
-        assertNull(eccCaseDetails.getCaseData().getStateAPI());
+        verifyCaseDataAfterTransfer(eccCaseDetails, managingOffice, officeCT);
 
         verify(caseTransferEventService, times(2)).transfer(caseTransferEventParamsArgumentCaptor.capture());
         var params = caseTransferEventParamsArgumentCaptor.getAllValues();
@@ -259,7 +226,7 @@ class CaseTransferDifferentCountryServiceTest {
     }
 
     @Test
-    void caseTransferSameCountryWithEccCaseReturnsTransferError() {
+    void caseTransferWithEccCaseReturnsTransferError() {
         var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
         var eccCases = List.of("120002/2021");
@@ -277,13 +244,23 @@ class CaseTransferDifferentCountryServiceTest {
         assertEquals(2, errors.size());
         assertEquals(caseTransferError, errors.get(0));
         assertEquals(caseTransferError, errors.get(1));
-        assertEquals(managingOffice, caseDetails.getCaseData().getManagingOffice());
-        assertEquals("Transferred to " + officeCT, caseDetails.getCaseData().getLinkedCaseCT());
-        assertEquals(positionTypeCT, caseDetails.getCaseData().getPositionType());
-        assertNull(caseDetails.getCaseData().getOfficeCT());
-        assertNull(caseDetails.getCaseData().getPositionTypeCT());
-        assertNull(caseDetails.getCaseData().getStateAPI());
+
+        verifyCaseDataAfterTransfer(caseDetails, managingOffice, officeCT);
+
         verify(caseTransferEventService, times(2)).transfer(isA(CaseTransferEventParams.class));
+    }
+
+    @Test
+    void transferCaseNoCasesFoundThrowsException() {
+        var caseDetails = CaseDataBuilder.builder()
+                .withEthosCaseReference(claimantEthosCaseReference)
+                .buildAsCaseDetails(caseTypeId, jurisdiction);
+        when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken)).thenReturn(Collections.emptyList());
+
+        Assertions.assertThrows(IllegalStateException.class,
+                () -> caseTransferDifferentCountryService.transferCase(caseDetails, userToken));
+
+        verify(caseTransferEventService, never()).transfer(isA(CaseTransferEventParams.class));
     }
 
     private void verifyCaseTransferEventParams(String expectedEthosCaseReference,
@@ -292,12 +269,13 @@ class CaseTransferDifferentCountryServiceTest {
         assertEquals(userToken, params.getUserToken());
         assertEquals(caseTypeId, params.getCaseTypeId());
         assertEquals(jurisdiction, params.getJurisdiction());
-        assertEquals(expectedEthosCaseReference, params.getEthosCaseReference());
+        assertEquals(List.of(expectedEthosCaseReference), params.getEthosCaseReferences());
         assertEquals(expectedSourceEthosCaseReference, params.getSourceEthosCaseReference());
         assertEquals(expectedManagingOffice, params.getNewManagingOffice());
-        assertEquals(positionTypeCT, params.getPositionType());
+        assertEquals(expectedPositionType, params.getPositionType());
         assertEquals(reasonCT, params.getReason());
-        assertEquals(SINGLE_CASE_TYPE, params.getEcmCaseType());
+        assertEquals(SINGLE_CASE_TYPE, params.getMultipleReference());
+        assertFalse(params.isConfirmationRequired());
         assertFalse(params.isTransferSameCountry());
     }
 
@@ -310,7 +288,7 @@ class CaseTransferDifferentCountryServiceTest {
         CaseDataBuilder builder = CaseDataBuilder.builder()
                 .withEthosCaseReference(claimantEthosCaseReference)
                 .withManagingOffice(managingOffice)
-                .withCaseTransfer(officeCT, positionTypeCT, reasonCT);
+                .withCaseTransfer(officeCT, reasonCT);
         for (String eccCase : eccCases) {
             builder.withEccCase(eccCase);
         }
@@ -345,7 +323,21 @@ class CaseTransferDifferentCountryServiceTest {
                 .withEthosCaseReference(ethosCaseReference)
                 .withManagingOffice(managingOffice)
                 .withCounterClaim(claimantEthosCaseReference)
-                .withCaseTransfer(officeCT, positionTypeCT, reasonCT)
+                .withCaseTransfer(officeCT, reasonCT)
                 .buildAsCaseDetails(caseTypeId, jurisdiction);
+    }
+
+    private void verifyCaseDataAfterTransfer(CaseDetails caseDetails, String managingOffice, String officeCT) {
+        assertEquals(managingOffice, caseDetails.getCaseData().getManagingOffice());
+        assertEquals("Transferred to " + officeCT, caseDetails.getCaseData().getLinkedCaseCT());
+        assertEquals(expectedPositionType, caseDetails.getCaseData().getPositionType());
+        assertNull(caseDetails.getCaseData().getOfficeCT());
+        assertNull(caseDetails.getCaseData().getStateAPI());
+    }
+
+    private void verifyCaseDataAfterTransferFails(CaseDetails caseDetails, String managingOffice, String officeCT) {
+        assertEquals(managingOffice, caseDetails.getCaseData().getManagingOffice());
+        assertEquals(officeCT, caseDetails.getCaseData().getOfficeCT().getSelectedCode());
+        assertNull(caseDetails.getCaseData().getPositionType());
     }
 }

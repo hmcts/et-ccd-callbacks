@@ -69,12 +69,12 @@ public class CaseTransferSameCountryService {
                     .userToken(userToken)
                     .caseTypeId(caseDetails.getCaseTypeId())
                     .jurisdiction(caseDetails.getJurisdiction())
-                    .ethosCaseReference(caseData.getEthosCaseReference())
+                    .ethosCaseReferences(List.of(caseData.getEthosCaseReference()))
                     .sourceEthosCaseReference(sourceCaseData.getEthosCaseReference())
                     .newManagingOffice(newManagingOffice)
-                    .positionType(caseDetails.getCaseData().getPositionTypeCT())
                     .reason(caseDetails.getCaseData().getReasonForCT())
-                    .ecmCaseType(SINGLE_CASE_TYPE)
+                    .multipleReference(SINGLE_CASE_TYPE)
+                    .confirmationRequired(false)
                     .transferSameCountry(true)
                     .build();
 
@@ -87,7 +87,6 @@ public class CaseTransferSameCountryService {
 
         sourceCaseData.setManagingOffice(newManagingOffice);
         sourceCaseData.setOfficeCT(null);
-        sourceCaseData.setPositionTypeCT(null);
         sourceCaseData.setStateAPI(null);
 
         return errors;

@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.items.BFActionTypeItem;
@@ -17,11 +17,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -35,8 +35,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferUtils.BF_ACTIONS_ERROR_MSG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferUtils.HEARINGS_ERROR_MSG;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class CaseTransferSameCountryServiceTest {
+@ExtendWith(SpringExtension.class)
+class CaseTransferSameCountryServiceTest {
 
     @InjectMocks
     private CaseTransferSameCountryService caseTransferSameCountryService;
@@ -57,7 +57,7 @@ public class CaseTransferSameCountryServiceTest {
     private final String reasonCT = "Just a test";
 
     @Test
-    public void caseTransferSameCountry() {
+    void caseTransferSameCountry() {
         var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
         var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), officeCT, null);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken))
@@ -75,7 +75,7 @@ public class CaseTransferSameCountryServiceTest {
     }
 
     @Test
-    public void caseTransferSameCountryWithBfActionClearedAndHearingHeard() {
+    void caseTransferSameCountryWithBfActionClearedAndHearingHeard() {
         var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
         var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), officeCT, HEARING_STATUS_HEARD);
         addBfAction(caseDetails.getCaseData(), YES);
@@ -94,7 +94,7 @@ public class CaseTransferSameCountryServiceTest {
     }
 
     @Test
-    public void caseTransferSameCountryWithBfAction() {
+    void caseTransferSameCountryWithBfAction() {
         var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
         var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), officeCT, null);
         addBfAction(caseDetails.getCaseData(), null);
@@ -114,7 +114,7 @@ public class CaseTransferSameCountryServiceTest {
     }
 
     @Test
-    public void caseTransferSameCountryWithHearingListed() {
+    void caseTransferSameCountryWithHearingListed() {
         var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
         var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), officeCT, HEARING_STATUS_LISTED);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken))
@@ -133,7 +133,7 @@ public class CaseTransferSameCountryServiceTest {
     }
 
     @Test
-    public void caseTransferSameCountryWithBfActionAndHearingListed() {
+    void caseTransferSameCountryWithBfActionAndHearingListed() {
         var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
         var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), officeCT, HEARING_STATUS_LISTED);
         addBfAction(caseDetails.getCaseData(), null);
@@ -155,7 +155,7 @@ public class CaseTransferSameCountryServiceTest {
     }
 
     @Test
-    public void caseTransferSameCountryWithEccCase() {
+    void caseTransferSameCountryWithEccCase() {
         var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
         var eccCaseReference = "120002/2021";
@@ -180,7 +180,7 @@ public class CaseTransferSameCountryServiceTest {
     }
 
     @Test
-    public void caseTransferSameCountryWithEccCases() {
+    void caseTransferSameCountryWithEccCases() {
         var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
         var eccCases = List.of("120002/2021", "120003/2021");
@@ -206,7 +206,7 @@ public class CaseTransferSameCountryServiceTest {
     }
 
     @Test
-    public void caseTransferSameCountryWithEccCaseAsSource() {
+    void caseTransferSameCountryWithEccCaseAsSource() {
         var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
         var eccCaseReference = "120009/2021";
@@ -228,7 +228,7 @@ public class CaseTransferSameCountryServiceTest {
     }
 
     @Test
-    public void caseTransferSameCountryWithEccCaseReturnsTransferError() {
+    void caseTransferSameCountryWithEccCaseReturnsTransferError() {
         var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
         var eccCases = List.of("120002/2021");
@@ -253,7 +253,7 @@ public class CaseTransferSameCountryServiceTest {
     }
 
     @Test
-    public void caseTransferSameCountryEccLinkedCase() {
+    void caseTransferSameCountryEccLinkedCase() {
         var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
         var caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), Collections.emptyList(),
                 officeCT, null);
@@ -270,16 +270,15 @@ public class CaseTransferSameCountryServiceTest {
         assertNull(caseDetails.getCaseData().getStateAPI());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void transferCaseNoCasesFoundThrowsException() {
+    @Test
+    void transferCaseNoCasesFoundThrowsException() {
         var caseDetails = CaseDataBuilder.builder()
                 .withEthosCaseReference(claimantEthosCaseReference)
                 .buildAsCaseDetails(caseTypeId, jurisdiction);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken)).thenReturn(Collections.emptyList());
 
-        caseTransferSameCountryService.transferCase(caseDetails, userToken);
-
-        fail("transferCase should have thrown IllegalStateException");
+        assertThrows(IllegalStateException.class,
+                () -> caseTransferSameCountryService.transferCase(caseDetails, userToken));
     }
 
     private void verifyCaseTransferEventParams(String expectedEthosCaseReference,

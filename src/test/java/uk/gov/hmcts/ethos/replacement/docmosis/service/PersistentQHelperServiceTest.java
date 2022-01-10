@@ -74,7 +74,7 @@ public class PersistentQHelperServiceTest {
                 MultiplesHelper.generateMarkUp("ccdGatewayBaseUrl",
                         ccdRequest.getCaseDetails().getCaseId(),
                         ccdRequest.getCaseDetails().getCaseData().getMultipleRefNumber()),
-                SCOPE_OF_TRANSFER_INTRA_COUNTRY
+                true,null
                 );
 
         verify(userService).getUserDetails(userToken);

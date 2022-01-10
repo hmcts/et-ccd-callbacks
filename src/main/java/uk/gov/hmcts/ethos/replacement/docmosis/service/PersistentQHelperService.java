@@ -20,15 +20,18 @@ public class PersistentQHelperService {
                                            List<String> errors, List<String> ethosCaseRefCollection, String officeCT,
                                            String positionTypeCT, String ccdGatewayBaseUrl,
                                            String reasonForCT, String multipleRef, String confirmation,
-                                           String multipleReferenceLinkMarkUp, String scopeOfTransfer) {
+                                           String multipleReferenceLinkMarkUp, boolean transferSameCountry,
+                                           String sourceEthosCaseReference) {
 
         String username = userService.getUserDetails(userToken).getEmail();
+        var dataModel = PersistentQHelper.getCreationSingleDataModel(ccdGatewayBaseUrl, officeCT, positionTypeCT,
+                reasonForCT, transferSameCountry, sourceEthosCaseReference);
 
         PersistentQHelper.sendSingleUpdatesPersistentQ(caseTypeId,
                 jurisdiction,
                 username,
                 ethosCaseRefCollection,
-                PersistentQHelper.getCreationSingleDataModel(ccdGatewayBaseUrl, officeCT, positionTypeCT, reasonForCT, scopeOfTransfer),
+                dataModel,
                 errors,
                 multipleRef,
                 confirmation,

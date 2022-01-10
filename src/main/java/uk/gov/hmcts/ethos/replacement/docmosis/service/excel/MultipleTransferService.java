@@ -2,14 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ecm.common.model.multiples.SubmitMultipleEvent;
@@ -20,16 +15,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PersistentQHelperService;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOPE_OF_TRANSFER_INTER_COUNTRY;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOPE_OF_TRANSFER_INTRA_COUNTRY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -45,27 +36,6 @@ public class MultipleTransferService {
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
-
-    public void populateCaseTransferOffices(MultipleData multipleData) {
-        var managingOffice = multipleData.getManagingOffice();
-        if (StringUtils.isBlank(managingOffice)) {
-            return;
-        }
-
-        var officeCT = new DynamicFixedListType();
-        if (TribunalOffice.isEnglandWalesOffice(managingOffice)) {
-            var tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
-                    .filter(tribunalOffice -> !tribunalOffice.getOfficeName().equals(managingOffice))
-                    .map(tribunalOffice ->
-                            DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
-                    .collect(Collectors.toList());
-            officeCT.setListItems(tribunalOffices);
-        } else if (TribunalOffice.isScotlandOffice(managingOffice)) {
-            officeCT.setListItems(Collections.emptyList());
-        }
-
-        multipleData.setOfficeMultipleCT(officeCT);
-    }
 
     public void multipleTransferLogic(String userToken, MultipleDetails multipleDetails, List<String> errors) {
         log.info("Multiple transfer logic");
@@ -122,7 +92,8 @@ public class MultipleTransferService {
                 MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl,
                         multipleDetails.getCaseId(),
                         multipleData.getMultipleReference()),
-                interCountryCaseTransfer ? SCOPE_OF_TRANSFER_INTER_COUNTRY : SCOPE_OF_TRANSFER_INTRA_COUNTRY
+                interCountryCaseTransfer,
+                null
         );
     }
 

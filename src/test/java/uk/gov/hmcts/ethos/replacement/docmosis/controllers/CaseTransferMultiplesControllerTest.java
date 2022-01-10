@@ -1,19 +1,20 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferDifferentCountryService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferSameCountryService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.MultipleTransferDifferentCountryService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.MultipleTransferSameCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.MultipleDataBuilder;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
@@ -28,27 +29,25 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest({CaseTransferController.class, JsonMapper.class})
-public class CaseTransferControllerTest {
+@ExtendWith(SpringExtension.class)
+@WebMvcTest({CaseTransferMultiplesController.class, JsonMapper.class})
+class CaseTransferMultiplesControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
 
-    private static final String INIT_TRANSFER_TO_SCOTLAND_URL = "/caseTransfer/initTransferToScotland";
-    private static final String INIT_TRANSFER_TO_ENGLANDWALES_URL = "/caseTransfer/initTransferToEnglandWales";
-    private static final String CASE_TRANSFER_SAME_COUNTRY_URL = "/caseTransfer/transferSameCountry";
-    private static final String CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL =
-            "/caseTransfer/transferSameCountryEccLinkedCase";
-    private static final String CASE_TRANSFER_DIFFERENT_COUNTRY_URL = "/caseTransfer/transferDifferentCountry";
+    private static final String INIT_TRANSFER_TO_SCOTLAND_URL = "/caseTransferMultiples/initTransferToScotland";
+    private static final String INIT_TRANSFER_TO_ENGLANDWALES_URL = "/caseTransferMultiples/initTransferToEnglandWales";
+    private static final String CASE_TRANSFER_SAME_COUNTRY_URL = "/caseTransferMultiples/transferSameCountry";
+    private static final String CASE_TRANSFER_DIFFERENT_COUNTRY_URL = "/caseTransferMultiples/transferDifferentCountry";
 
     @MockBean
     VerifyTokenService verifyTokenService;
 
     @MockBean
-    CaseTransferSameCountryService caseTransferSameCountryService;
+    MultipleTransferSameCountryService multipleTransferSameCountryService;
 
     @MockBean
-    CaseTransferDifferentCountryService caseTransferDifferentCountryService;
+    MultipleTransferDifferentCountryService multipleTransferDifferentCountryService;
 
     @Autowired
     JsonMapper jsonMapper;
@@ -57,7 +56,7 @@ public class CaseTransferControllerTest {
     MockMvc mockMvc;
 
     @Test
-    public void testInitTransferToScotland() throws Exception {
+    void testInitTransferToScotland() throws Exception {
         var ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
@@ -69,7 +68,7 @@ public class CaseTransferControllerTest {
     }
 
     @Test
-    public void testInitTransferToScotlandError400() throws Exception {
+    void testInitTransferToScotlandError400() throws Exception {
         mockMvc.perform(post(INIT_TRANSFER_TO_SCOTLAND_URL)
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -78,7 +77,7 @@ public class CaseTransferControllerTest {
     }
 
     @Test
-    public void testInitTransferToScotlandForbidden() throws Exception {
+    void testInitTransferToScotlandForbidden() throws Exception {
         var ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
@@ -90,7 +89,7 @@ public class CaseTransferControllerTest {
     }
 
     @Test
-    public void testInitTransferToEnglandWales() throws Exception {
+    void testInitTransferToEnglandWales() throws Exception {
         var ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
@@ -102,7 +101,7 @@ public class CaseTransferControllerTest {
     }
 
     @Test
-    public void testInitTransferToEnglandWalesError400() throws Exception {
+    void testInitTransferToEnglandWalesError400() throws Exception {
         mockMvc.perform(post(INIT_TRANSFER_TO_ENGLANDWALES_URL)
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -111,7 +110,7 @@ public class CaseTransferControllerTest {
     }
 
     @Test
-    public void testInitTransferToEnglandWalesForbidden() throws Exception {
+    void testInitTransferToEnglandWalesForbidden() throws Exception {
         var ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
@@ -123,128 +122,90 @@ public class CaseTransferControllerTest {
     }
 
     @Test
-    public void testTransferSameCountry() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+    void testTransferSameCountry() throws Exception {
+        var multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_URL)
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.toJson(ccdRequest)))
+                        .content(jsonMapper.toJson(multipleRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", hasSize(0)))
                 .andExpect(jsonPath("$.warnings", nullValue()));
 
-        verify(caseTransferSameCountryService, times(1)).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(multipleTransferSameCountryService, times(1)).transferMultiple(multipleRequest.getCaseDetails(),
+                AUTH_TOKEN);
     }
 
     @Test
-    public void testTransferSameCountryError400() throws Exception {
+    void testTransferSameCountryError400() throws Exception {
         mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_URL)
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("error"))
                 .andExpect(status().isBadRequest());
 
-        verify(caseTransferSameCountryService, never()).transferCase(any(CaseDetails.class), anyString());
+        verify(multipleTransferSameCountryService, never()).transferMultiple(any(MultipleDetails.class), anyString());
     }
 
     @Test
-    public void testTransferSameCountryForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+    void testTransferSameCountryForbidden() throws Exception {
+        var multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_URL)
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonMapper.toJson(ccdRequest)))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMapper.toJson(multipleRequest)))
                 .andExpect(status().isForbidden());
 
-        verify(caseTransferSameCountryService, never()).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(multipleTransferSameCountryService, never()).transferMultiple(any(MultipleDetails.class), anyString());
     }
 
     @Test
-    public void testTransferSameCountryEccLinkedCase() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-
-        mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL)
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
-                .andExpect(jsonPath("$.warnings", nullValue()));
-
-        verify(caseTransferSameCountryService, times(1)).updateEccLinkedCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
-    }
-
-    @Test
-    public void testTransferSameCountryEccLinkedCaseError400() throws Exception {
-        mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL)
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("error"))
-                .andExpect(status().isBadRequest());
-
-        verify(caseTransferSameCountryService, never()).updateEccLinkedCase(any(CaseDetails.class), anyString());
-    }
-
-    @Test
-    public void testTransferSameCountryEccLinkedCaseForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-
-        mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL)
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-
-        verify(caseTransferSameCountryService, never()).updateEccLinkedCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
-    }
-
-    @Test
-    public void testTransferDifferentCountry() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+    void testTransferDifferentCountry() throws Exception {
+        var multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(CASE_TRANSFER_DIFFERENT_COUNTRY_URL)
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.toJson(ccdRequest)))
+                        .content(jsonMapper.toJson(multipleRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", hasSize(0)))
                 .andExpect(jsonPath("$.warnings", nullValue()));
 
-        verify(caseTransferDifferentCountryService, times(1)).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(multipleTransferDifferentCountryService, times(1)).transferMultiple(multipleRequest.getCaseDetails(),
+                AUTH_TOKEN);
     }
 
     @Test
-    public void testTransferDifferentCountryError400() throws Exception {
+    void testTransferDifferentCountryError400() throws Exception {
         mockMvc.perform(post(CASE_TRANSFER_DIFFERENT_COUNTRY_URL)
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("error"))
                 .andExpect(status().isBadRequest());
 
-        verify(caseTransferDifferentCountryService, never()).transferCase(any(CaseDetails.class), anyString());
+        verify(multipleTransferDifferentCountryService, never()).transferMultiple(any(MultipleDetails.class),
+                anyString());
     }
 
     @Test
-    public void testTransferDifferentCountryForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+    void testTransferDifferentCountryForbidden() throws Exception {
+        var multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(CASE_TRANSFER_DIFFERENT_COUNTRY_URL)
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.toJson(ccdRequest)))
+                        .content(jsonMapper.toJson(multipleRequest)))
                 .andExpect(status().isForbidden());
 
-        verify(caseTransferDifferentCountryService, never()).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(multipleTransferDifferentCountryService, never()).transferMultiple(any(MultipleDetails.class),
+                anyString());
     }
 }

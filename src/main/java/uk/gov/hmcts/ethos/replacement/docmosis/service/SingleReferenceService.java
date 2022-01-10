@@ -3,13 +3,21 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SingleReference;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SingleRefEnglandWalesRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SingleRefRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SingleRefScotlandRepository;
 
 import java.time.LocalDate;
+
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_DEV_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_OFFICE_NUMBER;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_USERS_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_DEV_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_OFFICE_NUMBER;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_USERS_CASE_TYPE_ID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,17 +41,16 @@ public class SingleReferenceService {
                 return generateOfficeReference(singleRefScotlandRepository, currentYear, numberCases,
                         SCOTLAND_OFFICE_NUMBER, SCOTLAND_CASE_TYPE_ID);
 
-
             default:
                 throw new IllegalArgumentException(
                         String.format("Unable to create case reference: unexpected caseTypeId %s", caseTypeId));
         }
     }
 
-    private String generateOfficeReference(SingleRefRepository<? extends SingleReference> referenceRepository, String currentYear,
-                                           int numberCases, String officeNumber, String officeName) {
+    private String generateOfficeReference(SingleRefRepository<? extends SingleReference> referenceRepository,
+                                           String currentYear, int numberCases, String officeNumber,
+                                           String officeName) {
         return officeNumber + referenceRepository.ethosCaseRefGen(numberCases, Integer.parseInt(currentYear),
                 officeName);
     }
-
 }

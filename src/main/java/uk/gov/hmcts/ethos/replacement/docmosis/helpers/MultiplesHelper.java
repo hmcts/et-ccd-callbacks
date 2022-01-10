@@ -189,14 +189,12 @@ public class MultiplesHelper {
     }
 
     public static void resetMidFields(MultipleData multipleData) {
-
         multipleData.setFlag1(null);
         multipleData.setFlag2(null);
         multipleData.setFlag3(null);
         multipleData.setFlag4(null);
         multipleData.setSubMultiple(null);
 
-        multipleData.setManagingOffice(null);
         multipleData.setFileLocation(null);
         multipleData.setFileLocationGlasgow(null);
         multipleData.setFileLocationAberdeen(null);
@@ -231,7 +229,6 @@ public class MultiplesHelper {
 
         multipleData.setOfficeMultipleCT(null);
         multipleData.setPositionTypeCT(null);
-
     }
 
     public static SubMultipleTypeItem createSubMultipleTypeItem(String subMultipleReference, String subMultipleName) {

@@ -5,7 +5,7 @@ data "azurerm_subnet" "postgres" {
 }
 
 module "db" {
-  source             = "git@github.com:hmcts/cnp-module-postgres?ref=master"
+  source             = "git@github.com:hmcts/cnp-module-postgres?ref=postgresql_tf"
   product            = var.product
   component          = var.component
   location           = var.location_db

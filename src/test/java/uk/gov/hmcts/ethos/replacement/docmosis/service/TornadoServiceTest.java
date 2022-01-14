@@ -50,6 +50,7 @@ public class TornadoServiceTest {
     private DocumentManagementService documentManagementService;
     private UserService userService;
     private DefaultValuesReaderService defaultValuesReaderService;
+    private VenueAddressReaderService venueAddressReaderService;
     private HttpURLConnection mockConnection;
     private final String authToken = "a-test-auth-token";
     private final String documentInfoMarkup = "<a>some test markup</a>";
@@ -60,8 +61,9 @@ public class TornadoServiceTest {
         mockTornadoConnection();
         mockDocumentManagement();
         mockDefaultValuesReaderService();
+        mockVenueAddressReaderService();
 
-        tornadoService = new TornadoService(tornadoConnection, documentManagementService, userService, defaultValuesReaderService);
+        tornadoService = new TornadoService(tornadoConnection, documentManagementService, userService, defaultValuesReaderService, venueAddressReaderService);
     }
 
     @Test(expected = IOException.class)
@@ -202,6 +204,10 @@ public class TornadoServiceTest {
 
     private void mockDefaultValuesReaderService() {
         defaultValuesReaderService = mock(DefaultValuesReaderService.class);
+    }
+
+    private void mockVenueAddressReaderService() {
+        venueAddressReaderService = mock(VenueAddressReaderService.class);
     }
 
     private void mockConnectionSuccess() throws IOException {

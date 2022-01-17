@@ -18,7 +18,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,13 +26,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_ABERDEEN_VENUE_FIELD_NAME;
-import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_DUNDEE_VENUE_FIELD_NAME;
-import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_EDINBURGH_VENUE_FIELD_NAME;
-import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_GLASGOW_VENUE_FIELD_NAME;
-import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_VENUE_FIELD_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABERDEEN_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_AWAITING_JUDGMENT_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_COMPLETED_REPORT;
@@ -279,7 +272,7 @@ public class ListingHelper {
         sb.append("\"Office_name\":\"").append(getOfficeName(getListingCaseTypeSingleOrListings(caseType)))
                 .append(NEW_LINE);
         log.info("Hearing location");
-        sb.append("\"Hearing_location\":\"").append(getListingVenue(listingData)).append(NEW_LINE);
+        sb.append("\"Hearing_location\":\"").append(ListingVenueHelper.getListingVenue(listingData)).append(NEW_LINE);
         log.info("Listings dates");
         sb.append(getListingDate(listingData));
         log.info("Clerk");
@@ -639,59 +632,6 @@ public class ListingHelper {
             return getReportDocTemplateName(listingData.getReportType());
         }
         return NO_DOCUMENT_FOUND;
-    }
-
-    public static Map<String, String> createMap(String key, String value) {
-        Map<String, String> map = new HashMap<>();
-        map.put(key, value);
-        return map;
-    }
-
-    public static String getListingVenue(ListingData listingData) {
-        Map<String, String> venueToSearchMap = getListingVenueToSearch(listingData);
-        return venueToSearchMap.entrySet().iterator().next().getValue();
-    }
-
-    public static Map<String, String> getListingVenueToSearch(ListingData listingData) {
-        boolean allLocations = listingData.getListingVenue().equals(ALL_VENUES);
-        if (allLocations) {
-            log.info("All locations");
-            return createMap(ALL_VENUES, ALL_VENUES);
-        } else {
-            log.info("Specific venue");
-            return getVenueToSearch(listingData);
-        }
-    }
-
-    public static Map<String, String> getVenueToSearch(ListingData listingData) {
-        if (!isNullOrEmpty(listingData.getVenueGlasgow())
-                && !listingData.getVenueGlasgow().equals(ALL_VENUES)) {
-            return createMap(LISTING_GLASGOW_VENUE_FIELD_NAME, listingData.getVenueGlasgow());
-        } else if (!isNullOrEmpty(listingData.getVenueAberdeen())
-                && !listingData.getVenueAberdeen().equals(ALL_VENUES)) {
-            return createMap(LISTING_ABERDEEN_VENUE_FIELD_NAME, listingData.getVenueAberdeen());
-        } else if (!isNullOrEmpty(listingData.getVenueDundee())
-                && !listingData.getVenueDundee().equals(ALL_VENUES)) {
-            return createMap(LISTING_DUNDEE_VENUE_FIELD_NAME, listingData.getVenueDundee());
-        } else if (!isNullOrEmpty(listingData.getVenueEdinburgh())
-                && !listingData.getVenueEdinburgh().equals(ALL_VENUES)) {
-            return createMap(LISTING_EDINBURGH_VENUE_FIELD_NAME, listingData.getVenueEdinburgh());
-        }
-        return !isNullOrEmpty(listingData.getListingVenue())
-                ? createMap(LISTING_VENUE_FIELD_NAME, listingData.getListingVenue())
-                : createMap("", "");
-    }
-
-    public static boolean isAllScottishVenues(ListingData listingData) {
-        boolean allVenuesGlasgow = !isNullOrEmpty(listingData.getVenueGlasgow())
-                && listingData.getVenueGlasgow().equals(ALL_VENUES);
-        boolean allVenuesAberdeen = !isNullOrEmpty(listingData.getVenueAberdeen())
-                && listingData.getVenueAberdeen().equals(ALL_VENUES);
-        boolean allVenuesDundee = !isNullOrEmpty(listingData.getVenueDundee())
-                && listingData.getVenueDundee().equals(ALL_VENUES);
-        boolean allVenuesEdinburgh = !isNullOrEmpty(listingData.getVenueEdinburgh())
-                && listingData.getVenueEdinburgh().equals(ALL_VENUES);
-        return allVenuesGlasgow || allVenuesAberdeen || allVenuesDundee || allVenuesEdinburgh;
     }
 
     public static String getVenueFromDateListedType(DateListedType dateListedType) {

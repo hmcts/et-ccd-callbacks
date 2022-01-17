@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ecm.common.model.bulk.BulkData;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ecm.common.model.ccd.types.CorrespondenceScotType;
@@ -233,7 +234,7 @@ public class TornadoServiceTest {
         listingData.setHearingDocType(HEARING_DOC_ETCL);
         listingData.setHearingDocETCL(HEARING_ETCL_STAFF);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
-        listingData.setListingVenue("Glasgow");
+        listingData.setListingVenue(new DynamicFixedListType("Glasgow"));
         listingData.setListingCollection(new ArrayList<>(Collections.singleton(listingTypeItem)));
 
         return listingData;

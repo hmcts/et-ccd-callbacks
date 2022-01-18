@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +34,7 @@ public class VenueAddressReaderService {
             throw new VenueAddressReaderException("Venue address list not found for " + managingOffice);
         }
 
-         VenueAddress venueAddressItem = venueAddressList.stream()
+        VenueAddress venueAddressItem = venueAddressList.stream()
                 .filter(v -> v.getVenue().equals(hearingVenue))
                 .findAny()
                 .orElse(null);

@@ -3,12 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.Address;
@@ -27,11 +21,8 @@ import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressesService;
 
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -43,23 +34,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABERDEEN_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_PAGE_SIZE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.COMPANY_TYPE_CLAIMANT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FILE_EXTENSION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LABEL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LBL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.VENUE_ADDRESS_VALUES_FILE_PATH;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
@@ -470,7 +454,6 @@ public class DocumentHelper {
 
     public static HearingType getHearingByNumber(List<HearingTypeItem> hearingCollection,
                                                  String correspondenceHearingNumber) {
-
         var hearingType = new HearingType();
 
         for (HearingTypeItem hearingTypeItem : hearingCollection) {
@@ -489,7 +472,6 @@ public class DocumentHelper {
     }
 
     private static String getHearingDates(List<DateListedTypeItem> hearingDateCollection) {
-
         var sb = new StringBuilder();
 
         List<String> dateListedList = new ArrayList<>();
@@ -505,7 +487,6 @@ public class DocumentHelper {
     }
 
     private static String getHearingDatesAndTime(List<DateListedTypeItem> hearingDateCollection) {
-
         var sb = new StringBuilder(getHearingDates(hearingDateCollection));
         Iterator<DateListedTypeItem> itr = hearingDateCollection.iterator();
         var earliestTime = LocalTime.of(23, 59);
@@ -527,16 +508,6 @@ public class DocumentHelper {
         }
 
         return sb.toString();
-    }
-
-
-
-    private static String getCellValue(Cell currentCell) {
-        if (currentCell.getCellType() == CellType.STRING) {
-            return currentCell.getStringCellValue();
-        } else {
-            return "";
-        }
     }
 
     static String getHearingDuration(HearingType hearingType) {

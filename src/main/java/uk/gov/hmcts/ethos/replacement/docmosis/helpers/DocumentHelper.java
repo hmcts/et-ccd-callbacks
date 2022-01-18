@@ -65,6 +65,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
 public class DocumentHelper {
+    private DocumentHelper() {
+    }
+
     public static StringBuilder buildDocumentContent(CaseData caseData, String accessKey,
                                                      UserDetails userDetails, String caseTypeId,
                                                      CorrespondenceType correspondenceType,

@@ -103,6 +103,24 @@ public class VenueAddressReaderServiceTest {
     }
 
     @Test
+    public void getVenueAddressForHearing_HearingVenueNotInList() {
+        // Arrange
+        VenueAddress venueAddress = new VenueAddress();
+        venueAddress.setVenue("OtherVenue");
+        venueAddress.setAddress("Test Address");
+        List<VenueAddress> venueAddressList = List.of(venueAddress);
+        var officeName = TribunalOffice.MANCHESTER.getOfficeName();
+        when(venueAddressesService.getTribunalVenueAddresses(officeName)).thenReturn(venueAddressList);
+        HearingType hearingType = getHearingTypeForVenue_EnglandWales("Manchester1");
+
+        // Act
+        String resultAddress = venueAddressReaderService.getVenueAddress(hearingType, ENGLANDWALES_CASE_TYPE_ID, officeName);
+
+        // Assert
+        assertEquals("Manchester1", resultAddress);
+    }
+
+    @Test
     public void getVenueAddressForHearing_HearingVenueNotFound() {
         // Arrange
         VenueAddress venueAddress = new VenueAddress();

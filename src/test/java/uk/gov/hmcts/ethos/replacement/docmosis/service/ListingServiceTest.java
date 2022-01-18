@@ -115,8 +115,8 @@ public class ListingServiceTest {
         listingDetails = new ListingDetails();
         ListingData listingData = new ListingData();
         listingData.setListingDate("2019-12-12");
-        listingData.setListingVenue("Aberdeen");
-        listingData.setVenueAberdeen("AberdeenVenue");
+        listingData.setListingVenue(new DynamicFixedListType("Aberdeen"));
+        listingData.setVenueAberdeen(new DynamicFixedListType("AberdeenVenue"));
         listingData.setListingCollection(new ArrayList<>());
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingData.setReportType(BROUGHT_FORWARD_REPORT);
@@ -128,8 +128,8 @@ public class ListingServiceTest {
         ListingData listingData1 = new ListingData();
         listingData1.setListingDateFrom("2019-12-09");
         listingData1.setListingDateTo("2019-12-12");
-        listingData1.setListingVenue("Aberdeen");
-        listingData1.setVenueAberdeen("AberdeenVenue");
+        listingData1.setListingVenue(new DynamicFixedListType("Aberdeen"));
+        listingData1.setVenueAberdeen(new DynamicFixedListType("AberdeenVenue"));
         listingData1.setListingCollection(new ArrayList<>());
         listingData1.setHearingDateType(RANGE_HEARING_DATE_TYPE);
         listingData1.setReportType("Brought Forward Report");
@@ -282,8 +282,8 @@ public class ListingServiceTest {
     public void listingCaseCreationWithHearingDocType() {
         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=Aberdeen, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
-                "venueGlasgow=null, venueAberdeen=AberdeenVenue, venueDundee=null, venueEdinburgh=null, hearingDocType=ETL Test, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, clerkResponsible=null, " +
+                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
+                "venueGlasgow=null, venueAberdeen=DynamicFixedListType(value=DynamicValueType(code=AberdeenVenue, label=AberdeenVenue), listItems=null), venueDundee=null, venueEdinburgh=null, hearingDocType=ETL Test, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, clerkResponsible=null, " +
                 "reportType=Brought Forward Report, documentName=ETL Test, showAll=null, localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, " +
                 "localReportsSummary2=null, localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Leeds)";
         listingDetails.getCaseData().setHearingDocType("ETL Test");
@@ -297,8 +297,8 @@ public class ListingServiceTest {
     public void listingCaseCreationWithReportType() {
         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=Aberdeen, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
-                "venueGlasgow=null, venueAberdeen=AberdeenVenue, venueDundee=null, venueEdinburgh=null, " +
+                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
+                "venueGlasgow=null, venueAberdeen=DynamicFixedListType(value=DynamicValueType(code=AberdeenVenue, label=AberdeenVenue), listItems=null), venueDundee=null, venueEdinburgh=null, " +
                 "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, clerkResponsible=null, " +
                 "reportType=Brought Forward Report, documentName=Brought Forward Report, showAll=null, localReportsSummaryHdr=null, localReportsSummary=null, " +
                 "localReportsSummaryHdr2=null, localReportsSummary2=null, localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Leeds)";
@@ -311,8 +311,8 @@ public class ListingServiceTest {
     public void listingCaseCreationWithoutDocumentName() {
         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=Aberdeen, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
-                "venueGlasgow=null, venueAberdeen=AberdeenVenue, venueDundee=null, venueEdinburgh=null, " +
+                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
+                "venueGlasgow=null, venueAberdeen=DynamicFixedListType(value=DynamicValueType(code=AberdeenVenue, label=AberdeenVenue), listItems=null), venueDundee=null, venueEdinburgh=null, " +
                 "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, clerkResponsible=null, " +
                 "reportType=null, documentName=Missing document name, showAll=null, localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, " +
                 "localReportsSummary2=null, localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Leeds)";
@@ -347,12 +347,12 @@ public class ListingServiceTest {
     @Test
     public void processListingHearingsRequestGlasgow() throws IOException {
         listingDetails.getCaseData().setVenueAberdeen(null);
-        listingDetails.getCaseData().setVenueGlasgow("GlasgowVenue");
-        listingDetails.getCaseData().setListingVenue("Glasgow");
+        listingDetails.getCaseData().setVenueGlasgow(new DynamicFixedListType("GlasgowVenue"));
+        listingDetails.getCaseData().setListingVenue(new DynamicFixedListType("Glasgow"));
         listingDetails.getCaseData().setManagingOffice("Glasgow");
         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=Glasgow, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
+                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Glasgow, label=Glasgow), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
                 "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, hearingDocType=null, hearingDocETCL=null, " +
                 "roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, clerkResponsible=null, reportType=Brought Forward Report, documentName=null, showAll=null, " +
                 "localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, " +
@@ -366,12 +366,12 @@ public class ListingServiceTest {
     @Test
     public void processListingHearingsRequestEdinburgh() throws IOException {
         listingDetails.getCaseData().setVenueAberdeen(null);
-        listingDetails.getCaseData().setVenueEdinburgh("EdinburghVenue");
-        listingDetails.getCaseData().setListingVenue("Edinburgh");
+        listingDetails.getCaseData().setVenueEdinburgh(new DynamicFixedListType("EdinburghVenue"));
+        listingDetails.getCaseData().setListingVenue(new DynamicFixedListType("Edinburgh"));
         listingDetails.getCaseData().setManagingOffice("Edinburgh");
         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=Edinburgh, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
+                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Edinburgh, label=Edinburgh), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
                 "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, hearingDocType=null, hearingDocETCL=null, " +
                 "roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, clerkResponsible=null, reportType=Brought Forward Report, documentName=null, showAll=null, " +
                 "localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, " +
@@ -385,11 +385,11 @@ public class ListingServiceTest {
     @Test
     public void processListingHearingsRequestDundee() throws IOException {
         listingDetails.getCaseData().setVenueAberdeen(null);
-        listingDetails.getCaseData().setVenueDundee("DundeeVenue");
-        listingDetails.getCaseData().setListingVenue("Dundee");
+        listingDetails.getCaseData().setVenueDundee(new DynamicFixedListType("DundeeVenue"));
+        listingDetails.getCaseData().setListingVenue(new DynamicFixedListType("Dundee"));
         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=Dundee, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
+                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Dundee, label=Dundee), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
                 "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, hearingDocType=null, hearingDocETCL=null, " +
                 "roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, clerkResponsible=null, reportType=Brought Forward Report, documentName=null, showAll=null, " +
                 "localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, " +
@@ -404,12 +404,12 @@ public class ListingServiceTest {
     @Test
     public void processListingHearingsRequestNonScottish() throws IOException {
         listingDetails.getCaseData().setVenueAberdeen(null);
-        listingDetails.getCaseData().setListingVenue("Leeds");
+        listingDetails.getCaseData().setListingVenue(new DynamicFixedListType("Leeds"));
         listingDetails.getCaseData().setManagingOffice("Leeds");
 
         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=Leeds, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
+                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Leeds, label=Leeds), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
                 "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, hearingDocType=null, hearingDocETCL=null, " +
                 "roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, clerkResponsible=null, reportType=Brought Forward Report, documentName=null, showAll=null, " +
                 "localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, " +
@@ -448,7 +448,7 @@ public class ListingServiceTest {
     public void processListingHearingsRequestAberdeenWithInValidHearingType() throws IOException {
         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=Aberdeen, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
+                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
                 "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, hearingDocType=ETCL - Cause List, hearingDocETCL=Public, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, clerkResponsible=null, " +
                 "reportType=Brought Forward Report, documentName=null, showAll=null, localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, " +
                 "localReportsSummary2=null, localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Aberdeen)";
@@ -466,7 +466,7 @@ public class ListingServiceTest {
     public void processListingHearingsRequestAberdeenWithPrivateHearingType() throws IOException {
         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=Aberdeen, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
+                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
                 "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, " +
                 "hearingDocType=ETCL - Cause List, hearingDocETCL=Press List, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, clerkResponsible=null, " +
                 "reportType=Brought Forward Report, documentName=null, showAll=null, localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, " +
@@ -507,7 +507,7 @@ public class ListingServiceTest {
                 "bfDateCollection=null, clerkResponsible=null, reportType=Brought Forward Report, documentName=null, showAll=null, localReportsSummaryHdr=null, " +
                 "localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Aberdeen)";
         submitEvents.get(0).getCaseData().setClaimantCompany("RYAN AIR LTD");
-        listingDetails.getCaseData().setVenueAberdeen(ALL_VENUES);
+        listingDetails.getCaseData().setVenueAberdeen(new DynamicFixedListType(ALL_VENUES));
         listingDetails.getCaseData().setManagingOffice("Aberdeen");
         when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.processListingHearingsRequest(listingDetails, "authToken");
@@ -568,7 +568,7 @@ public class ListingServiceTest {
                 "bfDateCollection=null, clerkResponsible=null, reportType=Brought Forward Report, documentName=null, showAll=null, localReportsSummaryHdr=null, " +
                 "localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Leeds)";
         submitEvents.get(0).getCaseData().setClaimantCompany("RYAN AIR LTD");
-        listingDetails.getCaseData().setVenueAberdeen(ALL_VENUES);
+        listingDetails.getCaseData().setVenueAberdeen(new DynamicFixedListType(ALL_VENUES));
         listingDetails.getCaseData().setManagingOffice("Leeds");
         when(ccdClient.retrieveCasesVenueAndDateElasticSearch("authToken", ENGLANDWALES_CASE_TYPE_ID,
                 listingDetails.getCaseData().getListingDate(), listingDetails.getCaseData().getListingDate(),
@@ -607,7 +607,7 @@ public class ListingServiceTest {
                 "documentName=null, showAll=null, localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, " +
                 "localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Leeds)";
         submitEvents.get(0).getCaseData().setClaimantCompany("RYAN AIR LTD");
-        listingDetailsRange.getCaseData().setListingVenue(ALL_VENUES);
+        listingDetailsRange.getCaseData().setListingVenue(new DynamicFixedListType(ALL_VENUES));
         listingDetailsRange.getCaseData().setManagingOffice("Leeds");
         when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.processListingHearingsRequest(listingDetailsRange, "authToken");
@@ -733,8 +733,8 @@ public class ListingServiceTest {
     public void setCourtAddressFromCaseData() {
         String result = "ListingData(tribunalCorrespondenceAddress=Manchester Avenue, Manchester, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=Aberdeen, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
-                "venueGlasgow=null, venueAberdeen=AberdeenVenue, venueDundee=null, venueEdinburgh=null, " +
+                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
+                "venueGlasgow=null, venueAberdeen=DynamicFixedListType(value=DynamicValueType(code=AberdeenVenue, label=AberdeenVenue), listItems=null), venueDundee=null, venueEdinburgh=null, " +
                 "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, clerkResponsible=null, " +
                 "reportType=Brought Forward Report, documentName=null, showAll=null, localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, " +
                 "localReportsSummary2=null, localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Leeds)";
@@ -747,7 +747,7 @@ public class ListingServiceTest {
     public void generateBFReportDataSingleDateMatch() throws IOException {
         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=Aberdeen, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
+                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
                 "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, " +
                 "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=[BFDateTypeItem(id=222, " +
                 "value=BFDateType(caseReference=4210000/2019, broughtForwardAction=null, broughtForwardDate=2019-12-12, broughtForwardDateCleared=, " +
@@ -755,7 +755,7 @@ public class ListingServiceTest {
                 "localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, " +
                 "localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Leeds)";
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
-       listingDetails.getCaseData().setManagingOffice("Leeds");
+        listingDetails.getCaseData().setManagingOffice("Leeds");
         ListingData listingDataResult = listingService.generateReportData(listingDetails, "authToken");
         assertEquals(result, listingDataResult.toString());
     }
@@ -764,7 +764,7 @@ public class ListingServiceTest {
     public void generateBFReportDataSingleDateMisMatch() throws IOException {
         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-30, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=Aberdeen, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
+                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
                 "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, " +
                 "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, " +
                 "bfDateCollection=[], clerkResponsible=null, reportType=Brought Forward Report, documentName=null, showAll=null, localReportsSummaryHdr=null, " +
@@ -781,7 +781,7 @@ public class ListingServiceTest {
     public void generateBFReportDataRangeDatesWithMatchingClerkResponsible() throws IOException {
         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Range, listingDate=null, " +
-                "listingDateFrom=2019-12-09, listingDateTo=2019-12-12, listingVenue=Aberdeen, listingCollection=[], listingVenueOfficeGlas=null, " +
+                "listingDateFrom=2019-12-09, listingDateTo=2019-12-12, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, " +
                 "listingVenueOfficeAber=null, venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, " +
                 "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=[BFDateTypeItem(id=111, " +
                 "value=BFDateType(caseReference=4210000/2019, broughtForwardAction=null, broughtForwardDate=2019-12-11, " +
@@ -800,7 +800,7 @@ public class ListingServiceTest {
     public void generateBFReportDataRangeDatesWithMisMatchedClerkResponsible() throws IOException {
         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Range, listingDate=null, listingDateFrom=2019-12-09, " +
-                "listingDateTo=2019-12-12, listingVenue=Aberdeen, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
+                "listingDateTo=2019-12-12, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
                 "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, " +
                 "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, " +
                 "bfDateCollection=[], clerkResponsible=null, reportType=Brought Forward Report, documentName=null, showAll=null, localReportsSummaryHdr=null, " +
@@ -892,7 +892,7 @@ public class ListingServiceTest {
     @Ignore("Fix as part of reporting work")
     @Test
     public void generateClaimsAcceptedReportDataForGlasgow() throws IOException {
-         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
+        String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
                 "listingDateTo=null, listingVenue=Aberdeen, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
                 "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, " +
@@ -918,15 +918,15 @@ public class ListingServiceTest {
                 "ConStd26wkTotal=null, ConFast26wkTotal=null, ConOpen26wkTotal=null, ConNone26wkTotalPerCent=null, ConStd26wkTotalPerCent=null, ConFast26wkTotalPerCent=null, " +
                 "ConOpen26wkTotalPerCent=null, xConNone26wkTotal=null, xConStd26wkTotal=null, xConFast26wkTotal=null, xConOpen26wkTotal=null, xConNone26wkTotalPerCent=null, " +
                 "xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null, "
-                 + "claimServedDay1Total=null, claimServedDay1Percent=null, claimServedDay2Total=null, "
-                 + "claimServedDay2Percent=null, claimServedDay3Total=null, claimServedDay3Percent=null, "
-                 + "claimServedDay4Total=null, claimServedDay4Percent=null, claimServedDay5Total=null, "
-                 + "claimServedDay5Percent=null, claimServed6PlusDaysTotal=null, claimServed6PlusDaysPercent=null, "
-                 + "claimServedTotal=null, claimServedItems=null, manuallyCreatedTotalCases=null, " +
-                 "et1OnlineTotalCases=null, eccTotalCases=null, migratedTotalCases=null, " +
-                 "manuallyCreatedTotalCasesPercent=null, et1OnlineTotalCasesPercent=null," +
-                 " eccTotalCasesPercent=null, migratedTotalCasesPercent=null"
-                 + "), " +
+                + "claimServedDay1Total=null, claimServedDay1Percent=null, claimServedDay2Total=null, "
+                + "claimServedDay2Percent=null, claimServedDay3Total=null, claimServedDay3Percent=null, "
+                + "claimServedDay4Total=null, claimServedDay4Percent=null, claimServedDay5Total=null, "
+                + "claimServedDay5Percent=null, claimServed6PlusDaysTotal=null, claimServed6PlusDaysPercent=null, "
+                + "claimServedTotal=null, claimServedItems=null, manuallyCreatedTotalCases=null, " +
+                "et1OnlineTotalCases=null, eccTotalCases=null, migratedTotalCases=null, " +
+                "manuallyCreatedTotalCasesPercent=null, et1OnlineTotalCasesPercent=null," +
+                " eccTotalCasesPercent=null, migratedTotalCasesPercent=null"
+                + "), " +
                 "localReportsDetail=[AdhocReportTypeItem(id=null, value=AdhocReportType(reportDate=null, reportOffice=null, receiptDate=null, " +
                 "hearingDate=null, date=null, full=null, half=null, mins=null, total=null, eeMember=null, erMember=null, caseReference=4210000/2019, " +
                 "multipleRef=null, multSub=null, hearingNumber=null, hearingType=null, hearingTelConf=null, hearingDuration=null, hearingClerk=null, " +
@@ -948,15 +948,15 @@ public class ListingServiceTest {
                 "ConNone26wkTotalPerCent=null, ConStd26wkTotalPerCent=null, ConFast26wkTotalPerCent=null, ConOpen26wkTotalPerCent=null, xConNone26wkTotal=null, xConStd26wkTotal=null, " +
                 "xConFast26wkTotal=null, xConOpen26wkTotal=null, xConNone26wkTotalPerCent=null, xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null))], managingOffice=Leeds)" +
                 "xConFast26wkTotal=null, xConOpen26wkTotal=null, xConNone26wkTotalPerCent=null, xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null, "
-                 + "claimServedDay1Total=null, claimServedDay1Percent=null, claimServedDay2Total=null, "
-                 + "claimServedDay2Percent=null, claimServedDay3Total=null, claimServedDay3Percent=null, "
-                 + "claimServedDay4Total=null, claimServedDay4Percent=null, claimServedDay5Total=null, "
-                 + "claimServedDay5Percent=null, claimServed6PlusDaysTotal=null, claimServed6PlusDaysPercent=null, "
-                 + "claimServedTotal=null, claimServedItems=null, manuallyCreatedTotalCases=null, " +
-                 "et1OnlineTotalCases=null, eccTotalCases=null, migratedTotalCases=null, " +
-                 "manuallyCreatedTotalCasesPercent=null, et1OnlineTotalCasesPercent=null, " +
-                 "eccTotalCasesPercent=null, migratedTotalCasesPercent=null"
-                 +"))])";
+                + "claimServedDay1Total=null, claimServedDay1Percent=null, claimServedDay2Total=null, "
+                + "claimServedDay2Percent=null, claimServedDay3Total=null, claimServedDay3Percent=null, "
+                + "claimServedDay4Total=null, claimServedDay4Percent=null, claimServedDay5Total=null, "
+                + "claimServedDay5Percent=null, claimServed6PlusDaysTotal=null, claimServed6PlusDaysPercent=null, "
+                + "claimServedTotal=null, claimServedItems=null, manuallyCreatedTotalCases=null, " +
+                "et1OnlineTotalCases=null, eccTotalCases=null, migratedTotalCases=null, " +
+                "manuallyCreatedTotalCasesPercent=null, et1OnlineTotalCasesPercent=null, " +
+                "eccTotalCasesPercent=null, migratedTotalCasesPercent=null"
+                +"))])";
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(CLAIMS_ACCEPTED_REPORT);
         listingDetails.getCaseData().setManagingOffice("Leeds");
@@ -1289,10 +1289,10 @@ public class ListingServiceTest {
         var caseDataBuilder = new NoPositionChangeCaseDataBuilder();
         var result =  new NoPositionChangeSearchResult();
         result.setCases(List.of(caseDataBuilder.withCaseType("SINGLE")
-                                    .withCurrentPosition("Position")
-                                    .withDateToPosition("2021-04-03")
-                                    .withReceiptDate("2021-03-03")
-                                    .buildAsSubmitEvent(ACCEPTED_STATE)));
+                .withCurrentPosition("Position")
+                .withDateToPosition("2021-04-03")
+                .withReceiptDate("2021-03-03")
+                .buildAsSubmitEvent(ACCEPTED_STATE)));
         when(ccdClient.runElasticSearch(anyString(), anyString(), anyString(), eq(NoPositionChangeSearchResult.class)))
                 .thenReturn(result);
         when(ccdClient.buildAndGetElasticSearchRequestWithRetriesMultiples(anyString(), anyString(), anyString()))

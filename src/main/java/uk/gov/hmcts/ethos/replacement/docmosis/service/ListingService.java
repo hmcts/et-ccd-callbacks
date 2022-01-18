@@ -19,6 +19,7 @@ import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ecm.common.model.listing.items.ListingTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingVenueHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReportData;
@@ -171,7 +172,7 @@ public class ListingService {
             throws IOException {
         var listingData = listingDetails.getCaseData();
         Map.Entry<String, String> entry =
-                ListingHelper.getListingVenueToSearch(listingData).entrySet().iterator().next();
+                ListingVenueHelper.getListingVenueToSearch(listingData).entrySet().iterator().next();
         String venueToSearchMapping = entry.getKey();
         String venueToSearch = entry.getValue();
         String dateFrom;
@@ -347,14 +348,14 @@ public class ListingService {
     }
 
     private boolean isListingVenueValid(ListingData listingData, DateListedTypeItem dateListedTypeItem) {
-        if (listingData.getListingVenue().equals(ALL_VENUES)) {
+        if (listingData.hasListingVenue() && ALL_VENUES.equals(listingData.getListingVenue().getSelectedCode())) {
             return true;
         } else {
             String venueSearched;
-            String venueToSearch = ListingHelper.getListingVenue(listingData);
+            String venueToSearch = ListingVenueHelper.getListingVenue(listingData);
             log.info("VENUE TO SEARCH: " + venueToSearch);
 
-            if (ListingHelper.isAllScottishVenues(listingData)) {
+            if (ListingVenueHelper.isAllScottishVenues(listingData)) {
                 venueSearched = dateListedTypeItem.getValue().hasHearingVenue()
                         ? dateListedTypeItem.getValue().getHearingVenueDay().getValue().getLabel()
                         : " ";

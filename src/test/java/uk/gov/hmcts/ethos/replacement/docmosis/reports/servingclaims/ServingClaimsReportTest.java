@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.servingclaims;
 import org.assertj.core.util.Strings;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.ccd.items.BFActionTypeItem;
@@ -33,7 +34,7 @@ public class ServingClaimsReportTest {
         var listingDataRange = new ListingData();
         listingDataRange.setListingDateFrom("2020-08-02");
         listingDataRange.setListingDateTo("2020-08-24");
-        listingDataRange.setListingVenue("Leeds");
+        listingDataRange.setListingVenue(new DynamicFixedListType("Leeds"));
         listingDataRange.setReportType("Claims Served");
         listingDetails.setCaseData(listingDataRange);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);

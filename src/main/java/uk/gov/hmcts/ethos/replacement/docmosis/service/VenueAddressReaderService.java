@@ -57,8 +57,7 @@ public class VenueAddressReaderService {
     private String getHearingVenueScotland(HearingType hearingType) {
         var venue = hearingType.getHearingVenueScotland();
         if (StringUtils.isBlank(venue)) {
-            log.error("No office found for hearing {}", hearingType.getHearingNumber());
-            return null;
+            throw new VenueAddressReaderException("No office found for hearing " + hearingType.getHearingNumber());
         }
 
         switch (venue) {
@@ -71,8 +70,7 @@ public class VenueAddressReaderService {
             case EDINBURGH_OFFICE:
                 return hearingType.getHearingEdinburgh().getSelectedLabel();
             default:
-                log.error("No {} venue found", venue);
-                return null;
+                throw new VenueAddressReaderException("No venue found for " + venue);
         }
     }
 }

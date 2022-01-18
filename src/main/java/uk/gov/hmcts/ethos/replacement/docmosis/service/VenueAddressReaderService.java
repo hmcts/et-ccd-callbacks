@@ -1,10 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.VenueAddress;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.VenueAddressReaderException;
 
 import java.util.List;
 
@@ -27,13 +30,18 @@ public class VenueAddressReaderService {
     public String getVenueAddress(HearingType hearingType, String caseTypeId, String managingOffice) {
         String hearingVenue = getHearingVenue(hearingType, caseTypeId);
         List<VenueAddress> venueAddressList  = venueAddressesService.getTribunalVenueAddresses(managingOffice);
+
+        if (CollectionUtils.isEmpty(venueAddressList)) {
+            throw new VenueAddressReaderException("Venue address list not found for " + managingOffice);
+        }
+
          VenueAddress venueAddressItem = venueAddressList.stream()
                 .filter(v -> v.getVenue().equals(hearingVenue))
                 .findAny()
                 .orElse(null);
 
         return venueAddressItem != null
-                ? StringUtils.defaultString(venueAddressItem.getAddress(), hearingVenue)
+                ? StringUtils.defaultIfBlank(venueAddressItem.getAddress(), hearingVenue)
                 : hearingVenue;
     }
 
@@ -49,6 +57,11 @@ public class VenueAddressReaderService {
 
     private String getHearingVenueScotland(HearingType hearingType) {
         var venue = hearingType.getHearingVenueScotland();
+        if (StringUtils.isBlank(venue)) {
+            log.error("No office found for hearing {}", hearingType.getHearingNumber());
+            return null;
+        }
+
         switch (venue) {
             case GLASGOW_OFFICE:
                 return hearingType.getHearingGlasgow().getSelectedLabel();

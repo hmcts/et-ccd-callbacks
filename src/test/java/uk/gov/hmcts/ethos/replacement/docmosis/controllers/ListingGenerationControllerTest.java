@@ -32,6 +32,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.Heari
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportSummary;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ListingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.PrintHearingListService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
@@ -45,8 +46,12 @@ import java.util.Objects;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -72,6 +77,7 @@ public class ListingGenerationControllerTest {
     private static final String GENERATE_LISTINGS_DOC_SINGLE_CASES_URL = "/generateListingsDocSingleCases";
     private static final String GENERATE_LISTINGS_DOC_SINGLE_CASES_CONFIRMATION_URL = "/generateListingsDocSingleCasesConfirmation";
     private static final String GENERATE_REPORT_URL = "/generateReport";
+    private static final String INIT_PRINT_HEARING_LISTS_URL = "/initPrintHearingLists";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -85,14 +91,15 @@ public class ListingGenerationControllerTest {
     @MockBean
     private VerifyTokenService verifyTokenService;
 
+    @MockBean
+    private PrintHearingListService printHearingListService;
+
     private MockMvc mvc;
     private JsonNode requestContent;
     private JsonNode requestContent1;
     private JsonNode requestContentSingleCase;
     private JsonNode requestContentSingleCase1;
-    private JsonNode listingRequestJson;
     private ListingDetails listingDetails;
-    private ListingData listingData;
     private CaseData caseData;
     private DocumentInfo documentInfo;
     private DefaultValues defaultValues;
@@ -630,4 +637,45 @@ public class ListingGenerationControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    public void initPrintHearingLists() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mvc.perform(post(INIT_PRINT_HEARING_LISTS_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", AUTH_TOKEN)
+                .content(requestContentSingleCase.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+
+        verify(printHearingListService, times(1)).initPrintHearingLists(any(CaseData.class));
+    }
+
+    @Test
+    public void initPrintHearingListsForbidden() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+
+        mvc.perform(post(INIT_PRINT_HEARING_LISTS_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", AUTH_TOKEN)
+                .content(requestContentSingleCase.toString()))
+                .andExpect(status().isForbidden());
+
+        verify(printHearingListService, never()).initPrintHearingLists(any(CaseData.class));
+    }
+
+    @Test
+    public void initPrintHearingListsError400() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mvc.perform(post(INIT_PRINT_HEARING_LISTS_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", AUTH_TOKEN)
+                .content("bad-content"))
+                .andExpect(status().isBadRequest());
+
+        verify(printHearingListService, never()).initPrintHearingLists(any(CaseData.class));
+    }
 }

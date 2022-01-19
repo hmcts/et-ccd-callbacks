@@ -1,0 +1,439 @@
+venue-addresses:
+  tribunal-offices:
+    aberdeen:
+      - venue: Aberdeen
+        address: Ground Floor, AB1, 48 Huntly Street, Aberdeen, AB10 1SH
+      - venue: I J C
+        address: Longman Road, Inverness, IV1 1AH
+      - venue: Inverness
+        address: Inverness Justice Centre, Longman Road, Inverness, IV1 1AH
+      - venue: Kirkwall
+        address: Kirkwall Sheriff Court, Sheriff Court House, Watergate, Kirkwall, Orkney, KW15 1PD
+      - venue: Lerwick
+        address: Lerwick Sheriff Court, King Erik Street, Lerwick, Shetland, ZE1 0HD
+      - venue: Radio Room Shetland
+        address: Radio Room, Isleburgh Community Centre, Burgh Road, Shetland, ZE1 0EQ
+      - venue: Stornoway
+        address: Stornoway HC, Sheriff Court House, Lewis Street, Stornoway, Isle of Lewis, HS1 2JF
+      - venue: Wick
+        address: Wick Sheriff Court House, Bridge Street, Wick, Caithness, KW1 4AJ
+    bristol:
+      - venue: Barnstaple
+        address: Barnstaple
+      - venue: Bath Law Courts
+        address: Bath Law Courts
+      - venue: Bodmin
+        address: Bodmin Magistrates’ Court, Launceston Road, Bodmin, PL31 2AL
+      - venue: Bournemouth MC
+        address: Bournemouth MC
+      - venue: Brighton
+        address: Brighton
+      - venue: Brighton CC
+        address: Brighton CC
+      - venue: Bristol 1
+        address: Bristol 1
+      - venue: Bristol 2
+        address: Bristol 2
+      - venue: Bristol 3
+        address: Bristol 3
+      - venue: Bristol 4
+        address: Bristol 4
+      - venue: Bristol 5
+        address: Bristol 5
+      - venue: Bristol 6
+        address: Bristol 6
+      - venue: Bristol CFJC
+        address: Bristol ET, Bristol Civil and Family Justice Centre, 2 Redcliff Street, Bristol, BS1 6GR
+      - venue: Bristol Crown
+        address: Bristol Crown
+      - venue: Bristol Mags
+        address: Bristol Mags
+      - venue: Bristol TBC
+        address: Bristol TBC
+      - venue: Bristol Vintry
+        address: Bristol Vintry
+      - venue: BristolCityHall
+        address: BristolCityHall
+      - venue: Cardiff CFJC
+        address: Cardiff CFJC
+      - venue: Exeter
+        address: 2 Floor, Keble House, Southernhay Gardens, Exeter, EX1 1NT
+      - venue: Exeter Combined
+        address: Exeter Combined Court, Southernhay Gardens, Exeter, EX1 1UH
+      - venue: Exeter Mags
+        address: Exeter Mags
+      - venue: Floating Case
+        address: Floating Case
+      - venue: Gloucester CCFC
+        address: Gloucester CCFC
+      - venue: Havant
+        address: Havant Hearing Centre, The Courthouse, Elmleigh Road, Havant, PO9 2AL
+      - venue: Plym St Cath Ho
+        address: Plym St Cath Ho
+      - venue: Plymouth Mags
+        address: Plymouth Magistrates’ Court, St Andrews Street, Plymouth, PL1 2DP
+      - venue: Queensway House
+        address: Queensway House
+      - venue: ROIT
+        address: ROIT
+      - venue: Southampton
+        address: West Hampshire Magistrates’ Court, 100 The Avenue, Southampton, SO17 1EY
+      - venue: Swindon
+        address: Swindon
+      - venue: Swindon2
+        address: Swindon2
+      - venue: Taunton
+        address: Taunton
+      - venue: Truro
+        address: Truro
+      - venue: Truro Mags
+        address: Truro Mags
+      - venue: UWE Bristol
+        address: UWE Bristol
+      - venue: Vintry House
+        address: Vintry House
+      - venue: Worle
+        address: Worle
+      - venue: Yeovil Mags
+        address: Yeovil Mags
+    dundee:
+      - venue: Dundee
+        address: Ground Floor, Block C, Caledonian House, Greenmarket, Dundee, DD1 4QG
+      - venue: Tribunal
+        address: Ground Floor, Endeavour House, 1 Greenmarket, Dundee, DD1 4QB
+    edinburgh:
+      - venue: Edinburgh
+        address: 54-56 Melville Street, Edinburgh, EH3 7HF
+    glasgow:
+      - venue: Campbeltown Sheriff Court
+        address: Campbeltown HC, Sheriff Court House, Castle Hill, Campbeltown, PA28 6AN
+      - venue: Dumfries Sheriff Court
+        address: Dumfries HC, Sheriff Court House, Buccleuch Street, Dumfries, DG1 2AN
+      - venue: Fort William Sheriff Court
+        address: Fort William SC, Sheriff Court House, High Street, Fort William, PH33 6EE
+      - venue: Glasgow
+        address: Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT
+      - venue: Kirkcudbright Sheriff Court
+        address: Kirkcudbright, Sheriff Court House, High Street, Kirkcudbright, DG6 4JW
+      - venue: Lochmaddy Sheriff Court
+        address: Lochmaddy HC, Sheriff Court House, Lochmaddy, Isle of North Uist, HS6 5AE
+      - venue: Oban Sheriff Court
+        address: Oban HC, Sheriff Court House, Albany Street, Oban, PA34 4AL
+      - venue: Portree Sheriff Court
+        address: Portree HC, Sheriff Court House, Somerled Square, Portree, IV51 9EH
+      - venue: Stirling Sheriff Court
+        address: Stirling SC, Sheriff Court House, Viewfield Place, Stirling, FK8 1NH
+      - venue: Stornoway Sheriff Court
+        address: Stornoway HC, Sheriff Court House, Lewis Street, Stornoway, Isle of Lewis, HS1 2JF
+      - venue: Stranraer Sheriff Court
+        address: Stranraer HC, Sheriff Court House, Lewis Street, Stranraer, DG9 7AA
+    leeds:
+      - venue: Hull
+        address: Wilberforce Court, Alfred Gelder Street, Hull, HU1 1UY
+      - venue: IAC
+        address: IAC
+      - venue: Leeds
+        address: 4th Floor, City Exchange, 11 Albion Street, Leeds, LS1 5ES
+      - venue: Scarborough
+        address: Scarborough
+      - venue: Sheffield Combi
+        address: The Law Courts, 50 West Bar, Sheffield, S3 8PH
+      - venue: Teesside ET
+        address: Teesside ET
+      - venue: Wakefield Count
+        address: Wakefield Count
+      - venue: Hull Combined Court Centre
+        address: Hull Combined Court Centre, Lowgate, Hull, HU1 2EZ
+    london_central:
+      - venue: Field House
+        address: Field House
+      - venue: Fox Court rm 1
+        address: London (Central), 4th Floor Fox Court, 30 Brooke Street, London, EC1N 7RS
+      - venue: London Central
+        address: Victory House, 30-34 Kingsway, London, WC2B 6EX
+      - venue: RCJ
+        address: RCJ
+    london_east:
+      - venue: Colchester
+        address: Colchester
+      - venue: East London
+        address: East London Tribunals, 2nd Floor Import Building, 2 Clove Crescent, London,E 14 2BE
+      - venue: Stratford
+        address: Stratford
+      - venue: Woburn Place
+        address: Woburn Place
+    london_south:
+      - venue: Ashford
+        address: 1st Floor, Ashford House, County Square Shopping Centre, Ashford, TN23 1YB
+      - venue: Croydon
+        address: Montague Court, 101 London Road, West Croydon, London, CR0 2RF
+      - venue: London
+        address: London
+    manchester:
+      - venue: Barrow
+        address: Barrow Magistrates Court, Abbey Road, Barrow in Furness, Cumbria, LA14 5QX
+      - venue: Blackpool Mags
+        address: Blackpool Magistrates Court, Civic Centre, Chapel Street, Blackpool, Lancashire, FY1 5DQ
+      - venue: Burnley Court
+        address: Burnley Court
+      - venue: Carlisle C C
+        address: Carlisle Combined Court, Courts of Justice, Earl Street, Carlisle, Cumbria, CA1 1DJ
+      - venue: Carlisle Mags
+        address: Carlisle Magistrates Court, The Court House, Rickergate, Carlisle, CA3 8 QH
+      - venue: Crown Court
+        address: Crown Court
+      - venue: Fleetwood
+        address: Fleetwood
+      - venue: Kendal
+        address: Kendal
+      - venue: Lancaster
+        address: Lancaster
+      - venue: Liverpool
+        address: Employment Tribunals, Third Floor, Civil & Family Court, 35 Vernon Street, Liverpool, L2 2BX
+      - venue: Manchester
+        address: Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, Manchester, M3 2JA
+      - venue: Manchester IA
+        address: Piccadilly Exchange, 2 Piccadilly Plaza, Mosley Street, Manchester, M1 4AH
+      - venue: Manchester Mags
+        address: Manchester Mags
+      - venue: Minshull Street
+        address: Minshull Street
+      - venue: St. Helens
+        address: St. Helens
+      - venue: The Lowry
+        address: The Lowry Theatre Complex, Pier 8, Salford Quays, Salford, M50 3AZ
+    midlands_east:
+      - venue: Bedford
+        address: Bedford
+      - venue: Boston Court Ho
+        address: Boston Court House, 55 Norfolk Street, Boston, PE21 6PE
+      - venue: Boston Sessions
+        address: Boston Sessions
+      - venue: Ilkeston
+        address: Ilkeston
+      - venue: Leicester
+        address: Leicester Hearing Centre, 5a New Walk, Leicester, LE1 6TE
+      - venue: Lincoln
+        address: Lincoln Magistrates Court, 358 High Street, Lincoln, LN5 7QA
+      - venue: London Central
+        address: London Central
+      - venue: Newcastle
+        address: Newcastle
+      - venue: Nottingham
+        address: Tribunal Hearing Centre, Nottingham Justice Centre, Carrington Street, Nottingham, NG2 1EE
+      - venue: Nottingham old
+        address: Nottingham old
+      - venue: Skegness
+        address: Skegness
+      - venue: Sleaford
+        address: Sleaford
+      - venue: Spalding
+        address: Spalding
+      - venue: Teeside
+        address: Teeside
+    midlands_west:
+      - venue: BCJC
+        address: BCJC
+      - venue: Birmingham CCT
+        address: Midlands West Employment Tribunal, Centre City Tower, 5-7 Hill Street, Birmingham, West Midlands, B5 4UU
+      - venue: Bury St Edmunds
+        address: Bury St Edmunds
+      - venue: Cambridge
+        address: Cambridge
+      - venue: Cambridge
+        address: Cambridge
+      - venue: Hereford Court
+        address: Hereford Court
+      - venue: Leicester
+        address: Leicester
+      - venue: Stoke
+        address: Stoke
+      - venue: STOKE (Hanley)
+        address: Stoke-on-Trent Combined Court, Bethesda Street, Hanley, Stoke-on-Trent, T1 3BP
+      - venue: Telford
+        address: Telford Magistrates Court, Telford Square, Malinsgate, Telford, Shropshire, TF3 4HX
+    newcastle:
+      - venue: Carlisle
+        address: Carlisle
+      - venue: Kendal Mags
+        address: Kendal Mags
+      - venue: Kings Court
+        address: Kings Court
+      - venue: Leeds ET
+        address: Leeds ET
+      - venue: Manorview
+        address: Manorview
+      - venue: Middlesbrough
+        address: Victoria Square, Middlesbrough, TS1 2AS
+      - venue: Newcastle CFT
+        address: Newcastle CFCTC, Barras Bridge, Newcastle upon Tyne, Tyne & Wear, NE1 8QF
+      - venue: Newcastle ET
+        address: Newcastle ET
+      - venue: Whitby
+        address: Whitby
+      - venue: North Shields
+        address: Earl Grey Way, North Shields, NE29 6AR
+      - venue: Teesside Mags
+        address: Teesside Justice Centre, Victoria Square, Middlesbrough, Cleveland, TS1 2AS
+    wales:
+      - venue: Abergele
+        address: Abergele
+      - venue: Aberystwyth CC
+        address: Aberystwyth CC
+      - venue: Aberystwyth JC
+        address: Y Lanfa, Trefechan, Aberystwyth, SY23 1AS
+      - venue: Aberystwyth Mag
+        address: Aberystwyth Mag
+      - venue: Brecon Court
+        address: Brecon Court
+      - venue: Caernarfon CC
+        address: Caernarfon CC
+      - venue: Caernarfon CJC
+        address: Llanberis Road, Caernarfon, LL55 2DF
+      - venue: CARDIFF
+        address: CARDIFF
+      - venue: Cardiff CJC
+        address: 2 Park Street, Cardiff, CF10 1ET
+      - venue: Cardiff Crown
+        address: The Law Courts, Cathays Park, Cardiff, CF10 3PG
+      - venue: Cardiff Mag YC1
+        address: Cardiff Mag YC1
+      - venue: Cardiff Mag YC2
+        address: Cardiff Mag YC2
+      - venue: Cardiff Mags
+        address: Wales Employment Tribunal, 3rd Floor, Cardiff Magistrates’ Court, Fitzalan Place, Cardiff, CF24 0RZ
+      - venue: Cardiff Social
+        address: Cardiff Social
+      - venue: Cardiff SSCSA
+        address: Cardiff SSCSA
+      - venue: Carmarthen
+        address: Carmarthen
+      - venue: Carmarthen CC
+        address: The Hearing Centre, Hill House, Picton Terrace, Carmarthen, SA31 3BT
+      - venue: CARMARTHEN DC
+        address: CARMARTHEN DC
+      - venue: Carmarthen HH
+        address: Carmarthen HH
+      - venue: Chester County
+        address: Chester County
+      - venue: Chester Mags
+        address: Chester Mags
+      - venue: Denbigh Mags
+        address: Denbigh Mags
+      - venue: Dolgellau Court
+        address: Dolgellau Court
+      - venue: Flint Mags
+        address: Flint Mags
+      - venue: GOWERTON
+        address: GOWERTON
+      - venue: Haverfordwest
+        address: Haverfordwest
+      - venue: Haverfordwest M
+        address: Haverfordwest M
+      - venue: HaverfordwestCC
+        address: Penffynnon, Hawthorn Rise, Haverfordwest, SA61 2AX
+      - venue: Hereford
+        address: Hereford
+      - venue: Hereford CC
+        address: Hereford CC
+      - venue: Holyhead Mags
+        address: Holyhead Mags
+      - venue: LEDBURY
+        address: LEDBURY
+      - venue: Llandrindod
+        address: Llandrindod
+      - venue: Llandrindod W
+        address: Llandrindod W
+      - venue: Llandudno Mags
+        address: The Court House, Conwy Road, Llandudno, LL30 1GA
+      - venue: Llanelli County
+        address: Llanelli County
+      - venue: Llanelli Mags
+        address: Town Hall Square, Llanelli, SA15 3AW
+      - venue: Llangefni Court
+        address: Llangefni Court
+      - venue: Llangefni Mags
+        address: Llangefni Mags
+      - venue: Manchester ET
+        address: Manchester ET
+      - venue: Mold
+        address: Law Courts, Mold, CH7 1AE
+      - venue: Mold Court
+        address: Mold Court
+      - venue: Neath
+        address: Neath
+      - venue: Neath Mags
+        address: Neath Mags
+      - venue: Newport
+        address: Newport
+      - venue: Newport AIT
+        address: Newport AIT
+      - venue: ORIEL HOUSE
+        address: ORIEL HOUSE
+      - venue: Pontypridd
+        address: The Courthouse, Courthouse Street, Pontypridd, CF37 1JR
+      - venue: Port Talbot
+        address: Harbourside Road, Port Talbot, SA13 1SB
+      - venue: Prestatyn JC
+        address: Victoria Road, Prestatyn, LL19 7TE
+      - venue: Shrewsbury
+        address: Shrewsbury
+      - venue: SW AREA TRAFFIC
+        address: SW AREA TRAFFIC
+      - venue: SWAN.MAG COURT
+        address: SWAN.MAG COURT
+      - venue: Swansea
+        address: Swansea
+      - venue: Swansea CJ
+        address: Caravella House, Quay West, Quay Parade, Swansea, SA1 1SP
+      - venue: SWANSEA CROWN C
+        address: SWANSEA CROWN C
+      - venue: Swansea Mags
+        address: Grove Place, Swansea, SA1 5DB
+      - venue: Swansea Sage
+        address: Swansea Sage
+      - venue: Towyn & Kinmel
+        address: Towyn & Kinmel
+      - venue: Tribunalservice
+        address: Tribunalservice
+      - venue: Wales
+        address: 3rd Floor, Cardiff Magistrates’ Court, Fitzalan Place, Cardiff, CF24 0RZ
+      - venue: Welshpool Mags
+        address: Mansion House, 24 Severn Street, Welshpool, SY21 7UX
+      - venue: With Georgia
+        address: With Georgia
+      - venue: Wrexham Courts
+        address: The Law Courts, Bodhyfryd, Wrexham, LL12 7BP
+      - venue: Wrexham SSCSA
+        address: Wrexham SSCSA
+      - venue: Cardiff SSCS
+        address: Eastgate House, 35-43 Newport Rd, Cardiff CF24 0AB
+    watford:
+      - venue: Amersham
+        address: Amersham Law Courts King George V Road, Amersham, HP6 5AJ
+      - venue: Aylesbury Crown
+        address: Aylesbury Crown Court, Walton Street, Aylesbury, HP21 7FT
+      - venue: Bedford
+        address: Bedford County Court and Family Court, Shire Hall, 3 St Paul's Square, Bedford, MK40 1SQ
+      - venue: Bedford Mags
+        address: Bedford Mags
+      - venue: Bury St Edmunds
+        address: Bury St Edmunds County Court and Family Court, Triton House, St Andrew's Street, North, Bury St. Edmunds, IP33 1TR
+      - venue: Cambridge
+        address: Cambridge County Court and Family Court, 197 East Road, Cambridge, CB1 1BA
+      - venue: Huntingdon
+        address: Huntingdon Law Courts Walden Rd, Huntingdon, PE29 3DW
+      - venue: London Central
+        address: London Central
+      - venue: Milton Keynes
+        address: Milton Keynes
+      - venue: Norwich
+        address: Norwich Magistrates' Court and Family Court, Bishopgate, Norwich, NR3 1UP
+      - venue: Reading ET
+        address: Reading Tribunal Hearing Centre 2nd Floor, 30-31 Friar Street, Reading, RG1 1DX
+      - venue: Transfer Team 3
+        address: Transfer Team 3
+      - venue: Watford
+        address: 2nd Floor, Radius House, 51 Clarendon Road, Watford, WD17 1HP
+      - venue: Peterborough
+        address: Peterborough nightingale Court Knights’ Chamber and Visitor Centre, Bishop’s, Palace, Peterborough Cathedral, Peterborough, PE1 1XZ

@@ -3,11 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.Address;
@@ -26,8 +21,8 @@ import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
 
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -39,42 +34,31 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABERDEEN_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_PAGE_SIZE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.COMPANY_TYPE_CLAIMANT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FILE_EXTENSION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LABEL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LBL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.VENUE_ADDRESS_VALUES_FILE_PATH;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
 public class DocumentHelper {
-
     private DocumentHelper() {
     }
 
-    private static final String VENUE_ADDRESS_OPENING_PROCESSING_ERROR = "Failed while opening or "
-            + "processing the entries for the venueAddressValues.xlsx file : ---> ";
-
     public static StringBuilder buildDocumentContent(CaseData caseData, String accessKey,
                                                      UserDetails userDetails, String caseTypeId,
-                                                     InputStream venueAddressInputStream,
                                                      CorrespondenceType correspondenceType,
                                                      CorrespondenceScotType correspondenceScotType,
                                                      MultipleData multipleData,
-                                                     DefaultValues allocatedCourtAddress) {
+                                                     DefaultValues allocatedCourtAddress,
+                                                     VenueAddressReaderService venueAddressReaderService) {
         var sb = new StringBuilder();
         String templateName = getTemplateName(correspondenceType, correspondenceScotType);
 
@@ -97,8 +81,8 @@ public class DocumentHelper {
             log.info("Single template");
             sb.append(getClaimantData(caseData));
             sb.append(getRespondentData(caseData));
-            sb.append(getHearingData(caseData, caseTypeId, venueAddressInputStream, correspondenceType,
-                    correspondenceScotType));
+            sb.append(getHearingData(caseData, caseTypeId, correspondenceType,
+                    correspondenceScotType, venueAddressReaderService));
             sb.append(getCorrespondenceData(correspondenceType));
             sb.append(getCorrespondenceScotData(correspondenceScotType));
             sb.append(getCourtData(caseData, allocatedCourtAddress));
@@ -418,9 +402,9 @@ public class DocumentHelper {
     }
 
     private static StringBuilder getHearingData(CaseData caseData, String caseTypeId,
-                                                InputStream venueAddressInputStream,
                                                 CorrespondenceType correspondenceType,
-                                                CorrespondenceScotType correspondenceScotType) {
+                                                CorrespondenceScotType correspondenceScotType,
+                                                VenueAddressReaderService venueAddressReaderService) {
         log.info("Hearing Data");
         var sb = new StringBuilder();
         //Currently checking collection not the HearingType
@@ -443,8 +427,8 @@ public class DocumentHelper {
                 sb.append("\"Hearing_time\":\"").append(NEW_LINE);
             }
             log.info("Checking hearing venue and duration");
-            sb.append("\"Hearing_venue\":\"").append(nullCheck(getVenueAddress(
-                    hearingType, caseTypeId, venueAddressInputStream))).append(NEW_LINE);
+            sb.append("\"Hearing_venue\":\"").append(nullCheck(venueAddressReaderService.getVenueAddress(
+                    hearingType, caseTypeId, caseData.getManagingOffice()))).append(NEW_LINE);
             sb.append("\"Hearing_duration\":\"").append(nullCheck(getHearingDuration(hearingType))).append(NEW_LINE);
         } else {
             sb.append("\"Hearing_date\":\"").append(NEW_LINE);
@@ -470,7 +454,6 @@ public class DocumentHelper {
 
     public static HearingType getHearingByNumber(List<HearingTypeItem> hearingCollection,
                                                  String correspondenceHearingNumber) {
-
         var hearingType = new HearingType();
 
         for (HearingTypeItem hearingTypeItem : hearingCollection) {
@@ -489,7 +472,6 @@ public class DocumentHelper {
     }
 
     private static String getHearingDates(List<DateListedTypeItem> hearingDateCollection) {
-
         var sb = new StringBuilder();
 
         List<String> dateListedList = new ArrayList<>();
@@ -505,7 +487,6 @@ public class DocumentHelper {
     }
 
     private static String getHearingDatesAndTime(List<DateListedTypeItem> hearingDateCollection) {
-
         var sb = new StringBuilder(getHearingDates(hearingDateCollection));
         Iterator<DateListedTypeItem> itr = hearingDateCollection.iterator();
         var earliestTime = LocalTime.of(23, 59);
@@ -527,70 +508,6 @@ public class DocumentHelper {
         }
 
         return sb.toString();
-    }
-
-    private static String getVenueAddress(HearingType hearingType, String caseTypeId,
-                                          InputStream venueAddressInputStream) {
-
-        String hearingVenue = getHearingVenue(hearingType, caseTypeId);
-        log.info("HearingVenue: " + hearingVenue);
-        try (Workbook workbook = new XSSFWorkbook(venueAddressInputStream)) {
-            var datatypeSheet = workbook.getSheet(caseTypeId);
-            if (datatypeSheet != null) {
-                log.info("Processing venue addresses for tab : " + caseTypeId + " within file : "
-                        + VENUE_ADDRESS_VALUES_FILE_PATH);
-                for (Row currentRow : datatypeSheet) {
-                    if (currentRow.getRowNum() == 0) {
-                        continue;
-                    }
-                    String excelHearingVenue = getCellValue(currentRow.getCell(0));
-                    log.info("ExcelHearingVenue: " + excelHearingVenue);
-                    if (!isNullOrEmpty(excelHearingVenue) && excelHearingVenue.equals(hearingVenue)) {
-                        return getCellValue(currentRow.getCell(1));
-                    }
-                }
-            }
-
-        } catch (Exception ex) {
-            log.error(VENUE_ADDRESS_OPENING_PROCESSING_ERROR + ex.getMessage());
-        }
-
-        return hearingVenue;
-    }
-
-    private static String getHearingVenue(HearingType hearingType, String caseTypeId) {
-        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
-            return hearingType.getHearingVenue().getValue().getLabel();
-        } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
-            return getHearingVenueScotland(hearingType);
-        } else {
-            throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
-        }
-    }
-
-    private static String getHearingVenueScotland(HearingType hearingType) {
-        var venue = hearingType.getHearingVenueScotland();
-        switch (venue) {
-            case GLASGOW_OFFICE:
-                return hearingType.getHearingGlasgow().getSelectedLabel();
-            case ABERDEEN_OFFICE:
-                return hearingType.getHearingAberdeen().getSelectedLabel();
-            case DUNDEE_OFFICE:
-                return hearingType.getHearingDundee().getSelectedLabel();
-            case EDINBURGH_OFFICE:
-                return hearingType.getHearingEdinburgh().getSelectedLabel();
-            default:
-                log.error("No {} venue found", venue);
-                return null;
-        }
-    }
-
-    private static String getCellValue(Cell currentCell) {
-        if (currentCell.getCellType() == CellType.STRING) {
-            return currentCell.getStringCellValue();
-        } else {
-            return "";
-        }
     }
 
     static String getHearingDuration(HearingType hearingType) {

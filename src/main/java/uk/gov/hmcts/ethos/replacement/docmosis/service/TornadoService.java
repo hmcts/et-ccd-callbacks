@@ -31,7 +31,6 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LETTER_ADDRESS_ALLOCATED_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.VENUE_ADDRESS_VALUES_FILE_PATH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService.APPLICATION_DOCX_VALUE;
 
 @Slf4j
@@ -44,6 +43,7 @@ public class TornadoService {
     private final DocumentManagementService documentManagementService;
     private final UserService userService;
     private final DefaultValuesReaderService defaultValuesReaderService;
+    private final VenueAddressReaderService venueAddressReaderService;
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
@@ -72,22 +72,17 @@ public class TornadoService {
                                   String caseTypeId, CorrespondenceType correspondenceType,
                                   CorrespondenceScotType correspondenceScotType,
                                   MultipleData multipleData) throws IOException {
-        try (var venueAddressInputStream = getVenueAddressInputStream();
-            var os = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
+        try (var os = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
             var allocatedCourtAddress = getAllocatedCourtAddress(caseData, caseTypeId, multipleData);
             var userDetails = userService.getUserDetails(authToken);
 
             var documentContent = DocumentHelper.buildDocumentContent(caseData,
                     tornadoConnection.getAccessKey(),
-                    userDetails, caseTypeId, venueAddressInputStream, correspondenceType,
-                    correspondenceScotType, multipleData, allocatedCourtAddress);
+                    userDetails, caseTypeId, correspondenceType,
+                    correspondenceScotType, multipleData, allocatedCourtAddress, venueAddressReaderService);
 
             writeOutputStream(os, documentContent);
         }
-    }
-
-    private InputStream getVenueAddressInputStream() {
-        return getClass().getClassLoader().getResourceAsStream(VENUE_ADDRESS_VALUES_FILE_PATH);
     }
 
     private DefaultValues getAllocatedCourtAddress(CaseData caseData, String caseTypeId, MultipleData multipleData) {

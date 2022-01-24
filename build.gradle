@@ -318,7 +318,7 @@ wrapper {
 flyway {
     url = 'jdbc:' + System.getenv('DB_URL') + '/et_cos'
     user = 'et_cos'
-    password = System.getenv('ET_COS_HANDLER_DB_PASSWORD')
+    password = System.getenv('ET_COS_DB_PASSWORD')
 }
 
 task installLocalDb(type: Exec) {

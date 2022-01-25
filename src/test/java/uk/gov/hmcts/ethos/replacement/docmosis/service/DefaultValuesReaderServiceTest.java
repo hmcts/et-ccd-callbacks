@@ -106,7 +106,7 @@ public class DefaultValuesReaderServiceTest {
         assertEquals(POSITION_TYPE_CASE_CLOSED, caseData.getPositionType());
         assertEquals(POSITION_TYPE_CASE_CLOSED, caseData.getCaseSource());
         assertEquals("TestManagingOffice", caseData.getManagingOffice());
-        assertEquals(MULTIPLE_CASE_TYPE, caseData.getCaseType());
+        assertEquals(MULTIPLE_CASE_TYPE, caseData.getEcmCaseType());
         verifyAddress(caseData.getTribunalCorrespondenceAddress());
         assertEquals("TestTelephone", caseData.getTribunalCorrespondenceTelephone());
         assertEquals("TestFax", caseData.getTribunalCorrespondenceFax());
@@ -125,7 +125,7 @@ public class DefaultValuesReaderServiceTest {
         assertEquals("ExistingPositionType", caseData.getPositionType());
         assertEquals("ExistingCaseSource", caseData.getCaseSource());
         assertEquals("TestManagingOffice", caseData.getManagingOffice());
-        assertEquals("ExistingCaseType", caseData.getCaseType());
+        assertEquals("ExistingCaseType", caseData.getEcmCaseType());
         verifyAddress(caseData.getTribunalCorrespondenceAddress());
         assertEquals("TestTelephone", caseData.getTribunalCorrespondenceTelephone());
         assertEquals("TestFax", caseData.getTribunalCorrespondenceFax());
@@ -147,7 +147,7 @@ public class DefaultValuesReaderServiceTest {
         assertEquals(POSITION_TYPE_CASE_CLOSED, caseData.getPositionType());
         assertEquals(POSITION_TYPE_CASE_CLOSED, caseData.getCaseSource());
         assertEquals("TestManagingOffice", caseData.getManagingOffice());
-        assertEquals(MULTIPLE_CASE_TYPE, caseData.getCaseType());
+        assertEquals(MULTIPLE_CASE_TYPE, caseData.getEcmCaseType());
         verifyAddress(caseData.getTribunalCorrespondenceAddress());
         assertEquals("TestTelephone", caseData.getTribunalCorrespondenceTelephone());
         assertEquals("TestFax", caseData.getTribunalCorrespondenceFax());
@@ -194,7 +194,7 @@ public class DefaultValuesReaderServiceTest {
         caseData.setPositionType("ExistingPositionType");
         caseData.setCaseSource("ExistingCaseSource");
         caseData.setManagingOffice("ExistingManagingOffice");
-        caseData.setCaseType("ExistingCaseType");
+        caseData.setEcmCaseType("ExistingCaseType");
 
         return caseData;
     }

@@ -10,7 +10,11 @@ import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.types.*;
+import uk.gov.hmcts.ecm.common.model.ccd.types.ClaimantIndType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.RestrictedReportingType;
 import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
 
@@ -22,7 +26,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 
 public class ListingHelperTest {
@@ -114,6 +120,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"2 of 3\",\n"
                 + "\"Hearing_panel\":\"\",\n"
                 + "\"Hearing_notes\":\"Notes2\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Org2\"}]\n"
                 + "}],\n"
                 + "},\n"
@@ -156,6 +165,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"1 of 3\",\n"
                 + "\"Hearing_panel\":\"Panel\",\n"
                 + "\"Hearing_notes\":\"Notes with  -  new line\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Org\"}]\n"
                 + "}],\n"
                 + "},\n"
@@ -198,6 +210,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"2 of 3\",\n"
                 + "\"Hearing_panel\":\"Panel\",\n"
                 + "\"Hearing_notes\":\"Notes4\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Organization\"},\n"
                 + "{\"Judge\":\"Judge For Tribunal4\",\n"
                 + "\"Court_addressLine1\":\"Manchester Employment Tribunal\",\n"
@@ -234,6 +249,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"2 of 3\",\n"
                 + "\"Hearing_panel\":\"\",\n"
                 + "\"Hearing_notes\":\"Notes3\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Org\"}]\n"
                 + "}],\n"
                 + "}],\n"
@@ -378,6 +396,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"2 of 3\",\n"
                 + "\"Hearing_panel\":\"\",\n"
                 + "\"Hearing_notes\":\"Notes2\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Org2\"}]\n"
                 + "},\n"
                 + "{\"date\":\"12 October 2020\",\n"
@@ -418,6 +439,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"1 of 3\",\n"
                 + "\"Hearing_panel\":\"Panel\",\n"
                 + "\"Hearing_notes\":\"Notes1\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Org\"}]\n"
                 + "},\n"
                 + "{\"date\":\"14 December 2020\",\n"
@@ -458,6 +482,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"2 of 3\",\n"
                 + "\"Hearing_panel\":\"Panel\",\n"
                 + "\"Hearing_notes\":\"Notes4\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Organization\"},\n"
                 + "{\"Judge\":\"Judge For Tribunal4\",\n"
                 + "\"Court_addressLine1\":\"Manchester Employment Tribunal\",\n"
@@ -494,6 +521,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"2 of 3\",\n"
                 + "\"Hearing_panel\":\"\",\n"
                 + "\"Hearing_notes\":\"Notes3\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Org\"}]\n"
                 + "}],\n"
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
@@ -567,6 +597,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"2 of 3\",\n"
                 + "\"Hearing_panel\":\"\",\n"
                 + "\"Hearing_notes\":\"Notes3\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Org\"}]\n"
                 + "},\n"
                 + "{\"date\":\"12 October 2020\",\n"
@@ -607,6 +640,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"1 of 3\",\n"
                 + "\"Hearing_panel\":\"Panel\",\n"
                 + "\"Hearing_notes\":\"Notes1\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Org\"}]\n"
                 + "},\n"
                 + "{\"date\":\"14 October 2020\",\n"
@@ -647,6 +683,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"2 of 3\",\n"
                 + "\"Hearing_panel\":\"\",\n"
                 + "\"Hearing_notes\":\"Notes2\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Org2\"}]\n"
                 + "}],\n"
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
@@ -717,6 +756,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"2 of 3\",\n"
                 + "\"Hearing_panel\":\"\",\n"
                 + "\"Hearing_notes\":\"Notes3\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Org\"},\n"
                 + "{\"Judge\":\"\",\n"
                 + "\"Court_addressLine1\":\"Manchester Employment Tribunal\",\n"
@@ -753,6 +795,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"1 of 3\",\n"
                 + "\"Hearing_panel\":\"Panel\",\n"
                 + "\"Hearing_notes\":\"Notes1\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Org\"},\n"
                 + "{\"Judge\":\"\",\n"
                 + "\"Court_addressLine1\":\"Manchester Employment Tribunal\",\n"
@@ -789,6 +834,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"2 of 3\",\n"
                 + "\"Hearing_panel\":\"\",\n"
                 + "\"Hearing_notes\":\"Notes2\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Org2\"}],\n"
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
                 + "}\n"
@@ -860,6 +908,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"2 of 3\",\n"
                 + "\"Hearing_panel\":\"\",\n"
                 + "\"Hearing_notes\":\"Notes3\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Org\"},\n"
                 + "{\"Judge\":\"\",\n"
                 + "\"Court_addressLine1\":\"Manchester Employment Tribunal\",\n"
@@ -896,6 +947,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"2 of 3\",\n"
                 + "\"Hearing_panel\":\"\",\n"
                 + "\"Hearing_notes\":\"Notes2\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Org2\"}]\n"
                 + "},\n"
                 + "{\"Hearing_venue\":\"Not_Allocated\",\n"
@@ -935,6 +989,9 @@ public class ListingHelperTest {
                 + "\"Hearing_dayofdays\":\"1 of 3\",\n"
                 + "\"Hearing_panel\":\"Panel\",\n"
                 + "\"Hearing_notes\":\"Notes1\",\n"
+                + "\"Judicial_mediation\":\"\",\n"
+                + "\"Reading_deliberation_day\":\"\",\n"
+                + "\"Hearing_format\":\"\",\n"
                 + "\"respondent_representative\":\"Org\"}]\n"
                 + "}],\n"
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
@@ -986,6 +1043,7 @@ public class ListingHelperTest {
         hearingType.setHearingVenue(new DynamicFixedListType(ABERDEEN_OFFICE));
         hearingType.setHearingEstLengthNum("2");
         hearingType.setHearingEstLengthNumType("hours");
+        hearingType.setHearingFormat(List.of("Telephone"));
         String expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, "
                 + "causeListVenue=EdinburghVenue, elmoCaseReference=null, " +
                 "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
@@ -993,7 +1051,7 @@ public class ListingHelperTest {
                 "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , "
                 + "respondent=Juan Pedro, respondentTown= , " +
                 "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 4, "
-                + "respondentOthers= , hearingNotes= )";
+                + "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData,
                 hearingType, dateListedType, 1, 3).toString());
 
@@ -1008,7 +1066,7 @@ public class ListingHelperTest {
                 "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , "
                 + "respondent=Juan Pedro, respondentTown= , " +
                 "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 5, "
-                + "respondentOthers= , hearingNotes= )";
+                + "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData,
                 hearingType, dateListedType, 1, 3).toString());
 
@@ -1021,7 +1079,7 @@ public class ListingHelperTest {
                 + "hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
                 "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , "
                 + "respondent=Juan Pedro, respondentTown= , respondentRepresentative= , estHearingLength=2 hours, "
-                + "hearingPanel= , hearingRoom=Tribunal 5, respondentOthers= , hearingNotes= )";
+                + "hearingPanel= , hearingRoom=Tribunal 5, respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData,
                 hearingType, dateListedType, 1, 3).toString());
 
@@ -1034,7 +1092,7 @@ public class ListingHelperTest {
                 + "hearingEEMember= , hearingERMember= , hearingClerk=Clerk, hearingDay=2 of 3, "
                 + "claimantName=Rodriguez, claimantTown= , claimantRepresentative= , respondent=Juan Pedro, "
                 + "respondentTown= , respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , "
-                + "hearingRoom=Tribunal 7, respondentOthers= , hearingNotes= )";
+                + "hearingRoom=Tribunal 7, respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData,
                 hearingType, dateListedType, 1, 3).toString());
 
@@ -1044,21 +1102,24 @@ public class ListingHelperTest {
         caseDataRule50.setRestrictedReporting(restrictedReportingType);
         ListingData listingDataPublic = listingDetails.getCaseData();
         listingDataPublic.setHearingDocETCL(HEARING_ETCL_PUBLIC);
+        dateListedType.setHearingTypeReadingDeliberation("Neither");
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=EdinburghVenue, "
                 + "elmoCaseReference=null, jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
                 + "hearingEEMember= , hearingERMember= , hearingClerk=Clerk, hearingDay=2 of 3, claimantName= , "
                 + "claimantTown= , claimantRepresentative= , respondent= , respondentTown= , "
                 + "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 7, "
-                + "respondentOthers= , hearingNotes= )";
+                + "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDataPublic, caseDataRule50,
                 hearingType, dateListedType, 1, 3).toString());
         ListingData listingDataPressList = listingDetails.getCaseData();
         listingDataPressList.setHearingDocETCL(HEARING_ETCL_PRESS_LIST);
+        caseDataRule50.setManagingOffice(DUNDEE_OFFICE);
+        dateListedType.setHearingTypeReadingDeliberation("Reading Day");
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=EdinburghVenue, elmoCaseReference=null, " +
                 "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
                 "hearingDay=2 of 3, claimantName=Order made pursuant to Rule 50, claimantTown= , claimantRepresentative= , " +
                 "respondent=Order made pursuant to Rule 50, respondentTown= , respondentRepresentative= , estHearingLength=2 hours, " +
-                "hearingPanel= , hearingRoom=Tribunal 7, respondentOthers= , hearingNotes= )";
+                "hearingPanel= , hearingRoom=Tribunal 7, respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDataPressList, caseDataRule50, hearingType, dateListedType, 1, 3).toString());
 
         dateListedType.setHearingVenueDay(new DynamicFixedListType("ManchesterVenue"));
@@ -1068,7 +1129,7 @@ public class ListingHelperTest {
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue= , elmoCaseReference=null, " +
                 "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
                 "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , respondent=Juan Pedro, respondentTown= , " +
-                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom= , respondentOthers= , hearingNotes= )";
+                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom= , respondentOthers= , hearingNotes= , judicialMediation=Yes, hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData, hearingType, dateListedType, 1, 3).toString());
     }
 

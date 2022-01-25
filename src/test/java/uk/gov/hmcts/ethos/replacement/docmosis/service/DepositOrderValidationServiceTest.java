@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEPOSIT_REFUNDED_GREATER_DEPOSIT_ERROR;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UNABLE_TO_FIND_PARTY;
 
-public class DepositOrderValidationServiceTest {
+class DepositOrderValidationServiceTest {
 
     private DepositOrderValidationService depositOrderValidationService;
 
@@ -24,9 +24,8 @@ public class DepositOrderValidationServiceTest {
     private CaseDetails caseDetails3;
     private CaseDetails caseDetails5;
 
-
     @BeforeEach
-    public void setup() throws Exception {
+    void setup() throws Exception {
         depositOrderValidationService = new DepositOrderValidationService();
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
         caseDetails2 = generateCaseDetails("caseDetailsTest2.json");

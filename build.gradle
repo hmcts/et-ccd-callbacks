@@ -16,7 +16,7 @@ plugins {
     id 'org.sonarqube' version '3.3'
     id 'au.com.dius.pact' version '4.2.9'
     id 'io.freefair.lombok' version '5.3.0'
-    id 'org.flywaydb.flyway' version '8.2.1'
+    id 'org.flywaydb.flyway' version '8.4.3'
 }
 
 group = 'uk.gov.hmcts.et'
@@ -212,7 +212,7 @@ ext {
 }
 
 dependencies {
-    implementation 'com.github.hmcts:et-common:0.0.12'
+    implementation 'com.github.hmcts:et-common:0.0.13'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
@@ -296,7 +296,6 @@ dependencies {
     contractTestImplementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.4'
     contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.7.RELEASE'
     contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.7.RELEASE'
-
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 }

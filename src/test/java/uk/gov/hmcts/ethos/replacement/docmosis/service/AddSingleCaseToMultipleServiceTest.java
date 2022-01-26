@@ -116,7 +116,7 @@ public class AddSingleCaseToMultipleServiceTest {
                 new ArrayList<>(Collections.singletonList(caseDetails.getCaseData().getEthosCaseReference())),
                 new ArrayList<>());
 
-        assertEquals(MULTIPLE_CASE_TYPE, caseDetails.getCaseData().getCaseType());
+        assertEquals(MULTIPLE_CASE_TYPE, caseDetails.getCaseData().getEcmCaseType());
         assertEquals("246000", caseDetails.getCaseData().getMultipleReference());
         assertEquals(YES, caseDetails.getCaseData().getLeadClaimant());
     }
@@ -163,7 +163,7 @@ public class AddSingleCaseToMultipleServiceTest {
 
         verifyNoMoreInteractions(multipleHelperService);
 
-        assertEquals(MULTIPLE_CASE_TYPE, caseDetails.getCaseData().getCaseType());
+        assertEquals(MULTIPLE_CASE_TYPE, caseDetails.getCaseData().getEcmCaseType());
         assertEquals("246000", caseDetails.getCaseData().getMultipleReference());
         assertEquals(NO, caseDetails.getCaseData().getLeadClaimant());
     }
@@ -219,7 +219,7 @@ public class AddSingleCaseToMultipleServiceTest {
 
         verifyNoMoreInteractions(multipleHelperService);
 
-        assertEquals(MULTIPLE_CASE_TYPE, caseDetails.getCaseData().getCaseType());
+        assertEquals(MULTIPLE_CASE_TYPE, caseDetails.getCaseData().getEcmCaseType());
         assertEquals("246000", caseDetails.getCaseData().getMultipleReference());
         assertEquals(YES, caseDetails.getCaseData().getLeadClaimant());
 

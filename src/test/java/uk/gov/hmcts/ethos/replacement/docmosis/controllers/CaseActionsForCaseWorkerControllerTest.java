@@ -25,11 +25,13 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorker
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -103,6 +105,9 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL = "/dynamicRespondentRepresentativeNames";
     private static final String DYNAMIC_RESTRICTED_REPORTING_URL = "/dynamicRestrictedReporting";
     private static final String DYNAMIC_DEPOSIT_ORDER_URL = "/dynamicDepositOrder";
+    private static final String DYNAMIC_JUDGMENT_URL = "/dynamicJudgments";
+    private static final String JUDGEMENT_SUBMITTED_URL = "/judgementSubmitted";
+
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -133,6 +138,12 @@ public class CaseActionsForCaseWorkerControllerTest {
 
     @MockBean
     private DepositOrderValidationService depositOrderValidationService;
+
+    @MockBean
+    private JudgmentValidationService judgmentValidationService;
+
+    @MockBean
+    private ConciliationTrackService conciliationTrackService;
 
     @MockBean
     private SingleCaseMultipleMidEventValidationService singleCaseMultipleMidEventValidationService;
@@ -1017,6 +1028,24 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
+    public void dynamicJudgmentError400() throws Exception {
+        mvc.perform(post(DYNAMIC_JUDGMENT_URL)
+                .content("error")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void judgmentSubmittedError400() throws Exception {
+        mvc.perform(post(JUDGEMENT_SUBMITTED_URL)
+                .content("error")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void createCaseError500() throws Exception {
         when(caseCreationForCaseWorkerService.caseCreationRequest(isA(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
@@ -1094,6 +1123,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void amendCaseDetailsError500() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(eventValidationService.validateCurrentPosition(isA(CaseDetails.class))).thenReturn(true);
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -1466,6 +1496,26 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void dynamicRestrictedReportingUrlForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
+                .content(requestContent2.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void dynamicJudgmentUrlForbidden() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(DYNAMIC_JUDGMENT_URL)
+                .content(requestContent2.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void judgmentSubmittedUrlForbidden() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(JUDGEMENT_SUBMITTED_URL)
                 .content(requestContent2.toString())
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))

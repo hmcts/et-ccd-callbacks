@@ -203,7 +203,7 @@ public class ReportHelper {
                     validateMatchingDate(listingData, caseData.getPreAcceptCase().getDateAccepted());
             if (matchingDateIsValid) {
                 var adhocReportType = new AdhocReportType();
-                adhocReportType.setCaseType(caseData.getCaseType());
+                adhocReportType.setCaseType(caseData.getEcmCaseType());
                 getCommonReportDetailFields(listingDetails, caseData, adhocReportType);
                 adhocReportTypeItem.setValue(adhocReportType);
             }
@@ -255,7 +255,7 @@ public class ReportHelper {
         if (caseData.getClerkResponsible() != null && caseData.getClerkResponsible().getValue() != null) {
             adhocReportType.setClerk(caseData.getClerkResponsible().getSelectedLabel());
         }
-        adhocReportType.setCaseType(caseData.getCaseType());
+        adhocReportType.setCaseType(caseData.getEcmCaseType());
     }
 
     private static String getFileLocation(ListingDetails listingDetails, CaseData caseData) {

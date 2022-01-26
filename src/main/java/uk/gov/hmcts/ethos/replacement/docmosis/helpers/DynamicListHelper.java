@@ -4,6 +4,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.ecm.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
 
 import java.time.LocalDate;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements.NO_HEARINGS;
 
 public class DynamicListHelper {
 
@@ -74,7 +76,31 @@ public class DynamicListHelper {
                         + " - " + date.format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
                 listItems.add(getDynamicCodeLabel(hearingNumber, hearingData));
             }
+        } else {
+            listItems.add(getDynamicValue(NO_HEARINGS));
         }
         return listItems;
+    }
+
+    public static List<DynamicValueType> createDynamicJurisdictionCodes(CaseData caseData) {
+        List<DynamicValueType> listItems = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(caseData.getJurCodesCollection())) {
+            for (JurCodesTypeItem jurCodesTypeItem : caseData.getJurCodesCollection()) {
+                listItems.add(getDynamicValue(jurCodesTypeItem.getValue().getJuridictionCodesList()));
+            }
+        }
+        return listItems;
+    }
+
+    public static DynamicValueType findDynamicValue(List<DynamicValueType> listItems, String code) {
+        var dynamicValue = new DynamicValueType();
+        for (DynamicValueType dynamicValueType : listItems) {
+            if (dynamicValueType.getCode().equals(code)) {
+                dynamicValue.setCode(code);
+                dynamicValue.setLabel(dynamicValueType.getLabel());
+                return dynamicValue;
+            }
+        }
+        return dynamicValue;
     }
 }

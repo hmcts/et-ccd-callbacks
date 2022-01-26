@@ -198,32 +198,6 @@ public class Helper {
                 DynamicListHelper.getDynamicValue(BF_ACTION_STRIKING_OUT_WARNING)));
     }
 
-    public static List<String> hearingMidEventValidation(CaseData caseData) {
-
-        List<String> errors = new ArrayList<>();
-
-        if (caseData.getHearingCollection() != null) {
-            for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-                if (hearingTypeItem.getValue().getHearingNumber() == null
-                        || hearingTypeItem.getValue().getHearingNumber().isEmpty()) {
-                    errors.add(HEARING_CREATION_NUMBER_ERROR);
-                    return errors;
-                }
-                if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
-                    for (DateListedTypeItem dateListedTypeItem
-                            : hearingTypeItem.getValue().getHearingDateCollection()) {
-                        if (dateListedTypeItem.getValue().getListedDate() == null
-                                || dateListedTypeItem.getValue().getListedDate().isEmpty()) {
-                            errors.add(HEARING_CREATION_DAY_ERROR);
-                            return  errors;
-                        }
-                    }
-                }
-            }
-        }
-        return errors;
-    }
-
     public static void updatePositionTypeToClosed(CaseData caseData) {
 
         caseData.setPositionType(CASE_CLOSED_POSITION);

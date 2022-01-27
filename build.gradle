@@ -223,7 +223,6 @@ dependencyManagement {
             entry 'netty-handler'
             entry 'netty-handler-proxy'
             entry 'netty-resolver'
-            entry 'netty-tcnative'
             entry 'netty-transport'
             entry 'netty-transport-native-epoll'
             entry 'netty-transport-native-kqueue'
@@ -276,6 +275,7 @@ dependencies {
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLoggingVersion
     implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: reformLoggingVersion
     implementation group: 'com.github.hmcts', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
+    implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.48.Final'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

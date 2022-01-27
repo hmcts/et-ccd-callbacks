@@ -223,6 +223,7 @@ dependencyManagement {
             entry 'netty-handler'
             entry 'netty-handler-proxy'
             entry 'netty-resolver'
+            entry 'netty-tcnative'
             entry 'netty-transport'
             entry 'netty-transport-native-epoll'
             entry 'netty-transport-native-kqueue'

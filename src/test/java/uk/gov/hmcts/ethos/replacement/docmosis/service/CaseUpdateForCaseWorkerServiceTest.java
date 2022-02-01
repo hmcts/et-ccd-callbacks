@@ -22,7 +22,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_DEV_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_DEV_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
@@ -83,7 +82,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
         scotlandDefaultValues = DefaultValues.builder()
                 .positionType("Awaiting ET3")
                 .claimantTypeOfClaimant(INDIVIDUAL_TYPE_CLAIMANT)
-                .managingOffice(GLASGOW_OFFICE)
+                .managingOffice(TribunalOffice.GLASGOW.getOfficeName())
                 .caseType(SINGLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("Eagle Building,")
                 .tribunalCorrespondenceAddressLine2("215 Bothwell Street,")

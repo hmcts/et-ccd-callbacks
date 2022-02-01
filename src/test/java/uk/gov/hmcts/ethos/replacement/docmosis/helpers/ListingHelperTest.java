@@ -15,6 +15,7 @@ import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RestrictedReportingType;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
 
@@ -1040,7 +1041,7 @@ public class ListingHelperTest {
         dateListedTypeItem.setId("123");
         dateListedTypeItem.setValue(dateListedType);
         hearingType.setHearingDateCollection(new ArrayList<>(Collections.singleton(dateListedTypeItem)));
-        hearingType.setHearingVenue(new DynamicFixedListType(ABERDEEN_OFFICE));
+        hearingType.setHearingVenue(new DynamicFixedListType(TribunalOffice.ABERDEEN.getOfficeName()));
         hearingType.setHearingEstLengthNum("2");
         hearingType.setHearingEstLengthNumType("hours");
         hearingType.setHearingFormat(List.of("Telephone"));
@@ -1057,7 +1058,7 @@ public class ListingHelperTest {
 
         dateListedType.setHearingRoom(new DynamicFixedListType("Tribunal 5"));
         dateListedType.setHearingEdinburgh(null);
-        dateListedType.setHearingVenueDay(new DynamicFixedListType(DUNDEE_OFFICE));
+        dateListedType.setHearingVenueDay(new DynamicFixedListType(TribunalOffice.DUNDEE.getOfficeName()));
         dateListedType.setHearingRoom(new DynamicFixedListType("DundeeVenue"));
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=DundeeVenue, "
                 + "elmoCaseReference=null, " +
@@ -1072,7 +1073,7 @@ public class ListingHelperTest {
 
         dateListedType.setHearingRoom(new DynamicFixedListType("Tribunal 5"));
         dateListedType.setHearingDundee(null);
-        dateListedType.setHearingVenueDay(new DynamicFixedListType(GLASGOW_OFFICE));
+        dateListedType.setHearingVenueDay(new DynamicFixedListType(TribunalOffice.GLASGOW.getOfficeName()));
         dateListedType.setHearingGlasgow(new DynamicFixedListType("GlasgowVenue"));
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=GlasgowVenue, "
                 + "elmoCaseReference=null, jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
@@ -1085,7 +1086,7 @@ public class ListingHelperTest {
 
         dateListedType.setHearingRoom(new DynamicFixedListType("Tribunal 7"));
         dateListedType.setHearingGlasgow(null);
-        dateListedType.setHearingVenueDay(new DynamicFixedListType(EDINBURGH_OFFICE));
+        dateListedType.setHearingVenueDay(new DynamicFixedListType(TribunalOffice.EDINBURGH.getOfficeName()));
         dateListedType.setHearingEdinburgh(new DynamicFixedListType("EdinburghVenue"));
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=EdinburghVenue, "
                 + "elmoCaseReference=null, jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
@@ -1113,7 +1114,7 @@ public class ListingHelperTest {
                 hearingType, dateListedType, 1, 3).toString());
         ListingData listingDataPressList = listingDetails.getCaseData();
         listingDataPressList.setHearingDocETCL(HEARING_ETCL_PRESS_LIST);
-        caseDataRule50.setManagingOffice(DUNDEE_OFFICE);
+        caseDataRule50.setManagingOffice(TribunalOffice.DUNDEE.getOfficeName());
         dateListedType.setHearingTypeReadingDeliberation("Reading Day");
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=EdinburghVenue, elmoCaseReference=null, " +
                 "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +

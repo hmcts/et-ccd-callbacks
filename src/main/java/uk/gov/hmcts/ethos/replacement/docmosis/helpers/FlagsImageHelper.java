@@ -213,7 +213,8 @@ public class FlagsImageHelper {
     }
 
     private static boolean withOutstation(CaseData caseData, String caseTypeId) {
-        return SCOTLAND_CASE_TYPE_ID.equals(caseTypeId) && !TribunalOffice.GLASGOW.getOfficeName().equals(caseData.getManagingOffice());
+        return SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)
+                && !TribunalOffice.GLASGOW.getOfficeName().equals(caseData.getManagingOffice());
     }
 
 }

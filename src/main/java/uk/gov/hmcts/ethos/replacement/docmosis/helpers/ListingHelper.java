@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
@@ -176,9 +177,9 @@ public class ListingHelper {
         for (Method m: dateListedType.getClass().getDeclaredMethods()) {
             if (m.getName().startsWith("getHearingRoom")) {
                 try {
-                    String room = (String)m.invoke(dateListedType);
-                    if (!isNullOrEmpty(room)) {
-                        return room;
+                    DynamicFixedListType room = (DynamicFixedListType)m.invoke(dateListedType);
+                    if (room != null) {
+                        return room.getValue().getCode();
                     }
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     log.error("Error getting hearing room:", e);

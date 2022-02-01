@@ -69,7 +69,7 @@ public class VenueAddressReaderService {
                 return hearingType.getHearingEdinburgh().getSelectedLabel();
             default:
                 // Should never be thrown since TribunalOffice will catch the exception first
-                throw new RuntimeException("No venue found for " + venue);
+                throw new VenueAddressReaderException("No venue found for " + venue);
         }
     }
 }

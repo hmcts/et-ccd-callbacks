@@ -6,6 +6,7 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DIGITAL_FILE;
@@ -17,7 +18,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_RESERVED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_RULE_503B;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_SENSITIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_WITH_OUTSTATION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.IMAGE_FILE_EXTENSION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.IMAGE_FILE_PRECEDING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ONE;
@@ -213,7 +213,8 @@ public class FlagsImageHelper {
     }
 
     private static boolean withOutstation(CaseData caseData, String caseTypeId) {
-        return SCOTLAND_CASE_TYPE_ID.equals(caseTypeId) && !GLASGOW_OFFICE.equals(caseData.getManagingOffice());
+        return SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)
+                && !TribunalOffice.GLASGOW.getOfficeName().equals(caseData.getManagingOffice());
     }
 
 }

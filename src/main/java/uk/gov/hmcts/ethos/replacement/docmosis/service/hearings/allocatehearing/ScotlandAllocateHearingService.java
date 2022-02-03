@@ -11,11 +11,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.CourtWorkerService;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABERDEEN_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
-
 @Service
 public class ScotlandAllocateHearingService {
     private final HearingSelectionService hearingSelectionService;
@@ -88,20 +83,21 @@ public class ScotlandAllocateHearingService {
         selectedListing.setHearingDundee(null);
         selectedListing.setHearingEdinburgh(null);
 
-        switch (managingOffice) {
-            case GLASGOW_OFFICE:
+        final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(managingOffice);
+        switch (tribunalOffice) {
+            case GLASGOW:
                 selectedHearing.setHearingGlasgow(caseData.getAllocateHearingVenue());
                 selectedListing.setHearingGlasgow(caseData.getAllocateHearingVenue());
                 break;
-            case ABERDEEN_OFFICE:
+            case ABERDEEN:
                 selectedHearing.setHearingAberdeen(caseData.getAllocateHearingVenue());
                 selectedListing.setHearingAberdeen(caseData.getAllocateHearingVenue());
                 break;
-            case DUNDEE_OFFICE:
+            case DUNDEE:
                 selectedHearing.setHearingDundee(caseData.getAllocateHearingVenue());
                 selectedListing.setHearingDundee(caseData.getAllocateHearingVenue());
                 break;
-            case EDINBURGH_OFFICE:
+            case EDINBURGH:
                 selectedHearing.setHearingEdinburgh(caseData.getAllocateHearingVenue());
                 selectedListing.setHearingEdinburgh(caseData.getAllocateHearingVenue());
                 break;

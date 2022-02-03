@@ -15,6 +15,7 @@ import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RestrictedReportingType;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
 
@@ -1018,7 +1019,6 @@ public class ListingHelperTest {
     }
 
     @Test
-    @Ignore("Fix after venues refactored")
     public void getListingTypeFromSubmitData() {
         CaseData caseData = new CaseData();
         ClaimantIndType claimantIndType = new ClaimantIndType();
@@ -1040,12 +1040,12 @@ public class ListingHelperTest {
         dateListedTypeItem.setId("123");
         dateListedTypeItem.setValue(dateListedType);
         hearingType.setHearingDateCollection(new ArrayList<>(Collections.singleton(dateListedTypeItem)));
-        hearingType.setHearingVenue(new DynamicFixedListType(ABERDEEN_OFFICE));
+        hearingType.setHearingVenue(new DynamicFixedListType(TribunalOffice.ABERDEEN.getOfficeName()));
         hearingType.setHearingEstLengthNum("2");
         hearingType.setHearingEstLengthNumType("hours");
         hearingType.setHearingFormat(List.of("Telephone"));
         String expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, "
-                + "causeListVenue=EdinburghVenue, elmoCaseReference=null, " +
+                + "causeListVenue=Edinburgh, elmoCaseReference=null, " +
                 "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
                 + "hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
                 "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , "
@@ -1057,9 +1057,9 @@ public class ListingHelperTest {
 
         dateListedType.setHearingRoom(new DynamicFixedListType("Tribunal 5"));
         dateListedType.setHearingEdinburgh(null);
-        dateListedType.setHearingVenueDay(new DynamicFixedListType(DUNDEE_OFFICE));
-        dateListedType.setHearingRoom(new DynamicFixedListType("DundeeVenue"));
-        expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=DundeeVenue, "
+        dateListedType.setHearingVenueDay(new DynamicFixedListType(TribunalOffice.DUNDEE.getOfficeName()));
+        dateListedType.setHearingRoom(new DynamicFixedListType("Tribunal 5"));
+        expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=Dundee, "
                 + "elmoCaseReference=null, " +
                 "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , hearingEEMember= , "
                 + "hearingERMember= , hearingClerk=Clerk, " +
@@ -1072,9 +1072,9 @@ public class ListingHelperTest {
 
         dateListedType.setHearingRoom(new DynamicFixedListType("Tribunal 5"));
         dateListedType.setHearingDundee(null);
-        dateListedType.setHearingVenueDay(new DynamicFixedListType(GLASGOW_OFFICE));
+        dateListedType.setHearingVenueDay(new DynamicFixedListType(TribunalOffice.GLASGOW.getOfficeName()));
         dateListedType.setHearingGlasgow(new DynamicFixedListType("GlasgowVenue"));
-        expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=GlasgowVenue, "
+        expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=Glasgow, "
                 + "elmoCaseReference=null, jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
                 + "hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
                 "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , "
@@ -1085,9 +1085,9 @@ public class ListingHelperTest {
 
         dateListedType.setHearingRoom(new DynamicFixedListType("Tribunal 7"));
         dateListedType.setHearingGlasgow(null);
-        dateListedType.setHearingVenueDay(new DynamicFixedListType(EDINBURGH_OFFICE));
+        dateListedType.setHearingVenueDay(new DynamicFixedListType(TribunalOffice.EDINBURGH.getOfficeName()));
         dateListedType.setHearingEdinburgh(new DynamicFixedListType("EdinburghVenue"));
-        expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=EdinburghVenue, "
+        expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=Edinburgh, "
                 + "elmoCaseReference=null, jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
                 + "hearingEEMember= , hearingERMember= , hearingClerk=Clerk, hearingDay=2 of 3, "
                 + "claimantName=Rodriguez, claimantTown= , claimantRepresentative= , respondent=Juan Pedro, "
@@ -1103,7 +1103,7 @@ public class ListingHelperTest {
         ListingData listingDataPublic = listingDetails.getCaseData();
         listingDataPublic.setHearingDocETCL(HEARING_ETCL_PUBLIC);
         dateListedType.setHearingTypeReadingDeliberation("Neither");
-        expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=EdinburghVenue, "
+        expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=Edinburgh, "
                 + "elmoCaseReference=null, jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
                 + "hearingEEMember= , hearingERMember= , hearingClerk=Clerk, hearingDay=2 of 3, claimantName= , "
                 + "claimantTown= , claimantRepresentative= , respondent= , respondentTown= , "
@@ -1113,23 +1113,50 @@ public class ListingHelperTest {
                 hearingType, dateListedType, 1, 3).toString());
         ListingData listingDataPressList = listingDetails.getCaseData();
         listingDataPressList.setHearingDocETCL(HEARING_ETCL_PRESS_LIST);
-        caseDataRule50.setManagingOffice(DUNDEE_OFFICE);
+        caseDataRule50.setManagingOffice(TribunalOffice.DUNDEE.getOfficeName());
         dateListedType.setHearingTypeReadingDeliberation("Reading Day");
-        expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=EdinburghVenue, elmoCaseReference=null, " +
+        expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=Edinburgh, elmoCaseReference=null, " +
                 "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
                 "hearingDay=2 of 3, claimantName=Order made pursuant to Rule 50, claimantTown= , claimantRepresentative= , " +
                 "respondent=Order made pursuant to Rule 50, respondentTown= , respondentRepresentative= , estHearingLength=2 hours, " +
                 "hearingPanel= , hearingRoom=Tribunal 7, respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDataPressList, caseDataRule50, hearingType, dateListedType, 1, 3).toString());
 
-        dateListedType.setHearingVenueDay(new DynamicFixedListType("ManchesterVenue"));
         dateListedType.setHearingRoom(null);
-
         dateListedType.setHearingVenueDay(null);
-        expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue= , elmoCaseReference=null, " +
+        dateListedType.setHearingVenueDayScotland(TribunalOffice.EDINBURGH.getOfficeName());
+
+        expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=EdinburghVenue, elmoCaseReference=null, " +
                 "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
                 "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , respondent=Juan Pedro, respondentTown= , " +
-                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom= , respondentOthers= , hearingNotes= , judicialMediation=Yes, hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
+                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom= , respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
+        assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData, hearingType, dateListedType, 1, 3).toString());
+
+        dateListedType.setHearingVenueDayScotland(TribunalOffice.GLASGOW.getOfficeName());
+        dateListedType.setHearingEdinburgh(null);
+        dateListedType.setHearingGlasgow(new DynamicFixedListType("GlasgowVenue"));
+        expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=GlasgowVenue, elmoCaseReference=null, " +
+                "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
+                "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , respondent=Juan Pedro, respondentTown= , " +
+                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom= , respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
+        assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData, hearingType, dateListedType, 1, 3).toString());
+
+        dateListedType.setHearingVenueDayScotland(TribunalOffice.ABERDEEN.getOfficeName());
+        dateListedType.setHearingGlasgow(null);
+        dateListedType.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue"));
+        expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=AberdeenVenue, elmoCaseReference=null, " +
+                "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
+                "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , respondent=Juan Pedro, respondentTown= , " +
+                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom= , respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
+        assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData, hearingType, dateListedType, 1, 3).toString());
+
+        dateListedType.setHearingVenueDayScotland(TribunalOffice.DUNDEE.getOfficeName());
+        dateListedType.setHearingAberdeen(null);
+        dateListedType.setHearingDundee(new DynamicFixedListType("DundeeVenue"));
+        expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=DundeeVenue, elmoCaseReference=null, " +
+                "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
+                "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , respondent=Juan Pedro, respondentTown= , " +
+                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom= , respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData, hearingType, dateListedType, 1, 3).toString());
     }
 

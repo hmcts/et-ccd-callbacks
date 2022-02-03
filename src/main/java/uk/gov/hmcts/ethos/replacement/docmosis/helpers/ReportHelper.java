@@ -8,6 +8,7 @@ import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.ccd.items.BFActionTypeItem;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ecm.common.model.listing.items.AdhocReportTypeItem;
@@ -20,10 +21,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABERDEEN_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_CLOSED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_INPUT_IN_ERROR;
@@ -262,17 +259,18 @@ public class ReportHelper {
         String caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
         DynamicFixedListType fileLocation = null;
         if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
-            switch (caseData.getManagingOffice()) {
-                case DUNDEE_OFFICE:
+            final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
+            switch (tribunalOffice) {
+                case DUNDEE:
                     fileLocation = caseData.getFileLocationDundee();
                     break;
-                case GLASGOW_OFFICE:
+                case GLASGOW:
                     fileLocation = caseData.getFileLocationGlasgow();
                     break;
-                case ABERDEEN_OFFICE:
+                case ABERDEEN:
                     fileLocation = caseData.getFileLocationAberdeen();
                     break;
-                case EDINBURGH_OFFICE:
+                case EDINBURGH:
                     fileLocation = caseData.getFileLocationEdinburgh();
                     break;
                 default:

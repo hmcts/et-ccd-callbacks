@@ -26,6 +26,7 @@ import uk.gov.hmcts.ecm.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
@@ -46,14 +47,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABERDEEN_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_DEV_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -480,24 +477,25 @@ public class CaseManagementForCaseWorkerServiceTest {
         assertEquals(HEARING_STATUS_LISTED, caseData.getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().getHearingStatus());
 
-        assertEquals(ABERDEEN_OFFICE, caseData.getHearingCollection().get(0).getValue()
+        assertEquals(TribunalOffice.ABERDEEN.getOfficeName(), caseData.getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().getHearingAberdeen().getSelectedLabel());
         assertNull(caseData.getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().getHearingGlasgow());
 
-        assertEquals(GLASGOW_OFFICE, caseData.getHearingCollection().get(1).getValue()
+        assertEquals(TribunalOffice.GLASGOW.getOfficeName(), caseData.getHearingCollection().get(1).getValue()
                 .getHearingDateCollection().get(0).getValue().getHearingGlasgow().getSelectedLabel());
         assertNull(caseData.getHearingCollection().get(1).getValue()
                 .getHearingDateCollection().get(0).getValue().getHearingAberdeen());
 
-        assertEquals(EDINBURGH_OFFICE, caseData.getHearingCollection().get(2).getValue()
+        assertEquals(TribunalOffice.EDINBURGH.getOfficeName(), caseData.getHearingCollection().get(2).getValue()
                 .getHearingDateCollection().get(0).getValue().getHearingEdinburgh().getSelectedLabel());
         assertNull(caseData.getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().getHearingGlasgow());
 
-        assertEquals(DUNDEE_OFFICE, caseData.getHearingCollection().get(3).getValue()
+        final String dundee = TribunalOffice.DUNDEE.getOfficeName();
+        assertEquals(dundee, caseData.getHearingCollection().get(3).getValue()
                 .getHearingDateCollection().get(0).getValue().getHearingDundee().getSelectedLabel());
-        assertEquals(DUNDEE_OFFICE, caseData.getHearingCollection().get(3).getValue()
+        assertEquals(dundee, caseData.getHearingCollection().get(3).getValue()
                 .getHearingDateCollection().get(0).getValue().getHearingVenueDayScotland());
     }
 

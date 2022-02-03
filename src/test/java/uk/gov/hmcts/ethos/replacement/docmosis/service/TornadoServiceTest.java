@@ -35,7 +35,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_STAFF;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LETTER_ADDRESS_ALLOCATED_OFFICE;
@@ -117,7 +116,7 @@ public class TornadoServiceTest {
         when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName()))
                 .thenReturn(defaultValues);
         var caseData = new CaseData();
-        caseData.setAllocatedOffice(GLASGOW_OFFICE);
+        caseData.setAllocatedOffice(TribunalOffice.GLASGOW.getOfficeName());
         var correspondenceScotType = new CorrespondenceScotType();
         correspondenceScotType.setTopLevelScotDocuments("test-template");
         correspondenceScotType.setLetterAddress(LETTER_ADDRESS_ALLOCATED_OFFICE);
@@ -136,7 +135,7 @@ public class TornadoServiceTest {
         when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName()))
                 .thenReturn(defaultValues);
         var caseData = new CaseData();
-        caseData.setAllocatedOffice(GLASGOW_OFFICE);
+        caseData.setAllocatedOffice(TribunalOffice.GLASGOW.getOfficeName());
         var correspondenceScotType = new CorrespondenceScotType();
         correspondenceScotType.setTopLevelScotDocuments("test-template");
         correspondenceScotType.setLetterAddress(LETTER_ADDRESS_ALLOCATED_OFFICE);

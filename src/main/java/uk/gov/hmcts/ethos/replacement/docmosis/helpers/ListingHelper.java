@@ -4,9 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.listing.items.ListingTypeItem;
 import uk.gov.hmcts.ecm.common.model.listing.types.ListingType;
@@ -27,16 +29,12 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABERDEEN_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_AWAITING_JUDGMENT_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_COMPLETED_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_SOURCE_LOCAL_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FILE_EXTENSION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_BY_HEARING_TYPE_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
@@ -179,9 +177,9 @@ public class ListingHelper {
         for (Method m: dateListedType.getClass().getDeclaredMethods()) {
             if (m.getName().startsWith("getHearingRoom")) {
                 try {
-                    String room = (String)m.invoke(dateListedType);
-                    if (!isNullOrEmpty(room)) {
-                        return room;
+                    DynamicFixedListType room = (DynamicFixedListType)m.invoke(dateListedType);
+                    if (room != null) {
+                        return room.getValue().getCode();
                     }
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     log.error("Error getting hearing room:", e);
@@ -662,23 +660,24 @@ public class ListingHelper {
 
         // Scotland
         var hearingVenueScotland = dateListedType.getHearingVenueDayScotland();
-        switch (hearingVenueScotland) {
-            case GLASGOW_OFFICE:
+        final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(hearingVenueScotland);
+        switch (tribunalOffice) {
+            case GLASGOW:
                 if (dateListedType.hasHearingGlasgow()) {
                     return dateListedType.getHearingGlasgow().getSelectedLabel();
                 }
                 break;
-            case ABERDEEN_OFFICE:
+            case ABERDEEN:
                 if (dateListedType.hasHearingAberdeen()) {
                     return dateListedType.getHearingAberdeen().getSelectedLabel();
                 }
                 break;
-            case DUNDEE_OFFICE:
+            case DUNDEE:
                 if (dateListedType.hasHearingDundee()) {
                     return dateListedType.getHearingDundee().getSelectedLabel();
                 }
                 break;
-            case EDINBURGH_OFFICE:
+            case EDINBURGH:
                 if (dateListedType.hasHearingEdinburgh()) {
                     return dateListedType.getHearingEdinburgh().getSelectedLabel();
                 }

@@ -330,21 +330,22 @@ public class ListingService {
     private List<SubmitEvent> getDateRangeReportSearch(ListingDetails listingDetails, String authToken)
             throws IOException {
         var listingData = listingDetails.getCaseData();
-        var caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
-        boolean isRangeHearingDateType = listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE);
-        if (!isRangeHearingDateType) {
-            var dateToSearch = LocalDate.parse(listingData.getListingDate(), OLD_DATE_TIME_PATTERN2).toString();
-            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, caseTypeId,
-                    TribunalOffice.valueOfOfficeName(listingData.getManagingOffice()), dateToSearch, dateToSearch,
-                    listingData.getReportType());
+
+        String dateSearchFrom;
+        String dateSearchTo;
+        if (RANGE_HEARING_DATE_TYPE.equals(listingData.getHearingDateType())) {
+            dateSearchFrom = LocalDate.parse(listingData.getListingDateFrom(), OLD_DATE_TIME_PATTERN2).toString();
+            dateSearchTo = LocalDate.parse(listingData.getListingDateTo(), OLD_DATE_TIME_PATTERN2).toString();
         } else {
-            var dateToSearchFrom = LocalDate.parse(listingData.getListingDateFrom(),
-                    OLD_DATE_TIME_PATTERN2).toString();
-            var dateToSearchTo = LocalDate.parse(listingData.getListingDateTo(), OLD_DATE_TIME_PATTERN2).toString();
-            return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, caseTypeId,
-                    TribunalOffice.valueOfOfficeName(listingData.getManagingOffice()), dateToSearchFrom, dateToSearchTo,
-                    listingData.getReportType());
+            dateSearchFrom = LocalDate.parse(listingData.getListingDate(), OLD_DATE_TIME_PATTERN2).toString();
+            dateSearchTo = dateSearchFrom;
         }
+
+        var caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
+        var tribunalOffice = listingData.getManagingOffice() != null
+                ? TribunalOffice.valueOfOfficeName(listingData.getManagingOffice()) : null;
+        return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, caseTypeId, tribunalOffice, dateSearchFrom,
+                dateSearchTo, listingData.getReportType());
     }
 
     private boolean isListingVenueValid(ListingData listingData, DateListedTypeItem dateListedTypeItem) {

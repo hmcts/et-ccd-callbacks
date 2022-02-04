@@ -1206,6 +1206,17 @@ public class ListingServiceTest {
     }
 
     @Test
+    public void generateCasesCompletedReportDataForScotland() throws IOException {
+        listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
+        listingDetails.getCaseData().setReportType(CASES_COMPLETED_REPORT);
+        listingDetails.getCaseData().setManagingOffice(null);
+        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        ListingData listingDataResult = listingService.generateReportData(listingDetails, "authToken");
+        assertNotNull(listingDataResult.getLocalReportsDetailHdr());
+        assertEquals(1, listingDataResult.getLocalReportsDetail().size());
+    }
+
+    @Test
     public void generateCasesCompletedReportDataForEnglandWithConTrackNone() throws IOException {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(CASES_COMPLETED_REPORT);

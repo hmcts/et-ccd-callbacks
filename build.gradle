@@ -138,6 +138,16 @@ task codeceptFunctional(type: Exec, dependsOn :'yarnInstall') {
     commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@e2e', '--steps', '--reporter', 'mocha-multi'
 }
 
+task crossbrowser(dependsOn: ':codeceptFunctionalSauce') {
+    group = 'Delivery pipeline'
+    description = 'Execute cross browser tests on saucelabs'
+}
+
+task codeceptFunctionalSauce(type: Exec, dependsOn: ':yarnInstall') {
+    workingDir '.'
+    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run-multiple', '--all', '--config', './src/test/end-to-end/saucelabs.conf.js', '--grep', '@crossbrowser', '--verbose', '--debug', '--steps', '--reporter', 'mocha-multi'
+}
+
 project.ext {
     pacticipant = 'ethos_replDocmosisService'
     pacticipantVersion = getCheckedOutGitCommitHash()
@@ -232,7 +242,7 @@ dependencyManagement {
 }
 
 dependencies {
-    implementation 'com.github.hmcts:et-common:0.0.17'
+    implementation 'com.github.hmcts:et-common:0.0.18'
     implementation 'com.github.hmcts:et-data-model:0.0.2'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'

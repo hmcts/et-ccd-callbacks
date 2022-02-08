@@ -61,20 +61,15 @@ public class MultipleHelperService {
                         ccdGatewayBaseUrl,
                         String.valueOf(submitEvent.getCaseId()),
                         newLeadCase));
-
             } else {
-
                 log.info("No lead case found for: " + newLeadCase);
-
             }
 
         } else {
-
             multipleData.setLeadCase(MultiplesHelper.generateMarkUp(
                     ccdGatewayBaseUrl,
                     caseId,
                     newLeadCase));
-
         }
 
     }
@@ -98,18 +93,12 @@ public class MultipleHelperService {
                         errors,
                         multipleRef);
             } else {
-
-                errors.add("Multiple " + multipleRef + " has been transferred. The case cannot be moved to this "
-                        + "multiple");
-
+                errors.add("Multiple " + multipleRef
+                        + " has been transferred. The case cannot be moved to this multiple");
             }
-
         } else {
-
             errors.add("Multiple " + multipleRef + " does not exist");
-
         }
-
     }
 
     public void validateSubMultiple(String subMultipleName,

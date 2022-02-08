@@ -210,24 +210,21 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void amendHearing(CaseData caseData, String caseTypeId) {
-        if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
-            return;
-        }
-
-        for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-            var hearingType =  hearingTypeItem.getValue();
-            if (CollectionUtils.isNotEmpty(hearingType.getHearingDateCollection())) {
-                for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
-                    var dateListedType = dateListedTypeItem.getValue();
-                    if (dateListedType.getHearingStatus() == null) {
-                        var listedDateWithZeroTime = dateListedType.getListedDate().split("T")[0] + "T00:00:00";
-                        dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
-                        dateListedType.setHearingTimingStart(dateListedType.getListedDate());
-                        dateListedType.setHearingTimingBreak(listedDateWithZeroTime);
-                        dateListedType.setHearingTimingResume(listedDateWithZeroTime);
-                        dateListedType.setHearingTimingFinish(listedDateWithZeroTime);
+        if (caseData.getHearingCollection() != null && !caseData.getHearingCollection().isEmpty()) {
+            for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
+                var hearingType =  hearingTypeItem.getValue();
+                if (hearingTypeItem.getValue().getHearingDateCollection() != null
+                        && !hearingTypeItem.getValue().getHearingDateCollection().isEmpty()) {
+                    for (DateListedTypeItem dateListedTypeItem
+                            : hearingTypeItem.getValue().getHearingDateCollection()) {
+                        var dateListedType = dateListedTypeItem.getValue();
+                        if (dateListedType.getHearingStatus() == null) {
+                            dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
+                            dateListedType.setHearingTimingStart(dateListedType.getListedDate());
+                            dateListedType.setHearingTimingFinish(dateListedType.getListedDate());
+                        }
+                        populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
                     }
-                    populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
                 }
             }
         }

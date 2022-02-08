@@ -65,10 +65,9 @@ public class BFHelper {
                     bfActionTypeItemListAux.add(bfActionTypeItemAux);
                 }
             }
-
         } else {
-
-            log.info("BF Actions is empty. Creating a dummy one");
+            log.info("BF Actions for case reference {} is empty. Creating a dummy one",
+                    caseData.getEthosCaseReference());
 
             var dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(Helper.getDefaultBfListItems());
@@ -86,7 +85,5 @@ public class BFHelper {
         }
 
         caseData.setBfActions(bfActionTypeItemListAux);
-
     }
-
 }

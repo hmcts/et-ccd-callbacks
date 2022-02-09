@@ -113,12 +113,8 @@ public class ReportDocHelper {
                 }
                 break;
             case HEARINGS_TO_JUDGEMENTS_REPORT:
-                try {
-                    sb.append(ListingHelper.getListingDate(listingData));
-                    sb.append(getHearingsToJudgmentsReport(listingData));
-                } catch (JsonProcessingException e) {
-                    throw new ReportException(CANNOT_CREATE_REPORT_DATA_EXCEPTION, e);
-                }
+                sb.append(ListingHelper.getListingDate(listingData));
+                sb.append(getHearingsToJudgmentsReport(listingData));
                 break;
             case NO_CHANGE_IN_CURRENT_POSITION_REPORT:
                 sb.append(getNoPositionChangeReport(listingData));
@@ -149,7 +145,7 @@ public class ReportDocHelper {
         }
     }
 
-    private static StringBuilder getHearingsToJudgmentsReport(ListingData listingData) throws JsonProcessingException {
+    private static StringBuilder getHearingsToJudgmentsReport(ListingData listingData) {
         if (!(listingData instanceof HearingsToJudgmentsReportData)) {
             throw new IllegalStateException((LISTING_DATA_STATE_EXCEPTION + "HearingsToJudgmentsReportData"));
         }

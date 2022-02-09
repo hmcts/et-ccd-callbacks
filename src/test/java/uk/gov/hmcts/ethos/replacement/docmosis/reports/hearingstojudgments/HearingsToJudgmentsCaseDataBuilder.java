@@ -25,9 +25,9 @@ public class HearingsToJudgmentsCaseDataBuilder {
         return this;
     }
 
-    public HearingsToJudgmentsCaseDataBuilder withHearing(String listedDate, String hearingStatus, String hearingType,
-                                                          String disposed) {
-        return withHearing(listedDate, hearingStatus, hearingType, disposed, null, null, null);
+    public HearingsToJudgmentsCaseDataBuilder withHearing(String listedDate, String hearingNumber, String hearingStatus,
+                                                          String hearingType, String disposed) {
+        return withHearing(listedDate, hearingStatus, hearingType, disposed, hearingNumber, null, null);
     }
 
     public HearingsToJudgmentsCaseDataBuilder withHearing(String listedDate, String hearingStatus, String hearingType,
@@ -62,11 +62,12 @@ public class HearingsToJudgmentsCaseDataBuilder {
     }
 
     public HearingsToJudgmentsCaseDataBuilder withJudgment(String judgmentHearingDate, String dateJudgmentMade,
-                                                           String dateJudgmentSent) {
+                                                           String dateJudgmentSent, String DynamicJudgmentHearing) {
         var judgementType = new JudgementType();
         judgementType.setJudgmentHearingDate(judgmentHearingDate);
         judgementType.setDateJudgmentSent(dateJudgmentSent);
         judgementType.setDateJudgmentMade(dateJudgmentMade);
+        judgementType.setDynamicJudgementHearing(DynamicFixedListType.of(DynamicValueType.create(DynamicJudgmentHearing, DynamicJudgmentHearing)));
         var judgementTypeItem = new JudgementTypeItem();
         judgementTypeItem.setValue(judgementType);
 

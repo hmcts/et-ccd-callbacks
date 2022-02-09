@@ -109,6 +109,7 @@ public class ReportDataService {
     private void setSharedReportDocumentFields(ListingData reportData, ListingDetails listingDetails, boolean isDateRangeReport) {
         reportData.setDocumentName(listingDetails.getCaseData().getDocumentName());
         reportData.setReportType(listingDetails.getCaseData().getReportType());
+        reportData.setManagingOffice(listingDetails.getCaseData().getManagingOffice());
 
         if (isDateRangeReport) {
             reportData.setHearingDateType(listingDetails.getCaseData().getHearingDateType());

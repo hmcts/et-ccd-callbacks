@@ -7,6 +7,8 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem;
+import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.JudgementType;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
 import java.time.LocalDate;
@@ -157,7 +159,8 @@ public class HearingsToJudgmentsReport {
             var dateListedType = dateListedTypeItem.getValue();
             var hearingListedDate = LocalDate.parse(dateListedType.getListedDate(), OLD_DATE_TIME_PATTERN);
             var judgements = judgmentsCollection.stream()
-                                .filter(j -> judgmentHearingDateMatchHearingListedDate(j, hearingListedDate))
+                                .filter(j -> judgmentHearingDateMatchHearingListedDate(j.getValue(), hearingListedDate)
+                                        && judgmentHearingMatchHearingNumber(j.getValue(), hearingType))
                                 .collect(Collectors.toList());
 
             if (judgements.isEmpty()
@@ -189,11 +192,19 @@ public class HearingsToJudgmentsReport {
         return hearingJudgmentsList;
     }
 
-    private boolean judgmentHearingDateMatchHearingListedDate(JudgementTypeItem judgment, LocalDate hearingListedDate) {
-        return judgment.getValue() != null
-                && judgment.getValue().getJudgmentHearingDate() != null
+    private boolean judgmentHearingMatchHearingNumber(JudgementType judgment, HearingType hearing) {
+        return judgment != null && hearing != null
+                && judgment.getDynamicJudgementHearing() != null
+                && judgment.getDynamicJudgementHearing().getValue() != null
+                && judgment.getDynamicJudgementHearing().getValue().getLabel() != null
+                && judgment.getDynamicJudgementHearing().getValue().getLabel().split(" : ")[0]
+                    .equals(hearing.getHearingNumber());
+    }
+
+    private boolean judgmentHearingDateMatchHearingListedDate(JudgementType judgment, LocalDate hearingListedDate) {
+        return judgment != null && judgment.getJudgmentHearingDate() != null
                 && hearingListedDate.isEqual(
-                        LocalDate.parse(judgment.getValue().getJudgmentHearingDate(), OLD_DATE_TIME_PATTERN2));
+                        LocalDate.parse(judgment.getJudgmentHearingDate(), OLD_DATE_TIME_PATTERN2));
     }
 
     private boolean isValidCase(HearingsToJudgmentsSubmitEvent submitEvent) {

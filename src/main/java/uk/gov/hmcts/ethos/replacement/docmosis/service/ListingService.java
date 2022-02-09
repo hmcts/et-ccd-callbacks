@@ -229,8 +229,7 @@ public class ListingService {
             case CASE_SOURCE_LOCAL_REPORT:
                 return caseSourceLocalReport.generateReportData(listingDetails, submitEvents);
             case HEARINGS_BY_HEARING_TYPE_REPORT:
-                return hearingsByHearingTypeReport.processHearingsByHearingTypeRequest(
-                        listingDetails, submitEvents);
+                return hearingsByHearingTypeReport.processHearingsByHearingTypeRequest(listingDetails, submitEvents);
             case MEMBER_DAYS_REPORT:
                 return new MemberDaysReport().runReport(listingDetails, submitEvents);
             default:

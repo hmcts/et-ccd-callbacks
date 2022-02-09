@@ -18,13 +18,13 @@ public final class Constants {
     public static final String REPORT_DETAILS_SINGLE = "reportDetailsSingle";
     public static final String REPORT_DETAILS_MULTIPLE = "reportDetailsMultiple";
 
-
     public static final String ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD = "data.managingOffice.keyword";
     public static final String ELASTICSEARCH_FIELD_STATE_KEYWORD = "state.keyword";
     public static final String ELASTICSEARCH_FIELD_HEARING_COLLECTION = "data.hearingCollection";
     public static final String ELASTICSEARCH_FIELD_JUDGMENT_COLLECTION = "data.judgementCollection";
-    public static final String ELASTICSEARCH_FIELD_HEARING_LISTED_DATE = "data.hearingCollection.value.hearingDateCollection.value.listedDate";
-    
+    public static final String ELASTICSEARCH_FIELD_HEARING_LISTED_DATE =
+            "data.hearingCollection.value.hearingDateCollection.value.listedDate";
+
     private Constants() {
     }
 }

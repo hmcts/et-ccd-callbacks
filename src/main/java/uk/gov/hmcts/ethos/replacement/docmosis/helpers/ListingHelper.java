@@ -72,12 +72,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleH
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AWAITING_JUDGMENT_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_DOCUMENT_FOUND_ERROR;
 
 @Slf4j
 public class ListingHelper {
 
     private static final String ROOM_NOT_ALLOCATED = "* Not Allocated";
+    private static final String NO_DOCUMENT_FOUND = "No document found";
     private static final int NUMBER_CHAR_PARSING_DATE = 20;
     private static final String LISTING_NEWLINE = "\"listing\":[\n";
     private static final String ARRAY_ELEMENT_CLOSING_NEWLINE = "}],\n";
@@ -651,7 +651,7 @@ public class ListingHelper {
         } else if (listingData.getReportType() != null) {
             return getReportDocTemplateName(listingData.getReportType());
         }
-        return NO_DOCUMENT_FOUND_ERROR;
+        return NO_DOCUMENT_FOUND;
     }
 
     public static String getVenueFromDateListedType(DateListedType dateListedType) {
@@ -830,7 +830,7 @@ public class ListingHelper {
             case MEMBER_DAYS_REPORT:
                 return "EM-TRB-SCO-ENG-00800";
             default:
-                return NO_DOCUMENT_FOUND_ERROR;
+                return NO_DOCUMENT_FOUND;
         }
     }
 
@@ -865,7 +865,7 @@ public class ListingHelper {
         } else if (listingData.getHearingDocType().equals(HEARING_DOC_IT57)) {
             return IT57_TEMPLATE;
         }
-        return NO_DOCUMENT_FOUND_ERROR;
+        return NO_DOCUMENT_FOUND;
     }
 }
 

@@ -24,9 +24,7 @@ public final class Constants {
     public static final String ELASTICSEARCH_FIELD_HEARING_COLLECTION = "data.hearingCollection";
     public static final String ELASTICSEARCH_FIELD_JUDGMENT_COLLECTION = "data.judgementCollection";
     public static final String ELASTICSEARCH_FIELD_HEARING_LISTED_DATE = "data.hearingCollection.value.hearingDateCollection.value.listedDate";
-
-    public static final String NO_DOCUMENT_FOUND_ERROR = "No document found";
-
+    
     private Constants() {
     }
 }

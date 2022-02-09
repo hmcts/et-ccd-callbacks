@@ -24,13 +24,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_AWAITING_JUDGMENT_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_COMPLETED_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_SOURCE_LOCAL_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FILE_EXTENSION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_BY_HEARING_TYPE_REPORT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIVE_CASELOAD_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
@@ -38,6 +36,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SERVING_CLAIMS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TIME_TO_FIRST_HEARING_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AWAITING_JUDGMENT_REPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_OFFICE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_CASES;
@@ -147,6 +147,21 @@ public class ReportDocHelper {
                     nullCheck(listingData.getLocalReportsSummary().get(0)
                             .getValue().getReportOffice())).append(NEW_LINE);
         }
+    }
+
+    private static StringBuilder getHearingsToJudgmentsReport(ListingData listingData) throws JsonProcessingException {
+        if (!(listingData instanceof HearingsToJudgmentsReportData)) {
+            throw new IllegalStateException((LISTING_DATA_STATE_EXCEPTION + "HearingsToJudgmentsReportData"));
+        }
+
+        var sb = new StringBuilder();
+        try {
+            var reportData = (HearingsToJudgmentsReportData) listingData;
+            sb.append(reportData.toReportObjectString());
+        } catch (JsonProcessingException e) {
+            throw new ReportException(CANNOT_CREATE_REPORT_DATA_EXCEPTION, e);
+        }
+        return sb;
     }
 
     private static StringBuilder getNoPositionChangeReport(ListingData listingData) {
@@ -611,29 +626,6 @@ public class ReportDocHelper {
         }
 
         return reportSummaryContent;
-    }
-
-    private static StringBuilder getHearingsToJudgmentsReport(ListingData listingData)
-            throws JsonProcessingException {
-        if (!(listingData instanceof HearingsToJudgmentsReportData)) {
-            throw new IllegalStateException((LISTING_DATA_STATE_EXCEPTION + "HearingsToJudgmentsReportData"));
-        }
-        var reportData = (HearingsToJudgmentsReportData) listingData;
-
-        var sb = new StringBuilder();
-        sb.append(REPORT_OFFICE).append(reportData.getReportSummary().getOffice()).append(NEW_LINE);
-        sb.append(TOTAL_CASES).append(
-                nullCheck(reportData.getReportSummary().getTotalCases())).append(NEW_LINE);
-        sb.append("\"Total_Within_4Weeks\":\"").append(
-                nullCheck(reportData.getReportSummary().getTotal4Wk())).append(NEW_LINE);
-        sb.append("\"Total_Percent_Within_4Weeks\":\"").append(
-                nullCheck(reportData.getReportSummary().getTotal4WkPercent())).append(NEW_LINE);
-        sb.append("\"Total_Not_Within_4Weeks\":\"").append(
-                nullCheck(reportData.getReportSummary().getTotalX4Wk())).append(NEW_LINE);
-        sb.append("\"Total_Percent_Not_Within_4Weeks\":\"").append(
-                nullCheck(reportData.getReportSummary().getTotalX4WkPercent())).append(NEW_LINE);
-        addJsonCollection("reportDetails", reportData.getReportDetails().iterator(), sb);
-        return sb;
     }
 
     private static StringBuilder getHearingsByHearingTypeReport(ListingData listingData) {

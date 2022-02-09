@@ -2,12 +2,12 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem;
-import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsCaseData;
-import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsSubmitEvent;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -49,41 +49,44 @@ public class HearingsToJudgmentsReport {
         String judge;
     }
 
-    private final HearingsToJudgmentsReportDataSource hearingsToJudgmentsReportDataSource;
+    private final HearingsToJudgmentsDataSource hearingsToJudgmentsReportDataSource;
     private final String listingDateFrom;
     private final String listingDateTo;
 
-    public HearingsToJudgmentsReport(HearingsToJudgmentsReportDataSource hearingsToJudgmentsReportDataSource,
+    public HearingsToJudgmentsReport(HearingsToJudgmentsDataSource hearingsToJudgmentsReportDataSource,
                                      String listingDateFrom, String listingDateTo) {
         this.hearingsToJudgmentsReportDataSource = hearingsToJudgmentsReportDataSource;
         this.listingDateFrom = listingDateFrom;
         this.listingDateTo = listingDateTo;
     }
 
-    public HearingsToJudgmentsReportData runReport(String caseTypeId) {
-        var submitEvents = getCases(caseTypeId);
-        var reportData = initReport(caseTypeId);
+    public HearingsToJudgmentsReportData runReport(String caseTypeId, String managingOffice) {
+        var submitEvents = getCases(caseTypeId, managingOffice);
+        var office = StringUtils.isNotBlank(managingOffice) && TribunalOffice.isEnglandWalesOffice(managingOffice)
+                        ? managingOffice
+                        : TribunalOffice.SCOTLAND.getOfficeName();
+        var reportData = initReport(office);
 
         if (CollectionUtils.isNotEmpty(submitEvents)) {
-            populateData(reportData, submitEvents, caseTypeId);
+            populateData(reportData, submitEvents, caseTypeId, office);
         }
 
         return reportData;
     }
 
-    private HearingsToJudgmentsReportData initReport(String caseTypeId) {
-        var reportSummary = new HearingsToJudgmentsReportSummary(UtilHelper.getListingCaseTypeId(caseTypeId));
+    private HearingsToJudgmentsReportData initReport(String office) {
+        var reportSummary = new HearingsToJudgmentsReportSummary(office);
         return new HearingsToJudgmentsReportData(reportSummary);
     }
 
-    private List<HearingsToJudgmentsSubmitEvent> getCases(String caseTypeId) {
+    private List<HearingsToJudgmentsSubmitEvent> getCases(String caseTypeId, String managingOffice) {
         return hearingsToJudgmentsReportDataSource.getData(UtilHelper.getListingCaseTypeId(caseTypeId),
-                listingDateFrom, listingDateTo);
+                managingOffice, listingDateFrom, listingDateTo);
     }
 
     private void populateData(HearingsToJudgmentsReportData reportData,
                               List<HearingsToJudgmentsSubmitEvent> submitEvents,
-                              String listingCaseTypeId) {
+                              String listingCaseTypeId, String office) {
         log.info(String.format("Hearings to judgments case type id %s search results: %d",
                 listingCaseTypeId, submitEvents.size()));
 
@@ -106,7 +109,7 @@ public class HearingsToJudgmentsReport {
                     }
 
                     var reportDetail = new HearingsToJudgmentsReportDetail();
-                    reportDetail.setReportOffice(caseData.getManagingOffice());
+                    reportDetail.setReportOffice(office);
                     reportDetail.setCaseReference(caseData.getEthosCaseReference());
                     reportDetail.setHearingDate(hearingWithJudgment.hearingDate);
                     reportDetail.setJudgementDateSent(hearingWithJudgment.judgmentDateSent);

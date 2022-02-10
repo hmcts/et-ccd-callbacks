@@ -14,10 +14,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper.ad
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_OFFICE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_CASES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_NOT_WITHIN_4WEEKS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_PERCENT_NOT_WITHIN_4WEEKS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_PERCENT_WITHIN_4WEEKS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_WITHIN_4WEEKS;
 
 @Getter
 public class HearingsToJudgmentsReportData extends ListingData {
@@ -25,6 +21,11 @@ public class HearingsToJudgmentsReportData extends ListingData {
     // returned to CCD in any callback response.
     // Otherwise, this would trigger a CCD Case Data Validation error
     // because the properties are not in the CCD config
+
+    public static final String TOTAL_WITHIN_4WEEKS = "\"Total_Within_4Weeks\":\"";
+    public static final String TOTAL_PERCENT_WITHIN_4WEEKS = "\"Total_Percent_Within_4Weeks\":\"";
+    public static final String TOTAL_NOT_WITHIN_4WEEKS = "\"Total_Not_Within_4Weeks\":\"";
+    public static final String TOTAL_PERCENT_NOT_WITHIN_4WEEKS = "\"Total_Percent_Not_Within_4Weeks\":\"";
 
     @JsonIgnore
     private final HearingsToJudgmentsReportSummary reportSummary;

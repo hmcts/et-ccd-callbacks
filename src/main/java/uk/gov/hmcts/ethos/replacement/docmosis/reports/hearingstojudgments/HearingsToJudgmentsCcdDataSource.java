@@ -12,7 +12,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class HearingsToJudgmentsCcdDataSource implements HearingsToJudgmentsDataSource {
-
     private final String authToken;
     private final CcdClient ccdClient;
 
@@ -22,15 +21,14 @@ public class HearingsToJudgmentsCcdDataSource implements HearingsToJudgmentsData
 
         try {
             var query = HearingsToJudgmentsElasticSearchQuery.create(managingOffice, listingDateFrom, listingDateTo);
-            var submitEvents = new ArrayList<HearingsToJudgmentsSubmitEvent>();
             var searchResult = ccdClient.runElasticSearch(authToken, caseTypeId, query,
                     HearingsToJudgmentsSearchResult.class);
 
             if (searchResult != null && CollectionUtils.isNotEmpty(searchResult.getCases())) {
-                submitEvents.addAll(searchResult.getCases());
+                return searchResult.getCases();
             }
 
-            return submitEvents;
+            return new ArrayList<>();
         } catch (Exception e) {
             throw new ReportException(String.format(
                     "Failed to get Hearings To Judgments search results for case type id %s", caseTypeId), e);

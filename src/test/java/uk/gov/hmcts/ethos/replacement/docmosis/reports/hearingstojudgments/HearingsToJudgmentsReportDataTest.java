@@ -10,10 +10,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_OFFICE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_CASES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_NOT_WITHIN_4WEEKS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_PERCENT_NOT_WITHIN_4WEEKS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_PERCENT_WITHIN_4WEEKS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_WITHIN_4WEEKS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportData.TOTAL_NOT_WITHIN_4WEEKS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportData.TOTAL_PERCENT_NOT_WITHIN_4WEEKS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportData.TOTAL_PERCENT_WITHIN_4WEEKS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportData.TOTAL_WITHIN_4WEEKS;
 
 class HearingsToJudgmentsReportDataTest {
 

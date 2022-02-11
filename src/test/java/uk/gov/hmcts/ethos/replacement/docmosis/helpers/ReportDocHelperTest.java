@@ -33,6 +33,8 @@ import java.util.Objects;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AWAITING_JUDGMENT_REPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
 
 public class ReportDocHelperTest {
@@ -216,7 +218,7 @@ public class ReportDocHelperTest {
     @Test(expected = IllegalStateException.class)
     public void testCasesAwaitingJudgementInvalidListingData() {
         var listingData = new ListingData();
-        listingData.setReportType(Constants.CASES_AWAITING_JUDGMENT_REPORT);
+        listingData.setReportType(CASES_AWAITING_JUDGMENT_REPORT);
 
         ReportDocHelper.buildReportDocumentContent(listingData, "access-key", "template-name", userDetails);
     }
@@ -467,7 +469,7 @@ public class ReportDocHelperTest {
                 .add(new PositionTypeSummary("Draft with members", 10));
 
         var reportData = new CasesAwaitingJudgmentReportData(reportSummary);
-        reportData.setReportType(Constants.CASES_AWAITING_JUDGMENT_REPORT);
+        reportData.setReportType(CASES_AWAITING_JUDGMENT_REPORT);
         reportData.setDocumentName("TestDocument");
 
         var reportDetail = new ReportDetail();
@@ -524,7 +526,7 @@ public class ReportDocHelperTest {
         reportSummary.setTotalX4WkPercent("60.00");
 
         var reportData = new HearingsToJudgmentsReportData(reportSummary);
-        reportData.setReportType(Constants.HEARINGS_TO_JUDGEMENTS_REPORT);
+        reportData.setReportType(HEARINGS_TO_JUDGEMENTS_REPORT);
         reportData.setDocumentName("TestDocument");
         reportData.setHearingDateType(Constants.RANGE_HEARING_DATE_TYPE);
         reportData.setListingDateFrom("2021-06-20");

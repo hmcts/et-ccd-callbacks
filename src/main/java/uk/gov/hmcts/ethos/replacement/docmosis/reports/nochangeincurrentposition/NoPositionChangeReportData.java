@@ -12,13 +12,8 @@ import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper.addJsonCollection;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_DATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_DETAILS_MULTIPLE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_DETAILS_SINGLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_OFFICE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_CASES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_MULTIPLE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_SINGLE;
 
 @Getter
 public class NoPositionChangeReportData extends ListingData {
@@ -26,6 +21,12 @@ public class NoPositionChangeReportData extends ListingData {
     // returned to CCD in any callback response.
     // Otherwise, this would trigger a CCD Case Data Validation error
     // because the properties are not in the CCD config
+
+    public static final String REPORT_DATE = "\"Report_Date\":\"";
+    public static final String TOTAL_SINGLE = "\"Total_Single\":\"";
+    public static final String TOTAL_MULTIPLE = "\"Total_Multiple\":\"";
+    public static final String REPORT_DETAILS_SINGLE = "reportDetailsSingle";
+    public static final String REPORT_DETAILS_MULTIPLE = "reportDetailsMultiple";
 
     @JsonIgnore
     private final NoPositionChangeReportSummary reportSummary;

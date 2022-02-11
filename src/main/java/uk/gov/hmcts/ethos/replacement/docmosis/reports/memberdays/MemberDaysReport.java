@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays;
 
 import io.micrometer.core.instrument.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
@@ -27,7 +26,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
-@Service
 @Slf4j
 public class MemberDaysReport {
     private static final int MINUTES = 60;

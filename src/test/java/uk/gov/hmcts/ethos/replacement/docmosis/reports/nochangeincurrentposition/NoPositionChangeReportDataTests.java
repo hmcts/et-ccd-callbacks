@@ -8,13 +8,13 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_DATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_DETAILS_MULTIPLE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_DETAILS_SINGLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_OFFICE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_CASES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_MULTIPLE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_SINGLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData.REPORT_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData.REPORT_DETAILS_MULTIPLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData.REPORT_DETAILS_SINGLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData.TOTAL_MULTIPLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData.TOTAL_SINGLE;
 
 class NoPositionChangeReportDataTests {
 

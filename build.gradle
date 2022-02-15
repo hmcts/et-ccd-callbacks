@@ -361,5 +361,5 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     if (project.hasProperty("dburl")) { // set by jenkins
         url = "jdbc:postgresql://${dburl}"
     }
-    project.flyway.locations = ['classpath:db/migration','classpath:db/dev']
+    locations = ['classpath:db/migration','classpath:db/dev']
 }

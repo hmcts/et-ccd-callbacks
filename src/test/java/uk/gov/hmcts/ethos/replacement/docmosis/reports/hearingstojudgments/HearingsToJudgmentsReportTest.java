@@ -374,7 +374,7 @@ class HearingsToJudgmentsReportTest {
         // And has a judgment made
         // When I request report data
         // Then the case is in the report data
-        var managingOffice = "";
+        var managingOffice = TribunalOffice.GLASGOW.getOfficeName();
         when(hearingsToJudgmentsReportDataSource.getData(SCOTLAND_CASE_TYPE_ID, managingOffice, DATE_FROM, DATE_TO)).thenReturn(submitEvents);
 
         submitEvents.add(caseDataBuilder
@@ -389,7 +389,7 @@ class HearingsToJudgmentsReportTest {
         assertEquals(1, reportData.getReportDetails().size());
 
         var reportDetail = reportData.getReportDetails().get(0);
-        assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportDetail.getReportOffice());
+        assertEquals(TribunalOffice.GLASGOW.getOfficeName(), reportDetail.getReportOffice());
     }
 
     @Test

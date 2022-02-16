@@ -70,7 +70,7 @@ public class HearingsToJudgmentsReport {
         var reportData = initReport(office);
 
         if (CollectionUtils.isNotEmpty(submitEvents)) {
-            populateData(reportData, submitEvents, caseTypeId, office);
+            populateData(reportData, submitEvents, caseTypeId);
         }
 
         return reportData;
@@ -88,7 +88,7 @@ public class HearingsToJudgmentsReport {
 
     private void populateData(HearingsToJudgmentsReportData reportData,
                               List<HearingsToJudgmentsSubmitEvent> submitEvents,
-                              String listingCaseTypeId, String office) {
+                              String listingCaseTypeId) {
         log.info(String.format("Hearings to judgments case type id %s search results: %d",
                 listingCaseTypeId, submitEvents.size()));
 
@@ -111,7 +111,7 @@ public class HearingsToJudgmentsReport {
                     }
 
                     var reportDetail = new HearingsToJudgmentsReportDetail();
-                    reportDetail.setReportOffice(office);
+                    reportDetail.setReportOffice(caseData.getManagingOffice());
                     reportDetail.setCaseReference(caseData.getEthosCaseReference());
                     reportDetail.setHearingDate(hearingWithJudgment.hearingDate);
                     reportDetail.setJudgementDateSent(hearingWithJudgment.judgmentDateSent);

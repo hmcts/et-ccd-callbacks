@@ -365,4 +365,3 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     locations = ['filesystem:src/main/resources/db/migration',
                  'filesystem:src/main/resources/db/dev']
 }
-migratePostgresDatabase.finalizedBy flywayInfo

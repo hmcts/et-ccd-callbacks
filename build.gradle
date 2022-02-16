@@ -351,15 +351,18 @@ task installLocalDb(type: Exec) {
     project.flyway.url = 'jdbc:' + System.getenv('DB_URL') + '/et_cos'
     project.flyway.user = 'et_cos'
     project.flyway.password = System.getenv('ET_COS_DB_PASSWORD')
-    project.flyway.locations = ['classpath:db/migration','classpath:db/dev']
+    project.flyway.locations = ['filesystem:src/main/resources/db/migration',
+                                'filesystem:src/main/resources/db/dev']
 
     commandLine 'sh', 'bin/init-db.sh'
 }
-installLocalDb.finalizedBy flywayMigrate
+installLocalDb.finalizedBy flywayMigrate, flywayInfo
 
 task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     if (project.hasProperty("dburl")) { // set by jenkins
         url = "jdbc:postgresql://${dburl}"
     }
-    locations = ['classpath:db/migration','classpath:db/dev']
+    locations = ['filesystem:src/main/resources/db/migration',
+                 'filesystem:src/main/resources/db/dev']
 }
+migratePostgresDatabase.finalizedBy flywayInfo

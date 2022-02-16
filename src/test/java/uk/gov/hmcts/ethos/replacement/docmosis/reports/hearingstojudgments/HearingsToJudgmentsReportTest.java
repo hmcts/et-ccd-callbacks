@@ -1,12 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem;
-import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsSubmitEvent;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,7 +44,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 class HearingsToJudgmentsReportTest {
 
-    HearingsToJudgmentsReportDataSource hearingsToJudgmentsReportDataSource;
+    HearingsToJudgmentsDataSource hearingsToJudgmentsReportDataSource;
     HearingsToJudgmentsReport hearingsToJudgmentsReport;
     HearingsToJudgmentsCaseDataBuilder caseDataBuilder;
     List<HearingsToJudgmentsSubmitEvent> submitEvents = new ArrayList<>();
@@ -59,6 +58,8 @@ class HearingsToJudgmentsReportTest {
     static final String DATE_TO = BASE_DATE.plusDays(29).format(OLD_DATE_TIME_PATTERN);
     static final String INVALID_JUDGMENT_HEARING_DATE = BASE_DATE.plusDays(1).format(OLD_DATE_TIME_PATTERN2);
     static final String INVALID_HEARING_LISTING_DATE = BASE_DATE.minusDays(2).format(OLD_DATE_TIME_PATTERN);
+    static final String DYNAMIC_JUDGMENT_HEARING_LABEL = "1 : Hearing";
+    static final String HEARING_NUMBER = "1";
 
     public HearingsToJudgmentsReportTest() {
         caseDataBuilder = new HearingsToJudgmentsCaseDataBuilder();
@@ -68,43 +69,40 @@ class HearingsToJudgmentsReportTest {
     public void setup() {
         submitEvents.clear();
 
-        hearingsToJudgmentsReportDataSource = mock(HearingsToJudgmentsReportDataSource.class);
-        when(hearingsToJudgmentsReportDataSource.getData(ENGLANDWALES_CASE_TYPE_ID, DATE_FROM, DATE_TO)).thenReturn(submitEvents);
+        hearingsToJudgmentsReportDataSource = mock(HearingsToJudgmentsDataSource.class);
+        when(hearingsToJudgmentsReportDataSource.getData(ENGLANDWALES_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName(), DATE_FROM, DATE_TO)).thenReturn(submitEvents);
 
         hearingsToJudgmentsReport = new HearingsToJudgmentsReport(hearingsToJudgmentsReportDataSource, DATE_FROM, DATE_TO);
     }
 
     @Test
-    @Disabled("Fix when report is amended to include Managing Office")
     void shouldNotShowSubmittedCase() {
         // Given a case is submitted
         // When I request report data
         // Then the case should not be in the report data
 
-        submitEvents.add(caseDataBuilder.buildAsSubmitEvent(SUBMITTED_STATE));
+        submitEvents.add(caseDataBuilder.withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName()).buildAsSubmitEvent(SUBMITTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
 
     @Test
-    @Disabled("Fix when report is amended to include Managing Office")
     void shouldNotShowCaseIfNoHearingsExist() {
         // Given a case is not submitted
         // And has no hearings
         // When I request report data
         // Then the case should not be in the report data
 
-        submitEvents.add(caseDataBuilder.buildAsSubmitEvent(ACCEPTED_STATE));
+        submitEvents.add(caseDataBuilder.withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName()).buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
 
     @Test
-    @Disabled("Fix when report is amended to include Managing Office")
     void shouldNotShowCaseIfNoHearingHasNotBeenHeard() {
         // Given a case is accepted
         // And has no hearing that has been heard
@@ -112,16 +110,16 @@ class HearingsToJudgmentsReportTest {
         // Then the case should not be in the report data
 
         submitEvents.add(caseDataBuilder
-                .withHearing(HEARING_LISTING_DATE, HEARING_STATUS_LISTED, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_LISTED, HEARING_TYPE_JUDICIAL_HEARING, YES)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
 
     @Test
-    @Disabled("Fix when report is amended to include Managing Office")
     void shouldNotShowCaseIfHeardButNoJudgmentsMade() {
         // Given a case is accepted
         // And has been heard
@@ -130,16 +128,16 @@ class HearingsToJudgmentsReportTest {
         // Then the case should not be in the report data
 
         submitEvents.add(caseDataBuilder
-                .withHearing(HEARING_LISTING_DATE, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
 
     @Test
-    @Disabled("Fix when report is amended to include Managing Office")
     void shouldNotShowCaseIfHeardButJudgmentsHasNoValue() {
         // Given a case is accepted
         // And has been heard
@@ -150,19 +148,19 @@ class HearingsToJudgmentsReportTest {
         var judgmentTypeItem = new JudgementTypeItem();
         judgmentTypeItem.setValue(null);
         var submitEvent = caseDataBuilder
-                .withHearing(HEARING_LISTING_DATE, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment("2021-07-16", DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
+                .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withJudgment("2021-07-16", DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvent.getCaseData().getJudgementCollection().add(judgmentTypeItem);
         submitEvents.add(submitEvent);
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
 
     @Test
-    @Disabled("Fix when report is amended to include Managing Office")
     void shouldNotShowCaseIfHeardButJudgmentsHasNoHearingDate() {
         // Given a case is accepted
         // And has been heard
@@ -171,18 +169,18 @@ class HearingsToJudgmentsReportTest {
         // Then the case should not be in the report data
 
         var submitEvent = caseDataBuilder
-                .withHearing(HEARING_LISTING_DATE, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment("2021-07-16", DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
-                .withJudgment(null, null, null)
+                .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withJudgment("2021-07-16", DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
+                .withJudgment(null, null, null, null)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvents.add(submitEvent);
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
 
-    @Disabled("Fix when report is amended to include Managing Office")
     @ParameterizedTest
     @CsvSource({
             HEARING_STATUS_HEARD + "," + HEARING_TYPE_JUDICIAL_COSTS_HEARING + "," + YES,
@@ -284,17 +282,17 @@ class HearingsToJudgmentsReportTest {
         // Then the case is not in the report data
 
         submitEvents.add(caseDataBuilder
-                .withHearing(HEARING_LISTING_DATE, hearingStatus, HearingType, disposed)
-                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
+                .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, hearingStatus, HearingType, disposed)
+                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertEquals(0, reportData.getReportDetails().size());
     }
 
     @Test
-    @Disabled("Fix when report is amended to include Managing Office")
     void shouldNotShowHearingsWithInvalidHearingListDate() {
         // Given a case is accepted
         // And has a hearing with listed date outside the date range
@@ -302,17 +300,17 @@ class HearingsToJudgmentsReportTest {
         // Then the case is not in the report data
 
         submitEvents.add(caseDataBuilder
-                .withHearing(INVALID_HEARING_LISTING_DATE, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment(INVALID_JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
+                .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
+                .withHearing(INVALID_HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withJudgment(INVALID_JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertEquals(0, reportData.getReportDetails().size());
     }
 
     @Test
-    @Disabled("Fix when report is amended to include Managing Office")
     void shouldNotShowHearingsWithInvalidJudgments() {
         // Given a case is accepted
         // And has been heard
@@ -321,17 +319,36 @@ class HearingsToJudgmentsReportTest {
         // Then the case is not in the report data
 
         submitEvents.add(caseDataBuilder
-                .withHearing(HEARING_LISTING_DATE, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment(INVALID_JUDGMENT_HEARING_DATE, DATE_WITHIN_4WKS, DATE_WITHIN_4WKS)
+                .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withJudgment(INVALID_JUDGMENT_HEARING_DATE, DATE_WITHIN_4WKS, DATE_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertEquals(0, reportData.getReportDetails().size());
     }
 
     @Test
-    @Disabled("Fix when report is amended to include Managing Office")
+    void shouldShowNotShowJudgmentWithInvalidHearingNumber() {
+        // Given a case is accepted
+        // And has been heard
+        // And has a judgment made with the incorrect hearing number
+        // When I request report data
+        // Then the case is not in the report data
+
+        submitEvents.add(caseDataBuilder
+                .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
+                .withHearing(HEARING_LISTING_DATE, "2", HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
+                .buildAsSubmitEvent(ACCEPTED_STATE));
+
+        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
+        assertCommonValues(reportData);
+        assertEquals(0, reportData.getReportDetails().size());
+    }
+
+    @Test
     void shouldShowValidCase() {
         // Given a case is accepted
         // And has been heard
@@ -340,43 +357,42 @@ class HearingsToJudgmentsReportTest {
         // Then the case is in the report data
 
         submitEvents.add(caseDataBuilder
-                .withHearing(HEARING_LISTING_DATE, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
+                .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
     }
 
     @Test
-    @Disabled("Fix when report is amended to include Managing Office")
     void shouldShowCorrectScotlandOfficeValidCase() {
         // Given a case with a scottish office is accepted
         // And has been heard
         // And has a judgment made
         // When I request report data
         // Then the case is in the report data
-        when(hearingsToJudgmentsReportDataSource.getData(SCOTLAND_CASE_TYPE_ID, DATE_FROM, DATE_TO)).thenReturn(submitEvents);
-        var managingOffice = "Test Office";
+        var managingOffice = "";
+        when(hearingsToJudgmentsReportDataSource.getData(SCOTLAND_CASE_TYPE_ID, managingOffice, DATE_FROM, DATE_TO)).thenReturn(submitEvents);
 
         submitEvents.add(caseDataBuilder
                 .withManagingOffice(managingOffice)
-                .withHearing(HEARING_LISTING_DATE, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(SCOTLAND_LISTING_CASE_TYPE_ID);
+        var reportData = hearingsToJudgmentsReport.runReport(SCOTLAND_LISTING_CASE_TYPE_ID, managingOffice);
         assertNotNull(reportData);
-        assertEquals(SCOTLAND_CASE_TYPE_ID, reportData.getReportSummary().getOffice());
+        assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportData.getReportSummary().getOffice());
         assertEquals(1, reportData.getReportDetails().size());
 
         var reportDetail = reportData.getReportDetails().get(0);
-        assertEquals(managingOffice, reportDetail.getReportOffice());
+        assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportDetail.getReportOffice());
     }
 
     @Test
-    @Disabled("Fix when report is amended to include Managing Office")
     void shouldShowTotalHearingsInSummary() {
         // Given I have 2 valid cases with hearings with judgements within 4 weeks
         // And 1 valid case with hearings with judgement not within 4 weeks
@@ -390,7 +406,7 @@ class HearingsToJudgmentsReportTest {
         submitEvents.add(createValidSubmitEventWithin4Wks());
         submitEvents.add(createValidSubmitEventWithin4Wks());
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertEquals("4", reportData.getReportSummary().getTotalCases());
         assertEquals(1, reportData.getReportDetails().size());
@@ -400,7 +416,6 @@ class HearingsToJudgmentsReportTest {
         assertEquals("25.00", reportData.getReportSummary().getTotalX4WkPercent());
     }
 
-    @Disabled("Fix when report is amended to include Managing Office")
     @ParameterizedTest
     @CsvSource({
             "2021-07-16T10:00:00.000,2021-07-16,2021-08-26,2021-08-26,41,2500121/2021,1,One Test,"
@@ -424,18 +439,19 @@ class HearingsToJudgmentsReportTest {
 
         submitEvents.add(caseDataBuilder
                 .withEthosCaseReference(caseReference)
+                .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
                 .withHearing(hearingListedDate, HEARING_STATUS_HEARD, hearingType, YES,
                         hearingNumber, hearingJudge, hearingReserved)
-                .withJudgment(judgmentHearingDate, dateJudgmentMade, dateJudgmentSent)
+                .withJudgment(judgmentHearingDate, dateJudgmentMade, dateJudgmentSent, hearingNumber)
                 .buildAsSubmitEvent(caseState));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
 
         var reportDetail = reportData.getReportDetails().get(0);
         assertEquals(hearingJudge, reportDetail.getHearingJudge());
-        assertEquals(ENGLANDWALES_CASE_TYPE_ID, reportDetail.getReportOffice());
+        assertEquals(TribunalOffice.NEWCASTLE.getOfficeName(), reportDetail.getReportOffice());
         assertEquals(caseReference, reportDetail.getCaseReference());
         assertEquals(hearingReserved, reportDetail.getReservedHearing());
         assertEquals(expectedTotalDays, reportDetail.getTotalDays());
@@ -444,7 +460,6 @@ class HearingsToJudgmentsReportTest {
     }
 
     @Test
-    @Disabled("Fix when report is amended to include Managing Office")
     void shouldContainCorrectDetailValuesForMultipleHearingsWithJudgments() {
         // Given I have a valid case
         // And the case has the following hearings:
@@ -461,22 +476,22 @@ class HearingsToJudgmentsReportTest {
 
         submitEvents.add(caseDataBuilder
                 .withEthosCaseReference(caseReference)
-                .withManagingOffice(ENGLANDWALES_CASE_TYPE_ID)
+                .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
                 .withHearing("2021-07-06T10:00:00.000", HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING,
-                        YES, "1", "A.N. Other", YES)
-                .withJudgment("2021-07-06", "2021-08-03", "2021-08-04")
+                        YES, HEARING_NUMBER, "A.N. Other", YES)
+                .withJudgment("2021-07-06", "2021-08-03", "2021-08-04", DYNAMIC_JUDGMENT_HEARING_LABEL)
                 .withHearing("2021-07-05T10:00:00.000", HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING,
                         YES, "2", judge, NO)
-                .withJudgment(judgmentHearingDate, "2021-08-03", dateJudgmentSent)
+                .withJudgment(judgmentHearingDate, "2021-08-03", dateJudgmentSent, "2")
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
 
         var reportDetail = reportData.getReportDetails().get(0);
         assertEquals(judge, reportDetail.getHearingJudge());
-        assertEquals(ENGLANDWALES_CASE_TYPE_ID, reportDetail.getReportOffice());
+        assertEquals(TribunalOffice.NEWCASTLE.getOfficeName(), reportDetail.getReportOffice());
         assertEquals(caseReference, reportDetail.getCaseReference());
         assertEquals(NO, reportDetail.getReservedHearing());
         assertEquals(expectedTotalDays, reportDetail.getTotalDays());
@@ -486,20 +501,22 @@ class HearingsToJudgmentsReportTest {
 
     private HearingsToJudgmentsSubmitEvent createValidSubmitEventWithin4Wks() {
         caseDataBuilder = new HearingsToJudgmentsCaseDataBuilder();
-        return caseDataBuilder.withHearing(HEARING_LISTING_DATE, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment(JUDGMENT_HEARING_DATE, DATE_WITHIN_4WKS, DATE_WITHIN_4WKS)
+        return caseDataBuilder.withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withJudgment(JUDGMENT_HEARING_DATE, DATE_WITHIN_4WKS, DATE_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
     }
 
     private HearingsToJudgmentsSubmitEvent createValidSubmitEventNotWithin4Wks() {
         caseDataBuilder = new HearingsToJudgmentsCaseDataBuilder();
-        return caseDataBuilder.withHearing(HEARING_LISTING_DATE, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
+        return caseDataBuilder.withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
     }
 
     private void assertCommonValues(HearingsToJudgmentsReportData reportData) {
         assertNotNull(reportData);
-        assertEquals("Newcastle", reportData.getReportSummary().getOffice());
+        assertEquals(TribunalOffice.NEWCASTLE.getOfficeName(), reportData.getReportSummary().getOffice());
     }
 }

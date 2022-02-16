@@ -26,6 +26,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderServic
 import uk.gov.hmcts.ethos.replacement.docmosis.service.GenerateReportService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ListingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PrintHearingListService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public class ListingGenerationController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
     private final ListingService listingService;
+    private final ReportDataService reportDataService;
     private final DefaultValuesReaderService defaultValuesReaderService;
     private final VerifyTokenService verifyTokenService;
     private final PrintHearingListService printHearingListService;
@@ -244,7 +246,7 @@ public class ListingGenerationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var listingData = listingService.generateReportData(listingRequest.getCaseDetails(), userToken);
+        var listingData = reportDataService.generateReportData(listingRequest.getCaseDetails(), userToken);
 
         return getResponseEntity(listingData, listingRequest.getCaseDetails().getCaseTypeId(), userToken);
 

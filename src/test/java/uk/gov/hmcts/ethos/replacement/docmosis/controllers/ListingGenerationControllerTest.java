@@ -20,6 +20,7 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ecm.common.model.listing.ListingRequest;
@@ -31,6 +32,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.Rep
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportSummary;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays.MemberDaysReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.GenerateReportService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ListingService;
@@ -59,12 +61,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_AWAITING_JUDGMENT_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AWAITING_JUDGMENT_REPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @RunWith(SpringRunner.class)
@@ -89,6 +91,9 @@ public class ListingGenerationControllerTest {
 
     @MockBean
     private ListingService listingService;
+
+    @MockBean
+    private ReportDataService reportDataService;
 
     @MockBean
     private DefaultValuesReaderService defaultValuesReaderService;
@@ -376,7 +381,7 @@ public class ListingGenerationControllerTest {
     @Test
     public void generateReportOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(listingService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
+        when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(listingRequest.getCaseDetails().getCaseData());
         when(listingService.processHearingDocument(isA(ListingData.class),
                 isA(String.class), eq(AUTH_TOKEN)))
@@ -393,12 +398,12 @@ public class ListingGenerationControllerTest {
 
     @Test
     public void generateHearingsToJudgmentsReportOk() throws Exception {
-        var reportSummary = new HearingsToJudgmentsReportSummary(ENGLANDWALES_CASE_TYPE_ID);
+        var reportSummary = new HearingsToJudgmentsReportSummary(TribunalOffice.LEEDS.getOfficeName());
         var reportData = new HearingsToJudgmentsReportData(reportSummary);
         reportData.setReportType(HEARINGS_TO_JUDGEMENTS_REPORT);
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(listingService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
+        when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(reportData);
         when(listingService.processHearingDocument(isA(ListingData.class),
                 isA(String.class), eq(AUTH_TOKEN)))
@@ -420,7 +425,7 @@ public class ListingGenerationControllerTest {
         reportData.setReportType(CASES_AWAITING_JUDGMENT_REPORT);
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(listingService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
+        when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(reportData);
         when(listingService.processHearingDocument(isA(ListingData.class),
                 isA(String.class), eq(AUTH_TOKEN)))
@@ -442,7 +447,7 @@ public class ListingGenerationControllerTest {
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN))
             .thenReturn(true);
-        when(listingService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
+        when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
             .thenReturn(reportData);
         when(listingService.processHearingDocument(isA(ListingData.class),
             isA(String.class), eq(AUTH_TOKEN)))
@@ -484,7 +489,7 @@ public class ListingGenerationControllerTest {
 
     @Test
     public void generateReportError500() throws Exception {
-        when(listingService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
+        when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_REPORT_URL)

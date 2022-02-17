@@ -23,6 +23,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.Cas
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.GenerateReportService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ListingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PrintHearingListService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
@@ -52,6 +53,7 @@ public class ListingGenerationController {
     private final DefaultValuesReaderService defaultValuesReaderService;
     private final VerifyTokenService verifyTokenService;
     private final PrintHearingListService printHearingListService;
+    private final GenerateReportService generateReportService;
 
     @PostMapping(value = "/listingCaseCreation", consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "handles logic related to the creation of listing cases.")
@@ -200,6 +202,30 @@ public class ListingGenerationController {
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
                 .confirmation_header(GENERATED_DOCUMENT_URL + ccdRequest.getCaseDetails().getCaseData().getDocMarkUp())
+                .build());
+    }
+
+    @PostMapping(value = "/initGenerateReport", consumes = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Initialise listing data for generating a report")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
+    })
+    public ResponseEntity<ListingCallbackResponse> initGenerateReport(
+            @RequestBody ListingRequest listingRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        log.info("INIT GENERATE REPORT ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        generateReportService.initGenerateReport(listingRequest.getCaseDetails());
+
+        return ResponseEntity.ok(ListingCallbackResponse.builder()
+                .data(listingRequest.getCaseDetails().getCaseData())
                 .build());
     }
 

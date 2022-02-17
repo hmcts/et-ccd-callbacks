@@ -13,14 +13,10 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_DEV_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_OFFICE_NUMBER;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_USERS_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_DEV_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_OFFICE_NUMBER;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_USERS_BULK_CASE_TYPE_ID;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleReferenceServiceTest {
@@ -40,10 +36,6 @@ public class MultipleReferenceServiceTest {
                 .thenReturn("00015");
         var expectedReference = ENGLANDWALES_OFFICE_NUMBER + "00015";
 
-        assertEquals(expectedReference,
-                multipleReferenceService.createReference(ENGLANDWALES_DEV_BULK_CASE_TYPE_ID, 1));
-        assertEquals(expectedReference,
-                multipleReferenceService.createReference(ENGLANDWALES_USERS_BULK_CASE_TYPE_ID, 1));
         assertEquals(expectedReference, multipleReferenceService.createReference(ENGLANDWALES_BULK_CASE_TYPE_ID, 1));
     }
 
@@ -62,8 +54,6 @@ public class MultipleReferenceServiceTest {
         when(multipleRefScotlandRepository.ethosMultipleCaseRefGen(1, SCOTLAND_CASE_TYPE_ID)).thenReturn("00015");
         var expectedReference = SCOTLAND_OFFICE_NUMBER + "00015";
 
-        assertEquals(expectedReference, multipleReferenceService.createReference(SCOTLAND_DEV_BULK_CASE_TYPE_ID, 1));
-        assertEquals(expectedReference, multipleReferenceService.createReference(SCOTLAND_USERS_BULK_CASE_TYPE_ID, 1));
         assertEquals(expectedReference, multipleReferenceService.createReference(SCOTLAND_BULK_CASE_TYPE_ID, 1));
     }
 

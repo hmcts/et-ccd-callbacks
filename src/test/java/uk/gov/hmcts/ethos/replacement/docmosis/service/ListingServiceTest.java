@@ -44,6 +44,8 @@ import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgm
 import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReportCaseData;
 import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReportSubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
+
+import static org.mockito.ArgumentMatchers.anyList;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReportData;
@@ -1344,6 +1346,7 @@ public class ListingServiceTest {
     @Test
     public void generateRespondentsReportData() throws IOException {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         listingDetails.getCaseData().setReportType(RESPONDENTS_REPORT);
         listingDetails.getCaseData().setDocumentName("name");
         listingDetails.getCaseData().setHearingDateType("Ranged");
@@ -1387,8 +1390,7 @@ public class ListingServiceTest {
         doReturn(localSubmitEvents).when(ccdClient).retrieveCasesGenericReportElasticSearch(anyString(), anyString(),
             any(TribunalOffice.class), anyString(), anyString(), anyString());
 
-        doReturn(memberDaysReportData).when(memberDaysReport).runReport(any(ListingDetails.class),
-            Mockito.<SubmitEvent>anyList());
+        doReturn(memberDaysReportData).when(memberDaysReport).runReport(any(ListingDetails.class), anyList());
 
         var listingDataResult = (MemberDaysReportData) listingService.generateReportData(listingDetailsRange,
             "authToken");

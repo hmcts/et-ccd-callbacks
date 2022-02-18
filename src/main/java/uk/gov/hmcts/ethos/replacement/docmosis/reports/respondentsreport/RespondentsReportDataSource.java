@@ -4,5 +4,6 @@ import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReport
 import java.util.List;
 
 public interface RespondentsReportDataSource {
-    List<RespondentsReportSubmitEvent> getData(String caseTypeId, String listingDateFrom, String listingDateTo);
+    List<RespondentsReportSubmitEvent> getData(String caseTypeId, String managingOffice, String listingDateFrom,
+                                               String listingDateTo);
 }

@@ -14,9 +14,10 @@ public class RespondentsReportCcdDataSource implements RespondentsReportDataSour
     private final CcdClient ccdClient;
 
     @Override
-    public List<RespondentsReportSubmitEvent> getData(String caseTypeId, String listingDateFrom, String listingDateTo) {
+    public List<RespondentsReportSubmitEvent> getData(String caseTypeId, String managingOffice, String listingDateFrom,
+                                                      String listingDateTo) {
         try {
-            var query = RespondentsReportElasticSearchQuery.create(listingDateFrom, listingDateTo);
+            var query = RespondentsReportElasticSearchQuery.create(managingOffice, listingDateFrom, listingDateTo);
             return ccdClient.respondentsReportSearch(authToken, caseTypeId, query);
         } catch (Exception e) {
             throw new ReportException(String.format(

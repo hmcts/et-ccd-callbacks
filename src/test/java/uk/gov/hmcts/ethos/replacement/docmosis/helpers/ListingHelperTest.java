@@ -30,6 +30,7 @@ import java.util.Objects;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_AWAITING_JUDGMENT_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_COMPLETED_REPORT;
@@ -1276,6 +1277,8 @@ public class ListingHelperTest {
         assertEquals("EM-TRB-SCO-ENG-00786", ListingHelper.getListingDocName(listingData));
         listingData.setReportType(MEMBER_DAYS_REPORT);
         assertEquals("EM-TRB-SCO-ENG-00800", ListingHelper.getListingDocName(listingData));
+        listingData.setReportType(RESPONDENTS_REPORT);
+        assertEquals("EM-TRB-SCO-ENG-00815", ListingHelper.getListingDocName(listingData));
         listingData.setReportType("");
         assertEquals("No document found", ListingHelper.getListingDocName(listingData));
     }

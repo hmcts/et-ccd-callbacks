@@ -24,6 +24,9 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 public class DocumentHelperTest {
 
@@ -705,7 +708,7 @@ public class DocumentHelperTest {
                 + "}\n"
                 + "}\n";
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails7.getCaseData(), "",
-                userDetails, ENGLANDWALES_CASE_TYPE_ID, 
+                userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails7.getCaseData().getCorrespondenceType(),
                 caseDetails7.getCaseData().getCorrespondenceScotType(),
                 null, null, venueAddressReaderService).toString());
@@ -784,7 +787,7 @@ public class DocumentHelperTest {
                 + "}\n"
                 + "}\n";
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails8.getCaseData(), "",
-                userDetails, ENGLANDWALES_CASE_TYPE_ID, 
+                userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails8.getCaseData().getCorrespondenceType(),
                 caseDetails8.getCaseData().getCorrespondenceScotType(),
                 null, null, venueAddressReaderService).toString());
@@ -862,7 +865,7 @@ public class DocumentHelperTest {
                 + "}\n"
                 + "}\n";
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails9.getCaseData(), "",
-                userDetails, ENGLANDWALES_CASE_TYPE_ID, 
+                userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails9.getCaseData().getCorrespondenceType(),
                 caseDetails9.getCaseData().getCorrespondenceScotType(),
                 null, null, venueAddressReaderService).toString());
@@ -940,7 +943,7 @@ public class DocumentHelperTest {
                 + "}\n";
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails12.getCaseData(), "",
                 userDetails,
-                ENGLANDWALES_CASE_TYPE_ID, 
+                ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails12.getCaseData().getCorrespondenceType(),
                 caseDetails12.getCaseData().getCorrespondenceScotType(),
                 null, null, venueAddressReaderService).toString());
@@ -981,7 +984,7 @@ public class DocumentHelperTest {
                 + "}\n"
                 + "}\n";
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails13.getCaseData(), "",
-                userDetails, ENGLANDWALES_CASE_TYPE_ID, 
+                userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails13.getCaseData().getCorrespondenceType(),
                 caseDetails13.getCaseData().getCorrespondenceScotType(),
                 null, null, venueAddressReaderService).toString());
@@ -1141,7 +1144,7 @@ public class DocumentHelperTest {
                 + "}\n";
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails14.getCaseData(), "",
                 userDetails,
-                ENGLANDWALES_CASE_TYPE_ID, 
+                ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails14.getCaseData().getCorrespondenceType(),
                 caseDetails14.getCaseData().getCorrespondenceScotType(),
                 null, null, venueAddressReaderService).toString());
@@ -1366,7 +1369,7 @@ public class DocumentHelperTest {
                 + "}\n"
                 + "}\n";
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails15.getCaseData(), "",
-                userDetails, ENGLANDWALES_CASE_TYPE_ID, 
+                userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails15.getCaseData().getCorrespondenceType(),
                 caseDetails15.getCaseData().getCorrespondenceScotType(),
                 null, null, venueAddressReaderService).toString());
@@ -1435,7 +1438,7 @@ public class DocumentHelperTest {
                 + "}\n"
                 + "}\n";
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetailsEmpty.getCaseData(), "",
-                userDetails, "", 
+                userDetails, "",
                 caseDetailsEmpty.getCaseData().getCorrespondenceType(),
                 caseDetailsEmpty.getCaseData().getCorrespondenceScotType(),
                 null, null, venueAddressReaderService).toString());
@@ -1513,7 +1516,7 @@ public class DocumentHelperTest {
                 + "}\n"
                 + "}\n";
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetailsScot1.getCaseData(), "",
-                userDetails, SCOTLAND_CASE_TYPE_ID, 
+                userDetails, SCOTLAND_CASE_TYPE_ID,
                 caseDetailsScot1.getCaseData().getCorrespondenceType(),
                 caseDetailsScot1.getCaseData().getCorrespondenceScotType(),
                 null, null, venueAddressReaderService).toString());
@@ -1589,7 +1592,7 @@ public class DocumentHelperTest {
                 + "}\n"
                 + "}\n";
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetailsScot2.getCaseData(), "",
-                userDetails, DUMMY_CASE_TYPE_ID, 
+                userDetails, DUMMY_CASE_TYPE_ID,
                 caseDetailsScot2.getCaseData().getCorrespondenceType(),
                 caseDetailsScot2.getCaseData().getCorrespondenceScotType(),
                 null, null, venueAddressReaderService).toString());
@@ -1664,7 +1667,7 @@ public class DocumentHelperTest {
                 + "}\n"
                 + "}\n";
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetailsScot3.getCaseData(), "",
-                userDetails, SCOTLAND_CASE_TYPE_ID, 
+                userDetails, SCOTLAND_CASE_TYPE_ID,
                 caseDetailsScot3.getCaseData().getCorrespondenceType(),
                 caseDetailsScot3.getCaseData().getCorrespondenceScotType(),
                 null, null, venueAddressReaderService).toString());
@@ -1746,7 +1749,7 @@ public class DocumentHelperTest {
                 .tribunalCorrespondenceTown("Aberdeen")
                 .build();
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetailsScot3.getCaseData(), "",
-                userDetails, SCOTLAND_CASE_TYPE_ID, 
+                userDetails, SCOTLAND_CASE_TYPE_ID,
                 caseDetailsScot3.getCaseData().getCorrespondenceType(),
                 caseDetailsScot3.getCaseData().getCorrespondenceScotType(),
                 null, allocatedCourtAddress, venueAddressReaderService).toString());
@@ -1764,7 +1767,7 @@ public class DocumentHelperTest {
         caseData.setCorrespondenceScotType(correspondenceScotType);
         caseDetailsTemplates.setCaseData(caseData);
         assertEquals(getJson(topLevel, part), DocumentHelper.buildDocumentContent(caseDetailsTemplates.getCaseData(),
-                "", userDetails, SCOTLAND_CASE_TYPE_ID, 
+                "", userDetails, SCOTLAND_CASE_TYPE_ID,
                 caseDetailsTemplates.getCaseData().getCorrespondenceType(),
                 caseDetailsTemplates.getCaseData().getCorrespondenceScotType(), null,
                 null, venueAddressReaderService).toString());
@@ -1776,7 +1779,7 @@ public class DocumentHelperTest {
         caseData.setCorrespondenceScotType(correspondenceScotType);
         caseDetailsTemplates.setCaseData(caseData);
         assertEquals(getJson(topLevel, part), DocumentHelper.buildDocumentContent(caseDetailsTemplates.getCaseData(),
-                "", userDetails, SCOTLAND_CASE_TYPE_ID, 
+                "", userDetails, SCOTLAND_CASE_TYPE_ID,
                 caseDetailsTemplates.getCaseData().getCorrespondenceType(),
                 caseDetailsTemplates.getCaseData().getCorrespondenceScotType(), null,
                 null, venueAddressReaderService).toString());
@@ -1788,7 +1791,7 @@ public class DocumentHelperTest {
         caseData.setCorrespondenceScotType(correspondenceScotType);
         caseDetailsTemplates.setCaseData(caseData);
         assertEquals(getJson(topLevel, part), DocumentHelper.buildDocumentContent(caseDetailsTemplates.getCaseData(),
-                "", userDetails, SCOTLAND_CASE_TYPE_ID, 
+                "", userDetails, SCOTLAND_CASE_TYPE_ID,
                 caseDetailsTemplates.getCaseData().getCorrespondenceType(),
                 caseDetailsTemplates.getCaseData().getCorrespondenceScotType(), null,
                 null, venueAddressReaderService).toString());
@@ -1800,7 +1803,7 @@ public class DocumentHelperTest {
         caseData.setCorrespondenceScotType(correspondenceScotType);
         caseDetailsTemplates.setCaseData(caseData);
         assertEquals(getJson(topLevel, part), DocumentHelper.buildDocumentContent(caseDetailsTemplates.getCaseData(),
-                "", userDetails, SCOTLAND_CASE_TYPE_ID, 
+                "", userDetails, SCOTLAND_CASE_TYPE_ID,
                 caseDetailsTemplates.getCaseData().getCorrespondenceType(),
                 caseDetailsTemplates.getCaseData().getCorrespondenceScotType(), null,
                 null, venueAddressReaderService).toString());
@@ -1812,7 +1815,7 @@ public class DocumentHelperTest {
         caseData.setCorrespondenceScotType(correspondenceScotType);
         caseDetailsTemplates.setCaseData(caseData);
         assertEquals(getJson(topLevel, part), DocumentHelper.buildDocumentContent(caseDetailsTemplates.getCaseData(),
-                "", userDetails, SCOTLAND_CASE_TYPE_ID, 
+                "", userDetails, SCOTLAND_CASE_TYPE_ID,
                 caseDetailsTemplates.getCaseData().getCorrespondenceType(),
                 caseDetailsTemplates.getCaseData().getCorrespondenceScotType(), null,
                 null, venueAddressReaderService).toString());
@@ -1824,7 +1827,7 @@ public class DocumentHelperTest {
         caseData.setCorrespondenceScotType(correspondenceScotType);
         caseDetailsTemplates.setCaseData(caseData);
         assertEquals(getJson(topLevel, part), DocumentHelper.buildDocumentContent(caseDetailsTemplates.getCaseData(),
-                "", userDetails, SCOTLAND_CASE_TYPE_ID, 
+                "", userDetails, SCOTLAND_CASE_TYPE_ID,
                 caseDetailsTemplates.getCaseData().getCorrespondenceType(),
                 caseDetailsTemplates.getCaseData().getCorrespondenceScotType(), null,
                 null, venueAddressReaderService).toString());
@@ -1836,7 +1839,7 @@ public class DocumentHelperTest {
         caseData.setCorrespondenceScotType(correspondenceScotType);
         caseDetailsTemplates.setCaseData(caseData);
         assertEquals(getJson(topLevel, part), DocumentHelper.buildDocumentContent(caseDetailsTemplates.getCaseData(),
-                "", userDetails, SCOTLAND_CASE_TYPE_ID, 
+                "", userDetails, SCOTLAND_CASE_TYPE_ID,
                 caseDetailsTemplates.getCaseData().getCorrespondenceType(),
                 caseDetailsTemplates.getCaseData().getCorrespondenceScotType(), null,
                 null, venueAddressReaderService).toString());
@@ -1915,7 +1918,7 @@ public class DocumentHelperTest {
                 + "}\n"
                 + "}\n";
         assertEquals(result, DocumentHelper.buildDocumentContent(caseDetailsTemplates.getCaseData(),
-                "", userDetails, "", 
+                "", userDetails, "",
                 caseDetailsTemplates.getCaseData().getCorrespondenceType(),
                 caseDetailsTemplates.getCaseData().getCorrespondenceScotType(), null,
                 null, venueAddressReaderService).toString());
@@ -2027,7 +2030,7 @@ public class DocumentHelperTest {
         multipleData.setAddressLabelsAttributesType(addressLabelsAttributesType);
         multipleData.setAddressLabelCollection(MultipleUtil.getAddressLabelTypeItemList());
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails2.getCaseData(), "",
-                userDetails, ENGLANDWALES_CASE_TYPE_ID, 
+                userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 multipleData.getCorrespondenceType(), multipleData.getCorrespondenceScotType(),
                 multipleData, null, venueAddressReaderService).toString());
     }

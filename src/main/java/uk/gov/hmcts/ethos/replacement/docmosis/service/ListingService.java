@@ -34,6 +34,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays.MemberDaysRepo
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeCcdDataSource;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReport;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReportCcdDataSource;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReportParams;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.servingclaims.ServingClaimsReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.timetofirsthearing.TimeToFirstHearingReport;
 
@@ -74,6 +78,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TIME_TO_FIRST_HEARI
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper.CASES_SEARCHED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -236,6 +241,8 @@ public class ListingService {
                     return getHearingsToJudgmentsReport(listingDetails, authToken);
                 case NO_CHANGE_IN_CURRENT_POSITION_REPORT:
                     return getNoPositionChangeReport(listingDetails, authToken);
+                case RESPONDENTS_REPORT:
+                    return getRespondentsReport(listingDetails, authToken);
                 default:
                     return getDateRangeReport(listingDetails, authToken);
             }
@@ -244,10 +251,28 @@ public class ListingService {
         }
     }
 
-    private CasesAwaitingJudgmentReportData getCasesAwaitingJudgmentReport(
-            ListingDetails listingDetails, String authToken) {
-        log.info("Cases Awaiting Judgment for {}, Office {}", listingDetails.getCaseTypeId(),
-                listingDetails.getCaseData().getManagingOffice());
+    private RespondentsReportData getRespondentsReport(ListingDetails listingDetails, String authToken) {
+        log.info("Respondents Report for {}", listingDetails.getCaseTypeId());
+        var reportDataSource = new RespondentsReportCcdDataSource(authToken, ccdClient);
+        setListingDateRangeForSearch(listingDetails);
+        var listingData = listingDetails.getCaseData();
+
+        var params = new RespondentsReportParams(listingDetails.getCaseTypeId(), listingData.getManagingOffice(),
+                listingDateFrom, listingDateTo);
+        var respondentsReport = new RespondentsReport(reportDataSource);
+        var reportData = respondentsReport.generateReport(params);
+        reportData.setDocumentName(listingData.getDocumentName());
+        reportData.setReportType(listingData.getReportType());
+        reportData.setHearingDateType(listingData.getHearingDateType());
+        reportData.setListingDateFrom(listingData.getListingDateFrom());
+        reportData.setListingDateTo(listingData.getListingDateTo());
+        reportData.setListingDate(listingData.getListingDate());
+        return reportData;
+    }
+
+    private CasesAwaitingJudgmentReportData getCasesAwaitingJudgmentReport(ListingDetails listingDetails,
+                                                                           String authToken) {
+        log.info("Cases Awaiting Judgment for {}", listingDetails.getCaseTypeId());
         var reportDataSource = new CcdReportDataSource(authToken, ccdClient);
 
         var casesAwaitingJudgmentReport = new CasesAwaitingJudgmentReport(reportDataSource);
@@ -287,6 +312,7 @@ public class ListingService {
     }
 
     private ListingData getDateRangeReport(ListingDetails listingDetails, String authToken) throws IOException {
+        clearListingFields(listingDetails.getCaseData());
         List<SubmitEvent> submitEvents = getDateRangeReportSearch(listingDetails, authToken);
         log.info("Number of cases found: " + submitEvents.size());
         switch (listingDetails.getCaseData().getReportType()) {
@@ -312,6 +338,15 @@ public class ListingService {
             default:
                 return listingDetails.getCaseData();
         }
+    }
+
+    private void clearListingFields(ListingData listingData) {
+        listingData.setLocalReportsSummary(null);
+        listingData.setLocalReportsSummaryHdr(null);
+        listingData.setLocalReportsSummaryHdr2(null);
+        listingData.setLocalReportsSummary2(null);
+        listingData.setLocalReportsDetailHdr(null);
+        listingData.setLocalReportsDetail(null);
     }
 
     private void setListingDateRangeForSearch(ListingDetails listingDetails) {

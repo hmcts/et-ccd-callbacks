@@ -30,15 +30,16 @@ import java.util.Objects;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AWAITING_JUDGMENT_REPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_AWAITING_JUDGMENT_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_COMPLETED_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_SOURCE_LOCAL_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_IT56;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_IT57;
@@ -1275,6 +1276,8 @@ public class ListingHelperTest {
         assertEquals("EM-TRB-SCO-ENG-00783", ListingHelper.getListingDocName(listingData));
         listingData.setReportType(HEARINGS_TO_JUDGEMENTS_REPORT);
         assertEquals("EM-TRB-SCO-ENG-00786", ListingHelper.getListingDocName(listingData));
+        listingData.setReportType(NO_CHANGE_IN_CURRENT_POSITION_REPORT);
+        assertEquals("EM-TRB-SCO-ENG-00794", ListingHelper.getListingDocName(listingData));
         listingData.setReportType(MEMBER_DAYS_REPORT);
         assertEquals("EM-TRB-SCO-ENG-00800", ListingHelper.getListingDocName(listingData));
         listingData.setReportType(RESPONDENTS_REPORT);
@@ -1286,7 +1289,6 @@ public class ListingHelperTest {
     @Test
     public void getRespondentOthersWithLineBreaksForMultipleRespondents() {
         String expected = "Mark Taylor\\nTony Jones\\nSteve Thomas";
-
         String actual = ListingHelper.getRespondentOthersWithLineBreaks(listingDetails.getCaseData().getListingCollection().get(0).getValue());
 
         assertEquals(expected, actual);
@@ -1295,7 +1297,6 @@ public class ListingHelperTest {
     @Test
     public void getRespondentOthersWithLineBreaksForTwoRespondents() {
         String expected = "Mark Taylor\\nTony Jones";
-
         String actual = ListingHelper.getRespondentOthersWithLineBreaks(listingDetails.getCaseData().getListingCollection().get(1).getValue());
 
         assertEquals(expected, actual);
@@ -1304,7 +1305,6 @@ public class ListingHelperTest {
     @Test
     public void getRespondentOthersWithLineBreaksForSingleRespondent() {
         String expected = "Mark Taylor";
-
         String actual = ListingHelper.getRespondentOthersWithLineBreaks(listingDetails.getCaseData().getListingCollection().get(2).getValue());
 
         assertEquals(expected, actual);
@@ -1313,7 +1313,6 @@ public class ListingHelperTest {
     @Test
     public void getRespondentOthersWithLineBreaksForNoRespondents() {
         String expected = "";
-
         String actual = ListingHelper.getRespondentOthersWithLineBreaks(listingDetails.getCaseData().getListingCollection().get(3).getValue());
 
         assertEquals(expected, actual);
@@ -1325,7 +1324,6 @@ public class ListingHelperTest {
         ListingHelper.isListingRangeValid(listingDetails.getCaseData(), errors);
 
         assertEquals(0, errors.size());
-
     }
 
     @Test

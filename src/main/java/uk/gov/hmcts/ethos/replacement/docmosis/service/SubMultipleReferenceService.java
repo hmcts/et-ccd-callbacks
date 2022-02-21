@@ -10,12 +10,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SubMultipleRefS
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_DEV_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_USERS_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_DEV_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_USERS_BULK_CASE_TYPE_ID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,13 +24,9 @@ public class SubMultipleReferenceService {
     public synchronized String createReference(String caseTypeId, String multipleReference, int numberCases) {
         switch (caseTypeId) {
             case ENGLANDWALES_BULK_CASE_TYPE_ID:
-            case ENGLANDWALES_DEV_BULK_CASE_TYPE_ID:
-            case ENGLANDWALES_USERS_BULK_CASE_TYPE_ID:
                 return generateOfficeReference(subMultipleRefEnglandWalesRepository, numberCases, multipleReference,
                         ENGLANDWALES_CASE_TYPE_ID);
             case SCOTLAND_BULK_CASE_TYPE_ID:
-            case SCOTLAND_DEV_BULK_CASE_TYPE_ID:
-            case SCOTLAND_USERS_BULK_CASE_TYPE_ID:
                 return generateOfficeReference(subMultipleRefScotlandRepository, numberCases, multipleReference,
                         SCOTLAND_CASE_TYPE_ID);
             default:

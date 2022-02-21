@@ -211,6 +211,7 @@ public class ListingService {
     }
 
     public ListingData getDateRangeReport(ListingDetails listingDetails, String authToken) throws IOException {
+        clearListingFields(listingDetails.getCaseData());
         List<SubmitEvent> submitEvents = getDateRangeReportSearch(listingDetails, authToken);
         log.info("Number of cases found: " + submitEvents.size());
         switch (listingDetails.getCaseData().getReportType()) {
@@ -235,6 +236,15 @@ public class ListingService {
             default:
                 return listingDetails.getCaseData();
         }
+    }
+
+    private void clearListingFields(ListingData listingData) {
+        listingData.setLocalReportsSummary(null);
+        listingData.setLocalReportsSummaryHdr(null);
+        listingData.setLocalReportsSummaryHdr2(null);
+        listingData.setLocalReportsSummary2(null);
+        listingData.setLocalReportsDetailHdr(null);
+        listingData.setLocalReportsDetail(null);
     }
 
     private List<SubmitEvent> getDateRangeReportSearch(ListingDetails listingDetails, String authToken)

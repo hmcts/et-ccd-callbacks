@@ -11,13 +11,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SingleRefScotla
 import java.time.LocalDate;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_DEV_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_OFFICE_NUMBER;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_USERS_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_DEV_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_OFFICE_NUMBER;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_USERS_CASE_TYPE_ID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,13 +26,9 @@ public class SingleReferenceService {
     public synchronized String createReference(String caseTypeId, int numberCases) {
         var currentYear = String.valueOf(LocalDate.now().getYear());
         switch (caseTypeId) {
-            case ENGLANDWALES_DEV_CASE_TYPE_ID:
-            case ENGLANDWALES_USERS_CASE_TYPE_ID:
             case ENGLANDWALES_CASE_TYPE_ID:
                 return generateOfficeReference(singleRefEnglandWalesRepository, currentYear, numberCases,
                         ENGLANDWALES_OFFICE_NUMBER, ENGLANDWALES_CASE_TYPE_ID);
-            case SCOTLAND_DEV_CASE_TYPE_ID:
-            case SCOTLAND_USERS_CASE_TYPE_ID:
             case SCOTLAND_CASE_TYPE_ID:
                 return generateOfficeReference(singleRefScotlandRepository, currentYear, numberCases,
                         SCOTLAND_OFFICE_NUMBER, SCOTLAND_CASE_TYPE_ID);

@@ -4,6 +4,7 @@ public final class Constants {
     public static final String NO_CHANGE_IN_CURRENT_POSITION_REPORT = "No Change In Current Position";
     public static final String HEARINGS_TO_JUDGEMENTS_REPORT = "Hearings To Judgments";
     public static final String CASES_AWAITING_JUDGMENT_REPORT = "Cases Awaiting Judgment";
+    public static final String RESPONDENTS_REPORT = "Respondents";
 
     public static final String REPORT_OFFICE = "\"Report_Office\":\"";
     public static final String TOTAL_CASES = "\"Total_Cases\":\"";

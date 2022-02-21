@@ -49,7 +49,6 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_DEV_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
@@ -62,9 +61,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @RunWith(SpringJUnit4ClassRunner.class)
 public class CaseManagementForCaseWorkerServiceTest {
 
+    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     @InjectMocks
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private CCDRequest scotlandCcdRequest1;
     private CCDRequest scotlandCcdRequest2;
     private CCDRequest scotlandCcdRequest3;
@@ -141,7 +140,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         caseData.setRespondentECC(createRespondentECC());
         manchesterCaseDetails.setCaseData(caseData);
         manchesterCaseDetails.setCaseId("123456");
-        manchesterCaseDetails.setCaseTypeId(ENGLANDWALES_DEV_CASE_TYPE_ID);
+        manchesterCaseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         manchesterCaseDetails.setJurisdiction("TRIBUNALS");
         manchesterCcdRequest.setCaseDetails(manchesterCaseDetails);
 
@@ -185,6 +184,7 @@ public class CaseManagementForCaseWorkerServiceTest {
             assertEquals(NO, respondentSumTypeItem.getValue().getResponseReceived());
         }
     }
+
     @Test
     public void caseDataDefaultsResetResponseRespondentAddress() {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
@@ -217,10 +217,10 @@ public class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseData.getRespondentCollection().get(0).getValue().setResponseReceived(YES);
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
-        assertEquals(YES,caseData.getRespondentCollection().get(0).getValue().getResponseReceived());
+        assertEquals(YES, caseData.getRespondentCollection().get(0).getValue().getResponseReceived());
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
             if (respondentSumTypeItem != caseData.getRespondentCollection().get(0))
-            assertEquals(NO, respondentSumTypeItem.getValue().getResponseReceived());
+                assertEquals(NO, respondentSumTypeItem.getValue().getResponseReceived());
         }
     }
 
@@ -566,7 +566,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         c2.setId(UUID.randomUUID().toString());
         c1.setValue(counterClaimType1);
         c2.setValue(counterClaimType2);
-        manchesterCcdRequest.getCaseDetails().getCaseData().setEccCases(Arrays.asList(c1,c2));
+        manchesterCcdRequest.getCaseDetails().getCaseData().setEccCases(Arrays.asList(c1, c2));
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
                 .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
         assertEquals(c1.getValue().getCounterClaim(), caseManagementForCaseWorkerService.createECC(manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,

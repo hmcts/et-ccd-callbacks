@@ -27,6 +27,8 @@ import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ecm.common.model.multiples.SubmitMultipleEvent;
+import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReportCaseData;
+import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReportSubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReportData;
@@ -36,6 +38,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.Heari
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeCaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeSearchResult;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReportData;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,6 +65,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AWAITING_JUDGMENT_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ReportDataServiceTest {
@@ -319,5 +323,27 @@ public class ReportDataServiceTest {
         assertEquals("name", listingDataResult.getDocumentName());
         assertEquals(NO_CHANGE_IN_CURRENT_POSITION_REPORT, listingDataResult.getReportType());
         assertEquals("2021-12-12", listingDataResult.getReportDate());
+    }
+
+    @Test
+    public void generateRespondentsReportData() throws IOException {
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        listingDetails.getCaseData().setReportType(RESPONDENTS_REPORT);
+        listingDetails.getCaseData().setDocumentName("name");
+        listingDetails.getCaseData().setHearingDateType("Ranged");
+        listingDetails.getCaseData().setListingDate("2022-01-13");
+        listingDetails.getCaseData().setListingDateFrom("2022-01-31");
+        listingDetails.getCaseData().setListingDateTo("2022-02-08");
+        var submitEvent = new RespondentsReportSubmitEvent();
+        submitEvent.setCaseData(new RespondentsReportCaseData());
+        when(ccdClient.respondentsReportSearch(anyString(), anyString(), anyString())).thenReturn(List.of(submitEvent));
+        var listingDataResult = (RespondentsReportData) reportDataService.generateReportData(listingDetails, "authToken");
+        assertEquals("name", listingDataResult.getDocumentName());
+        assertEquals(RESPONDENTS_REPORT, listingDataResult.getReportType());
+        assertEquals("Ranged", listingDataResult.getHearingDateType());
+        assertEquals("2022-01-13", listingDataResult.getListingDate());
+        assertEquals("2022-01-31", listingDataResult.getListingDateFrom());
+        assertEquals("2022-02-08", listingDataResult.getListingDateTo());
     }
 }

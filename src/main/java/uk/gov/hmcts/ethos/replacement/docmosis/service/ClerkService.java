@@ -2,11 +2,16 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
+import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.CourtWorkerService;
+
+import java.util.List;
 
 @Service
 public class ClerkService {
@@ -32,5 +37,22 @@ public class ClerkService {
         var selectedClerk = multipleData.getClerkResponsible();
 
         multipleData.setClerkResponsible(DynamicFixedListType.from(listItems, selectedClerk));
+    }
+
+    public void initialiseClerkResponsible(String caseTypeId, ListingData listingData) {
+        List<DynamicValueType> listItems;
+        if (Constants.SCOTLAND_LISTING_CASE_TYPE_ID.equals(caseTypeId)) {
+            listItems = getScotlandClerks();
+        } else {
+            var tribunalOffice = TribunalOffice.valueOfOfficeName(listingData.getManagingOffice());
+            listItems = courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice, CourtWorkerType.CLERK);
+        }
+
+        listingData.setClerkResponsible(DynamicFixedListType.from(listItems));
+    }
+
+    private List<DynamicValueType> getScotlandClerks() {
+        return courtWorkerService.getCourtWorkerByTribunalOffices(TribunalOffice.SCOTLAND_OFFICES,
+                CourtWorkerType.CLERK);
     }
 }

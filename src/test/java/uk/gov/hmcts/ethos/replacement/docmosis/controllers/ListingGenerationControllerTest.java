@@ -20,6 +20,7 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ecm.common.model.listing.ListingRequest;
@@ -31,7 +32,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.Rep
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportSummary;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays.MemberDaysReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.GenerateReportService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ListingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PrintHearingListService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -50,6 +53,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -57,12 +61,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_AWAITING_JUDGMENT_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AWAITING_JUDGMENT_REPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @RunWith(SpringRunner.class)
@@ -80,12 +84,16 @@ public class ListingGenerationControllerTest {
     private static final String GENERATE_LISTINGS_DOC_SINGLE_CASES_CONFIRMATION_URL = "/generateListingsDocSingleCasesConfirmation";
     private static final String GENERATE_REPORT_URL = "/generateReport";
     private static final String INIT_PRINT_HEARING_LISTS_URL = "/initPrintHearingLists";
+    private static final String INIT_GENERATE_REPORT_URL = "/initGenerateReport";
 
     @Autowired
     private WebApplicationContext applicationContext;
 
     @MockBean
     private ListingService listingService;
+
+    @MockBean
+    private ReportDataService reportDataService;
 
     @MockBean
     private DefaultValuesReaderService defaultValuesReaderService;
@@ -95,6 +103,9 @@ public class ListingGenerationControllerTest {
 
     @MockBean
     private PrintHearingListService printHearingListService;
+
+    @MockBean
+    private GenerateReportService generateReportService;
 
     private MockMvc mvc;
     private JsonNode requestContent;
@@ -370,7 +381,7 @@ public class ListingGenerationControllerTest {
     @Test
     public void generateReportOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(listingService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
+        when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(listingRequest.getCaseDetails().getCaseData());
         when(listingService.processHearingDocument(isA(ListingData.class),
                 isA(String.class), eq(AUTH_TOKEN)))
@@ -387,12 +398,12 @@ public class ListingGenerationControllerTest {
 
     @Test
     public void generateHearingsToJudgmentsReportOk() throws Exception {
-        var reportSummary = new HearingsToJudgmentsReportSummary(ENGLANDWALES_CASE_TYPE_ID);
+        var reportSummary = new HearingsToJudgmentsReportSummary(TribunalOffice.LEEDS.getOfficeName());
         var reportData = new HearingsToJudgmentsReportData(reportSummary);
         reportData.setReportType(HEARINGS_TO_JUDGEMENTS_REPORT);
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(listingService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
+        when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(reportData);
         when(listingService.processHearingDocument(isA(ListingData.class),
                 isA(String.class), eq(AUTH_TOKEN)))
@@ -414,7 +425,7 @@ public class ListingGenerationControllerTest {
         reportData.setReportType(CASES_AWAITING_JUDGMENT_REPORT);
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(listingService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
+        when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(reportData);
         when(listingService.processHearingDocument(isA(ListingData.class),
                 isA(String.class), eq(AUTH_TOKEN)))
@@ -436,7 +447,7 @@ public class ListingGenerationControllerTest {
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN))
             .thenReturn(true);
-        when(listingService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
+        when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
             .thenReturn(reportData);
         when(listingService.processHearingDocument(isA(ListingData.class),
             isA(String.class), eq(AUTH_TOKEN)))
@@ -453,6 +464,21 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
+    public void initGenerateReportOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mvc.perform(post(INIT_GENERATE_REPORT_URL)
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestContent.toString()))
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+
+        verify(generateReportService, times(1)).initGenerateReport(any(ListingDetails.class));
+    }
+
+    @Test
     public void generateReportError400() throws Exception {
         mvc.perform(post(GENERATE_REPORT_URL)
                 .content("error")
@@ -463,7 +489,7 @@ public class ListingGenerationControllerTest {
 
     @Test
     public void generateReportError500() throws Exception {
-        when(listingService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
+        when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_REPORT_URL)
@@ -529,6 +555,17 @@ public class ListingGenerationControllerTest {
     }
 
     @Test
+    public void initGenerateReportError400() throws Exception {
+        mvc.perform(post(INIT_GENERATE_REPORT_URL)
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("error"))
+                .andExpect(status().isBadRequest());
+
+        verify(generateReportService, never()).initGenerateReport(any(ListingDetails.class));
+    }
+
+    @Test
     public void listingCaseCreationError500() throws Exception {
         when(listingService.listingCaseCreation(isA(ListingDetails.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
@@ -590,6 +627,21 @@ public class ListingGenerationControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void initGenerateReportError500() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        doThrow(new InternalException(ERROR_MESSAGE)).when(generateReportService).initGenerateReport(
+                isA(ListingDetails.class));
+
+        mvc.perform(post(INIT_GENERATE_REPORT_URL)
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestContent.toString()))
+                .andExpect(status().isInternalServerError());
+
+        verify(generateReportService, times(1)).initGenerateReport(any(ListingDetails.class));
     }
 
     @Test
@@ -702,5 +754,16 @@ public class ListingGenerationControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(printHearingListService, never()).initPrintHearingLists(any(CaseData.class));
+    }
+
+    @Test
+    public void initGenerateReportForbidden() throws Exception {
+        mvc.perform(post(INIT_GENERATE_REPORT_URL)
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestContent.toString()))
+                .andExpect(status().isForbidden());
+
+        verify(generateReportService, never()).initGenerateReport(any(ListingDetails.class));
     }
 }

@@ -2,12 +2,14 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem;
-import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsCaseData;
-import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsSubmitEvent;
+import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.JudgementType;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -49,20 +51,23 @@ public class HearingsToJudgmentsReport {
         String judge;
     }
 
-    private final HearingsToJudgmentsReportDataSource hearingsToJudgmentsReportDataSource;
+    private final HearingsToJudgmentsDataSource hearingsToJudgmentsReportDataSource;
     private final String listingDateFrom;
     private final String listingDateTo;
 
-    public HearingsToJudgmentsReport(HearingsToJudgmentsReportDataSource hearingsToJudgmentsReportDataSource,
+    public HearingsToJudgmentsReport(HearingsToJudgmentsDataSource hearingsToJudgmentsReportDataSource,
                                      String listingDateFrom, String listingDateTo) {
         this.hearingsToJudgmentsReportDataSource = hearingsToJudgmentsReportDataSource;
         this.listingDateFrom = listingDateFrom;
         this.listingDateTo = listingDateTo;
     }
 
-    public HearingsToJudgmentsReportData runReport(String caseTypeId) {
-        var submitEvents = getCases(caseTypeId);
-        var reportData = initReport(caseTypeId);
+    public HearingsToJudgmentsReportData runReport(String caseTypeId, String managingOffice) {
+        var submitEvents = getCases(caseTypeId, managingOffice);
+        var office = StringUtils.isNotBlank(managingOffice) && TribunalOffice.isEnglandWalesOffice(managingOffice)
+                        ? managingOffice
+                        : TribunalOffice.SCOTLAND.getOfficeName();
+        var reportData = initReport(office);
 
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             populateData(reportData, submitEvents, caseTypeId);
@@ -71,14 +76,14 @@ public class HearingsToJudgmentsReport {
         return reportData;
     }
 
-    private HearingsToJudgmentsReportData initReport(String caseTypeId) {
-        var reportSummary = new HearingsToJudgmentsReportSummary(UtilHelper.getListingCaseTypeId(caseTypeId));
+    private HearingsToJudgmentsReportData initReport(String office) {
+        var reportSummary = new HearingsToJudgmentsReportSummary(office);
         return new HearingsToJudgmentsReportData(reportSummary);
     }
 
-    private List<HearingsToJudgmentsSubmitEvent> getCases(String caseTypeId) {
+    private List<HearingsToJudgmentsSubmitEvent> getCases(String caseTypeId, String managingOffice) {
         return hearingsToJudgmentsReportDataSource.getData(UtilHelper.getListingCaseTypeId(caseTypeId),
-                listingDateFrom, listingDateTo);
+                managingOffice, listingDateFrom, listingDateTo);
     }
 
     private void populateData(HearingsToJudgmentsReportData reportData,
@@ -154,7 +159,8 @@ public class HearingsToJudgmentsReport {
             var dateListedType = dateListedTypeItem.getValue();
             var hearingListedDate = LocalDate.parse(dateListedType.getListedDate(), OLD_DATE_TIME_PATTERN);
             var judgements = judgmentsCollection.stream()
-                                .filter(j -> judgmentHearingDateMatchHearingListedDate(j, hearingListedDate))
+                                .filter(j -> judgmentHearingDateMatchHearingListedDate(j.getValue(), hearingListedDate)
+                                        && judgmentHearingMatchHearingNumber(j.getValue(), hearingType))
                                 .collect(Collectors.toList());
 
             if (judgements.isEmpty()
@@ -186,11 +192,19 @@ public class HearingsToJudgmentsReport {
         return hearingJudgmentsList;
     }
 
-    private boolean judgmentHearingDateMatchHearingListedDate(JudgementTypeItem judgment, LocalDate hearingListedDate) {
-        return judgment.getValue() != null
-                && judgment.getValue().getJudgmentHearingDate() != null
+    private boolean judgmentHearingMatchHearingNumber(JudgementType judgment, HearingType hearing) {
+        return judgment != null && hearing != null
+                && judgment.getDynamicJudgementHearing() != null
+                && judgment.getDynamicJudgementHearing().getValue() != null
+                && judgment.getDynamicJudgementHearing().getValue().getLabel() != null
+                && judgment.getDynamicJudgementHearing().getValue().getLabel().split(" : ")[0]
+                    .equals(hearing.getHearingNumber());
+    }
+
+    private boolean judgmentHearingDateMatchHearingListedDate(JudgementType judgment, LocalDate hearingListedDate) {
+        return judgment != null && judgment.getJudgmentHearingDate() != null
                 && hearingListedDate.isEqual(
-                        LocalDate.parse(judgment.getValue().getJudgmentHearingDate(), OLD_DATE_TIME_PATTERN2));
+                        LocalDate.parse(judgment.getJudgmentHearingDate(), OLD_DATE_TIME_PATTERN2));
     }
 
     private boolean isValidCase(HearingsToJudgmentsSubmitEvent submitEvent) {

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -35,6 +36,8 @@ import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
+import uk.gov.hmcts.ecm.common.model.listing.items.AdhocReportTypeItem;
+import uk.gov.hmcts.ecm.common.model.listing.types.AdhocReportType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays.MemberDaysReport;
@@ -49,9 +52,11 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
@@ -76,7 +81,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PRIVAT
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIVE_CASELOAD_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_CLOSED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
@@ -980,6 +984,36 @@ public class ListingServiceTest {
         assertEquals(result, listingDataResult.toString());
     }
 
+    @Test
+    public void checkExistingDataInReport() throws IOException {
+        var adhocReportType = new AdhocReportType();
+        adhocReportType.setSinglesTotal("6");
+        adhocReportType.setMultiplesTotal("10");
+        listingDetails.getCaseData().setLocalReportsSummaryHdr(adhocReportType);
+        var adhocReportType2 = new AdhocReportType();
+        adhocReportType2.setCaseReference("1800001/2021");
+        adhocReportType2.setDateOfAcceptance("2021-01-01");
+        var adhocReportTypeItem = new AdhocReportTypeItem();
+        adhocReportTypeItem.setValue(adhocReportType2);
+        List<AdhocReportTypeItem> localReportsSummary = List.of(adhocReportTypeItem);
+        listingDetails.getCaseData().setLocalReportsSummary(localReportsSummary);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        listingDetails.getCaseData().setReportType(CLAIMS_ACCEPTED_REPORT);
+        submitEvents.remove(0);
+
+        when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(),
+                anyString(), anyString())).thenReturn(submitEvents);
+        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken");
+
+        assertTrue(CollectionUtils.isEmpty(listingDataResult.getLocalReportsDetail()));
+        assertTrue(CollectionUtils.isEmpty(listingDataResult.getLocalReportsSummary2()));
+        assertTrue(CollectionUtils.isEmpty(listingDataResult.getLocalReportsSummary()));
+        assertNull(listingDataResult.getLocalReportsDetailHdr());
+        assertNull(listingDataResult.getLocalReportsSummaryHdr());
+        assertNull(listingDataResult.getLocalReportsSummaryHdr2());
+
+    }
+
     @Ignore("Fix as part of reporting work")
     @Test
     public void generateLiveCaseloadReportDataForEnglandWithValidPositionType() throws IOException {
@@ -1102,7 +1136,7 @@ public class ListingServiceTest {
                 "et1OnlineTotalCases=null, eccTotalCases=null, migratedTotalCases=null, " +
                 "manuallyCreatedTotalCasesPercent=null, et1OnlineTotalCasesPercent=null, " +
                 "eccTotalCasesPercent=null, migratedTotalCasesPercent=null"
-                +"))])";
+                +"))]), managingOffice=Leeds";
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(LIVE_CASELOAD_REPORT);
         listingDetails.getCaseData().setManagingOffice("Leeds");
@@ -1295,8 +1329,7 @@ public class ListingServiceTest {
         doReturn(localSubmitEvents).when(ccdClient).retrieveCasesGenericReportElasticSearch(anyString(), anyString(),
             any(TribunalOffice.class), anyString(), anyString(), anyString());
 
-        doReturn(memberDaysReportData).when(memberDaysReport).runReport(any(ListingDetails.class),
-            Mockito.<SubmitEvent>anyList());
+        doReturn(memberDaysReportData).when(memberDaysReport).runReport(any(ListingDetails.class), anyList());
 
         var listingDataResult = (MemberDaysReportData) listingService.getDateRangeReport(listingDetailsRange,
             "authToken");

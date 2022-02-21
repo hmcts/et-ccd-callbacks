@@ -10,14 +10,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.MultipleRefScot
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_DEV_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_OFFICE_NUMBER;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_USERS_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_DEV_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_OFFICE_NUMBER;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_USERS_BULK_CASE_TYPE_ID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,13 +25,9 @@ public class MultipleReferenceService {
 
     public synchronized String createReference(String caseTypeId, int numberCases) {
         switch (caseTypeId) {
-            case ENGLANDWALES_DEV_BULK_CASE_TYPE_ID:
-            case ENGLANDWALES_USERS_BULK_CASE_TYPE_ID:
             case ENGLANDWALES_BULK_CASE_TYPE_ID:
                 return generateOfficeReference(multipleRefEnglandWalesRepository, numberCases,
                         ENGLANDWALES_OFFICE_NUMBER, ENGLANDWALES_CASE_TYPE_ID);
-            case SCOTLAND_DEV_BULK_CASE_TYPE_ID:
-            case SCOTLAND_USERS_BULK_CASE_TYPE_ID:
             case SCOTLAND_BULK_CASE_TYPE_ID:
                 return generateOfficeReference(multipleRefScotlandRepository, numberCases,
                         SCOTLAND_OFFICE_NUMBER, SCOTLAND_CASE_TYPE_ID);

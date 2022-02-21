@@ -30,6 +30,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
@@ -54,6 +55,8 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -88,6 +91,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String RESTRICTED_CASES_URL = "/restrictedCases";
     private static final String AMEND_HEARING_URL = "/amendHearing";
     private static final String AMEND_CASE_STATE_URL = "/amendCaseState";
+    private static final String AMEND_FIX_CASE_API_URL = "/amendFixCaseAPI";
     private static final String MID_RESPONDENT_ADDRESS_URL = "/midRespondentAddress";
     private static final String JURISDICTION_VALIDATION_URL = "/jurisdictionValidation";
     private static final String JUDGEMENT_VALIDATION_URL = "/judgmentValidation";
@@ -107,7 +111,6 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String DYNAMIC_DEPOSIT_ORDER_URL = "/dynamicDepositOrder";
     private static final String DYNAMIC_JUDGMENT_URL = "/dynamicJudgments";
     private static final String JUDGEMENT_SUBMITTED_URL = "/judgementSubmitted";
-
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -159,6 +162,9 @@ public class CaseActionsForCaseWorkerControllerTest {
 
     @MockBean
     private ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
+
+    @MockBean
+    private FixCaseApiService fixCaseApiService;
 
     private MockMvc mvc;
     private JsonNode requestContent;
@@ -1046,6 +1052,16 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
+    public void dynamicFixCaseAPIError400() throws Exception {
+        mvc.perform(post(AMEND_FIX_CASE_API_URL)
+                .content("error")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        verify(fixCaseApiService, never()).checkUpdateMultipleReference(any(CaseDetails.class), anyString());
+    }
+
+    @Test
     public void createCaseError500() throws Exception {
         when(caseCreationForCaseWorkerService.caseCreationRequest(isA(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
@@ -1520,6 +1536,18 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void dynamicFixCaseAPIForbidden() throws Exception {
+        CaseDetails caseDetails = new CaseDetails();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(AMEND_FIX_CASE_API_URL)
+                .content(requestContent2.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+        verify(fixCaseApiService, never()).checkUpdateMultipleReference(caseDetails, AUTH_TOKEN);
     }
 
     @Test

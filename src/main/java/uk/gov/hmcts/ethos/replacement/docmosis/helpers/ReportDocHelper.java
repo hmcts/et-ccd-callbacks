@@ -16,6 +16,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.Cas
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays.MemberDaysReportDoc;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReportData;
 
 import java.time.LocalDate;
 import java.util.Iterator;
@@ -40,6 +41,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AW
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_OFFICE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_CASES;
 
 @Slf4j
@@ -115,6 +117,14 @@ public class ReportDocHelper {
             case HEARINGS_TO_JUDGEMENTS_REPORT:
                 sb.append(ListingHelper.getListingDate(listingData));
                 sb.append(getHearingsToJudgmentsReport(listingData));
+                break;
+            case RESPONDENTS_REPORT:
+                try {
+                    sb.append(ListingHelper.getListingDate(listingData));
+                    sb.append(getRespondentsReport(listingData));
+                } catch (JsonProcessingException e) {
+                    throw new ReportException(CANNOT_CREATE_REPORT_DATA_EXCEPTION, e);
+                }
                 break;
             case NO_CHANGE_IN_CURRENT_POSITION_REPORT:
                 sb.append(getNoPositionChangeReport(listingData));
@@ -622,6 +632,21 @@ public class ReportDocHelper {
         }
 
         return reportSummaryContent;
+    }
+
+    private static StringBuilder getRespondentsReport(ListingData listingData)
+            throws JsonProcessingException {
+        if (!(listingData instanceof RespondentsReportData)) {
+            throw new IllegalStateException((LISTING_DATA_STATE_EXCEPTION + "RespondentsReportData"));
+        }
+        var reportData = (RespondentsReportData) listingData;
+
+        var sb = new StringBuilder();
+        sb.append(REPORT_OFFICE).append(reportData.getReportSummary().getOffice()).append(NEW_LINE);
+        sb.append("\"MoreThan1Resp\":\"").append(
+                nullCheck(reportData.getReportSummary().getTotalCasesWithMoreThanOneRespondent())).append(NEW_LINE);
+        addJsonCollection("reportDetails", reportData.getReportDetails().iterator(), sb);
+        return sb;
     }
 
     private static StringBuilder getHearingsByHearingTypeReport(ListingData listingData) {

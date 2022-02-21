@@ -21,9 +21,9 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_DEV_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_DEV_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
@@ -51,7 +51,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
         englandWalesCaseDetails.setCaseData(new CaseData());
         englandWalesCaseDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         englandWalesCaseDetails.setCaseId("123456");
-        englandWalesCaseDetails.setCaseTypeId(ENGLANDWALES_DEV_CASE_TYPE_ID);
+        englandWalesCaseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         englandWalesCaseDetails.setJurisdiction("TRIBUNALS");
         englandWalesCcdRequest.setCaseDetails(englandWalesCaseDetails);
 
@@ -60,7 +60,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
         scotlandCaseDetails.setCaseData(new CaseData());
         scotlandCaseDetails.getCaseData().setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
         scotlandCaseDetails.setCaseId("123456");
-        scotlandCaseDetails.setCaseTypeId(SCOTLAND_DEV_CASE_TYPE_ID);
+        scotlandCaseDetails.setCaseTypeId(SCOTLAND_CASE_TYPE_ID);
         scotlandCaseDetails.setJurisdiction("TRIBUNALS");
         scotlandCcdRequest.setCaseDetails(scotlandCaseDetails);
 

@@ -16,6 +16,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.Heari
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeCcdDataSource;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReport;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReportCcdDataSource;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReportParams;
 
 import java.time.LocalDate;
 
@@ -25,6 +29,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AWAITING_JUDGMENT_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -48,6 +53,8 @@ public class ReportDataService {
                     return getHearingsToJudgmentsReport(listingDetails, authToken);
                 case NO_CHANGE_IN_CURRENT_POSITION_REPORT:
                     return getNoPositionChangeReport(listingDetails, authToken);
+                case RESPONDENTS_REPORT:
+                    return getRespondentsReport(listingDetails, authToken);
                 default:
                     return listingService.getDateRangeReport(listingDetails, authToken);
             }
@@ -87,6 +94,20 @@ public class ReportDataService {
                 listingDetails.getCaseData().getReportDate());
         var reportData = hearingsToJudgmentsReport.runReport(listingDetails.getCaseTypeId());
         setSharedReportDocumentFields(reportData, listingDetails, false);
+        return reportData;
+    }
+
+    private RespondentsReportData getRespondentsReport(ListingDetails listingDetails, String authToken) {
+        log.info("Respondents Report for {}", listingDetails.getCaseTypeId());
+        var reportDataSource = new RespondentsReportCcdDataSource(authToken, ccdClient);
+        setListingDateRangeForSearch(listingDetails);
+        var listingData = listingDetails.getCaseData();
+
+        var params = new RespondentsReportParams(listingDetails.getCaseTypeId(), listingData.getManagingOffice(),
+                listingDateFrom, listingDateTo);
+        var respondentsReport = new RespondentsReport(reportDataSource);
+        var reportData = respondentsReport.generateReport(params);
+        setSharedReportDocumentFields(reportData, listingDetails, true);
         return reportData;
     }
 

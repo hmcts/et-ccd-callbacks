@@ -22,6 +22,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionServ
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferOfficeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.FixMultipleCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleAmendService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCloseEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationMidEventValidationService;
@@ -76,6 +77,7 @@ public class ExcelActionsController {
     private final FileLocationSelectionService fileLocationSelectionService;
     private final ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
     private final ClerkService clerkService;
+    private final FixMultipleCaseApiService fixMultipleCaseApiService;
 
     @PostMapping(value = "/createMultiple", consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Creates a multiple case. Retrieves cases by ethos case reference. Creates an Excel")
@@ -126,6 +128,31 @@ public class ExcelActionsController {
 
         multipleAmendService.bulkAmendMultipleLogic(userToken, multipleDetails, errors);
 
+        return getMultipleCallbackRespEntity(errors, multipleDetails);
+    }
+
+    @PostMapping(value = "/fixMultipleCaseApi", consumes = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Fix case event for multiples")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Accessed successfully",
+                response = MultipleCallbackResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error")
+    })
+    public ResponseEntity<MultipleCallbackResponse> fixMultipleCaseApi(
+            @RequestBody MultipleRequest multipleRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        log.info("AMEND MULTIPLE ---> " + LOG_MESSAGE + multipleRequest.getCaseDetails().getCaseId());
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        List<String> errors = new ArrayList<>();
+        var multipleDetails = multipleRequest.getCaseDetails();
+        multipleAmendService.bulkAmendMultipleLogic(userToken, multipleDetails, errors);
+        fixMultipleCaseApiService.fixMultipleCase(userToken, multipleDetails, errors);
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 

@@ -16,7 +16,7 @@ public class JudgeSelectionService {
     }
 
     public DynamicFixedListType createJudgeSelection(TribunalOffice tribunalOffice, HearingType selectedHearing) {
-        var listItems = judgeService.getJudges(tribunalOffice);
+        var listItems = judgeService.getJudgesDynamicList(tribunalOffice);
         var selectedJudge = selectedHearing.getJudge();
         return DynamicFixedListType.from(listItems, selectedJudge);
     }

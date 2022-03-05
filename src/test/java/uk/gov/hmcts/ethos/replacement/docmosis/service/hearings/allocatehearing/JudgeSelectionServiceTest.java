@@ -42,7 +42,7 @@ public class JudgeSelectionServiceTest {
         var dynamicValues = SelectionServiceTestUtils.createListItems("judge", "Judge ");
 
         var judgeService = mock(JudgeService.class);
-        when(judgeService.getJudges(tribunalOffice)).thenReturn(dynamicValues);
+        when(judgeService.getJudgesDynamicList(tribunalOffice)).thenReturn(dynamicValues);
         return judgeService;
     }
 

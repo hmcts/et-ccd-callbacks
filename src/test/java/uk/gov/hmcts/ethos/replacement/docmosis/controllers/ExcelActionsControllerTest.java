@@ -23,6 +23,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionServ
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.FixMultipleCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleAmendService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCloseEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationMidEventValidationService;
@@ -90,7 +91,7 @@ public class ExcelActionsControllerTest {
     private static final String LISTINGS_DATE_RANGE_MID_EVENT_VALIDATION_URL = "/listingsDateRangeMidEventValidation";
     private static final String INITIALISE_BATCH_UPDATE_URL = "/initialiseBatchUpdate";
     private static final String INITIALISE_CLOSE_MULTIPLE_URL = "/initialiseCloseMultiple";
-
+    private static final String FIX_MULTIPLE_CASE_API_URL = "/fixMultipleCaseApi";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -150,6 +151,9 @@ public class ExcelActionsControllerTest {
     private MultipleCloseEventValidationService multipleCloseEventValidationService;
 
     @MockBean
+    private FixMultipleCaseApiService fixMultipleCaseApiService;
+
+    @MockBean
     private ClerkService clerkService;
 
     private MockMvc mvc;
@@ -191,6 +195,19 @@ public class ExcelActionsControllerTest {
     public void amendMultiple() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_MULTIPLE_URL)
+                .content(requestContent.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(0)))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    public void fixMultipleCaseApi() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(FIX_MULTIPLE_CASE_API_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -478,6 +495,15 @@ public class ExcelActionsControllerTest {
     @Test
     public void amendMultipleError400() throws Exception {
         mvc.perform(post(AMEND_MULTIPLE_URL)
+                .content("error")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void fixMultipleCaseApi400() throws Exception {
+        mvc.perform(post(FIX_MULTIPLE_CASE_API_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -947,6 +973,16 @@ public class ExcelActionsControllerTest {
     public void closeMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CLOSE_MULTIPLE_URL)
+                .content(requestContent.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void fixMultipleCaseForbidden() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(FIX_MULTIPLE_CASE_API_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))

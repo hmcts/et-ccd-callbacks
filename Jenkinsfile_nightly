@@ -18,10 +18,10 @@ def product = "et"
 def component = "cos"
 
 def secrets = [
-        "ethos-${params.ENVIRONMENT}": [
+        "et-cos-${params.ENVIRONMENT}": [
                 secret('ccd-user-email', 'CCD_CASEWORKER_E2E_EMAIL'),
                 secret('ccd-user-password', 'CCD_CASEWORKER_E2E_PASSWORD'),
-                secret('ethos-repl-service-s2s-secret', 'SERVICE_SECRET'),
+                secret('et-cos-s2s-secret', 'SERVICE_SECRET'),
                 secret('idam-client-secret', 'IDAM_CLIENT_SECRET')
         ]
 ]
@@ -43,7 +43,7 @@ withNightlyPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     enableFullFunctionalTest()
     enableCrossBrowserTest()
-    enableFortifyScan()
+    //enableFortifyScan()
 
     after('fullFunctionalTest') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'

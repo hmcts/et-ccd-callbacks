@@ -20,12 +20,18 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.Respond
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReportCcdDataSource;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReportParams;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays.SessionDaysCcdReportDataSource;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays.SessionDaysReport;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays.SessionDaysReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays.SessionDaysReportParams;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.JudgeService;
 
 import java.time.LocalDate;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SESSION_DAYS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AWAITING_JUDGMENT_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
@@ -37,6 +43,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDE
 public class ReportDataService {
     private final CcdClient ccdClient;
     private final ListingService listingService;
+    private final JudgeService judgeService;
 
     private String listingDateFrom;
     private String listingDateTo;
@@ -55,6 +62,8 @@ public class ReportDataService {
                     return getNoPositionChangeReport(listingDetails, authToken);
                 case RESPONDENTS_REPORT:
                     return getRespondentsReport(listingDetails, authToken);
+                case SESSION_DAYS_REPORT:
+                    return getSessionDaysReport(listingDetails, authToken);
                 default:
                     return listingService.getDateRangeReport(listingDetails, authToken);
             }
@@ -98,7 +107,7 @@ public class ReportDataService {
     }
 
     private RespondentsReportData getRespondentsReport(ListingDetails listingDetails, String authToken) {
-        log.info("Respondents Report for {}", listingDetails.getCaseTypeId());
+        log.info("Respondents Report for {}", listingDetails.getCaseData().getManagingOffice());
         var reportDataSource = new RespondentsReportCcdDataSource(authToken, ccdClient);
         setListingDateRangeForSearch(listingDetails);
         var listingData = listingDetails.getCaseData();
@@ -108,6 +117,25 @@ public class ReportDataService {
         var respondentsReport = new RespondentsReport(reportDataSource);
         var reportData = respondentsReport.generateReport(params);
         setSharedReportDocumentFields(reportData, listingDetails, true);
+        return reportData;
+    }
+
+    private SessionDaysReportData getSessionDaysReport(ListingDetails listingDetails, String authToken) {
+        log.info("Session Days Report for {}", listingDetails.getCaseData().getManagingOffice());
+        var reportDataSource = new SessionDaysCcdReportDataSource(authToken, ccdClient);
+        setListingDateRangeForSearch(listingDetails);
+
+        var sessionDaysReport = new SessionDaysReport(reportDataSource, judgeService);
+        var listingData = listingDetails.getCaseData();
+        var params = new SessionDaysReportParams(listingDetails.getCaseTypeId(), listingData.getManagingOffice(),
+                listingDateFrom, listingDateTo);
+        var reportData = sessionDaysReport.generateReport(params);
+        reportData.setDocumentName(listingData.getDocumentName());
+        reportData.setReportType(listingData.getReportType());
+        reportData.setHearingDateType(listingData.getHearingDateType());
+        reportData.setListingDateFrom(listingData.getListingDateFrom());
+        reportData.setListingDateTo(listingData.getListingDateTo());
+        reportData.setListingDate(listingData.getListingDate());
         return reportData;
     }
 

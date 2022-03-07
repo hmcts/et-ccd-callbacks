@@ -11,4 +11,3 @@ import java.util.List;
 public interface JudgeRepository extends JpaRepository<Judge, Integer> {
     List<Judge> findByTribunalOffice(TribunalOffice tribunalOffice);
 }
-

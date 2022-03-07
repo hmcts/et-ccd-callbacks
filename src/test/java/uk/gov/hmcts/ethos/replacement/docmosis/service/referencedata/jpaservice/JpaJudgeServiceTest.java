@@ -24,7 +24,7 @@ public class JpaJudgeServiceTest {
         when(judgeRepository.findByTribunalOffice(tribunalOffice)).thenReturn(judges);
 
         var judgeService = new JpaJudgeService(judgeRepository);
-        var values = judgeService.getJudges(tribunalOffice);
+        var values = judgeService.getJudgesDynamicList(tribunalOffice);
 
         assertEquals(3, values.size());
         verifyValue(values.get(0), "judge1", "Judge 1");

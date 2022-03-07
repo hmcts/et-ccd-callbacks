@@ -16,7 +16,7 @@ plugins {
     id 'org.sonarqube' version '3.3'
     id 'au.com.dius.pact' version '4.3.5'
     id 'io.freefair.lombok' version '6.4.0'
-    id 'org.flywaydb.flyway' version '8.5.1'
+    id 'org.flywaydb.flyway' version '8.5.2'
 }
 
 group = 'uk.gov.hmcts.et'
@@ -282,7 +282,7 @@ dependencies {
     implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.8'
     implementation group: 'io.github.openfeign', name: 'feign-core', version: '11.8'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
-    implementation group: 'com.github.hmcts', name: 'document-management-client', version: '6.0.0'
+    implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLoggingVersion
     implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: reformLoggingVersion
     implementation group: 'com.github.hmcts', name: 'properties-volume-spring-boot-starter', version: '0.1.0'

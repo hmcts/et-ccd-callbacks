@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -57,11 +57,11 @@ public class ListingGenerationController {
     private final GenerateReportService generateReportService;
 
     @PostMapping(value = "/listingCaseCreation", consumes = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "handles logic related to the creation of listing cases.")
+    @Operation(summary = "handles logic related to the creation of listing cases.")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<ListingCallbackResponse> listingCaseCreation(
             @RequestBody ListingRequest listingRequest,
@@ -81,11 +81,11 @@ public class ListingGenerationController {
     }
 
     @PostMapping(value = "/listingSingleCases", consumes = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "search hearings by venue and date in a specific case.")
+    @Operation(summary = "search hearings by venue and date in a specific case.")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> listingSingleCases(
             @RequestBody CCDRequest ccdRequest,
@@ -111,12 +111,11 @@ public class ListingGenerationController {
     }
 
     @PostMapping(value = "/listingHearings", consumes = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "search hearings by venue and date.")
+    @Operation(summary = "search hearings by venue and date.")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Accessed successfully",
-                response = CCDCallbackResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<ListingCallbackResponse> listingHearings(
             @RequestBody ListingRequest listingRequest,
@@ -146,11 +145,11 @@ public class ListingGenerationController {
     }
 
     @PostMapping(value = "/generateListingsDocSingleCases", consumes = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "generate a listing document.")
+    @Operation(summary = "generate a listing document.")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> generateListingsDocSingleCases(
             @RequestBody CCDRequest ccdRequest,
@@ -183,11 +182,11 @@ public class ListingGenerationController {
     }
 
     @PostMapping(value = "/generateListingsDocSingleCasesConfirmation", consumes = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "generate a listing document confirmation.")
+    @Operation(summary = "generate a listing document confirmation.")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> generateListingsDocSingleCasesConfirmation(
             @RequestBody CCDRequest ccdRequest,
@@ -207,11 +206,11 @@ public class ListingGenerationController {
     }
 
     @PostMapping(value = "/initGenerateReport", consumes = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Initialise listing data for generating a report")
+    @Operation(summary = "Initialise listing data for generating a report")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<ListingCallbackResponse> initGenerateReport(
             @RequestBody ListingRequest listingRequest,
@@ -231,11 +230,11 @@ public class ListingGenerationController {
     }
 
     @PostMapping(value = "/generateReport", consumes = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "generate data for selected report.")
+    @Operation(summary = "generate data for selected report.")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<ListingCallbackResponse> generateReport(
             @RequestBody ListingRequest listingRequest,
@@ -308,11 +307,11 @@ public class ListingGenerationController {
     }
 
     @PostMapping(value = "/generateHearingDocument", consumes = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "generate a listing document.")
+    @Operation(summary = "generate a listing document.")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<ListingCallbackResponse> generateHearingDocument(
             @RequestBody ListingRequest listingRequest,
@@ -331,11 +330,11 @@ public class ListingGenerationController {
     }
 
     @PostMapping(value = "/generateHearingDocumentConfirmation", consumes = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "generate a listing document confirmation.")
+    @Operation(summary = "generate a listing document confirmation.")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<ListingCallbackResponse> generateHearingDocumentConfirmation(
             @RequestBody ListingRequest listingRequest,
@@ -356,11 +355,11 @@ public class ListingGenerationController {
     }
 
     @PostMapping(value = "/initPrintHearingLists", consumes = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Initialises case data for Print Hearing Lists event")
+    @Operation(summary = "Initialises case data for Print Hearing Lists event")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Accessed successfully", response = CCDCallbackResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request"),
-        @ApiResponse(code = 500, message = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initPrintHearingLists(
             @RequestBody CCDRequest ccdRequest,

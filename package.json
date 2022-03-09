@@ -1,6 +1,6 @@
 {
-  "name": "ecm-e2e-tests",
-  "description": "End to End CCD tests for ECM",
+  "name": "et-cos-e2e-tests",
+  "description": "End to End CCD tests for ET CCD Callbacks",
   "version": "1.0.0",
   "private": true,
   "engines": {

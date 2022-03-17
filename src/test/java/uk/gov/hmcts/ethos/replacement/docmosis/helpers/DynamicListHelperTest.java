@@ -7,8 +7,8 @@ import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.types.JudgementType;
-import uk.gov.hmcts.ecm.common.model.ccd.types.JudgmentReconsiderationType;
 import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepositOrder;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
@@ -249,5 +249,21 @@ public class DynamicListHelperTest {
         assertNotNull(caseData.getJudgementCollection());
         JudgementType judgementType = caseData.getJudgementCollection().get(0).getValue();
         assertEquals("No Hearings", judgementType.getDynamicJudgementHearing().getListItems().get(0).getCode());
+    }
+
+    @Test
+    public void dynamicJudgment_ifHearingDateIsInvalid() {
+        var casedata = caseDetails2.getCaseData();
+        var judgmentType = new JudgementType();
+        judgmentType.setJudgmentHearingDate("2022-02-02");
+        var judgmentTypeItem = new JudgementTypeItem();
+        judgmentTypeItem.setValue(judgmentType);
+        casedata.setJudgementCollection(List.of(judgmentTypeItem));
+
+        DynamicJudgements.dynamicJudgements(casedata);
+
+        assertNotNull(casedata.getJudgementCollection());
+        var judgementType = casedata.getJudgementCollection().get(0).getValue();
+        assertNull(judgementType.getJudgmentHearingDate());
     }
 }

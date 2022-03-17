@@ -13,6 +13,7 @@ import uk.gov.hmcts.ecm.common.model.multiples.types.MultipleObjectType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PersistentQHelperService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,8 @@ public class MultipleTransferService {
     private final ExcelReadingService excelReadingService;
     private final PersistentQHelperService persistentQHelperService;
     private final MultipleCasesReadingService multipleCasesReadingService;
+    private final SingleCasesReadingService singleCasesReadingService;
+    private final CaseTransferUtils caseTransferUtils;
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
@@ -56,11 +59,12 @@ public class MultipleTransferService {
 
         } else {
 
-            log.info("Send updates to single cases");
+            validateCaseBeforeTransfer(userToken, multipleDetails, errors, multipleObjects);
 
-            multipleDetails.getCaseData().setState(UPDATING_STATE);
-
-            sendUpdatesToSinglesCT(userToken, multipleDetails, errors, multipleObjects);
+            if (errors.isEmpty()) {
+                multipleDetails.getCaseData().setState(UPDATING_STATE);
+                sendUpdatesToSinglesCT(userToken, multipleDetails, errors, multipleObjects);
+            }
 
         }
 
@@ -70,12 +74,26 @@ public class MultipleTransferService {
 
     }
 
+    private void validateCaseBeforeTransfer(String userToken, MultipleDetails multipleDetails, List<String> errors,
+                                            SortedMap<String, Object> multipleObjects) {
+        List<String> ethosCaseRefCollection = new ArrayList<>(multipleObjects.keySet());
+        var submitEvents = singleCasesReadingService.retrieveSingleCases(userToken,
+                multipleDetails.getCaseTypeId(), ethosCaseRefCollection,
+                multipleDetails.getCaseData().getMultipleSource());
+        for (var submitEvent : submitEvents) {
+            var validationErrors = caseTransferUtils.validateCase(submitEvent.getCaseData());
+            if (!validationErrors.isEmpty()) {
+                errors.addAll(validationErrors);
+            }
+        }
+    }
+
     private void sendUpdatesToSinglesCT(String userToken, MultipleDetails multipleDetails,
                                         List<String> errors, SortedMap<String, Object> multipleObjects) {
 
         List<String> ethosCaseRefCollection = new ArrayList<>(multipleObjects.keySet());
         var multipleData = multipleDetails.getCaseData();
-        boolean interCountryCaseTransfer = interCountryCaseTransfer(multipleDetails.getCaseTypeId(),
+        boolean sameCountryCaseTransfer = isSameCountryCaseTransfer(multipleDetails.getCaseTypeId(),
                 multipleData.getOfficeMultipleCT().getValue().getCode());
         persistentQHelperService.sendCreationEventToSingles(
                 userToken,
@@ -92,19 +110,17 @@ public class MultipleTransferService {
                 MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl,
                         multipleDetails.getCaseId(),
                         multipleData.getMultipleReference()),
-                interCountryCaseTransfer,
+                sameCountryCaseTransfer,
                 null
         );
     }
 
-    public boolean interCountryCaseTransfer(String caseTypeId, String officeMultipleCT) {
-        List<String> scotOffices = List.of(TribunalOffice.ABERDEEN.getOfficeName(),
-                TribunalOffice.DUNDEE.getOfficeName(), TribunalOffice.EDINBURGH.getOfficeName(),
-                TribunalOffice.GLASGOW.getOfficeName(), TribunalOffice.SCOTLAND.getOfficeName());
-        boolean isScottishDestinationOffice = scotOffices.contains(officeMultipleCT);
+    public boolean isSameCountryCaseTransfer(String caseTypeId, String officeMultipleCT) {
+        var tribunalOffice = TribunalOffice.valueOfOfficeName(officeMultipleCT);
+        boolean isScottishDestinationOffice = TribunalOffice.SCOTLAND_OFFICES.contains(tribunalOffice);
 
-        return ((isScottishDestinationOffice && ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId))
-                || (!isScottishDestinationOffice && SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId)));
+        return ((isScottishDestinationOffice && SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId))
+                || (!isScottishDestinationOffice && ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId)));
     }
 
     public void populateDataIfComingFromCT(String userToken, MultipleDetails multipleDetails, List<String> errors) {

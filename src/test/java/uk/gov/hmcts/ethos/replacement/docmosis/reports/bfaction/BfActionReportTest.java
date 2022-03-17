@@ -47,7 +47,8 @@ public class BfActionReportTest {
         listingDetails.setCaseData(listingData);
         bfActionReport = new BfActionReport();
         submitEvent = new SubmitEvent();
-
+        submitEvent.setCaseId(2);
+        submitEvent.setState(ACCEPTED_STATE);
         caseData = new CaseData();
         caseData.setEthosCaseReference("1800522/2020");
         caseData.setReceiptDate("2018-08-10");
@@ -103,9 +104,6 @@ public class BfActionReportTest {
         items.add(bfActionTypeItem4);
 
         caseData.setBfActions(items);
-
-        submitEvent.setCaseId(2);
-        submitEvent.setState(ACCEPTED_STATE);
         submitEvent.setCaseData(caseData);
         submitEvents.add(submitEvent);
 
@@ -142,10 +140,7 @@ public class BfActionReportTest {
         bFActionType.setNotes("test comment one");
         bfActionTypeItem.setValue(bFActionType);
         items.add(bfActionTypeItem);
-
         caseData.setBfActions(items);
-        submitEvent.setCaseId(2);
-        submitEvent.setState(ACCEPTED_STATE);
         submitEvent.setCaseData(caseData);
         submitEvents.add(submitEvent);
 
@@ -168,10 +163,7 @@ public class BfActionReportTest {
         // Two bf action entries added and the second BFActionTypeItem has
         // the "YYYY-MM-DD HH:MM:SS" date and time pattern without milliseconds for the BfDate
         List<BFActionTypeItem> items = getBFActionTypeItems();
-
         caseData.setBfActions(items);
-        submitEvent.setCaseId(2);
-        submitEvent.setState(ACCEPTED_STATE);
         submitEvent.setCaseData(caseData);
         submitEvents.add(submitEvent);
 
@@ -196,10 +188,7 @@ public class BfActionReportTest {
         bFActionType4.setNotes("test case with cleared bfs");
         bfActionTypeItem4.setValue(bFActionType4);
         items.add(bfActionTypeItem4);
-
         caseData.setBfActions(items);
-        submitEvent.setCaseId(2);
-        submitEvent.setState(ACCEPTED_STATE);
         submitEvent.setCaseData(caseData);
         submitEvents.add(submitEvent);
 
@@ -226,13 +215,10 @@ public class BfActionReportTest {
         bfActionTypeItem6.setValue(bFActionType6);
         items.add(bfActionTypeItem6);
         caseData.setBfActions(items);
-        var bfActionReport = new BfActionReport();
-
-        submitEvent.setCaseId(2);
-        submitEvent.setState(ACCEPTED_STATE);
         submitEvent.setCaseData(caseData);
         submitEvents.add(submitEvent);
 
+        var bfActionReport = new BfActionReport();
         var resultListingData = bfActionReport.runReport(listingDetails, submitEvents);
         // bFActionType3 is added last. But it has the earliest bfDate. As the returned listingData from
         // bfActionReport.runReport method call should be ordered by bfDate, bFActionType3
@@ -244,6 +230,39 @@ public class BfActionReportTest {
         assertEquals(bFActionType3.getNotes(), firstBFDateTypeItem.getBroughtForwardDateReason());
         assertEquals(bFActionType3.getDateEntered(), firstBFDateTypeItem.getBroughtForwardEnteredDate());
         assertEquals(bFActionType3.getCleared(), firstBFDateTypeItem.getBroughtForwardDateCleared());
+    }
+
+    @Test
+    public void shouldReturnBfActionsWithFormattedComment() {
+        listingData.setListingDateFrom("2019-12-03");
+        listingData.setListingDateTo("2019-12-28");
+        listingData.setHearingDateType(RANGE_HEARING_DATE_TYPE);
+        listingDetails.setCaseData(listingData);
+
+        List<BFActionTypeItem> items = getBFActionTypeItems();
+
+        var bfActionTypeItemFour = new BFActionTypeItem();
+        bfActionTypeItemFour.setId("1488");
+        var bFActionTypeFour = new BFActionType();
+        bFActionTypeFour.setCwActions("Another order requested");
+        bFActionTypeFour.setBfDate("2019-12-07");
+        bFActionTypeFour.setDateEntered("2019-11-25");
+        bFActionTypeFour.setNotes("test non-cleared bf two\n Second line comment");
+        bfActionTypeItemFour.setValue(bFActionTypeFour);
+
+        items.add(bfActionTypeItemFour);
+        caseData.setBfActions(items);
+        submitEvent.setCaseData(caseData);
+        submitEvents.add(submitEvent);
+
+        var bfActionReport = new BfActionReport();
+        var resultListingData = bfActionReport.runReport(listingDetails, submitEvents);
+        //Because the Bf entries are sorted by bf date, bfActionTypeItemFour is the first entry in the
+        //result listing data
+        var firstBFDateTypeItem = resultListingData.getBfDateCollection().get(0).getValue();
+        var correctedComment = bfActionTypeItemFour.getValue().getNotes()
+            .replace("\n", ". ");
+        assertEquals(correctedComment, firstBFDateTypeItem.getBroughtForwardDateReason());
     }
 
     private List<BFActionTypeItem> getBFActionTypeItems() {

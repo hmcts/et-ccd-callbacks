@@ -16,10 +16,7 @@ import java.util.List;
 public class MemberDaysReportData extends ListingData {
 
     @JsonIgnore
-    public String office;
-
-    @JsonIgnore
-    public String durationDescription;
+    private String office;
 
     @JsonIgnore
     private String fullDaysTotal;

@@ -22,6 +22,7 @@ import uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.types.*;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
 import uk.gov.hmcts.ecm.common.model.multiples.CaseImporterFile;
@@ -348,7 +349,7 @@ public class MultipleUtil {
         multipleData.setState(OPEN_STATE);
         multipleData.setCaseCounter("2");
 
-        multipleData.setOfficeMultipleCT(generateDynamicList(ENGLANDWALES_CASE_TYPE_ID));
+        multipleData.setOfficeMultipleCT(generateDynamicList(TribunalOffice.MANCHESTER.getOfficeName()));
         multipleData.setPositionTypeCT("PositionTypeCT");
         multipleData.setReasonForCT("ReasonForCT");
 

@@ -7,6 +7,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.ImportStrategy;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.RowHandlerImportStrategy;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.SheetHandler;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.StaffDataRowHandler;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 
@@ -23,11 +24,12 @@ public class StaffImportService {
 
     public StaffImportService(UserService userService, ExcelReadingService excelReadingService,
                               JudgeRepository judgeRepository,
+                              SheetHandler sheetHandler,
                               StaffDataRowHandler rowHandler) {
         this.userService = userService;
         this.excelReadingService = excelReadingService;
         this.judgeRepository = judgeRepository;
-        importStrategy = RowHandlerImportStrategy.create(rowHandler);
+        importStrategy = RowHandlerImportStrategy.create(sheetHandler, rowHandler);
     }
 
     @Transactional

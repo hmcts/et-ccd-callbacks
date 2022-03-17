@@ -18,8 +18,9 @@ class RowHandlerImportStrategyTest {
 
     @Test
     void testCreate() {
+        var sheetHandler = mock(SheetHandler.class);
         var rowHandler = mock(RowHandler.class);
-        assertNotNull(RowHandlerImportStrategy.create(rowHandler));
+        assertNotNull(RowHandlerImportStrategy.create(sheetHandler, rowHandler));
     }
 
     @Test
@@ -30,9 +31,10 @@ class RowHandlerImportStrategyTest {
             createSheet(workbook, tribunalOffice.getOfficeName());
         }
 
+        var sheetHandler = new TestSheetHandler();
         var rowHandler = mock(RowHandler.class);
         when(rowHandler.accept(isA(Row.class))).thenReturn(true);
-        var strategy = RowHandlerImportStrategy.create(rowHandler);
+        var strategy = RowHandlerImportStrategy.create(sheetHandler, rowHandler);
 
         strategy.importWorkbook(workbook);
 
@@ -50,9 +52,10 @@ class RowHandlerImportStrategyTest {
             createSheet(workbook, tribunalOffice.getOfficeName());
         }
 
+        var sheetHandler = new TestSheetHandler();
         var rowHandler = mock(RowHandler.class);
         when(rowHandler.accept(isA(Row.class))).thenReturn(false);
-        var strategy = RowHandlerImportStrategy.create(rowHandler);
+        var strategy = RowHandlerImportStrategy.create(sheetHandler, rowHandler);
 
         strategy.importWorkbook(workbook);
 

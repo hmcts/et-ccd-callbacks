@@ -7,6 +7,7 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseRetrievalException;
 import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CcdReportDataSource;
@@ -19,7 +20,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReportCcdDataSource;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReportData;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReportParams;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays.SessionDaysCcdReportDataSource;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays.SessionDaysReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays.SessionDaysReportData;
@@ -112,7 +112,7 @@ public class ReportDataService {
         setListingDateRangeForSearch(listingDetails);
         var listingData = listingDetails.getCaseData();
 
-        var params = new RespondentsReportParams(listingDetails.getCaseTypeId(), listingData.getManagingOffice(),
+        var params = new ReportParams(listingDetails.getCaseTypeId(), listingData.getManagingOffice(),
                 listingDateFrom, listingDateTo);
         var respondentsReport = new RespondentsReport(reportDataSource);
         var reportData = respondentsReport.generateReport(params);

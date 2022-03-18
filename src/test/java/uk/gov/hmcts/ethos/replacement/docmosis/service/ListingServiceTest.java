@@ -137,7 +137,6 @@ public class ListingServiceTest {
         listingDetailsRange.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetailsRange.setJurisdiction("EMPLOYMENT");
 
-        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         DateListedType dateListedType = new DateListedType();
         dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType.setHearingClerk(new DynamicFixedListType("Clerk"));
@@ -149,10 +148,10 @@ public class ListingServiceTest {
         dateListedType.setHearingTimingBreak("2019-12-12T12:11:00.000");
         dateListedType.setHearingTimingResume("2019-12-12T12:11:00.000");
         dateListedType.setHearingTimingFinish("2019-12-12T12:11:00.000");
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setId("123");
         dateListedTypeItem.setValue(dateListedType);
 
-        DateListedTypeItem dateListedTypeItem1 = new DateListedTypeItem();
         DateListedType dateListedType1 = new DateListedType();
         dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType1.setHearingClerk(new DynamicFixedListType("Clerk"));
@@ -164,10 +163,10 @@ public class ListingServiceTest {
         dateListedType1.setHearingTimingBreak("2019-12-10T12:00:00.000");
         dateListedType1.setHearingTimingResume("2019-12-10T13:00:00.000");
         dateListedType1.setHearingTimingFinish("2019-12-10T14:00:00.000");
+        DateListedTypeItem dateListedTypeItem1 = new DateListedTypeItem();
         dateListedTypeItem1.setId("124");
         dateListedTypeItem1.setValue(dateListedType1);
 
-        DateListedTypeItem dateListedTypeItem2 = new DateListedTypeItem();
         DateListedType dateListedType2 = new DateListedType();
         dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType2.setHearingClerk(new DynamicFixedListType("Clerk1"));
@@ -176,10 +175,10 @@ public class ListingServiceTest {
         dateListedType2.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue2"));
         dateListedType2.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
         dateListedType2.setListedDate("2019-12-12T12:11:30.000");
+        DateListedTypeItem dateListedTypeItem2 = new DateListedTypeItem();
         dateListedTypeItem2.setId("124");
         dateListedTypeItem2.setValue(dateListedType2);
 
-        DateListedTypeItem dateListedTypeItem3 = new DateListedTypeItem();
         DateListedType dateListedType3 = new DateListedType();
         dateListedType3.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType3.setHearingClerk(new DynamicFixedListType("Clerk3"));
@@ -192,24 +191,25 @@ public class ListingServiceTest {
         dateListedType3.setHearingTimingBreak("2019-12-12T15:11:55.000");
         dateListedType3.setHearingTimingResume("2019-12-12T15:30:55.000");
         dateListedType3.setHearingTimingFinish("2019-12-12T16:30:55.000");
+        DateListedTypeItem dateListedTypeItem3 = new DateListedTypeItem();
         dateListedTypeItem3.setId("124");
         dateListedTypeItem3.setValue(dateListedType3);
 
-        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         HearingType hearingType = new HearingType();
         hearingType.setHearingDateCollection(new ArrayList<>(Arrays.asList(dateListedTypeItem, dateListedTypeItem1, dateListedTypeItem2)));
         hearingType.setHearingVenue(new DynamicFixedListType("Aberdeen"));
         hearingType.setHearingEstLengthNum("2");
         hearingType.setHearingEstLengthNumType("hours");
         hearingType.setHearingType(HEARING_TYPE_PERLIMINARY_HEARING);
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setId("12345");
         hearingTypeItem.setValue(hearingType);
 
-        BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
         BFActionType bfActionType = new BFActionType();
         bfActionType.setBfDate("2019-12-10");
         bfActionType.setCleared("020-12-30");
         bfActionType.setAction(BFHelperTest.getBfActionsDynamicFixedList());
+        BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
         bfActionTypeItem.setId("0000");
         bfActionTypeItem.setValue(bfActionType);
         HearingTypeItem hearingTypeItem1 = new HearingTypeItem();
@@ -219,35 +219,35 @@ public class ListingServiceTest {
         hearingTypeItem1.setId("12345");
         hearingTypeItem1.setValue(hearingType1);
 
-        BFActionTypeItem bfActionTypeItem1 = new BFActionTypeItem();
         BFActionType bfActionType1 = new BFActionType();
         bfActionType1.setBfDate("2019-12-11");
         bfActionType1.setCleared("");
         bfActionType1.setAction(BFHelperTest.getBfActionsDynamicFixedList());
+        BFActionTypeItem bfActionTypeItem1 = new BFActionTypeItem();
         bfActionTypeItem1.setId("111");
         bfActionTypeItem1.setValue(bfActionType1);
 
-        BFActionTypeItem bfActionTypeItem2 = new BFActionTypeItem();
         BFActionType bfActionType2 = new BFActionType();
         bfActionType2.setBfDate("2019-12-12");
         bfActionType2.setCleared("");
         bfActionType2.setAction(BFHelperTest.getBfActionsDynamicFixedList());
+        BFActionTypeItem bfActionTypeItem2 = new BFActionTypeItem();
         bfActionTypeItem2.setId("222");
         bfActionTypeItem2.setValue(bfActionType2);
 
-        BFActionTypeItem bfActionTypeItem3 = new BFActionTypeItem();
         BFActionType bfActionType3 = new BFActionType();
         bfActionType3.setBfDate("2019-12-13");
         bfActionType3.setCleared("");
         bfActionType3.setAction(BFHelperTest.getBfActionsDynamicFixedList());
+        BFActionTypeItem bfActionTypeItem3 = new BFActionTypeItem();
         bfActionTypeItem3.setId("333");
         bfActionTypeItem3.setValue(bfActionType3);
 
-        BFActionTypeItem bfActionTypeItem4 = new BFActionTypeItem();
         BFActionType bfActionType4 = new BFActionType();
         bfActionType4.setBfDate("2019-12-10");
         bfActionType4.setCleared("020-12-30");
         bfActionType4.setNotes("Test0");
+        BFActionTypeItem bfActionTypeItem4 = new BFActionTypeItem();
         bfActionTypeItem4.setId("0000");
         bfActionTypeItem4.setValue(bfActionType4);
 
@@ -977,20 +977,23 @@ public class ListingServiceTest {
                 + "hearingStage2=null, hearingFull=null, hearing=null, remedy=null, review=null, reconsider=null, "
                 + "subSplit=null, leadCase=null, et3ReceivedDate=null, judicialMediation=null, caseType=null, "
                 + "singlesTotal=1, multiplesTotal=0, dateOfAcceptance=null, respondentET3=null, respondentET4=null, "
-                + "listingHistory=null, ConNoneTotal=null, ConStdTotal=null, ConFastTotal=null, ConOpenTotal=null, " +
-                "ConNone26wkTotal=null, ConStd26wkTotal=null, ConFast26wkTotal=null, ConOpen26wkTotal=null, ConNone26wkTotalPerCent=null, " +
-                "ConStd26wkTotalPerCent=null, ConFast26wkTotalPerCent=null, ConOpen26wkTotalPerCent=null, xConNone26wkTotal=null, xConStd26wkTotal=null," +
-                " xConFast26wkTotal=null, xConOpen26wkTotal=null, xConNone26wkTotalPerCent=null, xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, " +
-                "xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null, "
+                + "listingHistory=null, ConNoneTotal=null, ConStdTotal=null, ConFastTotal=null, ConOpenTotal=null, "
+                + "ConNone26wkTotal=null, ConStd26wkTotal=null, ConFast26wkTotal=null, ConOpen26wkTotal=null, "
+                + "ConNone26wkTotalPerCent=null, "
+                + "ConStd26wkTotalPerCent=null, ConFast26wkTotalPerCent=null, ConOpen26wkTotalPerCent=null, "
+                + "xConNone26wkTotal=null, xConStd26wkTotal=null,"
+                + " xConFast26wkTotal=null, xConOpen26wkTotal=null, xConNone26wkTotalPerCent=null, "
+                + "xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, "
+                + "xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null, "
                 + "claimServedDay1Total=null, claimServedDay1Percent=null, claimServedDay2Total=null, "
                 + "claimServedDay2Percent=null, claimServedDay3Total=null, claimServedDay3Percent=null, "
                 + "claimServedDay4Total=null, claimServedDay4Percent=null, claimServedDay5Total=null, "
                 + "claimServedDay5Percent=null, claimServed6PlusDaysTotal=null, claimServed6PlusDaysPercent=null, "
-                + "claimServedTotal=null, claimServedItems=null, manuallyCreatedTotalCases=null," +
-                " et1OnlineTotalCases=null, eccTotalCases=null, migratedTotalCases=null, " +
-                "manuallyCreatedTotalCasesPercent=null, " +
-                "et1OnlineTotalCasesPercent=null, eccTotalCasesPercent=null, " +
-                "migratedTotalCasesPercent=null"
+                + "claimServedTotal=null, claimServedItems=null, manuallyCreatedTotalCases=null,"
+                + " et1OnlineTotalCases=null, eccTotalCases=null, migratedTotalCases=null, "
+                + "manuallyCreatedTotalCasesPercent=null, "
+                + "et1OnlineTotalCasesPercent=null, eccTotalCasesPercent=null, "
+                + "migratedTotalCasesPercent=null"
                 + "), localReportsSummary=null, "
                 + "localReportsSummaryHdr2=null, "
                 + "localReportsSummary2=null, localReportsDetailHdr=AdhocReportType(reportDate=null, "
@@ -1016,19 +1019,21 @@ public class ListingServiceTest {
                 + "hearingStage2=null, hearingFull=null, hearing=null, remedy=null, review=null, reconsider=null, "
                 + "subSplit=null, leadCase=null, et3ReceivedDate=null, judicialMediation=null, caseType=null, "
                 + "singlesTotal=null, multiplesTotal=null, dateOfAcceptance=null, respondentET3=null, "
-                + "respondentET4=null, listingHistory=null, ConNoneTotal=null, ConStdTotal=null, ConFastTotal=null, " +
-                "ConOpenTotal=null, ConNone26wkTotal=null, ConStd26wkTotal=null, ConFast26wkTotal=null, ConOpen26wkTotal=null, " +
-                "ConNone26wkTotalPerCent=null, ConStd26wkTotalPerCent=null, ConFast26wkTotalPerCent=null, ConOpen26wkTotalPerCent=null," +
-                " xConNone26wkTotal=null, xConStd26wkTotal=null, xConFast26wkTotal=null, xConOpen26wkTotal=null, xConNone26wkTotalPerCent=null, " +
-                "xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null, "
+                + "respondentET4=null, listingHistory=null, ConNoneTotal=null, ConStdTotal=null, ConFastTotal=null, "
+                + "ConOpenTotal=null, ConNone26wkTotal=null, ConStd26wkTotal=null, ConFast26wkTotal=null, ConOpen26wkTotal=null, "
+                + "ConNone26wkTotalPerCent=null, ConStd26wkTotalPerCent=null, ConFast26wkTotalPerCent=null, ConOpen26wkTotalPerCent=null,"
+                + " xConNone26wkTotal=null, xConStd26wkTotal=null, xConFast26wkTotal=null, xConOpen26wkTotal=null, " +
+                "xConNone26wkTotalPerCent=null, "
+                + "xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, xConOpen26wkTotalPerCent=null, " +
+                "delayedDaysForFirstHearing=null, "
                 + "claimServedDay1Total=null, claimServedDay1Percent=null, claimServedDay2Total=null, "
                 + "claimServedDay2Percent=null, claimServedDay3Total=null, claimServedDay3Percent=null, "
                 + "claimServedDay4Total=null, claimServedDay4Percent=null, claimServedDay5Total=null, "
                 + "claimServedDay5Percent=null, claimServed6PlusDaysTotal=null, claimServed6PlusDaysPercent=null, "
-                + "claimServedTotal=null, claimServedItems=null, manuallyCreatedTotalCases=null, " +
-                "et1OnlineTotalCases=null, eccTotalCases=null, migratedTotalCases=null, " +
-                "manuallyCreatedTotalCasesPercent=null, " +
-                "et1OnlineTotalCasesPercent=null, eccTotalCasesPercent=null, migratedTotalCasesPercent=null"
+                + "claimServedTotal=null, claimServedItems=null, manuallyCreatedTotalCases=null, "
+                + "et1OnlineTotalCases=null, eccTotalCases=null, migratedTotalCases=null, "
+                + "manuallyCreatedTotalCasesPercent=null, "
+                + "et1OnlineTotalCasesPercent=null, eccTotalCasesPercent=null, migratedTotalCasesPercent=null"
                 + "), "
                 + "localReportsDetail=[AdhocReportTypeItem(id=null, "
                 + "value=AdhocReportType(reportDate=null, reportOffice=Manchester, receiptDate=null, hearingDate=null, "
@@ -1053,20 +1058,23 @@ public class ListingServiceTest {
                 + "hearingPrelim=null, stage=null, hearingStage1=null, hearingStage2=null, hearingFull=null, "
                 + "hearing=null, remedy=null, review=null, reconsider=null, subSplit=null, leadCase=null, "
                 + "et3ReceivedDate=null, judicialMediation=null, caseType=Single, singlesTotal=null, multiplesTotal=null, "
-                + "dateOfAcceptance=2019-12-12, respondentET3=null, respondentET4=null, listingHistory=null, ConNoneTotal=null, " +
-                "ConStdTotal=null, ConFastTotal=null, ConOpenTotal=null, ConNone26wkTotal=null, ConStd26wkTotal=null, ConFast26wkTotal=null," +
-                " ConOpen26wkTotal=null, ConNone26wkTotalPerCent=null, ConStd26wkTotalPerCent=null, ConFast26wkTotalPerCent=null, " +
-                "ConOpen26wkTotalPerCent=null, xConNone26wkTotal=null, xConStd26wkTotal=null, xConFast26wkTotal=null, xConOpen26wkTotal=null, " +
-                "xConNone26wkTotalPerCent=null, xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null, "
+                + "dateOfAcceptance=2019-12-12, respondentET3=null, respondentET4=null, listingHistory=null, "
+                + "ConNoneTotal=null, "
+                + "ConStdTotal=null, ConFastTotal=null, ConOpenTotal=null, ConNone26wkTotal=null, ConStd26wkTotal=null, "
+                + "ConFast26wkTotal=null," + " ConOpen26wkTotal=null, ConNone26wkTotalPerCent=null,"
+                + " ConStd26wkTotalPerCent=null, ConFast26wkTotalPerCent=null, "
+                + "ConOpen26wkTotalPerCent=null, xConNone26wkTotal=null, xConStd26wkTotal=null, "
+                + "xConFast26wkTotal=null, xConOpen26wkTotal=null, "
+                + "xConNone26wkTotalPerCent=null, xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null, "
                 + "claimServedDay1Total=null, claimServedDay1Percent=null, claimServedDay2Total=null, "
                 + "claimServedDay2Percent=null, claimServedDay3Total=null, claimServedDay3Percent=null, "
                 + "claimServedDay4Total=null, claimServedDay4Percent=null, claimServedDay5Total=null, "
                 + "claimServedDay5Percent=null, claimServed6PlusDaysTotal=null, claimServed6PlusDaysPercent=null, "
-                + "claimServedTotal=null, claimServedItems=null, manuallyCreatedTotalCases=null, " +
-                "et1OnlineTotalCases=null, eccTotalCases=null, migratedTotalCases=null, " +
-                "manuallyCreatedTotalCasesPercent=null, et1OnlineTotalCasesPercent=null, " +
-                "eccTotalCasesPercent=null, migratedTotalCasesPercent=null"
-                +"))]), managingOffice=Leeds";
+                + "claimServedTotal=null, claimServedItems=null, manuallyCreatedTotalCases=null, "
+                + "et1OnlineTotalCases=null, eccTotalCases=null, migratedTotalCases=null, "
+                + "manuallyCreatedTotalCasesPercent=null, et1OnlineTotalCasesPercent=null, "
+                + "eccTotalCasesPercent=null, migratedTotalCasesPercent=null"
+                +"))])";
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(LIVE_CASELOAD_REPORT);
         listingDetails.getCaseData().setManagingOffice("Leeds");

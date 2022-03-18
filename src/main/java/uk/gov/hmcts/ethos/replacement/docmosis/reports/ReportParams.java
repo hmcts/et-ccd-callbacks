@@ -1,11 +1,11 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport;
+package uk.gov.hmcts.ethos.replacement.docmosis.reports;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @AllArgsConstructor
 @Data
-public class RespondentsReportParams {
+public class ReportParams {
     private final String caseTypeId;
     private final String managingOffice;
     private final String dateFrom;

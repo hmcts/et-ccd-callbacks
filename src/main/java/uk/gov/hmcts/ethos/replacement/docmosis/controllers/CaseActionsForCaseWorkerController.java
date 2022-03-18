@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
@@ -91,7 +93,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a case for a caseWorker.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -114,7 +119,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/retrieveCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "retrieve a case for a caseWorker.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -139,7 +147,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/retrieveCases", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "retrieve cases for a caseWorker.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -163,7 +174,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/updateCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update a case for a caseWorker.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -186,7 +200,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/preDefaultValues", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update pre default values in a case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -209,7 +226,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/postDefaultValues", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update the case with some default values after submitted.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -273,7 +293,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/amendCaseDetails", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend the case details for a single case and validates receipt date.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -319,7 +342,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/amendClaimantDetails", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend the case claimant details for a single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -342,7 +368,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/amendRespondentDetails", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend respondent details for a single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -374,7 +403,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/amendRespondentRepresentative", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend respondent representative for a single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -399,7 +431,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/dynamicRespondentRepresentativeNames", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the respondents names into a dynamic list")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -422,7 +457,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/updateHearing", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update hearing details for a single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -445,7 +483,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/allocateHearing", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update postponed date when allocating a hearing.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -468,7 +509,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/restrictedCases", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "change restricted reporting for a single case")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -492,7 +536,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/dynamicRestrictedReporting", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates a dynamic list for restricted reporting")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -515,7 +562,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/amendHearing", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend hearing details for a single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -538,7 +588,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/amendCaseState", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend the case state for a single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -567,7 +620,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/midRespondentAddress", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the mid dynamic fixed list with the respondent addresses.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -589,7 +645,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/jurisdictionValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates jurisdiction entries to prevent duplicates.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -614,7 +673,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/addAmendJurisdiction", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend jurisdiction details for a single case.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -636,7 +698,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/generateCaseRefNumbers", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "generates ethos case numbers according to caseRefNumberCount field.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -658,7 +723,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/midRespondentECC", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the mid dynamic list with the respondent names.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -681,7 +749,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/createECC", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a new Employer Contract Claim.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -706,7 +777,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/linkOriginalCaseECC", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "send an update to the original case with the new ECC reference created to link it.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -729,7 +803,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/singleCaseMultipleMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates the multiple and sub multiple in the single case when moving to a multiple.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -756,7 +833,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/hearingMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates the hearing number and the hearing days to prevent their creation.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -782,7 +862,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/dynamicListBfActions", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populate bf actions in dynamic lists.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -805,7 +888,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/bfActions", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "updates the dateEntered by the user with the current date.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -828,7 +914,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/dynamicJudgments", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the dynamic lists for judgements")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -850,7 +939,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/judgementSubmitted", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the dynamic lists for judgements")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -872,7 +964,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/judgmentValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates jurisdiction codes within judgement collection.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -895,7 +990,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/depositValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates deposit amount and deposit refunded.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -918,7 +1016,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/dynamicDepositOrder", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the respondents names into a dynamic list")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -940,7 +1041,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/aboutToStartDisposal", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update the position type to case closed.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -980,7 +1084,10 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/amendFixCaseAPI", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend case details in Fix Case API")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })

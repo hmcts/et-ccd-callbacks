@@ -24,12 +24,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LIST
 
 @Service
 @RequiredArgsConstructor
-class CaseTransferUtils {
+public class CaseTransferUtils {
 
-    static final String BF_ACTIONS_ERROR_MSG = "There are one or more open Brought Forward actions that must be "
+    public static final String BF_ACTIONS_ERROR_MSG = "There are one or more open Brought Forward actions that must be "
             + "cleared before the case %s can be transferred";
 
-    static final String HEARINGS_ERROR_MSG = "There are one or more hearings that have the status Listed. "
+    public static final String HEARINGS_ERROR_MSG = "There are one or more hearings that have the status Listed. "
             + "These must be updated before the case %s can be transferred";
 
     private final CcdClient ccdClient;
@@ -52,7 +52,7 @@ class CaseTransferUtils {
         }
     }
 
-    List<String> validateCase(CaseData caseData) {
+    public List<String> validateCase(CaseData caseData) {
         var errors = new ArrayList<String>();
         if (!checkBfActionsCleared(caseData)) {
             errors.add(String.format(BF_ACTIONS_ERROR_MSG, caseData.getEthosCaseReference()));

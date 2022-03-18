@@ -1,14 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport;
 
-import org.junit.Before;
-import org.junit.Test;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
-import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReportSubmitEvent;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -18,11 +9,19 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.Before;
+import org.junit.Test;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReportSubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 
 public class RespondentsReportTest {
 
-    //RespondentsReportDataSource reportDataSource;
-    RespondentsReportParams params;
+    ReportParams params;
+    RespondentsReportDataSource reportDataSource;
     RespondentsReport respondentsReport;
     RespondentsReportCaseDataBuilder caseDataBuilder = new RespondentsReportCaseDataBuilder();
     List<RespondentsReportSubmitEvent> submitEvents = new ArrayList<>();
@@ -35,10 +34,10 @@ public class RespondentsReportTest {
     public void setup() {
         submitEvents.clear();
         caseDataBuilder = new RespondentsReportCaseDataBuilder();
-        var reportDataSource = mock(RespondentsReportDataSource.class);
-        when(reportDataSource.getData(ENGLANDWALES_CASE_TYPE_ID, MANAGING_OFFICE, DATE_FROM, DATE_TO)).
-                thenReturn(submitEvents);
-        params = new RespondentsReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID, MANAGING_OFFICE, DATE_FROM, DATE_TO);
+        reportDataSource = mock(RespondentsReportDataSource.class);
+        when(reportDataSource.getData(ENGLANDWALES_CASE_TYPE_ID, MANAGING_OFFICE, DATE_FROM, DATE_TO))
+                .thenReturn(submitEvents);
+        params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID, MANAGING_OFFICE, DATE_FROM, DATE_TO);
         respondentsReport = new RespondentsReport(reportDataSource);
     }
 
@@ -49,7 +48,8 @@ public class RespondentsReportTest {
         // the case should not be in the report data
 
         caseDataBuilder.withNoRespondents();
-        submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
+        submitEvents.add(caseDataBuilder
+                .buildAsSubmitEvent());
 
         var reportData = respondentsReport.generateReport(params);
         assertCommonValues(reportData);

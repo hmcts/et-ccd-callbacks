@@ -16,7 +16,11 @@ public class JudgeSelectionService {
     }
 
     public DynamicFixedListType createJudgeSelection(TribunalOffice tribunalOffice, HearingType selectedHearing) {
-        var listItems = judgeService.getJudgesDynamicList(tribunalOffice);
+        var requiredTribunalOffice = tribunalOffice;
+        if (TribunalOffice.isScotlandOffice(tribunalOffice.getOfficeName())) {
+            requiredTribunalOffice = TribunalOffice.SCOTLAND;
+        }
+        var listItems = judgeService.getJudgesDynamicList(requiredTribunalOffice);
         var selectedJudge = selectedHearing.getJudge();
         return DynamicFixedListType.from(listItems, selectedJudge);
     }

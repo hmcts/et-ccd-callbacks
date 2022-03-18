@@ -13,6 +13,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepo
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.ClerkRowHandler;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.EmployeeMemberRowHandler;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.EmployerMemberRowHandler;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.JudgeRowHandler;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.SimpleSheetHandler;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.StaffDataRowHandler;
@@ -48,7 +50,9 @@ class StaffImportServiceTest {
         var sheetHandler = new SimpleSheetHandler();
         var rowHandler = new StaffDataRowHandler(List.of(
                 new JudgeRowHandler(judgeRepository),
-                new ClerkRowHandler(courtWorkerRepository)));
+                new ClerkRowHandler(courtWorkerRepository),
+                new EmployerMemberRowHandler(courtWorkerRepository),
+                new EmployeeMemberRowHandler(courtWorkerRepository)));
         var staffImportStrategy = new StaffImportStrategy(sheetHandler, rowHandler, judgeRepository,
                 courtWorkerRepository);
 
@@ -61,7 +65,7 @@ class StaffImportServiceTest {
         verify(courtWorkerRepository, times(1)).deleteAll();
         verify(excelReadingService, times(1)).readWorkbook(userToken, documentBinaryUrl);
         verify(judgeRepository, times(36)).save(any(Judge.class));
-        verify(courtWorkerRepository, times(36)).save(any(CourtWorker.class));
+        verify(courtWorkerRepository, times(108)).save(any(CourtWorker.class));
         assertEquals(userName, adminData.getStaffImportFile().getUser());
         assertNotNull(adminData.getStaffImportFile().getLastImported());
     }

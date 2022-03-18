@@ -16,28 +16,27 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.ClerkRowHandler.CLERK_ROW_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.EmployeeMemberRowHandler.EMPLOYEE_MEMBER_ROW_ID;
 
-class ClerkRowHandlerTest {
-
+class EmployeeMemberRowHandlerTest {
     @ParameterizedTest
-    @CsvSource({"TRIB_fl_Clerks, true", "fl_Judge, false"})
+    @CsvSource({"TRIB_fl_EEMember, true", "fl_Judge, false"})
     void testAcceptRow(String cellValue, boolean expected) {
         var row = mock(Row.class);
         mockCell(row, 0, cellValue);
         var courtWorkerRepository = mock(CourtWorkerRepository.class);
 
-        var clerkRowHandler = new ClerkRowHandler(courtWorkerRepository);
-        assertEquals(expected, clerkRowHandler.accept(row));
+        var employeeMemberRowHandler = new EmployeeMemberRowHandler(courtWorkerRepository);
+        assertEquals(expected, employeeMemberRowHandler.accept(row));
     }
 
     @Test
     void testHandle() {
-        var code = "ClerkCode";
-        var name = "Clerk Kent";
+        var code = "EECode";
+        var name = "Employee Member";
         var tribunalOffice = TribunalOffice.NEWCASTLE;
         var row = mock(Row.class);
-        mockCell(row, 0, CLERK_ROW_ID);
+        mockCell(row, 0, EMPLOYEE_MEMBER_ROW_ID);
         mockCell(row, 1, code);
         mockCell(row, 2, name);
         mockCell(row, 3, "1");
@@ -46,14 +45,14 @@ class ClerkRowHandlerTest {
 
         var courtWorkerRepository = mock(CourtWorkerRepository.class);
 
-        var clerkRowHandler = new ClerkRowHandler(courtWorkerRepository);
-        clerkRowHandler.handle(tribunalOffice, row);
+        var employeeMemberRowHandler = new EmployeeMemberRowHandler(courtWorkerRepository);
+        employeeMemberRowHandler.handle(tribunalOffice, row);
 
         var captor = ArgumentCaptor.forClass(CourtWorker.class);
         verify(courtWorkerRepository, times(1)).save(captor.capture());
 
         var actual = captor.getValue();
-        assertEquals(CourtWorkerType.CLERK, actual.getType());
+        assertEquals(CourtWorkerType.EMPLOYEE_MEMBER, actual.getType());
         assertEquals(code, actual.getCode());
         assertEquals(name, actual.getName());
         assertEquals(tribunalOffice, actual.getTribunalOffice());

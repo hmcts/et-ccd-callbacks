@@ -7,6 +7,7 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.Document;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ImportFile;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Judge;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.JudgeRowHandler;
@@ -39,18 +40,19 @@ class StaffImportServiceTest {
         when(userService.getUserDetails(userToken)).thenReturn(user);
         var excelReadingService = mockExcelReadingService(userToken, documentBinaryUrl);
         var judgeRepository = mock(JudgeRepository.class);
+
         var sheetHandler = new SimpleSheetHandler();
         var rowHandler = new StaffDataRowHandler(List.of(new JudgeRowHandler(judgeRepository)));
+        var staffImportStrategy = new StaffImportStrategy(sheetHandler, rowHandler, judgeRepository);
 
         var adminData = createAdminData(documentBinaryUrl);
 
-        var staffImportService = new StaffImportService(userService, excelReadingService, judgeRepository, sheetHandler,
-                rowHandler);
+        var staffImportService = new StaffImportService(userService, excelReadingService, staffImportStrategy);
         staffImportService.importStaff(adminData, userToken);
 
         verify(judgeRepository, times(1)).deleteAll();
         verify(excelReadingService, times(1)).readWorkbook(userToken, documentBinaryUrl);
-        verify(judgeRepository, times(36)).save(any());
+        verify(judgeRepository, times(36)).save(any(Judge.class));
         assertEquals(userName, adminData.getStaffImportFile().getUser());
         assertNotNull(adminData.getStaffImportFile().getLastImported());
     }

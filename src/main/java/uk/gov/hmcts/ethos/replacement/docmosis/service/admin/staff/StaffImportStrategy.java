@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.ImportStrategy;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.RowHandlerImportStrategy;
@@ -13,11 +14,13 @@ public class StaffImportStrategy implements ImportStrategy {
 
     private final RowHandlerImportStrategy rowHandlerImportStrategy;
     private final JudgeRepository judgeRepository;
+    private final CourtWorkerRepository courtWorkerRepository;
 
     public StaffImportStrategy(SheetHandler sheetHandler, StaffDataRowHandler rowHandler,
-                               JudgeRepository judgeRepository) {
+                               JudgeRepository judgeRepository, CourtWorkerRepository courtWorkerRepository) {
         rowHandlerImportStrategy = RowHandlerImportStrategy.create(sheetHandler, rowHandler);
         this.judgeRepository = judgeRepository;
+        this.courtWorkerRepository = courtWorkerRepository;
     }
 
     @Override
@@ -28,5 +31,6 @@ public class StaffImportStrategy implements ImportStrategy {
 
     private void deleteExistingData() {
         judgeRepository.deleteAll();
+        courtWorkerRepository.deleteAll();
     }
 }

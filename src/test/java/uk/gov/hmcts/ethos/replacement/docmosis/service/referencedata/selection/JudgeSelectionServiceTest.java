@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection;
 
 import org.junit.Test;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;

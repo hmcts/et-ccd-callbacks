@@ -15,6 +15,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerT
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.SelectionServiceTestUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.CourtWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.CourtWorkerSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.JudgeSelectionService;
 
 import java.util.List;
 
@@ -29,7 +31,7 @@ public class AllocateHearingServiceTest {
     private AllocateHearingService allocateHearingService;
 
     private CaseData caseData;
-    private final TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
+    private final TribunalOffice tribunalOffice = TribunalOffice.MANCHESTER;
     private HearingType selectedHearing;
     private DateListedType selectedListing;
 
@@ -41,9 +43,9 @@ public class AllocateHearingServiceTest {
         var judgeSelectionService = mockJudgeSelectionService();
         var venueSelectionService = mockVenueSelectionService();
         var roomSelectionService = mockRoomSelectionService();
-        var courtWorkerService = mockCourtWorkerService();
+        var courtWorkerSelectionService = mockCourtWorkerSelectionService();
         allocateHearingService = new AllocateHearingService(hearingSelectionService, judgeSelectionService,
-                venueSelectionService, roomSelectionService, courtWorkerService);
+                venueSelectionService, roomSelectionService, courtWorkerSelectionService);
     }
 
     @Test
@@ -238,7 +240,7 @@ public class AllocateHearingServiceTest {
         return roomSelectionService;
     }
 
-    private CourtWorkerService mockCourtWorkerService() {
+    private CourtWorkerSelectionService mockCourtWorkerSelectionService() {
         var courtWorkerService = mock(CourtWorkerService.class);
         var clerks = SelectionServiceTestUtils.createListItems("clerk", "Clerk ");
         when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
@@ -252,6 +254,6 @@ public class AllocateHearingServiceTest {
         when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
                 CourtWorkerType.EMPLOYEE_MEMBER)).thenReturn(employeeMembers);
 
-        return courtWorkerService;
+        return new CourtWorkerSelectionService(courtWorkerService);
     }
 }

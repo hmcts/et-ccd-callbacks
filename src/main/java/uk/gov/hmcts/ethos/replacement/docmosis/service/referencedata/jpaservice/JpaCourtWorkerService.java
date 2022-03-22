@@ -8,7 +8,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerT
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.CourtWorkerService;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,15 +20,6 @@ public class JpaCourtWorkerService implements CourtWorkerService {
     public List<DynamicValueType> getCourtWorkerByTribunalOffice(TribunalOffice tribunalOffice,
                                                                  CourtWorkerType courtWorkerType) {
         return courtWorkerRepository.findByTribunalOfficeAndType(tribunalOffice, courtWorkerType)
-                .stream()
-                .map(cw -> DynamicValueType.create(cw.getCode(), cw.getName()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<DynamicValueType> getCourtWorkerByTribunalOffices(Collection<TribunalOffice> tribunalOffices,
-                                                                  CourtWorkerType courtWorkerType) {
-        return courtWorkerRepository.findByTribunalOfficeInAndTypeOrderByName(tribunalOffices, courtWorkerType)
                 .stream()
                 .map(cw -> DynamicValueType.create(cw.getCode(), cw.getName()))
                 .collect(Collectors.toList());

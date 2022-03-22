@@ -7,9 +7,14 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.Document;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ImportFile;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorker;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Judge;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.ClerkRowHandler;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.EmployeeMemberRowHandler;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.EmployerMemberRowHandler;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.JudgeRowHandler;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.SimpleSheetHandler;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.StaffDataRowHandler;
@@ -40,10 +45,16 @@ class StaffImportServiceTest {
         when(userService.getUserDetails(userToken)).thenReturn(user);
         var excelReadingService = mockExcelReadingService(userToken, documentBinaryUrl);
         var judgeRepository = mock(JudgeRepository.class);
+        var courtWorkerRepository = mock(CourtWorkerRepository.class);
 
         var sheetHandler = new SimpleSheetHandler();
-        var rowHandler = new StaffDataRowHandler(List.of(new JudgeRowHandler(judgeRepository)));
-        var staffImportStrategy = new StaffImportStrategy(sheetHandler, rowHandler, judgeRepository);
+        var rowHandler = new StaffDataRowHandler(List.of(
+                new JudgeRowHandler(judgeRepository),
+                new ClerkRowHandler(courtWorkerRepository),
+                new EmployerMemberRowHandler(courtWorkerRepository),
+                new EmployeeMemberRowHandler(courtWorkerRepository)));
+        var staffImportStrategy = new StaffImportStrategy(sheetHandler, rowHandler, judgeRepository,
+                courtWorkerRepository);
 
         var adminData = createAdminData(documentBinaryUrl);
 
@@ -51,8 +62,10 @@ class StaffImportServiceTest {
         staffImportService.importStaff(adminData, userToken);
 
         verify(judgeRepository, times(1)).deleteAll();
+        verify(courtWorkerRepository, times(1)).deleteAll();
         verify(excelReadingService, times(1)).readWorkbook(userToken, documentBinaryUrl);
         verify(judgeRepository, times(36)).save(any(Judge.class));
+        verify(courtWorkerRepository, times(108)).save(any(CourtWorker.class));
         assertEquals(userName, adminData.getStaffImportFile().getUser());
         assertNotNull(adminData.getStaffImportFile().getLastImported());
     }

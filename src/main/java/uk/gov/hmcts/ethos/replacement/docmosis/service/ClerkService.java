@@ -22,7 +22,8 @@ public class ClerkService {
     }
 
     public void initialiseClerkResponsible(CaseData caseData) {
-        var tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
+        var tribunalOffice = TribunalOffice.getOfficeForReferenceData(
+                TribunalOffice.valueOfOfficeName(caseData.getManagingOffice()));
         var listItems = courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
                 CourtWorkerType.CLERK);
         var selectedClerk = caseData.getClerkResponsible();
@@ -31,7 +32,8 @@ public class ClerkService {
     }
 
     public void initialiseClerkResponsible(MultipleData multipleData) {
-        var tribunalOffice = TribunalOffice.valueOfOfficeName(multipleData.getManagingOffice());
+        var tribunalOffice = TribunalOffice.getOfficeForReferenceData(
+                TribunalOffice.valueOfOfficeName(multipleData.getManagingOffice()));
         var listItems = courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
                 CourtWorkerType.CLERK);
         var selectedClerk = multipleData.getClerkResponsible();
@@ -42,17 +44,13 @@ public class ClerkService {
     public void initialiseClerkResponsible(String caseTypeId, ListingData listingData) {
         List<DynamicValueType> listItems;
         if (Constants.SCOTLAND_LISTING_CASE_TYPE_ID.equals(caseTypeId)) {
-            listItems = getScotlandClerks();
+            listItems = courtWorkerService.getCourtWorkerByTribunalOffice(TribunalOffice.SCOTLAND,
+                    CourtWorkerType.CLERK);
         } else {
             var tribunalOffice = TribunalOffice.valueOfOfficeName(listingData.getManagingOffice());
             listItems = courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice, CourtWorkerType.CLERK);
         }
 
         listingData.setClerkResponsible(DynamicFixedListType.from(listItems));
-    }
-
-    private List<DynamicValueType> getScotlandClerks() {
-        return courtWorkerService.getCourtWorkerByTribunalOffices(TribunalOffice.SCOTLAND_OFFICES,
-                CourtWorkerType.CLERK);
     }
 }

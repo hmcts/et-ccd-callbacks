@@ -15,6 +15,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerT
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.SelectionServiceTestUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.CourtWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.CourtWorkerSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.JudgeSelectionService;
 
 import java.util.List;
 
@@ -40,9 +42,9 @@ public class ScotlandAllocatedHearingServiceTest {
         var hearingSelectionService = mockHearingSelectionService();
         var judgeSelectionService = mockJudgeSelectionService();
         var scotlandVenueSelectionService = mockScotlandVenueSelectionService();
-        var courtWorkerService = mockCourtWorkerService();
+        var courtWorkerSelectionService = mockCourtWorkerSelectionService();
         scotlandAllocateHearingService = new ScotlandAllocateHearingService(hearingSelectionService,
-                judgeSelectionService, scotlandVenueSelectionService, courtWorkerService);
+                judgeSelectionService, scotlandVenueSelectionService, courtWorkerSelectionService);
     }
 
     @Test
@@ -218,20 +220,20 @@ public class ScotlandAllocatedHearingServiceTest {
         return venueSelectionService;
     }
 
-    private CourtWorkerService mockCourtWorkerService() {
+    private CourtWorkerSelectionService mockCourtWorkerSelectionService() {
         var courtWorkerService = mock(CourtWorkerService.class);
         var clerks = SelectionServiceTestUtils.createListItems("clerk", "Clerk ");
-        when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
+        when(courtWorkerService.getCourtWorkerByTribunalOffice(TribunalOffice.SCOTLAND,
                 CourtWorkerType.CLERK)).thenReturn(clerks);
 
         var employerMembers = SelectionServiceTestUtils.createListItems("employerMember", "Employer Member ");
-        when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
+        when(courtWorkerService.getCourtWorkerByTribunalOffice(TribunalOffice.SCOTLAND,
                 CourtWorkerType.EMPLOYER_MEMBER)).thenReturn(employerMembers);
 
         var employeeMembers = SelectionServiceTestUtils.createListItems("employeeMember", "Employee Member ");
-        when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
+        when(courtWorkerService.getCourtWorkerByTribunalOffice(TribunalOffice.SCOTLAND,
                 CourtWorkerType.EMPLOYEE_MEMBER)).thenReturn(employeeMembers);
 
-        return courtWorkerService;
+        return new CourtWorkerSelectionService(courtWorkerService);
     }
 }

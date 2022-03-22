@@ -111,7 +111,7 @@ class ClerkServiceTest {
     private CourtWorkerService mockScotlandCourtWorkerService() {
         var courtWorkerService = mock(CourtWorkerService.class);
         var clerks = SelectionServiceTestUtils.createListItems("scotland", "Scotland ");
-        when(courtWorkerService.getCourtWorkerByTribunalOffices(TribunalOffice.SCOTLAND_OFFICES,
+        when(courtWorkerService.getCourtWorkerByTribunalOffice(TribunalOffice.SCOTLAND,
                 CourtWorkerType.CLERK)).thenReturn(clerks);
 
         return courtWorkerService;

@@ -9,23 +9,24 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.CourtWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.CourtWorkerSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.JudgeSelectionService;
 
 @Service
 public class ScotlandAllocateHearingService {
     private final HearingSelectionService hearingSelectionService;
     private final JudgeSelectionService judgeSelectionService;
     private final ScotlandVenueSelectionService scotlandVenueSelectionService;
-    private final CourtWorkerService courtWorkerService;
+    private final CourtWorkerSelectionService courtWorkerSelectionService;
 
     public ScotlandAllocateHearingService(HearingSelectionService hearingSelectionService,
                                           JudgeSelectionService judgeSelectionService,
                                           ScotlandVenueSelectionService scotlandVenueSelectionService,
-                                          CourtWorkerService courtWorkerService) {
+                                          CourtWorkerSelectionService courtWorkerSelectionService) {
         this.hearingSelectionService = hearingSelectionService;
         this.judgeSelectionService = judgeSelectionService;
         this.scotlandVenueSelectionService = scotlandVenueSelectionService;
-        this.courtWorkerService = courtWorkerService;
+        this.courtWorkerSelectionService = courtWorkerSelectionService;
     }
 
     public void handleListingSelected(CaseData caseData) {
@@ -120,7 +121,7 @@ public class ScotlandAllocateHearingService {
     }
 
     private DynamicFixedListType getEmployerMembers(TribunalOffice tribunalOffice, HearingType selectedHearing) {
-        var dynamicFixedListType = createCourtWorkerDynamicFixedListType(tribunalOffice,
+        var dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(tribunalOffice,
                 CourtWorkerType.EMPLOYER_MEMBER);
 
         if (selectedHearing.hasHearingEmployerMember()) {
@@ -130,7 +131,7 @@ public class ScotlandAllocateHearingService {
     }
 
     private DynamicFixedListType getEmployeeMembers(TribunalOffice tribunalOffice, HearingType selectedHearing) {
-        var dynamicFixedListType = createCourtWorkerDynamicFixedListType(tribunalOffice,
+        var dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(tribunalOffice,
                 CourtWorkerType.EMPLOYEE_MEMBER);
 
         if (selectedHearing.hasHearingEmployeeMember()) {
@@ -140,19 +141,12 @@ public class ScotlandAllocateHearingService {
     }
 
     private DynamicFixedListType getClerks(TribunalOffice tribunalOffice, DateListedType selectedListing) {
-        var dynamicFixedListType = createCourtWorkerDynamicFixedListType(tribunalOffice, CourtWorkerType.CLERK);
+        var dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(tribunalOffice,
+                CourtWorkerType.CLERK);
 
         if (selectedListing.hasHearingClerk()) {
             dynamicFixedListType.setValue(selectedListing.getHearingClerk().getValue());
         }
-        return dynamicFixedListType;
-    }
-
-    private DynamicFixedListType createCourtWorkerDynamicFixedListType(TribunalOffice tribunalOffice,
-                                                                       CourtWorkerType courtWorkerType) {
-        var dynamicFixedListType = new DynamicFixedListType();
-        dynamicFixedListType.setListItems(
-                courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice, courtWorkerType));
         return dynamicFixedListType;
     }
 }

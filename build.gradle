@@ -373,6 +373,7 @@ task generateXlsx(type: Exec, dependsOn: yarnInstallDefinitions) {
 }
 
 bootWithCCD {
+    dependsOn generateXlsx
     // Simulates idam and s2s locally.
     authMode = uk.gov.hmcts.rse.AuthMode.Local
     // Have the cftlib auto-create the et_cos database.

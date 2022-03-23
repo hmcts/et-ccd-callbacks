@@ -369,7 +369,6 @@ task generateXlsx(type: Exec, dependsOn: yarnInstallDefinitions) {
     commandLine 'yarn', 'json2xlsx', '-D', './definitions/json', '-o', './definitions/xlsx/et-englandwales-ccd-config-cftlib.xlsx'
     workingDir project.file('et-ccd-definitions-englandwales')
     environment 'CCD_DEF', 'http://localhost:8081'
-    environment 'IDAM_API_JWK_URL', 'http://localhost:5556/jwks'
 }
 
 bootWithCCD {

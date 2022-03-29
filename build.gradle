@@ -249,7 +249,7 @@ dependencies {
     //CVE-2021-42550
     implementation group: 'ch.qos.logback', name: 'logback-core', version: logbackVersion
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
-    implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.13.2.20220324', ext: 'pom'
+    implementation group: 'com.fasterxml.jackson', name: 'jackson-bom', version: '2.13.2.20220328', ext: 'pom'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2.1'
     implementation group: 'com.github.hmcts', name: 'et-common', version:'0.0.24'
     implementation group: 'com.github.hmcts', name: 'et-data-model', version:'0.0.4'

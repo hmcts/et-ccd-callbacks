@@ -23,7 +23,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesourcelocalreport.CaseSourceLocalReport;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype.HearingsByHearingTypeReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays.MemberDaysReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.servingclaims.ServingClaimsReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.timetofirsthearing.TimeToFirstHearingReport;
@@ -32,6 +31,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +41,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REP
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_COMPLETED_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_SOURCE_LOCAL_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_BY_HEARING_TYPE_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_STAFF;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
@@ -61,6 +60,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SERVING_CLAIMS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TIME_TO_FIRST_HEARING_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper.CAUSE_LIST_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper.CASES_SEARCHED;
 
 @RequiredArgsConstructor
@@ -76,7 +76,6 @@ public class ListingService {
     private String listingDateFrom;
     private String listingDateTo;
     private final CaseSourceLocalReport caseSourceLocalReport;
-    private final HearingsByHearingTypeReport hearingsByHearingTypeReport;
     private static final String MISSING_DOCUMENT_NAME = "Missing document name";
     private static final String MESSAGE = "Failed to generate document for case id : ";
 
@@ -136,6 +135,8 @@ public class ListingService {
                         addListingTypeItems(submitEvent, listingTypeItems, listingDetails);
                     }
                 }
+                listingTypeItems.sort(Comparator.comparing(o -> LocalDate.parse(o.getValue().getCauseListDate(),
+                        CAUSE_LIST_DATE_TIME_PATTERN)));
                 listingDetails.getCaseData().setListingCollection(listingTypeItems);
             }
 
@@ -233,10 +234,6 @@ public class ListingService {
                 return servingClaimsReport.generateReportData(listingDetails, submitEvents);
             case CASE_SOURCE_LOCAL_REPORT:
                 return caseSourceLocalReport.generateReportData(listingDetails, submitEvents);
-            case HEARINGS_BY_HEARING_TYPE_REPORT:
-                setListingDateRangeForSearch(listingDetails);
-                return hearingsByHearingTypeReport.processHearingsByHearingTypeRequest(
-                        listingDetails, submitEvents, listingDateFrom, listingDateTo);
             case MEMBER_DAYS_REPORT:
                 return new MemberDaysReport().runReport(listingDetails, submitEvents);
             default:

@@ -32,9 +32,6 @@ import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReport
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReportData;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportData;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsSearchResult;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsSubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeCaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeSearchResult;
@@ -46,7 +43,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -63,7 +60,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AWAITING_JUDGMENT_REPORT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
@@ -234,28 +230,6 @@ public class ReportDataServiceTest {
     }
 
     @Test
-    public void generateHearingToJudgmentsReportData() throws IOException {
-        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        listingDetails.getCaseData().setManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName());
-        listingDetails.getCaseData().setReportType(HEARINGS_TO_JUDGEMENTS_REPORT);
-        listingDetails.getCaseData().setDocumentName("name");
-        listingDetails.getCaseData().setHearingDateType("Ranged");
-        listingDetails.getCaseData().setListingDate("2021-07-13");
-        listingDetails.getCaseData().setListingDateFrom("2021-07-12");
-        listingDetails.getCaseData().setListingDateTo("2021-07-14");
-        var result = new HearingsToJudgmentsSearchResult();
-        result.setCases(List.of(new HearingsToJudgmentsSubmitEvent()));
-        when(ccdClient.runElasticSearch(anyString(), anyString(), anyString(), eq(HearingsToJudgmentsSearchResult.class))).thenReturn(result);
-        var listingDataResult = (HearingsToJudgmentsReportData) reportDataService.generateReportData(listingDetails, "authToken");
-        assertEquals("name", listingDataResult.getDocumentName());
-        assertEquals(HEARINGS_TO_JUDGEMENTS_REPORT, listingDataResult.getReportType());
-        assertEquals("Ranged", listingDataResult.getHearingDateType());
-        assertEquals("2021-07-13", listingDataResult.getListingDate());
-        assertEquals("2021-07-12", listingDataResult.getListingDateFrom());
-        assertEquals("2021-07-14", listingDataResult.getListingDateTo());
-    }
-
-    @Test
     public void generateCasesAwaitingJudgmentsReportData() throws IOException {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName());
@@ -274,7 +248,6 @@ public class ReportDataServiceTest {
     @Test
     public void generateNoPositionChangeReportData() throws IOException {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        listingDetails.getCaseData().setManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName());
         listingDetails.getCaseData().setReportType(NO_CHANGE_IN_CURRENT_POSITION_REPORT);
         listingDetails.getCaseData().setDocumentName("name");
         listingDetails.getCaseData().setReportDate("2021-12-12");

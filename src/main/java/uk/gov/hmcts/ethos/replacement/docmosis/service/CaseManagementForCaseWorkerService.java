@@ -23,7 +23,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +34,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.time.DayOfWeek.SATURDAY;
+import static java.time.DayOfWeek.SUNDAY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -40,6 +44,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LIST
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
@@ -56,6 +61,8 @@ public class CaseManagementForCaseWorkerService {
     private static final String MISSING_RESPONDENT = "Missing respondent";
     private static final String MESSAGE = "Failed to link ECC case for case id : ";
     private static final String CASE_NOT_FOUND_MESSAGE = "Case Reference Number not found.";
+    public static final String LISTED_DATE_ON_WEEKEND_MESSAGE = "A hearing date you have entered "
+            + "falls on a weekend. You cannot list this case on a weekend. Please amend the date of hearing.";
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
@@ -210,11 +217,10 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void amendHearing(CaseData caseData, String caseTypeId) {
-        if (caseData.getHearingCollection() != null && !caseData.getHearingCollection().isEmpty()) {
+        if (!CollectionUtils.isEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                 var hearingType =  hearingTypeItem.getValue();
-                if (hearingTypeItem.getValue().getHearingDateCollection() != null
-                        && !hearingTypeItem.getValue().getHearingDateCollection().isEmpty()) {
+                if (!CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
                     for (DateListedTypeItem dateListedTypeItem
                             : hearingTypeItem.getValue().getHearingDateCollection()) {
                         var dateListedType = dateListedTypeItem.getValue();
@@ -227,6 +233,29 @@ public class CaseManagementForCaseWorkerService {
                     }
                 }
             }
+        }
+    }
+
+    public void midEventAmendHearing(CaseData caseData, List<String> errors) {
+        if (!CollectionUtils.isEmpty(caseData.getHearingCollection())) {
+            for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
+                if (!CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
+                    for (DateListedTypeItem dateListedTypeItem
+                            : hearingTypeItem.getValue().getHearingDateCollection()) {
+                        addHearingsOnWeekendError(dateListedTypeItem, errors);
+                    }
+                }
+            }
+        }
+    }
+
+    private void addHearingsOnWeekendError(DateListedTypeItem dateListedTypeItem, List<String> errors) {
+        var date = LocalDateTime.parse(
+                dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        if (SUNDAY.equals(dayOfWeek)
+                || SATURDAY.equals(dayOfWeek)) {
+            errors.add(LISTED_DATE_ON_WEEKEND_MESSAGE);
         }
     }
 

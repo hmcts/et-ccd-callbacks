@@ -16,13 +16,17 @@ import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.EccCounterClaimTypeItem;
+import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.types.CasePreAcceptType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.ClaimantType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.EccCounterClaimType;
+import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
@@ -41,6 +45,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -57,6 +62,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -465,6 +471,50 @@ public class CaseManagementForCaseWorkerServiceTest {
                 .getHearingDateCollection().get(0).getValue().getHearingTimingStart());
         assertEquals("2019-11-01T12:11:00.000", caseData.getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().getHearingTimingFinish());
+    }
+
+    @Test
+    public void midEventAmendHearingDateOnWeekend() {
+        CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
+        var errors = new ArrayList<String>();
+        caseData.getHearingCollection().get(0).getValue().getHearingDateCollection().get(0).getValue().setListedDate("2022-03-19T12:11:00.000");
+        caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
+        assertFalse(errors.isEmpty());
+        assertEquals(LISTED_DATE_ON_WEEKEND_MESSAGE, errors.get(0));
+    }
+
+    @Test
+    public void amendMidEventHearingDateFridayNight() {
+        CaseData caseData = createCaseWithHearingDate("2022-03-18T23:59:00.000");
+        var errors = new ArrayList<String>();
+        caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
+        assertTrue(errors.isEmpty());
+    }
+
+    @Test
+    public void amendMidEventHearingDateMondayMorning() {
+        CaseData caseData = createCaseWithHearingDate("2022-03-21T00:00:00.000");
+        var errors = new ArrayList<String>();
+        caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
+        assertTrue(errors.isEmpty());
+    }
+
+    private CaseData createCaseWithHearingDate(String date) {
+        var caseData = new CaseData();
+        List<HearingTypeItem> hearings = new ArrayList<>();
+        HearingTypeItem hearing = new HearingTypeItem();
+        hearing.setId(UUID.randomUUID().toString());
+        HearingType hearingType = new HearingType();
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate(date);
+        dateListedTypeItem.setId(UUID.randomUUID().toString());
+        dateListedTypeItem.setValue(dateListedType);
+        hearingType.setHearingDateCollection(Collections.singletonList(dateListedTypeItem));
+        hearing.setValue(hearingType);
+        hearings.add(hearing);
+        caseData.setHearingCollection(hearings);
+        return caseData;
     }
 
     @Test

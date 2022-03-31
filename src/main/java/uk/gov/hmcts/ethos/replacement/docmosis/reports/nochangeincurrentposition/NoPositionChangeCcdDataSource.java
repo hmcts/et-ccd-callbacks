@@ -17,6 +17,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTE
 @RequiredArgsConstructor
 @Slf4j
 public class NoPositionChangeCcdDataSource implements NoPositionChangeDataSource {
+
     private final String authToken;
     private final CcdClient ccdClient;
 
@@ -26,14 +27,15 @@ public class NoPositionChangeCcdDataSource implements NoPositionChangeDataSource
             var reportDate3MonthsAgo = LocalDate.parse(reportDate, OLD_DATE_TIME_PATTERN2).minusMonths(3)
                     .format(OLD_DATE_TIME_PATTERN2);
             var query = NoPositionChangeElasticSearchQuery.create(reportDate3MonthsAgo);
+            var submitEvents = new ArrayList<NoPositionChangeSubmitEvent>();
             var searchResult = ccdClient.runElasticSearch(authToken, caseTypeId, query,
                     NoPositionChangeSearchResult.class);
 
             if (searchResult != null && CollectionUtils.isNotEmpty(searchResult.getCases())) {
-                return searchResult.getCases();
+                submitEvents.addAll(searchResult.getCases());
             }
 
-            return new ArrayList<>();
+            return submitEvents;
         } catch (Exception e) {
             throw new ReportException(String.format(
                     "Failed to get No Change In Current Position search results for case type id %s", caseTypeId), e);
@@ -44,13 +46,14 @@ public class NoPositionChangeCcdDataSource implements NoPositionChangeDataSource
     public List<SubmitMultipleEvent> getMultiplesData(String caseTypeId, List<String> multipleRefsList) {
         try {
             var query = NoPositionChangeMultiplesElasticSearchQuery.create(multipleRefsList);
+            var submitEvents = new ArrayList<SubmitMultipleEvent>();
             var searchResult = ccdClient.runElasticSearch(authToken, caseTypeId, query, MultipleCaseSearchResult.class);
 
             if (searchResult != null && CollectionUtils.isNotEmpty(searchResult.getCases())) {
-                return searchResult.getCases();
+                submitEvents.addAll(searchResult.getCases());
             }
 
-            return new ArrayList<>();
+            return submitEvents;
         } catch (Exception e) {
             throw new ReportException(String.format(
                     "Failed to get No Change In Current Position multiples search results for case type id %s",

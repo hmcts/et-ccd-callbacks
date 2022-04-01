@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
@@ -16,7 +16,8 @@ public class JudgeSelectionService {
     }
 
     public DynamicFixedListType createJudgeSelection(TribunalOffice tribunalOffice, HearingType selectedHearing) {
-        var listItems = judgeService.getJudgesDynamicList(tribunalOffice);
+        var requiredTribunalOffice = TribunalOffice.getOfficeForReferenceData(tribunalOffice);
+        var listItems = judgeService.getJudgesDynamicList(requiredTribunalOffice);
         var selectedJudge = selectedHearing.getJudge();
         return DynamicFixedListType.from(listItems, selectedJudge);
     }

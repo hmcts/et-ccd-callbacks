@@ -43,7 +43,7 @@ class BroughtForwardInitialiserTest {
     @Test
     void shouldAddScotlandClerks() {
         var clerks = List.of(DynamicValueType.create("clerk1", "Clerk1"));
-        when(courtWorkerService.getCourtWorkerByTribunalOffices(TribunalOffice.SCOTLAND_OFFICES,
+        when(courtWorkerService.getCourtWorkerByTribunalOffice(TribunalOffice.SCOTLAND,
                 CourtWorkerType.CLERK)).thenReturn(clerks);
         var listingDetails = createListingDetails(SCOTLAND_LISTING_CASE_TYPE_ID, BROUGHT_FORWARD_REPORT);
 

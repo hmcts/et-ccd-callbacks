@@ -34,27 +34,6 @@ public class JpaCourtWorkerServiceTest {
         verifyValue(values.get(2), "worker3", "Worker 3");
     }
 
-    @Test
-    public void testGetCourtWorkerByTribunalOffices() {
-        var courtWorkerType = CourtWorkerType.CLERK;
-        var courtWorkers = List.of(
-                createCourtWorker("worker1", "Worker 1"),
-                createCourtWorker("worker2", "Worker 2"),
-                createCourtWorker("worker3", "Worker 3"));
-        var courtWorkerRepository = mock(CourtWorkerRepository.class);
-        when(courtWorkerRepository.findByTribunalOfficeInAndTypeOrderByName(TribunalOffice.ENGLANDWALES_OFFICES,
-                courtWorkerType)).thenReturn(courtWorkers);
-
-        var courtWorkerService = new JpaCourtWorkerService(courtWorkerRepository);
-        var values = courtWorkerService.getCourtWorkerByTribunalOffices(TribunalOffice.ENGLANDWALES_OFFICES,
-                courtWorkerType);
-
-        assertEquals(3, values.size());
-        verifyValue(values.get(0), "worker1", "Worker 1");
-        verifyValue(values.get(1), "worker2", "Worker 2");
-        verifyValue(values.get(2), "worker3", "Worker 3");
-    }
-
     private CourtWorker createCourtWorker(String code, String name) {
         var courtWorker = new CourtWorker();
         courtWorker.setCode(code);

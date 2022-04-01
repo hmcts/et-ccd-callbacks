@@ -22,6 +22,7 @@ import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
@@ -90,6 +91,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String ALLOCATE_HEARING_URL = "/allocateHearing";
     private static final String RESTRICTED_CASES_URL = "/restrictedCases";
     private static final String AMEND_HEARING_URL = "/amendHearing";
+    private static final String MID_EVENT_AMEND_HEARING_URL = "/midEventAmendHearing";
     private static final String AMEND_CASE_STATE_URL = "/amendCaseState";
     private static final String AMEND_FIX_CASE_API_URL = "/amendFixCaseAPI";
     private static final String MID_RESPONDENT_ADDRESS_URL = "/midRespondentAddress";
@@ -111,9 +113,13 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String DYNAMIC_DEPOSIT_ORDER_URL = "/dynamicDepositOrder";
     private static final String DYNAMIC_JUDGMENT_URL = "/dynamicJudgments";
     private static final String JUDGEMENT_SUBMITTED_URL = "/judgementSubmitted";
+    private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL = "/reinstateClosedCaseMidEventValidation";
 
     @Autowired
     private WebApplicationContext applicationContext;
+
+    @MockBean
+    private CaseCloseService caseCloseService;
 
     @MockBean
     private CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
@@ -467,6 +473,19 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
+    public void midEventAmendHearing() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(MID_EVENT_AMEND_HEARING_URL)
+                .content(requestContent2.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(0)))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
     public void amendCaseState() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_CASE_STATE_URL)
@@ -764,6 +783,35 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
+    public void reinstateClosedCaseMidEventValidation() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(caseCloseService.validateReinstateClosedCaseMidEvent(isA(CaseData.class))).thenReturn(anyList());
+        mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
+                .content(requestContent.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", notNullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    public void reinstateClosedCaseMidEventValidationErrors() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(caseCloseService.validateReinstateClosedCaseMidEvent(isA(CaseData.class)))
+                .thenReturn(List.of("test error"));
+        mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
+                .content(requestContent.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
     public void createCaseError400() throws Exception {
         mvc.perform(post(CREATION_CASE_URL)
                 .content("error")
@@ -883,6 +931,15 @@ public class CaseActionsForCaseWorkerControllerTest {
     @Test
     public void amendHearingError400() throws Exception {
         mvc.perform(post(AMEND_HEARING_URL)
+                .content("error")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void midEventAmendHearingError400() throws Exception {
+        mvc.perform(post(MID_EVENT_AMEND_HEARING_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -1059,6 +1116,16 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
         verify(fixCaseApiService, never()).checkUpdateMultipleReference(any(CaseDetails.class), anyString());
+    }
+
+    @Test
+    public void reinstateClosedCaseError400() throws Exception {
+        mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
+                        .content("error")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        verify(caseCloseService, never()).validateReinstateClosedCaseMidEvent(any(CaseData.class));
     }
 
     @Test
@@ -1337,6 +1404,16 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
+    public void midEventAmendHearingForbidden() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(MID_EVENT_AMEND_HEARING_URL)
+                .content(requestContent2.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void amendCaseStateForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_CASE_STATE_URL)
@@ -1562,4 +1639,16 @@ public class CaseActionsForCaseWorkerControllerTest {
         verify(clerkService, never()).initialiseClerkResponsible(isA(CaseData.class));
         verify(fileLocationSelectionService, never()).initialiseFileLocation(isA(CaseData.class));
     }
+    @Test
+    public void reinstateClosedCaseForbidden() throws Exception {
+        CaseData caseData = new CaseData();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
+                        .content(requestContent2.toString())
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+        verify(caseCloseService, never()).validateReinstateClosedCaseMidEvent(caseData);
+    }
+
 }

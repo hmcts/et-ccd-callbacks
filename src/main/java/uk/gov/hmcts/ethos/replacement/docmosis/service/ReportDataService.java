@@ -11,6 +11,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CcdReportDataSource;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport.EccReport;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport.EccReportCcdDataSource;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport.EccReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype.HearingsByHearingTypeCcdReportDataSource;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype.HearingsByHearingTypeReport;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype.HearingsByHearingTypeReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsCcdDataSource;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportData;
@@ -28,11 +34,13 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.JudgeServic
 
 import java.time.LocalDate;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_BY_HEARING_TYPE_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SESSION_DAYS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AWAITING_JUDGMENT_REPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ECC_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
@@ -64,6 +72,10 @@ public class ReportDataService {
                     return getRespondentsReport(listingDetails, authToken);
                 case SESSION_DAYS_REPORT:
                     return getSessionDaysReport(listingDetails, authToken);
+                case ECC_REPORT:
+                    return getEccReport(listingDetails, authToken);
+                case HEARINGS_BY_HEARING_TYPE_REPORT:
+                    return getHearingsByHearingTypeReport(listingDetails, authToken);
                 default:
                     return listingService.getDateRangeReport(listingDetails, authToken);
             }
@@ -106,6 +118,28 @@ public class ReportDataService {
         return reportData;
     }
 
+    private EccReportData getEccReport(ListingDetails listingDetails, String authToken) {
+        log.info("Ecc Report for {}", listingDetails.getCaseTypeId());
+        var reportDataSource = new EccReportCcdDataSource(authToken, ccdClient);
+        setListingDateRangeForSearch(listingDetails);
+        var listingData = listingDetails.getCaseData();
+        var params = new ReportParams(listingDetails.getCaseTypeId(), listingData.getManagingOffice(),
+                listingDateFrom, listingDateTo);
+        var eccReport = new EccReport(reportDataSource);
+        var reportData = eccReport.generateReport(params);
+        setReportData(reportData, listingData);
+        return reportData;
+    }
+
+    private void setReportData(ListingData reportData, ListingData listingData) {
+        reportData.setDocumentName(listingData.getDocumentName());
+        reportData.setReportType(listingData.getReportType());
+        reportData.setHearingDateType(listingData.getHearingDateType());
+        reportData.setListingDateFrom(listingData.getListingDateFrom());
+        reportData.setListingDateTo(listingData.getListingDateTo());
+        reportData.setListingDate(listingData.getListingDate());
+    }
+
     private RespondentsReportData getRespondentsReport(ListingDetails listingDetails, String authToken) {
         log.info("Respondents Report for {}", listingDetails.getCaseData().getManagingOffice());
         var reportDataSource = new RespondentsReportCcdDataSource(authToken, ccdClient);
@@ -136,6 +170,21 @@ public class ReportDataService {
         reportData.setListingDateFrom(listingData.getListingDateFrom());
         reportData.setListingDateTo(listingData.getListingDateTo());
         reportData.setListingDate(listingData.getListingDate());
+        return reportData;
+    }
+
+    private HearingsByHearingTypeReportData getHearingsByHearingTypeReport(ListingDetails listingDetails,
+                                                                           String authToken) {
+        log.info("Hearings By Hearing Type Report for {}", listingDetails.getCaseTypeId());
+        var reportDataSource = new HearingsByHearingTypeCcdReportDataSource(authToken, ccdClient);
+        setListingDateRangeForSearch(listingDetails);
+        var listingData = listingDetails.getCaseData();
+        var hearingsByHearingTypeReport = new HearingsByHearingTypeReport(reportDataSource);
+        var params = new ReportParams(listingDetails.getCaseTypeId(), listingData.getManagingOffice(),
+                listingDateFrom, listingDateTo);
+        var reportData = hearingsByHearingTypeReport
+                .generateReport(params);
+        setReportData(reportData, listingData);
         return reportData;
     }
 

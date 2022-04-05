@@ -2,6 +2,36 @@
 
 This application is responsible for handling all CCD callback requests for employment tribunal cases that have a case type of either ET_EnglandWales or ET_Scotland.
 
+## CFTLIB Quickstart
+### Set environment variables
+
+| Variable | Purpose |
+| -------- | ------- |
+| ET_COS_DB_PASSWORD | Database password |
+| XUI_LD_ID | Launch Darkly Client Id |
+| SPRING_PROFILES_ACTIVE | cftlib |
+
+### Setup
+```bash
+yarn setup
+```
+
+### Run
+```bash
+    ./gradlew bootWithCCD
+    ./gradlew installlocaldb
+```
+
+Note installlocaldb only needs to be executed once in order to install the et_cos database
+
+Once the services are all booted (i.e. when the log messages stop) then ExUI is accessible from:
+
+http://localhost:3000
+
+Username: a@b.com
+
+No password required
+
 ## Getting started
 
 ### Prerequisites

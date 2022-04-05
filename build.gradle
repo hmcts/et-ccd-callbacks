@@ -17,7 +17,7 @@ plugins {
     id 'au.com.dius.pact' version '4.3.6'
     id 'io.freefair.lombok' version '6.4.1'
     id 'org.flywaydb.flyway' version '8.5.5'
-    id 'com.github.hmcts.rse-cft-lib' version '0.15.26'
+    id 'com.github.hmcts.rse-cft-lib' version '0.15.34'
 }
 
 group = 'uk.gov.hmcts.et'
@@ -343,7 +343,7 @@ wrapper {
 }
 
 task installLocalDb(type: Exec) {
-    project.flyway.url = 'jdbc:' + System.getenv('DB_URL') + '/et_cos'
+    project.flyway.url = 'jdbc:postgresql://localhost:6432/et_cos'
     project.flyway.user = 'et_cos'
     project.flyway.password = System.getenv('ET_COS_DB_PASSWORD')
     project.flyway.locations = ['filesystem:src/main/resources/db/migration',
@@ -378,10 +378,11 @@ bootWithCCD {
     // Simulates idam and s2s locally.
     authMode = uk.gov.hmcts.rse.AuthMode.Local
     // Have the cftlib auto-create the et_cos database.
-    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos'
+    //environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos'
 
-    environment 'ET_COS_DB_PORT', '6432'
-    environment 'ET_COS_DB_USER_NAME', 'postgres'
-    environment 'ET_COS_DB_USER_PASSWORD', 'postgres'
+    //environment 'ET_COS_DB_PORT', '6432'
+    //environment 'ET_COS_DB_USER_NAME', 'postgres'
+    //environment 'ET_COS_DB_USER_PASSWORD', 'postgres'
     environment 'CFTLIB_RUNNING', 'true'
+    environment 'XUI_LD_ID', System.getenv('XUI_LD_ID')
 }

@@ -58,5 +58,8 @@
     "merge": "^2.1.1",
     "minimist": "^1.2.6",
     "yargs-parser": "^21.0.1"
+  },
+  "scripts": {
+    "setup": "git submodule update --init --recursive && yarn --cwd ccd-definition-processor install"
   }
 }

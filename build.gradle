@@ -17,6 +17,7 @@ plugins {
     id 'au.com.dius.pact' version '4.3.6'
     id 'io.freefair.lombok' version '6.4.1'
     id 'org.flywaydb.flyway' version '8.5.5'
+    id 'com.github.hmcts.rse-cft-lib' version '0.15.26'
 }
 
 group = 'uk.gov.hmcts.et'
@@ -323,6 +324,8 @@ dependencies {
     contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.10.RELEASE'
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
+
+    cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '4.4.0'
 }
 
 bootJar {
@@ -356,4 +359,29 @@ task migratePostgresDatabase(type: org.flywaydb.gradle.task.FlywayMigrateTask) {
     }
     locations = ['filesystem:src/main/resources/db/migration',
                  'filesystem:src/main/resources/db/dev']
+}
+
+task yarnInstallDefinitions(type: Exec) {
+    commandLine 'yarn', 'install'
+    workingDir project.file('et-ccd-definitions-englandwales')
+}
+
+// Build the definition with a localhost callback URL for running with cftlib
+task generateXlsx(type: Exec, dependsOn: yarnInstallDefinitions) {
+    commandLine 'yarn', 'json2xlsx', '-D', './definitions/json', '-o', './definitions/xlsx/et-englandwales-ccd-config-cftlib.xlsx'
+    workingDir project.file('et-ccd-definitions-englandwales')
+    environment 'CCD_DEF', 'http://localhost:8081'
+}
+
+bootWithCCD {
+    dependsOn generateXlsx
+    // Simulates idam and s2s locally.
+    authMode = uk.gov.hmcts.rse.AuthMode.Local
+    // Have the cftlib auto-create the et_cos database.
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos'
+
+    environment 'ET_COS_DB_PORT', '6432'
+    environment 'ET_COS_DB_USER_NAME', 'postgres'
+    environment 'ET_COS_DB_USER_PASSWORD', 'postgres'
+    environment 'CFTLIB_RUNNING', 'true'
 }

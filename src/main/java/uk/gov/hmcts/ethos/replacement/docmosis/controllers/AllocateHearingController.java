@@ -132,7 +132,12 @@ public class AllocateHearingController {
         }
 
         var caseData = ccdRequest.getCaseDetails().getCaseData();
-        allocateHearingService.populateRooms(caseData);
+        var caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            allocateHearingService.populateRooms(caseData);
+        } else if (Constants.SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            scotlandAllocateHearingService.populateRooms(caseData);
+        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }

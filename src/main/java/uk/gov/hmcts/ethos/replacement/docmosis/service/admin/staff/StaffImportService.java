@@ -28,6 +28,7 @@ public class StaffImportService {
         var documentUrl = adminData.getStaffImportFile().getFile().getBinaryUrl();
         var workbook = excelReadingService.readWorkbook(userToken, documentUrl);
         staffImportStrategy.importWorkbook(workbook);
+        workbook.close();
 
         var user = userService.getUserDetails(userToken);
         adminData.getStaffImportFile().setUser(user.getName());

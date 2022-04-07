@@ -17,7 +17,7 @@ plugins {
     id 'au.com.dius.pact' version '4.3.6'
     id 'io.freefair.lombok' version '6.4.1'
     id 'org.flywaydb.flyway' version '8.5.5'
-    id 'com.github.hmcts.rse-cft-lib' version '0.15.34'
+    id 'com.github.hmcts.rse-cft-lib' version '0.15.60'
 }
 
 group = 'uk.gov.hmcts.et'
@@ -326,6 +326,7 @@ dependencies {
     contractTestImplementation sourceSets.test.runtimeClasspath
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '4.4.0'
+    cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
 }
 
 bootJar {

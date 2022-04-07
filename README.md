@@ -16,6 +16,11 @@ This application is responsible for handling all CCD callback requests for emplo
 yarn setup
 ```
 
+Make sure you have the latest RSE IdAM Simulator image
+```bash
+docker pull hmctspublic.azurecr.io/hmcts/rse/rse-idam-simulator:latest
+```
+
 ### Run
 ```bash
     ./gradlew bootWithCCD

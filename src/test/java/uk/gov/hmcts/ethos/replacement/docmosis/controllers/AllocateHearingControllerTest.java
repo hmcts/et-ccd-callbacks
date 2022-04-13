@@ -120,6 +120,22 @@ public class AllocateHearingControllerTest {
     }
 
     @Test
+    public void testHandleListingSelectedInvalidCaseTypeId() throws Exception {
+        var ccdRequest = CCDRequestBuilder.builder()
+                .withCaseTypeId("InvalidCaseTypeId")
+                .build();
+        var token = "some-token";
+        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
+
+        mockMvc.perform(post("/allocatehearing/handleListingSelected")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", token)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isBadRequest());
+        verify(allocateHearingService, never()).handleListingSelected(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
     public void testPopulateRoomsEnglandWales() throws Exception {
         var ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)

@@ -84,6 +84,9 @@ public class AllocateHearingController {
             allocateHearingService.handleListingSelected(caseData);
         } else if (Constants.SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
             scotlandAllocateHearingService.handleListingSelected(caseData);
+        } else {
+            log.error("Unexpected case type id " + caseTypeId);
+            return ResponseEntity.badRequest().build();
         }
 
         return getCallbackRespEntityNoErrors(caseData);

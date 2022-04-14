@@ -6,6 +6,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsSubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,7 +46,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 class HearingsToJudgmentsReportTest {
 
-    HearingsToJudgmentsDataSource hearingsToJudgmentsReportDataSource;
+    HearingsToJudgmentsReportDataSource hearingsToJudgmentsReportDataSource;
     HearingsToJudgmentsReport hearingsToJudgmentsReport;
     HearingsToJudgmentsCaseDataBuilder caseDataBuilder;
     List<HearingsToJudgmentsSubmitEvent> submitEvents = new ArrayList<>();
@@ -58,7 +60,6 @@ class HearingsToJudgmentsReportTest {
     static final String DATE_TO = BASE_DATE.plusDays(29).format(OLD_DATE_TIME_PATTERN);
     static final String INVALID_JUDGMENT_HEARING_DATE = BASE_DATE.plusDays(1).format(OLD_DATE_TIME_PATTERN2);
     static final String INVALID_HEARING_LISTING_DATE = BASE_DATE.minusDays(2).format(OLD_DATE_TIME_PATTERN);
-    static final String DYNAMIC_JUDGMENT_HEARING_LABEL = "1 : Hearing";
     static final String HEARING_NUMBER = "1";
 
     public HearingsToJudgmentsReportTest() {
@@ -69,10 +70,13 @@ class HearingsToJudgmentsReportTest {
     public void setup() {
         submitEvents.clear();
 
-        hearingsToJudgmentsReportDataSource = mock(HearingsToJudgmentsDataSource.class);
-        when(hearingsToJudgmentsReportDataSource.getData(ENGLANDWALES_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName(), DATE_FROM, DATE_TO)).thenReturn(submitEvents);
+        hearingsToJudgmentsReportDataSource = mock(HearingsToJudgmentsReportDataSource.class);
+        when(hearingsToJudgmentsReportDataSource.getData(ENGLANDWALES_CASE_TYPE_ID,
+                TribunalOffice.NEWCASTLE.getOfficeName(), DATE_FROM, DATE_TO)).thenReturn(submitEvents);
 
-        hearingsToJudgmentsReport = new HearingsToJudgmentsReport(hearingsToJudgmentsReportDataSource, DATE_FROM, DATE_TO);
+        var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName(),
+                DATE_FROM, DATE_TO);
+        hearingsToJudgmentsReport = new HearingsToJudgmentsReport(hearingsToJudgmentsReportDataSource, params);
     }
 
     @Test
@@ -150,7 +154,7 @@ class HearingsToJudgmentsReportTest {
         var submitEvent = caseDataBuilder
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
                 .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment("2021-07-16", DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
+                .withJudgment("2021-07-16", DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvent.getCaseData().getJudgementCollection().add(judgmentTypeItem);
         submitEvents.add(submitEvent);
@@ -171,8 +175,8 @@ class HearingsToJudgmentsReportTest {
         var submitEvent = caseDataBuilder
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
                 .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment("2021-07-16", DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
-                .withJudgment(null, null, null, null)
+                .withJudgment("2021-07-16", DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
+                .withJudgment(null, null, null)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvents.add(submitEvent);
 
@@ -284,7 +288,7 @@ class HearingsToJudgmentsReportTest {
         submitEvents.add(caseDataBuilder
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
                 .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, hearingStatus, HearingType, disposed)
-                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
+                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
         var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
@@ -302,7 +306,7 @@ class HearingsToJudgmentsReportTest {
         submitEvents.add(caseDataBuilder
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
                 .withHearing(INVALID_HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment(INVALID_JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
+                .withJudgment(INVALID_JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
         var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
@@ -321,26 +325,7 @@ class HearingsToJudgmentsReportTest {
         submitEvents.add(caseDataBuilder
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
                 .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment(INVALID_JUDGMENT_HEARING_DATE, DATE_WITHIN_4WKS, DATE_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
-                .buildAsSubmitEvent(ACCEPTED_STATE));
-
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
-        assertCommonValues(reportData);
-        assertEquals(0, reportData.getReportDetails().size());
-    }
-
-    @Test
-    void shouldShowNotShowJudgmentWithInvalidHearingNumber() {
-        // Given a case is accepted
-        // And has been heard
-        // And has a judgment made with the incorrect hearing number
-        // When I request report data
-        // Then the case is not in the report data
-
-        submitEvents.add(caseDataBuilder
-                .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
-                .withHearing(HEARING_LISTING_DATE, "2", HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
+                .withJudgment(INVALID_JUDGMENT_HEARING_DATE, DATE_WITHIN_4WKS, DATE_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
         var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
@@ -359,7 +344,7 @@ class HearingsToJudgmentsReportTest {
         submitEvents.add(caseDataBuilder
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
                 .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
+                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
         var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
@@ -380,7 +365,7 @@ class HearingsToJudgmentsReportTest {
         submitEvents.add(caseDataBuilder
                 .withManagingOffice(managingOffice)
                 .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
+                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
         var reportData = hearingsToJudgmentsReport.runReport(SCOTLAND_LISTING_CASE_TYPE_ID, managingOffice);
@@ -461,7 +446,7 @@ class HearingsToJudgmentsReportTest {
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
                 .withHearing(hearingListedDate, HEARING_STATUS_HEARD, hearingType, YES,
                         hearingNumber, hearingJudge, hearingReserved)
-                .withJudgment(judgmentHearingDate, dateJudgmentMade, dateJudgmentSent, hearingNumber)
+                .withJudgment(judgmentHearingDate, dateJudgmentMade, dateJudgmentSent)
                 .buildAsSubmitEvent(caseState));
 
         var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
@@ -498,10 +483,10 @@ class HearingsToJudgmentsReportTest {
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
                 .withHearing("2021-07-06T10:00:00.000", HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING,
                         YES, HEARING_NUMBER, "A.N. Other", YES)
-                .withJudgment("2021-07-06", "2021-08-03", "2021-08-04", DYNAMIC_JUDGMENT_HEARING_LABEL)
+                .withJudgment("2021-07-06", "2021-08-03", "2021-08-04")
                 .withHearing("2021-07-05T10:00:00.000", HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING,
                         YES, "2", judge, NO)
-                .withJudgment(judgmentHearingDate, "2021-08-03", dateJudgmentSent, "2")
+                .withJudgment(judgmentHearingDate, "2021-08-03", dateJudgmentSent)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
         var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
@@ -522,7 +507,7 @@ class HearingsToJudgmentsReportTest {
         caseDataBuilder = new HearingsToJudgmentsCaseDataBuilder();
         return caseDataBuilder.withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
                 .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment(JUDGMENT_HEARING_DATE, DATE_WITHIN_4WKS, DATE_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
+                .withJudgment(JUDGMENT_HEARING_DATE, DATE_WITHIN_4WKS, DATE_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
     }
 
@@ -530,7 +515,7 @@ class HearingsToJudgmentsReportTest {
         caseDataBuilder = new HearingsToJudgmentsCaseDataBuilder();
         return caseDataBuilder.withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
                 .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
-                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS, DYNAMIC_JUDGMENT_HEARING_LABEL)
+                .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
     }
 

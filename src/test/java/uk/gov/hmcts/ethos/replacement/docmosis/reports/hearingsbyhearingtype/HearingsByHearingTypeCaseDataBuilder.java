@@ -68,7 +68,7 @@ public class HearingsByHearingTypeCaseDataBuilder {
                 hearingType.setHearingSitAlone("Yes");
                 break;
             case "JM":
-                hearingType.setJudicialMediation("JM");
+                hearingType.setJudicialMediation(YES);
                 break;
             case "Tel Con":
                 hearingType.setHearingFormat(List.of ("Telephone"));
@@ -115,7 +115,7 @@ public class HearingsByHearingTypeCaseDataBuilder {
                 hearingStatus);
         List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_JUDICIAL_HEARING, "JM",
                 dateListedTypeItem));
-        submitEvents.add(createSubmitEvent(hearings, "1", "lead1", mulRef,mulName));
+        submitEvents.add(createSubmitEvent(hearings, "1", "Yes", mulRef,mulName));
         dateListedTypeItem = createHearingDateListed("2022-01-03T00:00:00.000",
                 hearingStatus);
         hearings = createHearingCollection(createHearing(HEARING_TYPE_JUDICIAL_REMEDY, "Hybrid",
@@ -153,7 +153,8 @@ public class HearingsByHearingTypeCaseDataBuilder {
         dateListedTypeItem = createHearingDateListed("2022-01-14T00:00:00.000", HEARING_STATUS_HEARD);
         var hearingTypeItem = createHearing(HEARING_TYPE_JUDICIAL_COSTS_HEARING, "Video", dateListedTypeItem);
         hearings.add(hearingTypeItem);
-        return createSubmitEvent(hearings, "123456", "No", "", "");
+        var submitEvent = createSubmitEvent(hearings, "123456", "No", "", "");
+        return submitEvent;
     }
 
     public HearingsByHearingTypeSubmitEvent createSubmitEventNullTime(String propertyToBeNull) {
@@ -170,7 +171,8 @@ public class HearingsByHearingTypeCaseDataBuilder {
         }
         var hearingTypeItem = createHearing(HEARING_TYPE_JUDICIAL_COSTS_HEARING, "Tel Con", dateListedTypeItem);
         hearings.add(hearingTypeItem);
-        return createSubmitEvent(hearings, "123456", "No", "", "");
+        var submitEvent = createSubmitEvent(hearings, "123456", "No", "", "");
+        return submitEvent;
     }
 
     public List<HearingsByHearingTypeSubmitEvent> createSubmitEventsWithoutDates() {
@@ -186,4 +188,6 @@ public class HearingsByHearingTypeCaseDataBuilder {
         submitEventsWithoutDates.add(createSubmitEvent(hearings, "2", "lead2", "multiRef", "subMulti"));
         return submitEventsWithoutDates;
     }
+
+
 }

@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysSubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Judge;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.JudgeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice.JpaJudgeService;
 
@@ -78,7 +79,7 @@ class SessionDaysReportTest {
         submitEvents.add(caseDataBuilder
                 .buildAsSubmitEvent());
 
-        var params = new SessionDaysReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
         var reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);
@@ -100,7 +101,7 @@ class SessionDaysReportTest {
         caseDataBuilder.withHearingData(hearingStatus);
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
 
-        var params = new SessionDaysReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
         var reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);
@@ -123,7 +124,7 @@ class SessionDaysReportTest {
         caseDataBuilder.withHearingData(HEARING_STATUS_HEARD);
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
 
-        var params = new SessionDaysReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
         var reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);
@@ -151,7 +152,7 @@ class SessionDaysReportTest {
     void assertReportDetailsValues(String judge, String judgeType, int index) {
         caseDataBuilder.withHearingData(HEARING_STATUS_HEARD);
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
-        var params = new SessionDaysReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
         var reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);

@@ -8,6 +8,8 @@ import uk.gov.hmcts.ecm.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ecm.common.model.ccd.types.JudgementType;
+import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsCaseData;
+import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsSubmitEvent;
 
 import java.util.ArrayList;
 
@@ -25,8 +27,8 @@ public class HearingsToJudgmentsCaseDataBuilder {
         return this;
     }
 
-    public HearingsToJudgmentsCaseDataBuilder withHearing(String listedDate, String hearingNumber, String hearingStatus,
-                                                          String hearingType, String disposed) {
+    public HearingsToJudgmentsCaseDataBuilder withHearing(String listedDate, String hearingNumber, String hearingStatus, String hearingType,
+                                                          String disposed) {
         return withHearing(listedDate, hearingStatus, hearingType, disposed, hearingNumber, null, null);
     }
 
@@ -62,12 +64,11 @@ public class HearingsToJudgmentsCaseDataBuilder {
     }
 
     public HearingsToJudgmentsCaseDataBuilder withJudgment(String judgmentHearingDate, String dateJudgmentMade,
-                                                           String dateJudgmentSent, String DynamicJudgmentHearing) {
+                                                           String dateJudgmentSent) {
         var judgementType = new JudgementType();
         judgementType.setJudgmentHearingDate(judgmentHearingDate);
         judgementType.setDateJudgmentSent(dateJudgmentSent);
         judgementType.setDateJudgmentMade(dateJudgmentMade);
-        judgementType.setDynamicJudgementHearing(DynamicFixedListType.of(DynamicValueType.create(DynamicJudgmentHearing, DynamicJudgmentHearing)));
         var judgementTypeItem = new JudgementTypeItem();
         judgementTypeItem.setValue(judgementType);
 

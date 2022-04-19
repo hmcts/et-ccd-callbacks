@@ -54,7 +54,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIM
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PRIVATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIVE_CASELOAD_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SERVING_CLAIMS_REPORT;
@@ -73,8 +72,6 @@ public class ListingService {
     private final CasesCompletedReport casesCompletedReport;
     private final TimeToFirstHearingReport timeToFirstHearingReport;
     private final ServingClaimsReport servingClaimsReport;
-    private String listingDateFrom;
-    private String listingDateTo;
     private final CaseSourceLocalReport caseSourceLocalReport;
     private static final String MISSING_DOCUMENT_NAME = "Missing document name";
     private static final String MESSAGE = "Failed to generate document for case id : ";
@@ -248,22 +245,6 @@ public class ListingService {
         listingData.setLocalReportsSummary2(null);
         listingData.setLocalReportsDetailHdr(null);
         listingData.setLocalReportsDetail(null);
-    }
-
-    private void setListingDateRangeForSearch(ListingDetails listingDetails) {
-        var listingData = listingDetails.getCaseData();
-        boolean isRangeHearingDateType = listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE);
-        if (!isRangeHearingDateType) {
-            listingDateFrom = LocalDate.parse(listingData.getListingDate(), OLD_DATE_TIME_PATTERN2)
-                    .atStartOfDay().format(OLD_DATE_TIME_PATTERN);
-            listingDateTo = LocalDate.parse(listingData.getListingDate(), OLD_DATE_TIME_PATTERN2)
-                    .atStartOfDay().plusDays(1).minusSeconds(1).format(OLD_DATE_TIME_PATTERN);
-        } else {
-            listingDateFrom = LocalDate.parse(listingData.getListingDateFrom(), OLD_DATE_TIME_PATTERN2)
-                    .atStartOfDay().format(OLD_DATE_TIME_PATTERN);
-            listingDateTo = LocalDate.parse(listingData.getListingDateTo(), OLD_DATE_TIME_PATTERN2)
-                    .atStartOfDay().plusDays(1).minusSeconds(1).format(OLD_DATE_TIME_PATTERN);
-        }
     }
 
     private List<SubmitEvent> getDateRangeReportSearch(ListingDetails listingDetails, String authToken)

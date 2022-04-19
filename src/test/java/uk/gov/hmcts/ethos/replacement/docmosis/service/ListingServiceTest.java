@@ -38,10 +38,19 @@ import uk.gov.hmcts.ecm.common.model.listing.ListingData;
 import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ecm.common.model.listing.items.AdhocReportTypeItem;
 import uk.gov.hmcts.ecm.common.model.listing.types.AdhocReportType;
+import uk.gov.hmcts.ecm.common.model.reports.eccreport.EccReportCaseData;
+import uk.gov.hmcts.ecm.common.model.reports.eccreport.EccReportSubmitEvent;
+import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeCaseData;
+import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeSubmitEvent;
+import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysCaseData;
+import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysSubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport.EccReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype.HearingsByHearingTypeReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays.MemberDaysReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays.MemberDaysReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays.SessionDaysReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.IOException;
@@ -72,6 +81,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_STANDARD_TRACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_BY_HEARING_TYPE_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_PRESS_LIST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_PUBLIC;
@@ -87,6 +97,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_CLOSED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SESSION_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -1342,38 +1353,7 @@ public class ListingServiceTest {
         submitEvents.get(0).getCaseData().setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
     }
 
-    @Test
-    public void generateMemberDaysReportData() throws IOException {
-        var localSubmitEvents = submitEvents;
-        String docName = "Member Days Report - Test";
-        listingDetailsRange.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        listingDetailsRange.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
-        listingDetailsRange.getCaseData().setReportType(MEMBER_DAYS_REPORT);
-        listingDetailsRange.getCaseData().setDocumentName(docName);
-        listingDetailsRange.getCaseData().setHearingDateType("Range");
-        listingDetailsRange.getCaseData().setListingDate("2021-09-12");
-        listingDetailsRange.getCaseData().setListingDateFrom("2021-09-08");
-        listingDetailsRange.getCaseData().setListingDateTo("2021-09-18");
 
-        var memberDaysReportData = new MemberDaysReportData();
-        memberDaysReportData.setFullDaysTotal("0");
-        memberDaysReportData.setHalfDaysTotal("4");
-        memberDaysReportData.setTotalDays("2");
-        memberDaysReportData.setOffice("Manchester");
-        memberDaysReportData.setDocumentName(docName);
-
-        var memberDaysReport = Mockito.mock(MemberDaysReport.class);
-
-        doReturn(localSubmitEvents).when(ccdClient).retrieveCasesGenericReportElasticSearch(anyString(), anyString(),
-            any(TribunalOffice.class), anyString(), anyString(), anyString());
-
-        doReturn(memberDaysReportData).when(memberDaysReport).runReport(any(ListingDetails.class), anyList());
-
-        var listingDataResult = (MemberDaysReportData) listingService.getDateRangeReport(listingDetailsRange,
-            "authToken");
-
-        assertEquals(MEMBER_DAYS_REPORT, listingDataResult.getReportType());
-    }
 
     @Test(expected = Exception.class)
     public void generateReportDataWithException() throws IOException {

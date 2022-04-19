@@ -47,6 +47,9 @@ public class ListHearingController {
     public ResponseEntity<CCDCallbackResponse> initialiseHearings(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
+
+        log.info("/initialiseHearings");
+
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -54,12 +57,19 @@ public class ListHearingController {
 
         var caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
         var caseData = ccdRequest.getCaseDetails().getCaseData();
-        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
-            venueSelectionService.initHearingCollection(caseData);
-        } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
-            scotlandVenueSelectionService.initHearingCollection(caseData);
-        } else {
-            throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
+
+        try {
+            log.info("/initialiseHearings case type id " + caseTypeId);
+            if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+                venueSelectionService.initHearingCollection(caseData);
+            } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+                scotlandVenueSelectionService.initHearingCollection(caseData);
+            } else {
+                throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
+            }
+        } catch (Exception e) {
+            log.error("/initialiseHearings error", e);
+            throw e;
         }
 
         return getCallbackRespEntityNoErrors(caseData);

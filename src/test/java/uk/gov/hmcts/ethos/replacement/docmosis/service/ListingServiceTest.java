@@ -1369,7 +1369,7 @@ public class ListingServiceTest {
     @Test
     public void dynamicVenueListing_Glasgow() {
         when(venueService.getVenues(any())).thenReturn(VENUES);
-        listingDetails.getCaseData().setManagingOffice(GLASGOW_OFFICE);
+        listingDetails.getCaseData().setManagingOffice("Glasgow");
 
         listingService.dynamicVenueListing(SCOTLAND_LISTING_CASE_TYPE_ID, listingDetails.getCaseData());
         assertEquals(3, listingDetails.getCaseData().getListingVenue().getListItems().size());

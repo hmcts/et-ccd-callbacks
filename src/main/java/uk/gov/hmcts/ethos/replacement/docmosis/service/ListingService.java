@@ -39,16 +39,12 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABERDEEN_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_COMPLETED_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_SOURCE_LOCAL_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_STAFF;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
@@ -159,13 +155,13 @@ public class ListingService {
     }
 
     private void populateScottishVenues(ListingData listingData) {
-        if (ABERDEEN_OFFICE.equals(listingData.getManagingOffice())) {
+        if ("Aberdeen".equals(listingData.getManagingOffice())) {
             listingData.setVenueAberdeen(listingData.getListingVenue());
-        } else if (DUNDEE_OFFICE.equals(listingData.getManagingOffice())) {
+        } else if ("Dundee".equals(listingData.getManagingOffice())) {
             listingData.setVenueDundee(listingData.getListingVenue());
-        } else if (EDINBURGH_OFFICE.equals(listingData.getManagingOffice())) {
+        } else if ("Edinburgh".equals(listingData.getManagingOffice())) {
             listingData.setVenueEdinburgh(listingData.getListingVenue());
-        } else if (GLASGOW_OFFICE.equals(listingData.getManagingOffice())) {
+        } else if ("Glasgow".equals(listingData.getManagingOffice())) {
             listingData.setVenueGlasgow(listingData.getListingVenue());
         }
     }

@@ -402,4 +402,30 @@ public class ListingGenerationController {
 
         return getCallbackRespEntityNoErrors(caseData);
     }
+
+    @PostMapping(value = "/dynamicListingVenue", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Populates the dynamicList for reports")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<ListingCallbackResponse> dynamicListingVenue(
+            @RequestBody ListingRequest listingRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        log.info("DYNAMIC LISTING VENUE LISTS ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        var caseTypeId = listingRequest.getCaseDetails().getCaseTypeId();
+        var listingData = listingRequest.getCaseDetails().getCaseData();
+        listingService.dynamicVenueListing(caseTypeId, listingData);
+
+        return ResponseEntity.ok(ListingCallbackResponse.builder()
+                .data(listingData)
+                .build());
+    }
 }

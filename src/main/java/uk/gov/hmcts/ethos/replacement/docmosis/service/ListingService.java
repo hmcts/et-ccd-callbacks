@@ -7,6 +7,8 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.DocumentInfo;
@@ -26,6 +28,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesourcelocalreport.Cas
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays.MemberDaysReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.servingclaims.ServingClaimsReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.timetofirsthearing.TimeToFirstHearingReport;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.VenueService;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -36,11 +39,16 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABERDEEN_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_COMPLETED_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_SOURCE_LOCAL_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUNDEE_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EDINBURGH_OFFICE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.GLASGOW_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_STAFF;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
@@ -56,6 +64,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIVE_CASELOAD_REPOR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SERVING_CLAIMS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TIME_TO_FIRST_HEARING_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -73,6 +82,7 @@ public class ListingService {
     private final TimeToFirstHearingReport timeToFirstHearingReport;
     private final ServingClaimsReport servingClaimsReport;
     private final CaseSourceLocalReport caseSourceLocalReport;
+    private final VenueService venueService;
     private static final String MISSING_DOCUMENT_NAME = "Missing document name";
     private static final String MESSAGE = "Failed to generate document for case id : ";
 
@@ -121,6 +131,10 @@ public class ListingService {
     }
 
     public ListingData processListingHearingsRequest(ListingDetails listingDetails, String authToken) {
+        if (SCOTLAND_LISTING_CASE_TYPE_ID.equals(listingDetails.getCaseTypeId())) {
+            populateScottishVenues(listingDetails.getCaseData());
+        }
+
         try {
             List<SubmitEvent> submitEvents = getListingHearingsSearch(listingDetails, authToken);
             if (submitEvents != null) {
@@ -141,6 +155,18 @@ public class ListingService {
             return listingDetails.getCaseData();
         } catch (Exception ex) {
             throw new CaseCreationException(MESSAGE + listingDetails.getCaseId() + ex.getMessage());
+        }
+    }
+
+    private void populateScottishVenues(ListingData listingData) {
+        if (ABERDEEN_OFFICE.equals(listingData.getManagingOffice())) {
+            listingData.setVenueAberdeen(listingData.getListingVenue());
+        } else if (DUNDEE_OFFICE.equals(listingData.getManagingOffice())) {
+            listingData.setVenueDundee(listingData.getListingVenue());
+        } else if (EDINBURGH_OFFICE.equals(listingData.getManagingOffice())) {
+            listingData.setVenueEdinburgh(listingData.getListingVenue());
+        } else if (GLASGOW_OFFICE.equals(listingData.getManagingOffice())) {
+            listingData.setVenueGlasgow(listingData.getListingVenue());
         }
     }
 
@@ -175,7 +201,7 @@ public class ListingService {
 
         return ccdClient.retrieveCasesVenueAndDateElasticSearch(
                 authToken, UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()),
-                dateFrom, dateTo, venueToSearch, venueToSearchMapping);
+                dateFrom, dateTo, venueToSearch, venueToSearchMapping, listingData.getManagingOffice());
     }
 
     private List<ListingTypeItem> getListingTypeItems(HearingTypeItem hearingTypeItem,
@@ -356,4 +382,24 @@ public class ListingService {
             throw new DocumentManagementException(MESSAGE + caseTypeId, ex);
         }
     }
+
+    public void dynamicVenueListing(String caseTypeId, ListingData listingData) {
+        if (SCOTLAND_LISTING_CASE_TYPE_ID.equals(caseTypeId)
+                || ENGLANDWALES_LISTING_CASE_TYPE_ID.equals(caseTypeId)) {
+            dynamicVenueList(listingData);
+        } else {
+            throw new IllegalArgumentException(String.format("Unexpected CaseType : %s", caseTypeId));
+        }
+    }
+
+    private void dynamicVenueList(ListingData listingData) {
+        List<DynamicValueType> listItems = new ArrayList<>();
+        listItems.add(DynamicValueType.create(ALL_VENUES, ALL_VENUES));
+        listItems.addAll(venueService.getVenues(TribunalOffice.valueOfOfficeName(listingData.getManagingOffice())));
+
+        var dynamicListingVenues = new DynamicFixedListType();
+        dynamicListingVenues.setListItems(listItems);
+        listingData.setListingVenue(dynamicListingVenues);
+    }
+
 }

@@ -6,7 +6,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 
@@ -15,9 +15,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.*;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadService.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.TESTING_FILE_NAME_EMPTY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.TESTING_FILE_NAME_WITH_TWO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.TESTING_FILE_NAME_WRONG_COLUMN_ROW;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.getDataTypeSheet;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadService.ERROR_SHEET_EMPTY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadService.ERROR_SHEET_NUMBER_COLUMNS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadService.ERROR_SHEET_NUMBER_ROWS;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleUploadServiceTest {

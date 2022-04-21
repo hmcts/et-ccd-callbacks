@@ -1,17 +1,23 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports;
 
+import org.assertj.core.util.Strings;
+import org.junit.Test;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.listing.ListingDetails;
+import uk.gov.hmcts.et.common.model.listing.types.AdhocReportType;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesourcelocalreport.CaseSourceLocalReport;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.assertj.core.util.Strings;
+
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
-import uk.gov.hmcts.ecm.common.model.listing.ListingData;
-import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
-import uk.gov.hmcts.ecm.common.model.listing.types.AdhocReportType;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesourcelocalreport.CaseSourceLocalReport;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
 
 public class CaseSourceLocalReportTest {
     @Test

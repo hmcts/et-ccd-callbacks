@@ -4,8 +4,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.ecm.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.listing.ListingData;
 
 import java.util.Map;
 import java.util.stream.Stream;

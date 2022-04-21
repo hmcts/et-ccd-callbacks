@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted;
 
 import org.apache.commons.collections4.CollectionUtils;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
-import uk.gov.hmcts.ecm.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 
 import java.time.LocalDate;

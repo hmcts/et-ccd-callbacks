@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
 import java.util.ArrayList;
 import java.util.List;

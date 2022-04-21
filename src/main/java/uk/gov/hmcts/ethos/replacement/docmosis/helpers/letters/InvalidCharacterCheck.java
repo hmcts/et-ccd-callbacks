@@ -2,9 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.elasticsearch.common.Strings;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.items.RepresentedTypeRItem;
-import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 
 import java.util.ArrayList;
 import java.util.List;

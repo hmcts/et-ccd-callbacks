@@ -43,8 +43,9 @@ public class ScotlandAllocatedHearingServiceTest {
         var judgeSelectionService = mockJudgeSelectionService();
         var scotlandVenueSelectionService = mockScotlandVenueSelectionService();
         var courtWorkerSelectionService = mockCourtWorkerSelectionService();
+        var roomSelectionService = mockRoomSelectionService();
         scotlandAllocateHearingService = new ScotlandAllocateHearingService(hearingSelectionService,
-                judgeSelectionService, scotlandVenueSelectionService, courtWorkerSelectionService);
+                judgeSelectionService, scotlandVenueSelectionService, courtWorkerSelectionService, roomSelectionService);
     }
 
     @Test
@@ -91,6 +92,14 @@ public class ScotlandAllocatedHearingServiceTest {
         assertEquals(readingDeliberation, caseData.getAllocateHearingReadingDeliberation());
         assertEquals(postponedBy, caseData.getAllocateHearingPostponedBy());
         assertEquals(hearingStatus, caseData.getAllocateHearingStatus());
+    }
+
+    @Test
+    public void testPopulateRooms() {
+        scotlandAllocateHearingService.populateRooms(caseData);
+
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(caseData.getAllocateHearingRoom(),
+                "room", "Room ");
     }
 
     @Test
@@ -235,5 +244,16 @@ public class ScotlandAllocatedHearingServiceTest {
                 CourtWorkerType.EMPLOYEE_MEMBER)).thenReturn(employeeMembers);
 
         return new CourtWorkerSelectionService(courtWorkerService);
+    }
+
+    private RoomSelectionService mockRoomSelectionService() {
+        var roomSelectionService = mock(RoomSelectionService.class);
+        var rooms = SelectionServiceTestUtils.createListItems("room", "Room ");
+        var dynamicFixedListType = new DynamicFixedListType();
+        dynamicFixedListType.setListItems(rooms);
+        when(roomSelectionService.createRoomSelection(isA(CaseData.class),
+                isA(DateListedType.class), isA(Boolean.class))).thenReturn(dynamicFixedListType);
+
+        return roomSelectionService;
     }
 }

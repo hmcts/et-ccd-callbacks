@@ -24,11 +24,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class AllocateHearingServiceTest {
 
     private AllocateHearingService allocateHearingService;
+    private RoomSelectionService roomSelectionService;
 
     private CaseData caseData;
     private final TribunalOffice tribunalOffice = TribunalOffice.MANCHESTER;
@@ -42,7 +45,7 @@ public class AllocateHearingServiceTest {
         var hearingSelectionService = mockHearingSelectionService();
         var judgeSelectionService = mockJudgeSelectionService();
         var venueSelectionService = mockVenueSelectionService();
-        var roomSelectionService = mockRoomSelectionService();
+        roomSelectionService = mockRoomSelectionService();
         var courtWorkerSelectionService = mockCourtWorkerSelectionService();
         allocateHearingService = new AllocateHearingService(hearingSelectionService, judgeSelectionService,
                 venueSelectionService, roomSelectionService, courtWorkerSelectionService);
@@ -132,6 +135,29 @@ public class AllocateHearingServiceTest {
 
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(caseData.getAllocateHearingRoom(),
                 "room", "Room ");
+    }
+
+    @Test
+    public void testPopulateRoomsNewVenueSelected() {
+        selectedListing.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("venue1", "venue1")));
+        selectedListing.setHearingRoom(DynamicFixedListType.of(DynamicValueType.create("room1", "room1")));
+        caseData.setAllocateHearingVenue(DynamicFixedListType.of(DynamicValueType.create("venue2", "venue2")));
+
+        allocateHearingService.populateRooms(caseData);
+
+        verify(roomSelectionService, times(1)).createRoomSelection(caseData, selectedListing, true);
+    }
+
+    @Test
+    public void testPopulateRoomsExistingVenueSelected() {
+        selectedListing.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("venue1", "venue1")));
+        var selectedRoom = DynamicValueType.create("room1", "Room 1");
+        selectedListing.setHearingRoom(DynamicFixedListType.of(selectedRoom));
+        caseData.setAllocateHearingVenue(DynamicFixedListType.of(DynamicValueType.create("venue1", "venue1")));
+
+        allocateHearingService.populateRooms(caseData);
+
+        verify(roomSelectionService, times(1)).createRoomSelection(caseData, selectedListing, false);
     }
 
     @Test
@@ -235,7 +261,7 @@ public class AllocateHearingServiceTest {
         var dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(rooms);
         when(roomSelectionService.createRoomSelection(isA(CaseData.class),
-                isA(DateListedType.class))).thenReturn(dynamicFixedListType);
+                isA(DateListedType.class), isA(Boolean.class))).thenReturn(dynamicFixedListType);
 
         return roomSelectionService;
     }

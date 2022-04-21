@@ -14,12 +14,17 @@ public class RoomSelectionService {
         this.roomService = roomService;
     }
 
-    public DynamicFixedListType createRoomSelection(CaseData caseData, DateListedType selectedListing) {
+    public DynamicFixedListType createRoomSelection(CaseData caseData, DateListedType selectedListing,
+                                                    boolean venueChanged) {
         var selectedVenue = caseData.getAllocateHearingVenue();
         var venueId = selectedVenue.getValue().getCode();
 
         var listItems = roomService.getRooms(venueId);
-        var selectedRoom = selectedListing.getHearingRoom();
-        return DynamicFixedListType.from(listItems, selectedRoom);
+        if (venueChanged) {
+            return DynamicFixedListType.from(listItems);
+        } else {
+            var selectedRoom = selectedListing.getHearingRoom();
+            return DynamicFixedListType.from(listItems, selectedRoom);
+        }
     }
 }

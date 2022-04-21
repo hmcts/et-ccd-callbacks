@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.Document;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ImportFile;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.VenueImport;
 
 public class AdminDataBuilder {
 
@@ -22,6 +24,18 @@ public class AdminDataBuilder {
             adminData.getStaffImportFile().setFile(new Document());
         }
         adminData.getStaffImportFile().getFile().setBinaryUrl(documentBinaryUrl);
+
+        return this;
+    }
+
+    public AdminDataBuilder withVenueImport(TribunalOffice tribunalOffice, String documentBinaryUrl) {
+        if (adminData.getVenueImport() == null) {
+            adminData.setVenueImport(new VenueImport());
+            adminData.getVenueImport().setVenueImportFile(new ImportFile());
+            adminData.getVenueImport().getVenueImportFile().setFile(new Document());
+        }
+        adminData.getVenueImport().getVenueImportFile().getFile().setBinaryUrl(documentBinaryUrl);
+        adminData.getVenueImport().setVenueImportOffice(tribunalOffice.getOfficeName());
 
         return this;
     }

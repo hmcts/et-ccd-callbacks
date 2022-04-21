@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
@@ -57,7 +58,10 @@ public class AllocateHearingService {
 
     public void populateRooms(CaseData caseData) {
         var selectedListing = getSelectedListing(caseData);
-        caseData.setAllocateHearingRoom(roomSelectionService.createRoomSelection(caseData, selectedListing));
+        var venueChanged = isVenueChanged(selectedListing.getHearingVenueDay(), caseData.getAllocateHearingVenue());
+
+        caseData.setAllocateHearingRoom(roomSelectionService.createRoomSelection(caseData, selectedListing,
+                venueChanged));
     }
 
     public void updateCase(CaseData caseData) {
@@ -83,6 +87,12 @@ public class AllocateHearingService {
 
     private DateListedType getSelectedListing(CaseData caseData) {
         return hearingSelectionService.getSelectedListing(caseData, caseData.getAllocateHearingHearing());
+    }
+
+    private boolean isVenueChanged(DynamicFixedListType currentVenue, DynamicFixedListType newVenue) {
+        var currentVenueCode = currentVenue != null ? currentVenue.getSelectedCode() : null;
+        var newVenueCode = newVenue != null ? newVenue.getSelectedCode() : null;
+        return !StringUtils.equals(currentVenueCode, newVenueCode);
     }
 
     private void addEmployerMembers(CaseData caseData, HearingType selectedHearing) {

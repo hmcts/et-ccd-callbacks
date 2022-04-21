@@ -155,13 +155,13 @@ public class ListingService {
     }
 
     private void populateScottishVenues(ListingData listingData) {
-        if ("Aberdeen".equals(listingData.getManagingOffice())) {
+        if (TribunalOffice.ABERDEEN.getOfficeName().equals(listingData.getManagingOffice())) {
             listingData.setVenueAberdeen(listingData.getListingVenue());
-        } else if ("Dundee".equals(listingData.getManagingOffice())) {
+        } else if (TribunalOffice.DUNDEE.getOfficeName().equals(listingData.getManagingOffice())) {
             listingData.setVenueDundee(listingData.getListingVenue());
-        } else if ("Edinburgh".equals(listingData.getManagingOffice())) {
+        } else if (TribunalOffice.EDINBURGH.getOfficeName().equals(listingData.getManagingOffice())) {
             listingData.setVenueEdinburgh(listingData.getListingVenue());
-        } else if ("Glasgow".equals(listingData.getManagingOffice())) {
+        } else if (TribunalOffice.GLASGOW.getOfficeName().equals(listingData.getManagingOffice())) {
             listingData.setVenueGlasgow(listingData.getListingVenue());
         }
     }

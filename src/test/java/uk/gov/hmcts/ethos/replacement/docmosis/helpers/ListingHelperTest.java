@@ -89,7 +89,6 @@ public class ListingHelperTest {
         return mapper.readValue(json, ListingDetails.class);
     }
 
-    @Ignore("Fix as part of reporting work")
     @Test
     public void buildCaseCauseListByRoom() {
         String expected = "{\n"
@@ -292,13 +291,13 @@ public class ListingHelperTest {
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
                 + "}\n"
                 + "}\n";
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         listingDetails.getCaseData().getListingCollection().get(0).getValue().setHearingNotes("Notes with \n new line");
         assertEquals(expected, ListingHelper.buildListingDocumentContent(listingDetails.getCaseData(),
                 "", PUBLIC_CASE_CAUSE_LIST_ROOM_TEMPLATE, userDetails,
                 ENGLANDWALES_LISTING_CASE_TYPE_ID).toString());
     }
 
-    @Ignore("Fix as part of reporting work")
     @Test
     public void buildCaseCauseListWithNoDocument() {
         String expected = "{\n"
@@ -326,6 +325,7 @@ public class ListingHelperTest {
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
                 + "}\n"
                 + "}\n";
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.LONDON_CENTRAL.getOfficeName());
         assertEquals(expected, ListingHelper.buildListingDocumentContent(listingDetails.getCaseData(),
                 "", "", userDetails, ENGLANDWALES_LISTING_CASE_TYPE_ID).toString());
     }
@@ -366,7 +366,6 @@ public class ListingHelperTest {
                 "", "", userDetails, SCOTLAND_LISTING_CASE_TYPE_ID).toString());
     }
 
-    @Ignore("Fix as part of reporting work")
     @Test
     public void buildCaseCauseList() {
         String expected = "{\n"
@@ -563,11 +562,11 @@ public class ListingHelperTest {
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
                 + "}\n"
                 + "}\n";
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         assertEquals(expected, ListingHelper.buildListingDocumentContent(listingDetails.getCaseData(), "",
                 PUBLIC_CASE_CAUSE_LIST_TEMPLATE, userDetails, ENGLANDWALES_LISTING_CASE_TYPE_ID).toString());
     }
 
-    @Ignore("Fix as part of reporting work")
     @Test
     public void buildCaseCauseList2() {
         String expected = "{\n"
@@ -725,11 +724,11 @@ public class ListingHelperTest {
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
                 + "}\n"
                 + "}\n";
+        listingDetails2.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         assertEquals(expected, ListingHelper.buildListingDocumentContent(listingDetails2.getCaseData(), "",
                 PUBLIC_CASE_CAUSE_LIST_TEMPLATE, userDetails, ENGLANDWALES_LISTING_CASE_TYPE_ID).toString());
     }
 
-    @Ignore("Fix as part of reporting work")
     @Test
     public void buildCaseCauseIt56() {
         String expected = "{\n"
@@ -875,11 +874,11 @@ public class ListingHelperTest {
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
                 + "}\n"
                 + "}\n";
+        listingDetails2.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         assertEquals(expected, ListingHelper.buildListingDocumentContent(listingDetails2.getCaseData(), "",
                 IT56_TEMPLATE, userDetails, ENGLANDWALES_LISTING_CASE_TYPE_ID).toString());
     }
 
-    @Ignore("Fix as part of reporting work")
     @Test
     public void buildCaseCauseListPressList() {
         String expected = "{\n"
@@ -1031,6 +1030,7 @@ public class ListingHelperTest {
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
                 + "}\n"
                 + "}\n";
+        listingDetails3.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         assertEquals(expected, ListingHelper.buildListingDocumentContent(listingDetails3.getCaseData(), "",
                 PRESS_LIST_CAUSE_LIST_SINGLE_TEMPLATE, userDetails, ENGLANDWALES_LISTING_CASE_TYPE_ID).toString());
     }

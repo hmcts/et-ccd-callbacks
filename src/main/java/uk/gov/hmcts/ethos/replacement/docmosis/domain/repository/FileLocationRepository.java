@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface FileLocationRepository extends JpaRepository<FileLocation, Integer> {
     List<FileLocation> findByTribunalOffice(TribunalOffice tribunalOffice);
+
+    long deleteByTribunalOffice(TribunalOffice tribunalOffice);
 }

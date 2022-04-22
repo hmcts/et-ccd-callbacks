@@ -48,7 +48,8 @@ class VenueFixedListSheetImporterTest {
 
     @BeforeAll
     static void setup() throws IOException, InvalidFormatException {
-        File file = new File("src/test/resources/admin/VenuesImportFile.xlsx");
+        var file = new File(VenueFixedListSheetImporterTest.class.getClassLoader()
+                .getResource("admin/VenuesImportFile.xlsx").getFile());
         workbook = new XSSFWorkbook(file);
     }
 

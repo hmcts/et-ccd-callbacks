@@ -13,6 +13,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.Document;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ImportFile;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.VenueImport;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FileLocationFixedListSheetImporter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FixedListSheetReaderException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.VenueFixedListSheetImporter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
@@ -35,6 +36,7 @@ class VenueImportServiceTest {
 
     private ExcelReadingService excelReadingService;
     private VenueFixedListSheetImporter venueFixedListSheetImporter;
+    private FileLocationFixedListSheetImporter fileLocationFixedListSheetImporter;
     private UserService userService;
 
     private final String userToken = "test-token";
@@ -45,6 +47,7 @@ class VenueImportServiceTest {
     void setup() {
         excelReadingService = mock(ExcelReadingService.class);
         venueFixedListSheetImporter = mock(VenueFixedListSheetImporter.class);
+        fileLocationFixedListSheetImporter = mock(FileLocationFixedListSheetImporter.class);
 
         userService = mock(UserService.class);
         var userDetails = mock(UserDetails.class);
@@ -56,7 +59,8 @@ class VenueImportServiceTest {
     void testInitImport() {
         var adminData = createAdminData(TribunalOffice.MANCHESTER);
 
-        var venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter, userService);
+        var venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
+                fileLocationFixedListSheetImporter, userService);
         venueImportService.initImport(adminData);
 
         assertNull(adminData.getVenueImport().getVenueImportFile());
@@ -70,10 +74,12 @@ class VenueImportServiceTest {
         var workbook = createWorkbook(tribunalOffice);
         when(excelReadingService.readWorkbook(userToken, documentUrl)).thenReturn(workbook);
 
-        var venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter, userService);
+        var venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
+                fileLocationFixedListSheetImporter, userService);
         venueImportService.importVenues(adminData, userToken);
 
         verify(venueFixedListSheetImporter, times(1)).importSheet(eq(tribunalOffice), any(XSSFSheet.class));
+        verify(fileLocationFixedListSheetImporter, times(1)).importSheet(eq(tribunalOffice), any(XSSFSheet.class));
         assertEquals(userName, adminData.getVenueImport().getVenueImportFile().getUser());
         assertNotNull(adminData.getVenueImport().getVenueImportFile().getLastImported());
     }
@@ -84,7 +90,8 @@ class VenueImportServiceTest {
 
     @Test
     void testImportVenuesScotland() throws FixedListSheetReaderException, IOException {
-        var venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter, userService);
+        var venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
+                fileLocationFixedListSheetImporter, userService);
 
         var adminData = createAdminData(TribunalOffice.SCOTLAND);
         var workbook = createWorkbook(TribunalOffice.SCOTLAND);
@@ -92,11 +99,13 @@ class VenueImportServiceTest {
 
         venueImportService.importVenues(adminData, userToken);
 
-        verify(venueFixedListSheetImporter, times(1)).importSheet(eq(TribunalOffice.GLASGOW), any(XSSFSheet.class));
-        verify(venueFixedListSheetImporter, times(1)).importSheet(eq(TribunalOffice.ABERDEEN), any(XSSFSheet.class));
-        verify(venueFixedListSheetImporter, times(1)).importSheet(eq(TribunalOffice.DUNDEE), any(XSSFSheet.class));
-        verify(venueFixedListSheetImporter, times(1)).importSheet(eq(TribunalOffice.EDINBURGH), any(XSSFSheet.class));
+        for (TribunalOffice tribunalOffice : TribunalOffice.SCOTLAND_OFFICES) {
+            verify(venueFixedListSheetImporter, times(1)).importSheet(eq(tribunalOffice), any(XSSFSheet.class));
+            verify(fileLocationFixedListSheetImporter, times(1)).importSheet(eq(tribunalOffice),
+                    any(XSSFSheet.class));
+        }
         verifyNoMoreInteractions(venueFixedListSheetImporter);
+        verifyNoMoreInteractions(fileLocationFixedListSheetImporter);
 
         assertEquals(userName, adminData.getVenueImport().getVenueImportFile().getUser());
         assertNotNull(adminData.getVenueImport().getVenueImportFile().getLastImported());

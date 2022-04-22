@@ -85,6 +85,7 @@ public class ListingGenerationControllerTest {
     private static final String GENERATE_REPORT_URL = "/generateReport";
     private static final String INIT_PRINT_HEARING_LISTS_URL = "/initPrintHearingLists";
     private static final String INIT_GENERATE_REPORT_URL = "/initGenerateReport";
+    private static final String DYNAMIC_LISTING_VENUE = "/dynamicListingVenue";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -282,6 +283,19 @@ public class ListingGenerationControllerTest {
                 .thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_HEARING_DOCUMENT_URL)
+                .content(requestContent.toString())
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    public void dynamicListingVenue() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(DYNAMIC_LISTING_VENUE)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -507,6 +521,15 @@ public class ListingGenerationControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void dynamicListingVenueError400() throws Exception {
+        mvc.perform(post(DYNAMIC_LISTING_VENUE)
+                .content("error")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

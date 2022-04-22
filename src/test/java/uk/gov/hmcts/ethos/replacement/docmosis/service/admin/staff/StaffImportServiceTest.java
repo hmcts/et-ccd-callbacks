@@ -73,7 +73,8 @@ class StaffImportServiceTest {
     private ExcelReadingService mockExcelReadingService(String userToken, String documentBinaryUrl)
             throws IOException, InvalidFormatException {
         var excelReadingService = mock(ExcelReadingService.class);
-        File file = new File("src/test/resources/admin/StaffImportFile.xlsx");
+        var file = new File(StaffImportServiceTest.class.getClassLoader()
+                .getResource("admin/StaffImportFile.xlsx").getFile());
         var workbook = new XSSFWorkbook(file);
         when(excelReadingService.readWorkbook(userToken, documentBinaryUrl)).thenReturn(workbook);
         return excelReadingService;

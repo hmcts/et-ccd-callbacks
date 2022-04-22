@@ -4,22 +4,24 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
+import java.util.List;
+
 public class FixedListSheetReader {
-    private final FixedListSheetImporter sheetImporter;
+    private final List<FixedListSheetImporter> sheetImporters;
 
     static final String FIXED_LIST_SHEET_NAME = "Scrubbed";
 
-    private FixedListSheetReader(FixedListSheetImporter sheetImporter) {
-        this.sheetImporter = sheetImporter;
+    private FixedListSheetReader(List<FixedListSheetImporter> sheetImporters) {
+        this.sheetImporters = sheetImporters;
     }
 
-    public static FixedListSheetReader create(FixedListSheetImporter sheetImporter) {
-        return new FixedListSheetReader(sheetImporter);
+    public static FixedListSheetReader create(List<FixedListSheetImporter> sheetImporters) {
+        return new FixedListSheetReader(sheetImporters);
     }
 
     public void handle(TribunalOffice tribunalOffice, XSSFWorkbook workbook) throws FixedListSheetReaderException {
         var sheet = getFixedListSheet(workbook);
-        sheetImporter.importSheet(tribunalOffice, sheet);
+        sheetImporters.forEach(s -> s.importSheet(tribunalOffice, sheet));
     }
 
     private XSSFSheet getFixedListSheet(XSSFWorkbook workbook) throws FixedListSheetReaderException {

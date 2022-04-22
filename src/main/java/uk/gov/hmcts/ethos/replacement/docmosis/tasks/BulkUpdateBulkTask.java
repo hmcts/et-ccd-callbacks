@@ -3,10 +3,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.tasks;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.bulk.BulkDetails;
-import uk.gov.hmcts.ecm.common.model.bulk.SubmitBulkEventSubmitEventType;
-import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
+import uk.gov.hmcts.et.common.model.bulk.SubmitBulkEventSubmitEventType;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 
 import java.io.IOException;
 

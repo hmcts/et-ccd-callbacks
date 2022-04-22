@@ -1,17 +1,19 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction;
 
+import org.junit.Before;
+import org.junit.Test;
+import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
+import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
-import org.junit.Before;
-import org.junit.Test;
-import uk.gov.hmcts.ecm.common.model.listing.items.BFDateTypeItem;
-import uk.gov.hmcts.ecm.common.model.listing.types.BFDateType;
 
 public class BfActionReportDocTest {
     private BfActionReportDoc bfActionReportDoc;

@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.RoomRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.RoomService;
 

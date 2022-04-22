@@ -2,9 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Test;
-import uk.gov.hmcts.ecm.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ecm.common.model.multiples.CaseImporterFile;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.et.common.model.multiples.CaseImporterFile;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 
 import java.io.IOException;

@@ -1,34 +1,53 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.assertj.core.util.Strings;
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
-import uk.gov.hmcts.ecm.common.model.listing.ListingData;
-import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
-import uk.gov.hmcts.ecm.common.model.listing.types.AdhocReportType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.listing.ListingDetails;
+import uk.gov.hmcts.et.common.model.listing.types.AdhocReportType;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesourcelocalreport.CaseSourceLocalReport;
 
-public class CaseSourceLocalReportTest {
-    @Test
-    public void testReportHeaderTotalsAreZeroIfNoCasesExist() {
+import java.util.ArrayList;
+import java.util.List;
 
-        ListingDetails listingDetails = new ListingDetails();
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
+
+class CaseSourceLocalReportTest {
+
+    private ListingDetails listingDetails;
+    private ListingData listingData;
+    private List<SubmitEvent> submitEvents;
+    private CaseSourceLocalReport caseSourceLocalReport;
+
+    @BeforeEach
+    void setup() {
+        listingDetails = new ListingDetails();
+        listingData = new ListingData();
+        submitEvents = new ArrayList<>();
+        caseSourceLocalReport = new CaseSourceLocalReport();
+    }
+
+    @Test
+    void testReportHeaderTotalsAreZeroIfNoCasesExist() {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        ListingData caseData = new ListingData();
-        listingDetails.setCaseData(caseData);
-        List<SubmitEvent> submitEvents = new ArrayList<>();
-        CaseSourceLocalReport caseSourceLocalReport = new CaseSourceLocalReport();
+        listingDetails.setCaseData(listingData);
         ListingData listingData = caseSourceLocalReport.generateReportData(listingDetails, submitEvents);
         verifyReportHeaderIsZero(listingData);
     }
 
     private void verifyReportHeaderIsZero(ListingData listingData) {
-        AdhocReportType adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
+        var adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
         assertEquals(0, Strings.isNullOrEmpty(adhocReportType.getEt1OnlineTotalCases())?0:Integer.parseInt(adhocReportType.getEt1OnlineTotalCases()));
         assertEquals(0, Strings.isNullOrEmpty(adhocReportType.getMigratedTotalCases())?0:Integer.parseInt(adhocReportType.getMigratedTotalCases()));
         assertEquals(0, Strings.isNullOrEmpty(adhocReportType.getEccTotalCases())?0:Integer.parseInt(adhocReportType.getEccTotalCases()));
@@ -41,20 +60,15 @@ public class CaseSourceLocalReportTest {
     }
 
     @Test
-    public void mainTest() {
-
-        ListingDetails listingDetails = new ListingDetails();
+    void mainTest() {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        ListingData listingData = new ListingData();
         listingDetails.setCaseData(listingData);
 
-        List<SubmitEvent> submitEvents = new ArrayList<>();
         submitEvents.add(createSubmitEvent( "1970-04-01", MANUALLY_CREATED_POSITION));
         submitEvents.add(createSubmitEvent( "1970-04-02", MIGRATION_CASE_SOURCE));
         submitEvents.add(createSubmitEvent( "1970-04-03", ET1_ONLINE_CASE_SOURCE));
         submitEvents.add(createSubmitEvent( "1970-04-04", FLAG_ECC));
 
-        CaseSourceLocalReport caseSourceLocalReport = new CaseSourceLocalReport();
         ListingData reportListingData = caseSourceLocalReport.generateReportData(listingDetails, submitEvents);
 
         AdhocReportType adhocReportType = reportListingData.getLocalReportsSummary().get(0).getValue();
@@ -85,5 +99,30 @@ public class CaseSourceLocalReportTest {
         caseData.setCaseSource(caseSource);
         submitEvent.setCaseData(caseData);
         return submitEvent;
+    }
+
+    @Test
+    void checkReportOfficeName_EngWales() {
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        listingDetails.setCaseData(listingData);
+
+        ListingData reportListingData = caseSourceLocalReport.generateReportData(listingDetails, submitEvents);
+        var adhocReportType = reportListingData.getLocalReportsSummary().get(0).getValue();
+        assertNotNull(adhocReportType.getReportOffice());
+        assertEquals(listingData.getManagingOffice(), adhocReportType.getReportOffice());
+    }
+
+    @Test
+    void checkReportOfficeName_Scotland() {
+        // Despite setting a managing office, as the casetype is Scotland, the report should have the Scottish office
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
+        listingDetails.setCaseData(listingData);
+
+        ListingData reportListingData = caseSourceLocalReport.generateReportData(listingDetails, submitEvents);
+        var adhocReportType = reportListingData.getLocalReportsSummary().get(0).getValue();
+        assertNotNull(adhocReportType.getReportOffice());
+        assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), adhocReportType.getReportOffice());
     }
 }

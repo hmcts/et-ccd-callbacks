@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays;
 
 import org.apache.commons.collections4.CollectionUtils;
-import uk.gov.hmcts.ecm.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
+
 import java.text.DecimalFormat;
 import java.util.List;
 

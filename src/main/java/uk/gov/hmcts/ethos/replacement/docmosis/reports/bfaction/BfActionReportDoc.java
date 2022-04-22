@@ -1,9 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction;
 
 import org.apache.commons.collections4.CollectionUtils;
-import uk.gov.hmcts.ecm.common.model.listing.ListingData;
-import uk.gov.hmcts.ecm.common.model.listing.items.BFDateTypeItem;
+import uk.gov.hmcts.et.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
+
 import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;

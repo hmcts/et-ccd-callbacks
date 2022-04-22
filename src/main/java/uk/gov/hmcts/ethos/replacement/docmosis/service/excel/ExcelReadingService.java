@@ -10,9 +10,9 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleObject;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 
 import java.io.IOException;
@@ -23,13 +23,13 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.CONSTRAINT_KEY;
-import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_2;
-import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_3;
-import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_4;
-import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_5;
-import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_6;
-import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.SHEET_NAME;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.CONSTRAINT_KEY;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_2;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_4;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_5;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_6;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.SHEET_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.SELECT_ALL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleHelper.NOT_ALLOCATED;
 

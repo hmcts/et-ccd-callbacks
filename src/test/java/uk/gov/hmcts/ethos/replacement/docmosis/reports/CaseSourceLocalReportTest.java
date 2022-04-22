@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports;
 
 import org.assertj.core.util.Strings;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -14,8 +14,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesourcelocalreport.Cas
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
@@ -23,16 +23,15 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_PO
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
-public class CaseSourceLocalReportTest {
+class CaseSourceLocalReportTest {
 
     private ListingDetails listingDetails;
     private ListingData listingData;
     private List<SubmitEvent> submitEvents;
+    private CaseSourceLocalReport caseSourceLocalReport;
 
-    CaseSourceLocalReport caseSourceLocalReport;
-
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         listingDetails = new ListingDetails();
         listingData = new ListingData();
         submitEvents = new ArrayList<>();
@@ -40,7 +39,7 @@ public class CaseSourceLocalReportTest {
     }
 
     @Test
-    public void testReportHeaderTotalsAreZeroIfNoCasesExist() {
+    void testReportHeaderTotalsAreZeroIfNoCasesExist() {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.setCaseData(listingData);
         ListingData listingData = caseSourceLocalReport.generateReportData(listingDetails, submitEvents);
@@ -48,7 +47,7 @@ public class CaseSourceLocalReportTest {
     }
 
     private void verifyReportHeaderIsZero(ListingData listingData) {
-        AdhocReportType adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
+        var adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
         assertEquals(0, Strings.isNullOrEmpty(adhocReportType.getEt1OnlineTotalCases())?0:Integer.parseInt(adhocReportType.getEt1OnlineTotalCases()));
         assertEquals(0, Strings.isNullOrEmpty(adhocReportType.getMigratedTotalCases())?0:Integer.parseInt(adhocReportType.getMigratedTotalCases()));
         assertEquals(0, Strings.isNullOrEmpty(adhocReportType.getEccTotalCases())?0:Integer.parseInt(adhocReportType.getEccTotalCases()));
@@ -61,7 +60,7 @@ public class CaseSourceLocalReportTest {
     }
 
     @Test
-    public void mainTest() {
+    void mainTest() {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.setCaseData(listingData);
 
@@ -103,7 +102,7 @@ public class CaseSourceLocalReportTest {
     }
 
     @Test
-    public void checkReportOfficeName_EngWales() {
+    void checkReportOfficeName_EngWales() {
         listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.setCaseData(listingData);
@@ -115,7 +114,7 @@ public class CaseSourceLocalReportTest {
     }
 
     @Test
-    public void checkReportOfficeName_Scotland() {
+    void checkReportOfficeName_Scotland() {
         // Despite setting a managing office, as the casetype is Scotland, the report should have the Scottish office
         listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);

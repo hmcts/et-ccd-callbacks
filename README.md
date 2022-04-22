@@ -1,33 +1,93 @@
 # Employment Tribunals CCD Callbacks Service
 
-This application is responsible for handling all CCD callback requests for employment tribunal cases that have a case type of either ET_EnglandWales or ET_Scotland.
+This application is responsible for handling all CCD callback requests for employment tribunal cases.
 
-## CFTLIB Quickstart
-### Set environment variables
+## Prerequisites
 
-| Variable | Purpose |
-| -------- | ------- |
-| ET_COS_DB_PASSWORD | Database password |
-| XUI_LD_ID | Launch Darkly Client Id |
-| SPRING_PROFILES_ACTIVE | cftlib |
+### Java
+- [JDK 11](https://www.oracle.com/java)
 
-### Setup
+### CCD Common Components
+The application should be run in an environment that includes CCD common components.
+
+There are two options for achieving this:
+- [CFTLib plugin](https://github.com/hmcts/rse-cft-lib)
+- [ECM CCD Docker](https://github.com/hmcts/ecm-ccd-docker)
+
+### Postgres Database
+A local database is required. This is provided by one of the CCD Common Components environments.
+
+[flyway](https://flywaydb.org/) migrations are automatically run on startup.
+
+### Azure Service Bus
+The application requires a connection to an Azure Service Bus queue.
+
+There are two options for achieving this:
+- Provide a connection string for a development queue in Azure
+- Configure a fake connection client
+
+### Docmosis Tornado
+[Docmosis Tornado](https://www.docmosis.com/products/tornado.html) is a third-party document generation engine used to
+generate reports. This is provided by one of the CCD Common Components environments.
+
+A license is required to use this product.
+
+## Building
+The project uses [Gradle](https://gradle.org) as a build tool, but you don't have to install it locally since there is a
+`./gradlew` wrapper script.
+
+To build the project execute the following command:
+
+```bash
+    ./gradlew build
+```
+
+To get the project to build in IntelliJ IDEA, you have to:
+
+- Install the Lombok plugin: Preferences -> Plugins
+- Enable Annotation Processing: Preferences -> Build, Execution, Deployment -> Compiler -> Annotation Processors
+
+## Running
+
+### Mandatory Environment Variables
+| Variable | Purpose                        |
+| -------- |--------------------------------|
+| ET_COS_DB_PASSWORD | Local et_cos database password |
+
+### Azure Service Bus
+Either provide a connection string in an environment variable to a development queue
+
+| Variable | Purpose                                    |
+| -------- |--------------------------------------------|
+| CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING | Connection string for create-updates queue |
+
+Or, if no development queue is available, set the following environment variable
+
+| Variable | Purpose                                             |
+| -------- |-----------------------------------------------------|
+| SERVICEBUS_FAKE | Set to ```true``` to enable fake service bus client |
+
+### Running using CFTLib
+#### Set environment variables
+
+| Variable | Purpose                                          |
+| -------- |--------------------------------------------------|
+| XUI_LD_ID | Launch Darkly Client Id                          |
+| SPRING_PROFILES_ACTIVE | Set to ```cftlib``` to use cftlib Spring profile |
+
+#### Setup
 ```bash
 yarn setup
 ```
-
 Make sure you have the latest RSE IdAM Simulator image
 ```bash
 docker pull hmctspublic.azurecr.io/hmcts/rse/rse-idam-simulator:latest
 ```
 
-### Run
+#### Run
 ```bash
     ./gradlew bootWithCCD
-    ./gradlew installlocaldb
 ```
-
-Note installlocaldb only needs to be executed once in order to install the et_cos database
 
 Once the services are all booted (i.e. when the log messages stop) then ExUI is accessible from:
 
@@ -37,67 +97,23 @@ Username: a@b.com
 
 No password required
 
-## Getting started
+**_Note the CFTLib plugin supports Spring Boot DevTools automatic restart._**
 
-### Prerequisites
-
-- [JDK 11](https://www.oracle.com/java)
-
-### Building
-
-The project uses [Gradle](https://gradle.org) as a build tool but you don't have to install it locally since there is a
-`./gradlew` wrapper script.
-
-To build the project please execute the following command:
-
-```bash
-    ./gradlew build
-```
-
-To get the project to build in IntelliJ IDEA, you have to:
-
- - Install the Lombok plugin: Preferences -> Plugins
- - Enable Annotation Processing: Preferences -> Build, Execution, Deployment -> Compiler -> Annotation Processors
-
-### Running
-
-Running the application is best achieved by setting up an environment containing all dependencies. A local development
-environment can be created using the ecm-ccd-docker project.
-See [here](https://github.com/hmcts/ecm-ccd-docker)
-
-#### Environment Variables
-Required:
-- ET_COS_DB_PASSWORD
-- CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING
-- DB_URL
-
-Optional:
-- TORNADO_ACCESS_KEY - only needed if you want to generate reports using Docmosis
-
-
+### Running using ECM CCD Docker
 #### Setup
-There is a dependency on a postgres database to be running locally.
+See [ECM CCD Docker](https://github.com/hmcts/ecm-ccd-docker) for steps to start the CCD Docker environment.
 
-To install the database schema required for et-ccd-callbacks execute the following command:
-```bash
-    ./gradlew installlocaldb
-```
-
-There is also a dependency on Azure Service Bus.
-
-To run the project locally you should use the dev profile.
-You can run the application by executing following command:
-
+#### Run
 ```bash
     ./gradlew bootRun --args='--spring.profiles.active=dev'
 ```
 
-The application will start locally on `http://localhost:8081`
+Once the services are all booted (i.e. when the log messages stop) then ExUI is accessible from:
 
-### API documentation
+http://localhost:3455
 
-API documentation is provided with Swagger:
-UI to interact with the API resources
+## API documentation
+API documentation is provided with Swagger
 
 ```bash
     http://localhost:8081/swagger-ui.html
@@ -108,24 +124,21 @@ UI to interact with the API resources
 ### Database
 All database updates are applied using [flyway](https://flywaydb.org/). See src/main/resources/db
 
-### Unit tests
-
-To run all unit tests please execute following command:
+### Unit Tests
+To run all unit tests:
 
 ```bash
     ./gradlew test
 ```
 
-### Coding style tests
-
-To run all checks (including unit tests) please execute following command:
+### Coding Style Tests
+To run all checks (including unit tests):
 
 ```bash
     ./gradlew check
 ```
 
 ### OWASP Dependency Vulnerability Checks
-
 To run the OWASP checks for vulnerabilities in dependencies:
 
 ```bash
@@ -133,5 +146,4 @@ To run the OWASP checks for vulnerabilities in dependencies:
 ```
 
 ## License
-
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.

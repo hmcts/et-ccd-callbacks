@@ -31,7 +31,6 @@ withPipeline(type, product, component) {
   env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
   loadVaultSecrets(secrets)
   enableAksStagingDeployment()
-  enableDbMigration('et-cos')
   onMaster {
     disableLegacyDeployment()
   }

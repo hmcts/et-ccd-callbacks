@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class QueueClientConfiguration {
 
-    @ConditionalOnProperty(name = "cftlib.running", havingValue = "false", matchIfMissing = true)
+    @ConditionalOnProperty(name = "servicebus.fake", havingValue = "false", matchIfMissing = true)
     @Bean("create-updates-send-client")
     public IQueueClient createUpdatesSendClient(
         @Value("${queue.create-updates.send.connection-string}") String connectionString,

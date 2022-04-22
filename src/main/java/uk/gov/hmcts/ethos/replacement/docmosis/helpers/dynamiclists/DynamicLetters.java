@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists;
 
 import org.apache.commons.collections4.CollectionUtils;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.ecm.common.model.ccd.types.CorrespondenceScotType;
-import uk.gov.hmcts.ecm.common.model.ccd.types.CorrespondenceType;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
+import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DynamicListHelper;
 
 import java.util.List;
@@ -36,9 +36,8 @@ public class DynamicLetters {
         }
     }
 
-    public static void dynamicMultipleLetters(SubmitEvent submitEvent, MultipleData multipleData, String caseTypeId,
-                                              List<DynamicValueType> listItems) {
-        listItems.addAll(DynamicListHelper.createDynamicHearingList(submitEvent.getCaseData()));
+    public static void dynamicMultipleLetters(SubmitEvent submitEvent, MultipleData multipleData, String caseTypeId) {
+        List<DynamicValueType> listItems = DynamicListHelper.createDynamicHearingList(submitEvent.getCaseData());
         if (CollectionUtils.isNotEmpty(listItems)) {
             var dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(listItems);

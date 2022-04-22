@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.model.ccd.DocumentInfo;
-import uk.gov.hmcts.ecm.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
-import uk.gov.hmcts.ecm.common.model.multiples.CaseImporterFile;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.et.common.model.multiples.CaseImporterFile;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
@@ -148,7 +148,14 @@ public class ExcelDocManagementService {
                         documentManagementService.generateDownloadableURL(documentSelfPath)))
                 .url(documentManagementService.generateDownloadableURL(documentSelfPath))
                 .build();
-
     }
 
+    public DocumentInfo uploadExcelReportDocument(String userToken, String documentName, byte[] excelBytes) {
+        URI documentUri = documentManagementService.uploadDocument(userToken, excelBytes,
+            documentName, APPLICATION_EXCEL_VALUE, "Listings_Type");
+
+        log.info("Excel Report - URI documentSelfPath uploaded and created: " + documentUri.toString());
+
+        return getScheduleDocument(documentUri, documentName);
+    }
 }

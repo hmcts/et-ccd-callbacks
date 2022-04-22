@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
-import uk.gov.hmcts.ecm.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.listing.ListingData;
 
 import java.util.ArrayList;
 import java.util.List;

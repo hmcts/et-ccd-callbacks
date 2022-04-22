@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.ecm.common.model.generic.GenericCallbackResponse;
+import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

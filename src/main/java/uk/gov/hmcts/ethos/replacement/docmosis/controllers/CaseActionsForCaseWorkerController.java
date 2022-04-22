@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ecm.common.model.ccd.CCDCallbackResponse;
-import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
+import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
@@ -27,7 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudge
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRestrictedReporting;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
@@ -73,7 +73,7 @@ public class CaseActionsForCaseWorkerController {
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String EVENT_FIELDS_VALIDATION = "Event fields validation: ";
-    private final CaseCloseService caseCloseService;
+    private final CaseCloseValidator caseCloseValidator;
     private final CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CaseUpdateForCaseWorkerService caseUpdateForCaseWorkerService;
@@ -1157,7 +1157,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         var caseData =  ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = caseCloseService.validateReinstateClosedCaseMidEvent(caseData);
+        List<String> errors = caseCloseValidator.validateReinstateClosedCaseMidEvent(caseData);
 
         return getCallbackRespEntityErrors(errors, caseData);
     }

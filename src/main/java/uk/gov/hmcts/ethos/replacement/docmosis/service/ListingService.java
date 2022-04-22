@@ -7,16 +7,16 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ecm.common.model.ccd.DocumentInfo;
-import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
-import uk.gov.hmcts.ecm.common.model.listing.ListingData;
-import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
-import uk.gov.hmcts.ecm.common.model.listing.items.ListingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.listing.ListingDetails;
+import uk.gov.hmcts.et.common.model.listing.items.ListingTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingVenueHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
@@ -54,7 +54,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIM
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PRIVATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIVE_CASELOAD_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SERVING_CLAIMS_REPORT;
@@ -73,8 +72,6 @@ public class ListingService {
     private final CasesCompletedReport casesCompletedReport;
     private final TimeToFirstHearingReport timeToFirstHearingReport;
     private final ServingClaimsReport servingClaimsReport;
-    private String listingDateFrom;
-    private String listingDateTo;
     private final CaseSourceLocalReport caseSourceLocalReport;
     private static final String MISSING_DOCUMENT_NAME = "Missing document name";
     private static final String MESSAGE = "Failed to generate document for case id : ";
@@ -178,7 +175,7 @@ public class ListingService {
 
         return ccdClient.retrieveCasesVenueAndDateElasticSearch(
                 authToken, UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()),
-                dateFrom, dateTo, venueToSearch, venueToSearchMapping);
+                dateFrom, dateTo, venueToSearch, venueToSearchMapping, listingData.getManagingOffice());
     }
 
     private List<ListingTypeItem> getListingTypeItems(HearingTypeItem hearingTypeItem,
@@ -248,22 +245,6 @@ public class ListingService {
         listingData.setLocalReportsSummary2(null);
         listingData.setLocalReportsDetailHdr(null);
         listingData.setLocalReportsDetail(null);
-    }
-
-    private void setListingDateRangeForSearch(ListingDetails listingDetails) {
-        var listingData = listingDetails.getCaseData();
-        boolean isRangeHearingDateType = listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE);
-        if (!isRangeHearingDateType) {
-            listingDateFrom = LocalDate.parse(listingData.getListingDate(), OLD_DATE_TIME_PATTERN2)
-                    .atStartOfDay().format(OLD_DATE_TIME_PATTERN);
-            listingDateTo = LocalDate.parse(listingData.getListingDate(), OLD_DATE_TIME_PATTERN2)
-                    .atStartOfDay().plusDays(1).minusSeconds(1).format(OLD_DATE_TIME_PATTERN);
-        } else {
-            listingDateFrom = LocalDate.parse(listingData.getListingDateFrom(), OLD_DATE_TIME_PATTERN2)
-                    .atStartOfDay().format(OLD_DATE_TIME_PATTERN);
-            listingDateTo = LocalDate.parse(listingData.getListingDateTo(), OLD_DATE_TIME_PATTERN2)
-                    .atStartOfDay().plusDays(1).minusSeconds(1).format(OLD_DATE_TIME_PATTERN);
-        }
     }
 
     private List<SubmitEvent> getDateRangeReportSearch(ListingDetails listingDetails, String authToken)

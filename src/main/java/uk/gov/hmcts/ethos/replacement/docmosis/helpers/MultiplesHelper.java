@@ -2,14 +2,14 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import uk.gov.hmcts.ecm.common.model.bulk.items.CaseIdTypeItem;
-import uk.gov.hmcts.ecm.common.model.bulk.types.CaseType;
 import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleObject;
-import uk.gov.hmcts.ecm.common.model.multiples.items.CaseMultipleTypeItem;
-import uk.gov.hmcts.ecm.common.model.multiples.items.SubMultipleTypeItem;
-import uk.gov.hmcts.ecm.common.model.multiples.types.SubMultipleType;
+import uk.gov.hmcts.et.common.model.bulk.items.CaseIdTypeItem;
+import uk.gov.hmcts.et.common.model.bulk.types.CaseType;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
+import uk.gov.hmcts.et.common.model.multiples.items.CaseMultipleTypeItem;
+import uk.gov.hmcts.et.common.model.multiples.items.SubMultipleTypeItem;
+import uk.gov.hmcts.et.common.model.multiples.types.SubMultipleType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,12 +31,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_PO
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_1;
-import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_2;
-import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_3;
-import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_4;
-import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_5;
-import static uk.gov.hmcts.ecm.common.model.multiples.MultipleConstants.HEADER_6;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_1;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_2;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_4;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_5;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_6;
 
 @Slf4j
 public class MultiplesHelper {

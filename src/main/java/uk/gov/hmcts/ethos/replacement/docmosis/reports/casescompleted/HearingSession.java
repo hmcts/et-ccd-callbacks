@@ -2,8 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
-import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
 @RequiredArgsConstructor
 @Data

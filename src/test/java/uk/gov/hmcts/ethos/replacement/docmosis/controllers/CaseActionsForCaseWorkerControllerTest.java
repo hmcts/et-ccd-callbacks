@@ -14,31 +14,31 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.File;
@@ -119,7 +119,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     private WebApplicationContext applicationContext;
 
     @MockBean
-    private CaseCloseService caseCloseService;
+    private CaseCloseValidator caseCloseValidator;
 
     @MockBean
     private CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
@@ -785,7 +785,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     @Test
     public void reinstateClosedCaseMidEventValidation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(caseCloseService.validateReinstateClosedCaseMidEvent(isA(CaseData.class))).thenReturn(anyList());
+        when(caseCloseValidator.validateReinstateClosedCaseMidEvent(isA(CaseData.class))).thenReturn(anyList());
         mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -799,7 +799,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     @Test
     public void reinstateClosedCaseMidEventValidationErrors() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(caseCloseService.validateReinstateClosedCaseMidEvent(isA(CaseData.class)))
+        when(caseCloseValidator.validateReinstateClosedCaseMidEvent(isA(CaseData.class)))
                 .thenReturn(List.of("test error"));
         mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -1125,7 +1125,7 @@ public class CaseActionsForCaseWorkerControllerTest {
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-        verify(caseCloseService, never()).validateReinstateClosedCaseMidEvent(any(CaseData.class));
+        verify(caseCloseValidator, never()).validateReinstateClosedCaseMidEvent(any(CaseData.class));
     }
 
     @Test
@@ -1628,6 +1628,18 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
+    public void reinstateClosedCaseForbidden() throws Exception {
+        CaseData caseData = new CaseData();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
+                        .content(requestContent2.toString())
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+        verify(caseCloseValidator, never()).validateReinstateClosedCaseMidEvent(caseData);
+    }
+
+    @Test
     public void initialiseAmendCaseDetailsForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(INITIALISE_AMEND_CASE_DETAILS_URL)
@@ -1639,16 +1651,4 @@ public class CaseActionsForCaseWorkerControllerTest {
         verify(clerkService, never()).initialiseClerkResponsible(isA(CaseData.class));
         verify(fileLocationSelectionService, never()).initialiseFileLocation(isA(CaseData.class));
     }
-    @Test
-    public void reinstateClosedCaseForbidden() throws Exception {
-        CaseData caseData = new CaseData();
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
-                        .content(requestContent2.toString())
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-        verify(caseCloseService, never()).validateReinstateClosedCaseMidEvent(caseData);
-    }
-
 }

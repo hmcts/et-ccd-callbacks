@@ -1,14 +1,14 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction;
 
 import org.springframework.util.CollectionUtils;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.ecm.common.model.ccd.items.BFActionTypeItem;
-import uk.gov.hmcts.ecm.common.model.listing.ListingData;
-import uk.gov.hmcts.ecm.common.model.listing.ListingDetails;
-import uk.gov.hmcts.ecm.common.model.listing.items.BFDateTypeItem;
-import uk.gov.hmcts.ecm.common.model.listing.items.BFDateTypeItemComparator;
-import uk.gov.hmcts.ecm.common.model.listing.types.BFDateType;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
+import uk.gov.hmcts.et.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.listing.ListingDetails;
+import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
+import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItemComparator;
+import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 
 import java.util.ArrayList;

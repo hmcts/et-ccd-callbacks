@@ -1,19 +1,21 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
-import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.VenueService;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class VenueSelectionService {
     private final VenueService venueService;
 
@@ -22,7 +24,10 @@ public class VenueSelectionService {
     }
 
     public void initHearingCollection(CaseData caseData) {
-        var venues = venueService.getVenues(TribunalOffice.valueOfOfficeName(caseData.getManagingOffice()));
+        var tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
+        var venues = venueService.getVenues(tribunalOffice);
+        log.info(venues.size() + " venues found for " + tribunalOffice);
+
         if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
             var hearingTypeItem = new HearingTypeItem();
             hearingTypeItem.setId(UUID.randomUUID().toString());

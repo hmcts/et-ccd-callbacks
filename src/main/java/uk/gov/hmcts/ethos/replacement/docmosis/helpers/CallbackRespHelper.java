@@ -2,14 +2,14 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.sun.istack.NotNull;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.ecm.common.model.ccd.CCDCallbackResponse;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ecm.common.model.ccd.DocumentInfo;
-import uk.gov.hmcts.ecm.common.model.listing.ListingCallbackResponse;
-import uk.gov.hmcts.ecm.common.model.listing.ListingData;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleCallbackResponse;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.listing.ListingCallbackResponse;
+import uk.gov.hmcts.et.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 
 import java.util.List;
 

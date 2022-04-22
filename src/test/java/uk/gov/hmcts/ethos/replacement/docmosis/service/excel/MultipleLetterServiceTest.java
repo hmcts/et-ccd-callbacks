@@ -6,12 +6,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.gov.hmcts.ecm.common.model.ccd.DocumentInfo;
-import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.ecm.common.model.ccd.types.CorrespondenceScotType;
-import uk.gov.hmcts.ecm.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
+import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DynamicListHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
@@ -23,7 +24,12 @@ import java.util.TreeMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
 
@@ -204,6 +210,8 @@ public class MultipleLetterServiceTest {
 
     @Test
     public void dynamicMultipleLetters() {
+        MultipleUtil.addHearingToCaseData(submitEvents.get(0).getCaseData());
+        var hearingFromCase = DynamicListHelper.createDynamicHearingList(submitEvents.get(0).getCaseData()).get(0);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsFlags);
         when(singleCasesReadingService.retrieveSingleCase(userToken,
@@ -216,6 +224,10 @@ public class MultipleLetterServiceTest {
                 multipleDetails.getCaseTypeId(),
                 multipleObjectsFlags.firstKey(),
                 multipleDetails.getCaseData().getMultipleSource());
+        assertEquals(1, multipleDetails.getCaseData().getCorrespondenceType().getDynamicHearingNumber()
+                .getListItems().size());
+        assertEquals(hearingFromCase, multipleDetails.getCaseData().getCorrespondenceType().getDynamicHearingNumber()
+                .getListItems().get(0));
     }
 
 }

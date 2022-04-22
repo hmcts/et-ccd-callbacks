@@ -1,11 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
-import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
@@ -18,15 +19,18 @@ public class ScotlandAllocateHearingService {
     private final JudgeSelectionService judgeSelectionService;
     private final ScotlandVenueSelectionService scotlandVenueSelectionService;
     private final CourtWorkerSelectionService courtWorkerSelectionService;
+    private final RoomSelectionService roomSelectionService;
 
     public ScotlandAllocateHearingService(HearingSelectionService hearingSelectionService,
                                           JudgeSelectionService judgeSelectionService,
                                           ScotlandVenueSelectionService scotlandVenueSelectionService,
-                                          CourtWorkerSelectionService courtWorkerSelectionService) {
+                                          CourtWorkerSelectionService courtWorkerSelectionService,
+                                          RoomSelectionService roomSelectionService) {
         this.hearingSelectionService = hearingSelectionService;
         this.judgeSelectionService = judgeSelectionService;
         this.scotlandVenueSelectionService = scotlandVenueSelectionService;
         this.courtWorkerSelectionService = courtWorkerSelectionService;
+        this.roomSelectionService = roomSelectionService;
     }
 
     public void handleListingSelected(CaseData caseData) {
@@ -63,6 +67,14 @@ public class ScotlandAllocateHearingService {
             caseData.getAllocateHearingEmployeeMember().setValue(null);
             caseData.getAllocateHearingEmployerMember().setValue(null);
         }
+    }
+
+    public void populateRooms(CaseData caseData) {
+        var selectedListing = getSelectedListing(caseData);
+        var venueChanged = isVenueChanged(selectedListing, caseData.getAllocateHearingVenue());
+
+        caseData.setAllocateHearingRoom(roomSelectionService.createRoomSelection(caseData, selectedListing,
+                venueChanged));
     }
 
     public void updateCase(CaseData caseData) {
@@ -118,6 +130,36 @@ public class ScotlandAllocateHearingService {
 
     private DateListedType getSelectedListing(CaseData caseData) {
         return hearingSelectionService.getSelectedListing(caseData, caseData.getAllocateHearingHearing());
+    }
+
+    private boolean isVenueChanged(DateListedType listing, DynamicFixedListType newVenue) {
+        var currentVenue = getCurrentVenue(listing);
+        return isVenueChanged(currentVenue, newVenue);
+    }
+
+    private boolean isVenueChanged(DynamicFixedListType currentVenue, DynamicFixedListType newVenue) {
+        var currentVenueCode = currentVenue != null ? currentVenue.getSelectedCode() : null;
+        var newVenueCode = newVenue != null ? newVenue.getSelectedCode() : null;
+        return !StringUtils.equals(currentVenueCode, newVenueCode);
+    }
+
+    private DynamicFixedListType getCurrentVenue(DateListedType listing) {
+        if (listing.getHearingVenueDayScotland() == null) {
+            return null;
+        }
+        final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(listing.getHearingVenueDayScotland());
+        switch (tribunalOffice) {
+            case GLASGOW:
+                return listing.getHearingGlasgow();
+            case ABERDEEN:
+                return listing.getHearingAberdeen();
+            case DUNDEE:
+                return listing.getHearingDundee();
+            case EDINBURGH:
+                return listing.getHearingEdinburgh();
+            default:
+                throw new IllegalArgumentException(String.format("Unexpected Scottish office %s", tribunalOffice));
+        }
     }
 
     private DynamicFixedListType getEmployerMembers(TribunalOffice tribunalOffice, HearingType selectedHearing) {

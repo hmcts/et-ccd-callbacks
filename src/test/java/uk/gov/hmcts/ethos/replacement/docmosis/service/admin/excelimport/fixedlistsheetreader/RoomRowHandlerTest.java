@@ -1,0 +1,196 @@
+package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader;
+
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Room;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Venue;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class RoomRowHandlerTest {
+
+    private XSSFWorkbook workbook;
+    private FixedListMappings fixedListMappings;
+    private List<Venue> venues;
+
+    @BeforeEach
+    void setup() {
+        workbook = new XSSFWorkbook();
+        workbook.createSheet("Test");
+
+        venues = new ArrayList<>();
+        venues.add(createVenue("GTC"));
+        venues.add(createVenue("Glasgow COET"));
+
+        fixedListMappings = new FixedListMappings();
+        fixedListMappings.getRooms().put(TribunalOffice.GLASGOW, new HashMap<>());
+        fixedListMappings.getRooms().get(TribunalOffice.GLASGOW).put("CambeltownSC", "Cambeltown HC");
+        fixedListMappings.getRooms().get(TribunalOffice.GLASGOW).put("DumfriesSC", "Dumfries HC");
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        workbook.close();
+    }
+
+    @Test
+    void testAcceptMatchingVenue() {
+        var roomRowHandler = new RoomRowHandler(TribunalOffice.GLASGOW, fixedListMappings, venues);
+        var row = createRow("GTC", "201", "201");
+
+        assertTrue(roomRowHandler.accept(row));
+    }
+
+    @Test
+    void testAcceptMatchingVenueWithWhitespace() {
+        var roomRowHandler = new RoomRowHandler(TribunalOffice.GLASGOW, fixedListMappings, venues);
+        var row = createRow("GlasgowCOET", "201", "201");
+
+        assertTrue(roomRowHandler.accept(row));
+    }
+
+    @Test
+    void testAcceptMatchingVenueMapping() {
+        var roomRowHandler = new RoomRowHandler(TribunalOffice.GLASGOW, fixedListMappings, venues);
+        var row = createRow("CambeltownSC", "1", "1");
+
+        assertTrue(roomRowHandler.accept(row));
+    }
+
+    @Test
+    void testAcceptFalse() {
+        var roomRowHandler = new RoomRowHandler(TribunalOffice.GLASGOW, fixedListMappings, venues);
+        var row = createRow("NoVenueFound", "201", "201");
+
+        assertFalse(roomRowHandler.accept(row));
+    }
+
+    @Test
+    void testHandle() {
+        var roomRowHandler = new RoomRowHandler(TribunalOffice.GLASGOW, fixedListMappings, venues);
+        var row = createRow("GTC", "201", "201");
+
+        roomRowHandler.handle(row);
+        var rooms = roomRowHandler.getRooms();
+        assertEquals(1, rooms.size());
+        verifyRoom(rooms.get(0), "GTC", "201", "201");
+    }
+
+    @Test
+    void testHandleNumericCodeAndName() {
+        var roomRowHandler = new RoomRowHandler(TribunalOffice.GLASGOW, fixedListMappings, venues);
+        var row = createRow("CambeltownSC", 1, 1);
+
+        roomRowHandler.handle(row);
+        var rooms = roomRowHandler.getRooms();
+        assertEquals(1, rooms.size());
+        verifyRoom(rooms.get(0), "Cambeltown HC", "1", "1");
+    }
+
+    @Test
+    void testHandleMultipleRows() {
+        var roomRowHandler = new RoomRowHandler(TribunalOffice.GLASGOW, fixedListMappings, venues);
+        var rows = List.of(
+                createRow("VenueGlasgow", "GTC", "GTC"),
+                createRow("GTC", "201", "201"),
+                createRow("GTC", "202", "202"),
+                createRow("CambeltownSC", 1, 1),
+                createRow("CambeltownSC", 2, 2),
+                createRow("DumfriesSC", 1, 1),
+                createRow("GlasgowCOET", "12 - AIT", "12 - AIT"),
+                createRow("flLocations", "code", "label")
+        );
+
+        for (var row : rows) {
+            if (roomRowHandler.accept(row)) {
+                roomRowHandler.handle(row);
+            }
+        }
+
+        var rooms = roomRowHandler.getRooms();
+        assertEquals(6, rooms.size());
+        verifyRoom(rooms.get(0), "GTC", "201", "201");
+        verifyRoom(rooms.get(1), "GTC", "202", "202");
+        verifyRoom(rooms.get(2), "Cambeltown HC", "1", "1");
+        verifyRoom(rooms.get(3), "Cambeltown HC", "2", "2");
+        verifyRoom(rooms.get(4), "Dumfries HC", "1", "1");
+        verifyRoom(rooms.get(5), "Glasgow COET", "12 - AIT", "12 - AIT");
+    }
+
+    @Test
+    void testHandleNoVenueFoundThrowsException() {
+        var roomRowHandler = new RoomRowHandler(TribunalOffice.GLASGOW, fixedListMappings, venues);
+        var row = createRow("NoVenueFound", "201", "201");
+        assertThrows(IllegalArgumentException.class, () -> roomRowHandler.handle(row));
+    }
+
+    @Test
+    void testHandleUnexpectedCellTypeThrowsException() {
+        var roomRowHandler = new RoomRowHandler(TribunalOffice.GLASGOW, fixedListMappings, venues);
+        var row = createInvalidRow();
+        assertThrows(IllegalArgumentException.class, () -> roomRowHandler.handle(row));
+    }
+
+    private Venue createVenue(String code) {
+        var venue = new Venue();
+        venue.setCode(code);
+        return venue;
+    }
+
+    private Row createRow(String listId, String code, String name) {
+        var row = createRow(listId);
+        row.createCell(1, CellType.STRING);
+        row.getCell(1).setCellValue(code);
+        row.createCell(2, CellType.STRING);
+        row.getCell(2).setCellValue(name);
+
+        return row;
+    }
+
+    private Row createRow(String listId, int code, int name) {
+        var row = createRow(listId);
+        row.createCell(1, CellType.NUMERIC);
+        row.getCell(1).setCellValue(code);
+        row.createCell(2, CellType.NUMERIC);
+        row.getCell(2).setCellValue(name);
+
+        return row;
+    }
+
+    private Row createInvalidRow() {
+        var sheet = workbook.getSheet("Test");
+        var row = sheet.createRow(sheet.getLastRowNum() + 1);
+        row.createCell(0, CellType.BOOLEAN);
+        row.getCell(0).setCellValue(true);
+
+        return row;
+    }
+
+    private Row createRow(String listId) {
+        var sheet = workbook.getSheet("Test");
+        var row = sheet.createRow(sheet.getLastRowNum() + 1);
+        row.createCell(0, CellType.STRING);
+        row.getCell(0).setCellValue(listId);
+
+        return row;
+    }
+
+    void verifyRoom(Room room, String expectedVenueCode, String expectedCode, String expectedName) {
+        assertEquals(expectedVenueCode, room.getVenueCode());
+        assertEquals(expectedCode, room.getCode());
+        assertEquals(expectedName, room.getName());
+    }
+}

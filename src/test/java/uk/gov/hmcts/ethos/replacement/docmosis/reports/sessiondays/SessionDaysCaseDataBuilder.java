@@ -1,19 +1,19 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays;
 
+import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysCaseData;
+import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysSubmitEvent;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
-import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
-import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
-import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
-import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysCaseData;
-import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysSubmitEvent;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
 

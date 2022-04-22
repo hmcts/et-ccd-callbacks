@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
 import org.junit.Test;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.SelectionServiceTestUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.RoomService;
 
@@ -19,7 +19,7 @@ public class RoomSelectionServiceTest {
         var selectedListing = mockSelectedListing(null);
 
         var roomSelectionService = new RoomSelectionService(roomService);
-        var actualResult = roomSelectionService.createRoomSelection(caseData, selectedListing);
+        var actualResult = roomSelectionService.createRoomSelection(caseData, selectedListing, false);
 
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(actualResult, "room", "Room ");
     }
@@ -32,9 +32,34 @@ public class RoomSelectionServiceTest {
         var selectedListing = mockSelectedListing(selectedRoom);
 
         var roomSelectionService = new RoomSelectionService(roomService);
-        var actualResult = roomSelectionService.createRoomSelection(caseData, selectedListing);
+        var actualResult = roomSelectionService.createRoomSelection(caseData, selectedListing, false);
 
         SelectionServiceTestUtils.verifyDynamicFixedListSelected(actualResult, "room", "Room ", selectedRoom);
+    }
+
+    @Test
+    public void testCreateRoomSelectionVenueChangedNoSelectedRoom() {
+        var caseData = mockCaseData();
+        var roomService = mockRoomService();
+        var selectedListing = mockSelectedListing(null);
+
+        var roomSelectionService = new RoomSelectionService(roomService);
+        var actualResult = roomSelectionService.createRoomSelection(caseData, selectedListing, true);
+
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(actualResult, "room", "Room ");
+    }
+
+    @Test
+    public void testCreateRoomSelectionVenueChangedWithSelectedRoom() {
+        var caseData = mockCaseData();
+        var roomService = mockRoomService();
+        var selectedRoom = DynamicValueType.create("room2", "Room 2");
+        var selectedListing = mockSelectedListing(selectedRoom);
+
+        var roomSelectionService = new RoomSelectionService(roomService);
+        var actualResult = roomSelectionService.createRoomSelection(caseData, selectedListing, true);
+
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(actualResult, "room", "Room ");
     }
 
     private CaseData mockCaseData() {

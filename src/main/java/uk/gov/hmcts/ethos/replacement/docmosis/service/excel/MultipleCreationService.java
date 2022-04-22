@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleObject;
-import uk.gov.hmcts.ecm.common.model.multiples.items.CaseMultipleTypeItem;
-import uk.gov.hmcts.ecm.common.model.multiples.items.SubMultipleTypeItem;
-import uk.gov.hmcts.ecm.common.model.multiples.types.MultipleObjectType;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
+import uk.gov.hmcts.et.common.model.multiples.items.CaseMultipleTypeItem;
+import uk.gov.hmcts.et.common.model.multiples.items.SubMultipleTypeItem;
+import uk.gov.hmcts.et.common.model.multiples.types.MultipleObjectType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.MultipleReferenceService;
 

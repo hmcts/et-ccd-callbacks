@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({AllocateHearingController.class, JsonMapper.class})
@@ -119,7 +120,23 @@ public class AllocateHearingControllerTest {
     }
 
     @Test
-    public void testPopulateRooms() throws Exception {
+    public void testHandleListingSelectedInvalidCaseTypeId() throws Exception {
+        var ccdRequest = CCDRequestBuilder.builder()
+                .withCaseTypeId("InvalidCaseTypeId")
+                .build();
+        var token = "some-token";
+        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
+
+        mockMvc.perform(post("/allocatehearing/handleListingSelected")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", token)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isBadRequest());
+        verify(allocateHearingService, never()).handleListingSelected(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    public void testPopulateRoomsEnglandWales() throws Exception {
         var ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -136,6 +153,28 @@ public class AllocateHearingControllerTest {
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
         verify(allocateHearingService, times(1)).populateRooms(ccdRequest.getCaseDetails().getCaseData());
+        verify(scotlandAllocateHearingService, never()).populateRooms(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    public void testPopulateRoomsScotland() throws Exception {
+        var ccdRequest = CCDRequestBuilder.builder()
+                .withCaseTypeId(SCOTLAND_CASE_TYPE_ID)
+                .build();
+        var token = "some-token";
+        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
+
+        mockMvc.perform(post("/allocatehearing/populateRooms")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", token)
+                        .content(jsonMapper.toJson(ccdRequest)))
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(scotlandAllocateHearingService, times(1)).populateRooms(ccdRequest.getCaseDetails().getCaseData());
+        verify(allocateHearingService, never()).populateRooms(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test

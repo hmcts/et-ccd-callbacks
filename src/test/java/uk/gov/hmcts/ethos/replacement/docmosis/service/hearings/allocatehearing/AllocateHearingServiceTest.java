@@ -2,15 +2,15 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing
 
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicValueType;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.items.DateListedTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.items.HearingTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.types.DateListedType;
-import uk.gov.hmcts.ecm.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.SelectionServiceTestUtils;
@@ -24,11 +24,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class AllocateHearingServiceTest {
 
     private AllocateHearingService allocateHearingService;
+    private RoomSelectionService roomSelectionService;
 
     private CaseData caseData;
     private final TribunalOffice tribunalOffice = TribunalOffice.MANCHESTER;
@@ -42,7 +45,7 @@ public class AllocateHearingServiceTest {
         var hearingSelectionService = mockHearingSelectionService();
         var judgeSelectionService = mockJudgeSelectionService();
         var venueSelectionService = mockVenueSelectionService();
-        var roomSelectionService = mockRoomSelectionService();
+        roomSelectionService = mockRoomSelectionService();
         var courtWorkerSelectionService = mockCourtWorkerSelectionService();
         allocateHearingService = new AllocateHearingService(hearingSelectionService, judgeSelectionService,
                 venueSelectionService, roomSelectionService, courtWorkerSelectionService);
@@ -132,6 +135,29 @@ public class AllocateHearingServiceTest {
 
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(caseData.getAllocateHearingRoom(),
                 "room", "Room ");
+    }
+
+    @Test
+    public void testPopulateRoomsNewVenueSelected() {
+        selectedListing.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("venue1", "venue1")));
+        selectedListing.setHearingRoom(DynamicFixedListType.of(DynamicValueType.create("room1", "room1")));
+        caseData.setAllocateHearingVenue(DynamicFixedListType.of(DynamicValueType.create("venue2", "venue2")));
+
+        allocateHearingService.populateRooms(caseData);
+
+        verify(roomSelectionService, times(1)).createRoomSelection(caseData, selectedListing, true);
+    }
+
+    @Test
+    public void testPopulateRoomsExistingVenueSelected() {
+        selectedListing.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("venue1", "venue1")));
+        var selectedRoom = DynamicValueType.create("room1", "Room 1");
+        selectedListing.setHearingRoom(DynamicFixedListType.of(selectedRoom));
+        caseData.setAllocateHearingVenue(DynamicFixedListType.of(DynamicValueType.create("venue1", "venue1")));
+
+        allocateHearingService.populateRooms(caseData);
+
+        verify(roomSelectionService, times(1)).createRoomSelection(caseData, selectedListing, false);
     }
 
     @Test
@@ -235,7 +261,7 @@ public class AllocateHearingServiceTest {
         var dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(rooms);
         when(roomSelectionService.createRoomSelection(isA(CaseData.class),
-                isA(DateListedType.class))).thenReturn(dynamicFixedListType);
+                isA(DateListedType.class), isA(Boolean.class))).thenReturn(dynamicFixedListType);
 
         return roomSelectionService;
     }

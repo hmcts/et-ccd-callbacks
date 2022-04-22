@@ -13,7 +13,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
-import uk.gov.hmcts.ecm.common.model.ccd.UploadedDocument;
+import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClient;
 import uk.gov.hmcts.reform.ccd.document.am.model.Classification;

@@ -2,10 +2,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.ecm.common.model.bulk.items.CaseIdTypeItem;
-import uk.gov.hmcts.ecm.common.model.bulk.types.CaseType;
 import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.bulk.items.CaseIdTypeItem;
+import uk.gov.hmcts.et.common.model.bulk.types.CaseType;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.util.Arrays;
 import java.util.List;

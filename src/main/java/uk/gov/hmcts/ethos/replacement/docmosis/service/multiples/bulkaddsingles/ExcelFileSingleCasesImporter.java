@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 
 import java.io.IOException;

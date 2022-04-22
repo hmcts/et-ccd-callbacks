@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ecm.common.model.ccd.CCDCallbackResponse;
-import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
+import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.AllocateHearingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.ScotlandAllocateHearingService;
@@ -84,6 +84,9 @@ public class AllocateHearingController {
             allocateHearingService.handleListingSelected(caseData);
         } else if (Constants.SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
             scotlandAllocateHearingService.handleListingSelected(caseData);
+        } else {
+            log.error("Unexpected case type id " + caseTypeId);
+            return ResponseEntity.badRequest().build();
         }
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -132,7 +135,12 @@ public class AllocateHearingController {
         }
 
         var caseData = ccdRequest.getCaseDetails().getCaseData();
-        allocateHearingService.populateRooms(caseData);
+        var caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            allocateHearingService.populateRooms(caseData);
+        } else if (Constants.SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            scotlandAllocateHearingService.populateRooms(caseData);
+        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }

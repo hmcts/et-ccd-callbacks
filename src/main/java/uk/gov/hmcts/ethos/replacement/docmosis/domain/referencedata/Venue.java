@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata;
 import lombok.Data;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -16,7 +17,8 @@ import javax.persistence.Table;
 @Data
 public class Venue {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "serial")
     private Integer id;
     @Enumerated(EnumType.STRING)
     private TribunalOffice tribunalOffice;

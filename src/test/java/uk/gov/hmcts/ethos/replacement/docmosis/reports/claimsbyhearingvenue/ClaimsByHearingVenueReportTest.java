@@ -3,13 +3,13 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.ccd.Address;
-import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.types.ClaimantType;
-import uk.gov.hmcts.ecm.common.model.ccd.types.ClaimantWorkAddressType;
-import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.claimsbyhearingvenue.ClaimsByHearingVenueSubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.Address;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 

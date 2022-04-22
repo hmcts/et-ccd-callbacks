@@ -2,8 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.model.bulk.items.CaseIdTypeItem;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.et.common.model.bulk.items.CaseIdTypeItem;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleAmendService;
 
 import java.util.ArrayList;

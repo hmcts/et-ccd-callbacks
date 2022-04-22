@@ -4,28 +4,35 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.bulk.BulkDetails;
-import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.ecm.common.model.bulk.types.MultipleType;
-import uk.gov.hmcts.ecm.common.model.bulk.types.SearchType;
-import uk.gov.hmcts.ecm.common.model.ccd.Address;
-import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.ecm.common.model.ccd.items.JurCodesTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.ecm.common.model.ccd.types.ClaimantIndType;
-import uk.gov.hmcts.ecm.common.model.ccd.types.ClaimantType;
-import uk.gov.hmcts.ecm.common.model.ccd.types.JurCodesType;
-import uk.gov.hmcts.ecm.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.MultipleType;
+import uk.gov.hmcts.et.common.model.bulk.types.SearchType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
+import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.PENDING_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 
 public class BulkHelperTest {
 

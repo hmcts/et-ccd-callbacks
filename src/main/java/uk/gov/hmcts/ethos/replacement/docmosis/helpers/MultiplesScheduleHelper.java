@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.ecm.common.model.ccd.Address;
-import uk.gov.hmcts.ecm.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadES;
 import uk.gov.hmcts.ecm.common.model.schedule.types.ScheduleClaimantIndType;
 import uk.gov.hmcts.ecm.common.model.schedule.types.ScheduleClaimantType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.util.ArrayList;
 import java.util.Arrays;

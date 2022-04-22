@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentpositio
 
 import org.junit.Test;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.model.multiples.MultipleCaseSearchResult;
+import uk.gov.hmcts.et.common.model.multiples.MultipleCaseSearchResult;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 
 import java.io.IOException;

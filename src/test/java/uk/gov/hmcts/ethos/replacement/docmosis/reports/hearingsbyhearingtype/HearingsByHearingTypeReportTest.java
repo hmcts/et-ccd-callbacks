@@ -197,6 +197,23 @@ class HearingsByHearingTypeReportTest {
        assertEquals("1", reportSummaryHdr.getFields().getCostsCount());
     }
 
+    @Test
+    void checkReportOfficeName_EngWales() {
+        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        ReportParams reportParamsWithManagingOffice = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID, managingOffice, DATE_FROM, DATE_TO);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParamsWithManagingOffice);
+        var reportSummaryHdr = reportData.getReportSummaryHdr();
+        assertEquals(managingOffice, reportSummaryHdr.getOffice());
+    }
+
+    @Test
+    void checkReportOfficeName_Scotland() {
+        ReportParams reportParamsWithManagingOffice = new ReportParams(SCOTLAND_LISTING_CASE_TYPE_ID, null, DATE_FROM, DATE_TO);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParamsWithManagingOffice);
+        var reportSummaryHdr = reportData.getReportSummaryHdr();
+        assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportSummaryHdr.getOffice());
+    }
+
     @ParameterizedTest
     @CsvSource({"Start, 0", "Finish, 0", "Break, 480", "Resume, 480"})
      void nullTimeOnHearing(String time, String result) {

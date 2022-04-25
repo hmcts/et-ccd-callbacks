@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 
@@ -41,6 +43,7 @@ class NoPositionChangeReportTests {
     static final String REPORT_CREATE_DATE = BASE_DATE.plusMonths(3).format(OLD_DATE_TIME_PATTERN2);
     static final String DATE_WITHIN_3MONTHS = BASE_DATE.plusDays(2).format(OLD_DATE_TIME_PATTERN2);
     static final String DATE_BEFORE_3MONTHS = BASE_DATE.minusDays(2).format(OLD_DATE_TIME_PATTERN2);
+    static ListingDetails listingDetails;
 
     public NoPositionChangeReportTests() {
         caseDataBuilder = new NoPositionChangeCaseDataBuilder();
@@ -48,16 +51,21 @@ class NoPositionChangeReportTests {
 
     @BeforeEach
     public void setup() {
+        listingDetails = new ListingDetails();
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var listingData = new ListingData();
+        listingData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        listingDetails.setCaseData(listingData);
         submitEvents.clear();
 
         noPositionChangeDataSource = mock(NoPositionChangeDataSource.class);
-        when(noPositionChangeDataSource.getData(ENGLANDWALES_CASE_TYPE_ID, REPORT_CREATE_DATE)).thenReturn(submitEvents);
+        when(noPositionChangeDataSource.getData(ENGLANDWALES_CASE_TYPE_ID, REPORT_CREATE_DATE,
+                TribunalOffice.MANCHESTER.getOfficeName())).thenReturn(submitEvents);
         when(noPositionChangeDataSource.getMultiplesData(eq(ENGLANDWALES_BULK_CASE_TYPE_ID), anyList())).thenReturn(submitMultipleEvents);
 
         noPositionChangeReport = new NoPositionChangeReport(noPositionChangeDataSource, REPORT_CREATE_DATE);
     }
 
-    @Disabled("Fix as part of report fixes")
     @Test
     void shouldNotShowSingleCase_PositionsWithChangeDatesLessThan3MonthsAgo() {
         // Given a single case has a position change date within 3 month of the report date
@@ -66,13 +74,12 @@ class NoPositionChangeReportTests {
 
         submitEvents.add(createValidSingleSubmitEventWithin3Months(ACCEPTED_STATE));
 
-        var reportData = noPositionChangeReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = noPositionChangeReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetailsSingle().isEmpty());
         assertTrue(reportData.getReportDetailsMultiple().isEmpty());
     }
 
-    @Disabled("Fix as part of report fixes")
     @Test
     void shouldNotShowMultipleCase_PositionsWithChangeDatesLessThan3MonthsAgo() {
         // Given a multiple case has a position change date within 3 month of the report date
@@ -81,13 +88,12 @@ class NoPositionChangeReportTests {
 
         submitEvents.add(createValidMultipleSubmitEventWithin3Months(CLOSED_STATE));
 
-        var reportData = noPositionChangeReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = noPositionChangeReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetailsSingle().isEmpty());
         assertTrue(reportData.getReportDetailsMultiple().isEmpty());
     }
 
-    @Disabled("Fix as part of report fixes")
     @Test
     void shouldShowSingleCase_PositionsWithChangeDatesMoreThan3MonthsAgo() {
         // Given a single case has a position change date older than the report date by 3 month
@@ -101,7 +107,7 @@ class NoPositionChangeReportTests {
                 .withEthosCaseReference("2500123/2021")
                 .buildAsSubmitEvent(SUBMITTED_STATE));
 
-        var reportData = noPositionChangeReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = noPositionChangeReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals("1" , reportData.getReportSummary().getTotalCases());
         assertEquals("1" , reportData.getReportSummary().getTotalSingleCases());
@@ -116,7 +122,6 @@ class NoPositionChangeReportTests {
         assertEquals("2021", reportDetail.getYear());
     }
 
-    @Disabled("Fix as part of report fixes")
     @Test
     void shouldShowSingleCase_PositionsWithChangeDatesExactly3MonthsAgo() {
         // Given a single case has a position change date exactly older than the report date by 3 month
@@ -130,7 +135,7 @@ class NoPositionChangeReportTests {
                 .withEthosCaseReference("2500123/2021")
                 .buildAsSubmitEvent(SUBMITTED_STATE));
 
-        var reportData = noPositionChangeReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = noPositionChangeReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals("1" , reportData.getReportSummary().getTotalCases());
         assertEquals("1" , reportData.getReportSummary().getTotalSingleCases());
@@ -145,7 +150,6 @@ class NoPositionChangeReportTests {
         assertEquals("2021", reportDetail.getYear());
     }
 
-    @Disabled("Fix as part of report fixes")
     @Test
     void shouldShowMultipleCase_PositionsWithChangeDatesMoreThan3MonthsAgo() {
         // Given a multiple case has a position change date older than the report date by 3 month
@@ -169,7 +173,7 @@ class NoPositionChangeReportTests {
         submitMultipleData.setCaseData(multipleData);
         submitMultipleEvents.add(submitMultipleData);
 
-        var reportData = noPositionChangeReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = noPositionChangeReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals("1" , reportData.getReportSummary().getTotalCases());
         assertEquals("0" , reportData.getReportSummary().getTotalSingleCases());
@@ -184,7 +188,6 @@ class NoPositionChangeReportTests {
         assertEquals("2021", reportDetail.getYear());
     }
 
-    @Disabled("Fix as part of report fixes")
     @Test
     void shouldShowCorrectMultipleRespondentText_SinglePositionsWithChangeDatesMoreThan3MonthsAgo() {
         // Given a single case has a position change date older than the report date by 3 month
@@ -201,7 +204,7 @@ class NoPositionChangeReportTests {
                 .withEthosCaseReference("2500123/2021")
                 .buildAsSubmitEvent(SUBMITTED_STATE));
 
-        var reportData = noPositionChangeReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = noPositionChangeReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals("1" , reportData.getReportSummary().getTotalCases());
         assertEquals("1" , reportData.getReportSummary().getTotalSingleCases());
@@ -216,7 +219,6 @@ class NoPositionChangeReportTests {
         assertEquals("2021", reportDetail.getYear());
     }
 
-    @Disabled("Fix as part of report fixes")
     @Test
     void shouldShowAllCases_PositionsWithChangeDatesMoreThan3MonthsAgo() {
         // Given a mix of cases has a position change date older or newer than the report date by 3 month
@@ -228,7 +230,7 @@ class NoPositionChangeReportTests {
         submitEvents.add(createValidSingleSubmitEventBefore3Months(SUBMITTED_STATE));
         submitEvents.add(createValidSingleSubmitEventWithin3Months(ACCEPTED_STATE));
 
-        var reportData = noPositionChangeReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = noPositionChangeReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals("2" , reportData.getReportSummary().getTotalCases());
         assertEquals("1" , reportData.getReportSummary().getTotalSingleCases());
@@ -241,7 +243,7 @@ class NoPositionChangeReportTests {
     void shouldNotIncludeClosedOrTransferredStates() {
         submitEvents.add(createValidSingleSubmitEventBefore3Months(TRANSFERRED_STATE));
         submitEvents.add(createValidMultipleSubmitEventBefore3Months(CLOSED_STATE));
-        var reportData = noPositionChangeReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = noPositionChangeReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals("0", reportData.getReportSummary().getTotalCases());
     }
@@ -253,7 +255,7 @@ class NoPositionChangeReportTests {
         submitEvents.add(createValidSingleSubmitEventBefore3Months(REJECTED_STATE));
         submitEvents.add(createValidSingleSubmitEventBefore3Months(SUBMITTED_STATE));
         submitEvents.add(createValidSingleSubmitEventBefore3Months(TRANSFERRED_STATE));
-        var reportData = noPositionChangeReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = noPositionChangeReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals("3", reportData.getReportSummary().getTotalCases());
         assertEquals("3", reportData.getReportSummary().getTotalSingleCases());
@@ -310,7 +312,7 @@ class NoPositionChangeReportTests {
 
     private void assertCommonValues(NoPositionChangeReportData reportData) {
         assertNotNull(reportData);
-        assertEquals(ENGLANDWALES_CASE_TYPE_ID, reportData.getReportSummary().getOffice());
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), reportData.getReportSummary().getOffice());
         assertEquals(REPORT_CREATE_DATE, reportData.getReportDate());
     }
 }

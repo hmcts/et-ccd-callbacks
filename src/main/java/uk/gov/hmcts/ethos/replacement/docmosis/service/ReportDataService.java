@@ -121,7 +121,7 @@ public class ReportDataService {
         var reportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
         var hearingsToJudgmentsReport = new NoPositionChangeReport(reportDataSource,
                 listingDetails.getCaseData().getReportDate());
-        var reportData = hearingsToJudgmentsReport.runReport(listingDetails.getCaseTypeId());
+        var reportData = hearingsToJudgmentsReport.runReport(listingDetails);
         setSharedReportDocumentFields(reportData, listingDetails, false);
         return reportData;
     }

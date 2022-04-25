@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentpositio
 
 import org.junit.Test;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCaseSearchResult;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 
@@ -23,6 +24,7 @@ public class NoPositionChangeCcdDataSourceTests {
     public void shouldReturnSearchResults() throws IOException {
         var authToken = "A test token";
         var caseTypeId = "A test case type";
+        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var reportDate = "2021-07-10";
         var ccdClient = mock(CcdClient.class);
         var searchResult = new NoPositionChangeSearchResult();
@@ -31,7 +33,7 @@ public class NoPositionChangeCcdDataSourceTests {
                 .thenReturn(searchResult);
 
         var ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
-        var results = ccdReportDataSource.getData(caseTypeId, reportDate);
+        var results = ccdReportDataSource.getData(caseTypeId, reportDate, managingOffice);
 
         assertEquals(1, results.size());
         assertEquals(searchResult.getCases().get(0), results.get(0));
@@ -41,13 +43,14 @@ public class NoPositionChangeCcdDataSourceTests {
     public void shouldReturnEmptyListForNullSearchResults() throws IOException {
         var authToken = "A test token";
         var caseTypeId = "A test case type";
+        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var reportDate = "2021-07-10";
         var ccdClient = mock(CcdClient.class);
         when(ccdClient.runElasticSearch(anyString(), anyString(), anyString(), eq(NoPositionChangeSearchResult.class)))
                 .thenReturn(null);
 
         var ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
-        var results = ccdReportDataSource.getData(caseTypeId, reportDate);
+        var results = ccdReportDataSource.getData(caseTypeId, reportDate, managingOffice);
 
         assertNotNull(results);
         assertEquals(0, results.size());
@@ -57,13 +60,14 @@ public class NoPositionChangeCcdDataSourceTests {
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
         var authToken = "A test token";
         var caseTypeId = "A test case type";
+        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var reportDate = "2021-07-10";
         var ccdClient = mock(CcdClient.class);
         when(ccdClient.runElasticSearch(anyString(), anyString(), anyString(), eq(NoPositionChangeSearchResult.class)))
                 .thenThrow(new IOException());
 
         var ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
-        ccdReportDataSource.getData(caseTypeId, reportDate);
+        ccdReportDataSource.getData(caseTypeId, reportDate, managingOffice);
         fail("Should throw exception instead");
     }
 

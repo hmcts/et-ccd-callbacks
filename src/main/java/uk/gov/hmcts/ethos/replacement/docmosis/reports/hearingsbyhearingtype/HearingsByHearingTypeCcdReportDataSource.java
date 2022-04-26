@@ -21,7 +21,7 @@ public class HearingsByHearingTypeCcdReportDataSource implements HearingsByHeari
         var caseTypeId = UtilHelper.getListingCaseTypeId(reportParams.getCaseTypeId());
         try {
             var query = HearingsByHearingTypeElasticSearchQuery.create(
-                    reportParams.getDateFrom(), reportParams.getDateTo());
+                    reportParams.getManagingOffice(), reportParams.getDateFrom(), reportParams.getDateTo());
             return ccdClient.hearingsByHearingTypeSearch(authToken, caseTypeId, query);
         } catch (Exception e) {
             throw new ReportException(String.format(

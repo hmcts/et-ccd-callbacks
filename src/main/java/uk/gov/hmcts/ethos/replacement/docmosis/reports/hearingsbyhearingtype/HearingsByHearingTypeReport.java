@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.Strings;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeCaseData;
 import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -52,7 +52,11 @@ public class HearingsByHearingTypeReport {
     public HearingsByHearingTypeReportData generateReport(ReportParams params) {
 
         var submitEvents = getCases(params);
-        var reportData = initReport(params.getCaseTypeId());
+        var managingOffice = params.getManagingOffice();
+        var office = StringUtils.isNotBlank(managingOffice) && TribunalOffice.isEnglandWalesOffice(managingOffice)
+                ? managingOffice
+                : TribunalOffice.SCOTLAND.getOfficeName();
+        var reportData = initReport(office);
         this.dateFrom = params.getDateFrom();
         this.dateTo = params.getDateTo();
         if (CollectionUtils.isNotEmpty(submitEvents)) {
@@ -61,11 +65,11 @@ public class HearingsByHearingTypeReport {
         return reportData;
     }
 
-    private HearingsByHearingTypeReportData initReport(String caseTypeId) {
+    private HearingsByHearingTypeReportData initReport(String managingOffice) {
         var reportSummaryHdr = new HearingsByHearingTypeReportSummaryHdr();
         var fields = new ReportFields();
         initReportFields(fields);
-        reportSummaryHdr.setOffice(UtilHelper.getListingCaseTypeId(caseTypeId));
+        reportSummaryHdr.setOffice(managingOffice);
         reportSummaryHdr.setFields(fields);
         return new HearingsByHearingTypeReportData(reportSummaryHdr);
     }

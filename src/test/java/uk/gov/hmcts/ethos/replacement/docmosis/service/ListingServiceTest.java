@@ -11,6 +11,7 @@ import org.mockito.Spy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -38,6 +39,7 @@ import uk.gov.hmcts.et.common.model.listing.items.AdhocReportTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.AdhocReportType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.VenueService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.IOException;
@@ -95,6 +97,8 @@ public class ListingServiceTest {
     private TornadoService tornadoService;
     @Mock
     private CcdClient ccdClient;
+    @Mock
+    private VenueService venueService;
     @Spy
     private CasesCompletedReport casesCompletedReport = new CasesCompletedReport();
     private CaseDetails caseDetails;
@@ -102,6 +106,8 @@ public class ListingServiceTest {
     private ListingDetails listingDetailsRange;
     private DocumentInfo documentInfo;
     private List<SubmitEvent> submitEvents;
+    private static final List<DynamicValueType> VENUES = List.of(DynamicValueType.create("venue1", "Venue 1"),
+            DynamicValueType.create("venue2", "Venue 2"));
 
     @Before
     public void setUp() {
@@ -370,6 +376,7 @@ public class ListingServiceTest {
 
     @Test
     public void processListingHearingsRequestGlasgow() throws IOException {
+        listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setVenueAberdeen(null);
         listingDetails.getCaseData().setVenueGlasgow(new DynamicFixedListType("GlasgowVenue"));
         listingDetails.getCaseData().setListingVenue(new DynamicFixedListType("Glasgow"));
@@ -389,6 +396,7 @@ public class ListingServiceTest {
 
     @Test
     public void processListingHearingsRequestEdinburgh() throws IOException {
+        listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setVenueAberdeen(null);
         listingDetails.getCaseData().setVenueEdinburgh(new DynamicFixedListType("EdinburghVenue"));
         listingDetails.getCaseData().setListingVenue(new DynamicFixedListType("Edinburgh"));
@@ -408,6 +416,7 @@ public class ListingServiceTest {
 
     @Test
     public void processListingHearingsRequestDundee() throws IOException {
+        listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setVenueAberdeen(null);
         listingDetails.getCaseData().setVenueDundee(new DynamicFixedListType("DundeeVenue"));
         listingDetails.getCaseData().setListingVenue(new DynamicFixedListType("Dundee"));
@@ -659,24 +668,24 @@ public class ListingServiceTest {
         assertEquals(result, listingDataResult.toString());
     }
 
+    @Ignore("Fix with report fix")
     @Test(expected = Exception.class)
-    @Ignore("Fix with RET-937")
     public void processListingHearings_listedDateNullOrEmpty() throws IOException {
         submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue().getHearingDateCollection()
                 .get(1).getValue().setListedDate(null);
         submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue().getHearingDateCollection()
                 .get(1).getValue().setListedDate("");
         //listingDetailsRange.getCaseData().setListingVenue(ALL_VENUES);
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(),
+                anyString(), anyString(), anyString())).thenReturn(submitEvents);
         listingService.processListingHearingsRequest(listingDetailsRange, "authToken");
     }
 
     @Test(expected = Exception.class)
     public void processListingHearings_causeListDateNull() throws IOException {
         //listingDetailsRange.getCaseData().setListingVenue(ALL_VENUES);
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(),
+                anyString(), anyString(), anyString())).thenReturn(submitEvents);
         var listingData = listingService.processListingHearingsRequest(listingDetailsRange, "authToken");
         var listingCollection = listingData.getListingCollection();
         listingCollection.get(0).getValue().setCauseListDate(null);
@@ -719,16 +728,17 @@ public class ListingServiceTest {
         listingDetailsRange.getCaseData().setListingDateFrom("2021-01-01");
         listingDetailsRange.getCaseData().setListingDateTo("2021-12-01");
 
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(),
+                anyString(), anyString(), anyString())).thenReturn(submitEvents);
         var listingDataResult = listingService.processListingHearingsRequest(listingDetailsRange, "authToken");
         assertEquals(result, listingDataResult.toString());
     }
 
     @Test(expected = Exception.class)
-    @Ignore("Fix with RET-937")
     public void processListingHearingsRequestWithException() throws IOException {
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(),
+                anyString(), anyString(), anyString())).thenThrow(new Exception(ERROR_MESSAGE));
+
         listingService.processListingHearingsRequest(listingDetails, "authToken");
     }
 
@@ -1343,5 +1353,32 @@ public class ListingServiceTest {
     public void generateReportDataWithException() throws IOException {
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
         listingService.getDateRangeReport(listingDetails, "authToken");
+    }
+
+    @Test
+    public void dynamicVenueListing_Leeds() {
+        when(venueService.getVenues(any())).thenReturn(VENUES);
+        listingDetails.getCaseData().setManagingOffice("Leeds");
+
+        listingService.dynamicVenueListing(ENGLANDWALES_LISTING_CASE_TYPE_ID, listingDetails.getCaseData());
+        assertEquals(3, listingDetails.getCaseData().getListingVenue().getListItems().size());
+        assertTrue(listingDetails.getCaseData().getListingVenue().getListItems()
+                .contains(DynamicValueType.create(ALL_VENUES, ALL_VENUES)));
+    }
+
+    @Test
+    public void dynamicVenueListing_Glasgow() {
+        when(venueService.getVenues(any())).thenReturn(VENUES);
+        listingDetails.getCaseData().setManagingOffice("Glasgow");
+
+        listingService.dynamicVenueListing(SCOTLAND_LISTING_CASE_TYPE_ID, listingDetails.getCaseData());
+        assertEquals(3, listingDetails.getCaseData().getListingVenue().getListItems().size());
+        assertTrue(listingDetails.getCaseData().getListingVenue().getListItems()
+                .contains(DynamicValueType.create(ALL_VENUES, ALL_VENUES)));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void dynamicVenueListing_invalidCaseType(){
+        listingService.dynamicVenueListing("InvalidCaseType", listingDetails.getCaseData());
     }
 }

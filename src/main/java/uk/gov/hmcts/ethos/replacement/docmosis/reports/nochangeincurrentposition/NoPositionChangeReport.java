@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 
 import java.time.LocalDate;
@@ -11,10 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 
@@ -29,9 +33,16 @@ public class NoPositionChangeReport {
         this.reportDate = reportDate;
     }
 
-    public NoPositionChangeReportData runReport(String caseTypeId) {
-        var submitEvents = getCases(caseTypeId);
-        var reportData = initReport(caseTypeId);
+    public NoPositionChangeReportData runReport(ListingDetails listingDetails) {
+        var caseTypeId = listingDetails.getCaseTypeId();
+        var managingOffice = isNullOrEmpty(listingDetails.getCaseData().getManagingOffice())
+                ? TribunalOffice.GLASGOW.getOfficeName()
+                : listingDetails.getCaseData().getManagingOffice();
+
+        var submitEvents = getCases(caseTypeId, managingOffice);
+        var reportData = initReport(SCOTLAND_LISTING_CASE_TYPE_ID.equals(caseTypeId)
+            ? TribunalOffice.SCOTLAND.getOfficeName()
+            : managingOffice);
 
         log.info("Retrieved No Change In Current Position report case data");
         if (CollectionUtils.isEmpty(submitEvents)) {
@@ -58,12 +69,13 @@ public class NoPositionChangeReport {
     }
 
     private NoPositionChangeReportData initReport(String caseTypeId) {
-        var reportSummary = new NoPositionChangeReportSummary(UtilHelper.getListingCaseTypeId(caseTypeId));
+        var reportSummary = new NoPositionChangeReportSummary(caseTypeId);
         return new NoPositionChangeReportData(reportSummary, reportDate);
     }
 
-    private List<NoPositionChangeSubmitEvent> getCases(String caseTypeId) {
-        return noPositionChangeDataSource.getData(UtilHelper.getListingCaseTypeId(caseTypeId), reportDate);
+    private List<NoPositionChangeSubmitEvent> getCases(String caseTypeId, String managingOffice) {
+        return noPositionChangeDataSource.getData(
+                UtilHelper.getListingCaseTypeId(caseTypeId), reportDate, managingOffice);
     }
 
     private List<SubmitMultipleEvent> getMultipleCases(String casTypeId, List<String> multipleCaseIds) {

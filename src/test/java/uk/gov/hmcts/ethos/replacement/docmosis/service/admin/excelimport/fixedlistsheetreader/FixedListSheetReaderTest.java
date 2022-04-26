@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -14,12 +16,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 class FixedListSheetReaderTest {
-    
+
     @Test
     void testHandleImportsFixedListSheet() throws FixedListSheetReaderException {
         var fixedListSheetName = "Scotland Scrubbed";
         var sheetImporter = mock(FixedListSheetImporter.class);
-        var sheetReader = FixedListSheetReader.create(sheetImporter);
+        var sheetReader = FixedListSheetReader.create(List.of(sheetImporter));
         var workbook = createWorkbook("Sheet1", fixedListSheetName, "Sheet3");
 
         sheetReader.handle(TribunalOffice.SCOTLAND, workbook);
@@ -33,7 +35,7 @@ class FixedListSheetReaderTest {
     @Test
     void testHandleThrowsExceptionWhenFixedListSheetNotFound() {
         var sheetImporter = mock(FixedListSheetImporter.class);
-        var sheetReader = FixedListSheetReader.create(sheetImporter);
+        var sheetReader = FixedListSheetReader.create(List.of(sheetImporter));
         var workbook = createWorkbook("Sheet1", "Sheet2", "Sheet3");
 
         assertThrows(FixedListSheetReaderException.class, () -> sheetReader.handle(TribunalOffice.SCOTLAND, workbook));
@@ -42,7 +44,7 @@ class FixedListSheetReaderTest {
     @Test
     void testHandleThrowsExceptionWhenNoSheetsExistInWorkbook() {
         var sheetImporter = mock(FixedListSheetImporter.class);
-        var sheetReader = FixedListSheetReader.create(sheetImporter);
+        var sheetReader = FixedListSheetReader.create(List.of(sheetImporter));
         var workbook = createWorkbook();
 
         assertThrows(FixedListSheetReaderException.class, () -> sheetReader.handle(TribunalOffice.SCOTLAND, workbook));

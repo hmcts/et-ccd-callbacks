@@ -90,7 +90,13 @@ public class TimeToFirstHearingReport {
 
         var listingData = listingDetails.getCaseData();
         listingData.setLocalReportsDetailHdr(adhocReportType);
-        listingData.setLocalReportsSummary(new ArrayList<>());
+
+        // Init localReportSummary
+        var adhocReportTypeItem = new AdhocReportTypeItem();
+        adhocReportTypeItem.setId(UUID.randomUUID().toString());
+        adhocReportTypeItem.setValue(adhocReportType);
+
+        listingData.setLocalReportsSummary(Collections.singletonList(adhocReportTypeItem));
         listingData.setLocalReportsDetail(new ArrayList<>());
     }
 

@@ -438,7 +438,7 @@ public class MultipleUtil {
         caseData.setLeadClaimant(YES);
         caseData.setMultipleReference("246000");
         caseData.setSubMultipleName("updatedSubMultipleName");
-
+        caseData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         caseData.setEcmCaseType(MULTIPLE_CASE_TYPE);
         caseData.setMultipleFlag(NO);
 

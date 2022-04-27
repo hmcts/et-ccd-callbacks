@@ -30,6 +30,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_WITH
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_COSTS_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_MEDIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
 public class CasesAwaitingJudgmentReportTest {
 
@@ -440,6 +441,21 @@ public class CasesAwaitingJudgmentReportTest {
         assertEquals("Case 2", reportData.getReportDetails().get(1).getCaseNumber());
         assertEquals("Case 3", reportData.getReportDetails().get(2).getCaseNumber());
         assertEquals("Case 1", reportData.getReportDetails().get(3).getCaseNumber());
+    }
+
+    @Test
+    public void checkReportOfficeName_Scotland() {
+        submitEvents.add(caseDataBuilder
+                .withPositionType(validPositionType)
+                .withHearing(LISTING_DATE, HEARING_STATUS_HEARD)
+                .buildAsSubmitEvent(ACCEPTED_STATE));
+        var listingDetails = new ListingDetails();
+        var caseData = new ListingData();
+        caseData.setManagingOffice(null);
+        listingDetails.setCaseData(caseData);
+        listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportData.getReportSummary().getOffice());
     }
 
     private CasesAwaitingJudgmentSubmitEvent createValidSubmitEvent(String positionType) {

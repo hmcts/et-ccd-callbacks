@@ -2,9 +2,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.venues;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FileLocationFixedListSheetImporter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FixedListSheetReader;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FixedListSheetReaderException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.VenueFixedListSheetImporter;
@@ -13,18 +15,23 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class VenueImportService {
 
     private final ExcelReadingService excelReadingService;
-    private final VenueFixedListSheetImporter sheetImporter;
+    private final VenueFixedListSheetImporter venueFixedListSheetImporter;
+    private final FileLocationFixedListSheetImporter fileLocationFixedListSheetImporter;
     private final UserService userService;
 
-    public VenueImportService(ExcelReadingService excelReadingService, VenueFixedListSheetImporter sheetImporter,
+    public VenueImportService(ExcelReadingService excelReadingService,
+                              VenueFixedListSheetImporter venueFixedListSheetImporter,
+                              FileLocationFixedListSheetImporter fileLocationFixedListSheetImporter,
                               UserService userService) {
         this.excelReadingService = excelReadingService;
-        this.sheetImporter = sheetImporter;
+        this.venueFixedListSheetImporter = venueFixedListSheetImporter;
+        this.fileLocationFixedListSheetImporter = fileLocationFixedListSheetImporter;
         this.userService = userService;
     }
 
@@ -35,10 +42,12 @@ public class VenueImportService {
         }
     }
 
+    @Transactional
     public void importVenues(AdminData adminData, String userToken) throws IOException, FixedListSheetReaderException {
         var workbook = getWorkbook(adminData, userToken);
         var tribunalOffice = TribunalOffice.valueOfOfficeName(adminData.getVenueImport().getVenueImportOffice());
-        var sheetReader = FixedListSheetReader.create(sheetImporter);
+        var sheetImporters = List.of(venueFixedListSheetImporter, fileLocationFixedListSheetImporter);
+        var sheetReader = FixedListSheetReader.create(sheetImporters);
 
         var importOffices = new ArrayList<TribunalOffice>();
         if (TribunalOffice.SCOTLAND.equals(tribunalOffice)) {

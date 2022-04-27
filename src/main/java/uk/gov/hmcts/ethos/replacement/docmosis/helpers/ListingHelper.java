@@ -293,7 +293,7 @@ public class ListingHelper {
         sb.append(getCourtListingData(listingData));
         log.info("Getting logo");
         sb.append(getLogo(caseType));
-        sb.append("\"Office_name\":\"").append(getOfficeName(getListingCaseTypeSingleOrListings(caseType)))
+        sb.append("\"Office_name\":\"").append(listingData.getManagingOffice())
                 .append(NEW_LINE);
         log.info("Hearing location");
         sb.append("\"Hearing_location\":\"").append(ListingVenueHelper.getListingVenue(listingData)).append(NEW_LINE);

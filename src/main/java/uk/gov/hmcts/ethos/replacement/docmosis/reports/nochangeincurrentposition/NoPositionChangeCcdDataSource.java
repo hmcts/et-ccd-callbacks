@@ -22,11 +22,11 @@ public class NoPositionChangeCcdDataSource implements NoPositionChangeDataSource
     private final CcdClient ccdClient;
 
     @Override
-    public List<NoPositionChangeSubmitEvent> getData(String caseTypeId, String reportDate) {
+    public List<NoPositionChangeSubmitEvent> getData(String caseTypeId, String reportDate, String managingOffice) {
         try {
             var reportDate3MonthsAgo = LocalDate.parse(reportDate, OLD_DATE_TIME_PATTERN2).minusMonths(3)
                     .format(OLD_DATE_TIME_PATTERN2);
-            var query = NoPositionChangeElasticSearchQuery.create(reportDate3MonthsAgo);
+            var query = NoPositionChangeElasticSearchQuery.create(reportDate3MonthsAgo, managingOffice);
             var submitEvents = new ArrayList<NoPositionChangeSubmitEvent>();
             var searchResult = ccdClient.runElasticSearch(authToken, caseTypeId, query,
                     NoPositionChangeSearchResult.class);

@@ -36,6 +36,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_INPUT_IN_ERROR;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_TRANSFERRED_OTHER_COUNTRY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_TRANSFERRED_SAME_COUNTRY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -730,6 +731,41 @@ public class CaseCompletedReportTest {
                 0, 0, 0);
         verifyReportHeader(reportListingData, reportHeaderValues);
         verifyReportDetails(reportListingData, 3);
+    }
+
+    @Test
+    public void initReport_ReportOfficeName_Scotland() {
+        // given case office in Scotland
+        // when we generate report data
+        // then we have some data
+
+        ListingDetails listingDetails = new ListingDetails();
+        listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
+        ListingData listingData = new ListingData();
+        listingData.setListingDate("1970-01-01");
+        listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
+        listingData.setManagingOffice(null);
+        listingDetails.setCaseData(listingData);
+
+        List<SubmitEvent> submitEvents = new ArrayList<>();
+        DateListedTypeItem dateListedTypeItem = createHearingDateListed("1970-01-01T00:00:00",
+                HEARING_STATUS_HEARD, YES);
+        List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_PERLIMINARY_HEARING,
+            dateListedTypeItem));
+        submitEvents.add(createSubmitEvent(CLOSED_STATE, JURISDICTION_OUTCOME_DISMISSED_AT_HEARING, hearings,
+                CONCILIATION_TRACK_NO_CONCILIATION));
+
+        CasesCompletedReport casesCompletedReport = new CasesCompletedReport();
+        ListingData reportListingData = casesCompletedReport.generateReportData(listingDetails, submitEvents);
+
+        ReportHeaderValues reportHeaderValues = new ReportHeaderValues(
+                1, 1, 1.0, "Scotland",
+                1, 1, 1.0,
+                0, 0, 0,
+                0, 0, 0,
+                0, 0, 0);
+        verifyReportHeader(reportListingData, reportHeaderValues);
+        verifyReportDetails(reportListingData, 1);
     }
 
     private SubmitEvent createSubmitEvent(String state) {

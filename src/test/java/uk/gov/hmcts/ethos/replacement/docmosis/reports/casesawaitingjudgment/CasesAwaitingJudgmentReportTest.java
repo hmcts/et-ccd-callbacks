@@ -444,6 +444,21 @@ public class CasesAwaitingJudgmentReportTest {
     }
 
     @Test
+    public void checkReportOfficeName_EngWales() {
+        submitEvents.add(caseDataBuilder
+                .withPositionType(validPositionType)
+                .withHearing(LISTING_DATE, HEARING_STATUS_HEARD)
+                .buildAsSubmitEvent(ACCEPTED_STATE));
+        var listingDetails = new ListingDetails();
+        var caseData = new ListingData();
+        caseData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        listingDetails.setCaseData(caseData);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), reportData.getReportSummary().getOffice());
+    }
+
+    @Test
     public void checkReportOfficeName_Scotland() {
         submitEvents.add(caseDataBuilder
                 .withPositionType(validPositionType)

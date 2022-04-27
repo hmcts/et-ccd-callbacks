@@ -103,6 +103,10 @@ No password required
 #### Setup
 See [ECM CCD Docker](https://github.com/hmcts/ecm-ccd-docker) for steps to start the CCD Docker environment.
 
+```bash
+    ./bin/init-db.sh
+```
+
 #### Run
 ```bash
     ./gradlew bootRun --args='--spring.profiles.active=dev'

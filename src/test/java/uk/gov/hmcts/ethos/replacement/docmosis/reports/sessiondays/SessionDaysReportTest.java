@@ -28,6 +28,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POST
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_SETTLED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_WITHDRAWN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JudgeEmploymentStatus.FEE_PAID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JudgeEmploymentStatus.SALARIED;
@@ -176,7 +177,13 @@ class SessionDaysReportTest {
 
     @Test
     void checkReportOffice_Scotland() {
-        var params = new ReportParams(SCOTLAND_LISTING_CASE_TYPE_ID, TribunalOffice.GLASGOW.getOfficeName(),
+        when(reportDataSource.getData(SCOTLAND_CASE_TYPE_ID, null,
+                DATE_FROM, DATE_TO)).thenReturn(submitEvents);
+        when(judgeService.getJudges(TribunalOffice.GLASGOW)).thenReturn(getJudges());
+
+        caseDataBuilder.withHearingData(HEARING_STATUS_HEARD);
+        submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
+        var params = new ReportParams(SCOTLAND_LISTING_CASE_TYPE_ID, null,
                 DATE_FROM, DATE_TO);
         var reportData = sessionDaysReport.generateReport(params);
         assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportData.getReportSummary().getOffice());

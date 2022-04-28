@@ -177,7 +177,7 @@ public class ReportDataService {
     }
 
     private SessionDaysReportData getSessionDaysReport(ListingDetails listingDetails, String authToken) {
-        log.info("Session Days Report for {}", listingDetails.getCaseData().getManagingOffice());
+        log.info("Session Days Report for {}", listingDetails.getCaseTypeId());
         var reportDataSource = new SessionDaysCcdReportDataSource(authToken, ccdClient);
         setListingDateRangeForSearch(listingDetails);
 

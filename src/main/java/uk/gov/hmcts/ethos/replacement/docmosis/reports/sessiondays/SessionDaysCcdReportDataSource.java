@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysSubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
+
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -15,10 +16,10 @@ public class SessionDaysCcdReportDataSource implements SessionDaysReportDataSour
     private final CcdClient ccdClient;
 
     @Override
-    public List<SessionDaysSubmitEvent> getData(String caseTypeId,
+    public List<SessionDaysSubmitEvent> getData(String caseTypeId, String managingOffice,
                                                 String listingDateFrom, String listingDateTo) {
         try {
-            var query = SessionDaysElasticSearchQuery.create(listingDateFrom, listingDateTo);
+            var query = SessionDaysElasticSearchQuery.create(listingDateFrom, listingDateTo, managingOffice);
             return ccdClient.sessionDaysSearch(authToken, caseTypeId, query);
         } catch (Exception e) {
             throw new ReportException(String.format(

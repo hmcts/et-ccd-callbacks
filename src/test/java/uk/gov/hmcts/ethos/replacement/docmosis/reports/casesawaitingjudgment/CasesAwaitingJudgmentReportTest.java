@@ -445,10 +445,6 @@ public class CasesAwaitingJudgmentReportTest {
 
     @Test
     public void checkReportOfficeName_EngWales() {
-        submitEvents.add(caseDataBuilder
-                .withPositionType(validPositionType)
-                .withHearing(LISTING_DATE, HEARING_STATUS_HEARD)
-                .buildAsSubmitEvent(ACCEPTED_STATE));
         var listingDetails = new ListingDetails();
         var caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
@@ -460,10 +456,6 @@ public class CasesAwaitingJudgmentReportTest {
 
     @Test
     public void checkReportOfficeName_Scotland() {
-        submitEvents.add(caseDataBuilder
-                .withPositionType(validPositionType)
-                .withHearing(LISTING_DATE, HEARING_STATUS_HEARD)
-                .buildAsSubmitEvent(ACCEPTED_STATE));
         var listingDetails = new ListingDetails();
         var caseData = new ListingData();
         caseData.setManagingOffice(null);

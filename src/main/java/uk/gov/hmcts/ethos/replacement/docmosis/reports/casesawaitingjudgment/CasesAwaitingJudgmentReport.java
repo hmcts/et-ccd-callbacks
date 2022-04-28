@@ -70,9 +70,11 @@ public class CasesAwaitingJudgmentReport {
     public CasesAwaitingJudgmentReportData runReport(ListingDetails listingDetails) {
         var managingOffice = listingDetails.getCaseData().getManagingOffice();
         var submitEvents = getCases(listingDetails.getCaseTypeId(), managingOffice);
-        var reportOffice = StringUtils.isNotBlank(managingOffice) && TribunalOffice.isEnglandWalesOffice(managingOffice)
-                ? managingOffice
-                : TribunalOffice.SCOTLAND.getOfficeName();
+
+        var reportOffice = StringUtils.isNotBlank(managingOffice)
+                && TribunalOffice.isEnglandWalesOffice(managingOffice)
+                ? managingOffice :
+                TribunalOffice.SCOTLAND.getOfficeName();
         var reportData = initReport(reportOffice);
 
         populateData(reportData, submitEvents);

@@ -23,7 +23,8 @@ public class EccReportCcdDataSource implements EccReportDataSource {
             return ccdClient.eccReportSearch(authToken, reportParams.getCaseTypeId(), query);
         } catch (Exception e) {
             throw new ReportException(String.format(
-                    "Failed to get ECC Report search results for office %s", reportParams.getManagingOffice()), e);
+                    "Failed to get ECC Report search results for case type %s and office %s",
+                    reportParams.getCaseTypeId(), reportParams.getManagingOffice()), e);
         }
     }
 }

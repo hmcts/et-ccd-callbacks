@@ -18,9 +18,11 @@ public class CftlibConfig implements CFTLibConfigurer {
       "caseworker-employment-englandwales");
     // Create our roles in CCD to allow our definition to import.
     lib.createRoles(
-      "caseworker-employment",
-      "caseworker-employment-api",
-      "caseworker-employment-englandwales"
+            "caseworker-employment",
+            "caseworker-employment-api",
+            "caseworker-employment-englandwales",
+            "caseworker-employment-etjudge",
+            "caseworker-employment-etjudge-englandwales"
     );
     // Import our definition.
     var def = Files.readAllBytes(Path.of("et-ccd-definitions-englandwales/definitions/xlsx/et-englandwales-ccd-config-cftlib.xlsx"));

@@ -1033,17 +1033,17 @@ public class ListingServiceTest {
         List<AdhocReportTypeItem> localReportsSummary = List.of(adhocReportTypeItem);
         listingDetails.getCaseData().setLocalReportsSummary(localReportsSummary);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         listingDetails.getCaseData().setReportType(CLAIMS_ACCEPTED_REPORT);
         submitEvents.remove(0);
 
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(),
                 anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken");
-
         assertTrue(CollectionUtils.isEmpty(listingDataResult.getLocalReportsDetail()));
         assertTrue(CollectionUtils.isEmpty(listingDataResult.getLocalReportsSummary2()));
         assertTrue(CollectionUtils.isEmpty(listingDataResult.getLocalReportsSummary()));
-        assertNull(listingDataResult.getLocalReportsDetailHdr());
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), listingDataResult.getLocalReportsDetailHdr().getReportOffice());
         assertNull(listingDataResult.getLocalReportsSummaryHdr());
         assertNull(listingDataResult.getLocalReportsSummaryHdr2());
 

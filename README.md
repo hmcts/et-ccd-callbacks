@@ -49,13 +49,20 @@ To get the project to build in IntelliJ IDEA, you have to:
 
 ## Running
 
+To run the application, first set the mandatory environment variables.
+
+Then either follow the instructions for [Running using CFTLib](#running-using-cftlib) or
+[Running using ECM CCD Docker](#running-using-ecm-ccd-docker).
+
 ### Mandatory Environment Variables
 | Variable | Purpose                        |
 | -------- |--------------------------------|
 | ET_COS_DB_PASSWORD | Local et_cos database password |
 
 ### Azure Service Bus
-Either provide a connection string in an environment variable to a development queue
+Either provide a connection string in an environment variable to a development queue.
+
+If you require a development queue then ask one of the team to set this up.
 
 | Variable | Purpose                                    |
 | -------- |--------------------------------------------|
@@ -103,6 +110,7 @@ No password required
 #### Setup
 See [ECM CCD Docker](https://github.com/hmcts/ecm-ccd-docker) for steps to start the CCD Docker environment.
 
+Create the local et_cos database:
 ```bash
     ./bin/init-db.sh
 ```
@@ -119,9 +127,7 @@ http://localhost:3455
 ## API documentation
 API documentation is provided with Swagger
 
-```bash
-    http://localhost:8081/swagger-ui.html
-```
+http://localhost:8081/swagger-ui.html
 
 ## Developing
 

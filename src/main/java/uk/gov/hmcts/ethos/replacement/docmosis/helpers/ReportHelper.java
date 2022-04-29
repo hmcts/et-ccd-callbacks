@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -8,13 +7,10 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.AdhocReportTypeItem;
-import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.AdhocReportType;
-import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
 
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -23,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
@@ -57,37 +52,6 @@ public class ReportHelper {
             String dateToSearchFrom = listingData.getListingDateFrom();
             String dateToSearchTo = listingData.getListingDateTo();
             return ListingHelper.getMatchingDateBetween(dateToSearchFrom, dateToSearchTo, matchingDate, true);
-        }
-    }
-
-    public static ListingData processBroughtForwardDatesRequest(ListingDetails listingDetails,
-                                                                List<SubmitEvent> submitEvents) {
-        if (submitEvents != null && !submitEvents.isEmpty()) {
-            log.info(CASES_SEARCHED + submitEvents.size());
-            List<BFDateTypeItem> bfDateTypeItems = new ArrayList<>();
-            for (SubmitEvent submitEvent : submitEvents) {
-                addBfDateTypeItems(submitEvent, listingDetails, bfDateTypeItems);
-            }
-            listingDetails.getCaseData().setBfDateCollection(bfDateTypeItems);
-        }
-
-        listingDetails.getCaseData().clearReportFields();
-        return listingDetails.getCaseData();
-    }
-
-    private static void addBfDateTypeItems(
-            SubmitEvent submitEvent,
-            ListingDetails listingDetails,
-            List<BFDateTypeItem> bfDateTypeItems) {
-        if (submitEvent.getCaseData().getBfActions() != null
-                && !submitEvent.getCaseData().getBfActions().isEmpty()) {
-            for (BFActionTypeItem bfActionTypeItem : submitEvent.getCaseData().getBfActions()) {
-                var bfDateTypeItem = getBFDateTypeItem(bfActionTypeItem,
-                        listingDetails.getCaseData(), submitEvent.getCaseData());
-                if (bfDateTypeItem.getValue() != null) {
-                    bfDateTypeItems.add(bfDateTypeItem);
-                }
-            }
         }
     }
 
@@ -149,6 +113,12 @@ public class ReportHelper {
 
     public static ListingData processLiveCaseloadRequest(ListingDetails listingDetails,
                                                          List<SubmitEvent> submitEvents) {
+        var localReportsDetailHdr = new AdhocReportType();
+        var caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
+        var reportOffice = getReportOffice(caseTypeId, listingDetails.getCaseData().getManagingOffice());
+        localReportsDetailHdr.setReportOffice(reportOffice);
+        listingDetails.getCaseData().setLocalReportsDetailHdr(localReportsDetailHdr);
+
         if (submitEvents != null && !submitEvents.isEmpty()) {
             log.info(CASES_SEARCHED + submitEvents.size());
             List<AdhocReportTypeItem> localReportsDetailList = new ArrayList<>();
@@ -160,17 +130,12 @@ public class ReportHelper {
                     localReportsDetailList.add(localReportsDetailItem);
                 }
             }
-
-            var localReportsDetailHdr = new AdhocReportType();
-            localReportsDetailHdr.setReportOffice(listingDetails.getCaseData().getManagingOffice());
-            listingDetails.getCaseData().setLocalReportsDetailHdr(localReportsDetailHdr);
             listingDetails.getCaseData().setLocalReportsDetail(localReportsDetailList);
 
             var localReportsSummaryHdr = new AdhocReportType();
             var singlesTotal = getSinglesTotal(localReportsDetailList);
             var multiplesTotal = getMultiplesTotal(localReportsDetailList);
             var total = singlesTotal + multiplesTotal;
-
             localReportsSummaryHdr.setSinglesTotal(String.valueOf(singlesTotal));
             localReportsSummaryHdr.setMultiplesTotal(String.valueOf(multiplesTotal));
             localReportsSummaryHdr.setTotal(String.valueOf(total));
@@ -197,31 +162,6 @@ public class ReportHelper {
                     .filter(reportItem -> MULTIPLE_CASE_TYPE.equals(reportItem.getValue().getCaseType())).count();
         }
         return multiplesTotal;
-    }
-
-    private static BFDateTypeItem getBFDateTypeItem(BFActionTypeItem bfActionTypeItem,
-                                                    ListingData listingData, CaseData caseData) {
-        var bfDateTypeItem = new BFDateTypeItem();
-        var bfActionType = bfActionTypeItem.getValue();
-        if (!isNullOrEmpty(bfActionType.getBfDate()) && isNullOrEmpty(bfActionType.getCleared())) {
-            boolean matchingDateIsValid = validateMatchingDate(listingData, bfActionType.getBfDate());
-            boolean clerkResponsibleIsValid = validateClerkResponsible(listingData, caseData);
-            if (matchingDateIsValid && clerkResponsibleIsValid) {
-                var bfDateType = new BFDateType();
-                bfDateType.setCaseReference(caseData.getEthosCaseReference());
-                if (!Strings.isNullOrEmpty(bfActionType.getAllActions())) {
-                    bfDateType.setBroughtForwardAction(bfActionType.getAllActions());
-                } else if (!Strings.isNullOrEmpty(bfActionType.getCwActions())) {
-                    bfDateType.setBroughtForwardAction(bfActionType.getCwActions());
-                }
-                bfDateType.setBroughtForwardDate(bfActionType.getBfDate());
-                bfDateType.setBroughtForwardDateCleared(bfActionType.getCleared());
-                bfDateType.setBroughtForwardDateReason(bfActionType.getNotes());
-                bfDateTypeItem.setId(String.valueOf(bfActionTypeItem.getId()));
-                bfDateTypeItem.setValue(bfDateType);
-            }
-        }
-        return bfDateTypeItem;
     }
 
     private static AdhocReportTypeItem getClaimsAcceptedDetailItem(ListingDetails listingDetails, CaseData caseData) {
@@ -256,20 +196,6 @@ public class ReportHelper {
             }
         }
         return adhocReportTypeItem;
-    }
-
-    private static boolean validateClerkResponsible(ListingData listingData, CaseData caseData) {
-        var listingClerkCode = getClerkCode(listingData.getClerkResponsible());
-        var caseDataClerkCode = getClerkCode(caseData.getClerkResponsible());
-        if (listingClerkCode != null) {
-            return listingClerkCode.equals(caseDataClerkCode);
-        } else {
-            return true;
-        }
-    }
-
-    private static String getClerkCode(DynamicFixedListType dynamicFixedListType) {
-        return dynamicFixedListType != null ? dynamicFixedListType.getSelectedCode() : null;
     }
 
     private static void getCommonReportDetailFields(ListingDetails listingDetails, CaseData caseData,

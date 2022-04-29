@@ -78,12 +78,15 @@ public class ReportHelper {
 
     public static ListingData processClaimsAcceptedRequest(ListingDetails listingDetails,
                                                            List<SubmitEvent> submitEvents) {
-        if (submitEvents != null && !submitEvents.isEmpty()) {
+        var localReportsDetailHdr = new AdhocReportType();
+        localReportsDetailHdr.setReportOffice(getReportOffice(
+                UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()),
+                listingDetails.getCaseData().getManagingOffice()));
+        if (CollectionUtils.isNotEmpty(submitEvents)) {
             log.info(CASES_SEARCHED + submitEvents.size());
             var totalCases = 0;
             var totalSingles = 0;
             var totalMultiples = 0;
-            var localReportsDetailHdr = new AdhocReportType();
             List<AdhocReportTypeItem> localReportsDetailList = new ArrayList<>();
             for (SubmitEvent submitEvent : submitEvents) {
                 AdhocReportTypeItem localReportsDetailItem =
@@ -101,10 +104,9 @@ public class ReportHelper {
             localReportsDetailHdr.setTotal(Integer.toString(totalCases));
             localReportsDetailHdr.setSinglesTotal(Integer.toString(totalSingles));
             localReportsDetailHdr.setMultiplesTotal(Integer.toString(totalMultiples));
-            localReportsDetailHdr.setReportOffice(listingDetails.getCaseData().getManagingOffice());
-            listingDetails.getCaseData().setLocalReportsDetailHdr(localReportsDetailHdr);
             listingDetails.getCaseData().setLocalReportsDetail(localReportsDetailList);
         }
+        listingDetails.getCaseData().setLocalReportsDetailHdr(localReportsDetailHdr);
         listingDetails.getCaseData().clearReportFields();
         return listingDetails.getCaseData();
     }
@@ -142,16 +144,6 @@ public class ReportHelper {
 
         listingDetails.getCaseData().clearReportFields();
         return listingDetails.getCaseData();
-    }
-
-    private static String getReportOffice(String caseTypeId, String managingOffice) {
-        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
-            return managingOffice;
-        } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
-            return TribunalOffice.SCOTLAND.getOfficeName();
-        } else {
-            throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
-        }
     }
 
     private static long getSinglesTotal(List<AdhocReportTypeItem> localReportsDetailList) {
@@ -265,5 +257,15 @@ public class ReportHelper {
             return invalidPositionTypes.stream().noneMatch(str -> str.equals(caseData.getPositionType()));
         }
         return true;
+    }
+
+    private static String getReportOffice(String caseTypeId, String managingOffice) {
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            return managingOffice;
+        } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            return TribunalOffice.SCOTLAND.getOfficeName();
+        } else {
+            throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
+        }
     }
 }

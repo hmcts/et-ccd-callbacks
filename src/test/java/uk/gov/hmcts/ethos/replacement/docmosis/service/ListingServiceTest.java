@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
@@ -866,17 +867,17 @@ public class ListingServiceTest {
         assertEquals(result, listingData.toString());
     }
 
-    @Ignore("Fix as part of reporting work")
     @Test
     public void generateClaimsAcceptedReportDataForEngland() throws IOException {
         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=Aberdeen, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
+                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, " +
+                "listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
                 "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, " +
                 "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, " +
                 "clerkResponsible=null, reportType=Claims Accepted, documentName=null, showAll=null, localReportsSummaryHdr=null, " +
                 "localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, " +
-                "localReportsDetailHdr=AdhocReportType(reportDate=null, reportOffice=Manchester, receiptDate=null, hearingDate=null, date=null, " +
+                "localReportsDetailHdr=AdhocReportType(reportDate=null, reportOffice=Leeds, receiptDate=null, hearingDate=null, date=null, " +
                 "full=null, half=null, mins=null, total=1, eeMember=null, erMember=null, caseReference=null, multipleRef=null, multSub=null, " +
                 "hearingNumber=null, hearingType=null, hearingTelConf=null, hearingDuration=null, hearingClerk=null, clerk=null, hearingSitAlone=null, " +
                 "hearingJudge=null, judgeType=null, judgementDateSent=null, position=null, dateToPosition=null, fileLocation=null, " +
@@ -922,9 +923,7 @@ public class ListingServiceTest {
                 "dateOfAcceptance=2019-12-12, respondentET3=null, respondentET4=null, listingHistory=null, ConNoneTotal=null, ConStdTotal=null, ConFastTotal=null, " +
                 "ConOpenTotal=null, ConNone26wkTotal=null, ConStd26wkTotal=null, ConFast26wkTotal=null, ConOpen26wkTotal=null, ConNone26wkTotalPerCent=null, " +
                 "ConStd26wkTotalPerCent=null, ConFast26wkTotalPerCent=null, ConOpen26wkTotalPerCent=null, xConNone26wkTotal=null, xConStd26wkTotal=null, xConFast26wkTotal=null, " +
-                "xConOpen26wkTotal=null, xConNone26wkTotalPerCent=null, xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null))], managingOffice=Leeds)" +
-                "xConOpen26wkTotal=null, xConNone26wkTotalPerCent=null, xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, "
-                + "xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null, "
+                "xConOpen26wkTotal=null, xConNone26wkTotalPerCent=null, xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null, "
                 + "claimServedDay1Total=null, claimServedDay1Percent=null, claimServedDay2Total=null, "
                 + "claimServedDay2Percent=null, claimServedDay3Total=null, claimServedDay3Percent=null, "
                 + "claimServedDay4Total=null, claimServedDay4Percent=null, claimServedDay5Total=null, "
@@ -933,26 +932,27 @@ public class ListingServiceTest {
                 "et1OnlineTotalCases=null, eccTotalCases=null, migratedTotalCases=null, " +
                 "manuallyCreatedTotalCasesPercent=null, et1OnlineTotalCasesPercent=null, " +
                 "eccTotalCasesPercent=null, migratedTotalCasesPercent=null"
-                +"))])";
+                +"))], managingOffice=Leeds)";
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(CLAIMS_ACCEPTED_REPORT);
-        listingDetails.getCaseData().setManagingOffice("Leeds");
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken");
         assertEquals(result, listingDataResult.toString());
+        assertEquals(TribunalOffice.LEEDS.getOfficeName(), listingDataResult.getLocalReportsDetailHdr().getReportOffice());
     }
 
-    @Ignore("Fix as part of reporting work")
     @Test
     public void generateClaimsAcceptedReportDataForGlasgow() throws IOException {
         String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
                 "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=Aberdeen, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
+                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, " +
+                "listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
                 "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, " +
                 "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, " +
                 "clerkResponsible=null, reportType=Claims Accepted, documentName=null, showAll=null, localReportsSummaryHdr=null, " +
                 "localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, " +
-                "localReportsDetailHdr=AdhocReportType(reportDate=null, reportOffice=Leeds, receiptDate=null, hearingDate=null, date=null, " +
+                "localReportsDetailHdr=AdhocReportType(reportDate=null, reportOffice=Scotland, receiptDate=null, hearingDate=null, date=null, " +
                 "full=null, half=null, mins=null, total=1, eeMember=null, erMember=null, caseReference=null, multipleRef=null, multSub=null, " +
                 "hearingNumber=null, hearingType=null, hearingTelConf=null, hearingDuration=null, hearingClerk=null, clerk=null, hearingSitAlone=null, " +
                 "hearingJudge=null, judgeType=null, judgementDateSent=null, position=null, dateToPosition=null, fileLocation=null, fileLocationGlasgow=null, " +
@@ -999,7 +999,6 @@ public class ListingServiceTest {
                 "dateOfAcceptance=2019-12-12, respondentET3=null, respondentET4=null, listingHistory=null, ConNoneTotal=null, ConStdTotal=null, " +
                 "ConFastTotal=null, ConOpenTotal=null, ConNone26wkTotal=null, ConStd26wkTotal=null, ConFast26wkTotal=null, ConOpen26wkTotal=null, " +
                 "ConNone26wkTotalPerCent=null, ConStd26wkTotalPerCent=null, ConFast26wkTotalPerCent=null, ConOpen26wkTotalPerCent=null, xConNone26wkTotal=null, xConStd26wkTotal=null, " +
-                "xConFast26wkTotal=null, xConOpen26wkTotal=null, xConNone26wkTotalPerCent=null, xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null))], managingOffice=Leeds)" +
                 "xConFast26wkTotal=null, xConOpen26wkTotal=null, xConNone26wkTotalPerCent=null, xConStd26wkTotalPerCent=null, xConFast26wkTotalPerCent=null, xConOpen26wkTotalPerCent=null, delayedDaysForFirstHearing=null, "
                 + "claimServedDay1Total=null, claimServedDay1Percent=null, claimServedDay2Total=null, "
                 + "claimServedDay2Percent=null, claimServedDay3Total=null, claimServedDay3Percent=null, "
@@ -1009,14 +1008,15 @@ public class ListingServiceTest {
                 "et1OnlineTotalCases=null, eccTotalCases=null, migratedTotalCases=null, " +
                 "manuallyCreatedTotalCasesPercent=null, et1OnlineTotalCasesPercent=null, " +
                 "eccTotalCasesPercent=null, migratedTotalCasesPercent=null"
-                +"))])";
+                +"))], managingOffice=Glasgow)";
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setReportType(CLAIMS_ACCEPTED_REPORT);
-        listingDetails.getCaseData().setManagingOffice("Leeds");
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
-        submitEvents.get(0).getCaseData().setManagingOffice("Glasgow");
+        submitEvents.get(0).getCaseData().setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
         ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken");
         assertEquals(result, listingDataResult.toString());
+        assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), listingDataResult.getLocalReportsDetailHdr().getReportOffice());
     }
 
     @Test
@@ -1033,17 +1033,17 @@ public class ListingServiceTest {
         List<AdhocReportTypeItem> localReportsSummary = List.of(adhocReportTypeItem);
         listingDetails.getCaseData().setLocalReportsSummary(localReportsSummary);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         listingDetails.getCaseData().setReportType(CLAIMS_ACCEPTED_REPORT);
         submitEvents.remove(0);
 
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(),
                 anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken");
-
         assertTrue(CollectionUtils.isEmpty(listingDataResult.getLocalReportsDetail()));
         assertTrue(CollectionUtils.isEmpty(listingDataResult.getLocalReportsSummary2()));
         assertTrue(CollectionUtils.isEmpty(listingDataResult.getLocalReportsSummary()));
-        assertNull(listingDataResult.getLocalReportsDetailHdr());
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), listingDataResult.getLocalReportsDetailHdr().getReportOffice());
         assertNull(listingDataResult.getLocalReportsSummaryHdr());
         assertNull(listingDataResult.getLocalReportsSummaryHdr2());
 

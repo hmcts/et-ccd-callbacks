@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
@@ -146,6 +147,12 @@ public class ReportHelper {
 
     public static ListingData processLiveCaseloadRequest(ListingDetails listingDetails,
                                                          List<SubmitEvent> submitEvents) {
+        var localReportsDetailHdr = new AdhocReportType();
+        var caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
+        var reportOffice = getReportOffice(caseTypeId, listingDetails.getCaseData().getManagingOffice());
+        localReportsDetailHdr.setReportOffice(reportOffice);
+        listingDetails.getCaseData().setLocalReportsDetailHdr(localReportsDetailHdr);
+
         if (submitEvents != null && !submitEvents.isEmpty()) {
             log.info(CASES_SEARCHED + submitEvents.size());
             List<AdhocReportTypeItem> localReportsDetailList = new ArrayList<>();
@@ -157,17 +164,12 @@ public class ReportHelper {
                     localReportsDetailList.add(localReportsDetailItem);
                 }
             }
-
-            var localReportsDetailHdr = new AdhocReportType();
-            localReportsDetailHdr.setReportOffice(listingDetails.getCaseData().getManagingOffice());
-            listingDetails.getCaseData().setLocalReportsDetailHdr(localReportsDetailHdr);
             listingDetails.getCaseData().setLocalReportsDetail(localReportsDetailList);
 
             var localReportsSummaryHdr = new AdhocReportType();
             var singlesTotal = getSinglesTotal(localReportsDetailList);
             var multiplesTotal = getMultiplesTotal(localReportsDetailList);
             var total = singlesTotal + multiplesTotal;
-
             localReportsSummaryHdr.setSinglesTotal(String.valueOf(singlesTotal));
             localReportsSummaryHdr.setMultiplesTotal(String.valueOf(multiplesTotal));
             localReportsSummaryHdr.setTotal(String.valueOf(total));
@@ -176,6 +178,16 @@ public class ReportHelper {
 
         listingDetails.getCaseData().clearReportFields();
         return listingDetails.getCaseData();
+    }
+
+    private static String getReportOffice(String caseTypeId, String managingOffice) {
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            return managingOffice;
+        } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            return TribunalOffice.SCOTLAND.getOfficeName();
+        } else {
+            throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
+        }
     }
 
     private static long getSinglesTotal(List<AdhocReportTypeItem> localReportsDetailList) {

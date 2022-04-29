@@ -333,7 +333,7 @@ public class ReportHelper {
         return true;
     }
 
-    private static String getReportOffice(String caseTypeId, String managingOffice) {
+    public static String getReportOffice(String caseTypeId, String managingOffice) {
         if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
             return managingOffice;
         } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {

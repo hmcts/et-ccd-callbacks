@@ -370,7 +370,7 @@ public class MultipleUtil {
         multipleData.setLeadCase("21006/2020");
         multipleData.setState(OPEN_STATE);
         multipleData.setCaseCounter("2");
-
+        multipleData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         multipleData.setOfficeMultipleCT(generateDynamicList(TribunalOffice.MANCHESTER.getOfficeName()));
         multipleData.setPositionTypeCT("PositionTypeCT");
         multipleData.setReasonForCT("ReasonForCT");
@@ -438,7 +438,7 @@ public class MultipleUtil {
         caseData.setLeadClaimant(YES);
         caseData.setMultipleReference("246000");
         caseData.setSubMultipleName("updatedSubMultipleName");
-
+        caseData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         caseData.setEcmCaseType(MULTIPLE_CASE_TYPE);
         caseData.setMultipleFlag(NO);
 

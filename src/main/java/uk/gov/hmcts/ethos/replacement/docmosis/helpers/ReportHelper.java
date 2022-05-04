@@ -80,8 +80,7 @@ public class ReportHelper {
                                                            List<SubmitEvent> submitEvents) {
         var localReportsDetailHdr = new AdhocReportType();
         localReportsDetailHdr.setReportOffice(getReportOffice(
-                UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()),
-                listingDetails.getCaseData().getManagingOffice()));
+                listingDetails.getCaseTypeId(), listingDetails.getCaseData().getManagingOffice()));
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             log.info(CASES_SEARCHED + submitEvents.size());
             var totalCases = 0;
@@ -114,8 +113,8 @@ public class ReportHelper {
     public static ListingData processLiveCaseloadRequest(ListingDetails listingDetails,
                                                          List<SubmitEvent> submitEvents) {
         var localReportsDetailHdr = new AdhocReportType();
-        var caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
-        var reportOffice = getReportOffice(caseTypeId, listingDetails.getCaseData().getManagingOffice());
+        var reportOffice = getReportOffice(listingDetails.getCaseTypeId(),
+                listingDetails.getCaseData().getManagingOffice());
         localReportsDetailHdr.setReportOffice(reportOffice);
         listingDetails.getCaseData().setLocalReportsDetailHdr(localReportsDetailHdr);
 
@@ -259,13 +258,14 @@ public class ReportHelper {
         return true;
     }
 
-    public static String getReportOffice(String caseTypeId, String managingOffice) {
+    public static String getReportOffice(String listingCaseTypeId, String managingOffice) {
+        var caseTypeId = UtilHelper.getListingCaseTypeId(listingCaseTypeId);
         if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
             return managingOffice;
         } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
             return TribunalOffice.SCOTLAND.getOfficeName();
         } else {
-            throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
+            throw new IllegalArgumentException("Unexpected case type id " + listingCaseTypeId);
         }
     }
 }

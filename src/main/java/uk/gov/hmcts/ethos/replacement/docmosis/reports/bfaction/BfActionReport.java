@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
@@ -39,11 +37,7 @@ public class BfActionReport {
         bfActionReportData.setDocumentName(BROUGHT_FORWARD_REPORT);
 
         var managingOffice = caseData.getManagingOffice();
-        var reportOffice = StringUtils.isNotBlank(managingOffice) && TribunalOffice.isEnglandWalesOffice(managingOffice)
-                ? managingOffice
-                : TribunalOffice.SCOTLAND.getOfficeName();
-        bfActionReportData.setOffice(reportOffice);
-
+        bfActionReportData.setOffice(ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), managingOffice));
         bfActionReportData.setListingDate(caseData.getListingDate());
         bfActionReportData.setListingDateFrom(caseData.getListingDateFrom());
         bfActionReportData.setListingDateTo(caseData.getListingDateTo());

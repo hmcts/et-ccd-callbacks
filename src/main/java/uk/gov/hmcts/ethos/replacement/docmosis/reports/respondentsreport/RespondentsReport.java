@@ -23,8 +23,7 @@ public class RespondentsReport {
 
     public RespondentsReportData generateReport(ReportParams params) {
         var submitEvents = getCases(params);
-        var reportOffice = ReportHelper.getReportOffice(
-                UtilHelper.getListingCaseTypeId(params.getCaseTypeId()), params.getManagingOffice());
+        var reportOffice = ReportHelper.getReportOffice(params.getCaseTypeId(), params.getManagingOffice());
         var reportData = initReport(reportOffice);
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             executeReport(reportData, submitEvents);

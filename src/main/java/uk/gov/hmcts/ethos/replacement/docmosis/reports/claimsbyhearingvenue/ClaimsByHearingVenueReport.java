@@ -35,7 +35,8 @@ public class ClaimsByHearingVenueReport {
         var submitEvents = reportDataSource.getData(
             UtilHelper.getListingCaseTypeId(searchParams.getCaseTypeId()),
                 searchParams.getDateFrom(), searchParams.getDateTo());
-        var claimsByHearingVenueReportData = initReport(searchParams.getManagingOffice());
+        var reportOffice = ReportHelper.getReportOffice(searchParams.getCaseTypeId(), searchParams.getManagingOffice());
+        var claimsByHearingVenueReportData = initReport(reportOffice);
 
         setReportListingDate(claimsByHearingVenueReportData, searchParams.getDateFrom(),
                 searchParams.getDateTo(), hearingDateType);

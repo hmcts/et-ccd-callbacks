@@ -6,6 +6,7 @@ import org.junit.Test;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.AdhocReportTypeItem;
@@ -55,6 +56,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_BY_HEARING_TYPE_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
@@ -536,6 +538,20 @@ public class ReportDocHelperTest {
         var actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
                 "EM-TRB-SCO-ENG-00818", userDetails).toString();
         assertEquals(expectedJson, actualJson);
+    }
+
+    @Test
+    public void testEccReportContainsOfficeWhenNoCasesFound() {
+        var reportData = new EccReportData(TribunalOffice.MANCHESTER.getOfficeName());
+        reportData.setReportType(ECC_REPORT);
+        reportData.setDocumentName("TestDocument");
+        reportData.setHearingDateType(Constants.RANGE_HEARING_DATE_TYPE);
+        reportData.setListingDateFrom("2022-01-01");
+        reportData.setListingDateTo("2022-01-10");
+
+        var actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
+                "EM-TRB-SCO-ENG-00818", userDetails).toString();
+        assertTrue(actualJson.contains("\"Report_Office\":\"Manchester\""));
     }
 
     private CasesAwaitingJudgmentReportData getCasesAwaitingJudgementReportData() {

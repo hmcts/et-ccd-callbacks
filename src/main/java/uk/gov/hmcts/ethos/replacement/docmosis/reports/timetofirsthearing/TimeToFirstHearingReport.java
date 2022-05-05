@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.Strings;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
@@ -36,18 +37,22 @@ public class TimeToFirstHearingReport {
     static final String ZERO_DECIMAL = "0.00";
 
     public ListingData generateReportData(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
+        var managingOffice = listingDetails.getCaseData().getManagingOffice();
+        var reportOffice = StringUtils.isNotBlank(managingOffice) && TribunalOffice.isEnglandWalesOffice(managingOffice)
+                ? managingOffice
+                : TribunalOffice.SCOTLAND.getOfficeName();
 
-        initReport(listingDetails);
+        initReport(listingDetails, reportOffice);
 
         if (CollectionUtils.isNotEmpty(submitEvents)) {
-            executeReport(listingDetails, submitEvents);
+            executeReport(listingDetails, submitEvents, reportOffice);
         }
 
         listingDetails.getCaseData().clearReportFields();
         return listingDetails.getCaseData();
     }
 
-    private void initReport(ListingDetails listingDetails) {
+    private void initReport(ListingDetails listingDetails, String reportOffice) {
 
         var adhocReportType = new AdhocReportType();
 
@@ -81,7 +86,7 @@ public class TimeToFirstHearingReport {
         adhocReportType.setTotalx26wkPerCent(ZERO_DECIMAL);
 
         //localReportsDetail fields
-        adhocReportType.setReportOffice("");
+        adhocReportType.setReportOffice(reportOffice);
         adhocReportType.setCaseReference("");
         adhocReportType.setConciliationTrack("");
         adhocReportType.setReceiptDate("");
@@ -100,20 +105,21 @@ public class TimeToFirstHearingReport {
         listingData.setLocalReportsDetail(new ArrayList<>());
     }
 
-    private void executeReport(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
+    private void executeReport(ListingDetails listingDetails, List<SubmitEvent> submitEvents, String reportOffice) {
         log.info(String.format("Time to first hearing report case type id %s for office %s with search results: %d",
                 listingDetails.getCaseTypeId(), listingDetails.getCaseData().getManagingOffice(), submitEvents.size()));
         populateLocalReportSummary(listingDetails.getCaseData(), submitEvents);
-        populateLocalReportSummaryHdr(listingDetails);
-        populateLocalReportSummaryDetail(listingDetails, submitEvents);
+        populateLocalReportSummaryHdr(listingDetails, reportOffice);
+        populateLocalReportSummaryDetail(listingDetails, submitEvents, reportOffice);
 
     }
 
-    private void populateLocalReportSummaryDetail(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
+    private void populateLocalReportSummaryDetail(ListingDetails listingDetails, List<SubmitEvent> submitEvents,
+                                                  String reportOffice) {
         var localReportsDetailList = listingDetails.getCaseData().getLocalReportsDetail();
         for (var submitEvent : submitEvents) {
             var localReportsDetailItem =
-                    getLocalReportsDetail(listingDetails, submitEvent.getCaseData());
+                    getLocalReportsDetail(listingDetails, submitEvent.getCaseData(), reportOffice);
             if (localReportsDetailItem != null) {
                 localReportsDetailList.add(localReportsDetailItem);
             }
@@ -121,7 +127,8 @@ public class TimeToFirstHearingReport {
         listingDetails.getCaseData().setLocalReportsDetail(localReportsDetailList);
     }
 
-    private AdhocReportTypeItem getLocalReportsDetail(ListingDetails listingDetails, CaseData caseData) {
+    private AdhocReportTypeItem getLocalReportsDetail(ListingDetails listingDetails, CaseData caseData,
+                                                      String reportOffice) {
 
         var firstHearingDate = getFirstHearingDate(caseData);
         if (firstHearingDate == null || isFirstHearingWithin26Weeks(caseData, firstHearingDate)) {
@@ -129,7 +136,7 @@ public class TimeToFirstHearingReport {
         }
         var adhocReportType = new AdhocReportType();
         adhocReportType.setHearingDate(firstHearingDate.toString());
-        adhocReportType.setReportOffice(listingDetails.getCaseData().getManagingOffice());
+        adhocReportType.setReportOffice(reportOffice);
         adhocReportType.setCaseReference(caseData.getEthosCaseReference());
         adhocReportType.setConciliationTrack(getConciliationTrack(caseData));
         if (!Strings.isNullOrEmpty(caseData.getReceiptDate())) {
@@ -145,11 +152,11 @@ public class TimeToFirstHearingReport {
 
     }
 
-    private void populateLocalReportSummaryHdr(ListingDetails listingDetails) {
+    private void populateLocalReportSummaryHdr(ListingDetails listingDetails, String reportOffice) {
 
         var listingData = listingDetails.getCaseData();
         var adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
-        adhocReportType.setReportOffice(listingDetails.getCaseData().getManagingOffice());
+        adhocReportType.setReportOffice(reportOffice);
         int totalCases = Integer.parseInt(adhocReportType.getConOpenTotal())
                 + Integer.parseInt(adhocReportType.getConStdTotal())
                 + Integer.parseInt(adhocReportType.getConFastTotal())

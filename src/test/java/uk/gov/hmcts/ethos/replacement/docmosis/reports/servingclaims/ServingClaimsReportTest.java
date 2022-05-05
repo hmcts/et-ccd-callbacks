@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.servingclaims;
 import org.assertj.core.util.Strings;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -21,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRANSFERRED_STATE;
 
@@ -330,4 +332,25 @@ public class ServingClaimsReportTest {
         assertEquals(1, localReportsDetailCount);
         assertEquals(0, claimServedItemsCount);
     }
+
+    @Test
+    public void shouldShowReportOfficeName_EngWales() {
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        var servingClaimsReport = new ServingClaimsReport();
+        var resultListingData = servingClaimsReport.generateReportData(listingDetails, submitEvents);
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(),
+                resultListingData.getLocalReportsDetailHdr().getReportOffice());
+    }
+
+    @Test
+    public void shouldShowReportOfficeName_Scotland() {
+        listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
+        listingDetails.getCaseData().setManagingOffice(null);
+        var servingClaimsReport = new ServingClaimsReport();
+        var resultListingData = servingClaimsReport.generateReportData(listingDetails, submitEvents);
+        assertEquals(TribunalOffice.SCOTLAND.getOfficeName(),
+                resultListingData.getLocalReportsDetailHdr().getReportOffice());
+    }
+
 }

@@ -18,6 +18,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 
 @Slf4j
 @Service("multipleCreationMidEventValidationService")
@@ -29,6 +30,8 @@ public class MultipleCreationMidEventValidationService {
     public static final String LEAD_STATE_ERROR = " lead case has not been Accepted.";
     public static final String LEAD_BELONG_MULTIPLE_ERROR = " lead case already belongs to a different multiple";
     public static final String LEAD_EXIST_ERROR = " lead case does not exist.";
+    public static final String CASE_BELONGS_DIFFERENT_OFFICE = "Case %s is managed by %s";
+    public static final String LEAD_CASE_BELONGS_DIFFERENT_OFFICE = "Lead case %s is managed by %s";
     public static final int MULTIPLE_MAX_SIZE = 50;
 
     private final SingleCasesReadingService singleCasesReadingService;
@@ -63,7 +66,7 @@ public class MultipleCreationMidEventValidationService {
 
                 log.info("Validating lead case introduced by user: " + multipleData.getLeadCase());
 
-                validateCases(userToken, multipleDetails.getCaseTypeId(),
+                validateCases(userToken, multipleDetails,
                         new ArrayList<>(Collections.singletonList(multipleData.getLeadCase())), errors, true);
 
             }
@@ -74,7 +77,7 @@ public class MultipleCreationMidEventValidationService {
 
             validateCaseReferenceCollectionSize(ethosCaseRefCollection, errors);
 
-            validateCases(userToken, multipleDetails.getCaseTypeId(), ethosCaseRefCollection, errors, false);
+            validateCases(userToken, multipleDetails, ethosCaseRefCollection, errors, false);
 
         }
 
@@ -93,13 +96,13 @@ public class MultipleCreationMidEventValidationService {
 
     }
 
-    private void validateCases(String userToken, String multipleCaseTypeId, List<String> caseRefCollection,
+    private void validateCases(String userToken, MultipleDetails multipleDetails, List<String> caseRefCollection,
                                List<String> errors, boolean isLead) {
 
-        if (errors.isEmpty() && !caseRefCollection.isEmpty()) {
+        if (!caseRefCollection.isEmpty()) {
 
             List<SubmitEvent> submitEvents = singleCasesReadingService.retrieveSingleCases(userToken,
-                    multipleCaseTypeId, caseRefCollection, MANUALLY_CREATED_POSITION);
+                    multipleDetails.getCaseTypeId(), caseRefCollection, MANUALLY_CREATED_POSITION);
 
             log.info("Validate number of cases returned");
 
@@ -107,7 +110,9 @@ public class MultipleCreationMidEventValidationService {
 
             log.info("Validating cases");
 
-            validateSingleCasesState(submitEvents, errors, isLead);
+            boolean isScotland = SCOTLAND_BULK_CASE_TYPE_ID.equals(multipleDetails.getCaseTypeId());
+            validateSingleCasesState(submitEvents, errors, isLead, multipleDetails.getCaseData().getManagingOffice(),
+                    isScotland);
 
         }
 
@@ -139,7 +144,8 @@ public class MultipleCreationMidEventValidationService {
 
     }
 
-    private void validateSingleCasesState(List<SubmitEvent> submitEvents, List<String> errors, boolean isLead) {
+    private void validateSingleCasesState(List<SubmitEvent> submitEvents, List<String> errors, boolean isLead,
+                                          String managingOffice, boolean isScotland) {
 
         List<String> listCasesStateError = new ArrayList<>();
 
@@ -162,6 +168,14 @@ public class MultipleCreationMidEventValidationService {
 
                 listCasesMultipleError.add(submitEvent.getCaseData().getEthosCaseReference());
 
+            }
+
+            if (!isScotland && !isNullOrEmpty(submitEvent.getCaseData().getManagingOffice())
+                    && !managingOffice.equals(submitEvent.getCaseData().getManagingOffice())) {
+                String errorMessage = isLead ? LEAD_CASE_BELONGS_DIFFERENT_OFFICE : CASE_BELONGS_DIFFERENT_OFFICE;
+                errors.add(String.format(errorMessage,
+                        submitEvent.getCaseData().getEthosCaseReference(),
+                        submitEvent.getCaseData().getManagingOffice()));
             }
 
         }

@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.elasticsearch.common.Strings;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
 @Service
 @Slf4j
@@ -37,8 +39,12 @@ public class ServingClaimsReport {
 
     private void initReport(ListingDetails listingDetails) {
         var listingData = listingDetails.getCaseData();
+        var reportOffice = isNullOrEmpty(listingData.getManagingOffice())
+                || SCOTLAND_LISTING_CASE_TYPE_ID.equals(listingDetails.getCaseTypeId())
+                ? TribunalOffice.SCOTLAND.getOfficeName()
+                : listingData.getManagingOffice();
         var adhocReportType = new AdhocReportType();
-        adhocReportType.setReportOffice(UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()));
+        adhocReportType.setReportOffice(reportOffice);
         listingData.setLocalReportsDetailHdr(adhocReportType);
         listingData.setLocalReportsDetail(new ArrayList<>());
     }

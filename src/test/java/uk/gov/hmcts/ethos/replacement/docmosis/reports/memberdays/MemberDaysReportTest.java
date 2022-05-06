@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -21,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
@@ -30,17 +31,20 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIM
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
-public class MemberDaysReportTest {
+class MemberDaysReportTest {
     private List<SubmitEvent> submitEvents;
     private ListingDetails listingDetails;
+    private MemberDaysReport memberDaysReport;
     private static final String SIT_ALONE_PANEL = "Sit Alone";
     private static final String FULL_PANEL = "Full Panel";
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
+        memberDaysReport = new MemberDaysReport();
         listingDetails = new ListingDetails();
         var listingData = new ListingData();
         listingData.setListingDateFrom("2019-12-08");
@@ -244,15 +248,13 @@ public class MemberDaysReportTest {
     }
 
     @Test
-    public void shouldReturnMembersDayReportType() {
-        var memberDaysReport = new MemberDaysReport();
+    void shouldReturnMembersDayReportType() {
         var resultListingData = memberDaysReport.runReport(listingDetails, submitEvents);
         assertEquals(MEMBER_DAYS_REPORT, resultListingData.getReportType());
     }
 
     @Test
-    public void shouldReturnZeroReportDetailsEntriesForEmptySubmitEvents() {
-        var memberDaysReport = new MemberDaysReport();
+    void shouldReturnZeroReportDetailsEntriesForEmptySubmitEvents() {
         var resultListingData = memberDaysReport.runReport(listingDetails, null);
         var actualHeardHearingsCount  = resultListingData.getReportDetails().size();
         var expectedHeardHearingsCount = 0;
@@ -260,8 +262,7 @@ public class MemberDaysReportTest {
     }
 
     @Test
-    public void shouldIncludeOnlyCasesWithHeardHearingStatus() {
-        var memberDaysReport = new MemberDaysReport();
+    void shouldIncludeOnlyCasesWithHeardHearingStatus() {
         var resultListingData = memberDaysReport.runReport(listingDetails, submitEvents);
         var actualHeardHearingsCount  = resultListingData.getReportDetails().size();
         var expectedHeardHearingsCount = 5;
@@ -269,8 +270,7 @@ public class MemberDaysReportTest {
     }
 
     @Test
-    public void shouldIncludeOnlyCasesWithFullPanelHearing() {
-        var memberDaysReport = new MemberDaysReport();
+    void shouldIncludeOnlyCasesWithFullPanelHearing() {
         List<Long> validHearingsCountList = new ArrayList<>();
         submitEvents.forEach(s -> validHearingsCountList.add(getValidHearingsInCurrentSubmitEvent(s)));
         var expectedFullPanelHearingsCount = validHearingsCountList.stream().filter(x -> x > 0).count();
@@ -285,8 +285,7 @@ public class MemberDaysReportTest {
     }
 
     @Test
-    public void shouldReturnZeroCasesWhenForNoHearingsWithFullPanelHearing() {
-        var memberDaysReport = new MemberDaysReport();
+    void shouldReturnZeroCasesWhenForNoHearingsWithFullPanelHearing() {
         submitEvents.forEach(s -> s.getCaseData().getHearingCollection()
             .forEach(h -> h.getValue().setHearingSitAlone(SIT_ALONE_PANEL)));
         var expectedReportDateType = "Range";
@@ -300,8 +299,7 @@ public class MemberDaysReportTest {
     }
 
     @Test
-    public void shouldIncludeOnlyCasesWithValidHearingDates() {
-        var memberDaysReport = new MemberDaysReport();
+    void shouldIncludeOnlyCasesWithValidHearingDates() {
         var thirdSubmitEvent = submitEvents.get(2);
         var caseData3FirstHearing = thirdSubmitEvent.getCaseData().getHearingCollection().get(0);
         var dateListedTypeToSetToInvalidRange = caseData3FirstHearing.getValue()
@@ -323,8 +321,7 @@ public class MemberDaysReportTest {
     }
 
     @Test
-    public void shouldReturnCorrectHearingDateCountForListedDateWithSpaceAndMilliseconds() {
-        var memberDaysReport = new MemberDaysReport();
+    void shouldReturnCorrectHearingDateCountForListedDateWithSpaceAndMilliseconds() {
         var thirdSubmitEvent = submitEvents.get(2);
         var caseData3FirstHearing = thirdSubmitEvent.getCaseData().getHearingCollection().get(0);
         caseData3FirstHearing.getValue().getHearingDateCollection().get(0)
@@ -340,8 +337,7 @@ public class MemberDaysReportTest {
     }
 
     @Test
-    public void shouldReturnZeroHearingDurationForNullHearingTimingStart() {
-        var memberDaysReport = new MemberDaysReport();
+    void shouldReturnZeroHearingDurationForNullHearingTimingStart() {
         submitEvents.remove(2);
         submitEvents.remove(1);
         var caseData = submitEvents.get(0).getCaseData();
@@ -364,8 +360,7 @@ public class MemberDaysReportTest {
     }
 
     @Test
-    public void shouldReturnZeroHearingDurationForNullHearingTimingFinish() {
-        var memberDaysReport = new MemberDaysReport();
+    void shouldReturnZeroHearingDurationForNullHearingTimingFinish() {
         submitEvents.remove(2);
         submitEvents.remove(1);
         var caseData = submitEvents.get(0).getCaseData();
@@ -382,8 +377,7 @@ public class MemberDaysReportTest {
     }
 
     @Test
-    public void shouldReturnCorrectHearingDurationDaysCount() {
-        var memberDaysReport = new MemberDaysReport();
+    void shouldReturnCorrectHearingDurationDaysCount() {
         var resultListingData = memberDaysReport.runReport(listingDetails, submitEvents);
         assertEquals("8", resultListingData.getHalfDaysTotal());
         assertEquals("2", resultListingData.getFullDaysTotal());
@@ -395,8 +389,7 @@ public class MemberDaysReportTest {
     }
 
     @Test
-    public void shouldReturnSortedSummaryItemsList() {
-        var memberDaysReport = new MemberDaysReport();
+    void shouldReturnSortedSummaryItemsList() {
         var resultListingData = memberDaysReport.runReport(listingDetails, submitEvents);
         var memberDaySummaryItems = resultListingData.getMemberDaySummaryItems();
         assertEquals("10 December 2019", memberDaySummaryItems.get(0).getHearingDate());
@@ -406,8 +399,7 @@ public class MemberDaysReportTest {
     }
 
     @Test
-    public void shouldReturnSortedDetailedItemsList() {
-        var memberDaysReport = new MemberDaysReport();
+    void shouldReturnSortedDetailedItemsList() {
         var resultListingData = memberDaysReport.runReport(listingDetails, submitEvents);
         var reportDetails = resultListingData.getReportDetails();
         assertEquals("10 December 2019", reportDetails.get(0).getHearingDate());
@@ -421,19 +413,33 @@ public class MemberDaysReportTest {
     }
 
     @Test
-    public void shouldReturnOnlySelectedSingleDateDetailedItemsList() {
+    void shouldReturnOnlySelectedSingleDateDetailedItemsList() {
         listingDetails.getCaseData().setListingDate("2019-12-11");
         listingDetails.getCaseData().setListingDateFrom(null);
         listingDetails.getCaseData().setListingDateTo(null);
         listingDetails.getCaseData().setListingVenue(new DynamicFixedListType("Leeds"));
         listingDetails.getCaseData().setHearingDateType(SINGLE_HEARING_DATE_TYPE);
-        var memberDaysReport = new MemberDaysReport();
         var resultListingData = memberDaysReport.runReport(listingDetails, submitEvents);
         var reportDetails = resultListingData.getReportDetails();
         assertEquals("11 December 2019", reportDetails.get(0).getHearingDate());
         assertEquals("1800522/2020", reportDetails.get(0).getCaseReference());
         assertEquals("33", reportDetails.get(0).getHearingNumber());
         assertEquals("120", reportDetails.get(0).getHearingDuration());
+    }
+
+    @Test
+    void checkReportingOffice_EnglandWales() {
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        var resultListingData = memberDaysReport.runReport(listingDetails, submitEvents);
+        assertEquals(TribunalOffice.LEEDS.getOfficeName(), resultListingData.getOffice());
+    }
+
+    @Test
+    void checkReportingOffice_Scotland() {
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
+        listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
+        var resultListingData = memberDaysReport.runReport(listingDetails, submitEvents);
+        assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), resultListingData.getOffice());
     }
 
     private List<DateListedTypeItem> extractDateListedTypeItems(List<SubmitEvent> submitEvents) {

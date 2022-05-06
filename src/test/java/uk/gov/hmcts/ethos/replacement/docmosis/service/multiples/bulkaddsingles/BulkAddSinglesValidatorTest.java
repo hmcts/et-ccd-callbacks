@@ -35,7 +35,7 @@ public class BulkAddSinglesValidatorTest {
 
         validatedSingleCases = new ArrayList<>();
         singleCasesValidator = mock(SingleCasesValidator.class);
-        when(singleCasesValidator.getValidatedCases(ethosCaseReferences, ENGLANDWALES_BULK_CASE_TYPE_ID,
+        when(singleCasesValidator.getValidatedCases(ethosCaseReferences, multipleDetails,
                 multipleReference, authToken)).thenReturn(validatedSingleCases);
 
         bulkAddSinglesValidator = new BulkAddSinglesValidator(singleCasesImporter, singleCasesValidator);
@@ -85,7 +85,7 @@ public class BulkAddSinglesValidatorTest {
     public void shouldReturnErrorWhenValidationThrowsException() throws IOException {
         ethosCaseReferences.add("case1");
         validatedSingleCases.add(ValidatedSingleCase.createValidCase("case1"));
-        when(singleCasesValidator.getValidatedCases(ethosCaseReferences, ENGLANDWALES_BULK_CASE_TYPE_ID, multipleReference,
+        when(singleCasesValidator.getValidatedCases(ethosCaseReferences, multipleDetails, multipleReference,
                 authToken)).thenThrow(IOException.class);
 
         var errors = bulkAddSinglesValidator.validate(multipleDetails, authToken);

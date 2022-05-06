@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CaseData;
 import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
@@ -69,7 +70,12 @@ public class CasesAwaitingJudgmentReport {
     public CasesAwaitingJudgmentReportData runReport(ListingDetails listingDetails) {
         var managingOffice = listingDetails.getCaseData().getManagingOffice();
         var submitEvents = getCases(listingDetails.getCaseTypeId(), managingOffice);
-        var reportData = initReport(managingOffice);
+
+        var reportOffice = StringUtils.isNotBlank(managingOffice)
+                && TribunalOffice.isEnglandWalesOffice(managingOffice)
+                ? managingOffice :
+                TribunalOffice.SCOTLAND.getOfficeName();
+        var reportData = initReport(reportOffice);
 
         populateData(reportData, submitEvents);
 

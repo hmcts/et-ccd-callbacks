@@ -13,8 +13,13 @@ import java.util.UUID;
 public class EccReportCaseDataBuilder {
     private final EccReportCaseData caseData = new EccReportCaseData();
 
-    public void withNoEcc() {
+    public static EccReportCaseDataBuilder builder() {
+        return new EccReportCaseDataBuilder();
+    }
+
+    public EccReportCaseDataBuilder withNoEcc() {
         caseData.setEccCases(null);
+        return this;
     }
 
     public RespondentSumTypeItem getRespondent(String respName) {
@@ -35,16 +40,20 @@ public class EccReportCaseDataBuilder {
         return item;
     }
 
-    public void withRespondents() {
+    public EccReportCaseDataBuilder withRespondents() {
         RespondentSumTypeItem item1 = getRespondent("Resp1");
         RespondentSumTypeItem item2 = getRespondent("Resp2");
         caseData.setRespondentCollection(Arrays.asList(item1, item2));
+
+        return this;
     }
 
-    public void withEccs() {
+    public EccReportCaseDataBuilder withEccs() {
         EccCounterClaimTypeItem item1 = getEcc("ecc1");
         EccCounterClaimTypeItem item2 = getEcc("ecc2");
         caseData.setEccCases(Arrays.asList(item1, item2));
+
+        return this;
     }
 
     public EccReportSubmitEvent buildAsSubmitEvent() {

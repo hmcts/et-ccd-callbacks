@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.platform.commons.util.StringUtils;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -21,6 +22,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
 public class BfActionReportTest {
@@ -263,6 +265,24 @@ public class BfActionReportTest {
         var correctedComment = bfActionTypeItemFour.getValue().getNotes()
             .replace("\n", ". ");
         assertEquals(correctedComment, firstBFDateTypeItem.getBroughtForwardDateReason());
+    }
+
+    @Test
+    public void shouldShowReportOfficeName_EngWales() {
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        var resultListingData = bfActionReport.runReport(listingDetails, submitEvents);
+        var bfActionReportData = (BfActionReportData) resultListingData;
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), bfActionReportData.getOffice());
+    }
+
+    @Test
+    public void shouldShowReportOfficeName_Scotland() {
+        listingDetails.getCaseData().setManagingOffice(null);
+        listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
+        var resultListingData = bfActionReport.runReport(listingDetails, submitEvents);
+        var bfActionReportData = (BfActionReportData) resultListingData;
+        assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), bfActionReportData.getOffice());
     }
 
     private List<BFActionTypeItem> getBFActionTypeItems() {

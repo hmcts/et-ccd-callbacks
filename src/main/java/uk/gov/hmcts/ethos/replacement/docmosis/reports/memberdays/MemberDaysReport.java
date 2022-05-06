@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -25,7 +24,6 @@ import static java.util.stream.Collectors.groupingBy;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
 @Slf4j
@@ -51,10 +49,7 @@ public class MemberDaysReport {
     private MemberDaysReportData initiateReport(ListingDetails listingDetails) {
         var reportData = new MemberDaysReportData();
         var caseData = listingDetails.getCaseData();
-        var reportOffice = isNullOrEmpty(caseData.getManagingOffice())
-                || SCOTLAND_LISTING_CASE_TYPE_ID.equals(listingDetails.getCaseTypeId())
-                ? TribunalOffice.SCOTLAND.getOfficeName()
-                : caseData.getManagingOffice();
+        var reportOffice = ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), caseData.getManagingOffice());
 
         reportData.setOffice(reportOffice);
         reportData.setHearingDateType(caseData.getHearingDateType());

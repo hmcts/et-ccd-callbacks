@@ -206,7 +206,7 @@ public class MultipleCreationService {
 
             log.info("Case Type: " + multipleDetails.getCaseTypeId());
 
-            return multipleReferenceService.createReference(multipleDetails.getCaseTypeId(), 1);
+            return multipleReferenceService.createReference(multipleDetails.getCaseTypeId());
 
         } else {
 

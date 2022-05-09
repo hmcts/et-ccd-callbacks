@@ -7,6 +7,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.SubMultipleReference;
 
 @NoRepositoryBean
 public interface SubMultipleRefRepository<T extends SubMultipleReference> extends JpaRepository<T, Integer> {
-    @Procedure("fn_ethossubmultiplecaserefgen")
+    @Procedure("fn_ethosSubMultipleCaseRefGen")
     String ethosSubMultipleCaseRefGen(int multipleRef, int numberCases, String office);
 }

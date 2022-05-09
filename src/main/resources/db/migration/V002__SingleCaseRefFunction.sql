@@ -1,74 +1,63 @@
-CREATE OR REPLACE FUNCTION fn_ethosCaseRefGen (numofcases INT, yr INT , office varchar(200))
-RETURNS VARCHAR(10) AS $$
+CREATE OR REPLACE FUNCTION fn_ethosCaseRefGen(yr integer, caseTypeId varchar(200))
+    RETURNS VARCHAR(10) AS
+$$
 
--- =============================================
--- Author:		Mohammed Hafejee
-
--- TEST :		SELECT fn_ethosCaseRefGen (2,2020,'Manchester');
+    -- =============================================
+-- TEST :		SELECT fn_ethosCaseRefGen (2022,'ET_EnglandWales');
+--      		SELECT fn_ethosCaseRefGen (2022,'ET_Scotland');
 --
 -- Create date: 14-APR-2020
 -- Description:	Function to generate Ethos case reference numbers for single cases
 -- VERSION	:	14-MAR-2020		1.0  - Initial
 --          :   28-OCT-2021     2.0  - CCD Consolidation
+--          :   06-MAY-2022     3.0  - New method for calculating references
+--                                     https://tools.hmcts.net/jira/browse/RET-822
 -- =============================================
 
-DECLARE currentval integer;
-DECLARE currentyr varchar(10);
-DECLARE currentvalstr varchar(20);
-
+DECLARE
+    currentYear    smallint;
+    currentCounter integer;
 BEGIN
-    CASE
-        WHEN office = 'ET_EnglandWales' THEN
-            SELECT counter, cyear INTO currentval,currentyr FROM single_reference_englandwales FOR UPDATE ;
+    IF caseTypeId = 'ET_EnglandWales' THEN
+        SELECT cyear, counter
+        INTO currentYear, currentCounter
+        FROM single_reference_englandwales
+        WHERE cyear = yr
+            FOR UPDATE;
 
-            CASE
-                WHEN currentyr <> yr::text AND RIGHT(currentyr, 2) <> RIGHT(yr::text, 2) THEN
-                    UPDATE  single_reference_englandwales SET counter = numofcases, cyear = yr ;
-                    currentval := 0;
-                    currentyr = yr;
-                WHEN (currentval + numofcases) > 99999  THEN
-                    UPDATE  single_reference_englandwales SET counter = (numofcases + currentval) - 99999,
-                    cyear = RIGHT(currentyr, 2);
-                    IF (currentval + 1)  > 99999 THEN
-                        currentval := 0;
-                        currentyr = CONCAT('00',RIGHT(currentyr, 2));
-                    END IF;
-                ELSE
-                    UPDATE single_reference_englandwales SET counter = counter + numofcases;
-            END CASE;
+        IF currentYear IS NULL THEN
+            currentYear = yr;
+            currentCounter = 6000001;
 
-            currentval = currentval + 1 ;
-            currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
-            currentyr =  RIGHT(CONCAT('00',currentyr),4);
-            currentvalstr = CONCAT(currentvalstr,'/',currentyr);
+            INSERT INTO single_reference_englandwales
+                (CYEAR, COUNTER)
+            VALUES (currentYear, currentCounter);
+        ELSE
+            currentCounter = currentCounter + 1;
+            UPDATE single_reference_englandwales SET counter = currentCounter WHERE cyear = currentYear;
+        END IF;
+    ELSIF caseTypeId = 'ET_Scotland' THEN
+        SELECT cyear, counter
+        INTO currentYear, currentCounter
+        FROM single_reference_scotland
+        WHERE cyear = yr
+            FOR UPDATE;
 
-            RETURN  currentvalstr;
+        IF currentYear IS NULL THEN
+            currentYear = yr;
+            currentCounter = 8000001;
 
-        WHEN office = 'ET_Scotland' THEN
-            SELECT counter, cyear INTO currentval,currentyr FROM single_reference_scotland FOR UPDATE;
+            INSERT INTO single_reference_scotland
+                (CYEAR, COUNTER)
+            VALUES (currentYear, currentCounter);
+        ELSE
+            currentCounter = currentCounter + 1;
+            UPDATE single_reference_scotland SET counter = currentCounter WHERE cyear = currentYear;
+        END IF;
+    ELSE
+        RAISE EXCEPTION 'Unexpected caseTypeId %', caseTypeId;
+    END IF;
 
-            CASE
-                WHEN currentyr <> yr::text AND RIGHT(currentyr, 2) <> RIGHT(yr::text, 2) THEN
-                    UPDATE  single_reference_scotland SET counter = numofcases, cyear = yr;
-                    currentval := 0;
-                    currentyr = yr;
-                WHEN (currentval + numofcases) > 99999  THEN
-                    UPDATE  single_reference_scotland SET counter = (numofcases + currentval) - 99999,
-                    cyear = RIGHT(currentyr, 2);
-                    IF (currentval + 1)  > 99999 THEN
-                        currentval := 0;
-                        currentyr = CONCAT('00',RIGHT(currentyr, 2));
-                    END IF;
-                ELSE
-                    UPDATE  single_reference_scotland SET counter = counter + numofcases;
-            END CASE;
-
-            currentval = currentval + 1;
-            currentvalstr = RIGHT(CONCAT ('00000', currentval) ,5);
-            currentyr = RIGHT(CONCAT('00',currentyr),4);
-            currentvalstr = CONCAT(currentvalstr,'/',currentyr);
-
-            RETURN  currentvalstr;
-    END CASE;
+    RETURN currentCounter || '/' || currentYear;
 END;
 $$ LANGUAGE plpgsql;

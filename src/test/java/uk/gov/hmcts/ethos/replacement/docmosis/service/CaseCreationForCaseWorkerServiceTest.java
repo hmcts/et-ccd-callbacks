@@ -77,17 +77,4 @@ public class CaseCreationForCaseWorkerServiceTest {
         SubmitEvent submitEvent1 = caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, authToken);
         assertEquals(submitEvent1, submitEvent);
     }
-
-    @Test
-    public void generateCaseRefNumbers() {
-        when(singleReferenceService.createReference("Manchester",2)).thenReturn("2100001/2019");
-        when(multipleReferenceService.createReference("Manchester_Multiple",1)).thenReturn("2100005");
-        CaseData caseData = caseCreationForCaseWorkerService.generateCaseRefNumbers(ccdRequest);
-        assertEquals("2100001/2019", caseData.getStartCaseRefNumber());
-        assertEquals("2", caseData.getCaseRefNumberCount());
-        assertEquals("2100005", caseData.getMultipleRefNumber());
-    }
-
-
-
 }

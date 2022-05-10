@@ -20,9 +20,9 @@ public class MultipleReferenceService {
     public synchronized String createReference(String caseTypeId) {
         switch (caseTypeId) {
             case ENGLANDWALES_BULK_CASE_TYPE_ID:
-                return multipleRefEnglandWalesRepository.ethosMultipleCaseRefGen(ENGLANDWALES_BULK_CASE_TYPE_ID);
+                return multipleRefEnglandWalesRepository.ethosMultipleCaseRefGen();
             case SCOTLAND_BULK_CASE_TYPE_ID:
-                return multipleRefScotlandRepository.ethosMultipleCaseRefGen(SCOTLAND_BULK_CASE_TYPE_ID);
+                return multipleRefScotlandRepository.ethosMultipleCaseRefGen();
             default:
                 throw new IllegalArgumentException(
                         String.format("Unable to create case reference: unexpected caseTypeId %s", caseTypeId));

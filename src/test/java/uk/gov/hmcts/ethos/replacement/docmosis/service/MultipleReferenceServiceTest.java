@@ -29,8 +29,7 @@ public class MultipleReferenceServiceTest {
     @Test
     public void createEnglandWalesReference() {
         var expectedReference = "6000001";
-        when(multipleRefEnglandWalesRepository.ethosMultipleCaseRefGen(ENGLANDWALES_BULK_CASE_TYPE_ID))
-                .thenReturn(expectedReference);
+        when(multipleRefEnglandWalesRepository.ethosMultipleCaseRefGen()).thenReturn(expectedReference);
 
         assertEquals(expectedReference, multipleReferenceService.createReference(ENGLANDWALES_BULK_CASE_TYPE_ID));
     }
@@ -45,8 +44,7 @@ public class MultipleReferenceServiceTest {
     @Test
     public void createScotlandReference() {
         var expectedReference = "8000001";
-        when(multipleRefScotlandRepository.ethosMultipleCaseRefGen(SCOTLAND_BULK_CASE_TYPE_ID))
-                .thenReturn(expectedReference);
+        when(multipleRefScotlandRepository.ethosMultipleCaseRefGen()).thenReturn(expectedReference);
 
         assertEquals(expectedReference, multipleReferenceService.createReference(SCOTLAND_BULK_CASE_TYPE_ID));
     }

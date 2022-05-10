@@ -11,9 +11,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SubMultipleRefS
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SubMultipleReferenceServiceTest {
@@ -28,8 +26,8 @@ public class SubMultipleReferenceServiceTest {
     @Test
     public void createManchesterReference() {
         var multipleRef = "6000001";
-        when(subMultipleRefEnglandWalesRepository.ethosSubMultipleCaseRefGen(Integer.parseInt(multipleRef), 1,
-                ENGLANDWALES_CASE_TYPE_ID)).thenReturn(multipleRef + "/1");
+        when(subMultipleRefEnglandWalesRepository.ethosSubMultipleCaseRefGen(Integer.parseInt(multipleRef), 1))
+                .thenReturn(multipleRef + "/1");
         var expectedRef = multipleRef + "/1";
 
         assertEquals(expectedRef, subMultipleReferenceService.createReference(ENGLANDWALES_BULK_CASE_TYPE_ID,
@@ -39,8 +37,8 @@ public class SubMultipleReferenceServiceTest {
     @Test
     public void createScotlandReference() {
         var multipleRef = "8000001";
-        when(subMultipleRefScotlandRepository.ethosSubMultipleCaseRefGen(Integer.parseInt(multipleRef), 1,
-                SCOTLAND_CASE_TYPE_ID)).thenReturn(multipleRef + "/1");
+        when(subMultipleRefScotlandRepository.ethosSubMultipleCaseRefGen(Integer.parseInt(multipleRef), 1)).
+                thenReturn(multipleRef + "/1");
         var expectedRef = multipleRef + "/1";
 
         assertEquals(expectedRef, subMultipleReferenceService.createReference(SCOTLAND_BULK_CASE_TYPE_ID,

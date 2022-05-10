@@ -23,9 +23,9 @@ public class SingleReferenceService {
         var currentYear = LocalDate.now().getYear();
         switch (caseTypeId) {
             case ENGLANDWALES_CASE_TYPE_ID:
-                return singleRefEnglandWalesRepository.ethosCaseRefGen(currentYear, ENGLANDWALES_CASE_TYPE_ID);
+                return singleRefEnglandWalesRepository.ethosCaseRefGen(currentYear);
             case SCOTLAND_CASE_TYPE_ID:
-                return singleRefScotlandRepository.ethosCaseRefGen(currentYear, SCOTLAND_CASE_TYPE_ID);
+                return singleRefScotlandRepository.ethosCaseRefGen(currentYear);
             default:
                 throw new IllegalArgumentException(
                         String.format("Unable to create case reference: unexpected caseTypeId %s", caseTypeId));

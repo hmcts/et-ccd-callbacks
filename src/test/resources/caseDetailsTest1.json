@@ -495,5 +495,6 @@
   },
   "id": "123456789",
   "jurisdiction": "English",
-  "state": "UK"
+  "state": "UK",
+  "case_type_id" : "ET_EnglandWales"
 }

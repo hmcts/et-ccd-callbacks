@@ -33,7 +33,7 @@ public class ClerkController {
     private final ClerkAddService clerkAddService;
 
     @PostMapping(value = "/addClerk", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Initialise import venue data")
+    @Operation(summary = "Add a clerk")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -52,9 +52,8 @@ public class ClerkController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        List<String> errors;
         var adminData = ccdRequest.getCaseDetails().getAdminData();
-        errors = clerkAddService.addClerk(adminData);
+        List<String> errors = clerkAddService.addClerk(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }

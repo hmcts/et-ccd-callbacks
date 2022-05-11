@@ -3,15 +3,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.SubMultipleReference;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SubMultipleRefEnglandWalesRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SubMultipleRefRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SubMultipleRefScotlandRepository;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,19 +20,14 @@ public class SubMultipleReferenceService {
     public synchronized String createReference(String caseTypeId, String multipleReference, int numberCases) {
         switch (caseTypeId) {
             case ENGLANDWALES_BULK_CASE_TYPE_ID:
-                return generateOfficeReference(subMultipleRefEnglandWalesRepository, numberCases, multipleReference,
-                        ENGLANDWALES_CASE_TYPE_ID);
+                return subMultipleRefEnglandWalesRepository.ethosSubMultipleCaseRefGen(
+                        Integer.parseInt(multipleReference), numberCases);
             case SCOTLAND_BULK_CASE_TYPE_ID:
-                return generateOfficeReference(subMultipleRefScotlandRepository, numberCases, multipleReference,
-                        SCOTLAND_CASE_TYPE_ID);
+                return subMultipleRefScotlandRepository.ethosSubMultipleCaseRefGen(
+                        Integer.parseInt(multipleReference), numberCases);
             default:
                 throw new IllegalArgumentException(
                         String.format("Unable to create case reference: unexpected caseTypeId %s", caseTypeId));
         }
-    }
-
-    private String generateOfficeReference(SubMultipleRefRepository<? extends SubMultipleReference> referenceRepository,
-                                           int numberCases, String multipleRef, String officeName) {
-        return referenceRepository.ethosSubMultipleCaseRefGen(Integer.parseInt(multipleRef), numberCases, officeName);
     }
 }

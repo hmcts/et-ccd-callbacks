@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.clerk;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
@@ -9,28 +8,41 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorker;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepository;
 
-@Slf4j
+import java.util.ArrayList;
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class ClerkAddService {
 
     private final CourtWorkerRepository courtWorkerRepository;
 
-    public void addClerk(AdminData adminData) {
+    static final String EXIST_CLERK_CODE_ERROR_MESSAGE = "Clerk Code exists for this tribunal office.";
+    static final String EXIST_CLERK_NAME_ERROR_MESSAGE = "Clerk Name exists for this tribunal office.";
+
+    public List<String>  addClerk(AdminData adminData) {
+        List<String> errors = new ArrayList<>();
+
         var tribunalOffice = TribunalOffice.valueOfOfficeName(adminData.getClerkAdd().getTribunalOffice());
         var clerkCode = adminData.getClerkAdd().getClerkCode();
         var clerkName = adminData.getClerkAdd().getClerkName();
 
         if (courtWorkerRepository.existsByTribunalOfficeAndTypeAndCode(
                 tribunalOffice, CourtWorkerType.CLERK, clerkCode)) {
-            log.info("Clerk Code should not already exist for this tribunal office.");
-        } else if (courtWorkerRepository.existsByTribunalOfficeAndTypeAndName(
+            errors.add(EXIST_CLERK_CODE_ERROR_MESSAGE);
+        }
+
+        if (courtWorkerRepository.existsByTribunalOfficeAndTypeAndName(
                 tribunalOffice, CourtWorkerType.CLERK, clerkName)) {
-            log.info("Clerk Name should not already exist for this tribunal office.");
-        } else {
+            errors.add(EXIST_CLERK_NAME_ERROR_MESSAGE);
+        }
+
+        if (errors.isEmpty()) {
             var courtWorker = createCourtWorker(tribunalOffice, clerkCode, clerkName);
             courtWorkerRepository.save(courtWorker);
         }
+
+        return errors;
     }
 
     private CourtWorker createCourtWorker(TribunalOffice tribunalOffice, String clerkCode, String clerkName) {

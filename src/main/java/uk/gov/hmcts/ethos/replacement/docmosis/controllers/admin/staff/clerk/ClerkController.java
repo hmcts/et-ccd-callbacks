@@ -18,12 +18,14 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.clerk.ClerkAddService;
 
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @RestController
-@RequestMapping("/admin/clerk")
+@RequestMapping("/admin/staff/clerk")
 @RequiredArgsConstructor
 public class ClerkController {
 
@@ -50,10 +52,11 @@ public class ClerkController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
+        List<String> errors;
         var adminData = ccdRequest.getCaseDetails().getAdminData();
-        clerkAddService.addClerk(adminData);
+        errors = clerkAddService.addClerk(adminData);
 
-        return CCDCallbackResponse.getCallbackRespEntityNoErrors(adminData);
+        return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }
 
 }

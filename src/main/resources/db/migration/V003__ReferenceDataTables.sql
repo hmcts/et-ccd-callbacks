@@ -29,8 +29,7 @@ CREATE TABLE court_worker (
     tribunal_office VARCHAR(100),
     type VARCHAR(20),
     code VARCHAR(100),
-    name VARCHAR(100),
-    venue_code VARCHAR(100)
+    name VARCHAR(100)
 );
 
 CREATE TABLE file_location (

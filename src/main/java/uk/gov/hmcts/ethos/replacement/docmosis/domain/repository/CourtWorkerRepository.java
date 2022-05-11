@@ -16,7 +16,7 @@ public interface CourtWorkerRepository extends JpaRepository<CourtWorker, Intege
     List<CourtWorker> findByTribunalOfficeInAndTypeOrderByName(Collection<TribunalOffice> tribunalOffices,
                                                    CourtWorkerType courtWorkerType);
 
-    boolean existsByTribunalOfficeAndAndTypeAndCode(
+    boolean existsByTribunalOfficeAndTypeAndCode(
             TribunalOffice tribunalOffice,
             CourtWorkerType courtWorkerType,
             String clerkCode);

@@ -21,19 +21,19 @@ public class ClerkAddService {
         var clerkCode = adminData.getClerkAdd().getClerkCode();
         var clerkName = adminData.getClerkAdd().getClerkName();
 
-        if (courtWorkerRepository.existsByTribunalOfficeAndAndTypeAndCode(
+        if (courtWorkerRepository.existsByTribunalOfficeAndTypeAndCode(
                 tribunalOffice, CourtWorkerType.CLERK, clerkCode)) {
             log.info("Clerk Code should not already exist for this tribunal office.");
         } else if (courtWorkerRepository.existsByTribunalOfficeAndTypeAndName(
                 tribunalOffice, CourtWorkerType.CLERK, clerkName)) {
             log.info("Clerk Name should not already exist for this tribunal office.");
         } else {
-            var courtWorker = toSetCourtWorker(tribunalOffice, clerkCode, clerkName);
+            var courtWorker = createCourtWorker(tribunalOffice, clerkCode, clerkName);
             courtWorkerRepository.save(courtWorker);
         }
     }
 
-    private CourtWorker toSetCourtWorker(TribunalOffice tribunalOffice, String clerkCode, String clerkName) {
+    private CourtWorker createCourtWorker(TribunalOffice tribunalOffice, String clerkCode, String clerkName) {
         var courtWorker = new CourtWorker();
         courtWorker.setType(CourtWorkerType.CLERK);
         courtWorker.setCode(clerkCode);

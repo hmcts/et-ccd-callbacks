@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.clerk;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.staff.clerk;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.clerk.ClerkAddService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.clerk.ClerkAddService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -25,7 +25,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping("/admin/clerk")
 @RequiredArgsConstructor
-public class ClerkAddController {
+public class ClerkController {
 
     private final VerifyTokenService verifyTokenService;
     private final ClerkAddService clerkAddService;

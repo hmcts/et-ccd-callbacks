@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.clerk;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.clerk;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -8,10 +8,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Judge;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JudgeEmploymentStatus;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge.JudgeService;
 
 import static org.mockito.Mockito.*;
 
-class AddJudgeServiceTest {
+class JudgeServiceTest {
     private JudgeRepository judgeRepository;
     private final String judgeCode = "testCode";
     private final String judgeName = "testName";
@@ -24,7 +25,7 @@ class AddJudgeServiceTest {
     @Test
     void shouldSaveJudge() {
         var adminData = createAdminData(judgeCode, judgeName, "ABERDEEN", "SALARIED");
-        var addJudgeService = new AddJudgeService(judgeRepository);
+        var addJudgeService = new JudgeService(judgeRepository);
         when(judgeRepository.existsByCodeOrName(judgeCode, judgeName)).thenReturn(false);
         Assert.assertEquals(addJudgeService.saveJudge(adminData), true);
         verify(judgeRepository, times(1)).save(createJudge(adminData));
@@ -33,7 +34,7 @@ class AddJudgeServiceTest {
     @Test
     void shouldReturnFalseIfJudgeExists() {
         var adminData = createAdminData(judgeCode, judgeName, "ABERDEEN", "SALARIED");
-        var addJudgeService = new AddJudgeService(judgeRepository);
+        var addJudgeService = new JudgeService(judgeRepository);
         when(judgeRepository.existsByCodeOrName(judgeCode, judgeName)).thenReturn(true);
         Assert.assertEquals(addJudgeService.saveJudge(adminData), false);
         verify(judgeRepository, never()).save(createJudge(adminData));

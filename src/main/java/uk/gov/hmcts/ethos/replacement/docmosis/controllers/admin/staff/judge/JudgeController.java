@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.staff.judge;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,17 +15,17 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.AddJudgeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge.JudgeService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/admin/staff/judge")
 @RequiredArgsConstructor
-public class AddJudgeController {
+public class JudgeController {
 
     private final VerifyTokenService verifyTokenService;
-    private final AddJudgeService addJudgeService;
+    private final JudgeService judgeService;
 
     @PostMapping(value = "/addJudge", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add Judge")
@@ -44,7 +44,7 @@ public class AddJudgeController {
         }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
-        if (!addJudgeService.saveJudge(adminData)) {
+        if (!judgeService.saveJudge(adminData)) {
             return ResponseEntity.status(HttpStatus.CONFLICT.value()).build();
         }
 

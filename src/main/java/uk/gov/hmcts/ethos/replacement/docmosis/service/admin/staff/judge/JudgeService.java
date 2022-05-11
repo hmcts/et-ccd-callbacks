@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service.admin;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,11 +10,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository
 
 @Service
 @Slf4j
-public class AddJudgeService {
+public class JudgeService {
 
     private final JudgeRepository judgeRepository;
 
-    public AddJudgeService(JudgeRepository judgeRepository) {
+    public JudgeService(JudgeRepository judgeRepository) {
         this.judgeRepository = judgeRepository;
     }
 

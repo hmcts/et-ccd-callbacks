@@ -27,7 +27,7 @@ class JudgeServiceTest {
         var adminData = createAdminData(judgeCode, judgeName, "ABERDEEN", "SALARIED");
         var addJudgeService = new JudgeService(judgeRepository);
         when(judgeRepository.existsByCodeOrName(judgeCode, judgeName)).thenReturn(false);
-        Assert.assertEquals(addJudgeService.saveJudge(adminData), true);
+        Assert.assertEquals(true, addJudgeService.saveJudge(adminData));
         verify(judgeRepository, times(1)).save(createJudge(adminData));
     }
 
@@ -36,7 +36,7 @@ class JudgeServiceTest {
         var adminData = createAdminData(judgeCode, judgeName, "ABERDEEN", "SALARIED");
         var addJudgeService = new JudgeService(judgeRepository);
         when(judgeRepository.existsByCodeOrName(judgeCode, judgeName)).thenReturn(true);
-        Assert.assertEquals(addJudgeService.saveJudge(adminData), false);
+        Assert.assertEquals(false, addJudgeService.saveJudge(adminData));
         verify(judgeRepository, never()).save(createJudge(adminData));
     }
 

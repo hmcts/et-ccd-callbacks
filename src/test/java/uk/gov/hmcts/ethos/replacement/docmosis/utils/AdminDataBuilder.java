@@ -40,6 +40,23 @@ public class AdminDataBuilder {
         return this;
     }
 
+    public AdminDataBuilder withJudgeData(String judgeCode, String judgeName, String tribunalOffice, String employmentStatus) {
+        if (adminData.getJudgeCode() == null) {
+            adminData.setJudgeCode(judgeCode);
+        }
+        if (adminData.getJudgeName() == null) {
+            adminData.setJudgeName(judgeName);
+        }
+        if (adminData.getTribunalOffice() == null) {
+            adminData.setTribunalOffice(tribunalOffice);
+        }
+        if (adminData.getEmploymentStatus() == null) {
+            adminData.setEmploymentStatus(employmentStatus);
+        }
+
+        return this;
+    }
+
     public CCDRequest buildAsCCDRequest() {
         var ccdRequest = new CCDRequest();
         var caseDetails = new CaseDetails();

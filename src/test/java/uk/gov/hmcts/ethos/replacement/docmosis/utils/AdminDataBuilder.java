@@ -7,6 +7,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ClerkAdd;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.Document;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.EmployeeMember;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.EmployerMember;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ImportFile;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.VenueImport;
 
@@ -70,4 +71,15 @@ public class AdminDataBuilder {
         adminData.setEmployeeMember(employeeMember);
         return this;
     }
+
+    public AdminDataBuilder withEmployerMember(String tribunalOffice, String employerMemberCode, String employerMemberName) {
+        var employerMember = new EmployerMember();
+        employerMember.setTribunalOffice(tribunalOffice);
+        employerMember.setEmployerMemberCode(employerMemberCode);
+        employerMember.setEmployerMemberName(employerMemberName);
+
+        adminData.setEmployerMember(employerMember);
+        return this;
+    }
+
 }

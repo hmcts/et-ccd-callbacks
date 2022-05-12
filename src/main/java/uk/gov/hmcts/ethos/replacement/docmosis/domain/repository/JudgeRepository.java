@@ -11,5 +11,5 @@ import java.util.List;
 public interface JudgeRepository extends JpaRepository<Judge, Integer> {
     List<Judge> findByTribunalOffice(TribunalOffice tribunalOffice);
 
-    boolean existsByCodeOrName(String code, String name);
+    boolean existsByCodeAndTribunalOffice(String code, TribunalOffice tribunalOffice);
 }

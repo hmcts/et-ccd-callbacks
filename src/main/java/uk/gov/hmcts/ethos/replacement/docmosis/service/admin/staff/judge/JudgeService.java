@@ -13,25 +13,26 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository
 public class JudgeService {
 
     private final JudgeRepository judgeRepository;
+    public static final String ADD_JUDGE_CONFLICT_ERROR =
+            "A judge already exists with the same Code (%s) and Tribunal Office (%s)";
 
     public JudgeService(JudgeRepository judgeRepository) {
         this.judgeRepository = judgeRepository;
     }
 
-    public boolean saveJudge(AdminData adminData) {
+    public void saveJudge(AdminData adminData) {
         var judge =  new Judge();
         judge.setCode(adminData.getJudgeCode());
         judge.setName(adminData.getJudgeName());
         judge.setEmploymentStatus(JudgeEmploymentStatus.valueOf(adminData.getEmploymentStatus()));
         judge.setTribunalOffice(TribunalOffice.valueOf(adminData.getTribunalOffice()));
 
-        if (!judgeRepository.existsByCodeOrName(adminData.getJudgeCode(), adminData.getJudgeName())) {
-            judgeRepository.save(judge);
+        if (judgeRepository.existsByCodeAndTribunalOffice(adminData.getJudgeCode(),
+                TribunalOffice.valueOf(adminData.getTribunalOffice()))) {
+            throw new SaveJudgeException(String.format(ADD_JUDGE_CONFLICT_ERROR,
+                    adminData.getJudgeCode(), adminData.getTribunalOffice()));
         } else {
-            log.error("A judge with the same name or code already exists.");
-            return false;
+            judgeRepository.save(judge);
         }
-
-        return true;
     }
 }

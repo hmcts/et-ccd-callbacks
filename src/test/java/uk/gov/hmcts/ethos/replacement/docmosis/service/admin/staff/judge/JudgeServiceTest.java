@@ -1,6 +1,5 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service.admin;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -8,14 +7,21 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Judge;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JudgeEmploymentStatus;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge.JudgeService;
 
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
+
 
 class JudgeServiceTest {
     private JudgeRepository judgeRepository;
     private final String judgeCode = "testCode";
     private final String judgeName = "testName";
+    private final String tribunalOffice = "ABERDEEN";
 
     @BeforeEach
     void setup() {
@@ -24,19 +30,20 @@ class JudgeServiceTest {
 
     @Test
     void shouldSaveJudge() {
-        var adminData = createAdminData(judgeCode, judgeName, "ABERDEEN", "SALARIED");
+        var adminData = createAdminData(judgeCode, judgeName, tribunalOffice, "SALARIED");
         var addJudgeService = new JudgeService(judgeRepository);
-        when(judgeRepository.existsByCodeOrName(judgeCode, judgeName)).thenReturn(false);
-        Assert.assertEquals(true, addJudgeService.saveJudge(adminData));
+        when(judgeRepository.existsByCodeAndTribunalOffice(judgeCode, TribunalOffice.valueOf(tribunalOffice))).thenReturn(false);
+
+        assertDoesNotThrow(() -> addJudgeService.saveJudge(adminData));
         verify(judgeRepository, times(1)).save(createJudge(adminData));
     }
 
     @Test
-    void shouldReturnFalseIfJudgeExists() {
-        var adminData = createAdminData(judgeCode, judgeName, "ABERDEEN", "SALARIED");
+    void shouldReturnErrorIfJudgeExists() {
+        var adminData = createAdminData(judgeCode, judgeName, tribunalOffice, "SALARIED");
         var addJudgeService = new JudgeService(judgeRepository);
-        when(judgeRepository.existsByCodeOrName(judgeCode, judgeName)).thenReturn(true);
-        Assert.assertEquals(false, addJudgeService.saveJudge(adminData));
+        when(judgeRepository.existsByCodeAndTribunalOffice(judgeCode, TribunalOffice.valueOf(tribunalOffice))).thenReturn(true);
+        assertThrows(SaveJudgeException.class, () -> addJudgeService.saveJudge(adminData));
         verify(judgeRepository, never()).save(createJudge(adminData));
     }
 

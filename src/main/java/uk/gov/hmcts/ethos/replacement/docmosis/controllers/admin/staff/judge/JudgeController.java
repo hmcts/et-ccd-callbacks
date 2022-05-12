@@ -16,6 +16,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge.JudgeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge.SaveJudgeException;
+
+import java.util.Arrays;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -32,7 +35,6 @@ public class JudgeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Accessed successfully"),
             @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "409", description = "Conflict"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> addJudge(
@@ -44,8 +46,10 @@ public class JudgeController {
         }
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
-        if (!judgeService.saveJudge(adminData)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT.value()).build();
+        try {
+            judgeService.saveJudge(adminData);
+        } catch (SaveJudgeException e) {
+            return CCDCallbackResponse.getCallbackRespEntityErrors(Arrays.asList(e.getMessage()), adminData);
         }
 
         return CCDCallbackResponse.getCallbackRespEntityNoErrors(adminData);

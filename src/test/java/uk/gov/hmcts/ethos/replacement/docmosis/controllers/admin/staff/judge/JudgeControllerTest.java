@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge.JudgeService.ADD_JUDGE_CONFLICT_ERROR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge.JudgeService.ADD_JUDGE_CODE_CONFLICT_ERROR;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({JudgeController.class, JsonMapper.class})
@@ -68,8 +68,8 @@ class JudgeControllerTest {
                 .buildAsCCDRequest();
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
-        String error = String.format(ADD_JUDGE_CONFLICT_ERROR,
-                adminData.getJudgeCode(), adminData.getTribunalOffice());
+        String error = String.format(ADD_JUDGE_CODE_CONFLICT_ERROR,
+                adminData.getJudgeCode());
 
         var token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);

@@ -13,24 +13,32 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository
 public class JudgeService {
 
     private final JudgeRepository judgeRepository;
-    public static final String ADD_JUDGE_CONFLICT_ERROR =
-            "A judge already exists with the same Code (%s) and Tribunal Office (%s)";
+
+    public static final String ADD_JUDGE_CODE_CONFLICT_ERROR =
+            "A judge with the same Code (%s) already exists.";
+
+    public static final String ADD_JUDGE_NAME_AND_OFFICE_CONFLICT_ERROR =
+            "A judge with the same Name (%s) and Tribunal Office (%s) already exists.";
 
     public JudgeService(JudgeRepository judgeRepository) {
         this.judgeRepository = judgeRepository;
     }
 
     public void saveJudge(AdminData adminData) {
+        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice());
+
         var judge =  new Judge();
         judge.setCode(adminData.getJudgeCode());
         judge.setName(adminData.getJudgeName());
         judge.setEmploymentStatus(JudgeEmploymentStatus.valueOf(adminData.getEmploymentStatus()));
-        judge.setTribunalOffice(TribunalOffice.valueOf(adminData.getTribunalOffice()));
+        judge.setTribunalOffice(tribunalOffice);
 
-        if (judgeRepository.existsByCodeAndTribunalOffice(adminData.getJudgeCode(),
-                TribunalOffice.valueOf(adminData.getTribunalOffice()))) {
-            throw new SaveJudgeException(String.format(ADD_JUDGE_CONFLICT_ERROR,
-                    adminData.getJudgeCode(), adminData.getTribunalOffice()));
+        if (judgeRepository.existsByCode(adminData.getJudgeCode())) {
+            throw new SaveJudgeException(String.format(ADD_JUDGE_CODE_CONFLICT_ERROR,
+                    adminData.getJudgeCode()));
+        } else if (judgeRepository.existsByNameAndTribunalOffice(adminData.getJudgeName(), tribunalOffice)) {
+            throw new SaveJudgeException(String.format(ADD_JUDGE_NAME_AND_OFFICE_CONFLICT_ERROR,
+                    adminData.getJudgeName(), adminData.getTribunalOffice()));
         } else {
             judgeRepository.save(judge);
         }

@@ -21,7 +21,7 @@ class JudgeServiceTest {
     private JudgeRepository judgeRepository;
     private final String judgeCode = "testCode";
     private final String judgeName = "testName";
-    private final String tribunalOffice = "ABERDEEN";
+    private final String tribunalOffice = "Aberdeen";
 
     @BeforeEach
     void setup() {
@@ -32,17 +32,30 @@ class JudgeServiceTest {
     void shouldSaveJudge() {
         var adminData = createAdminData(judgeCode, judgeName, tribunalOffice, "SALARIED");
         var addJudgeService = new JudgeService(judgeRepository);
-        when(judgeRepository.existsByCodeAndTribunalOffice(judgeCode, TribunalOffice.valueOf(tribunalOffice))).thenReturn(false);
+        when(judgeRepository.existsByCode(judgeCode)).thenReturn(false);
+        when(judgeRepository.existsByNameAndTribunalOffice(judgeName,
+                TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(false);
 
         assertDoesNotThrow(() -> addJudgeService.saveJudge(adminData));
         verify(judgeRepository, times(1)).save(createJudge(adminData));
     }
 
     @Test
-    void shouldReturnErrorIfJudgeExists() {
+    void shouldReturnErrorIfJudgeWithSameCodeExists() {
         var adminData = createAdminData(judgeCode, judgeName, tribunalOffice, "SALARIED");
         var addJudgeService = new JudgeService(judgeRepository);
-        when(judgeRepository.existsByCodeAndTribunalOffice(judgeCode, TribunalOffice.valueOf(tribunalOffice))).thenReturn(true);
+        when(judgeRepository.existsByCode(judgeCode)).thenReturn(true);
+        assertThrows(SaveJudgeException.class, () -> addJudgeService.saveJudge(adminData));
+        verify(judgeRepository, never()).save(createJudge(adminData));
+    }
+
+    @Test
+    void shouldReturnErrorIfJudgeWithSameNameAndOfficeExists() {
+        var adminData = createAdminData(judgeCode, judgeName, tribunalOffice, "SALARIED");
+        var addJudgeService = new JudgeService(judgeRepository);
+        when(judgeRepository.existsByCode(judgeCode)).thenReturn(false);
+        when(judgeRepository.existsByNameAndTribunalOffice(judgeName,
+                TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(true);
         assertThrows(SaveJudgeException.class, () -> addJudgeService.saveJudge(adminData));
         verify(judgeRepository, never()).save(createJudge(adminData));
     }
@@ -61,7 +74,7 @@ class JudgeServiceTest {
         judge.setCode(adminData.getJudgeCode());
         judge.setName(adminData.getJudgeName());
         judge.setEmploymentStatus(JudgeEmploymentStatus.valueOf(adminData.getEmploymentStatus()));
-        judge.setTribunalOffice(TribunalOffice.valueOf(adminData.getTribunalOffice()));
+        judge.setTribunalOffice(TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice()));
         return judge;
     }
 }

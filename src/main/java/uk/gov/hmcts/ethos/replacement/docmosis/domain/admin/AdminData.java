@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.domain.admin;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ClerkAdd;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.EmployeeMember;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ImportFile;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.VenueImport;
@@ -18,4 +19,6 @@ public class AdminData {
     private VenueImport venueImport;
     @JsonProperty("employeeMember")
     private EmployeeMember employeeMember;
+    @JsonProperty("clerkAdd")
+    private ClerkAdd clerkAdd;
 }

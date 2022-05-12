@@ -21,5 +21,6 @@ public interface CourtWorkerRepository extends JpaRepository<CourtWorker, Intege
 
     boolean existsByTribunalOfficeAndTypeAndName(TribunalOffice tribunalOffice, CourtWorkerType courtWorkerType,
         String name);
+
 }
 

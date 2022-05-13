@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CourtWorkerControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String ADD_EMPLOYEE_MEMBER_URL = "/admin/staff/courtworker/addCourtWorker";
+    private static final String ADD_COURT_WORKER_URL = "/admin/staff/courtworker/addCourtWorker";
     private CCDRequest ccdRequest;
 
     @MockBean
@@ -63,7 +63,7 @@ class CourtWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(courtWorkerService.addCourtWorker(any())).thenReturn(new ArrayList<>());
 
-        mockMvc.perform(post(ADD_EMPLOYEE_MEMBER_URL)
+        mockMvc.perform(post(ADD_COURT_WORKER_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
@@ -78,12 +78,11 @@ class CourtWorkerControllerTest {
     @Test
     void addEmployeeMember_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ADD_EMPLOYEE_MEMBER_URL)
+        mockMvc.perform(post(ADD_COURT_WORKER_URL)
             .contentType(APPLICATION_JSON)
             .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
             .content(jsonMapper.toJson(ccdRequest)))
-            .andExpect(status().isForbidden()
-        );
+            .andExpect(status().isForbidden());
         verify(courtWorkerService, never()).addCourtWorker(ccdRequest.getCaseDetails().getAdminData());
     }
 }

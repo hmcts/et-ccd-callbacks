@@ -42,37 +42,37 @@ class CourtWorkerServiceTest {
     @ParameterizedTest
     @EnumSource(CourtWorkerType.class)
     void shouldSaveCourtWorker(CourtWorkerType courtWorkerType) {
-        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(), "Code1", "Name1");;
+        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(), "Code1", "Name1");
         List<String> errors = courtWorkerService.addCourtWorker(adminData);
         assertEquals(0, errors.size());
         verify(courtWorkerRepository, times(1)).save(
-                createCourtWorker(TribunalOffice.LEEDS, courtWorkerType,"Code1", "Name1"));
+                createCourtWorker(TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name1"));
     }
 
     @ParameterizedTest
     @EnumSource(CourtWorkerType.class)
     void shouldGiveCodeError(CourtWorkerType courtWorkerType) {
-        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(), "Code1", "Name1");;
+        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(), "Code1", "Name1");
         when(courtWorkerRepository.existsByTribunalOfficeAndTypeAndCode(any(TribunalOffice.class),
                 any(CourtWorkerType.class), anyString())).thenReturn(true);
         List<String> errors = courtWorkerService.addCourtWorker(adminData);
         assertEquals(1, errors.size());
         assertEquals(String.format(CODE_ERROR_MESSAGE, "Code1", TribunalOffice.LEEDS.getOfficeName()), errors.get(0));
         verify(courtWorkerRepository, times(0)).save(
-                createCourtWorker(TribunalOffice.LEEDS, courtWorkerType,"Code1", "Name1"));
+                createCourtWorker(TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name1"));
     }
 
     @ParameterizedTest
     @EnumSource(CourtWorkerType.class)
     void shouldGiveNameError(CourtWorkerType courtWorkerType) {
-        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(), "Code1", "Name1");;
+        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(), "Code1", "Name1");
         when(courtWorkerRepository.existsByTribunalOfficeAndTypeAndName(any(TribunalOffice.class),
                 any(CourtWorkerType.class), anyString())).thenReturn(true);
         List<String> errors = courtWorkerService.addCourtWorker(adminData);
         assertEquals(1, errors.size());
         assertEquals(String.format(NAME_ERROR_MESSAGE, "Name1", TribunalOffice.LEEDS.getOfficeName()), errors.get(0));
         verify(courtWorkerRepository, times(0)).save(
-                createCourtWorker(TribunalOffice.LEEDS, courtWorkerType,"Code4", "Name1"));
+                createCourtWorker(TribunalOffice.LEEDS, courtWorkerType, "Code4", "Name1"));
     }
 
     private AdminData createAdminData(String officeName, String courtWorkerType, String testCode, String testName) {

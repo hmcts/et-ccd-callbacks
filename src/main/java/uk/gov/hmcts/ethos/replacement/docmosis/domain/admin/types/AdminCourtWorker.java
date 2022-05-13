@@ -6,13 +6,15 @@ import lombok.Data;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class EmployeeMember {
+public class AdminCourtWorker {
 
     @JsonProperty("tribunalOffice")
     private String tribunalOffice;
-    @JsonProperty("employeeMemberCode")
-    private String employeeMemberCode;
-    @JsonProperty("employeeMemberName")
-    private String employeeMemberName;
+    @JsonProperty("courtWorkerType")
+    private String courtWorkerType;
+    @JsonProperty("courtWorkerCode")
+    private String courtWorkerCode;
+    @JsonProperty("courtWorkerName")
+    private String courtWorkerName;
 
 }

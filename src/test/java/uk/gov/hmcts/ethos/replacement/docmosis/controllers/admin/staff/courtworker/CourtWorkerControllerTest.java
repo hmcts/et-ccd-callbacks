@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.staff.employeemember;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.staff.courtworker;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.employeemember.EmployeeMemberService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.courtworker.CourtWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AdminDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -32,17 +32,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest({EmployeeMemberController.class, JsonMapper.class})
-class EmployeeMemberControllerTest {
+@WebMvcTest({CourtWorkerController.class, JsonMapper.class})
+class CourtWorkerControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String ADD_EMPLOYEE_MEMBER_URL = "/admin/staff/employeemember/addEmployeeMember";
+    private static final String ADD_EMPLOYEE_MEMBER_URL = "/admin/staff/courtworker/addCourtWorker";
     private CCDRequest ccdRequest;
 
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
-    private EmployeeMemberService employeeMemberService;
+    private CourtWorkerService courtWorkerService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -61,7 +61,7 @@ class EmployeeMemberControllerTest {
     @Test
     void addEmployeeMember_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(employeeMemberService.addEmployeeMember(any())).thenReturn(new ArrayList<>());
+        when(courtWorkerService.addCourtWorker(any())).thenReturn(new ArrayList<>());
 
         mockMvc.perform(post(ADD_EMPLOYEE_MEMBER_URL)
                 .contentType(APPLICATION_JSON)
@@ -71,7 +71,7 @@ class EmployeeMemberControllerTest {
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", hasSize(0)))
                 .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(employeeMemberService, times(1)).addEmployeeMember(ccdRequest.getCaseDetails().getAdminData());
+        verify(courtWorkerService, times(1)).addCourtWorker(ccdRequest.getCaseDetails().getAdminData());
 
     }
 
@@ -84,6 +84,6 @@ class EmployeeMemberControllerTest {
             .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isForbidden()
         );
-        verify(employeeMemberService, never()).addEmployeeMember(ccdRequest.getCaseDetails().getAdminData());
+        verify(courtWorkerService, never()).addCourtWorker(ccdRequest.getCaseDetails().getAdminData());
     }
 }

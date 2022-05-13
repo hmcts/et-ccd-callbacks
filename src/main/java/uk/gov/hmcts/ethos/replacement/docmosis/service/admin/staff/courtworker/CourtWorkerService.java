@@ -32,23 +32,24 @@ public class CourtWorkerService {
 
         var courtWorker = setCourtWorker(tribunalOffice, courtWorkerRole, courtWorkerCode, courtWorkerName);
 
-        if (checkIfEmployeeMemberExists(courtWorker, tribunalOffice, errors)) {
+        if (checkIfEmployeeMemberExists(courtWorker, errors)) {
             courtWorkerRepository.save(courtWorker);
         }
 
         return errors;
     }
 
-    private boolean checkIfEmployeeMemberExists(CourtWorker courtWorker, TribunalOffice tribunalOffice,
-                                                List<String> errors) {
-        if (courtWorkerRepository.existsByTribunalOfficeAndTypeAndCode(tribunalOffice, courtWorker.getType(),
-                courtWorker.getCode())) {
-            errors.add(String.format(CODE_ERROR_MESSAGE, courtWorker.getCode(), tribunalOffice.getOfficeName()));
+    private boolean checkIfEmployeeMemberExists(CourtWorker courtWorker, List<String> errors) {
+        if (courtWorkerRepository.existsByTribunalOfficeAndTypeAndCode(courtWorker.getTribunalOffice(),
+                courtWorker.getType(), courtWorker.getCode())) {
+            errors.add(String.format(CODE_ERROR_MESSAGE, courtWorker.getCode(),
+                    courtWorker.getTribunalOffice().getOfficeName()));
         }
 
-        if (courtWorkerRepository.existsByTribunalOfficeAndTypeAndName(tribunalOffice, courtWorker.getType(),
-                courtWorker.getName())) {
-            errors.add(String.format(NAME_ERROR_MESSAGE, courtWorker.getName(), tribunalOffice.getOfficeName()));
+        if (courtWorkerRepository.existsByTribunalOfficeAndTypeAndName(courtWorker.getTribunalOffice(),
+                courtWorker.getType(), courtWorker.getName())) {
+            errors.add(String.format(NAME_ERROR_MESSAGE, courtWorker.getName(),
+                    courtWorker.getTribunalOffice().getOfficeName()));
         }
 
         return errors.isEmpty();

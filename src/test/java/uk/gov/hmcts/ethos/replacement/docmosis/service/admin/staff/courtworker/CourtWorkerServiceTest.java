@@ -1,10 +1,11 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.employeemember;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.courtworker;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.EmployeeMember;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.AdminCourtWorker;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorker;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepository;
@@ -18,67 +19,71 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.employeemember.EmployeeMemberService.CODE_ERROR_MESSAGE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.employeemember.EmployeeMemberService.NAME_ERROR_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.courtworker.CourtWorkerService.CODE_ERROR_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.courtworker.CourtWorkerService.NAME_ERROR_MESSAGE;
 
-class EmployeeMemberServiceTest {
+class CourtWorkerServiceTest {
 
     private CourtWorkerRepository courtWorkerRepository;
-    private EmployeeMemberService employeeMemberService;
+    private CourtWorkerService courtWorkerService;
     private AdminData adminData;
 
     @BeforeEach
     void setUp() {
         courtWorkerRepository = mock(CourtWorkerRepository.class);
-        employeeMemberService = new EmployeeMemberService(courtWorkerRepository);
+        courtWorkerService = new CourtWorkerService(courtWorkerRepository);
 
         when(courtWorkerRepository.existsByTribunalOfficeAndTypeAndCode(any(TribunalOffice.class),
                 any(CourtWorkerType.class), anyString())).thenReturn(false);
         when(courtWorkerRepository.existsByTribunalOfficeAndTypeAndName(any(TribunalOffice.class),
                 any(CourtWorkerType.class), anyString())).thenReturn(false);
-
-        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), "Code1", "Name1");;
     }
 
-    @Test
-    void shouldSaveEmployeeMember() {
-        List<String> errors = employeeMemberService.addEmployeeMember(adminData);
+    @ParameterizedTest
+    @EnumSource(CourtWorkerType.class)
+    void shouldSaveCourtWorker(CourtWorkerType courtWorkerType) {
+        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(), "Code1", "Name1");;
+        List<String> errors = courtWorkerService.addCourtWorker(adminData);
         assertEquals(0, errors.size());
         verify(courtWorkerRepository, times(1)).save(
-                createCourtWorker(TribunalOffice.LEEDS, CourtWorkerType.EMPLOYEE_MEMBER,"Code1", "Name1"));
+                createCourtWorker(TribunalOffice.LEEDS, courtWorkerType,"Code1", "Name1"));
     }
 
-    @Test
-    void shouldGiveCodeError() {
+    @ParameterizedTest
+    @EnumSource(CourtWorkerType.class)
+    void shouldGiveCodeError(CourtWorkerType courtWorkerType) {
+        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(), "Code1", "Name1");;
         when(courtWorkerRepository.existsByTribunalOfficeAndTypeAndCode(any(TribunalOffice.class),
                 any(CourtWorkerType.class), anyString())).thenReturn(true);
-        List<String> errors = employeeMemberService.addEmployeeMember(adminData);
+        List<String> errors = courtWorkerService.addCourtWorker(adminData);
         assertEquals(1, errors.size());
         assertEquals(String.format(CODE_ERROR_MESSAGE, "Code1", TribunalOffice.LEEDS.getOfficeName()), errors.get(0));
         verify(courtWorkerRepository, times(0)).save(
-                createCourtWorker(TribunalOffice.LEEDS, CourtWorkerType.EMPLOYEE_MEMBER,"Code1", "Name1"));
+                createCourtWorker(TribunalOffice.LEEDS, courtWorkerType,"Code1", "Name1"));
     }
 
-    @Test
-    void shouldGiveNameError() {
+    @ParameterizedTest
+    @EnumSource(CourtWorkerType.class)
+    void shouldGiveNameError(CourtWorkerType courtWorkerType) {
+        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(), "Code1", "Name1");;
         when(courtWorkerRepository.existsByTribunalOfficeAndTypeAndName(any(TribunalOffice.class),
                 any(CourtWorkerType.class), anyString())).thenReturn(true);
-        List<String> errors = employeeMemberService.addEmployeeMember(adminData);
+        List<String> errors = courtWorkerService.addCourtWorker(adminData);
         assertEquals(1, errors.size());
         assertEquals(String.format(NAME_ERROR_MESSAGE, "Name1", TribunalOffice.LEEDS.getOfficeName()), errors.get(0));
         verify(courtWorkerRepository, times(0)).save(
-                createCourtWorker(TribunalOffice.LEEDS, CourtWorkerType.EMPLOYEE_MEMBER,"Code4", "Name1"));
+                createCourtWorker(TribunalOffice.LEEDS, courtWorkerType,"Code4", "Name1"));
     }
 
-
-    private AdminData createAdminData(String officeName, String testCode, String testName) {
-        var employeeMember = new EmployeeMember();
-        employeeMember.setTribunalOffice(officeName);
-        employeeMember.setEmployeeMemberName(testName);
-        employeeMember.setEmployeeMemberCode(testCode);
+    private AdminData createAdminData(String officeName, String courtWorkerType, String testCode, String testName) {
+        var adminCourtWorker = new AdminCourtWorker();
+        adminCourtWorker.setTribunalOffice(officeName);
+        adminCourtWorker.setCourtWorkerName(testName);
+        adminCourtWorker.setCourtWorkerCode(testCode);
+        adminCourtWorker.setCourtWorkerType(courtWorkerType);
 
         var adminData = new AdminData();
-        adminData.setEmployeeMember(employeeMember);
+        adminData.setAdminCourtWorker(adminCourtWorker);
 
         return adminData;
     }

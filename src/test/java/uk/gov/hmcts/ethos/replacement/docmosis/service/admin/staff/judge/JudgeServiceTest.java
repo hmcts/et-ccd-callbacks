@@ -32,7 +32,7 @@ class JudgeServiceTest {
     void shouldSaveJudge() {
         var adminData = createAdminData(judgeCode, judgeName, tribunalOffice, "SALARIED");
         var addJudgeService = new JudgeService(judgeRepository);
-        when(judgeRepository.existsByCode(judgeCode)).thenReturn(false);
+        when(judgeRepository.existsByCodeAndTribunalOffice(judgeCode, TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(false);
         when(judgeRepository.existsByNameAndTribunalOffice(judgeName,
                 TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(false);
 
@@ -41,10 +41,10 @@ class JudgeServiceTest {
     }
 
     @Test
-    void shouldReturnErrorIfJudgeWithSameCodeExists() {
+    void shouldReturnErrorIfJudgeWithSameCodeAndOfficeExists() {
         var adminData = createAdminData(judgeCode, judgeName, tribunalOffice, "SALARIED");
         var addJudgeService = new JudgeService(judgeRepository);
-        when(judgeRepository.existsByCode(judgeCode)).thenReturn(true);
+        when(judgeRepository.existsByCodeAndTribunalOffice(judgeCode,TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(true);
         assertThrows(SaveJudgeException.class, () -> addJudgeService.saveJudge(adminData));
         verify(judgeRepository, never()).save(createJudge(adminData));
     }
@@ -53,7 +53,7 @@ class JudgeServiceTest {
     void shouldReturnErrorIfJudgeWithSameNameAndOfficeExists() {
         var adminData = createAdminData(judgeCode, judgeName, tribunalOffice, "SALARIED");
         var addJudgeService = new JudgeService(judgeRepository);
-        when(judgeRepository.existsByCode(judgeCode)).thenReturn(false);
+        when(judgeRepository.existsByCodeAndTribunalOffice(judgeCode,TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(false);
         when(judgeRepository.existsByNameAndTribunalOffice(judgeName,
                 TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(true);
         assertThrows(SaveJudgeException.class, () -> addJudgeService.saveJudge(adminData));

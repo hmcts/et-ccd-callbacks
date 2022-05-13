@@ -8,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge.JudgeService;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge.JudgeService.ADD_JUDGE_CODE_CONFLICT_ERROR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge.JudgeService.ADD_JUDGE_CODE_AND_OFFICE_CONFLICT_ERROR;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({JudgeController.class, JsonMapper.class})
@@ -64,12 +65,12 @@ class JudgeControllerTest {
     void testAddJudgeError() throws Exception {
         var ccdRequest = AdminDataBuilder
                 .builder()
-                .withJudgeData("testCode", "testName", "ABERDEEN", "SALARIED")
+                .withJudgeData("testCode", "testName", "Aberdeen", "SALARIED")
                 .buildAsCCDRequest();
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
-        String error = String.format(ADD_JUDGE_CODE_CONFLICT_ERROR,
-                adminData.getJudgeCode());
+        String error = String.format(ADD_JUDGE_CODE_AND_OFFICE_CONFLICT_ERROR,
+                adminData.getJudgeCode(), TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice()));
 
         var token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);

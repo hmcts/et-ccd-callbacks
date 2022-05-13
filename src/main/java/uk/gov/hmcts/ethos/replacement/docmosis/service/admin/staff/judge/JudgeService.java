@@ -14,8 +14,8 @@ public class JudgeService {
 
     private final JudgeRepository judgeRepository;
 
-    public static final String ADD_JUDGE_CODE_CONFLICT_ERROR =
-            "A judge with the same Code (%s) already exists.";
+    public static final String ADD_JUDGE_CODE_AND_OFFICE_CONFLICT_ERROR =
+            "A judge with the same Code (%s) and Tribunal Office (%s) already exists.";
 
     public static final String ADD_JUDGE_NAME_AND_OFFICE_CONFLICT_ERROR =
             "A judge with the same Name (%s) and Tribunal Office (%s) already exists.";
@@ -33,9 +33,9 @@ public class JudgeService {
         judge.setEmploymentStatus(JudgeEmploymentStatus.valueOf(adminData.getEmploymentStatus()));
         judge.setTribunalOffice(tribunalOffice);
 
-        if (judgeRepository.existsByCode(adminData.getJudgeCode())) {
-            throw new SaveJudgeException(String.format(ADD_JUDGE_CODE_CONFLICT_ERROR,
-                    adminData.getJudgeCode()));
+        if (judgeRepository.existsByCodeAndTribunalOffice(adminData.getJudgeCode(), tribunalOffice)) {
+            throw new SaveJudgeException(String.format(ADD_JUDGE_CODE_AND_OFFICE_CONFLICT_ERROR,
+                    adminData.getJudgeCode(), adminData.getTribunalOffice()));
         } else if (judgeRepository.existsByNameAndTribunalOffice(adminData.getJudgeName(), tribunalOffice)) {
             throw new SaveJudgeException(String.format(ADD_JUDGE_NAME_AND_OFFICE_CONFLICT_ERROR,
                     adminData.getJudgeName(), adminData.getTribunalOffice()));

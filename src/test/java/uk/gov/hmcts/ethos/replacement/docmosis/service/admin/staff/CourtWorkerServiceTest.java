@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.courtworker;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,6 +9,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.AdminCourtWork
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorker;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepository;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService;
 
 import java.util.List;
 
@@ -19,8 +20,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.courtworker.CourtWorkerService.CODE_ERROR_MESSAGE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.courtworker.CourtWorkerService.NAME_ERROR_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.CODE_ERROR_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.NAME_ERROR_MESSAGE;
 
 class CourtWorkerServiceTest {
 

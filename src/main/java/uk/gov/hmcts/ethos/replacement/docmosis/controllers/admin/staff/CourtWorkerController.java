@@ -24,7 +24,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @RestController
-@RequestMapping("/admin/staff/courtworker")
+@RequestMapping("/admin/staff")
 @RequiredArgsConstructor
 public class CourtWorkerController {
 
@@ -42,12 +42,60 @@ public class CourtWorkerController {
             @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
+        log.info("/addCourtWorker");
+
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
         var adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = courtWorkerService.addCourtWorker(adminData);
+
+        return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
+    }
+
+    @PostMapping(value = "/updateCourtWorkerMidEventSelectOffice", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Populates the dynamicList for court worker when office and type selected")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> updateCourtWorkerMidEventSelectOffice(
+            @RequestHeader("Authorization") String userToken,
+            @RequestBody CCDRequest ccdRequest) {
+
+        log.info("/updateCourtWorkerMidEventSelectOffice");
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
+        }
+
+        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectOffice(adminData);
+
+        return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
+    }
+
+    @PostMapping(value = "/updateCourtWorkerMidEventSelectClerk", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Populates the dynamicList for court worker when office and type selected")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> updateCourtWorkerMidEventSelectClerk(
+            @RequestHeader("Authorization") String userToken,
+            @RequestBody CCDRequest ccdRequest) {
+
+        log.info("/updateCourtWorkerMidEventSelectClerk");
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
+        }
+
+        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectClerk(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }
@@ -62,6 +110,8 @@ public class CourtWorkerController {
     public ResponseEntity<CCDCallbackResponse> updateCourtWorker(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
+
+        log.info("/updateCourtWorker");
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();

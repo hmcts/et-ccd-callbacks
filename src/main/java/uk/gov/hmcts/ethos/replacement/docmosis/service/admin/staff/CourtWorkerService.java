@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorker;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
@@ -19,6 +21,8 @@ public class CourtWorkerService {
 
     public static final String CODE_ERROR_MESSAGE = "The code %s already exists for the %s office";
     public static final String NAME_ERROR_MESSAGE = "The name %s already exists for the %s office";
+    public static final String NO_FOUND_ERROR_MESSAGE = "No %s court worker found in the %s office";
+    public static final String SAVE_ERROR_MESSAGE = "Update failed";
 
     private final CourtWorkerRepository courtWorkerRepository;
 
@@ -35,13 +39,62 @@ public class CourtWorkerService {
         return errors;
     }
 
+    public List<String> updateCourtWorkerMidEventSelectOffice(AdminData adminData) {
+        List<String> errors = new ArrayList<>();
+        var adminCourtWorker = adminData.getAdminCourtWorker();
+
+        List<CourtWorker> courtWorkerList = courtWorkerRepository.findByTribunalOfficeAndType(
+                TribunalOffice.valueOfOfficeName(adminCourtWorker.getTribunalOffice()),
+                CourtWorkerType.valueOf(adminCourtWorker.getCourtWorkerType()));
+
+        if (courtWorkerList.isEmpty()) {
+            errors.add(String.format(NO_FOUND_ERROR_MESSAGE, adminCourtWorker.getCourtWorkerType(),
+                    adminCourtWorker.getTribunalOffice()));
+            return errors;
+        }
+
+        List<DynamicValueType> dynamicCourtWorker = new ArrayList<>();
+        for (var courtWorker : courtWorkerList) {
+            dynamicCourtWorker.add(DynamicValueType.create(courtWorker.getId().toString(), courtWorker.getName()));
+        }
+
+        var courtWorkerDynamicList = new DynamicFixedListType();
+        courtWorkerDynamicList.setListItems(dynamicCourtWorker);
+
+        adminCourtWorker.setDynamicCourtWorkerList(courtWorkerDynamicList);
+
+        return errors;
+    }
+
+    public List<String> updateCourtWorkerMidEventSelectClerk(AdminData adminData) {
+        List<String> errors = new ArrayList<>();
+        var adminCourtWorker = adminData.getAdminCourtWorker();
+        var selectedId = Integer.parseInt(adminCourtWorker.getDynamicCourtWorkerList().getSelectedCode());
+
+        var findCourtWorker = courtWorkerRepository.findById(selectedId);
+        if (findCourtWorker.isPresent()) {
+            var selectedCourtWorker = findCourtWorker.get();
+            adminCourtWorker.setCourtWorkerCode(selectedCourtWorker.getCode());
+            adminCourtWorker.setCourtWorkerName(selectedCourtWorker.getName());
+        } else {
+            errors.add(SAVE_ERROR_MESSAGE);
+        }
+
+        return errors;
+    }
+
     public List<String> updateCourtWorker(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        var courtWorker = setCourtWorker(adminData);
+        var adminCourtWorker = adminData.getAdminCourtWorker();
+        var selectedId = Integer.parseInt(adminCourtWorker.getDynamicCourtWorkerList().getSelectedCode());
 
-        checkIfCourtWorkerNameExists(courtWorker, errors);
-        if (errors.isEmpty()) {
-            courtWorkerRepository.save(courtWorker);
+        var findCourtWorker = courtWorkerRepository.findById(selectedId);
+        if (findCourtWorker.isPresent()) {
+            var thisCourtWorker = findCourtWorker.get();
+            thisCourtWorker.setName(adminCourtWorker.getCourtWorkerName());
+            courtWorkerRepository.save(thisCourtWorker);
+        } else {
+            errors.add(SAVE_ERROR_MESSAGE);
         }
 
         return errors;
@@ -77,4 +130,5 @@ public class CourtWorkerService {
 
         return courtWorker;
     }
+
 }

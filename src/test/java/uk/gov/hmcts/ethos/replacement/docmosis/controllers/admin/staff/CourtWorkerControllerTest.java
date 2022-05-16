@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CourtWorkerControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String ADD_COURT_WORKER_URL = "/admin/staff/courtworker/addCourtWorker";
+    private static final String ADD_COURT_WORKER_URL = "/admin/staff/addCourtWorker";
     private CCDRequest ccdRequest;
 
     @MockBean

@@ -4,9 +4,8 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ClerkAdd;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.AdminCourtWorker;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.Document;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.EmployeeMember;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ImportFile;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.VenueImport;
 
@@ -41,7 +40,6 @@ public class AdminDataBuilder {
 
         return this;
     }
-
 
     public AdminDataBuilder withJudgeData(String judgeCode, String judgeName, String tribunalOffice, String employmentStatus) {
         if (adminData.getJudgeCode() == null) {
@@ -80,12 +78,12 @@ public class AdminDataBuilder {
     }
 
     public AdminDataBuilder withEmployeeMember(String tribunalOffice, String employeeMemberCode, String employeeMemberName) {
-        var employeeMember = new EmployeeMember();
+        var employeeMember = new AdminCourtWorker();
         employeeMember.setTribunalOffice(tribunalOffice);
-        employeeMember.setEmployeeMemberCode(employeeMemberCode);
-        employeeMember.setEmployeeMemberName(employeeMemberName);
+        employeeMember.setCourtWorkerCode(employeeMemberCode);
+        employeeMember.setCourtWorkerName(employeeMemberName);
 
-        adminData.setEmployeeMember(employeeMember);
+        adminData.setAdminCourtWorker(employeeMember);
         return this;
     }
 }

@@ -58,17 +58,6 @@ public class AdminDataBuilder {
         return this;
     }
 
-    public AdminDataBuilder withClerkAdd(TribunalOffice tribunalOffice, String clerkCode, String clerkName) {
-        if (adminData.getClerkAdd() == null) {
-            adminData.setClerkAdd(new ClerkAdd());
-        }
-        adminData.getClerkAdd().setTribunalOffice(tribunalOffice.getOfficeName());
-        adminData.getClerkAdd().setClerkCode(clerkCode);
-        adminData.getClerkAdd().setClerkName(clerkName);
-
-        return this;
-    }
-
     public CCDRequest buildAsCCDRequest() {
         var ccdRequest = new CCDRequest();
         var caseDetails = new CaseDetails();

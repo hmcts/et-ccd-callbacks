@@ -27,11 +27,6 @@ public class AdminData {
     @JsonProperty("employmentStatus")
     private String employmentStatus;
 
-    @JsonProperty("employeeMember")
-    private EmployeeMember employeeMember;
-    @JsonProperty("clerkAdd")
-    private ClerkAdd clerkAdd;
-
     @JsonProperty("adminCourtWorker")
     private AdminCourtWorker adminCourtWorker;
 

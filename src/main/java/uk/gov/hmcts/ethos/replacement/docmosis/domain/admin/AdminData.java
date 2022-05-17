@@ -18,4 +18,17 @@ public class AdminData {
     private VenueImport venueImport;
     @JsonProperty("adminCourtWorker")
     private AdminCourtWorker adminCourtWorker;
+
+    // For adding judge
+    @JsonProperty("tribunalOffice")
+    private String tribunalOffice;
+    @JsonProperty("judgeCode")
+    private String judgeCode;
+    @JsonProperty("judgeName")
+    private String judgeName;
+    @JsonProperty("employmentStatus")
+    private String employmentStatus;
+    @JsonProperty("courtWorker")
+    private String courtWorkerType;
+
 }

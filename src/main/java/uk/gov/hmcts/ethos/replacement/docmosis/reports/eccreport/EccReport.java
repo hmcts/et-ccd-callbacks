@@ -2,16 +2,14 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport;
 
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.eccreport.EccReportSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 
 public class EccReport {
 
@@ -23,18 +21,13 @@ public class EccReport {
 
     public EccReportData generateReport(ReportParams params) {
         var submitEvents = getCases(params);
-        var office = getOffice(params);
+        var office = ReportHelper.getReportOffice(params.getCaseTypeId(), params.getManagingOffice());
         var reportData = initReport(office);
 
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             executeReport(reportData, submitEvents);
         }
         return reportData;
-    }
-
-    private String getOffice(ReportParams params) {
-        return ENGLANDWALES_LISTING_CASE_TYPE_ID.equals(params.getCaseTypeId())
-                ? params.getManagingOffice() : TribunalOffice.SCOTLAND.getOfficeName();
     }
 
     private EccReportData initReport(String office) {

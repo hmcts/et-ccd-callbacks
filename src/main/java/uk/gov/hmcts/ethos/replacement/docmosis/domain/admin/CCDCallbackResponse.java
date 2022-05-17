@@ -9,6 +9,8 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 
+import java.util.List;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
@@ -24,4 +26,14 @@ public class CCDCallbackResponse extends GenericCallbackResponse {
                 .data(adminData)
                 .build());
     }
+
+    public static ResponseEntity<CCDCallbackResponse> getCallbackRespEntityErrors(
+            List<String> errors, AdminData adminData) {
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .data(adminData)
+                .errors(errors)
+                .build());
+    }
+
 }

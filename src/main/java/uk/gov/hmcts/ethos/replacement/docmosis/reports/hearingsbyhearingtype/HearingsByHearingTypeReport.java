@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.Strings;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeCaseData;
 import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -52,10 +51,7 @@ public class HearingsByHearingTypeReport {
     public HearingsByHearingTypeReportData generateReport(ReportParams params) {
 
         var submitEvents = getCases(params);
-        var managingOffice = params.getManagingOffice();
-        var office = StringUtils.isNotBlank(managingOffice) && TribunalOffice.isEnglandWalesOffice(managingOffice)
-                ? managingOffice
-                : TribunalOffice.SCOTLAND.getOfficeName();
+        var office = ReportHelper.getReportOffice(params.getCaseTypeId(), params.getManagingOffice());
         var reportData = initReport(office);
         this.dateFrom = params.getDateFrom();
         this.dateTo = params.getDateTo();

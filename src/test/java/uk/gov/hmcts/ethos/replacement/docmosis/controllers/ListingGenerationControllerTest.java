@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,6 +153,7 @@ public class ListingGenerationControllerTest {
         listingData.setListingDateFrom("2020-11-12");
         listingData.setHearingDateType("Range");
         listingData.setListingDateTo("2021-10-18");
+        listingData.setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());
 
         var listingTypeItem1 = new ListingTypeItem();
         listingTypeItem1.setId("97087d19-795a-4886-8cdb-06489b8b2ef5");
@@ -257,7 +257,6 @@ public class ListingGenerationControllerTest {
                 .andExpect(jsonPath("$.warnings", nullValue()));
     }
 
-    @Ignore("It needs to be fixed once owningOffice/managingOffice issue with Scotland is resolved")
     @Test
     public void listingHearings() throws Exception {
         when(listingService.processListingHearingsRequest(isA(ListingDetails.class), eq(AUTH_TOKEN)))

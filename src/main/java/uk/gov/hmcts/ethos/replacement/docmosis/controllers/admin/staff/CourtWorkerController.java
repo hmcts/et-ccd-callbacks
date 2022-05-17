@@ -54,48 +54,48 @@ public class CourtWorkerController {
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }
 
-    @PostMapping(value = "/updateCourtWorkerMidEventSelectOffice", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/updateCourtWorkerMidEventOffice", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates the dynamicList for court worker when office and type selected")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully"),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> updateCourtWorkerMidEventSelectOffice(
+    public ResponseEntity<CCDCallbackResponse> updateCourtWorkerMidEventOffice(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
-        log.info("/updateCourtWorkerMidEventSelectOffice");
+        log.info("/updateCourtWorkerMidEventOffice");
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
         var adminData = ccdRequest.getCaseDetails().getAdminData();
-        List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectOffice(adminData);
+        List<String> errors = courtWorkerService.updateCourtWorkerMidEventOffice(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }
 
-    @PostMapping(value = "/updateCourtWorkerMidEventSelectClerk", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/updateCourtWorkerMidEventClerk", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates the dynamicList for court worker when office and type selected")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully"),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> updateCourtWorkerMidEventSelectClerk(
+    public ResponseEntity<CCDCallbackResponse> updateCourtWorkerMidEventClerk(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
-        log.info("/updateCourtWorkerMidEventSelectClerk");
+        log.info("/updateCourtWorkerMidEventClerk");
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
         var adminData = ccdRequest.getCaseDetails().getAdminData();
-        List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectClerk(adminData);
+        List<String> errors = courtWorkerService.updateCourtWorkerMidEventClerk(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }

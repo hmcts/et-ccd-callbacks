@@ -39,14 +39,13 @@ public class CourtWorkerService {
         return errors;
     }
 
-    public List<String> updateCourtWorkerMidEventSelectOffice(AdminData adminData) {
+    public List<String> updateCourtWorkerMidEventOffice(AdminData adminData) {
         List<String> errors = new ArrayList<>();
         var tribunalOffice = adminData.getUpdateCourtWorkerOffice();
         var courtWorkerType = adminData.getUpdateCourtWorkerType();
 
-        List<CourtWorker> courtWorkerList = courtWorkerRepository.findByTribunalOfficeAndType(
-                TribunalOffice.valueOfOfficeName(tribunalOffice),
-                CourtWorkerType.valueOf(courtWorkerType));
+        List<CourtWorker> courtWorkerList = courtWorkerRepository.findByTribunalOfficeAndTypeOrderByNameAsc(
+                TribunalOffice.valueOfOfficeName(tribunalOffice), CourtWorkerType.valueOf(courtWorkerType));
 
         if (courtWorkerList.isEmpty()) {
             errors.add(String.format(NO_FOUND_ERROR_MESSAGE, courtWorkerType, tribunalOffice));
@@ -66,13 +65,13 @@ public class CourtWorkerService {
         return errors;
     }
 
-    public List<String> updateCourtWorkerMidEventSelectClerk(AdminData adminData) {
+    public List<String> updateCourtWorkerMidEventClerk(AdminData adminData) {
         List<String> errors = new ArrayList<>();
         var selectedId = Integer.parseInt(adminData.getUpdateCourtWorkerDynamicList().getSelectedCode());
 
         var findCourtWorker = courtWorkerRepository.findById(selectedId);
-        if (findCourtWorker.isPresent()) {
-            var selectedCourtWorker = findCourtWorker.get();
+        if (!findCourtWorker.isEmpty()) {
+            var selectedCourtWorker = findCourtWorker.get(0);
             adminData.setUpdateCourtWorkerCode(selectedCourtWorker.getCode());
             adminData.setUpdateCourtWorkerName(selectedCourtWorker.getName());
         } else {
@@ -87,10 +86,13 @@ public class CourtWorkerService {
         var selectedId = Integer.parseInt(adminData.getUpdateCourtWorkerDynamicList().getSelectedCode());
 
         var findCourtWorker = courtWorkerRepository.findById(selectedId);
-        if (findCourtWorker.isPresent()) {
-            var thisCourtWorker = findCourtWorker.get();
+        if (!findCourtWorker.isEmpty()) {
+            var thisCourtWorker = findCourtWorker.get(0);
             thisCourtWorker.setName(adminData.getUpdateCourtWorkerName());
-            courtWorkerRepository.save(thisCourtWorker);
+            checkIfCourtWorkerNameExists(thisCourtWorker, errors);
+            if (errors.isEmpty()) {
+                courtWorkerRepository.save(thisCourtWorker);
+            }
         } else {
             errors.add(SAVE_ERROR_MESSAGE);
         }

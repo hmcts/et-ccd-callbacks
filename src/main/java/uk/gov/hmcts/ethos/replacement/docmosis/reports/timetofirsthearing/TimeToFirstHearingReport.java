@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.Strings;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
@@ -14,6 +13,7 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.AdhocReportTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.AdhocReportType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -38,9 +38,7 @@ public class TimeToFirstHearingReport {
 
     public ListingData generateReportData(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
         var managingOffice = listingDetails.getCaseData().getManagingOffice();
-        var reportOffice = StringUtils.isNotBlank(managingOffice) && TribunalOffice.isEnglandWalesOffice(managingOffice)
-                ? managingOffice
-                : TribunalOffice.SCOTLAND.getOfficeName();
+        var reportOffice = ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), managingOffice);
 
         initReport(listingDetails, reportOffice);
 

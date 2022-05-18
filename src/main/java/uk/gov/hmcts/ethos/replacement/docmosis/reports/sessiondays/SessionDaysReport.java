@@ -29,10 +29,8 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.Math.round;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays.MemberDaysReport.OLD_DATE_TIME_PATTERN3;
 
 public class SessionDaysReport {
@@ -62,23 +60,13 @@ public class SessionDaysReport {
 
     private SessionDaysReportData initReport() {
         var reportSummary = new SessionDaysReportSummary(
-                getReportOffice(UtilHelper.getListingCaseTypeId(params.getCaseTypeId()), params.getManagingOffice()));
+                ReportHelper.getReportOffice(params.getCaseTypeId(), params.getManagingOffice()));
         reportSummary.setFtSessionDaysTotal("0");
         reportSummary.setPtSessionDaysTotal("0");
         reportSummary.setOtherSessionDaysTotal("0");
         reportSummary.setSessionDaysTotal("0");
         reportSummary.setPtSessionDaysPerCent("0.0");
         return new SessionDaysReportData(reportSummary);
-    }
-
-    private static String getReportOffice(String caseTypeId, String managingOffice) {
-        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
-            return managingOffice;
-        } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
-            return TribunalOffice.SCOTLAND.getOfficeName();
-        } else {
-            throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
-        }
     }
 
     public List<DateListedTypeItem> filterValidHearingDates(List<DateListedTypeItem> dateListedTypeItems) {

@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -12,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
 
@@ -21,7 +21,9 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -30,7 +32,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 public class DocumentHelperTest {
 
     private static final String DUMMY_CASE_TYPE_ID = "dummy case type id";
-
+    private static final String MANCHESTER_VENUE_ADDRESS = "Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, Manchester, M3 2JA";
+    private static final String GLASGOW_VENUE_ADDRESS = "Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT";
+    private static final String ABERDEEN_VENUE_ADDRESS = "Ground Floor, AB1, 48 Huntly Street, Aberdeen, AB10 1SH";
     private CaseDetails caseDetails1;
     private CaseDetails caseDetails2;
     private CaseDetails caseDetails3;
@@ -51,6 +55,7 @@ public class DocumentHelperTest {
     private CaseDetails caseDetailsScot3;
     private UserDetails userDetails;
     private VenueAddressReaderService venueAddressReaderService;
+    private HearingType hearingType;
 
     @Before
     public void setUp() throws Exception {
@@ -81,6 +86,7 @@ public class DocumentHelperTest {
 
     private void mockVenueAddressReaderService() {
         venueAddressReaderService = mock(VenueAddressReaderService.class);
+        when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(MANCHESTER_VENUE_ADDRESS);
     }
 
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
@@ -90,7 +96,6 @@ public class DocumentHelperTest {
         return mapper.readValue(json, CaseDetails.class);
     }
 
-    @Ignore("Fix as part of reporting work")
     @Test
     public void buildDocumentContent1() {
         String expected = "{\n"
@@ -170,7 +175,6 @@ public class DocumentHelperTest {
                 null, venueAddressReaderService).toString());
     }
 
-    @Ignore("Fix as part of reporting work")
     @Test
     public void buildDocumentContent2_ResponseStruckOut() {
         String expected = "{\n"
@@ -243,7 +247,6 @@ public class DocumentHelperTest {
         caseDetails2.getCaseData().getRepCollection().get(0).getValue().setRespRepName("RepresentativeNameRespondent");
     }
 
-    @Ignore("Fix as part of reporting work")
     @Test
     public void buildDocumentContent2_ResponseNotStruckOut() {
         String expected = "{\n"
@@ -633,7 +636,6 @@ public class DocumentHelperTest {
                 null, null, venueAddressReaderService).toString());
     }
 
-    @Ignore("Fix as part of reporting work")
     @Test
     public void buildDocumentContent7() {
         String expected = "{\n"
@@ -713,7 +715,6 @@ public class DocumentHelperTest {
                 null, null, venueAddressReaderService).toString());
     }
 
-    @Ignore("Fix as part of reporting work")
     @Test
     public void buildDocumentContent8() {
         String expected = "{\n"
@@ -792,7 +793,6 @@ public class DocumentHelperTest {
                 null, null, venueAddressReaderService).toString());
     }
 
-    @Ignore("Fix as part of reporting work")
     @Test
     public void buildDocumentContent9() {
         String expected = "{\n"
@@ -1444,8 +1444,9 @@ public class DocumentHelperTest {
     }
 
     @Test
-    @Ignore("Fix after venues refactored")
     public void buildDocumentContentScot1() {
+        when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(GLASGOW_VENUE_ADDRESS);
+
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-SCO-ENG-00042.docx\",\n"
@@ -1522,7 +1523,6 @@ public class DocumentHelperTest {
     }
 
     @Test
-    @Ignore("Fix after venues refactored")
     public void buildDocumentContentScot2() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
@@ -1565,7 +1565,7 @@ public class DocumentHelperTest {
                 + "\"Hearing_date\":\"25 November 2019\",\n"
                 + "\"Hearing_date_time\":\"25 November 2019 at 12:11\",\n"
                 + "\"Hearing_time\":\"12:11\",\n"
-                + "\"Hearing_venue\":\"Glasgow\",\n"
+                + "\"Hearing_venue\":\"Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT\",\n"
                 + "\"Hearing_duration\":\"2 days\",\n"
                 + "\"t_Scot_24\":\"true\",\n"
                 + "\"Court_addressLine1\":\"Eagle Building,\",\n"
@@ -1590,6 +1590,7 @@ public class DocumentHelperTest {
                 + "\"Case_No\":\"123456\",\n"
                 + "}\n"
                 + "}\n";
+        when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(GLASGOW_VENUE_ADDRESS);
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetailsScot2.getCaseData(), "",
                 userDetails, DUMMY_CASE_TYPE_ID,
                 caseDetailsScot2.getCaseData().getCorrespondenceType(),
@@ -1598,7 +1599,6 @@ public class DocumentHelperTest {
     }
 
     @Test
-    @Ignore("Fix after venues refactored")
     public void buildDocumentContentScot3() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
@@ -1665,6 +1665,7 @@ public class DocumentHelperTest {
                 + "\"Case_No\":\"123456\",\n"
                 + "}\n"
                 + "}\n";
+        when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(ABERDEEN_VENUE_ADDRESS);
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetailsScot3.getCaseData(), "",
                 userDetails, SCOTLAND_CASE_TYPE_ID,
                 caseDetailsScot3.getCaseData().getCorrespondenceType(),
@@ -1673,8 +1674,8 @@ public class DocumentHelperTest {
     }
 
     @Test
-    @Ignore("Fix after venues refactored")
     public void buildDocumentContentScot3AllocatedOffice() {
+        when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(ABERDEEN_VENUE_ADDRESS);
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-SCO-ENG-00044.docx\",\n"

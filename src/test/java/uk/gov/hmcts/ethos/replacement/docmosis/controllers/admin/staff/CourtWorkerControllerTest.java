@@ -37,8 +37,10 @@ class CourtWorkerControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ADD_COURT_WORKER_URL = "/admin/staff/addCourtWorker";
-    private static final String UPDATE_COURT_WORKER_MID_OFFICE_URL = "/admin/staff/updateCourtWorkerMidEventOffice";
-    private static final String UPDATE_COURT_WORKER_MID_CLERK_URL = "/admin/staff/updateCourtWorkerMidEventClerk";
+    private static final String UPDATE_COURT_WORKER_MID_OFFICE_URL =
+            "/admin/staff/updateCourtWorkerMidEventSelectOffice";
+    private static final String UPDATE_COURT_WORKER_MID_CLERK_URL =
+            "/admin/staff/updateCourtWorkerMidEventSelectCourtWorker";
     private static final String UPDATE_COURT_WORKER_URL = "/admin/staff/updateCourtWorker";
     private CCDRequest ccdRequest;
 
@@ -90,9 +92,9 @@ class CourtWorkerControllerTest {
     }
 
     @Test
-    void updateCourtWorkerMidEventOffice_Success() throws Exception {
+    void updateCourtWorkerMidEventSelectOffice_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(courtWorkerService.updateCourtWorkerMidEventOffice(any())).thenReturn(new ArrayList<>());
+        when(courtWorkerService.updateCourtWorkerMidEventSelectOffice(any())).thenReturn(new ArrayList<>());
         mockMvc.perform(post(UPDATE_COURT_WORKER_MID_OFFICE_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -102,24 +104,25 @@ class CourtWorkerControllerTest {
                 .andExpect(jsonPath("$.errors", hasSize(0)))
                 .andExpect(jsonPath("$.warnings", nullValue()));
         verify(courtWorkerService, times(1))
-                .updateCourtWorkerMidEventOffice(ccdRequest.getCaseDetails().getAdminData());
+                .updateCourtWorkerMidEventSelectOffice(ccdRequest.getCaseDetails().getAdminData());
     }
 
     @Test
-    void updateCourtWorkerMidEventOffice_invalidToken() throws Exception {
+    void updateCourtWorkerMidEventSelectOffice_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(UPDATE_COURT_WORKER_MID_OFFICE_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
-        verify(courtWorkerService, never()).updateCourtWorkerMidEventOffice(ccdRequest.getCaseDetails().getAdminData());
+        verify(courtWorkerService, never())
+                .updateCourtWorkerMidEventSelectOffice(ccdRequest.getCaseDetails().getAdminData());
     }
 
     @Test
-    void updateCourtWorkerMidEventClerk_Success() throws Exception {
+    void updateCourtWorkerMidEventSelectCourtWorker_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(courtWorkerService.updateCourtWorkerMidEventClerk(any())).thenReturn(new ArrayList<>());
+        when(courtWorkerService.updateCourtWorkerMidEventSelectCourtWorker(any())).thenReturn(new ArrayList<>());
         mockMvc.perform(post(UPDATE_COURT_WORKER_MID_CLERK_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -129,18 +132,19 @@ class CourtWorkerControllerTest {
                 .andExpect(jsonPath("$.errors", hasSize(0)))
                 .andExpect(jsonPath("$.warnings", nullValue()));
         verify(courtWorkerService, times(1))
-                .updateCourtWorkerMidEventClerk(ccdRequest.getCaseDetails().getAdminData());
+                .updateCourtWorkerMidEventSelectCourtWorker(ccdRequest.getCaseDetails().getAdminData());
     }
 
     @Test
-    void updateCourtWorkerMidEventClerk_invalidToken() throws Exception {
+    void updateCourtWorkerMidEventSelectCourtWorker_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(UPDATE_COURT_WORKER_MID_CLERK_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
-        verify(courtWorkerService, never()).updateCourtWorkerMidEventClerk(ccdRequest.getCaseDetails().getAdminData());
+        verify(courtWorkerService, never())
+                .updateCourtWorkerMidEventSelectCourtWorker(ccdRequest.getCaseDetails().getAdminData());
     }
 
     @Test

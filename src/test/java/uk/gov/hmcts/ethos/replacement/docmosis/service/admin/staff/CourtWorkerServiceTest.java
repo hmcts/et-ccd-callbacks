@@ -83,7 +83,7 @@ class CourtWorkerServiceTest {
 
     @ParameterizedTest
     @EnumSource(CourtWorkerType.class)
-    void updateCourtWorkerMidEventOffice_shouldReturnDynamicList(CourtWorkerType courtWorkerType) {
+    void updateCourtWorkerMidEventSelectOffice_shouldReturnDynamicList(CourtWorkerType courtWorkerType) {
         var tribunalOffice = TribunalOffice.LEEDS;
         var code = "Code1";
         var name = "Name1";
@@ -96,14 +96,14 @@ class CourtWorkerServiceTest {
         when(courtWorkerRepository.findByTribunalOfficeAndTypeOrderByNameAsc(any(TribunalOffice.class),
                 any(CourtWorkerType.class))).thenReturn(listCourtWorker);
 
-        List<String> errors = courtWorkerService.updateCourtWorkerMidEventOffice(adminData);
+        List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectOffice(adminData);
         assertEquals(0, errors.size());
         assertEquals(1, adminData.getUpdateCourtWorkerDynamicList().getListItems().size());
     }
 
     @ParameterizedTest
     @EnumSource(CourtWorkerType.class)
-    void updateCourtWorkerMidEventOffice_shouldGiveNotFoundError(CourtWorkerType courtWorkerType) {
+    void updateCourtWorkerMidEventSelectOffice_shouldGiveNotFoundError(CourtWorkerType courtWorkerType) {
         var tribunalOffice = TribunalOffice.LEEDS;
         var code = "Code1";
         var name = "Name1";
@@ -116,7 +116,7 @@ class CourtWorkerServiceTest {
         when(courtWorkerRepository.findByTribunalOfficeAndTypeOrderByNameAsc(any(TribunalOffice.class),
                 any(CourtWorkerType.class))).thenReturn(listCourtWorker);
 
-        List<String> errors = courtWorkerService.updateCourtWorkerMidEventOffice(adminData);
+        List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectOffice(adminData);
         assertEquals(1, errors.size());
         assertEquals(String.format(NO_FOUND_ERROR_MESSAGE, courtWorkerType.name(), tribunalOffice.getOfficeName()),
                 errors.get(0));
@@ -124,14 +124,14 @@ class CourtWorkerServiceTest {
 
     @ParameterizedTest
     @EnumSource(CourtWorkerType.class)
-    void updateCourtWorkerMidEventClerk_shouldReturnClerk(CourtWorkerType courtWorkerType) {
+    void updateCourtWorkerMidEventSelectCourtWorker_shouldReturnClerk(CourtWorkerType courtWorkerType) {
         adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(),
                 "Code1", "Name1");
 
         var listCourtWorker = createListCourtWorker(1, TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name1");
         when(courtWorkerRepository.findById(anyInt())).thenReturn(listCourtWorker);
 
-        List<String> errors = courtWorkerService.updateCourtWorkerMidEventClerk(adminData);
+        List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectCourtWorker(adminData);
         assertEquals(0, errors.size());
         assertEquals("Code1", adminData.getUpdateCourtWorkerCode());
         assertEquals("Name1", adminData.getUpdateCourtWorkerName());
@@ -139,14 +139,14 @@ class CourtWorkerServiceTest {
 
     @ParameterizedTest
     @EnumSource(CourtWorkerType.class)
-    void updateCourtWorkerMidEventClerk_shouldGiveError(CourtWorkerType courtWorkerType) {
+    void updateCourtWorkerMidEventSelectCourtWorker_shouldGiveError(CourtWorkerType courtWorkerType) {
         adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(),
                 "Code1", "Name1");
 
         List<CourtWorker> listCourtWorker = new ArrayList<>();
         when(courtWorkerRepository.findById(anyInt())).thenReturn(listCourtWorker);
 
-        List<String> errors = courtWorkerService.updateCourtWorkerMidEventClerk(adminData);
+        List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectCourtWorker(adminData);
         assertEquals(1, errors.size());
         assertEquals(SAVE_ERROR_MESSAGE, errors.get(0));
     }

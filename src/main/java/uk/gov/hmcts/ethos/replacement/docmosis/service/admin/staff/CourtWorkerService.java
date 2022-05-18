@@ -39,7 +39,7 @@ public class CourtWorkerService {
         return errors;
     }
 
-    public List<String> updateCourtWorkerMidEventOffice(AdminData adminData) {
+    public List<String> updateCourtWorkerMidEventSelectOffice(AdminData adminData) {
         List<String> errors = new ArrayList<>();
         var tribunalOffice = adminData.getUpdateCourtWorkerOffice();
         var courtWorkerType = adminData.getUpdateCourtWorkerType();
@@ -65,7 +65,7 @@ public class CourtWorkerService {
         return errors;
     }
 
-    public List<String> updateCourtWorkerMidEventClerk(AdminData adminData) {
+    public List<String> updateCourtWorkerMidEventSelectCourtWorker(AdminData adminData) {
         List<String> errors = new ArrayList<>();
         var selectedId = Integer.parseInt(adminData.getUpdateCourtWorkerDynamicList().getSelectedCode());
 

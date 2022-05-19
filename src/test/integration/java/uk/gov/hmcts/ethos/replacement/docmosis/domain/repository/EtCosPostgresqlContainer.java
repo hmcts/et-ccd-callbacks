@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.domain.repository;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 /**
- * Shared container for Postgres database testing
+ * Creates a shared container for PostgreSQL database integration testing.
  */
 public class EtCosPostgresqlContainer extends PostgreSQLContainer<EtCosPostgresqlContainer> {
     private static final String IMAGE_VERSION = "postgres:11.1";

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.staff.judge;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.staff;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,15 +15,15 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge.JudgeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge.SaveJudgeException;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.SaveJudgeException;
 
 import java.util.Arrays;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping("/admin/staff/judge")
+@RequestMapping("/admin/staff")
 @RequiredArgsConstructor
 public class JudgeController {
 
@@ -33,9 +33,9 @@ public class JudgeController {
     @PostMapping(value = "/addJudge", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add Judge")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> addJudge(
             @RequestHeader("Authorization") String userToken,

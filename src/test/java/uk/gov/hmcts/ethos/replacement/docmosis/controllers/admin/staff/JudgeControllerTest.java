@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.staff.judge;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.staff;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,23 +11,30 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge.JudgeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge.SaveJudgeException;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.SaveJudgeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AdminDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.judge.JudgeService.ADD_JUDGE_CODE_AND_OFFICE_CONFLICT_ERROR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeService.ADD_JUDGE_CODE_AND_OFFICE_CONFLICT_ERROR;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({JudgeController.class, JsonMapper.class})
 class JudgeControllerTest {
+
+    private static final String ADD_JUDGE_URL = "/admin/staff/addJudge";
+
     @MockBean
     private VerifyTokenService verifyTokenService;
 
@@ -50,7 +57,7 @@ class JudgeControllerTest {
         var token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
-        mockMvc.perform(post("/admin/staff/judge/addJudge")
+        mockMvc.perform(post(ADD_JUDGE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token)
                         .content(jsonMapper.toJson(ccdRequest)))
@@ -76,7 +83,7 @@ class JudgeControllerTest {
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
         doThrow(new SaveJudgeException(error)).when(judgeService).saveJudge(adminData);
 
-        mockMvc.perform(post("/admin/staff/judge/addJudge")
+        mockMvc.perform(post(ADD_JUDGE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token)
                         .content(jsonMapper.toJson(ccdRequest)))
@@ -94,7 +101,7 @@ class JudgeControllerTest {
         var token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
-        mockMvc.perform(post("/admin/staff/judge/addJudge")
+        mockMvc.perform(post(ADD_JUDGE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", token)
                         .content(jsonMapper.toJson(ccdRequest)))

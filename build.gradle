@@ -21,8 +21,121 @@ allprojects {
     targetCompatibility = '11.0'
 }
 
+sourceSets {
+    test {
+        java.srcDir 'src/test/java'
+    }
+    functional {
+        java.srcDir 'src/test/functional/java'
+        resources.srcDir 'src/test/functional/resources'
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+    contractTest {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+            java.srcDir 'src/test/contractTest/java'
+        }
+        resources.srcDir file('src/test/contractTest/resources')
+    }
+
+    integrationTest {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+            srcDir file('src/test/integration/java')
+        }
+        resources.srcDir file('src/test/integration/resources')
+    }
+}
+
+configurations {
+    functionalImplementation.extendsFrom testImplementation
+    functionalRuntimeOnly.extendsFrom testRuntimeOnly
+    contractTestImplementation.extendsFrom testImplementation
+    contractTestRuntimeOnly.extendsFrom testRuntimeOnly
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}
+
+test {
+    failFast = true
+    exclude '**/*ComponentTest*'
+}
+
+task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification', dependsOn: ':codeceptSmoke') {
+    testClassesDirs = sourceSets.functional.output.classesDirs
+    classpath = sourceSets.functional.runtimeClasspath
+
+    useJUnit {
+        includeCategories 'uk.gov.hmcts.ethos.replacement.functional.SmokeTest'
+    }
+    systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
+}
+
+task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification', dependsOn: ':codeceptFunctional') {
+    testClassesDirs = sourceSets.functional.output.classesDirs
+    classpath = sourceSets.functional.runtimeClasspath
+
+    useJUnit {
+        includeCategories 'uk.gov.hmcts.ethos.replacement.functional.SmokeTest'
+    }
+
+    systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
+    maxHeapSize = '1G'
+}
+
+task integration(type: Test) {
+    description = "Runs integration tests"
+    group = "Verification"
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    failFast = true
+}
+
+task yarnInstall(type: Exec) {
+    workingDir '.'
+    commandLine 'yarn', 'install'
+}
+
+task codeceptSmoke(type: Exec, dependsOn: ':yarnInstall') {
+    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@smoke', '--steps', '--reporter', 'mocha-multi'
+}
+
+task codeceptFunctional(type: Exec, dependsOn :'yarnInstall') {
+    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@e2e', '--steps', '--reporter', 'mocha-multi'
+}
+
+task crossbrowser(dependsOn: ':codeceptFunctionalSauce') {
+    group = 'Delivery pipeline'
+    description = 'Execute cross browser tests on saucelabs'
+}
+
+task nightlyFunctional(dependsOn: ':codeceptFunctionalNightly') {
+    group = 'Delivery pipeline'
+    description = 'Execute Functional Tests on nightly pipeline'
+}
+
+task codeceptFunctionalSauce(type: Exec, dependsOn: ':yarnInstall') {
+    workingDir '.'
+    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run-multiple', '--all', '--config', './src/test/end-to-end/saucelabs.conf.js', '--grep', '@crossbrowser', '--verbose', '--debug', '--steps', '--reporter', 'mocha-multi'
+}
+
+task codeceptFunctionalNightly(type: Exec, dependsOn :'yarnInstall') {
+    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@nightly', '--steps', '--reporter', 'mocha-multi'
+}
+
 jacocoTestReport {
-    executionData(test)
+    executionData(test, integration)
     reports {
         xml.required = true
         csv.required = false
@@ -64,93 +177,7 @@ sonarqube {
 }
 
 project.tasks['sonarqube'].dependsOn jacocoTestReport
-
-sourceSets {
-    test {
-        java.srcDir 'src/test/java'
-    }
-    functional {
-        java.srcDir 'src/test/functional/java'
-        resources.srcDir 'src/test/functional/resources'
-        compileClasspath += main.output + test.output
-        runtimeClasspath += main.output + test.output
-    }
-    contractTest {
-        java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
-            java.srcDir 'src/test/contractTest/java'
-            resources.srcDir 'src/test/contractTest/resources'
-        }
-        resources.srcDir file('src/test/contractTest/resources')
-    }
-}
-
-configurations {
-    functionalImplementation.extendsFrom testImplementation
-    functionalRuntimeOnly.extendsFrom testRuntimeOnly
-    contractTestImplementation.extendsFrom testImplementation
-    contractTestRuntimeOnly.extendsFrom testRuntimeOnly
-}
-
-test {
-    exclude '**/*ComponentTest*'
-    useJUnitPlatform()
-}
-
-task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification', dependsOn: ':codeceptSmoke') {
-    testClassesDirs = sourceSets.functional.output.classesDirs
-    classpath = sourceSets.functional.runtimeClasspath
-
-    useJUnit {
-        includeCategories 'uk.gov.hmcts.ethos.replacement.functional.SmokeTest'
-    }
-    systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
-}
-
-task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification', dependsOn: ':codeceptFunctional') {
-    testClassesDirs = sourceSets.functional.output.classesDirs
-    classpath = sourceSets.functional.runtimeClasspath
-
-    useJUnit {
-        includeCategories 'uk.gov.hmcts.ethos.replacement.functional.SmokeTest'
-    }
-
-    systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
-    maxHeapSize = '1G'
-}
-
-task yarnInstall(type: Exec) {
-    workingDir '.'
-    commandLine 'yarn', 'install'
-}
-
-task codeceptSmoke(type: Exec, dependsOn: ':yarnInstall') {
-    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@smoke', '--steps', '--reporter', 'mocha-multi'
-}
-
-task codeceptFunctional(type: Exec, dependsOn :'yarnInstall') {
-    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@e2e', '--steps', '--reporter', 'mocha-multi'
-}
-
-task crossbrowser(dependsOn: ':codeceptFunctionalSauce') {
-    group = 'Delivery pipeline'
-    description = 'Execute cross browser tests on saucelabs'
-}
-
-task nightlyFunctional(dependsOn: ':codeceptFunctionalNightly') {
-    group = 'Delivery pipeline'
-    description = 'Execute Functional Tests on nightly pipeline'
-}
-
-task codeceptFunctionalSauce(type: Exec, dependsOn: ':yarnInstall') {
-    workingDir '.'
-    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run-multiple', '--all', '--config', './src/test/end-to-end/saucelabs.conf.js', '--grep', '@crossbrowser', '--verbose', '--debug', '--steps', '--reporter', 'mocha-multi'
-}
-
-task codeceptFunctionalNightly(type: Exec, dependsOn :'yarnInstall') {
-    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@nightly', '--steps', '--reporter', 'mocha-multi'
-}
+project.tasks['check'].dependsOn integration
 
 project.ext {
     pacticipant = 'ethos_replDocmosisService'
@@ -329,6 +356,9 @@ dependencies {
     contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.10.RELEASE'
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
+
+    integrationTestImplementation sourceSets.main.runtimeClasspath
+    integrationTestImplementation sourceSets.test.runtimeClasspath
 }
 
 bootJar {

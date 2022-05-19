@@ -323,6 +323,19 @@ dependencies {
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.2'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.3'
 
+    implementation group: 'org.springframework', name: 'spring-aop', version: '5.3.20'
+    implementation group: 'org.springframework', name: 'spring-aspects', version: '5.3.20'
+    implementation group: 'org.springframework', name: 'spring-beans', version: '5.3.20'
+    implementation group: 'org.springframework', name: 'spring-context', version: '5.3.20'
+    implementation group: 'org.springframework', name: 'spring-core', version: '5.3.20'
+    implementation group: 'org.springframework', name: 'spring-expression', version: '5.3.20'
+    implementation group: 'org.springframework', name: 'spring-jcl', version: '5.3.20'
+    implementation group: 'org.springframework', name: 'spring-jdbc', version: '5.3.20'
+    implementation group: 'org.springframework', name: 'spring-orm', version: '5.3.20'
+    implementation group: 'org.springframework', name: 'spring-tx', version: '5.3.20'
+    implementation group: 'org.springframework', name: 'spring-web', version: '5.3.20'
+    implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.3.20'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 

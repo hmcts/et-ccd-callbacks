@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -27,6 +26,7 @@ public class ClaimsByHearingVenueExcelReportDocumentInfoServiceTest {
     ClaimsByHearingVenueExcelReportCreationService reportCreationService;
     ClaimsByHearingVenueReportData reportData;
     private DocumentInfo docInfo;
+
     @Before
     public void setUp() {
         reportData = new ClaimsByHearingVenueReportData();
@@ -40,13 +40,12 @@ public class ClaimsByHearingVenueExcelReportDocumentInfoServiceTest {
     }
 
     @Test
-    @Ignore("Fix with report")
     public void shouldReturnNonNullExcelReportDocumentInfo() {
         when(reportCreationService.getReportExcelFile(reportData))
                 .thenReturn(new byte[0]);
         when(excelDocManagementService
                 .uploadExcelReportDocument("dummyToken",
-                        "Leeds_Listings_Hearings_By_Venue_Report.xlsx",
+                        "ET_EnglandWales_Listings_Hearings_By_Venue_Report.xlsx",
                         new byte[0]))
                 .thenReturn(docInfo);
 
@@ -56,13 +55,12 @@ public class ClaimsByHearingVenueExcelReportDocumentInfoServiceTest {
     }
 
     @Test
-    @Ignore("Fix with report")
     public void shouldReturnCorrectCountOfDependenciesInvocation() {
         when(reportCreationService.getReportExcelFile(reportData))
                 .thenReturn(new byte[0]);
         when(excelDocManagementService
                 .uploadExcelReportDocument("dummyToken",
-                        "Leeds_Listings_Hearings_By_Venue_Report.xlsx",
+                        "ET_EnglandWales_Listings_Hearings_By_Venue_Report.xlsx",
                         new byte[0]))
                 .thenReturn(docInfo);
 
@@ -73,7 +71,7 @@ public class ClaimsByHearingVenueExcelReportDocumentInfoServiceTest {
         verifyNoMoreInteractions(reportCreationService);
         verify(excelDocManagementService, times(1))
                 .uploadExcelReportDocument("dummyToken",
-                        "Leeds_Listings_Hearings_By_Venue_Report.xlsx", new byte[0]);
+                        "ET_EnglandWales_Listings_Hearings_By_Venue_Report.xlsx", new byte[0]);
         verifyNoMoreInteractions(excelDocManagementService);
     }
 }

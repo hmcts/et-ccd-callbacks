@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -331,7 +330,6 @@ public class ListingHelperTest {
     }
 
     @Test
-    @Ignore("Fix after venues refactored")
     public void buildCaseCauseListWithNoDocumentAndRangeAndScotland() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
@@ -362,6 +360,7 @@ public class ListingHelperTest {
         listingDetails.getCaseData().setHearingDateType(RANGE_HEARING_DATE_TYPE);
         listingDetails.getCaseData().setListingDateFrom("2020-01-02");
         listingDetails.getCaseData().setListingDateTo("2020-03-01");
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.SCOTLAND.getOfficeName());
         assertEquals(expected, ListingHelper.buildListingDocumentContent(listingDetails.getCaseData(),
                 "", "", userDetails, SCOTLAND_LISTING_CASE_TYPE_ID).toString());
     }

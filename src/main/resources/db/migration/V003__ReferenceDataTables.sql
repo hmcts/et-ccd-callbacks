@@ -1,4 +1,6 @@
-CREATE TYPE emp_status AS ENUM('SALARIED', 'FEE_PAID');
+CREATE TYPE emp_status AS ENUM('SALARIED', 'FEE_PAID', 'UNKNOWN');
+
+CREATE CAST (CHARACTER VARYING as emp_status) WITH INOUT AS IMPLICIT;
 
 CREATE TABLE judge (
     id SERIAL PRIMARY KEY,
@@ -27,8 +29,7 @@ CREATE TABLE court_worker (
     tribunal_office VARCHAR(100),
     type VARCHAR(20),
     code VARCHAR(100),
-    name VARCHAR(100),
-    venue_code VARCHAR(100)
+    name VARCHAR(100)
 );
 
 CREATE TABLE file_location (

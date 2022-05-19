@@ -98,7 +98,7 @@ class CourtWorkerServiceTest {
 
         List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectOffice(adminData);
         assertEquals(0, errors.size());
-        assertEquals(1, adminData.getUpdateCourtWorkerDynamicList().getListItems().size());
+        assertEquals(1, adminData.getUpdateCourtWorkerSelectList().getListItems().size());
     }
 
     @ParameterizedTest
@@ -206,10 +206,10 @@ class CourtWorkerServiceTest {
 
         var courtWorkerDynamicList = new DynamicFixedListType();
         courtWorkerDynamicList.setListItems(listDynamicValueType);
-        adminData.setUpdateCourtWorkerDynamicList(courtWorkerDynamicList);
+        adminData.setUpdateCourtWorkerSelectList(courtWorkerDynamicList);
 
         var dynamicValueType = DynamicValueType.create(id, name);
-        adminData.getUpdateCourtWorkerDynamicList().setValue(dynamicValueType);
+        adminData.getUpdateCourtWorkerSelectList().setValue(dynamicValueType);
 
         return adminData;
     }

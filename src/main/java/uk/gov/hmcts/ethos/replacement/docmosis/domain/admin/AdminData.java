@@ -40,7 +40,7 @@ public class AdminData {
     private String updateCourtWorkerCode;
     @JsonProperty("updateCourtWorkerName")
     private String updateCourtWorkerName;
-    @JsonProperty("updateCourtWorkerDynamicList")
-    private DynamicFixedListType updateCourtWorkerDynamicList;
+    @JsonProperty("updateCourtWorkerSelectList")
+    private DynamicFixedListType updateCourtWorkerSelectList;
 
 }

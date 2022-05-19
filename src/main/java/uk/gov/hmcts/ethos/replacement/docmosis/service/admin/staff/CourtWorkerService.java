@@ -60,14 +60,14 @@ public class CourtWorkerService {
         var courtWorkerDynamicList = new DynamicFixedListType();
         courtWorkerDynamicList.setListItems(dynamicCourtWorker);
 
-        adminData.setUpdateCourtWorkerDynamicList(courtWorkerDynamicList);
+        adminData.setUpdateCourtWorkerSelectList(courtWorkerDynamicList);
 
         return errors;
     }
 
     public List<String> updateCourtWorkerMidEventSelectCourtWorker(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        var selectedId = Integer.parseInt(adminData.getUpdateCourtWorkerDynamicList().getSelectedCode());
+        var selectedId = Integer.parseInt(adminData.getUpdateCourtWorkerSelectList().getSelectedCode());
 
         var findCourtWorker = courtWorkerRepository.findById(selectedId);
         if (!findCourtWorker.isEmpty()) {
@@ -83,7 +83,7 @@ public class CourtWorkerService {
 
     public List<String> updateCourtWorker(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        var selectedId = Integer.parseInt(adminData.getUpdateCourtWorkerDynamicList().getSelectedCode());
+        var selectedId = Integer.parseInt(adminData.getUpdateCourtWorkerSelectList().getSelectedCode());
 
         var findCourtWorker = courtWorkerRepository.findById(selectedId);
         if (!findCourtWorker.isEmpty()) {

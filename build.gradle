@@ -21,6 +21,31 @@ allprojects {
     targetCompatibility = '11.0'
 }
 
+checkstyle {
+    maxWarnings = 0
+    sourceSets = [project.sourceSets.main]
+    toolVersion = '8.29'
+}
+
+def sonarExclusions = ['**/uk/gov/hmcts/ethos/replacement/docmosis/config/**',
+                       '**/uk/gov/hmcts/ethos/replacement/docmosis/model/**',
+                       '**/uk/gov/hmcts/reform/ethos/replacement/docmosis/CaseOrchestrationApplication',
+                       '**/uk/gov/hmcts/ethos/replacement/docmosis.config.DevQueueClient.java',
+                       '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/admin/**'
+]
+
+sonarqube {
+    properties {
+        property "sonar.exclusions", sonarExclusions.join(', ')
+        property "sonar.projectKey", "et-ccd-callbacks"
+        property "sonar.dynamicAnalysis", "reuseReports"
+        property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
+    }
+}
+
+project.tasks['sonarqube'].dependsOn jacocoTestReport
+
 sourceSets {
     test {
         java.srcDir 'src/test/java'
@@ -36,10 +61,10 @@ sourceSets {
             compileClasspath += main.output
             runtimeClasspath += main.output
             java.srcDir 'src/test/contractTest/java'
+            resources.srcDir 'src/test/contractTest/resources'
         }
         resources.srcDir file('src/test/contractTest/resources')
     }
-
     integrationTest {
         java {
             compileClasspath += main.output
@@ -59,17 +84,9 @@ configurations {
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
-tasks.withType(Test) {
-    useJUnitPlatform()
-
-    testLogging {
-        exceptionFormat = 'full'
-    }
-}
-
 test {
-    failFast = true
     exclude '**/*ComponentTest*'
+    useJUnitPlatform()
 }
 
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification', dependsOn: ':codeceptSmoke') {
@@ -92,14 +109,6 @@ task functional(type: Test, description: 'Runs the functional tests.', group: 'V
 
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
     maxHeapSize = '1G'
-}
-
-task integration(type: Test) {
-    description = "Runs integration tests"
-    group = "Verification"
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
-    failFast = true
 }
 
 task yarnInstall(type: Exec) {
@@ -134,49 +143,14 @@ task codeceptFunctionalNightly(type: Exec, dependsOn :'yarnInstall') {
     commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@nightly', '--steps', '--reporter', 'mocha-multi'
 }
 
-jacocoTestReport {
-    executionData(test, integration)
-    reports {
-        xml.required = true
-        csv.required = false
-        xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
-    }
+task integration(type: Test) {
+    description = "Runs integration tests"
+    group = "Verification"
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    failFast = true
 }
 
-jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            limit {
-                minimum = 0.0
-            }
-        }
-    }
-}
-
-checkstyle {
-    maxWarnings = 0
-    sourceSets = [project.sourceSets.main]
-    toolVersion = '8.29'
-}
-
-def sonarExclusions = ['**/uk/gov/hmcts/ethos/replacement/docmosis/config/**',
-                       '**/uk/gov/hmcts/ethos/replacement/docmosis/model/**',
-                       '**/uk/gov/hmcts/reform/ethos/replacement/docmosis/CaseOrchestrationApplication',
-                       '**/uk/gov/hmcts/ethos/replacement/docmosis.config.DevQueueClient.java',
-                       '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/admin/**'
-]
-
-sonarqube {
-    properties {
-        property "sonar.exclusions", sonarExclusions.join(', ')
-        property "sonar.projectKey", "et-ccd-callbacks"
-        property "sonar.dynamicAnalysis", "reuseReports"
-        property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    }
-}
-
-project.tasks['sonarqube'].dependsOn jacocoTestReport
 project.tasks['check'].dependsOn integration
 
 project.ext {
@@ -227,6 +201,25 @@ task fortifyScan(type: JavaExec)  {
     main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
     classpath += sourceSets.test.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+}
+
+jacocoTestReport {
+    executionData(test)
+    reports {
+        xml.required = true
+        csv.required = false
+        xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.0
+            }
+        }
+    }
 }
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html

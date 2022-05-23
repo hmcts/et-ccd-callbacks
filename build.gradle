@@ -21,25 +21,6 @@ allprojects {
     targetCompatibility = '11.0'
 }
 
-jacocoTestReport {
-    executionData(test)
-    reports {
-        xml.required = true
-        csv.required = false
-        xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
-    }
-}
-
-jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            limit {
-                minimum = 0.0
-            }
-        }
-    }
-}
-
 checkstyle {
     maxWarnings = 0
     sourceSets = [project.sourceSets.main]
@@ -84,6 +65,14 @@ sourceSets {
         }
         resources.srcDir file('src/test/contractTest/resources')
     }
+    integrationTest {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+            srcDir file('src/test/integration/java')
+        }
+        resources.srcDir file('src/test/integration/resources')
+    }
 }
 
 configurations {
@@ -91,6 +80,8 @@ configurations {
     functionalRuntimeOnly.extendsFrom testRuntimeOnly
     contractTestImplementation.extendsFrom testImplementation
     contractTestRuntimeOnly.extendsFrom testRuntimeOnly
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 test {
@@ -152,6 +143,16 @@ task codeceptFunctionalNightly(type: Exec, dependsOn :'yarnInstall') {
     commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@nightly', '--steps', '--reporter', 'mocha-multi'
 }
 
+task integration(type: Test) {
+    description = "Runs integration tests"
+    group = "Verification"
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    failFast = true
+}
+
+project.tasks['check'].dependsOn integration
+
 project.ext {
     pacticipant = 'ethos_replDocmosisService'
     pacticipantVersion = getCheckedOutGitCommitHash()
@@ -200,6 +201,25 @@ task fortifyScan(type: JavaExec)  {
     main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
     classpath += sourceSets.test.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+}
+
+jacocoTestReport {
+    executionData(test)
+    reports {
+        xml.required = true
+        csv.required = false
+        xml.destination file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.0
+            }
+        }
+    }
 }
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
@@ -329,6 +349,9 @@ dependencies {
     contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.10.RELEASE'
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
+
+    integrationTestImplementation sourceSets.main.runtimeClasspath
+    integrationTestImplementation sourceSets.test.runtimeClasspath
 }
 
 bootJar {

@@ -33,7 +33,8 @@ public class FileLocationService {
         if (fileLocationRepository.existsByCodeAndTribunalOffice(adminData.getFileLocationCode(), tribunalOffice)) {
             throw new SaveFileLocationException(String.format(ADD_FILE_LOCATION_CODE_AND_OFFICE_CONFLICT_ERROR,
                     adminData.getFileLocationCode(), adminData.getTribunalOffice()));
-        } else if (fileLocationRepository.existsByNameAndTribunalOffice(adminData.getFileLocationName(), tribunalOffice)) {
+        } else if (fileLocationRepository.existsByNameAndTribunalOffice(adminData.getFileLocationName(),
+                tribunalOffice)) {
             throw new SaveFileLocationException(String.format(ADD_FILE_LOCATION_NAME_AND_OFFICE_CONFLICT_ERROR,
                     adminData.getFileLocationName(), adminData.getTribunalOffice()));
         } else {

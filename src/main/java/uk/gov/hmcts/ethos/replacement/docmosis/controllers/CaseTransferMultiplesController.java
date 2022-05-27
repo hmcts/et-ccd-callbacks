@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +47,11 @@ public class CaseTransferMultiplesController {
     @PostMapping(value = "/initTransferToEnglandWales", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise case for transfer to England/Wales")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = MultipleCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -68,7 +74,11 @@ public class CaseTransferMultiplesController {
     @PostMapping(value = "/initTransferToScotland", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise case for transfer to Scotland")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = MultipleCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -91,7 +101,11 @@ public class CaseTransferMultiplesController {
     @PostMapping(value = "/transferSameCountry", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Transfer a multiple and its cases to another office within the same country")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = MultipleCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -114,7 +128,11 @@ public class CaseTransferMultiplesController {
     @PostMapping(value = "/transferDifferentCountry", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Transfer a multiple and its cases to another office in a different country")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = MultipleCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
@@ -22,6 +23,8 @@ import uk.gov.hmcts.et.common.model.listing.items.ListingTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingVenueHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesourcelocalreport.CaseSourceLocalReport;
@@ -398,4 +401,22 @@ public class ListingService {
         listingData.setListingVenue(dynamicListingVenues);
     }
 
+    public boolean checkInvalidCharsForAllParties(ListingDetails listingDetails,
+                                                  String authToken, List<String> errors) {
+        try {
+            List<SubmitEvent> submitEvents = getListingHearingsSearch(listingDetails, authToken);
+            if (submitEvents != null) {
+                List<String> invalidCharErrors = InvalidCharacterCheck.areCharsForClaimantsRespValid(submitEvents);
+                if (CollectionUtils.isEmpty(invalidCharErrors)) {
+                    return true;
+                } else {
+                    errors.addAll(invalidCharErrors);
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception ex) {
+            throw new ReportException(MESSAGE + listingDetails.getCaseId(), ex);
+        }
+    }
 }

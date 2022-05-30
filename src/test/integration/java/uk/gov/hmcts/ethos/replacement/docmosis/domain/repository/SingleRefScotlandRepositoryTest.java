@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.EtCosPostgresqlContainer;
 
 import static org.junit.Assert.assertEquals;
 
@@ -21,7 +20,7 @@ public class SingleRefScotlandRepositoryTest {
     SingleRefScotlandRepository singleRefScotlandRepository;
 
     @ClassRule
-    public static PostgreSQLContainer postgreSQLContainer = EtCosPostgresqlContainer.getInstance();
+    public static final PostgreSQLContainer postgreSQLContainer = EtCosPostgresqlContainer.getInstance();
 
     @Test
     public void testGenerateRefs() {

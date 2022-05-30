@@ -81,6 +81,9 @@ To run all unit tests please execute following command:
     ./gradlew test
 ```
 
+### Integration tests
+Integration tests require docker to be running. They are executed as part of the `gradle check` task.
+
 ### Coding style tests
 
 To run all checks (including unit tests) please execute following command:

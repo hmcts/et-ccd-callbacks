@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.utils;
+package uk.gov.hmcts.ethos.replacement.docmosis.domain.repository;
 
 import org.testcontainers.containers.PostgreSQLContainer;
 

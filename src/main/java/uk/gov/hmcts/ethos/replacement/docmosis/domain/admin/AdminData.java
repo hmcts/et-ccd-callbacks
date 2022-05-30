@@ -30,6 +30,12 @@ public class AdminData {
     @JsonProperty("judgeSelectList")
     private DynamicFixedListType judgeSelectList;
 
+    // For adding fileLocation
+    @JsonProperty("fileLocationCode")
+    private String fileLocationCode;
+    @JsonProperty("fileLocationName")
+    private String fileLocationName;
+
     @JsonProperty("adminCourtWorker")
     private AdminCourtWorker adminCourtWorker;
 

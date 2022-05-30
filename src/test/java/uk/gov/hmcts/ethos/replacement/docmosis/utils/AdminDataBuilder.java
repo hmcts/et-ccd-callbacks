@@ -75,4 +75,18 @@ public class AdminDataBuilder {
         adminData.setAdminCourtWorker(employeeMember);
         return this;
     }
+
+    public AdminDataBuilder withFileLocationData(String fileLocationCode, String fileLocationName, String tribunalOffice) {
+        if (adminData.getJudgeCode() == null) {
+            adminData.setJudgeCode(fileLocationCode);
+        }
+        if (adminData.getJudgeName() == null) {
+            adminData.setJudgeName(fileLocationName);
+        }
+        if (adminData.getTribunalOffice() == null) {
+            adminData.setTribunalOffice(tribunalOffice);
+        }
+
+        return this;
+    }
 }

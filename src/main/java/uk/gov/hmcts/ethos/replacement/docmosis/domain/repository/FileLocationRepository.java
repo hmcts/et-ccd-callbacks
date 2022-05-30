@@ -10,4 +10,8 @@ public interface FileLocationRepository extends JpaRepository<FileLocation, Inte
     List<FileLocation> findByTribunalOffice(TribunalOffice tribunalOffice);
 
     long deleteByTribunalOffice(TribunalOffice tribunalOffice);
+
+    boolean existsByCodeAndTribunalOffice(String code, TribunalOffice tribunalOffice);
+
+    boolean existsByNameAndTribunalOffice(String name, TribunalOffice tribunalOffice);
 }

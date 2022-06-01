@@ -36,6 +36,12 @@ public class AdminData {
     @JsonProperty("fileLocationName")
     private String fileLocationName;
 
+    // For adding fileLocation
+    @JsonProperty("fileLocationCode")
+    private String fileLocationCode;
+    @JsonProperty("fileLocationName")
+    private String fileLocationName;
+
     @JsonProperty("adminCourtWorker")
     private AdminCourtWorker adminCourtWorker;
 

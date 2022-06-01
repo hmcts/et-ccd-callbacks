@@ -11,7 +11,12 @@ import java.util.List;
 
 @Repository
 public interface CourtWorkerRepository extends JpaRepository<CourtWorker, Integer> {
+    List<CourtWorker> findById(int id);
+
     List<CourtWorker> findByTribunalOfficeAndType(TribunalOffice tribunalOffice, CourtWorkerType courtWorkerType);
+
+    List<CourtWorker> findByTribunalOfficeAndTypeOrderByNameAsc(TribunalOffice tribunalOffices,
+                                                               CourtWorkerType courtWorkerType);
 
     List<CourtWorker> findByTribunalOfficeInAndTypeOrderByName(Collection<TribunalOffice> tribunalOffices,
                                                    CourtWorkerType courtWorkerType);

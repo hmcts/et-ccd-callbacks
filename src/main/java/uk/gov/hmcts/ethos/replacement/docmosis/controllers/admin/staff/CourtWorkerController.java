@@ -78,7 +78,7 @@ public class CourtWorkerController {
     }
 
     @PostMapping(value = "/updateCourtWorkerMidEventSelectCourtWorker", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Populates the dynamicList for court worker when office and type selected")
+    @Operation(summary = "Populates the court worker code and name when dynamicList selected")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully"),
         @ApiResponse(responseCode = "400", description = "Bad Request"),

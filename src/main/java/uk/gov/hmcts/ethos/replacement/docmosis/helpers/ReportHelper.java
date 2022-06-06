@@ -71,7 +71,7 @@ public class ReportHelper {
             return LocalDate.parse(date, OLD_DATE_TIME_PATTERN2).toString();
         } catch (DateTimeException e) {
             log.warn(String.format("Unable to parse %s to LocalDate in getFormattedLocalDate "
-                + "method of ReportHelper", date), e);
+                    + "method of ReportHelper", date), e);
             return null;
         }
     }

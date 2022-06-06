@@ -25,6 +25,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEAR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_REMEDY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 class TimeToFirstHearingReportTest {
 
@@ -37,6 +38,7 @@ class TimeToFirstHearingReportTest {
         listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         var caseData = new ListingData();
+        caseData.setManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName());
         listingDetails.setCaseData(caseData);
 
         submitEvents = new ArrayList<>();
@@ -149,6 +151,7 @@ class TimeToFirstHearingReportTest {
         DateListedType dateListedType = new DateListedType();
         dateListedType.setListedDate(listedDate);
         dateListedType.setHearingStatus(status);
+        dateListedType.setHearingCaseDisposed(YES);
         dateListedTypeItem.setValue(dateListedType);
 
         return dateListedTypeItem;

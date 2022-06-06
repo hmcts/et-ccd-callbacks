@@ -503,7 +503,8 @@ class EventValidationServiceTest {
                 isRejected, partOfMultiple, errors);
 
         assertEquals(4, errors.size());
-        assertThat(errors).asList().contains(CLOSING_CASE_WITH_BF_OPEN_ERROR);
+        assertThat(errors).asList().contains(String.format(CLOSING_CASE_WITH_BF_OPEN_ERROR,
+                caseDetails18.getCaseData().getEthosCaseReference()));
         if (partOfMultiple) {
             assertThat(errors).asList().contains(caseDetails18.getCaseData().getEthosCaseReference()
                     + " - " + MISSING_JUDGEMENT_JURISDICTION_MESSAGE);
@@ -539,13 +540,14 @@ class EventValidationServiceTest {
 
     @Test
     void shouldCreateErrorMessageWithDatesInFutureWithinJudgement() {
-        var caseData = new CaseData();
         var judgementTypeItem = new JudgementTypeItem();
         var judgementType = new JudgementType();
         judgementTypeItem.setId(UUID.randomUUID().toString());
         judgementType.setDateJudgmentMade("2777-01-01");
         judgementType.setDateJudgmentSent("2777-01-01");
         judgementTypeItem.setValue(judgementType);
+
+        var caseData = new CaseData();
         caseData.setJudgementCollection(List.of(judgementTypeItem));
         List<String> errors = eventValidationService.validateJudgementDates(caseData);
         assertEquals("Date of Judgement Made can't be in future", errors.get(0));
@@ -554,13 +556,14 @@ class EventValidationServiceTest {
 
     @Test
     void shouldNotCreateErrorMessageWithDatesBeforeTodayWithinJudgement() {
-        var caseData = new CaseData();
         var judgementTypeItem = new JudgementTypeItem();
         var judgementType = new JudgementType();
         judgementTypeItem.setId(UUID.randomUUID().toString());
         judgementType.setDateJudgmentMade("2020-01-01");
         judgementType.setDateJudgmentSent("2021-12-01");
         judgementTypeItem.setValue(judgementType);
+
+        var caseData = new CaseData();
         caseData.setJudgementCollection(List.of(judgementTypeItem));
         List<String> errors = eventValidationService.validateJudgementDates(caseData);
         assertEquals(0, errors.size());

@@ -607,6 +607,9 @@ public class DocumentHelper {
         if (correspondence.getPart18Documents() != null) {
             return correspondence.getPart18Documents();
         }
+        if (correspondence.getPart20Documents() != null) {
+            return correspondence.getPart20Documents();
+        }
         return "";
     }
 
@@ -658,6 +661,9 @@ public class DocumentHelper {
         }
         if (correspondenceScotType.getPart15ScotDocuments() != null) {
             return correspondenceScotType.getPart15ScotDocuments();
+        }
+        if (correspondenceScotType.getPart16ScotDocuments() != null) {
+            return correspondenceScotType.getPart16ScotDocuments();
         }
         return "";
     }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.filelocation;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

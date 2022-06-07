@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -43,6 +45,12 @@ class CourtWorkerServiceTest {
                 any(CourtWorkerType.class), anyString())).thenReturn(false);
         when(courtWorkerRepository.existsByTribunalOfficeAndTypeAndName(any(TribunalOffice.class),
                 any(CourtWorkerType.class), anyString())).thenReturn(false);
+    }
+
+    @Test
+    void initAddCourtWorker_shouldClearAdminData() {
+        courtWorkerService.initAddCourtWorker(adminData);
+        assertNull(adminData.getAdminCourtWorker());
     }
 
     @ParameterizedTest

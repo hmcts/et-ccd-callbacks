@@ -75,7 +75,7 @@ class JudgeControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", hasSize(0)))
+                .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
         verify(judgeService, times(1)).initAddJudge(ccdRequest.getCaseDetails().getAdminData());
     }
@@ -88,8 +88,7 @@ class JudgeControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
-        verify(judgeService, never())
-                .updateJudgeMidEventSelectOffice(ccdRequest.getCaseDetails().getAdminData());
+        verify(judgeService, never()).initAddJudge(ccdRequest.getCaseDetails().getAdminData());
     }
 
     @Test

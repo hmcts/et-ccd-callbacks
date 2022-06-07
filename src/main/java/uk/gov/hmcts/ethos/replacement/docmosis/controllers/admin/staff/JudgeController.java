@@ -34,7 +34,7 @@ public class JudgeController {
     private final JudgeService judgeService;
 
     @PostMapping(value = "/initAddJudge", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Add Judge")
+    @Operation(summary = "Initial add Judge")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully"),
         @ApiResponse(responseCode = "400", description = "Bad Request"),

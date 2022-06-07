@@ -3,10 +3,15 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.FileLocation;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.FileLocationRepository;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -60,12 +65,93 @@ class FileLocationServiceTest {
         verify(fileLocationRepository, never()).save(fileLocation);
     }
 
+    @Test
+    void shouldUpdateFileLocation() {
+        when(fileLocationRepository.existsByCodeAndTribunalOffice(fileLocationCode,
+                TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(false);
+        when(fileLocationRepository.existsByNameAndTribunalOffice(fileLocationName,
+                TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(false);
+        when(fileLocationRepository.findByCode(fileLocationCode)).thenReturn(fileLocation);
+
+        List<String> errors = fileLocationService.updateFileLocation(adminData);
+        verify(fileLocationRepository, times(1)).save(fileLocation);
+        assertEquals(0, errors.size());
+
+    }
+
+    @Test
+    void shouldUpdateFileLocation_ReturnFileLocationNameAndOfficeConflictError() {
+
+        when(fileLocationRepository.existsByNameAndTribunalOffice(fileLocationName,
+                TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(true);
+        when(fileLocationRepository.findByCode(fileLocationCode)).thenReturn(fileLocation);
+
+        List<String> errors = fileLocationService.updateFileLocation(adminData);
+        verify(fileLocationRepository, times(0)).save(fileLocation);
+        assertEquals(1, errors.size());
+        assertEquals(errors.get(0), "A file location with the same Name (testName) and Tribunal Office (Aberdeen) already exists.");
+    }
+
+    @Test
+    void midEventSelectOffice_shouldReturnDynamicList() {
+
+        when(fileLocationRepository.findByTribunalOfficeOrderByNameAsc(TribunalOffice.valueOfOfficeName(tribunalOffice)))
+                .thenReturn(Arrays.asList(fileLocation));
+
+        List<String> errors = fileLocationService.midEventSelectTribunalOffice(adminData);
+        assertEquals(0, errors.size());
+        assertEquals(1, adminData.getFileLocationList().getListItems().size());
+
+    }
+
+    @Test
+    void midEventSelectOffice_shouldGiveFileLocationNotFoundByTribunalOffice() {
+
+        when(fileLocationRepository.findByTribunalOfficeOrderByNameAsc(TribunalOffice.valueOfOfficeName(tribunalOffice)))
+                .thenReturn(null);
+
+        List<String> errors = fileLocationService.midEventSelectTribunalOffice(adminData);
+        assertEquals(1, errors.size());
+        assertEquals(errors.get(0), "There is not any file location found in the Aberdeen office");
+    }
+
+    @Test
+    void midEventSelectFileLocation_shouldReturnFileLocation() {
+
+        when(fileLocationRepository.findByCode(adminData.getFileLocationCode()))
+                .thenReturn(fileLocation);
+
+        List<String> errors = fileLocationService.midEventSelectFileLocation(adminData);
+
+        assertEquals(0, errors.size());
+        assertEquals("testCode", adminData.getFileLocationCode());
+        assertEquals("testName", adminData.getFileLocationName());
+    }
+
+    @Test
+    void midEventSelectFileLocation_shouldGiveFileLocationNotFoundByFileLocationCode() {
+
+        when(fileLocationRepository.findByTribunalOfficeOrderByNameAsc(TribunalOffice.valueOfOfficeName(tribunalOffice)))
+                .thenReturn(null);
+
+        List<String> errors = fileLocationService.midEventSelectFileLocation(adminData);
+
+        assertEquals(1, errors.size());
+        assertEquals(errors.get(0), "There is not any file location found with the testCode location code");
+    }
+
     private AdminData createAdminData(String fileLocationCode, String fileLocationName, String tribunalOffice) {
         AdminData adminData = new AdminData();
         adminData.setFileLocationCode(fileLocationCode);
         adminData.setFileLocationName(fileLocationName);
         adminData.setTribunalOffice(tribunalOffice);
-
+        List<DynamicValueType> fileLocationDynamicList = new ArrayList<>();
+        DynamicValueType dynamicValueType = DynamicValueType.create(fileLocationCode, fileLocationName);
+        fileLocationDynamicList.add(dynamicValueType);
+        DynamicFixedListType fileLocationDynamicFixedList = new DynamicFixedListType();
+        fileLocationDynamicFixedList.setListItems(fileLocationDynamicList);
+        adminData.setFileLocationList(fileLocationDynamicFixedList);
+        adminData.getFileLocationList().setValue(dynamicValueType);
         return adminData;
     }
 

@@ -49,6 +49,7 @@ class CourtWorkerServiceTest {
 
     @Test
     void initAddCourtWorker_shouldClearAdminData() {
+        var adminData = new AdminData();
         courtWorkerService.initAddCourtWorker(adminData);
         assertNull(adminData.getAdminCourtWorker());
     }

@@ -38,6 +38,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeS
 @WebMvcTest({JudgeController.class, JsonMapper.class})
 class JudgeControllerTest {
 
+    private static final String INIT_ADD_JUDGE_URL = "/admin/staff/initAddJudge";
     private static final String ADD_JUDGE_URL = "/admin/staff/addJudge";
     private static final String UPDATE_JUDGE_MID_OFFICE_URL = "/admin/staff/updateJudgeMidEventSelectOffice";
     private static final String UPDATE_JUDGE_MID_JUDGE_URL = "/admin/staff/updateJudgeMidEventSelectJudge";
@@ -63,6 +64,32 @@ class JudgeControllerTest {
                 .builder()
                 .withJudgeData("testCode", "testName", "ABERDEEN", "SALARIED")
                 .buildAsCCDRequest();
+    }
+
+    @Test
+    void initAddJudge_Success() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(INIT_ADD_JUDGE_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(0)))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(judgeService, times(1)).initAddJudge(ccdRequest.getCaseDetails().getAdminData());
+    }
+
+    @Test
+    void initAddJudge_invalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(INIT_ADD_JUDGE_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
+        verify(judgeService, never())
+                .updateJudgeMidEventSelectOffice(ccdRequest.getCaseDetails().getAdminData());
     }
 
     @Test

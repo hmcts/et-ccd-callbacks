@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports;
 
+import java.time.DayOfWeek;
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class Constants {
     public static final String NO_CHANGE_IN_CURRENT_POSITION_REPORT = "No Change In Current Position";
     public static final String HEARINGS_TO_JUDGEMENTS_REPORT = "Hearings To Judgments";
@@ -17,6 +21,8 @@ public final class Constants {
     public static final String ELASTICSEARCH_FIELD_JUDGMENT_COLLECTION = "data.judgementCollection";
     public static final String ELASTICSEARCH_FIELD_HEARING_LISTED_DATE =
             "data.hearingCollection.value.hearingDateCollection.value.listedDate";
+
+    public static final Set<DayOfWeek> WEEKEND_DAYS_LIST = EnumSet.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
 
     private Constants() {
     }

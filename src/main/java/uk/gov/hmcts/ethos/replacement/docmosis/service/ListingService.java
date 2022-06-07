@@ -397,5 +397,4 @@ public class ListingService {
         dynamicListingVenues.setListItems(listItems);
         listingData.setListingVenue(dynamicListingVenues);
     }
-
 }

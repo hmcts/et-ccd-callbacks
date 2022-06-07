@@ -18,15 +18,20 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.FileLo
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.SaveFileLocationException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AdminDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,7 +39,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({FileLocationController.class, JsonMapper.class})
-public class FileLocationControllerTest {
+class FileLocationControllerTest {
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -143,7 +148,7 @@ public class FileLocationControllerTest {
         verify(verifyTokenService, never()).verifyTokenSignature(anyString());
         verify(fileLocationService, never()).initAdminData(any(AdminData.class));
     }
-
+  
     @Test
     void testUpdateFileLocationSuccess() throws Exception {
         var ccdRequest = AdminDataBuilder

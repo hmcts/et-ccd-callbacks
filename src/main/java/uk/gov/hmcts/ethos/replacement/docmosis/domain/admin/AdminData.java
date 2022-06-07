@@ -34,6 +34,10 @@ public class AdminData {
     @JsonProperty("fileLocationName")
     private String fileLocationName;
 
+    // For updating fileLocation
+    @JsonProperty("fileLocationList")
+    private DynamicFixedListType fileLocationList;
+
     @JsonProperty("adminCourtWorker")
     private AdminCourtWorker adminCourtWorker;
 

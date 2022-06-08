@@ -26,6 +26,10 @@ public class CourtWorkerService {
 
     private final CourtWorkerRepository courtWorkerRepository;
 
+    public void initAddCourtWorker(AdminData adminData) {
+        adminData.setAdminCourtWorker(null);
+    }
+
     public List<String> addCourtWorker(AdminData adminData) {
         List<String> errors = new ArrayList<>();
         var courtWorker = setCourtWorker(adminData);
@@ -130,5 +134,4 @@ public class CourtWorkerService {
 
         return courtWorker;
     }
-
 }

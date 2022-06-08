@@ -175,7 +175,8 @@ public class PersistentQHelper {
         return UpdateDataModelBuilder.build(multipleData, caseData);
     }
 
-    public static TransferToEcmDataModel getTransferToEcmModel(String ccdGatewayBaseUrl, String officeCT, String positionTypeCT, String reasonForCT, String sourceEthosCaseReference) {
+    public static TransferToEcmDataModel getTransferToEcmModel(String ccdGatewayBaseUrl, String officeCT,
+                                                               String positionTypeCT, String reasonForCT, String sourceEthosCaseReference) {
         return TransferToEcmDataModel.builder()
                 .officeCT(officeCT)
                 .positionTypeCT(positionTypeCT)

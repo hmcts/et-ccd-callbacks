@@ -15,8 +15,6 @@ public class CaseTransferToEcmParams {
     private String newCaseTypeId;
     private String positionType;
     private String reason;
-    private String multipleReference;
     private boolean confirmationRequired;
-    private String multipleReferenceLink;
     private String sourceEthosCaseReference;
 }

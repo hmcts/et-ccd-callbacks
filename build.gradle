@@ -21,8 +21,7 @@ allprojects {
 }
 
 checkstyle {
-    maxWarnings = 5000
-    sourceSets = [project.sourceSets.main]
+    maxWarnings = 4358
     toolVersion = '8.29'
 }
 

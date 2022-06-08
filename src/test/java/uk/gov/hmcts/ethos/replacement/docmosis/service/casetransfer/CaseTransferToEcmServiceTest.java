@@ -38,7 +38,7 @@ class CaseTransferToEcmServiceTest {
     private CaseTransferEventService caseTransferEventService;
 
     @Test
-    void transferTOEcm() {
+    void transferToEcm() {
         var ecmOfficeCT = TribunalOffice.BRISTOL.getOfficeName();
         var caseDetails = createCaseDetails(TribunalOffice.LEEDS.getOfficeName(), ecmOfficeCT);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, AUTH_TOKEN))

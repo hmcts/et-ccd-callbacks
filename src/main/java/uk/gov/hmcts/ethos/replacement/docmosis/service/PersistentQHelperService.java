@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PersistentQHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -46,8 +45,7 @@ public class PersistentQHelperService {
     public void sendTransferToEcmEvent(String userToken, String caseTypeId, String jurisdiction,
                                        List<String> errors, List<String> ethosCaseRefCollection, String officeCT,
                                        String positionTypeCT, String ccdGatewayBaseUrl,
-                                       String reasonForCT, String multipleRef, String confirmation,
-                                       String multipleReferenceLinkMarkUp, String sourceEthosCaseReference) {
+                                       String reasonForCT, String confirmation, String sourceEthosCaseReference) {
         String username = userService.getUserDetails(userToken).getEmail();
         var dataModel = PersistentQHelper.getTransferToEcmModel(ccdGatewayBaseUrl, officeCT, positionTypeCT,
                 reasonForCT, sourceEthosCaseReference);
@@ -58,11 +56,11 @@ public class PersistentQHelperService {
                 ethosCaseRefCollection,
                 dataModel,
                 errors,
-                multipleRef,
+                null,
                 confirmation,
                 createUpdatesBusSender,
                 String.valueOf(ethosCaseRefCollection.size()),
-                multipleReferenceLinkMarkUp
+                null
         );
 
     }

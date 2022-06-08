@@ -57,9 +57,7 @@ public class CaseTransferEventService {
                 params.getPositionType(),
                 ccdGatewayBaseUrl,
                 params.getReason(),
-                params.getMultipleReference(),
                 params.isConfirmationRequired() ? YES : NO,
-                params.getMultipleReferenceLink(),
                 params.getSourceEthosCaseReference()
         );
         return errors;

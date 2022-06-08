@@ -80,5 +80,4 @@ public class CaseTransferToEcmService {
         return errors;
     }
 
-
 }

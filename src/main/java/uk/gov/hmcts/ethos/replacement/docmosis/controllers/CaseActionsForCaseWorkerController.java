@@ -1161,7 +1161,7 @@ public class CaseActionsForCaseWorkerController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (DocumentTypeItem doc : ccdRequest.getCaseDetails().getCaseData().getServingDocumentCollection()) {
             if (doc.getValue().getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE)) {
                 sb.append("**<big>" + doc.getValue().getUploadedDocument().getDocumentFilename() + "</big>**<br/>");

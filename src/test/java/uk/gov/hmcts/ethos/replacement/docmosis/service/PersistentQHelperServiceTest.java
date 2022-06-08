@@ -81,4 +81,24 @@ public class PersistentQHelperServiceTest {
 
     }
 
+    @Test
+    public void sendTransferToEcmEvent() {
+
+        when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
+
+        persistentQHelperService.sendTransferToEcmEvent(userToken,
+                ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getJurisdiction(),
+                new ArrayList<>(), new ArrayList<>(Collections.singletonList("ethosCaseReference")), ENGLANDWALES_CASE_TYPE_ID,
+                "positionTypeCT", "ccdGatewayBaseUrl", "",
+                SINGLE_CASE_TYPE, NO,
+                MultiplesHelper.generateMarkUp("ccdGatewayBaseUrl",
+                        ccdRequest.getCaseDetails().getCaseId(),
+                        ccdRequest.getCaseDetails().getCaseData().getMultipleRefNumber()), null
+        );
+
+        verify(userService).getUserDetails(userToken);
+        verifyNoMoreInteractions(userService);
+
+    }
+
 }

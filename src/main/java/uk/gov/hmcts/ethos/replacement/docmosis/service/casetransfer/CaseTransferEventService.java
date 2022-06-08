@@ -44,4 +44,24 @@ public class CaseTransferEventService {
 
         return errors;
     }
+
+    public List<String> transferToEcm(CaseTransferToEcmParams params) {
+        var errors = new ArrayList<String>();
+        persistentQHelperService.sendTransferToEcmEvent(
+                params.getUserToken(),
+                params.getCaseTypeId(),
+                params.getJurisdiction(),
+                errors,
+                params.getEthosCaseReferences(),
+                params.getNewCaseTypeId(),
+                params.getPositionType(),
+                ccdGatewayBaseUrl,
+                params.getReason(),
+                params.getMultipleReference(),
+                params.isConfirmationRequired() ? YES : NO,
+                params.getMultipleReferenceLink(),
+                params.getSourceEthosCaseReference()
+        );
+        return errors;
+    }
 }

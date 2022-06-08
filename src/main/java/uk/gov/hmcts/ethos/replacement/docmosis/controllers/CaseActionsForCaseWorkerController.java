@@ -1164,9 +1164,13 @@ public class CaseActionsForCaseWorkerController {
         StringBuilder sb = new StringBuilder();
         for (DocumentTypeItem doc : ccdRequest.getCaseDetails().getCaseData().getServingDocumentCollection()) {
             if (doc.getValue().getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE)) {
-                sb.append("**<big>" + doc.getValue().getUploadedDocument().getDocumentFilename() + "</big>**<br/>");
+                sb.append("**<big>");
+                sb.append(doc.getValue().getUploadedDocument().getDocumentFilename());
+                sb.append("</big>**<br/>");
                 if (doc.getValue().getShortDescription() != null) {
-                    sb.append("<small>" + doc.getValue().getShortDescription() + "</small><br/>");
+                    sb.append("<small>");
+                    sb.append(doc.getValue().getShortDescription());
+                    sb.append("</small><br/>");
                 } else {
                     sb.append("<small>No description<small/><br/>");
                 }

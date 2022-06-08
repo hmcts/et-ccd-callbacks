@@ -804,18 +804,15 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void midServingDocumentOtherTypeNames() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
-        CaseData data = new CaseData();
-        data.setOtherTypeDocumentName("**<big>test-filename.xlsx</big>**<br/><small>Test description</small><br/>");
-
+        String expectedDocumentName = "**<big>test-filename.xlsx</big>**<br/><small>Test description</small><br/>";
         mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
                         .content(requestContent4.toString())
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").value(data))
+                .andExpect(jsonPath("$.data.otherTypeDocumentName").value(expectedDocumentName))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
-
     }
 
     @Test

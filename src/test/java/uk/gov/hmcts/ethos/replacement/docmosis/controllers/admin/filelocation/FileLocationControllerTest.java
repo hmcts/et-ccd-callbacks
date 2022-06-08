@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.filelocation;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -20,7 +18,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.AdminDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import java.util.ArrayList;
 import java.util.Arrays;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -28,14 +26,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.FileLocationService.*;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.FileLocationService.ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.FileLocationService.ERROR_FILE_LOCATION_NOT_FOUND_BY_TRIBUNAL_OFFICE;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({FileLocationController.class, JsonMapper.class})
@@ -83,7 +82,7 @@ class FileLocationControllerTest {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         String error = String.format(ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE,
-                adminData.getFileLocationCode(), TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice()));
+                adminData.getFileLocationCode());
 
         var token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
@@ -197,7 +196,7 @@ class FileLocationControllerTest {
 
         AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         String error = String.format(ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE,
-                adminData.getFileLocationCode(), TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice()));
+                adminData.getFileLocationCode());
 
         var token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
@@ -211,7 +210,7 @@ class FileLocationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors[0]",notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", notNullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
         verify(fileLocationService, times(1)).updateFileLocation(ccdRequest.getCaseDetails().getAdminData());
     }
@@ -270,7 +269,6 @@ class FileLocationControllerTest {
         String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
-
         String error = String.format(ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE,
                 adminData.getFileLocationCode());
 
@@ -282,7 +280,7 @@ class FileLocationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors[0]",notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", notNullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
         verify(fileLocationService, times(1))
                 .midEventSelectFileLocation(ccdRequest.getCaseDetails().getAdminData());
@@ -342,7 +340,6 @@ class FileLocationControllerTest {
         String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
-
         String error = String.format(ERROR_FILE_LOCATION_NOT_FOUND_BY_TRIBUNAL_OFFICE,
                 adminData.getFileLocationCode());
 
@@ -354,7 +351,7 @@ class FileLocationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors[0]",notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", notNullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
         verify(fileLocationService, times(1))
                 .midEventSelectTribunalOffice(ccdRequest.getCaseDetails().getAdminData());

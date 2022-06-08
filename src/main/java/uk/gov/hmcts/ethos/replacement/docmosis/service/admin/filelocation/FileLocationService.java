@@ -135,8 +135,9 @@ public class FileLocationService {
     public List<String> midEventSelectFileLocation(AdminData adminData) {
         List<String> errors = new ArrayList<>();
         String selectedFileLocationCode = adminData.getFileLocationList().getSelectedCode();
+        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice());
 
-        FileLocation selectedFileLocation = fileLocationRepository.findByCode(selectedFileLocationCode);
+        FileLocation selectedFileLocation = fileLocationRepository.findByCodeAndTribunalOffice(selectedFileLocationCode, tribunalOffice);
         if (selectedFileLocation != null) {
             adminData.setFileLocationCode(selectedFileLocation.getCode());
             adminData.setFileLocationName(selectedFileLocation.getName());
@@ -173,7 +174,7 @@ public class FileLocationService {
                     adminData.getFileLocationName(), adminData.getTribunalOffice()));
             return errors;
         }
-        FileLocation selectedFileLocation = fileLocationRepository.findByCode(selectedFileLocationCode);
+        FileLocation selectedFileLocation = fileLocationRepository.findByCodeAndTribunalOffice(selectedFileLocationCode, tribunalOffice);
         if (selectedFileLocation != null) {
             selectedFileLocation.setName(adminData.getFileLocationName());
             fileLocationRepository.save(selectedFileLocation);

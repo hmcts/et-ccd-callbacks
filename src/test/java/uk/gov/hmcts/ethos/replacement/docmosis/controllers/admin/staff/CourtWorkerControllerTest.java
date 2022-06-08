@@ -36,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CourtWorkerControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+    private static final String INIT_ADD_COURT_WORKER_URL = "/admin/staff/initAddCourtWorker";
     private static final String ADD_COURT_WORKER_URL = "/admin/staff/addCourtWorker";
     private static final String UPDATE_COURT_WORKER_MID_OFFICE_URL =
             "/admin/staff/updateCourtWorkerMidEventSelectOffice";
@@ -61,6 +62,33 @@ class CourtWorkerControllerTest {
             .builder()
             .withEmployeeMember(TribunalOffice.LEEDS.getOfficeName(), "TestCode", "TestName")
             .buildAsCCDRequest();
+    }
+
+    @Test
+    void initAddCourtWorker_Success() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(courtWorkerService.addCourtWorker(any())).thenReturn(new ArrayList<>());
+        mockMvc.perform(post(INIT_ADD_COURT_WORKER_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(courtWorkerService, times(1))
+                .initAddCourtWorker(ccdRequest.getCaseDetails().getAdminData());
+    }
+
+    @Test
+    void initAddCourtWorker_invalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(INIT_ADD_COURT_WORKER_URL)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
+        verify(courtWorkerService, never()).initAddCourtWorker(ccdRequest.getCaseDetails().getAdminData());
     }
 
     @Test

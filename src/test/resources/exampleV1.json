@@ -195,7 +195,15 @@
           "id": "12121",
           "value": {
             "Hearing_type": "Scheduled",
-            "hearingNumber": "6"
+            "hearingNumber": "6",
+            "hearingDateCollection": [
+              {
+                "id" : "123345",
+                "value" : {
+                  "listedDate": "2019-11-21T12:11:00.000"
+                }
+              }
+            ]
           }
         }
       ],

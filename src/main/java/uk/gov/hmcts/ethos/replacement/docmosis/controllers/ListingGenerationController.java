@@ -142,7 +142,6 @@ public class ListingGenerationController {
         var listingData = listingRequest.getCaseDetails().getCaseData();
 
         if (ListingHelper.isListingRangeValid(listingData, errors)) {
-
             listingData = listingService.processListingHearingsRequest(
                     listingRequest.getCaseDetails(), userToken);
 

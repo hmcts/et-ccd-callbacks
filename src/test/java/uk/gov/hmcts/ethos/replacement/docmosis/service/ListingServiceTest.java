@@ -569,94 +569,113 @@ public class ListingServiceTest {
 
     @Test
     public void processListingHearingsRequestAberdeenWithValidHearingType() throws IOException {
-        String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, " +
-                "tribunalCorrespondenceFax=null, " +
-                "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, " +
-                "reportDate=null, hearingDateType=Single, " +
-                "listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=DynamicFixedListType(" +
-                "value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), " +
-                "listingVenueScotland=null, listingCollection=[ListingTypeItem" +
-                "(id=123, value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, " +
-                "causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, " +
-                "jurisdictionCodesList=ABC, hearingType=Valid Hearing, positionType=Awaiting ET3, " +
-                "hearingJudgeName= , hearingEEMember= , hearingERMember= , " +
-                "hearingClerk=Clerk, hearingDay=1 of 3, claimantName=RYAN AIR LTD, claimantTown= , " +
-                "claimantRepresentative= , respondent= , respondentTown= , " +
-                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , " +
-                "hearingRoom=Tribunal 4, respondentOthers= , hearingNotes= , " +
-                "judicialMediation= , hearingFormat= , hearingReadingDeliberationMembersChambers= )), " +
-                "ListingTypeItem(id=124, value=ListingType(causeListDate=12 December 2019, " +
-                "causeListTime=12:11, causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, " +
-                "jurisdictionCodesList=ABC, hearingType=Valid Hearing, " +
-                "positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , hearingERMember= , " +
-                "hearingClerk=Clerk1, hearingDay=3 of 3, claimantName=RYAN AIR LTD, " +
-                "claimantTown= , claimantRepresentative= , respondent= , respondentTown= , " +
-                "respondentRepresentative= , estHearingLength=2 hours, " +
-                "hearingPanel= , hearingRoom=Tribunal 5, respondentOthers= , hearingNotes= , " +
-                "judicialMediation= , hearingFormat= , hearingReadingDeliberationMembersChambers= )), " +
-                "ListingTypeItem(id=124, value=ListingType(causeListDate=12 December 2019, " +
-                "causeListTime=12:11, causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, " +
-                "jurisdictionCodesList=ABC, hearingType=Preliminary Hearing, " +
-                "positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , " +
-                "hearingERMember= , hearingClerk=Clerk3, hearingDay=1 of 1, " +
-                "claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , respondent= , " +
-                "respondentTown= , respondentRepresentative= , " +
-                "estHearingLength=null null, hearingPanel= , hearingRoom=Tribunal 5, respondentOthers= , " +
-                "hearingNotes= , judicialMediation= , hearingFormat= , " +
-                "hearingReadingDeliberationMembersChambers= ))], listingVenueOfficeGlas=null, " +
-                "listingVenueOfficeAber=null, venueGlasgow=null, venueAberdeen=null, " +
-                "venueDundee=null, venueEdinburgh=null, hearingDocType=ETCL - Cause List, " +
-                "hearingDocETCL=Public, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, " +
-                "clerkResponsible=null, reportType=Brought Forward Report, documentName=null, " +
-                "showAll=null, localReportsSummaryHdr=null, localReportsSummary=null, " +
-                "localReportsSummaryHdr2=null, localReportsSummary2=null, " +
-                "localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Aberdeen)";
+        String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, "
+                + "tribunalCorrespondenceFax=null, "
+                + "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, "
+                + "reportDate=null, hearingDateType=Single, "
+                + "listingDate=2019-12-12, listingDateFrom=null, "
+                + "listingDateTo=null, listingVenue=DynamicFixedListType("
+                + "value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), "
+                + "listingVenueScotland=null, listingCollection=[ListingTypeItem"
+                + "(id=123, value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, "
+                + "causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, "
+                + "jurisdictionCodesList=ABC, hearingType=Valid Hearing, positionType=Awaiting ET3, "
+                + "hearingJudgeName= , hearingEEMember= , hearingERMember= , "
+                + "hearingClerk=Clerk, hearingDay=1 of 3, claimantName=RYAN AIR LTD, claimantTown= , "
+                + "claimantRepresentative= , respondent= , respondentTown= , "
+                + "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , "
+                + "hearingRoom=Tribunal 4, respondentOthers= , hearingNotes= , "
+                + "judicialMediation= , hearingFormat= , hearingReadingDeliberationMembersChambers= )), "
+                + "ListingTypeItem(id=124, value=ListingType(causeListDate=12 December 2019, "
+                + "causeListTime=12:11, causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, "
+                + "jurisdictionCodesList=ABC, hearingType=Valid Hearing, "
+                + "positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , hearingERMember= , "
+                + "hearingClerk=Clerk1, hearingDay=3 of 3, claimantName=RYAN AIR LTD, "
+                + "claimantTown= , claimantRepresentative= , respondent= , respondentTown= , "
+                + "respondentRepresentative= , estHearingLength=2 hours, "
+                + "hearingPanel= , hearingRoom=Tribunal 5, respondentOthers= , hearingNotes= , "
+                + "judicialMediation= , hearingFormat= , hearingReadingDeliberationMembersChambers= )), "
+                + "ListingTypeItem(id=124, value=ListingType(causeListDate=12 December 2019, "
+                + "causeListTime=12:11, causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, "
+                + "jurisdictionCodesList=ABC, hearingType=Preliminary Hearing, "
+                + "positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , "
+                + "hearingERMember= , hearingClerk=Clerk3, hearingDay=1 of 1, "
+                + "claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , respondent= , "
+                + "respondentTown= , respondentRepresentative= , "
+                + "estHearingLength=null null, hearingPanel= , hearingRoom=Tribunal 5, respondentOthers= , "
+                + "hearingNotes= , judicialMediation= , hearingFormat= , "
+                + "hearingReadingDeliberationMembersChambers= ))], listingVenueOfficeGlas=null, "
+                + "listingVenueOfficeAber=null, venueGlasgow=null, venueAberdeen=null, "
+                + "venueDundee=null, venueEdinburgh=null, hearingDocType=ETCL - Cause List, "
+                + "hearingDocETCL=Public, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, "
+                + "clerkResponsible=null, reportType=Brought Forward Report, documentName=null, "
+                + "showAll=null, localReportsSummaryHdr=null, localReportsSummary=null, "
+                + "localReportsSummaryHdr2=null, localReportsSummary2=null, "
+                + "localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Aberdeen)";
         submitEvents.get(0).getCaseData().setClaimantCompany("RYAN AIR LTD");
         submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue().setHearingType("Valid Hearing");
         listingDetails.getCaseData().setHearingDocType(HEARING_DOC_ETCL);
         listingDetails.getCaseData().setHearingDocETCL(HEARING_ETCL_PUBLIC);
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(),
+                anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.processListingHearingsRequest(listingDetails, "authToken");
         assertEquals(result, listingDataResult.toString());
     }
 
     @Test
     public void processListingHearingsRequestAberdeenWithInValidHearingType() throws IOException {
-        String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
-                "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
-                "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, hearingDocType=ETCL - Cause List, hearingDocETCL=Public, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, clerkResponsible=null, " +
-                "reportType=Brought Forward Report, documentName=null, showAll=null, localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, " +
-                "localReportsSummary2=null, localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Aberdeen)";
+        String result = "ListingData(tribunalCorrespondenceAddress=null, "
+                + "tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, "
+                + "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, "
+                + "reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, "
+                + "listingDateTo=null, listingVenue=DynamicFixedListType("
+                + "value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), "
+                + "listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, "
+                + "listingVenueOfficeAber=null, "
+                + "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, "
+                + "hearingDocType=ETCL - Cause List, hearingDocETCL=Public, roomOrNoRoom=null, "
+                + "docMarkUp=null, bfDateCollection=null, clerkResponsible=null, "
+                + "reportType=Brought Forward Report, documentName=null, showAll=null, "
+                + "localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, "
+                + "localReportsSummary2=null, localReportsDetailHdr=null, "
+                + "localReportsDetail=null, managingOffice=Aberdeen)";
         submitEvents.get(0).getCaseData().setClaimantCompany("RYAN AIR LTD");
         submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue().setHearingType(HEARING_TYPE_JUDICIAL_MEDIATION);
         listingDetails.getCaseData().setHearingDocType(HEARING_DOC_ETCL);
         listingDetails.getCaseData().setHearingDocETCL(HEARING_ETCL_PUBLIC);
         listingDetails.getCaseData().setManagingOffice("Aberdeen");
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(),
+                anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.processListingHearingsRequest(listingDetails, "authToken");
         assertEquals(result, listingDataResult.toString());
     }
 
     @Test
     public void processListingHearingsRequestAberdeenWithPrivateHearingType() throws IOException {
-        String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
-                "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, " +
-                "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, " +
-                "hearingDocType=ETCL - Cause List, hearingDocETCL=Press List, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, clerkResponsible=null, " +
-                "reportType=Brought Forward Report, documentName=null, showAll=null, localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, " +
-                "localReportsSummary2=null, localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Aberdeen)";
+        String result = "ListingData(tribunalCorrespondenceAddress=null, "
+                + "tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, "
+                + "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, "
+                + "hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, "
+                + "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType"
+                + "(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, "
+                + "listingCollection=[], listingVenueOfficeGlas=null, listingVenueOfficeAber=null, "
+                + "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, "
+                + "hearingDocType=ETCL - Cause List, hearingDocETCL=Press List, "
+                + "roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, clerkResponsible=null, "
+                + "reportType=Brought Forward Report, documentName=null, showAll=null, "
+                + "localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, "
+                + "localReportsSummary2=null, localReportsDetailHdr=null, "
+                + "localReportsDetail=null, managingOffice=Aberdeen)";
         submitEvents.get(0).getCaseData().setClaimantCompany("RYAN AIR LTD");
         submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue().setHearingType(HEARING_TYPE_PERLIMINARY_HEARING);
         submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue().setHearingPublicPrivate(HEARING_TYPE_PRIVATE);
         listingDetails.getCaseData().setHearingDocType(HEARING_DOC_ETCL);
         listingDetails.getCaseData().setHearingDocETCL(HEARING_ETCL_PRESS_LIST);
         listingDetails.getCaseData().setManagingOffice("Aberdeen");
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(),
+                anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.processListingHearingsRequest(listingDetails, "authToken");
         assertEquals(result, listingDataResult.toString());
     }
@@ -667,8 +686,8 @@ public class ListingServiceTest {
                 + "tribunalCorrespondenceFax=null, "
                 + "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single,"
                 + " listingDate=2019-12-12, listingDateFrom=null, "
-                + "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), " +
-                "listItems=null), listingVenueScotland=null, listingCollection=["
+                + "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), "
+                + "listItems=null), listingVenueScotland=null, listingCollection=["
                 + "ListingTypeItem(id=123, value=ListingType(causeListDate=12 December 2019, causeListTime=12:11,"
                 + " causeListVenue=Aberdeen, " + "elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, "
                 + "hearingType=Preliminary Hearing, positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , "
@@ -705,43 +724,71 @@ public class ListingServiceTest {
         listingDetails.getCaseData().setVenueAberdeen(new DynamicFixedListType(ALL_VENUES));
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(),
+                anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.processListingHearingsRequest(listingDetails, "authToken");
         assertEquals(result, listingDataResult.toString());
     }
 
     @Test
     public void processListingHearingsRequestDateRange() throws IOException {
-        String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
-                "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Range, listingDate=null, listingDateFrom=2019-12-09, " +
-                "listingDateTo=2019-12-12, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection=" +
-                "[ListingTypeItem(id=124, value=ListingType(causeListDate=10 December 2019, causeListTime=12:11, causeListVenue=Aberdeen, " +
-                "elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, hearingType=Preliminary Hearing, positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , " +
-                "hearingERMember= , hearingClerk=Clerk, hearingDay=2 of 3, claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , " +
-                "respondent= , respondentTown= , respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 4, " +
-                "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , hearingReadingDeliberationMembersChambers= )), " +
-                "ListingTypeItem(id=123, value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=Aberdeen, " +
-                "elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, hearingType=Preliminary Hearing, positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , " +
-                "hearingERMember= , hearingClerk=Clerk, hearingDay=1 of 3, claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , " +
-                "respondent= , respondentTown= , respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 4, " +
-                "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , hearingReadingDeliberationMembersChambers= )), ListingTypeItem(id=124, " +
-                "value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, " +
-                "hearingType=Preliminary Hearing, positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk1, " +
-                "hearingDay=3 of 3, claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , respondent= , respondentTown= , respondentRepresentative= , " +
-                "estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 5, respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , " +
-                "hearingReadingDeliberationMembersChambers= )), ListingTypeItem(id=124, value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, " +
-                "causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, hearingType=Preliminary Hearing, positionType=Awaiting ET3, " +
-                "hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk3, hearingDay=1 of 1, claimantName=RYAN AIR LTD, claimantTown= , " +
-                "claimantRepresentative= , respondent= , respondentTown= , respondentRepresentative= , estHearingLength=null null, hearingPanel= , " +
-                "hearingRoom=Tribunal 5, respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , hearingReadingDeliberationMembersChambers= ))], " +
-                "listingVenueOfficeGlas=null, listingVenueOfficeAber=null, venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, " +
-                "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, " +
-                "bfDateCollection=null, clerkResponsible=null, reportType=Brought Forward Report, documentName=null, showAll=null, localReportsSummaryHdr=null, " +
-                "localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Aberdeen)";
+        String result = "ListingData(tribunalCorrespondenceAddress=null, "
+                + "tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, "
+                + "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, "
+                + "reportDate=null, hearingDateType=Range, listingDate=null, listingDateFrom=2019-12-09, "
+                + "listingDateTo=2019-12-12, listingVenue=DynamicFixedListType"
+                + "(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection="
+                + "[ListingTypeItem(id=124, value=ListingType(causeListDate=10 December 2019, "
+                + "causeListTime=12:11, causeListVenue=Aberdeen, "
+                + "elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, hearingType=Preliminary "
+                + "Hearing, positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , "
+                + "hearingERMember= , hearingClerk=Clerk, hearingDay=2 of 3, "
+                + "claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , "
+                + "respondent= , respondentTown= , respondentRepresentative= , "
+                + "estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 4, "
+                + "respondentOthers= , hearingNotes= , judicialMediation= , "
+                + "hearingFormat= , hearingReadingDeliberationMembersChambers= )), "
+                + "ListingTypeItem(id=123, value=ListingType(causeListDate=12 December 2019, "
+                + "causeListTime=12:11, causeListVenue=Aberdeen, "
+                + "elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, hearingType=Preliminary Hearing, "
+                + "positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , "
+                + "hearingERMember= , hearingClerk=Clerk, hearingDay=1 of 3, "
+                + "claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , "
+                + "respondent= , respondentTown= , respondentRepresentative= , estHearingLength=2 hours, "
+                + "hearingPanel= , hearingRoom=Tribunal 4, "
+                + "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , "
+                + "hearingReadingDeliberationMembersChambers= )), ListingTypeItem(id=124, "
+                + "value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, "
+                + "causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, "
+                + "hearingType=Preliminary Hearing, positionType=Awaiting ET3, hearingJudgeName= , "
+                + "hearingEEMember= , hearingERMember= , hearingClerk=Clerk1, "
+                + "hearingDay=3 of 3, claimantName=RYAN AIR LTD, claimantTown= , "
+                + "claimantRepresentative= , respondent= , respondentTown= , respondentRepresentative= , "
+                + "estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 5, "
+                + "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , "
+                + "hearingReadingDeliberationMembersChambers= )), ListingTypeItem(id=124, "
+                + "value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, "
+                + "causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, "
+                + "hearingType=Preliminary Hearing, positionType=Awaiting ET3, "
+                + "hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk3, "
+                + "hearingDay=1 of 1, claimantName=RYAN AIR LTD, claimantTown= , "
+                + "claimantRepresentative= , respondent= , respondentTown= , respondentRepresentative= , "
+                + "estHearingLength=null null, hearingPanel= , "
+                + "hearingRoom=Tribunal 5, respondentOthers= , hearingNotes= , judicialMediation= , "
+                + "hearingFormat= , hearingReadingDeliberationMembersChambers= ))], "
+                + "listingVenueOfficeGlas=null, listingVenueOfficeAber=null, venueGlasgow=null, "
+                + "venueAberdeen=null, venueDundee=null, venueEdinburgh=null, "
+                + "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, "
+                + "bfDateCollection=null, clerkResponsible=null, reportType=Brought Forward Report, "
+                + "documentName=null, showAll=null, localReportsSummaryHdr=null, "
+                + "localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, "
+                + "localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Aberdeen)";
         listingDetailsRange.getCaseData().setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());
-        listingDetailsRange.getCaseData().setVenueAberdeen(new DynamicFixedListType(TribunalOffice.ABERDEEN.getOfficeName()));
+        listingDetailsRange.getCaseData().setVenueAberdeen(new DynamicFixedListType(
+                TribunalOffice.ABERDEEN.getOfficeName()));
         submitEvents.get(0).getCaseData().setClaimantCompany("RYAN AIR LTD");
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch("authToken", ENGLANDWALES_CASE_TYPE_ID, listingDetailsRange.getCaseData().getListingDateFrom(),
+        when(ccdClient.retrieveCasesVenueAndDateElasticSearch("authToken",
+                ENGLANDWALES_CASE_TYPE_ID, listingDetailsRange.getCaseData().getListingDateFrom(),
                 listingDetailsRange.getCaseData().getListingDateTo(), TribunalOffice.ABERDEEN.getOfficeName(),
                 LISTING_ABERDEEN_VENUE_FIELD_NAME, TribunalOffice.ABERDEEN.getOfficeName())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.processListingHearingsRequest(listingDetailsRange, "authToken");
@@ -750,70 +797,118 @@ public class ListingServiceTest {
 
     @Test
     public void processListingHearingsRequestSingleDate() throws IOException {
-        String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
-                "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, " +
-                "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection=[" +
-                "ListingTypeItem(id=123, value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=Aberdeen, " +
-                "elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, hearingType=Preliminary Hearing, positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , " +
-                "hearingERMember= , hearingClerk=Clerk, hearingDay=1 of 3, claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , " +
-                "respondent= , respondentTown= , respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 4, " +
-                "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , hearingReadingDeliberationMembersChambers= )), " +
-                "ListingTypeItem(id=124, value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=Aberdeen, " +
-                "elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, hearingType=Preliminary Hearing, positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , " +
-                "hearingERMember= , hearingClerk=Clerk1, hearingDay=3 of 3, claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , " +
-                "respondent= , respondentTown= , respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 5, " +
-                "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , hearingReadingDeliberationMembersChambers= )), ListingTypeItem(id=124, " +
-                "value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, " +
-                "causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, hearingType=Preliminary Hearing, positionType=Awaiting ET3, " +
-                "hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk3, hearingDay=1 of 1, claimantName=RYAN AIR LTD, claimantTown= , " +
-                "claimantRepresentative= , respondent= , respondentTown= , respondentRepresentative= , estHearingLength=null null, hearingPanel= , hearingRoom=Tribunal 5, " +
-                "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , hearingReadingDeliberationMembersChambers= ))], " +
-                "listingVenueOfficeGlas=null, listingVenueOfficeAber=null, venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, " +
-                "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, " +
-                "bfDateCollection=null, clerkResponsible=null, reportType=Brought Forward Report, documentName=null, showAll=null, localReportsSummaryHdr=null, " +
-                "localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Aberdeen)";
+        String result = "ListingData(tribunalCorrespondenceAddress=null, "
+                + "tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, "
+                + "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, "
+                + "hearingDateType=Single, listingDate=2019-12-12, listingDateFrom=null, "
+                + "listingDateTo=null, listingVenue=DynamicFixedListType(value=DynamicValueType("
+                + "code=Aberdeen, label=Aberdeen), listItems=null), listingVenueScotland=null, listingCollection=["
+                + "ListingTypeItem(id=123, value=ListingType(causeListDate=12 December 2019, "
+                + "causeListTime=12:11, causeListVenue=Aberdeen, "
+                + "elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, "
+                + "hearingType=Preliminary Hearing, positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , "
+                + "hearingERMember= , hearingClerk=Clerk, hearingDay=1 of 3, "
+                + "claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , "
+                + "respondent= , respondentTown= , respondentRepresentative= , "
+                + "estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 4, "
+                + "respondentOthers= , hearingNotes= , judicialMediation= , "
+                + "hearingFormat= , hearingReadingDeliberationMembersChambers= )), "
+                + "ListingTypeItem(id=124, value=ListingType(causeListDate=12 December 2019, "
+                + "causeListTime=12:11, causeListVenue=Aberdeen, "
+                + "elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, "
+                + "hearingType=Preliminary Hearing, positionType=Awaiting ET3, "
+                + "hearingJudgeName= , hearingEEMember= , "
+                + "hearingERMember= , hearingClerk=Clerk1, hearingDay=3 of 3, "
+                + "claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , "
+                + "respondent= , respondentTown= , respondentRepresentative= , "
+                + "estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 5, "
+                + "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , "
+                + "hearingReadingDeliberationMembersChambers= )), ListingTypeItem(id=124, "
+                + "value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, "
+                + "causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, "
+                + "hearingType=Preliminary Hearing, positionType=Awaiting ET3, "
+                + "hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk3, "
+                + "hearingDay=1 of 1, claimantName=RYAN AIR LTD, claimantTown= , "
+                + "claimantRepresentative= , respondent= , respondentTown= , respondentRepresentative= "
+                + ", estHearingLength=null null, hearingPanel= , hearingRoom=Tribunal 5, "
+                + "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= "
+                + ", hearingReadingDeliberationMembersChambers= ))], "
+                + "listingVenueOfficeGlas=null, listingVenueOfficeAber=null, venueGlasgow=null, "
+                + "venueAberdeen=null, venueDundee=null, venueEdinburgh=null, "
+                + "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, "
+                + "bfDateCollection=null, clerkResponsible=null, reportType=Brought Forward Report, "
+                + "documentName=null, showAll=null, localReportsSummaryHdr=null, "
+                + "localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, "
+                + "localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Aberdeen)";
         submitEvents.get(0).getCaseData().setClaimantCompany("RYAN AIR LTD");
         listingDetails.getCaseData().setVenueAberdeen(new DynamicFixedListType(ALL_VENUES));
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());
         when(ccdClient.retrieveCasesVenueAndDateElasticSearch("authToken", ENGLANDWALES_CASE_TYPE_ID,
                 listingDetails.getCaseData().getListingDate(), listingDetails.getCaseData().getListingDate(),
-                TribunalOffice.ABERDEEN.getOfficeName(), LISTING_VENUE_FIELD_NAME, TribunalOffice.ABERDEEN.getOfficeName())).thenReturn(submitEvents);
+                TribunalOffice.ABERDEEN.getOfficeName(), LISTING_VENUE_FIELD_NAME,
+                TribunalOffice.ABERDEEN.getOfficeName())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.processListingHearingsRequest(listingDetails, "authToken");
         assertEquals(result, listingDataResult.toString());
     }
 
     @Test
     public void processListingHearingsRequestRangeAndAllVenues() throws IOException {
-        String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, " +
-                "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, hearingDateType=Range, listingDate=null, " +
-                "listingDateFrom=2019-12-09, listingDateTo=2019-12-12, listingVenue=DynamicFixedListType(value=DynamicValueType(code=All, label=All), listItems=null), " +
-                "listingVenueScotland=null, listingCollection=[ListingTypeItem(id=124, " +
-                "value=ListingType(causeListDate=10 December 2019, causeListTime=12:11, causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, j" +
-                "urisdictionCodesList=ABC, hearingType=Preliminary Hearing, positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , " +
-                "hearingERMember= , hearingClerk=Clerk, hearingDay=2 of 3, claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , " +
-                "respondent= , respondentTown= , respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 4, " +
-                "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , hearingReadingDeliberationMembersChambers= )), " +
-                "ListingTypeItem(id=123, value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, " +
-                "causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, hearingType=Preliminary Hearing, " +
-                "positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk, hearingDay=1 of 3, " +
-                "claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , respondent= , respondentTown= , respondentRepresentative= , " +
-                "estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 4, respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , " +
-                "hearingReadingDeliberationMembersChambers= )), ListingTypeItem(id=124, " +
-                "value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, " +
-                "jurisdictionCodesList=ABC, hearingType=Preliminary Hearing, positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , " +
-                "hearingERMember= , hearingClerk=Clerk1, hearingDay=3 of 3, claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , " +
-                "respondent= , respondentTown= , respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 5, " +
-                "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , hearingReadingDeliberationMembersChambers= )), ListingTypeItem(id=124, " +
-                "value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, " +
-                "causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, jurisdictionCodesList=ABC, hearingType=Preliminary Hearing, " +
-                "positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk3, hearingDay=1 of 1, " +
-                "claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , respondent= , respondentTown= , respondentRepresentative= , " +
-                "estHearingLength=null null, hearingPanel= , hearingRoom=Tribunal 5, respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , " +
-                "hearingReadingDeliberationMembersChambers= ))], listingVenueOfficeGlas=null, " +
-                "listingVenueOfficeAber=null, venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, hearingDocType=null, " +
-                "hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, bfDateCollection=null, clerkResponsible=null, reportType=Brought Forward Report, " +
-                "documentName=null, showAll=null, localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, " +
-                "localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Aberdeen)";
+        String result = "ListingData(tribunalCorrespondenceAddress=null, "
+                + "tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, "
+                + "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, "
+                + "reportDate=null, hearingDateType=Range, listingDate=null, "
+                + "listingDateFrom=2019-12-09, listingDateTo=2019-12-12, "
+                + "listingVenue=DynamicFixedListType(value=DynamicValueType("
+                + "code=All, label=All), listItems=null), "
+                + "listingVenueScotland=null, listingCollection=[ListingTypeItem(id=124, "
+                + "value=ListingType(causeListDate=10 December 2019, causeListTime=12:11, "
+                + "causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, j"
+                + "urisdictionCodesList=ABC, hearingType=Preliminary Hearing, "
+                + "positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , "
+                + "hearingERMember= , hearingClerk=Clerk, hearingDay=2 of 3, "
+                + "claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , "
+                + "respondent= , respondentTown= , respondentRepresentative= , "
+                + "estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 4, "
+                + "respondentOthers= , hearingNotes= , judicialMediation= , "
+                + "hearingFormat= , hearingReadingDeliberationMembersChambers= )), "
+                + "ListingTypeItem(id=123, value=ListingType(causeListDate=12 "
+                + "December 2019, causeListTime=12:11, "
+                + "causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, "
+                + "jurisdictionCodesList=ABC, hearingType=Preliminary Hearing, "
+                + "positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , "
+                + "hearingERMember= , hearingClerk=Clerk, hearingDay=1 of 3, "
+                + "claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , "
+                + "respondent= , respondentTown= , respondentRepresentative= , "
+                + "estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 4, "
+                + "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , "
+                + "hearingReadingDeliberationMembersChambers= )), ListingTypeItem(id=124, "
+                + "value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, "
+                + "causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, "
+                + "jurisdictionCodesList=ABC, hearingType=Preliminary Hearing, "
+                + "positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , "
+                + "hearingERMember= , hearingClerk=Clerk1, hearingDay=3 of 3, "
+                + "claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , "
+                + "respondent= , respondentTown= , respondentRepresentative= , "
+                + "estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 5, "
+                + "respondentOthers= , hearingNotes= , judicialMediation= , "
+                + "hearingFormat= , hearingReadingDeliberationMembersChambers= )), ListingTypeItem(id=124, "
+                + "value=ListingType(causeListDate=12 December 2019, causeListTime=12:11, "
+                + "causeListVenue=Aberdeen, elmoCaseReference=4210000/2019, "
+                + "jurisdictionCodesList=ABC, hearingType=Preliminary Hearing, "
+                + "positionType=Awaiting ET3, hearingJudgeName= , hearingEEMember= , "
+                + "hearingERMember= , hearingClerk=Clerk3, hearingDay=1 of 1, "
+                + "claimantName=RYAN AIR LTD, claimantTown= , claimantRepresentative= , "
+                + "respondent= , respondentTown= , respondentRepresentative= , "
+                + "estHearingLength=null null, hearingPanel= , hearingRoom=Tribunal 5, "
+                + "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , "
+                + "hearingReadingDeliberationMembersChambers= ))], listingVenueOfficeGlas=null, "
+                + "listingVenueOfficeAber=null, venueGlasgow=null, venueAberdeen=null, "
+                + "venueDundee=null, venueEdinburgh=null, hearingDocType=null, "
+                + "hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, "
+                + "bfDateCollection=null, clerkResponsible=null, reportType=Brought Forward Report, "
+                + "documentName=null, showAll=null, localReportsSummaryHdr=null, "
+                + "localReportsSummary=null, localReportsSummaryHdr2=null, localReportsSummary2=null, "
+                + "localReportsDetailHdr=null, localReportsDetail=null, managingOffice=Aberdeen)";
         submitEvents.get(0).getCaseData().setClaimantCompany("RYAN AIR LTD");
         listingDetailsRange.getCaseData().setListingVenue(new DynamicFixedListType(ALL_VENUES));
         listingDetailsRange.getCaseData().setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());

@@ -1160,23 +1160,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
-        StringBuilder sb = new StringBuilder();
-        for (DocumentTypeItem doc : caseData.getServingDocumentCollection()) {
-            if (doc.getValue().getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE)) {
-                sb.append("**<big>");
-                sb.append(doc.getValue().getUploadedDocument().getDocumentFilename());
-                sb.append("</big>**<br/>");
-                if (doc.getValue().getShortDescription() != null) {
-                    sb.append("<small>");
-                    sb.append(doc.getValue().getShortDescription());
-                    sb.append("</small><br/>");
-                } else {
-                    sb.append("<small>No description<small/><br/>");
-                }
-            }
-        }
-        caseData.setOtherTypeDocumentName(sb.toString());
+        caseData.setOtherTypeDocumentName(generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
@@ -1192,5 +1176,20 @@ public class CaseActionsForCaseWorkerController {
                     ccdRequest.getCaseDetails().getCaseId()));
             caseData.setEthosCaseReference(reference);
         }
+    }
+
+    private String generateOtherTypeDocumentName(List<DocumentTypeItem> docList) {
+        StringBuilder sb = new StringBuilder();
+        for (DocumentTypeItem doc : docList) {
+            if (doc.getValue().getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE)) {
+                sb.append("**<big>");
+                sb.append(doc.getValue().getUploadedDocument().getDocumentFilename());
+                sb.append("</big>**<br/>");
+                sb.append("<small>");
+                sb.append(doc.getValue().getShortDescription());
+                sb.append("</small><br/>");
+            }
+        }
+        return sb.toString();
     }
 }

@@ -114,6 +114,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String JUDGEMENT_SUBMITTED_URL = "/judgementSubmitted";
     private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL = "/reinstateClosedCaseMidEventValidation";
     private static final String SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL = "/midServingDocumentOtherTypeNames";
+    private static final String EMAIL_LINK_TO_ACAS_URL = "/emailLinkToAcas";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -177,6 +178,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     private JsonNode requestContent2;
     private JsonNode requestContent3;
     private JsonNode requestContent4;
+    private JsonNode requestContent5;
     private SubmitEvent submitEvent;
     private DefaultValues defaultValues;
 
@@ -190,6 +192,8 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .getResource("/exampleV3.json")).toURI()));
         requestContent4 = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
                 .getResource("/exampleV4.json")).toURI()));
+        requestContent4 = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
+                .getResource("/exampleV5.json")).toURI()));
 
         objectMapper.readTree(new File(Objects.requireNonNull(getClass()
                 .getResource("/CaseCloseEvent_ValidHearingStatusCaseDetails.json")).toURI()));
@@ -810,6 +814,23 @@ public class CaseActionsForCaseWorkerControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.otherTypeDocumentName").value(expectedDocumentName))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    public void testGeneratingEmailLinkToAcas() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        // Use a tool like https://mailtolink.me/ to generate this:
+        //todo
+        String expectedLink = "";
+        mvc.perform(post(EMAIL_LINK_TO_ACAS_URL)
+                        .content(requestContent5.toString())
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.emailLinkToAcas").value(expectedLink))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
     }
@@ -1643,4 +1664,13 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    public void generateEmailLinkToAcasForbidden() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(EMAIL_LINK_TO_ACAS_URL)
+                        .content(requestContent5.toString())
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
 }

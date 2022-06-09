@@ -63,7 +63,6 @@ class CaseTransferEventServiceTest {
                 .newCaseTypeId(TribunalOffice.NEWCASTLE.getOfficeName())
                 .positionType("Test position type")
                 .reason("Test reason")
-                .multipleReference(null)
                 .confirmationRequired(false)
                 .sourceEthosCaseReference("120002/2021")
                 .build();
@@ -74,8 +73,7 @@ class CaseTransferEventServiceTest {
         verify(persistentQHelperService, times(1)).sendTransferToEcmEvent(
                 "test-token", ENGLANDWALES_CASE_TYPE_ID, "EMPLOYMENT", new ArrayList<>(),
                 List.of("120001/2021"), TribunalOffice.NEWCASTLE.getOfficeName(), "Test position type",
-                null, "Test reason", null, NO, null,
-                "120002/2021");
+                null, "Test reason", NO, "120002/2021");
 
     }
 }

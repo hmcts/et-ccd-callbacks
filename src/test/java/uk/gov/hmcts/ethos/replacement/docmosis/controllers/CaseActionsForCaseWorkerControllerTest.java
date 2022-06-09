@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
@@ -1632,6 +1631,16 @@ public class CaseActionsForCaseWorkerControllerTest {
 
         verify(clerkService, never()).initialiseClerkResponsible(isA(CaseData.class));
         verify(fileLocationSelectionService, never()).initialiseFileLocation(isA(CaseData.class));
+    }
+
+    @Test
+    public void midServingDocumentOtherTypeNamesForbidden() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
+                        .content(requestContent4.toString())
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
 }

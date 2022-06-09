@@ -14,12 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
-import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.*;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
@@ -1163,13 +1160,14 @@ public class CaseActionsForCaseWorkerController {
 
         StringBuilder sb = new StringBuilder();
         for (DocumentTypeItem doc : caseData.getServingDocumentCollection()) {
-            if (doc.getValue().getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE)) {
+            DocumentType docValue = doc.getValue();
+            if (docValue.getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE)) {
                 sb.append("**<big>");
-                sb.append(doc.getValue().getUploadedDocument().getDocumentFilename());
+                sb.append(docValue.getUploadedDocument().getDocumentFilename());
                 sb.append("</big>**<br/>");
-                if (doc.getValue().getShortDescription() != null) {
+                if (docValue.getShortDescription() != null) {
                     sb.append("<small>");
-                    sb.append(doc.getValue().getShortDescription());
+                    sb.append(docValue.getShortDescription());
                     sb.append("</small><br/>");
                 } else {
                     sb.append("<small>No description<small/><br/>");
@@ -1177,6 +1175,33 @@ public class CaseActionsForCaseWorkerController {
             }
         }
         caseData.setOtherTypeDocumentName(sb.toString());
+
+        StringBuilder addresses = new StringBuilder();
+        Address claimantAddressUK = caseData.getClaimantType().getClaimantAddressUK();
+        Address respondentAddress = caseData.getRespondentCollection().get(0).getValue().getRespondentAddress();
+        addresses.append("<div>Send documents by first class mail to:</div>")
+                .append("<h3>Claimant</h3>")
+                .append("<div>")
+                .append(claimantAddressUK.getAddressLine1())
+                .append("</div><div>")
+                .append(claimantAddressUK.getAddressLine2())
+                .append("</div><div>")
+                .append(claimantAddressUK.getPostTown())
+                .append("</div><div>")
+                .append(claimantAddressUK.getPostCode())
+                .append("</div>")
+                .append("<h3>Respondent</h3>")
+                .append("<div>")
+                .append(respondentAddress.getAddressLine1())
+                .append("</div><div>")
+                .append(respondentAddress.getAddressLine2())
+                .append("</div><div>")
+                .append(respondentAddress.getPostTown())
+                .append("</div><div>")
+                .append(respondentAddress.getPostCode())
+                .append("</div><br/>");
+
+        caseData.setClaimantAndRespondentAddresses(addresses.toString());
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }

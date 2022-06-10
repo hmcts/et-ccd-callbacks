@@ -56,7 +56,6 @@ class CaseTransferToEcmServiceTest {
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, AUTH_TOKEN))
                 .thenReturn(Collections.emptyList());
         var errors = caseTransferToEcmService.createCaseTransferToEcm(caseDetails, AUTH_TOKEN);
-        assertFalse(errors.isEmpty());
         assertEquals(1, errors.size());
         assertEquals(String.format(NO_CASES_FOUND, "60000001/2022"), errors.get(0));
     }

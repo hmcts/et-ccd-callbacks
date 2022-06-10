@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
@@ -74,6 +75,7 @@ public class CaseActionsForCaseWorkerController {
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String EVENT_FIELDS_VALIDATION = "Event fields validation: ";
+    private static final String SERVING_DOCUMENT_OTHER_TYPE = "Another type of document";
     private final CaseCloseValidator caseCloseValidator;
     private final CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
@@ -1138,6 +1140,31 @@ public class CaseActionsForCaseWorkerController {
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
+    @PostMapping(value = "/midServingDocumentOtherTypeNames", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "return serving document other type names")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> midServingDocumentOtherTypeNames(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setOtherTypeDocumentName(generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
+
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+    }
+
     private DefaultValues getPostDefaultValues(CaseDetails caseDetails) {
         return defaultValuesReaderService.getDefaultValues(caseDetails.getCaseData().getManagingOffice());
     }
@@ -1149,5 +1176,20 @@ public class CaseActionsForCaseWorkerController {
                     ccdRequest.getCaseDetails().getCaseId()));
             caseData.setEthosCaseReference(reference);
         }
+    }
+
+    private String generateOtherTypeDocumentName(List<DocumentTypeItem> docList) {
+        StringBuilder sb = new StringBuilder();
+        for (DocumentTypeItem doc : docList) {
+            if (doc.getValue().getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE)) {
+                sb.append("**<big>");
+                sb.append(doc.getValue().getUploadedDocument().getDocumentFilename());
+                sb.append("</big>**<br/>");
+                sb.append("<small>");
+                sb.append(doc.getValue().getShortDescription());
+                sb.append("</small><br/>");
+            }
+        }
+        return sb.toString();
     }
 }

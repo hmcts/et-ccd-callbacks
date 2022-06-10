@@ -21,7 +21,7 @@ allprojects {
 }
 
 checkstyle {
-    maxWarnings = 4358
+    maxWarnings = 4354
     toolVersion = '8.29'
 }
 

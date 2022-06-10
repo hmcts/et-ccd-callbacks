@@ -75,7 +75,8 @@ class FileLocationServiceTest {
                 TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(false);
         when(fileLocationRepository.existsByNameAndTribunalOffice(fileLocationName,
                 TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(false);
-        when(fileLocationRepository.findByCode(fileLocationCode)).thenReturn(fileLocation);
+        when(fileLocationRepository.findByCodeAndTribunalOffice(fileLocationCode,
+                TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(fileLocation);
 
         List<String> errors = fileLocationService.updateFileLocation(adminData);
         verify(fileLocationRepository, times(1)).save(fileLocation);
@@ -86,7 +87,8 @@ class FileLocationServiceTest {
     void shouldUpdateFileLocation_ReturnFileLocationNameAndOfficeConflictError() {
         when(fileLocationRepository.existsByNameAndTribunalOffice(fileLocationName,
                 TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(true);
-        when(fileLocationRepository.findByCode(fileLocationCode)).thenReturn(fileLocation);
+        when(fileLocationRepository.findByCodeAndTribunalOffice(fileLocationCode,
+                TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(fileLocation);
 
         List<String> errors = fileLocationService.updateFileLocation(adminData);
         verify(fileLocationRepository, times(0)).save(fileLocation);
@@ -97,7 +99,8 @@ class FileLocationServiceTest {
 
     @Test
     void midEventSelectOffice_shouldReturnDynamicList() {
-        when(fileLocationRepository.findByTribunalOfficeOrderByNameAsc(TribunalOffice.valueOfOfficeName(tribunalOffice)))
+        when(fileLocationRepository.findByTribunalOfficeOrderByNameAsc(
+                TribunalOffice.valueOfOfficeName(tribunalOffice)))
                 .thenReturn(List.of(fileLocation));
 
         List<String> errors = fileLocationService.midEventSelectTribunalOffice(adminData);
@@ -108,7 +111,8 @@ class FileLocationServiceTest {
     @Test
     void midEventSelectOffice_shouldGiveFileLocationNotFoundByTribunalOffice() {
 
-        when(fileLocationRepository.findByTribunalOfficeOrderByNameAsc(TribunalOffice.valueOfOfficeName(tribunalOffice)))
+        when(fileLocationRepository.findByTribunalOfficeOrderByNameAsc(
+                TribunalOffice.valueOfOfficeName(tribunalOffice)))
                 .thenReturn(null);
 
         List<String> errors = fileLocationService.midEventSelectTribunalOffice(adminData);
@@ -118,7 +122,9 @@ class FileLocationServiceTest {
 
     @Test
     void midEventSelectFileLocation_shouldReturnFileLocation() {
-        when(fileLocationRepository.findByCode(adminData.getFileLocationCode()))
+        when(fileLocationRepository.findByCodeAndTribunalOffice(
+                adminData.getFileLocationCode(),
+                TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice())))
                 .thenReturn(fileLocation);
 
         List<String> errors = fileLocationService.midEventSelectFileLocation(adminData);
@@ -130,7 +136,8 @@ class FileLocationServiceTest {
 
     @Test
     void midEventSelectFileLocation_shouldGiveFileLocationNotFoundByFileLocationCode() {
-        when(fileLocationRepository.findByTribunalOfficeOrderByNameAsc(TribunalOffice.valueOfOfficeName(tribunalOffice)))
+        when(fileLocationRepository.findByTribunalOfficeOrderByNameAsc(
+                TribunalOffice.valueOfOfficeName(tribunalOffice)))
                 .thenReturn(null);
 
         List<String> errors = fileLocationService.midEventSelectFileLocation(adminData);

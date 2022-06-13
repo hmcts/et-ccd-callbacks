@@ -18,6 +18,7 @@
       "claimantType": {
         "claimant_addressUK": {
           "AddressLine1": "232 Petticoat Square",
+          "AddressLine2": "22 House",
           "PostTown": "London",
           "PostCode": "W10 4AG",
           "Country": "United Kingdom"
@@ -66,7 +67,11 @@
             "responseStruckOut": "No"
           }
         }
-      ]
+      ],
+      "claimantIndType": {
+        "claimant_last_name": "Johnson",
+        "claimant_first_names": "Doris"
+      }
     }
   }
 }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -43,6 +45,13 @@ class CourtWorkerServiceTest {
                 any(CourtWorkerType.class), anyString())).thenReturn(false);
         when(courtWorkerRepository.existsByTribunalOfficeAndTypeAndName(any(TribunalOffice.class),
                 any(CourtWorkerType.class), anyString())).thenReturn(false);
+    }
+
+    @Test
+    void initAddCourtWorker_shouldClearAdminData() {
+        var adminData = new AdminData();
+        courtWorkerService.initAddCourtWorker(adminData);
+        assertNull(adminData.getAdminCourtWorker());
     }
 
     @ParameterizedTest
@@ -128,8 +137,9 @@ class CourtWorkerServiceTest {
         adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(),
                 "Code1", "Name1");
 
-        var listCourtWorker = createListCourtWorker(1, TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name1");
-        when(courtWorkerRepository.findById(anyInt())).thenReturn(listCourtWorker);
+        CourtWorker courtWorker = createCourtWorker(TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name1");
+        when(courtWorkerRepository.findByCodeAndTribunalOfficeAndType(anyString(), any(), any()))
+                .thenReturn(courtWorker);
 
         List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectCourtWorker(adminData);
         assertEquals(0, errors.size());
@@ -140,11 +150,11 @@ class CourtWorkerServiceTest {
     @ParameterizedTest
     @EnumSource(CourtWorkerType.class)
     void updateCourtWorkerMidEventSelectCourtWorker_shouldGiveError(CourtWorkerType courtWorkerType) {
-        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(),
-                "Code1", "Name1");
+        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(),
+                courtWorkerType.name(), "Code1", "Name1");
 
-        List<CourtWorker> listCourtWorker = new ArrayList<>();
-        when(courtWorkerRepository.findById(anyInt())).thenReturn(listCourtWorker);
+        when(courtWorkerRepository.findByCodeAndTribunalOfficeAndType(anyString(), any(), any()))
+                .thenReturn(null);
 
         List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectCourtWorker(adminData);
         assertEquals(1, errors.size());
@@ -158,8 +168,9 @@ class CourtWorkerServiceTest {
                 "Code1", "Name1");
         adminData.setUpdateCourtWorkerName("Name2");
 
-        var listCourtWorker = createListCourtWorker(1, TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name1");
-        when(courtWorkerRepository.findById(anyInt())).thenReturn(listCourtWorker);
+        CourtWorker courtWorker = createCourtWorkerWithId(1, TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name1");
+        when(courtWorkerRepository.findByCodeAndTribunalOfficeAndType(anyString(), any(), any()))
+                .thenReturn(courtWorker);
 
         List<String> errors = courtWorkerService.updateCourtWorker(adminData);
         assertEquals(0, errors.size());

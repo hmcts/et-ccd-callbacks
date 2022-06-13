@@ -811,6 +811,7 @@ public class CaseActionsForCaseWorkerControllerTest {
                 + "<br/>11 Small Street<br/>22 House<br/>Manchester<br/>M12 42R<br/><br/>"
                 + "**<big>Respondent 2</big>**<br/>Juan Garcia<br/>12 Small Street<br/>24 House"
                 + "<br/>Manchester<br/>M12 4ED<br/><br/>";
+      
         mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
                         .content(requestContent4.toString())
                         .header("Authorization", AUTH_TOKEN)

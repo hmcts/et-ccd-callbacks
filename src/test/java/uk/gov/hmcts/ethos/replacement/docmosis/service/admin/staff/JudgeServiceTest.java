@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -45,7 +46,16 @@ class JudgeServiceTest {
     }
 
     @Test
-    void shouldSaveJudge() {
+    void initAddJudge_shouldClearAdminData() {
+        judgeService.initAddJudge(adminData);
+        assertNull(adminData.getTribunalOffice());
+        assertNull(adminData.getJudgeCode());
+        assertNull(adminData.getJudgeName());
+        assertNull(adminData.getEmploymentStatus());
+    }
+
+    @Test
+    void saveJudge_shouldSaveJudge() {
         when(judgeRepository.existsByCodeAndTribunalOffice(judgeCode, TribunalOffice.valueOfOfficeName(tribunalOffice)))
                 .thenReturn(false);
         when(judgeRepository.existsByNameAndTribunalOffice(judgeName,
@@ -56,7 +66,7 @@ class JudgeServiceTest {
     }
 
     @Test
-    void shouldReturnErrorIfJudgeWithSameCodeAndOfficeExists() {
+    void saveJudge_shouldReturnErrorIfJudgeWithSameCodeAndOfficeExists() {
         when(judgeRepository.existsByCodeAndTribunalOffice(judgeCode, TribunalOffice.valueOfOfficeName(tribunalOffice)))
                 .thenReturn(true);
         assertThrows(SaveJudgeException.class, () -> judgeService.saveJudge(adminData));
@@ -64,7 +74,7 @@ class JudgeServiceTest {
     }
 
     @Test
-    void shouldReturnErrorIfJudgeWithSameNameAndOfficeExists() {
+    void saveJudge_shouldReturnErrorIfJudgeWithSameNameAndOfficeExists() {
         when(judgeRepository.existsByCodeAndTribunalOffice(judgeCode, TribunalOffice.valueOfOfficeName(tribunalOffice)))
                 .thenReturn(false);
         when(judgeRepository.existsByNameAndTribunalOffice(judgeName,

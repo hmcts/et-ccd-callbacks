@@ -26,6 +26,10 @@ public class CourtWorkerService {
 
     private final CourtWorkerRepository courtWorkerRepository;
 
+    public void initAddCourtWorker(AdminData adminData) {
+        adminData.setAdminCourtWorker(null);
+    }
+
     public List<String> addCourtWorker(AdminData adminData) {
         List<String> errors = new ArrayList<>();
         var courtWorker = setCourtWorker(adminData);
@@ -54,7 +58,7 @@ public class CourtWorkerService {
 
         List<DynamicValueType> dynamicCourtWorker = new ArrayList<>();
         for (var courtWorker : courtWorkerList) {
-            dynamicCourtWorker.add(DynamicValueType.create(courtWorker.getId().toString(), courtWorker.getName()));
+            dynamicCourtWorker.add(DynamicValueType.create(courtWorker.getCode(), courtWorker.getName()));
         }
 
         var courtWorkerDynamicList = new DynamicFixedListType();
@@ -67,11 +71,12 @@ public class CourtWorkerService {
 
     public List<String> updateCourtWorkerMidEventSelectCourtWorker(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        var selectedId = Integer.parseInt(adminData.getUpdateCourtWorkerSelectList().getSelectedCode());
+        var selectedCode = adminData.getUpdateCourtWorkerSelectList().getSelectedCode();
 
-        var findCourtWorker = courtWorkerRepository.findById(selectedId);
-        if (!findCourtWorker.isEmpty()) {
-            var selectedCourtWorker = findCourtWorker.get(0);
+        CourtWorker selectedCourtWorker = courtWorkerRepository.findByCodeAndTribunalOfficeAndType(selectedCode,
+                TribunalOffice.valueOfOfficeName(adminData.getUpdateCourtWorkerOffice()), CourtWorkerType.valueOf(adminData.getUpdateCourtWorkerType()));
+        if (selectedCourtWorker != null) {
+
             adminData.setUpdateCourtWorkerCode(selectedCourtWorker.getCode());
             adminData.setUpdateCourtWorkerName(selectedCourtWorker.getName());
         } else {
@@ -83,15 +88,18 @@ public class CourtWorkerService {
 
     public List<String> updateCourtWorker(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        var selectedId = Integer.parseInt(adminData.getUpdateCourtWorkerSelectList().getSelectedCode());
+        var selectedCode = adminData.getUpdateCourtWorkerSelectList().getSelectedCode();
 
-        var findCourtWorker = courtWorkerRepository.findById(selectedId);
-        if (!findCourtWorker.isEmpty()) {
-            var thisCourtWorker = findCourtWorker.get(0);
-            thisCourtWorker.setName(adminData.getUpdateCourtWorkerName());
-            checkIfCourtWorkerNameExists(thisCourtWorker, errors);
+        var selectedCourtWorker = courtWorkerRepository.findByCodeAndTribunalOfficeAndType(selectedCode,
+                TribunalOffice.valueOfOfficeName(adminData.getUpdateCourtWorkerOffice()), CourtWorkerType.valueOf(adminData.getUpdateCourtWorkerType()));
+
+
+        if (selectedCourtWorker != null) {
+
+            selectedCourtWorker.setName(adminData.getUpdateCourtWorkerName());
+            checkIfCourtWorkerNameExists(selectedCourtWorker, errors);
             if (errors.isEmpty()) {
-                courtWorkerRepository.save(thisCourtWorker);
+                courtWorkerRepository.save(selectedCourtWorker);
             }
         } else {
             errors.add(SAVE_ERROR_MESSAGE);
@@ -130,5 +138,4 @@ public class CourtWorkerService {
 
         return courtWorker;
     }
-
 }

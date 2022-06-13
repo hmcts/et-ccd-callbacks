@@ -33,6 +33,29 @@ public class JudgeController {
     private final VerifyTokenService verifyTokenService;
     private final JudgeService judgeService;
 
+    @PostMapping(value = "/initAddJudge", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Initial add Judge")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> initAddJudge(
+            @RequestHeader("Authorization") String userToken,
+            @RequestBody CCDRequest ccdRequest) {
+
+        log.info("/initAddJudge");
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
+        }
+
+        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        judgeService.initAddJudge(adminData);
+
+        return CCDCallbackResponse.getCallbackRespEntityNoErrors(adminData);
+    }
+
     @PostMapping(value = "/addJudge", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add Judge")
     @ApiResponses(value = {

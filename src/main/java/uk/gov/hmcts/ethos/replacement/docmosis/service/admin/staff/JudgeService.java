@@ -30,6 +30,13 @@ public class JudgeService {
         this.judgeRepository = judgeRepository;
     }
 
+    public void initAddJudge(AdminData adminData) {
+        adminData.setTribunalOffice(null);
+        adminData.setJudgeCode(null);
+        adminData.setJudgeName(null);
+        adminData.setEmploymentStatus(null);
+    }
+
     public void saveJudge(AdminData adminData) {
         TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice());
 

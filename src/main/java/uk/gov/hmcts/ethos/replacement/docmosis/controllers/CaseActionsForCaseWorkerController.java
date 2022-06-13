@@ -14,11 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
-import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.*;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -1202,10 +1198,10 @@ public class CaseActionsForCaseWorkerController {
         claimantAddressStr.append("**<big>Claimant</big>**")
                 .append("<br/>" + claimant.getClaimantFirstNames() + " " + claimant.getClaimantLastName())
                 .append("<br/>" + claimantAddressUK.getAddressLine1());
-        if (claimantAddressUK.getAddressLine2() != null) {
+        if (claimantAddressUK.getAddressLine2() != null && !claimantAddressUK.getAddressLine2().isBlank()) {
             claimantAddressStr.append( "<br/>" + claimantAddressUK.getAddressLine2());
         }
-        if (claimantAddressUK.getAddressLine3() != null) {
+        if (claimantAddressUK.getAddressLine3() != null && !claimantAddressUK.getAddressLine3().isBlank()) {
             claimantAddressStr.append( "<br/>" + claimantAddressUK.getAddressLine3());
         }
         claimantAddressStr.append("<br/>" + claimantAddressUK.getPostTown())

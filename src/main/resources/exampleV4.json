@@ -71,7 +71,11 @@
       "claimantIndType": {
         "claimant_last_name": "Johnson",
         "claimant_first_names": "Doris"
-      }
+      },
+      "servingDocumentRecipient": [
+        "Claimant",
+        "Respondent"
+      ]
     }
   }
 }

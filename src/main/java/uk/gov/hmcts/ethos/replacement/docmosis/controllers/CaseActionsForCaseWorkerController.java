@@ -14,14 +14,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
-import uk.gov.hmcts.et.common.model.ccd.*;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.*;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepositOrder;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
@@ -73,7 +71,6 @@ public class CaseActionsForCaseWorkerController {
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String EVENT_FIELDS_VALIDATION = "Event fields validation: ";
-    private static final String SERVING_DOCUMENT_OTHER_TYPE = "Another type of document";
     private final CaseCloseValidator caseCloseValidator;
     private final CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
@@ -1158,9 +1155,34 @@ public class CaseActionsForCaseWorkerController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setOtherTypeDocumentName(generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
-        caseData.setClaimantAddress(generateClaimantAddress(caseData.getClaimantIndType(), caseData.getClaimantType().getClaimantAddressUK()));
-        caseData.setRespondentAddress(generateRespondentAddress(caseData.getRespondentCollection()));
+        caseData.setOtherTypeDocumentName(CustomMarkdownHelper.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
+
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @PostMapping(value = "/midServingDocumentRecipient", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "return serving document other type recipient's addresses")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> midServingDocumentRecipient(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setClaimantAndRespondentAddresses(CustomMarkdownHelper.generateClaimantAndRespondentAddress(
+                caseData.getServingDocumentRecipient(), caseData.getClaimantIndType(),
+                caseData.getClaimantType().getClaimantAddressUK(),
+                caseData.getRespondentCollection()));
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
@@ -1176,63 +1198,6 @@ public class CaseActionsForCaseWorkerController {
                     ccdRequest.getCaseDetails().getCaseId()));
             caseData.setEthosCaseReference(reference);
         }
-    }
-
-    private String generateOtherTypeDocumentName(List<DocumentTypeItem> docList) {
-        StringBuilder sb = new StringBuilder();
-        for (DocumentTypeItem doc : docList) {
-            if (doc.getValue().getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE)) {
-                sb.append("**<big>");
-                sb.append(doc.getValue().getUploadedDocument().getDocumentFilename());
-                sb.append("</big>**<br/>");
-                sb.append("<small>");
-                sb.append(doc.getValue().getShortDescription());
-                sb.append("</small><br/>");
-            }
-        }
-        return sb.toString();
-    }
-
-    private String generateClaimantAddress(ClaimantIndType claimant, Address claimantAddressUK) {
-        StringBuilder claimantAddressStr = new StringBuilder();
-        claimantAddressStr.append("**<big>Claimant</big>**")
-                .append("<br/>" + claimant.getClaimantFirstNames() + " " + claimant.getClaimantLastName())
-                .append("<br/>" + claimantAddressUK.getAddressLine1());
-        if (claimantAddressUK.getAddressLine2() != null && !claimantAddressUK.getAddressLine2().isBlank()) {
-            claimantAddressStr.append( "<br/>" + claimantAddressUK.getAddressLine2());
-        }
-        if (claimantAddressUK.getAddressLine3() != null && !claimantAddressUK.getAddressLine3().isBlank()) {
-            claimantAddressStr.append( "<br/>" + claimantAddressUK.getAddressLine3());
-        }
-        claimantAddressStr.append("<br/>" + claimantAddressUK.getPostTown())
-                .append("<br/>" + claimantAddressUK.getPostCode());
-
-        return claimantAddressStr.toString();
-    }
-
-    private String generateRespondentAddress(List<RespondentSumTypeItem> respondentList) {
-        StringBuilder respondentAddressStr = new StringBuilder();
-        int index = 1;
-        for (RespondentSumTypeItem respondentItem : respondentList) {
-            respondentAddressStr.append("**<big>Respondent " + index + "</big>**")
-                    .append("<br/>" + respondentItem.getValue().getRespondentName())
-                    .append("<br/>" + respondentItem.getValue().getRespondentAddress().getAddressLine1());
-
-            Address respondentAddress = respondentItem.getValue().getRespondentAddress();
-            if (respondentAddress.getAddressLine2() != null && !respondentAddress.getAddressLine2().isBlank()) {
-                respondentAddressStr.append("<br/>" + respondentAddress.getAddressLine2());
-            }
-            if (respondentAddress.getAddressLine3() != null && !respondentAddress.getAddressLine3().isBlank()) {
-                respondentAddressStr.append("<br/>" + respondentAddress.getAddressLine3());
-            }
-            respondentAddressStr.append("<br/>" + respondentAddress.getPostTown())
-                    .append("<br/>" + respondentAddress.getPostCode())
-                    .append("<br/><br/>");
-
-            index++;
-        }
-
-        return respondentAddressStr.toString();
     }
 
 }

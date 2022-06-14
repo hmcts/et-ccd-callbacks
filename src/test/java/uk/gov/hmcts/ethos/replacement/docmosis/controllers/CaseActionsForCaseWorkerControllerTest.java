@@ -115,6 +115,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL =
             "/reinstateClosedCaseMidEventValidation";
     private static final String SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL = "/midServingDocumentOtherTypeNames";
+    private static final String SERVING_DOCUMENT_RECIPIENT_URL = "/midServingDocumentRecipient";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -805,21 +806,34 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         String expectedDocumentName = "**<big>test-filename.xlsx</big>**<br/><small>Test description</small><br/>";
-        String expectedClaimantAddress = "**<big>Claimant</big>**<br/>Doris Johnson"
-                + "<br/>232 Petticoat Square<br/>22 House<br/>London<br/>W10 4AG";
-        String expectedRespondentAddress = "**<big>Respondent 1</big>**<br/>Antonio Vazquez"
-                + "<br/>11 Small Street<br/>22 House<br/>Manchester<br/>M12 42R<br/><br/>"
-                + "**<big>Respondent 2</big>**<br/>Juan Garcia<br/>12 Small Street<br/>24 House"
-                + "<br/>Manchester<br/>M12 4ED<br/><br/>";
-      
         mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
                         .content(requestContent4.toString())
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.otherTypeDocumentName").value(expectedDocumentName))
-                .andExpect(jsonPath("$.data.claimantAddress").value(expectedClaimantAddress))
-                .andExpect(jsonPath("$.data.respondentAddress").value(expectedRespondentAddress))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    public void midServingDocumentRecipient() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        String expectedClaimantAndRespondentAddress = "**<big>Claimant</big>**<br/>Doris Johnson"
+                + "<br/>232 Petticoat Square<br/>22 House<br/>London<br/>W10 4AG<br/><br/>"
+                + "**<big>Respondent 1</big>**<br/>Antonio Vazquez"
+                + "<br/>11 Small Street<br/>22 House<br/>Manchester<br/>M12 42R<br/><br/>"
+                + "**<big>Respondent 2</big>**<br/>Juan Garcia<br/>12 Small Street<br/>24 House"
+                + "<br/>Manchester<br/>M12 4ED<br/><br/>";
+
+        mvc.perform(post(SERVING_DOCUMENT_RECIPIENT_URL)
+                        .content(requestContent4.toString())
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.claimantAndRespondentAddresses")
+                        .value(expectedClaimantAndRespondentAddress))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
     }
@@ -1648,6 +1662,16 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void midServingDocumentOtherTypeNamesForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
+                        .content(requestContent4.toString())
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void midServingDocumentRecipientForbidden() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(SERVING_DOCUMENT_RECIPIENT_URL)
                         .content(requestContent4.toString())
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))

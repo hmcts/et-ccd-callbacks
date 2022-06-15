@@ -26,7 +26,7 @@ public class FlagsImageHelperTest {
             FlagsImageHelper.buildFlagsImageFileName(caseDetails);
 
             assertEquals("<font color='DeepPink' size='5'> WITH OUTSTATION </font>", caseData.getFlagsImageAltText());
-            assertEquals("EMP-TRIB-100000000.jpg", caseData.getFlagsImageFileName());
+            assertEquals("EMP-TRIB-1000000000.jpg", caseData.getFlagsImageFileName());
         }
     }
 
@@ -39,7 +39,7 @@ public class FlagsImageHelperTest {
         FlagsImageHelper.buildFlagsImageFileName(caseDetails);
 
         assertEquals("", caseData.getFlagsImageAltText());
-        assertEquals("EMP-TRIB-000000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-0000000000.jpg", caseData.getFlagsImageFileName());
     }
 
     @Test
@@ -52,10 +52,9 @@ public class FlagsImageHelperTest {
             FlagsImageHelper.buildFlagsImageFileName(caseDetails);
 
             assertEquals("", caseData.getFlagsImageAltText());
-            assertEquals("EMP-TRIB-000000000.jpg", caseData.getFlagsImageFileName());
+            assertEquals("EMP-TRIB-0000000000.jpg", caseData.getFlagsImageFileName());
         }
     }
-
 
     private CaseDetails createCaseDetails(String caseTypeId, CaseData caseData) {
         var ccdRequest = CCDRequestBuilder.builder()

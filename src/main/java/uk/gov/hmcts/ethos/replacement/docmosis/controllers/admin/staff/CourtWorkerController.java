@@ -31,6 +31,29 @@ public class CourtWorkerController {
     private final VerifyTokenService verifyTokenService;
     private final CourtWorkerService courtWorkerService;
 
+    @PostMapping(value = "/initAddCourtWorker", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Initial add Court Worker")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> initAddCourtWorker(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
+            @RequestBody CCDRequest ccdRequest) {
+
+        log.info("/initAddCourtWorker");
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
+        }
+
+        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        courtWorkerService.initAddCourtWorker(adminData);
+
+        return CCDCallbackResponse.getCallbackRespEntityNoErrors(adminData);
+    }
+
     @PostMapping(value = "/addCourtWorker", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add a court worker")
     @ApiResponses(value = {
@@ -78,7 +101,7 @@ public class CourtWorkerController {
     }
 
     @PostMapping(value = "/updateCourtWorkerMidEventSelectCourtWorker", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Populates the dynamicList for court worker when office and type selected")
+    @Operation(summary = "Populates the court worker code and name when dynamicList selected")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully"),
         @ApiResponse(responseCode = "400", description = "Bad Request"),

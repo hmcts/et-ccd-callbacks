@@ -42,4 +42,26 @@ public class PersistentQHelperService {
 
     }
 
+    public void sendTransferToEcmEvent(String userToken, String caseTypeId, String jurisdiction,
+                                       List<String> errors, List<String> ethosCaseRefCollection, String officeCT,
+                                       String positionTypeCT, String ccdGatewayBaseUrl,
+                                       String reasonForCT, String confirmation, String sourceEthosCaseReference) {
+        String username = userService.getUserDetails(userToken).getEmail();
+        var dataModel = PersistentQHelper.getTransferToEcmModel(ccdGatewayBaseUrl, officeCT, positionTypeCT,
+                reasonForCT, sourceEthosCaseReference);
+
+        PersistentQHelper.sendSingleUpdatesPersistentQ(caseTypeId,
+                jurisdiction,
+                username,
+                ethosCaseRefCollection,
+                dataModel,
+                errors,
+                null,
+                confirmation,
+                createUpdatesBusSender,
+                String.valueOf(ethosCaseRefCollection.size()),
+                null
+        );
+
+    }
 }

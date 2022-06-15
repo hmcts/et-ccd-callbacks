@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-class CustomMarkdownHelperTest {
+class ServingHelperTest {
     private static CaseDetails caseDetails;
 
     @BeforeAll
@@ -24,7 +24,7 @@ class CustomMarkdownHelperTest {
 
     private static CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(
-                CustomMarkdownHelperTest.class.getClassLoader()
+                ServingHelperTest.class.getClassLoader()
                 .getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
@@ -34,7 +34,7 @@ class CustomMarkdownHelperTest {
     void generateOtherTypeDocumentName() {
         String expectedDocumentName = "**<big>test-filename.xlsx</big>**<br/><small>Test description</small><br/>";
         List<DocumentTypeItem> documentTypeItems = caseDetails.getCaseData().getServingDocumentCollection();
-        Assertions.assertEquals(expectedDocumentName, CustomMarkdownHelper.
+        Assertions.assertEquals(expectedDocumentName, ServingHelper.
                 generateOtherTypeDocumentName(documentTypeItems));
     }
 
@@ -49,8 +49,6 @@ class CustomMarkdownHelperTest {
 
         CaseData caseData = caseDetails.getCaseData();
         Assertions.assertEquals(expectedClaimantAndRespondentAddress,
-                CustomMarkdownHelper.generateClaimantAndRespondentAddress(
-                caseData.getServingDocumentRecipient(), caseData.getClaimantIndType(),
-                        caseData.getClaimantType().getClaimantAddressUK(), caseData.getRespondentCollection()));
+                ServingHelper.generateClaimantAndRespondentAddress(caseData));
     }
 }

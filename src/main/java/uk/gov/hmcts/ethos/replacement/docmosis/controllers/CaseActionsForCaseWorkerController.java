@@ -19,12 +19,11 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CustomMarkdownHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ServingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepositOrder;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
@@ -1161,7 +1160,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setOtherTypeDocumentName(CustomMarkdownHelper.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
+        caseData.setOtherTypeDocumentName(ServingHelper.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
@@ -1185,10 +1184,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setClaimantAndRespondentAddresses(CustomMarkdownHelper.generateClaimantAndRespondentAddress(
-                caseData.getServingDocumentRecipient(), caseData.getClaimantIndType(),
-                caseData.getClaimantType().getClaimantAddressUK(),
-                caseData.getRespondentCollection()));
+        caseData.setClaimantAndRespondentAddresses(ServingHelper.generateClaimantAndRespondentAddress(caseData));
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }

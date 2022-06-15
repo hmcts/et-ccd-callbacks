@@ -114,7 +114,6 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String JUDGEMENT_SUBMITTED_URL = "/judgementSubmitted";
     private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL = "/reinstateClosedCaseMidEventValidation";
     private static final String SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL = "/midServingDocumentOtherTypeNames";
-    private static final String EMAIL_LINK_TO_ACAS_URL = "/emailLinkToAcas";
     private static final String SERVING_DOCUMENT_RECIPIENT_URL = "/midServingDocumentRecipient";
 
     @Autowired
@@ -179,7 +178,6 @@ public class CaseActionsForCaseWorkerControllerTest {
     private JsonNode requestContent2;
     private JsonNode requestContent3;
     private JsonNode requestContent4;
-    private JsonNode requestContent5;
     private SubmitEvent submitEvent;
     private DefaultValues defaultValues;
 
@@ -193,8 +191,6 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .getResource("/exampleV3.json")).toURI()));
         requestContent4 = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
                 .getResource("/exampleV4.json")).toURI()));
-        requestContent4 = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
-                .getResource("/exampleV5.json")).toURI()));
 
         objectMapper.readTree(new File(Objects.requireNonNull(getClass()
                 .getResource("/CaseCloseEvent_ValidHearingStatusCaseDetails.json")).toURI()));
@@ -830,6 +826,12 @@ public class CaseActionsForCaseWorkerControllerTest {
                 + "**<big>Respondent 2</big>**<br/>Juan Garcia<br/>12 Small Street<br/>24 House"
                 + "<br/>Manchester<br/>M12 4ED<br/><br/>";
 
+        String expectedLink = "mailto:ET3@acas.org.uk?subject=2120001/2019" +
+                "&body=Parties%20in%20claim%3A%20Doris%20Johnson%20vs%20Antonio%20Vazquez%2C%20Juan%20Garcia%0D%0A" +
+                "Case%20reference%20number%3A%202120001/2019%0D%0A%0D%0ADear%20Acas%2C%0D%0A%0D%0AThe%20tribunal%20" +
+                "has%20completed%20ET1%20serving%20to%20the%20respondent.%0D%0A%0D%0AThe%20documents%20we%20sent%20are" +
+                "%20attached%20to%20this%20email.%0D%0A%0D%0A";
+
         mvc.perform(post(SERVING_DOCUMENT_RECIPIENT_URL)
                         .content(requestContent4.toString())
                         .header("Authorization", AUTH_TOKEN)
@@ -837,22 +839,6 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.claimantAndRespondentAddresses")
                         .value(expectedClaimantAndRespondentAddress))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
-    }
-
-    @Test
-    public void testGeneratingEmailLinkToAcas() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-
-        // Use a tool like https://mailtolink.me/ to generate this:
-        //todo
-        String expectedLink = "";
-        mvc.perform(post(EMAIL_LINK_TO_ACAS_URL)
-                        .content(requestContent5.toString())
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.emailLinkToAcas").value(expectedLink))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
@@ -1693,16 +1679,6 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SERVING_DOCUMENT_RECIPIENT_URL)
                         .content(requestContent4.toString())
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    public void generateEmailLinkToAcasForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(EMAIL_LINK_TO_ACAS_URL)
-                        .content(requestContent5.toString())
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());

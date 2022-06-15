@@ -54,4 +54,32 @@ public class ServingHelper {
         return addressStr.toString();
     }
 
+    public static String generateEmailLinkToAcas(CaseData caseData) {
+        StringBuilder respondentList = new StringBuilder();
+        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+        for (RespondentSumTypeItem respondent : respondentCollection) {
+            if (!respondentList.toString().isEmpty()) {
+                respondentList.append("%2C%20");
+            }
+            respondentList.append(respondent.getValue().getRespondentName().replaceAll("\\s+", "%20"));
+        }
+
+        String caseNumber = caseData.getEthosCaseReference();
+        String claimantName = caseData.getClaimantIndType().getClaimantFirstNames() + " "
+                + caseData.getClaimantIndType().getClaimantLastName();
+        String mailToLink = "mailto:ET3@acas.org.uk?subject="
+                + caseNumber
+                + "&body=Parties%20in%20claim%3A%20"
+                + claimantName.replaceAll("\\s+", "%20")
+                + "%20vs%20"
+                + respondentList
+                + "%0D%0ACase%20reference%20number%3A%20"
+                + caseNumber
+                + "%0D%0A%0D%0ADear%20Acas%2C%0D%0A%0D%0A"
+                + "The%20tribunal%20has%20completed%20ET1%20serving%20to%20the%20respondent.%0D%0A%0D%0A"
+                + "The%20documents%20we%20sent%20are%20attached%20to%20this%20email.%0D%0A%0D%0A";
+
+        return mailToLink;
+    }
+
 }

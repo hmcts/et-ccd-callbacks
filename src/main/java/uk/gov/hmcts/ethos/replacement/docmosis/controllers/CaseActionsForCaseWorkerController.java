@@ -14,14 +14,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
-import uk.gov.hmcts.et.common.model.ccd.*;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CustomMarkdownHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepositOrder;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
@@ -73,7 +76,6 @@ public class CaseActionsForCaseWorkerController {
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String EVENT_FIELDS_VALIDATION = "Event fields validation: ";
-    private static final String SERVING_DOCUMENT_OTHER_TYPE = "Another type of document";
     private final CaseCloseValidator caseCloseValidator;
     private final CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
@@ -1158,51 +1160,34 @@ public class CaseActionsForCaseWorkerController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setOtherTypeDocumentName(CustomMarkdownHelper.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
 
-        StringBuilder sb = new StringBuilder();
-        for (DocumentTypeItem doc : caseData.getServingDocumentCollection()) {
-            DocumentType docValue = doc.getValue();
-            if (docValue.getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE)) {
-                sb.append("**<big>");
-                sb.append(docValue.getUploadedDocument().getDocumentFilename());
-                sb.append("</big>**<br/>");
-                if (docValue.getShortDescription() != null) {
-                    sb.append("<small>");
-                    sb.append(docValue.getShortDescription());
-                    sb.append("</small><br/>");
-                } else {
-                    sb.append("<small>No description<small/><br/>");
-                }
-            }
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @PostMapping(value = "/midServingDocumentRecipient", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "return serving document other type recipient's addresses")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> midServingDocumentRecipient(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-        caseData.setOtherTypeDocumentName(sb.toString());
 
-        StringBuilder addresses = new StringBuilder();
-        Address claimantAddressUK = caseData.getClaimantType().getClaimantAddressUK();
-        Address respondentAddress = caseData.getRespondentCollection().get(0).getValue().getRespondentAddress();
-        addresses.append("<div>Send documents by first class mail to:</div>")
-                .append("<h3>Claimant</h3>")
-                .append("<div>")
-                .append(claimantAddressUK.getAddressLine1())
-                .append("</div><div>")
-                .append(claimantAddressUK.getAddressLine2())
-                .append("</div><div>")
-                .append(claimantAddressUK.getPostTown())
-                .append("</div><div>")
-                .append(claimantAddressUK.getPostCode())
-                .append("</div>")
-                .append("<h3>Respondent</h3>")
-                .append("<div>")
-                .append(respondentAddress.getAddressLine1())
-                .append("</div><div>")
-                .append(respondentAddress.getAddressLine2())
-                .append("</div><div>")
-                .append(respondentAddress.getPostTown())
-                .append("</div><div>")
-                .append(respondentAddress.getPostCode())
-                .append("</div><br/>");
-
-        caseData.setClaimantAndRespondentAddresses(addresses.toString());
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setClaimantAndRespondentAddresses(CustomMarkdownHelper.generateClaimantAndRespondentAddress(
+                caseData.getServingDocumentRecipient(), caseData.getClaimantIndType(),
+                caseData.getClaimantType().getClaimantAddressUK(),
+                caseData.getRespondentCollection()));
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
@@ -1269,4 +1254,5 @@ public class CaseActionsForCaseWorkerController {
             caseData.setEthosCaseReference(reference);
         }
     }
+
 }

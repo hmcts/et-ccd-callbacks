@@ -112,9 +112,11 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String DYNAMIC_DEPOSIT_ORDER_URL = "/dynamicDepositOrder";
     private static final String DYNAMIC_JUDGMENT_URL = "/dynamicJudgments";
     private static final String JUDGEMENT_SUBMITTED_URL = "/judgementSubmitted";
-    private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL = "/reinstateClosedCaseMidEventValidation";
+    private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL =
+            "/reinstateClosedCaseMidEventValidation";
     private static final String SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL = "/midServingDocumentOtherTypeNames";
     private static final String EMAIL_LINK_TO_ACAS_URL = "/emailLinkToAcas";
+    private static final String SERVING_DOCUMENT_RECIPIENT_URL = "/midServingDocumentRecipient";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -819,6 +821,28 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
+    public void midServingDocumentRecipient() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        String expectedClaimantAndRespondentAddress = "**<big>Claimant</big>**<br/>Doris Johnson"
+                + "<br/>232 Petticoat Square<br/>22 House<br/>London<br/>W10 4AG<br/><br/>"
+                + "**<big>Respondent 1</big>**<br/>Antonio Vazquez"
+                + "<br/>11 Small Street<br/>22 House<br/>Manchester<br/>M12 42R<br/><br/>"
+                + "**<big>Respondent 2</big>**<br/>Juan Garcia<br/>12 Small Street<br/>24 House"
+                + "<br/>Manchester<br/>M12 4ED<br/><br/>";
+
+        mvc.perform(post(SERVING_DOCUMENT_RECIPIENT_URL)
+                        .content(requestContent4.toString())
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.claimantAndRespondentAddresses")
+                        .value(expectedClaimantAndRespondentAddress))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
     public void testGeneratingEmailLinkToAcas() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
@@ -1229,7 +1253,8 @@ public class CaseActionsForCaseWorkerControllerTest {
     @Test
     public void amendCaseDetailsError500() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(eventValidationService.validateCaseState(isA(CaseDetails.class)))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
         when(eventValidationService.validateCurrentPosition(isA(CaseDetails.class))).thenReturn(true);
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent.toString())
@@ -1658,6 +1683,16 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void midServingDocumentOtherTypeNamesForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
+                        .content(requestContent4.toString())
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void midServingDocumentRecipientForbidden() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(SERVING_DOCUMENT_RECIPIENT_URL)
                         .content(requestContent4.toString())
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))

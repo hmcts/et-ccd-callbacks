@@ -183,5 +183,11 @@ public class CaseDataBuilder {
 
         return caseDetails;
     }
+
+    public CaseDataBuilder withEcmOfficeCT(String ecmOfficeCT, String reasonForCT) {
+        caseData.setEcmOfficeCT(ecmOfficeCT);
+        caseData.setReasonForCT(reasonForCT);
+        return this;
+    }
 }
 

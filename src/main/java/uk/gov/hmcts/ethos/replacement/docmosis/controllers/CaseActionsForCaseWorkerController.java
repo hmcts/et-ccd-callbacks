@@ -24,7 +24,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CustomMarkdownHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ServingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepositOrder;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
@@ -76,6 +76,7 @@ public class CaseActionsForCaseWorkerController {
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String EVENT_FIELDS_VALIDATION = "Event fields validation: ";
+    private static final String SERVING_DOCUMENT_OTHER_TYPE = "Another type of document";
     private final CaseCloseValidator caseCloseValidator;
     private final CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
@@ -1160,7 +1161,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setOtherTypeDocumentName(CustomMarkdownHelper.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
+        caseData.setOtherTypeDocumentName(ServingHelper.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
@@ -1184,10 +1185,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setClaimantAndRespondentAddresses(CustomMarkdownHelper.generateClaimantAndRespondentAddress(
-                caseData.getServingDocumentRecipient(), caseData.getClaimantIndType(),
-                caseData.getClaimantType().getClaimantAddressUK(),
-                caseData.getRespondentCollection()));
+        caseData.setClaimantAndRespondentAddresses(ServingHelper.generateClaimantAndRespondentAddress(caseData));
 
 
         StringBuilder respondentList = new StringBuilder();

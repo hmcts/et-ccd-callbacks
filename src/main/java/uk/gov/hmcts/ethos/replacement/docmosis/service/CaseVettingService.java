@@ -11,7 +11,7 @@ public class CaseVettingService {
     private String ccdGatewayBaseUrl;
 
     public void initialBeforeLinkLabel(CaseDetails caseDetails) {
-        caseDetails.getCaseData().setVettingBeforeLinkLabel(generateBeforeLinkLabel(caseDetails.getCaseId()));
+        caseDetails.getCaseData().setVettingBeforeLink(generateBeforeLinkLabel(caseDetails.getCaseId()));
     }
 
     private String generateBeforeLinkLabel(String caseId) {

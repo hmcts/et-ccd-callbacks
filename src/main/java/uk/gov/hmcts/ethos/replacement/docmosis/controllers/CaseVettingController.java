@@ -52,7 +52,7 @@ public class CaseVettingController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         caseVettingService.initialBeforeLinkLabel(caseDetails);
 
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
 
     }
 

@@ -39,14 +39,14 @@ public class ServingHelper {
                     + claimant.getClaimantLastName();
             addressStr.append("**<big>Claimant</big>**")
                     .append("<br/>" + claimantName)
-                    .append(caseData.getClaimantType().getClaimantAddressUK().toAddressString());
+                    .append(caseData.getClaimantType().getClaimantAddressUK().toAddressHtml());
         }
         if (recipients.contains(SERVING_RECIPIENT_RESPONDENT)) {
             int index = 1;
             for (RespondentSumTypeItem respondentItem : caseData.getRespondentCollection()) {
                 addressStr.append("**<big>Respondent " + index + "</big>**")
                         .append("<br/>" + respondentItem.getValue().getRespondentName())
-                        .append(respondentItem.getValue().getRespondentAddress().toAddressString());
+                        .append(respondentItem.getValue().getRespondentAddress().toAddressHtml());
                 index++;
             }
         }

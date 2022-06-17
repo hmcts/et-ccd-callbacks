@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,15 +23,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 public class Et1VettingController {
 
     private final VerifyTokenService verifyTokenService;
     private final Et1VettingService et1VettingService;
-
-    public Et1VettingController(VerifyTokenService verifyTokenService, Et1VettingService et1VettingService) {
-        this.verifyTokenService = verifyTokenService;
-        this.et1VettingService = et1VettingService;
-    }
 
     /**
      * Initialise ET1 case vetting.

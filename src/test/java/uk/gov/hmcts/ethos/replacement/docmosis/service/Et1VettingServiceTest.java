@@ -6,11 +6,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.LABEL_ACAS_CERT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.LABEL_FT1_FROM;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.LABEL_LINE_BR;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.LABEL_LINE_END;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.LABEL_LINE_START;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LINK_LABEL;
 
 class Et1VettingServiceTest {
 
@@ -30,17 +26,8 @@ class Et1VettingServiceTest {
         String caseId = "1655312312192821";
         caseDetails.setCaseId(caseId);
         et1VettingService.initialBeforeLinkLabel(caseDetails);
-        assertEquals(createBeforeLink(caseId), caseDetails.getCaseData().getVettingBeforeLink());
-    }
-
-    private String createBeforeLink(String caseId) {
-        String ccdGatewayBaseUrl = "null";
-        return LABEL_LINE_START
-                + LABEL_LINE_BR + "<a target=\"_blank\" href=\"" + ccdGatewayBaseUrl + "/cases/case-details/" + caseId
-                + "#Documents\">" + LABEL_FT1_FROM + "</a>"
-                + LABEL_LINE_BR + "<a target=\"_blank\" href=\"" + ccdGatewayBaseUrl + "/cases/case-details/" + caseId
-                + "#Documents\">" + LABEL_ACAS_CERT + "</a>"
-                + LABEL_LINE_BR + LABEL_LINE_END;
+        assertEquals(String.format(BEFORE_LINK_LABEL, "null", caseId, "null", caseId),
+                caseDetails.getCaseData().getVettingBeforeLink());
     }
 
 }

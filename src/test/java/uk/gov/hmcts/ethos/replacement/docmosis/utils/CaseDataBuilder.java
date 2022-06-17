@@ -64,20 +64,33 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withHearing(String hearingNumber, String hearingType, String judge) {
+        return withHearing(hearingNumber, hearingType, judge, null);
+    }
+
+    public CaseDataBuilder withHearing(String hearingNumber, String hearingType, String judge, String venue) {
         if (caseData.getHearingCollection() == null) {
             caseData.setHearingCollection(new ArrayList<>());
         }
 
+        HearingTypeItem hearingTypeItem = createHearing(hearingNumber, hearingType, judge, venue);
+        caseData.getHearingCollection().add(hearingTypeItem);
+
+        return this;
+    }
+
+    private HearingTypeItem createHearing(String hearingNumber, String hearingType, String judge, String venue) {
         var type = new HearingType();
         type.setHearingNumber(hearingNumber);
         type.setHearingType(hearingType);
         type.setJudge(new DynamicFixedListType(judge));
+        if (venue != null) {
+            type.setHearingVenue(DynamicFixedListType.of(DynamicValueType.create(venue, venue)));
+        }
 
         var hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(type);
-        caseData.getHearingCollection().add(hearingTypeItem);
 
-        return this;
+        return hearingTypeItem;
     }
 
     public CaseDataBuilder withHearingSession(int hearingIndex, String number, String listedDate, String hearingStatus,
@@ -94,7 +107,7 @@ public class CaseDataBuilder {
         if (hearing.getValue().getHearingDateCollection() == null) {
             hearing.getValue().setHearingDateCollection(new ArrayList<>());
         }
-        var hearingDates = new ArrayList<DateListedTypeItem>();
+
         hearing.getValue().getHearingDateCollection().add(dateListedTypeItem);
 
         return this;

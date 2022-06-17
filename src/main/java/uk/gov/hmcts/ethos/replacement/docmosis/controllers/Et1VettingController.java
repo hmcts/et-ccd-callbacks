@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseVettingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -22,14 +22,14 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 
 @Slf4j
 @RestController
-public class CaseVettingController {
+public class Et1VettingController {
 
     private final VerifyTokenService verifyTokenService;
-    private final CaseVettingService caseVettingService;
+    private final Et1VettingService et1VettingService;
 
-    public CaseVettingController(VerifyTokenService verifyTokenService, CaseVettingService caseVettingService) {
+    public Et1VettingController(VerifyTokenService verifyTokenService, Et1VettingService et1VettingService) {
         this.verifyTokenService = verifyTokenService;
-        this.caseVettingService = caseVettingService;
+        this.et1VettingService = et1VettingService;
     }
 
     @PostMapping(value = "/initialiseCaseVetting", consumes = APPLICATION_JSON_VALUE)
@@ -50,7 +50,7 @@ public class CaseVettingController {
         }
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        caseVettingService.initialBeforeLinkLabel(caseDetails);
+        et1VettingService.initialBeforeLinkLabel(caseDetails);
 
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
 

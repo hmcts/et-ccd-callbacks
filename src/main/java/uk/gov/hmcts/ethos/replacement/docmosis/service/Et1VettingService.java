@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 
 @Service
-public class CaseVettingService {
+public class Et1VettingService {
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;

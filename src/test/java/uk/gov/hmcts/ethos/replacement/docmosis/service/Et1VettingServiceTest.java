@@ -7,14 +7,14 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class CaseVettingServiceTest {
+class Et1VettingServiceTest {
 
-    private CaseVettingService caseVettingService;
+    private Et1VettingService et1VettingService;
     private CaseDetails caseDetails;
 
     @BeforeEach
     void setUp() {
-        caseVettingService = new CaseVettingService();
+        et1VettingService = new Et1VettingService();
         caseDetails = new CaseDetails();
         CaseData caseData = new CaseData();
         caseDetails.setCaseData(caseData);
@@ -24,7 +24,7 @@ class CaseVettingServiceTest {
     void initialBeforeLinkLabel_Normal_shouldReturnLinkLabel() {
         String caseId = "1655312312192821";
         caseDetails.setCaseId(caseId);
-        caseVettingService.initialBeforeLinkLabel(caseDetails);
+        et1VettingService.initialBeforeLinkLabel(caseDetails);
         assertEquals(createBeforeLink(caseId), caseDetails.getCaseData().getVettingBeforeLink());
     }
 

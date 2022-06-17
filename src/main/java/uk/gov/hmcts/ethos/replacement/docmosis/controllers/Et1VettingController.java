@@ -32,6 +32,13 @@ public class Et1VettingController {
         this.et1VettingService = et1VettingService;
     }
 
+    /**
+     * Initialise ET1 case vetting.
+     * Gets userToken as a parameter for security validation and ccdRequest data which has caseData as an object.
+     * @param userToken Used for authorisation
+     * @param ccdRequest CaseData which is a generic data type for most of the methods which holds ET1 case data
+     * @return caseData in ccdRequest
+     */
     @PostMapping(value = "/initialiseCaseVetting", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise case vetting")
     @ApiResponses(value = {

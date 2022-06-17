@@ -6,6 +6,11 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.LABEL_ACAS_CERT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.LABEL_FT1_FROM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.LABEL_LINE_BR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.LABEL_LINE_END;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.LABEL_LINE_START;
 
 class Et1VettingServiceTest {
 
@@ -30,12 +35,12 @@ class Et1VettingServiceTest {
 
     private String createBeforeLink(String caseId) {
         String ccdGatewayBaseUrl = "null";
-        return "Open these documents to help you complete this form: "
-                + "<br/><a target=\"_blank\" href=\"" + ccdGatewayBaseUrl + "/cases/case-details/"
-                + caseId + "#Documents\">ET1 form (opens in new tab)</a>"
-                + "<br/><a target=\"_blank\" href=\"" + ccdGatewayBaseUrl + "/cases/case-details/"
-                + caseId + "#Documents\">Acas certificate (opens in new tab)</a>"
-                + "<br/>Check the Documents tab for additional ET1 documents the claimant may have uploaded.";
+        return LABEL_LINE_START
+                + LABEL_LINE_BR + "<a target=\"_blank\" href=\"" + ccdGatewayBaseUrl + "/cases/case-details/" + caseId
+                + "#Documents\">" + LABEL_FT1_FROM + "</a>"
+                + LABEL_LINE_BR + "<a target=\"_blank\" href=\"" + ccdGatewayBaseUrl + "/cases/case-details/" + caseId
+                + "#Documents\">" + LABEL_ACAS_CERT + "</a>"
+                + LABEL_LINE_BR + LABEL_LINE_END;
     }
 
 }

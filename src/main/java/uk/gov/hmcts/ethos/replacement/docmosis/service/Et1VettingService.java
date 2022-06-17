@@ -10,20 +10,30 @@ public class Et1VettingService {
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
 
+    static final String LABEL_LINE_START = "Open these documents to help you complete this form: ";
+    static final String LABEL_FT1_FROM = "ET1 form (opens in new tab)";
+    static final String LABEL_ACAS_CERT = "Acas certificate (opens in new tab)";
+    static final String LABEL_LINE_END =
+            "Check the Documents tab for additional ET1 documents the claimant may have uploaded.";
+    static final String LABEL_LINE_BR = "<br/>";
+
+    /**
+     * Update vettingBeforeLink.
+     * @param caseDetails Get caseId and Update caseData
+     */
     public void initialBeforeLinkLabel(CaseDetails caseDetails) {
         caseDetails.getCaseData().setVettingBeforeLink(generateBeforeLinkLabel(caseDetails.getCaseId()));
     }
 
     private String generateBeforeLinkLabel(String caseId) {
-        return "Open these documents to help you complete this form: "
-                + generateDocLink(caseId, "ET1 form (opens in new tab)")
-                + generateDocLink(caseId, "Acas certificate (opens in new tab)")
-                + "<br/>"
-                + "Check the Documents tab for additional ET1 documents the claimant may have uploaded.";
+        return LABEL_LINE_START
+                + generateDocLink(caseId, LABEL_FT1_FROM)
+                + generateDocLink(caseId, LABEL_ACAS_CERT)
+                + LABEL_LINE_BR + LABEL_LINE_END;
     }
 
     private String generateDocLink(String caseId, String displayWords) {
-        return "<br/>"
+        return LABEL_LINE_BR
                 + "<a target=\"_blank\" href=\""
                 + ccdGatewayBaseUrl
                 + "/cases/case-details/"

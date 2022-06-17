@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ServingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ET1ServingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -31,11 +31,11 @@ public class ET1ServingController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
     private final VerifyTokenService verifyTokenService;
+    private final ET1ServingService ET1ServingService;
 
     /**
      * This service Gets userToken as a parameter for security validation
      * and ccdRequest data which has caseData as an object.
-     * It is used to populate
      * @param  userToken        Used for authorisation
      *
      * @param ccdRequest        CaseData which is a generic data type for most of the
@@ -64,7 +64,7 @@ public class ET1ServingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setOtherTypeDocumentName(ServingHelper.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
+        caseData.setOtherTypeDocumentName(ET1ServingService.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
@@ -72,7 +72,6 @@ public class ET1ServingController {
     /**
      * This service Gets userToken as a parameter for security validation
      * and ccdRequest data which has caseData as an object.
-     * It is used to populate
      * @param  userToken        Used for authorisation
      *
      * @param ccdRequest        CaseData which is a generic data type for most of the
@@ -80,7 +79,7 @@ public class ET1ServingController {
      * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse that
      *                          includes caseData which contains the claimant and respondent
      *                          addresses in html string format, and an email link that will
-     *                          be used to send email to Acas in MailTo syntax.
+     *                          be used
      */
     @PostMapping(value = "/midServingDocumentRecipient", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "return serving document other type recipient's addresses")
@@ -101,8 +100,8 @@ public class ET1ServingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setClaimantAndRespondentAddresses(ServingHelper.generateClaimantAndRespondentAddress(caseData));
-        caseData.setEmailLinkToAcas(ServingHelper.generateEmailLinkToAcas(caseData));
+        caseData.setClaimantAndRespondentAddresses(ET1ServingService.generateClaimantAndRespondentAddress(caseData));
+        caseData.setEmailLinkToAcas(ET1ServingService.generateEmailLinkToAcas(caseData));
 
         return getCallbackRespEntityNoErrors(caseData);
     }

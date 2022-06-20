@@ -18,17 +18,17 @@ public class ET1ServingService {
             "%3A%20{1}%20vs%20{2}%0D%0ACase%20reference%20number%3A%20{3}%0D%0A%0D%0ADear%20Acas%2C%0D%0A%0D%0AThe%" +
             "20tribunal%20has%20completed%20ET1%20serving%20to%20the%20respondent.%0D%0A%0D%0AThe%20documents%20we" +
             "%20sent%20are%20attached%20to%20this%20email.%0D%0A%0D%0A";
+    private static final String OTHER_TYPE_DOCUMENT_NAME = "**<big>%s</big>**<br/><small>%s</small><br/>";
+    private static final String CLAIMANT_ADDRESS = "**<big>Claimant</big>**<br/>%s %s%s";
+    private static final String RESPONDENT_ADDRESS = "**<big>Respondent %x</big>**<br/>%s%s";
 
     public String generateOtherTypeDocumentName(List<DocumentTypeItem> docList) {
         StringBuilder sb = new StringBuilder();
         for (DocumentTypeItem doc : docList) {
             if (doc.getValue().getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE)) {
-                sb.append("**<big>");
-                sb.append(doc.getValue().getUploadedDocument().getDocumentFilename());
-                sb.append("</big>**<br/>");
-                sb.append("<small>");
-                sb.append(doc.getValue().getShortDescription());
-                sb.append("</small><br/>");
+                sb.append(String.format(OTHER_TYPE_DOCUMENT_NAME,
+                        doc.getValue().getUploadedDocument().getDocumentFilename(),
+                        doc.getValue().getShortDescription()));
             }
         }
         return sb.toString();
@@ -39,16 +39,16 @@ public class ET1ServingService {
         StringBuilder addressStr = new StringBuilder();
         if (recipients.contains(SERVING_RECIPIENT_CLAIMANT)) {
             ClaimantIndType claimant = caseData.getClaimantIndType();
-            addressStr.append("**<big>Claimant</big>**")
-                    .append("<br/>" + claimant.getClaimantFirstNames() + " " + claimant.getClaimantLastName())
-                    .append(caseData.getClaimantType().getClaimantAddressUK().toAddressHtml());
+            addressStr.append(String.format(CLAIMANT_ADDRESS, claimant.getClaimantFirstNames(),
+                            claimant.getClaimantLastName(),
+                            caseData.getClaimantType().getClaimantAddressUK().toAddressHtml()));
         }
         if (recipients.contains(SERVING_RECIPIENT_RESPONDENT)) {
             int index = 1;
             for (RespondentSumTypeItem respondentItem : caseData.getRespondentCollection()) {
-                addressStr.append("**<big>Respondent " + index + "</big>**")
-                        .append("<br/>" + respondentItem.getValue().getRespondentName())
-                        .append(respondentItem.getValue().getRespondentAddress().toAddressHtml());
+                addressStr.append(String.format(RESPONDENT_ADDRESS, index,
+                        respondentItem.getValue().getRespondentName(),
+                        respondentItem.getValue().getRespondentAddress().toAddressHtml()));
                 index++;
             }
         }

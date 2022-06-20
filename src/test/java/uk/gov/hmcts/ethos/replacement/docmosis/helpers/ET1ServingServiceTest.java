@@ -39,8 +39,8 @@ class ET1ServingServiceTest {
     void generateOtherTypeDocumentName() {
         String expectedDocumentName = "**<big>test-filename.xlsx</big>**<br/><small>Test description</small><br/>";
         List<DocumentTypeItem> documentTypeItems = caseDetails.getCaseData().getServingDocumentCollection();
-        assertThat(expectedDocumentName, is(ET1ServingService.
-                generateOtherTypeDocumentName(documentTypeItems)));
+        assertThat(ET1ServingService.
+                generateOtherTypeDocumentName(documentTypeItems), is(expectedDocumentName));
     }
 
     @Test
@@ -53,8 +53,8 @@ class ET1ServingServiceTest {
                 + "<br/>Manchester<br/>M12 4ED<br/><br/>";
 
         CaseData caseData = caseDetails.getCaseData();
-        assertThat(expectedClaimantAndRespondentAddress,
-                is(ET1ServingService.generateClaimantAndRespondentAddress(caseData)));
+        assertThat(ET1ServingService.generateClaimantAndRespondentAddress(caseData),
+                is(expectedClaimantAndRespondentAddress));
     }
 
     @Test
@@ -65,6 +65,6 @@ class ET1ServingServiceTest {
                 "has%20completed%20ET1%20serving%20to%20the%20respondent.%0D%0A%0D%0AThe%20documents%20we%20sent%20are" +
                 "%20attached%20to%20this%20email.%0D%0A%0D%0A";
         CaseData caseData = caseDetails.getCaseData();
-        assertThat(expectedEmailLinkToAcas, is(ET1ServingService.generateEmailLinkToAcas(caseData)));
+        assertThat(ET1ServingService.generateEmailLinkToAcas(caseData), is(expectedEmailLinkToAcas));
     }
 }

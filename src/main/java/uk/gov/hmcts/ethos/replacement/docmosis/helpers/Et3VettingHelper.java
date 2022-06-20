@@ -49,7 +49,7 @@ public class Et3VettingHelper {
     private static String findEt3Received(CaseData caseData) {
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
         caseData.setEt3IsThereAnEt3Response(NO);
-        
+
         if (CollectionUtils.isEmpty(respondentCollection)) {
             log.error("Respondent collection is empty for case ref " + caseData.getEthosCaseReference());
             return NO;
@@ -57,7 +57,7 @@ public class Et3VettingHelper {
 
         for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
             RespondentSumType respondent = respondentSumTypeItem.getValue();
-            if (respondent.getResponseReceived().equals(YES)) {
+            if (!isNullOrEmpty(respondent.getResponseReceived()) && respondent.getResponseReceived().equals(YES)) {
                 caseData.setEt3IsThereAnEt3Response(YES);
                 return UtilHelper.listingFormatLocalDate(respondent.getResponseReceivedDate());
             }

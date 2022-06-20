@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,12 +25,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-//@RequestMapping("/et3Response")
+@RequestMapping("/et3Response")
 public class Et3ResponseController {
-
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
-
     private static final String LOG_MESSAGE = "{} received notification request for case reference : {}";
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
@@ -40,17 +37,17 @@ public class Et3ResponseController {
     @PostMapping(value = "/initEt3Response", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise ET3 Response page")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initEt3Response(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
-        log.info(LOG_MESSAGE, "CASE TRANSFER INIT TRANSFER TO SCOTLAND ---> ", ccdRequest.getCaseDetails().getCaseId());
+        log.info(LOG_MESSAGE, "INIT ET3 ---> ", ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -58,16 +55,14 @@ public class Et3ResponseController {
         }
 
         var caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setEt3StartPagePreamble("To help you " + generateMarkUp(ccdGatewayBaseUrl, ccdRequest.getCaseDetails().getCaseId()));
+//        for (RespondentSumType respondentSumType: caseData.
 
         return getCallbackRespEntityNoErrors(caseData);
     }
 
     public static String generateMarkUp(String ccdGatewayBaseUrl, String caseId) {
-
         String url = ccdGatewayBaseUrl + "/cases/case-details/" + caseId + "#Documents";
 
         return "<a target=\"_blank\" href=\"" + url + "\"> open the ET1 for, ACAS certificate and other documents </a>";
-
     }
 }

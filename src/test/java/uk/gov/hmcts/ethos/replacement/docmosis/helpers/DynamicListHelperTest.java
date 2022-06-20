@@ -3,8 +3,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
@@ -13,6 +15,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudge
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicLetters;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRestrictedReporting;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -23,7 +26,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DynamicListHelper.DYNAMIC_HEARING_LABEL_FORMAT;
 
 public class DynamicListHelperTest {
 
@@ -242,5 +247,40 @@ public class DynamicListHelperTest {
         assertNotNull(casedata.getJudgementCollection());
         var judgementType = casedata.getJudgementCollection().get(0).getValue();
         assertNull(judgementType.getJudgmentHearingDate());
+    }
+
+    @Test
+    public void testCreateDynamicHearingListWithVenue() {
+        String hearingNumber = "123";
+        String venue = "Bristol Mags";
+        CaseData caseData = CaseDataBuilder.builder()
+                .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge1", venue)
+                .withHearingSession(0, hearingNumber, "2019-11-25T12:11:00.000", Constants.HEARING_STATUS_HEARD, true)
+                .build();
+
+        var hearingList = DynamicListHelper.createDynamicHearingList(caseData);
+
+        assertEquals(1, hearingList.size());
+        assertEquals(hearingNumber, hearingList.get(0).getCode());
+        String expectedLabel = String.format(DYNAMIC_HEARING_LABEL_FORMAT, hearingNumber, HEARING_TYPE_JUDICIAL_HEARING,
+                venue, "25 Nov 2019");
+        assertEquals(expectedLabel, hearingList.get(0).getLabel());
+    }
+
+    @Test
+    public void testCreateDynamicHearingListNoVenue() {
+        String hearingNumber = "123";
+        CaseData caseData = CaseDataBuilder.builder()
+                .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge1")
+                .withHearingSession(0, hearingNumber, "2019-11-25T12:11:00.000", Constants.HEARING_STATUS_HEARD, true)
+                .build();
+
+        var hearingList = DynamicListHelper.createDynamicHearingList(caseData);
+
+        assertEquals(1, hearingList.size());
+        assertEquals(hearingNumber, hearingList.get(0).getCode());
+        String expectedLabel = String.format(DYNAMIC_HEARING_LABEL_FORMAT, hearingNumber, HEARING_TYPE_JUDICIAL_HEARING,
+                null, "25 Nov 2019");
+        assertEquals(expectedLabel, hearingList.get(0).getLabel());
     }
 }

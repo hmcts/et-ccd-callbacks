@@ -229,6 +229,6 @@
    file name: spring-security-rsa-1.0.10.RELEASE.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-rsa@.*$</packageUrl>
-        <cpe>cpe:/a:vmware:spring_security</cpe>
+        <cve>CVE-2022-22978</cve>
     </suppress>
 </suppressions>

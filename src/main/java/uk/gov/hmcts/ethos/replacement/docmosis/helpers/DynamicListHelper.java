@@ -6,6 +6,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -17,6 +18,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements.NO_HEARINGS;
 
 public class DynamicListHelper {
+
+    /** Format for the label property of a Hearing DynamicList item */
+    static final String DYNAMIC_HEARING_LABEL_FORMAT = "%s : %s - %s - %s";
 
     private DynamicListHelper() {
     }
@@ -66,14 +70,14 @@ public class DynamicListHelper {
         List<DynamicValueType> listItems = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-                var hearingNumber = hearingTypeItem.getValue().getHearingNumber();
-                var dateListedType = hearingTypeItem.getValue().getHearingDateCollection().get(0).getValue();
-                var listedDate = dateListedType.getListedDate().substring(0, 10);
-                LocalDate date = LocalDate.parse(listedDate);
-                String hearingData = hearingNumber
-                        + " : " + hearingTypeItem.getValue().getHearingType()
-                        + " - " + hearingTypeItem.getValue().getHearingVenue()
-                        + " - " + date.format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
+                var hearing = hearingTypeItem.getValue();
+                var hearingNumber = hearing.getHearingNumber();
+                var hearingType = hearing.getHearingType();
+                var venue = hearing.getHearingVenue() != null ? hearing.getHearingVenue().getSelectedLabel() : null;
+                var listedDate = getListedDate(hearing.getHearingDateCollection().get(0).getValue());
+
+                String hearingData = String.format(DYNAMIC_HEARING_LABEL_FORMAT, hearingNumber, hearingType, venue,
+                        listedDate);
                 listItems.add(getDynamicCodeLabel(hearingNumber, hearingData));
             }
         } else {
@@ -102,5 +106,11 @@ public class DynamicListHelper {
             }
         }
         return dynamicValue;
+    }
+
+    private static String getListedDate(DateListedType dateListedType) {
+        String listedDate = dateListedType.getListedDate().substring(0, 10);
+        LocalDate date = LocalDate.parse(listedDate);
+        return date.format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
     }
 }

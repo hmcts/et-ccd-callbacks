@@ -18,8 +18,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -30,16 +30,17 @@ public class Et3VettingController {
     private final VerifyTokenService verifyTokenService;
 
     @PostMapping(value = "/et3VettingStart", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "return serving document other type names")
+    @Operation(summary = "initilize data for et3 vetting")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> Et3VettingStart(
+    public ResponseEntity<CCDCallbackResponse> et3VettingStart(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
 
@@ -52,7 +53,5 @@ public class Et3VettingController {
         caseData.setEt3Date(Et3VettingHelper.getEt3Dates(caseData));
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
-
-
 
 }

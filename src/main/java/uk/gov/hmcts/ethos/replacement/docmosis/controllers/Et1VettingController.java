@@ -36,14 +36,14 @@ public class Et1VettingController {
      * @param ccdRequest CaseData which is a generic data type for most of the methods which holds ET1 case data
      * @return caseData in ccdRequest
      */
-    @PostMapping(value = "/initialiseCaseVetting", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/initialiseEt1Vetting", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise case vetting")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully"),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> initialiseCaseVetting(
+    public ResponseEntity<CCDCallbackResponse> initialiseEt1Vetting(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
@@ -54,7 +54,7 @@ public class Et1VettingController {
         }
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        et1VettingService.initialBeforeLinkLabel(caseDetails);
+        et1VettingService.initialBeforeYouStart(caseDetails);
 
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
 

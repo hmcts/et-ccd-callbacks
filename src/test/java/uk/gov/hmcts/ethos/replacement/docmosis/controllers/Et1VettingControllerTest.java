@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest({Et1VettingController.class, JsonMapper.class})
 class Et1VettingControllerTest {
 
-    private static final String INIT_CASE_VETTING = "/initialiseCaseVetting";
+    private static final String INIT_CASE_VETTING = "/initialiseEt1Vetting";
     private static final String AUTH_TOKEN = "some-token";
     private CCDRequest ccdRequest;
 
@@ -59,7 +59,7 @@ class Et1VettingControllerTest {
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(et1VettingService, times(1)).initialBeforeLinkLabel(ccdRequest.getCaseDetails());
+        verify(et1VettingService, times(1)).initialBeforeYouStart(ccdRequest.getCaseDetails());
     }
 
     @Test
@@ -70,7 +70,7 @@ class Et1VettingControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
-        verify(et1VettingService, never()).initialBeforeLinkLabel(ccdRequest.getCaseDetails());
+        verify(et1VettingService, never()).initialBeforeYouStart(ccdRequest.getCaseDetails());
     }
 
     @Test
@@ -81,7 +81,7 @@ class Et1VettingControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content("error"))
                 .andExpect(status().isBadRequest());
-        verify(et1VettingService, never()).initialBeforeLinkLabel(ccdRequest.getCaseDetails());
+        verify(et1VettingService, never()).initialBeforeYouStart(ccdRequest.getCaseDetails());
     }
 
 }

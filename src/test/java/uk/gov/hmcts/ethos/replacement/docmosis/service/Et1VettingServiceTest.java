@@ -25,9 +25,9 @@ class Et1VettingServiceTest {
     void initialBeforeLinkLabel_Normal_shouldReturnLinkLabel() {
         String caseId = "1655312312192821";
         caseDetails.setCaseId(caseId);
-        et1VettingService.initialBeforeLinkLabel(caseDetails);
+        et1VettingService.initialBeforeYouStart(caseDetails);
         assertEquals(String.format(BEFORE_LINK_LABEL, "null", caseId, "null", caseId),
-                caseDetails.getCaseData().getVettingBeforeLink());
+                caseDetails.getCaseData().getEt1VettingBeforeYouStart());
     }
 
 }

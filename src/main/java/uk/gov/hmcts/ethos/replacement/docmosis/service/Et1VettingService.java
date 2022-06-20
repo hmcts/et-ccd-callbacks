@@ -16,11 +16,11 @@ public class Et1VettingService {
             + "<br/>Check the Documents tab for additional ET1 documents the claimant may have uploaded.";
 
     /**
-     * Update vettingBeforeLink.
+     * Update et1VettingBeforeYouStart.
      * @param caseDetails Get caseId and Update caseData
      */
-    public void initialBeforeLinkLabel(CaseDetails caseDetails) {
-        caseDetails.getCaseData().setVettingBeforeLink(String.format(BEFORE_LINK_LABEL,
+    public void initialBeforeYouStart(CaseDetails caseDetails) {
+        caseDetails.getCaseData().setEt1VettingBeforeYouStart(String.format(BEFORE_LINK_LABEL,
                 ccdGatewayBaseUrl, caseDetails.getCaseId(), ccdGatewayBaseUrl, caseDetails.getCaseId()));
     }
 

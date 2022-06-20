@@ -43,7 +43,7 @@ public class Et1VettingService {
 
     private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {
         var documentBinaryUrl = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
-        return documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents"));
+        return documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
     }
 
 }

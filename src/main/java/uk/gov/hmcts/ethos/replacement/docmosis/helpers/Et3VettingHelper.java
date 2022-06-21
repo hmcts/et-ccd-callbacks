@@ -17,21 +17,24 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 public class Et3VettingHelper {
 
+    static final String ET3_TABLE_DATA =
+        "| Dates| |\r\n"
+        + "|--|--|\r\n"
+        + "|ET1 served| %s|\r\n"
+        + "|ET3 due| %s|\r\n"
+        + "|Extension| None|\r\n"
+        + "|ET3 received| %s|";
     private Et3VettingHelper() {
         //Access through static methods
     }
 
-    public static String getEt3Dates(CaseData caseData) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        stringBuilder.append("| Dates| |\r\n");
-        stringBuilder.append("|--|--|\r\n");
-        stringBuilder.append(String.format("|ET1 Served| %s|\r\n", formatDate(caseData.getClaimServedDate())));
-        stringBuilder.append(String.format("|ET3 due| %s|\r\n", findEt3Due(caseData.getClaimServedDate())));
-        stringBuilder.append("|Extension| None|\r\n");
-        stringBuilder.append(String.format("|ET3 received| %s|", findEt3Received(caseData)));
-
-        return stringBuilder.toString();
+    public static String getEt3DatesInMarkdown(CaseData caseData) {
+        return String.format(
+                ET3_TABLE_DATA,
+                formatDate(caseData.getClaimServedDate()),
+                findEt3Due(caseData.getClaimServedDate()),
+                findEt3Received(caseData)
+        );
     }
 
     private static String findEt3Due(String et3DueDate) {
@@ -48,7 +51,6 @@ public class Et3VettingHelper {
 
     private static String findEt3Received(CaseData caseData) {
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
-        caseData.setEt3IsThereAnEt3Response(NO);
 
         if (CollectionUtils.isEmpty(respondentCollection)) {
             log.error("Respondent collection is empty for case ref " + caseData.getEthosCaseReference());
@@ -58,11 +60,28 @@ public class Et3VettingHelper {
         for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
             RespondentSumType respondent = respondentSumTypeItem.getValue();
             if (!isNullOrEmpty(respondent.getResponseReceived()) && respondent.getResponseReceived().equals(YES)) {
-                caseData.setEt3IsThereAnEt3Response(YES);
                 return UtilHelper.listingFormatLocalDate(respondent.getResponseReceivedDate());
             }
         }
 
         return NO;
+    }
+
+    public static boolean isThereAnEt3Response(CaseData caseData) {
+        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+
+        if (CollectionUtils.isEmpty(respondentCollection)) {
+            log.error("Respondent collection is empty for case ref " + caseData.getEthosCaseReference());
+            return false;
+        }
+
+        for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
+            RespondentSumType respondent = respondentSumTypeItem.getValue();
+            if (!isNullOrEmpty(respondent.getResponseReceived()) && respondent.getResponseReceived().equals(YES)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -10,11 +10,13 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -200,6 +202,27 @@ public class CaseDataBuilder {
     public CaseDataBuilder withEcmOfficeCT(String ecmOfficeCT, String reasonForCT) {
         caseData.setEcmOfficeCT(ecmOfficeCT);
         caseData.setReasonForCT(reasonForCT);
+        return this;
+    }
+
+    public CaseDataBuilder withClaimServedDate(String claimServedDate) {
+        caseData.setClaimServedDate(claimServedDate);
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent(String respondent, String responseReceived, String receivedDate) {
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName(respondent);
+        respondentSumType.setResponseReceived(responseReceived);
+        respondentSumType.setResponseReceivedDate(receivedDate);
+
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(respondentSumType);
+
+        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
+        respondentCollection.add(respondentSumTypeItem);
+
+        caseData.setRespondentCollection(respondentCollection);
         return this;
     }
 }

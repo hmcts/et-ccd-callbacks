@@ -24,6 +24,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
+/**
+ * Rest controller for the ET3 Vetting pages, provides access to the state of the ET3 Response
+ * and formats data appropriately for rendering on the front end.
+ */
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -31,6 +35,10 @@ public class Et3VettingController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
 
+    /**
+     * Method calls when the Is there an ET3 Response?" page is loaded, will generate a table
+     * for displaying the state of the ET3 response and set if the response has been received
+     */
     @PostMapping(value = "/et3VettingStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "initialize data for et3 vetting")
     @ApiResponses(value = {

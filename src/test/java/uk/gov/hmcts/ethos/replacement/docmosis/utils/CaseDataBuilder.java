@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -73,6 +74,39 @@ public class CaseDataBuilder {
         }
 
         HearingTypeItem hearingTypeItem = createHearing(hearingNumber, hearingType, judge, venue);
+        caseData.getHearingCollection().add(hearingTypeItem);
+
+        return this;
+    }
+
+    public CaseDataBuilder withHearingScotland(String hearingNumber, String hearingType, String judge,
+                                               TribunalOffice tribunalOffice, String venue) {
+        if (caseData.getHearingCollection() == null) {
+            caseData.setHearingCollection(new ArrayList<>());
+        }
+
+        HearingTypeItem hearingTypeItem = createHearing(hearingNumber, hearingType, judge, null);
+        HearingType hearing = hearingTypeItem.getValue();
+        hearing.setHearingVenueScotland(tribunalOffice.getOfficeName());
+
+        DynamicFixedListType dynamicFixedListType = DynamicFixedListType.of(DynamicValueType.create(venue, venue));
+
+        switch (tribunalOffice) {
+            case ABERDEEN:
+                hearing.setHearingAberdeen(dynamicFixedListType);
+                break;
+            case DUNDEE:
+                hearing.setHearingDundee(dynamicFixedListType);
+                break;
+            case EDINBURGH:
+                hearing.setHearingEdinburgh(dynamicFixedListType);
+            case GLASGOW:
+                hearing.setHearingGlasgow(dynamicFixedListType);
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected tribunal office " + tribunalOffice);
+        }
+
         caseData.getHearingCollection().add(hearingTypeItem);
 
         return this;

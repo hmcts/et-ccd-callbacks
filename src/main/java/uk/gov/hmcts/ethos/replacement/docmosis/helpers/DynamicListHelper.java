@@ -1,12 +1,16 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -19,7 +23,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.Dynam
 
 public class DynamicListHelper {
 
-    /** Format for the label property of a Hearing DynamicList item */
+    /** Format for the label property of a Hearing DynamicList item. */
     static final String DYNAMIC_HEARING_LABEL_FORMAT = "%s : %s - %s - %s";
 
     private DynamicListHelper() {
@@ -73,7 +77,7 @@ public class DynamicListHelper {
                 var hearing = hearingTypeItem.getValue();
                 var hearingNumber = hearing.getHearingNumber();
                 var hearingType = hearing.getHearingType();
-                var venue = hearing.getHearingVenue() != null ? hearing.getHearingVenue().getSelectedLabel() : null;
+                var venue = getHearingVenue(hearing);
                 var listedDate = getListedDate(hearing.getHearingDateCollection().get(0).getValue());
 
                 String hearingData = String.format(DYNAMIC_HEARING_LABEL_FORMAT, hearingNumber, hearingType, venue,
@@ -84,6 +88,33 @@ public class DynamicListHelper {
             listItems.add(getDynamicValue(NO_HEARINGS));
         }
         return listItems;
+    }
+
+    private static String getHearingVenue(HearingType hearing) {
+        DynamicFixedListType hearingVenue;
+        if (StringUtils.isNotBlank(hearing.getHearingVenueScotland())) {
+            TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(hearing.getHearingVenueScotland());
+            switch (tribunalOffice) {
+                case GLASGOW:
+                    hearingVenue = hearing.getHearingGlasgow();
+                    break;
+                case ABERDEEN:
+                    hearingVenue = hearing.getHearingAberdeen();
+                    break;
+                case DUNDEE:
+                    hearingVenue = hearing.getHearingDundee();
+                    break;
+                case EDINBURGH:
+                    hearingVenue = hearing.getHearingEdinburgh();
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected Scotland tribunal office " + tribunalOffice);
+            }
+        } else {
+            hearingVenue = hearing.getHearingVenue();
+        }
+
+        return hearingVenue != null ? hearingVenue.getSelectedLabel() : null;
     }
 
     public static List<DynamicValueType> createDynamicJurisdictionCodes(CaseData caseData) {

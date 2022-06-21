@@ -25,14 +25,18 @@ public class Et1VettingService {
         var acasBinaryUrl = createDocLinkDefault(caseDetails.getCaseId());
 
         var documentCollection = caseDetails.getCaseData().getDocumentCollection();
-        for (DocumentTypeItem d : documentCollection) {
-            if (d.getValue().getTypeOfDocument().equals(ET1_DOC_TYPE)) {
-                et1BinaryUrl = createDocLinkBinary(d);
+        if (documentCollection != null && !documentCollection.isEmpty()) {
+            for (DocumentTypeItem d : documentCollection) {
+                if (d.getValue().getTypeOfDocument().equals(ET1_DOC_TYPE)) {
+                    et1BinaryUrl = createDocLinkBinary(d);
+                }
+                if (d.getValue().getTypeOfDocument().equals(ACAS_DOC_TYPE)) {
+                    acasBinaryUrl = createDocLinkBinary(d);
+                }
             }
-            if (d.getValue().getTypeOfDocument().equals(ACAS_DOC_TYPE)) {
-                acasBinaryUrl = createDocLinkBinary(d);
-            }
+
         }
+
         caseDetails.getCaseData().setEt1VettingBeforeYouStart(
                 String.format(BEFORE_LINK_LABEL, et1BinaryUrl, acasBinaryUrl));
     }

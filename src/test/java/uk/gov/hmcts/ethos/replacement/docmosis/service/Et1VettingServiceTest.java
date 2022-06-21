@@ -20,16 +20,14 @@ class Et1VettingServiceTest {
 
     private Et1VettingService et1VettingService;
     private CaseDetails caseDetails;
-    private String caseId;
 
     @BeforeEach
     void setUp() {
-        caseId = "1655312312192821";
         et1VettingService = new Et1VettingService();
         caseDetails = new CaseDetails();
         CaseData caseData = new CaseData();
         caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId(caseId);
+        caseDetails.setCaseId("1655312312192821");
     }
 
     @Test
@@ -53,6 +51,15 @@ class Et1VettingServiceTest {
         List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
         caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
 
+        et1VettingService.initialBeforeYouStart(caseDetails);
+        assertEquals(String.format(BEFORE_LINK_LABEL,
+                        "/cases/case-details/1655312312192821#Documents",
+                        "/cases/case-details/1655312312192821#Documents"),
+                caseDetails.getCaseData().getEt1VettingBeforeYouStart());
+    }
+
+    @Test
+    void initialBeforeYouStart_NoDocumentCollection_shouldReturnDefaultUrl() {
         et1VettingService.initialBeforeYouStart(caseDetails);
         assertEquals(String.format(BEFORE_LINK_LABEL,
                         "/cases/case-details/1655312312192821#Documents",

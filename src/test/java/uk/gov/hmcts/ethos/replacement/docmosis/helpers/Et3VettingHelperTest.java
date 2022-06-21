@@ -47,6 +47,14 @@ class Et3VettingHelperTest {
         assertEquals(expectedResult, actualResult);
     }
 
+    @Test
+    void givenRespondentCollectionEmpty() {
+        caseDetails1.getCaseData().setRespondentCollection(null);
+        String actualResult = Et3VettingHelper.getEt3Dates(caseDetails1.getCaseData());
+        String expectedResult = generateEt3Dates("Cannot find ET1 Served Date", "Cannot find ET3 Due Date", "No");
+        assertEquals(expectedResult, actualResult);
+    }
+
     private String generateEt3Dates(String et1ServedDate, String et3DueDate, String et3ReceivedDate) {
         StringBuilder stringBuilder = new StringBuilder();
 

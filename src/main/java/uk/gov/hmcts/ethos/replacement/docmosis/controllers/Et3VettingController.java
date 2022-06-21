@@ -30,7 +30,7 @@ public class Et3VettingController {
     private final VerifyTokenService verifyTokenService;
 
     @PostMapping(value = "/et3VettingStart", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "initilize data for et3 vetting")
+    @Operation(summary = "initialize data for et3 vetting")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {

@@ -54,8 +54,8 @@ public class Et3VettingController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setEt3Date(Et3VettingHelper.getEt3DatesInMarkdown(caseData));
         caseData.setEt3IsThereAnEt3Response(Et3VettingHelper.isThereAnEt3Response(caseData)
-                        ? YES
-                        : NO
+            ? YES
+            : NO
         );
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }

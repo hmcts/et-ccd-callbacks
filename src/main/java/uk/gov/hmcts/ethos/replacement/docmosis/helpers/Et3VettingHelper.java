@@ -28,6 +28,11 @@ public class Et3VettingHelper {
         //Access through static methods
     }
 
+    /**
+     * Formats the case data into the table that is rendered on the "Is there an ET3 Response?" page
+     * @param caseData The case data containing the ET3 response
+     * @return A string containing markdown for a table, will change content depending on if/when the ET3 response has been submitted
+     */
     public static String getEt3DatesInMarkdown(CaseData caseData) {
         return String.format(
                 ET3_TABLE_DATA,
@@ -35,6 +40,29 @@ public class Et3VettingHelper {
                 findEt3Due(caseData.getClaimServedDate()),
                 findEt3Received(caseData)
         );
+    }
+
+    /**
+     * Check if an ET3 response has been submitted on a given case data
+     * @param caseData The case data to check
+     * @return True if ET3 submitted, False if not submitted or if the respondent collection is empty
+     */
+    public static boolean isThereAnEt3Response(CaseData caseData) {
+        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+
+        if (CollectionUtils.isEmpty(respondentCollection)) {
+            log.error("Respondent collection is empty for case ref " + caseData.getEthosCaseReference());
+            return false;
+        }
+
+        for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
+            RespondentSumType respondent = respondentSumTypeItem.getValue();
+            if (!isNullOrEmpty(respondent.getResponseReceived()) && respondent.getResponseReceived().equals(YES)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static String findEt3Due(String et3DueDate) {
@@ -65,23 +93,5 @@ public class Et3VettingHelper {
         }
 
         return NO;
-    }
-
-    public static boolean isThereAnEt3Response(CaseData caseData) {
-        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
-
-        if (CollectionUtils.isEmpty(respondentCollection)) {
-            log.error("Respondent collection is empty for case ref " + caseData.getEthosCaseReference());
-            return false;
-        }
-
-        for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
-            RespondentSumType respondent = respondentSumTypeItem.getValue();
-            if (!isNullOrEmpty(respondent.getResponseReceived()) && respondent.getResponseReceived().equals(YES)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

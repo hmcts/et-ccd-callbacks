@@ -27,14 +27,13 @@ public class Et1VettingService {
         var documentCollection = caseDetails.getCaseData().getDocumentCollection();
         if (documentCollection != null && !documentCollection.isEmpty()) {
             for (DocumentTypeItem d : documentCollection) {
-                if (d.getValue().getTypeOfDocument().equals(ET1_DOC_TYPE)) {
+                if (ET1_DOC_TYPE.equals(d.getValue().getTypeOfDocument())) {
                     et1BinaryUrl = createDocLinkBinary(d);
                 }
-                if (d.getValue().getTypeOfDocument().equals(ACAS_DOC_TYPE)) {
+                if (ACAS_DOC_TYPE.equals(d.getValue().getTypeOfDocument())) {
                     acasBinaryUrl = createDocLinkBinary(d);
                 }
             }
-
         }
 
         caseDetails.getCaseData().setEt1VettingBeforeYouStart(

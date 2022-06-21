@@ -14,6 +14,10 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+/**
+ * ET3 vetting helper provides methods to assist with the ET3 vetting pages
+ * this includes formatting markdown and querying the state of the ET3 response
+ */
 @Slf4j
 public class Et3VettingHelper {
 

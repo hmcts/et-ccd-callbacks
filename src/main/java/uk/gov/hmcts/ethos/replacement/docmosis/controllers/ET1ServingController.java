@@ -105,4 +105,44 @@ public class ET1ServingController {
 
         return getCallbackRespEntityNoErrors(caseData);
     }
+
+    /**
+     * This service Gets userToken as a parameter for security validation
+     * and ccdRequest data which has caseData as an object.
+     * Send emails to claimant and respondent to notify them that the serving documents have been submitted
+     * @param  userToken        Used for authorisation
+     *
+     * @param ccdRequest        CaseData which is a generic data type for most of the
+     *                          methods which holds ET1 case data
+     * @return ResponseEntity
+     */
+    @PostMapping(value = "/afterSubmittedServing", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Send emails to claimant and respondent to notify them that the serving documents " +
+            "have been submitted")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> afterSubmittedServing(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        ET1ServingService.sendSubmittedEmailToRespondentAndClaimant(caseData);
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .data(caseData)
+                .confirmation_header(ET1ServingService.generateAfterSubmittedHtml(caseData))
+                .build());
+    }
+
 }

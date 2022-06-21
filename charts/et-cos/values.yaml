@@ -18,6 +18,7 @@ java:
           alias: CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING
         - name: AppInsightsInstrumentationKey
           alias: APP_INSIGHTS_KEY
+        - gov-notify-api-key
   environment:
     SERVER_PORT: 8081
     REFORM_TEAM: et
@@ -42,3 +43,4 @@ java:
     ET_COS_DB_USER_NAME: et_cos@et-cos-{{ .Values.global.environment }}
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SECURE_DOC_STORE_FEATURE: true
+    NOTIFY_TEMPLATE_ID: e2ff4e9d-5d82-4138-80f8-a02acc2fc2ef

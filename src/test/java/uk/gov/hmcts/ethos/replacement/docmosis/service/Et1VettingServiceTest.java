@@ -23,6 +23,12 @@ class Et1VettingServiceTest {
 
     private Et1VettingService et1VettingService;
     private CaseDetails caseDetails;
+    private final String et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
+    private final String acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
+    private final String acasBinaryUrl2 = "/documents/acas2222-4ef8ca1e3-8c60-d3d78808dca1/binary";
+    private final String acasBinaryUrl3 = "/documents/acas3333-4ef8ca1e3-8c60-d3d78808dca1/binary";
+    private final String acasBinaryUrl4 = "/documents/acas4444-4ef8ca1e3-8c60-d3d78808dca1/binary";
+    private final String acasBinaryUrl5 = "/documents/acas5555-4ef8ca1e3-8c60-d3d78808dca1/binary";
 
     @BeforeEach
     void setUp() {
@@ -35,7 +41,6 @@ class Et1VettingServiceTest {
 
     @Test
     void initialBeforeLinkLabel_ZeroAcas_shouldReturnEt1Only() {
-        var et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
         List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
         documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, et1BinaryUrl1));
         caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
@@ -47,13 +52,6 @@ class Et1VettingServiceTest {
 
     @Test
     void initialBeforeLinkLabel_FiveAcas_shouldReturnFiveAcas() {
-        var et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
-        var acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
-        var acasBinaryUrl2 = "/documents/acas2222-4ef8ca1e3-8c60-d3d78808dca1/binary";
-        var acasBinaryUrl3 = "/documents/acas3333-4ef8ca1e3-8c60-d3d78808dca1/binary";
-        var acasBinaryUrl4 = "/documents/acas4444-4ef8ca1e3-8c60-d3d78808dca1/binary";
-        var acasBinaryUrl5 = "/documents/acas5555-4ef8ca1e3-8c60-d3d78808dca1/binary";
-
         List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
         documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, et1BinaryUrl1));
         documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl1));
@@ -76,14 +74,6 @@ class Et1VettingServiceTest {
 
     @Test
     void initialBeforeLinkLabel_SixAcas_shouldReturnDocTab() {
-        var et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
-        var acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
-        var acasBinaryUrl2 = "/documents/acas2222-4ef8ca1e3-8c60-d3d78808dca1/binary";
-        var acasBinaryUrl3 = "/documents/acas3333-4ef8ca1e3-8c60-d3d78808dca1/binary";
-        var acasBinaryUrl4 = "/documents/acas4444-4ef8ca1e3-8c60-d3d78808dca1/binary";
-        var acasBinaryUrl5 = "/documents/acas5555-4ef8ca1e3-8c60-d3d78808dca1/binary";
-        var acasBinaryUrl6 = "/documents/acas6666-4ef8ca1e3-8c60-d3d78808dca1/binary";
-
         List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
         documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, et1BinaryUrl1));
         documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl1));
@@ -91,7 +81,8 @@ class Et1VettingServiceTest {
         documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl3));
         documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl4));
         documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl5));
-        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl6));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE,
+                "/documents/acas6666-4ef8ca1e3-8c60-d3d78808dca1/binary"));
         caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
 
         et1VettingService.initialiseEt1Vetting(caseDetails);

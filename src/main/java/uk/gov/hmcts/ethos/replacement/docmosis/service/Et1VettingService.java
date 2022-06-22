@@ -30,7 +30,6 @@ public class Et1VettingService {
     public String initialBeforeYouStart(CaseDetails caseDetails) {
 
         String et1Display = "";
-        String acasDisplay;
         StringBuilder acasDisplayStringBuilder = new StringBuilder();
         int acasCount = 0;
 
@@ -48,12 +47,10 @@ public class Et1VettingService {
             }
         }
 
-        if (acasCount > 5) {
-            acasDisplay = String.format(BEFORE_LABEL_ACAS_OPEN_TAB,
-                    String.format(DOC_LINK_DEFAULT, caseDetails.getCaseId()));
-        } else {
-            acasDisplay = acasDisplayStringBuilder.toString();
-        }
+        String acasDisplay = acasCount > 5
+                ? String.format(BEFORE_LABEL_ACAS_OPEN_TAB,
+                        String.format(DOC_LINK_DEFAULT, caseDetails.getCaseId()))
+                : acasDisplayStringBuilder.toString();
 
         return String.format(BEFORE_LABEL_TEMPLATE, et1Display, acasDisplay);
     }

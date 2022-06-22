@@ -16,6 +16,8 @@ public class Et1VettingService {
             "<br/><a target=\"_blank\" href=\"%s\">ET1 form (opens in new tab)</a>";
     static final String BEFORE_LABEL_ACAS =
             "<br/><a target=\"_blank\" href=\"%s\">Acas certificate %s (opens in new tab)</a>";
+    static final String BEFORE_LABEL_ACAS_OPEN_TAB = "<br/><a target=\"_blank\" href=\"%s\">"
+            + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
 
     /**
      * Update et1VettingBeforeYouStart.
@@ -28,7 +30,7 @@ public class Et1VettingService {
     public String initialBeforeYouStart(CaseDetails caseDetails) {
 
         String et1Display = "";
-        String acasDisplay = "";
+        String acasDisplay;
         StringBuilder acasDisplayStringBuilder = new StringBuilder();
         int acasCount = 0;
 
@@ -47,8 +49,8 @@ public class Et1VettingService {
         }
 
         if (acasCount > 5) {
-            acasDisplay = String.format(BEFORE_LABEL_ACAS,
-                    String.format(DOC_LINK_DEFAULT, caseDetails.getCaseId()), "");
+            acasDisplay = String.format(BEFORE_LABEL_ACAS_OPEN_TAB,
+                    String.format(DOC_LINK_DEFAULT, caseDetails.getCaseId()));
         } else {
             acasDisplay = acasDisplayStringBuilder.toString();
         }

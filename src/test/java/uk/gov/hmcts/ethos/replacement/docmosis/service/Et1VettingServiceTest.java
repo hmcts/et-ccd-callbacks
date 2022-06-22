@@ -14,6 +14,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ACAS_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LABEL_ACAS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LABEL_ACAS_OPEN_TAB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LABEL_ET1;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LABEL_TEMPLATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ET1_DOC_TYPE;
@@ -96,7 +97,7 @@ class Et1VettingServiceTest {
         et1VettingService.initialiseEt1Vetting(caseDetails);
         assertEquals(String.format(BEFORE_LABEL_TEMPLATE,
                         String.format(BEFORE_LABEL_ET1, et1BinaryUrl1),
-                        String.format(BEFORE_LABEL_ACAS, "/cases/case-details/1655312312192821#Documents", "")),
+                        String.format(BEFORE_LABEL_ACAS_OPEN_TAB, "/cases/case-details/1655312312192821#Documents")),
                 caseDetails.getCaseData().getEt1VettingBeforeYouStart());
     }
 

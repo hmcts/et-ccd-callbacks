@@ -29,6 +29,7 @@ class Et1VettingServiceTest {
     private final String acasBinaryUrl3 = "/documents/acas3333-4ef8ca1e3-8c60-d3d78808dca1/binary";
     private final String acasBinaryUrl4 = "/documents/acas4444-4ef8ca1e3-8c60-d3d78808dca1/binary";
     private final String acasBinaryUrl5 = "/documents/acas5555-4ef8ca1e3-8c60-d3d78808dca1/binary";
+    private final String caseId = "1655312312192821";
 
     @BeforeEach
     void setUp() {
@@ -36,7 +37,7 @@ class Et1VettingServiceTest {
         caseDetails = new CaseDetails();
         CaseData caseData = new CaseData();
         caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId("1655312312192821");
+        caseDetails.setCaseId(caseId);
     }
 
     @Test
@@ -88,7 +89,7 @@ class Et1VettingServiceTest {
         et1VettingService.initialiseEt1Vetting(caseDetails);
         String expected = String.format(BEFORE_LABEL_TEMPLATE,
                 String.format(BEFORE_LABEL_ET1, et1BinaryUrl1),
-                String.format(BEFORE_LABEL_ACAS_OPEN_TAB, "/cases/case-details/1655312312192821#Documents"));
+                String.format(BEFORE_LABEL_ACAS_OPEN_TAB, caseId));
         assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart()).isEqualTo(expected);
     }
 

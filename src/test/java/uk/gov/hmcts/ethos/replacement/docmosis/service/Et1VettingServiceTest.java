@@ -13,7 +13,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ACAS_DOC_TYPE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LINK_LABEL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LABEL_ACAS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LABEL_ET1;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LABEL_TEMPLATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ET1_DOC_TYPE;
 
 class Et1VettingServiceTest {
@@ -31,39 +33,77 @@ class Et1VettingServiceTest {
     }
 
     @Test
-    void initialBeforeLinkLabel_Exist_shouldReturnBinaryUrl() {
+    void initialBeforeLinkLabel_ZeroAcas_shouldReturnEt1Only() {
+        var et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
         List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
-        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE,
-                "http://dm-store:8080/documents/et10dcae-4efd-8886-0dca-1e3876c3178c/binary"));
-        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE,
-                "http://dm-store:8080/documents/acas76ce-4ef8ca1e3-8c60-d3d78808dca1/binary"));
+        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, et1BinaryUrl1));
         caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
 
-        et1VettingService.initialBeforeYouStart(caseDetails);
-        assertEquals(String.format(BEFORE_LINK_LABEL,
-                        "/documents/et10dcae-4efd-8886-0dca-1e3876c3178c/binary",
-                        "/documents/acas76ce-4ef8ca1e3-8c60-d3d78808dca1/binary"),
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertEquals(String.format(BEFORE_LABEL_TEMPLATE, String.format(BEFORE_LABEL_ET1, et1BinaryUrl1), ""),
                 caseDetails.getCaseData().getEt1VettingBeforeYouStart());
     }
 
     @Test
-    void initialBeforeLinkLabel_NotExist_shouldReturnDefaultUrl() {
+    void initialBeforeLinkLabel_FiveAcas_shouldReturnFiveAcas() {
+        var et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
+        var acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
+        var acasBinaryUrl2 = "/documents/acas2222-4ef8ca1e3-8c60-d3d78808dca1/binary";
+        var acasBinaryUrl3 = "/documents/acas3333-4ef8ca1e3-8c60-d3d78808dca1/binary";
+        var acasBinaryUrl4 = "/documents/acas4444-4ef8ca1e3-8c60-d3d78808dca1/binary";
+        var acasBinaryUrl5 = "/documents/acas5555-4ef8ca1e3-8c60-d3d78808dca1/binary";
+
         List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
+        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, et1BinaryUrl1));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl1));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl2));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl3));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl4));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl5));
         caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
 
-        et1VettingService.initialBeforeYouStart(caseDetails);
-        assertEquals(String.format(BEFORE_LINK_LABEL,
-                        "/cases/case-details/1655312312192821#Documents",
-                        "/cases/case-details/1655312312192821#Documents"),
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertEquals(String.format(BEFORE_LABEL_TEMPLATE,
+                        String.format(BEFORE_LABEL_ET1, et1BinaryUrl1),
+                        String.format(BEFORE_LABEL_ACAS, acasBinaryUrl1, "1")
+                                + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl2, "2")
+                                + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl3, "3")
+                                + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl4, "4")
+                                + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl5, "5")),
                 caseDetails.getCaseData().getEt1VettingBeforeYouStart());
     }
 
     @Test
-    void initialBeforeYouStart_NoDocumentCollection_shouldReturnDefaultUrl() {
-        et1VettingService.initialBeforeYouStart(caseDetails);
-        assertEquals(String.format(BEFORE_LINK_LABEL,
-                        "/cases/case-details/1655312312192821#Documents",
-                        "/cases/case-details/1655312312192821#Documents"),
+    void initialBeforeLinkLabel_SixAcas_shouldReturnDocTab() {
+        var et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
+        var acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
+        var acasBinaryUrl2 = "/documents/acas2222-4ef8ca1e3-8c60-d3d78808dca1/binary";
+        var acasBinaryUrl3 = "/documents/acas3333-4ef8ca1e3-8c60-d3d78808dca1/binary";
+        var acasBinaryUrl4 = "/documents/acas4444-4ef8ca1e3-8c60-d3d78808dca1/binary";
+        var acasBinaryUrl5 = "/documents/acas5555-4ef8ca1e3-8c60-d3d78808dca1/binary";
+        var acasBinaryUrl6 = "/documents/acas6666-4ef8ca1e3-8c60-d3d78808dca1/binary";
+
+        List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
+        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, et1BinaryUrl1));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl1));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl2));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl3));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl4));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl5));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl6));
+        caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
+
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertEquals(String.format(BEFORE_LABEL_TEMPLATE,
+                        String.format(BEFORE_LABEL_ET1, et1BinaryUrl1),
+                        String.format(BEFORE_LABEL_ACAS, "/cases/case-details/1655312312192821#Documents", "")),
+                caseDetails.getCaseData().getEt1VettingBeforeYouStart());
+    }
+
+    @Test
+    void initialBeforeYouStart_NoDocumentCollection_shouldReturnWithoutUrl() {
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertEquals(String.format(BEFORE_LABEL_TEMPLATE, "", ""),
                 caseDetails.getCaseData().getEt1VettingBeforeYouStart());
     }
 
@@ -71,7 +111,7 @@ class Et1VettingServiceTest {
         DocumentType documentType = new DocumentType();
         documentType.setTypeOfDocument(typeOfDocument);
         documentType.setUploadedDocument(new UploadedDocumentType());
-        documentType.getUploadedDocument().setDocumentBinaryUrl(binaryLink);
+        documentType.getUploadedDocument().setDocumentBinaryUrl("http://dm-store:8080" + binaryLink);
         DocumentTypeItem documentTypeItem = new DocumentTypeItem();
         documentTypeItem.setValue(documentType);
         return documentTypeItem;

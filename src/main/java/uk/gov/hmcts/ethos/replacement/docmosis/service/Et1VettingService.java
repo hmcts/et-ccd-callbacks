@@ -10,38 +10,50 @@ public class Et1VettingService {
     static final String ET1_DOC_TYPE = "ET1";
     static final String ACAS_DOC_TYPE = "ACAS Certificate";
     static final String DOC_LINK_DEFAULT = "/cases/case-details/%s#Documents";
-    static final String BEFORE_LINK_LABEL = "Open these documents to help you complete this form: "
-            + "<br/><a target=\"_blank\" href=\"%s\">ET1 form (opens in new tab)</a>"
-            + "<br/><a target=\"_blank\" href=\"%s\">Acas certificate (opens in new tab)</a>"
+    static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s"
             + "<br/>Check the Documents tab for additional ET1 documents the claimant may have uploaded.";
+    static final String BEFORE_LABEL_ET1 =
+            "<br/><a target=\"_blank\" href=\"%s\">ET1 form (opens in new tab)</a>";
+    static final String BEFORE_LABEL_ACAS =
+            "<br/><a target=\"_blank\" href=\"%s\">Acas certificate %s (opens in new tab)</a>";
 
     /**
      * Update et1VettingBeforeYouStart.
      * @param caseDetails Get caseId and Update caseData
      */
-    public void initialBeforeYouStart(CaseDetails caseDetails) {
+    public void initialiseEt1Vetting(CaseDetails caseDetails) {
+        caseDetails.getCaseData().setEt1VettingBeforeYouStart(initialBeforeYouStart(caseDetails));
+    }
 
-        var et1BinaryUrl = createDocLinkDefault(caseDetails.getCaseId());
-        var acasBinaryUrl = createDocLinkDefault(caseDetails.getCaseId());
+    public String initialBeforeYouStart(CaseDetails caseDetails) {
+
+        String et1Display = "";
+        String acasDisplay = "";
+        StringBuilder acasDisplayStringBuilder = new StringBuilder();
+        int acasCount = 0;
 
         var documentCollection = caseDetails.getCaseData().getDocumentCollection();
         if (documentCollection != null && !documentCollection.isEmpty()) {
             for (DocumentTypeItem d : documentCollection) {
                 if (ET1_DOC_TYPE.equals(d.getValue().getTypeOfDocument())) {
-                    et1BinaryUrl = createDocLinkBinary(d);
+                    et1Display = String.format(BEFORE_LABEL_ET1, createDocLinkBinary(d));
                 }
                 if (ACAS_DOC_TYPE.equals(d.getValue().getTypeOfDocument())) {
-                    acasBinaryUrl = createDocLinkBinary(d);
+                    acasCount++;
+                    acasDisplayStringBuilder.append(
+                            String.format(BEFORE_LABEL_ACAS, createDocLinkBinary(d), acasCount));
                 }
             }
         }
 
-        caseDetails.getCaseData().setEt1VettingBeforeYouStart(
-                String.format(BEFORE_LINK_LABEL, et1BinaryUrl, acasBinaryUrl));
-    }
+        if (acasCount > 5) {
+            acasDisplay = String.format(BEFORE_LABEL_ACAS,
+                    String.format(DOC_LINK_DEFAULT, caseDetails.getCaseId()), "");
+        } else {
+            acasDisplay = acasDisplayStringBuilder.toString();
+        }
 
-    private String createDocLinkDefault(String caseId) {
-        return String.format(DOC_LINK_DEFAULT, caseId);
+        return String.format(BEFORE_LABEL_TEMPLATE, et1Display, acasDisplay);
     }
 
     private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {

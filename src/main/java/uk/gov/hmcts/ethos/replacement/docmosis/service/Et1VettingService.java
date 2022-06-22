@@ -1,8 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 @Service
 public class Et1VettingService {
@@ -18,6 +22,15 @@ public class Et1VettingService {
             "<br/><a target=\"_blank\" href=\"%s\">Acas certificate %s (opens in new tab)</a>";
     static final String BEFORE_LABEL_ACAS_OPEN_TAB = "<br/><a target=\"_blank\" href=\"%s\">"
             + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
+    static final String CLAIMANT_DETAILS = "| Claimant | |\n"
+            + "| --- | --- |\n"
+            + "| First name | %s |\n"
+            + "| Last name | %s |\n"
+            + "| Contact address | %s |\n";
+    static final String RESPONDENT_DETAILS = "| Respondent | |\n"
+            + "| --- | --- |\n"
+            + "| Name | %s |\n"
+            + "| Contact address | %s |";
 
     /**
      * Update et1VettingBeforeYouStart.
@@ -25,6 +38,10 @@ public class Et1VettingService {
      */
     public void initialiseEt1Vetting(CaseDetails caseDetails) {
         caseDetails.getCaseData().setEt1VettingBeforeYouStart(initialBeforeYouStart(caseDetails));
+        caseDetails.getCaseData().setEt1VettingClaimantDetailsMarkUp(
+                initialClaimantDetailsMarkUp(caseDetails.getCaseData()));
+        caseDetails.getCaseData().setEt1VettingRespondentDetailsMarkUp(
+                initialRespondentDetailsMarkUp(caseDetails.getCaseData()));
     }
 
     public String initialBeforeYouStart(CaseDetails caseDetails) {
@@ -53,6 +70,20 @@ public class Et1VettingService {
                 : acasDisplayStringBuilder.toString();
 
         return String.format(BEFORE_LABEL_TEMPLATE, et1Display, acasDisplay);
+    }
+
+    private String initialClaimantDetailsMarkUp(CaseData caseData) {
+        return String.format(CLAIMANT_DETAILS,
+                caseData.getClaimantIndType().getClaimantFirstNames(),
+                caseData.getClaimantIndType().getClaimantLastName(),
+                caseData.getClaimantType().getClaimantAddressUK().toAddressHtml());
+    }
+
+    private String initialRespondentDetailsMarkUp(CaseData caseData) {
+        RespondentSumType respondent = caseData.getRespondentCollection().get(0).getValue();
+        return String.format(RESPONDENT_DETAILS,
+                respondent.getRespondentName(),
+                respondent.getRespondentAddress().toAddressHtml());
     }
 
     private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {

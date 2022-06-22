@@ -67,7 +67,7 @@ public class Et3VettingHelper {
 
         for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
             RespondentSumType respondent = respondentSumTypeItem.getValue();
-            if (respondentName.equals(respondent.getRespondentName())) {
+            if (respondentName.equals(respondent.getRespondentName()) && YES.equals(respondent.getResponseReceived())) {
                 return true;
             }
         }

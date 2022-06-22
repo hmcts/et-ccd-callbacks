@@ -253,10 +253,19 @@ public class CaseDataBuilder {
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(respondentSumType);
 
-        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
-        respondentCollection.add(respondentSumTypeItem);
+        if (caseData.getRespondentCollection() == null) {
+            caseData.setRespondentCollection(new ArrayList<>());
+        }
+        caseData.getRespondentCollection().add(respondentSumTypeItem);
+        return this;
+    }
 
-        caseData.setRespondentCollection(respondentCollection);
+    public CaseDataBuilder withChooseEt3Respondent(String respondentName) {
+        DynamicValueType respondent = DynamicValueType.create(respondentName, respondentName);
+        DynamicFixedListType respondentList = new DynamicFixedListType();
+        respondentList.setListItems(List.of(respondent));
+        respondentList.setValue(respondent);
+        caseData.setEt3ChooseRespondent(respondentList);
         return this;
     }
 }

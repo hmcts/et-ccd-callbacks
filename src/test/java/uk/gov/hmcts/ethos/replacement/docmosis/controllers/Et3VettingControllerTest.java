@@ -20,6 +20,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.when;
@@ -35,7 +36,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ContextConfiguration(classes = DocmosisApplication.class)
 class Et3VettingControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String ET3_VETTING_START_URL = "/et3VettingStart";
+    private static final String POPULATE_ET3_DATES_URL = "/et3Vetting/populateEt3Dates";
+    private static final String INIT_ET3_RESPONDENT_LIST_URL = "/et3Vetting/initEt3RespondentList";
     @Autowired
     private WebApplicationContext applicationContext;
     @MockBean
@@ -51,6 +53,7 @@ class Et3VettingControllerTest {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
 
         CaseDetails caseDetails = CaseDataBuilder.builder()
+                .withChooseEt3Respondent("Jack")
                 .withRespondent("Jack", YES, "2022-03-01")
                 .withClaimServedDate("2022-01-01")
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
@@ -61,9 +64,9 @@ class Et3VettingControllerTest {
     }
 
     @Test
-    void et3VettingStart_tokenOk() throws Exception {
+    void populateEt3Dates_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(ET3_VETTING_START_URL)
+        mvc.perform(post(POPULATE_ET3_DATES_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -74,9 +77,9 @@ class Et3VettingControllerTest {
     }
 
     @Test
-    void et3VettingStart_tokenFail() throws Exception {
+    void populateEt3Dates_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(ET3_VETTING_START_URL)
+        mvc.perform(post(POPULATE_ET3_DATES_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -84,8 +87,54 @@ class Et3VettingControllerTest {
     }
 
     @Test
-    void et3VettingStart_tokenBadRequest() throws Exception {
-        mvc.perform(post(ET3_VETTING_START_URL)
+    void populateEt3Dates_badRequest() throws Exception {
+        mvc.perform(post(POPULATE_ET3_DATES_URL)
+                .content("garbage content")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void initEt3RespondentList_tokenOkWithRespondentCollection() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(INIT_ET3_RESPONDENT_LIST_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(0)))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void initEt3RespondentList_tokenOkWithoutRespondentCollection() throws Exception {
+        ccdRequest.getCaseDetails().getCaseData().setRespondentCollection(null);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(INIT_ET3_RESPONDENT_LIST_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void initEt3RespondentList_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(INIT_ET3_RESPONDENT_LIST_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void initEt3RespondentList_badRequest() throws Exception {
+        mvc.perform(post(INIT_ET3_RESPONDENT_LIST_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))

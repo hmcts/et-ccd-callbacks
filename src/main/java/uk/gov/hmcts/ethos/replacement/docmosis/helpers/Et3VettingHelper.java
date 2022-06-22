@@ -20,7 +20,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 /**
  * ET3 vetting helper provides methods to assist with the ET3 vetting pages
- * this includes formatting markdown and querying the state of the ET3 response
+ * this includes formatting markdown and querying the state of the ET3 response.
  */
 @Slf4j
 public class Et3VettingHelper {
@@ -33,15 +33,17 @@ public class Et3VettingHelper {
         + "|ET3 due| %s|\r\n"
         + "|Extension| None|\r\n"
         + "|ET3 received| %s|";
+
     private Et3VettingHelper() {
         //Access through static methods
     }
 
     /**
-     * Formats the case data into the table that is rendered on the "Is there an ET3 Response?" page
+     * Formats the case data into the table that is rendered on the "Is there an ET3 Response?" page.
      * @param caseData The case data containing the ET3 response
-     * @return A string containing markdown for a table, will change content depending on if/when the ET3 response has been submitted
-     */
+     * @return A string containing markdown for a table, will change content depending on if/when the ET3 response
+     *         has been submitted
+     * */
     public static String getEt3DatesInMarkdown(CaseData caseData) {
         return String.format(
                 ET3_TABLE_DATA,
@@ -52,12 +54,11 @@ public class Et3VettingHelper {
     }
 
     /**
-     * Check if an ET3 response has been submitted on a given case data
+     * Check if an ET3 response has been submitted on a given case data.
      * @param caseData The case data to check
      * @return True if ET3 submitted, False if not submitted or if the respondent collection is empty
      */
     public static boolean isThereAnEt3Response(CaseData caseData) {
-        String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
 
         if (CollectionUtils.isEmpty(respondentCollection)) {
@@ -65,6 +66,7 @@ public class Et3VettingHelper {
             return false;
         }
 
+        String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
         for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
             RespondentSumType respondent = respondentSumTypeItem.getValue();
             if (respondentName.equals(respondent.getRespondentName()) && YES.equals(respondent.getResponseReceived())) {
@@ -88,7 +90,6 @@ public class Et3VettingHelper {
     }
 
     private static String findEt3ReceivedDate(CaseData caseData) {
-        String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
 
         if (CollectionUtils.isEmpty(respondentCollection)) {
@@ -96,9 +97,11 @@ public class Et3VettingHelper {
             return NO;
         }
 
+        String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
         for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
             RespondentSumType respondent = respondentSumTypeItem.getValue();
-            if (respondentName.equals(respondent.getRespondentName()) && YES.equals(respondent.getResponseReceived()))  {
+            if (respondentName.equals(respondent.getRespondentName())
+                    && YES.equals(respondent.getResponseReceived()))  {
                 return UtilHelper.listingFormatLocalDate(respondent.getResponseReceivedDate());
             }
         }
@@ -109,17 +112,18 @@ public class Et3VettingHelper {
     /**
      * This method will create and populate the dynamicList needed for the user to choose the respondent. It
      * initially checks to see if the collection is empty and returns an error to the user to let them know. If it is
-     * not empty, the code continues and calls upon an exisitng helper class which creates the list using the
+     * not empty, the code continues and calls upon an existing helper class which creates the list using the
      * respondent collection
      * @param caseData contains all the case data
-     * @return will either return a list which contains an error message if no respondents are found or will return an
-     * empty list showing that there were no errors
+     * @return will either return a list which contains an error message if no respondents were found or will return an
+     *         empty list showing that there were no errors
      */
     public static List<String> populateRespondentDynamicList(CaseData caseData) {
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
         if (CollectionUtils.isEmpty(respondentCollection)) {
             return Arrays.asList(String.format(NO_RESPONDENTS_FOUND_ERROR, caseData.getEthosCaseReference()));
         }
+
         List<DynamicValueType> dynamicRespondentList =
                 DynamicListHelper.createDynamicRespondentName(respondentCollection);
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();

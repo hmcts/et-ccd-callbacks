@@ -24,7 +24,6 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -45,7 +44,7 @@ public class Et3VettingController {
 
     /**
      * Method calls when the Is there an ET3 Response?" page is loaded, will generate a table
-     * for displaying the state of the ET3 response and set if the response has been received
+     * for displaying the state of the ET3 response and set if the response has been received.
      */
     @PostMapping(value = "/populateEt3Dates", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populate dates for ET3 vetting")
@@ -78,7 +77,7 @@ public class Et3VettingController {
 
     /**
      * Creates a DynamicList containing a list of all the respondents which the user will be able to select as part of
-     * the ET3 Vetting Process
+     * the ET3 Vetting Process.
      * @param ccdRequest holds the request and case data
      * @param userToken used for authorization
      * @return this will call the response entity but will also display any error messages which occur.
@@ -86,13 +85,13 @@ public class Et3VettingController {
     @PostMapping(value = "/initEt3RespondentList", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "initialize data for et3 vetting")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initEt3RespondentList(
             @RequestBody CCDRequest ccdRequest,

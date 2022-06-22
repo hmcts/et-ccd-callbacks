@@ -6,6 +6,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -113,8 +115,8 @@ class Et3VettingHelperTest {
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         errors = Et3VettingHelper.populateRespondentDynamicList(caseDetails.getCaseData());
-        assertEquals(0, errors.size());
-        assertEquals(3, caseDetails.getCaseData().getEt3ChooseRespondent().getListItems().size());
+        assertThat(errors.size(), is(0));
+        assertThat(caseDetails.getCaseData().getEt3ChooseRespondent().getListItems().size(), is(3));
     }
 
     @Test
@@ -124,7 +126,7 @@ class Et3VettingHelperTest {
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         errors = Et3VettingHelper.populateRespondentDynamicList(caseDetails.getCaseData());
-        assertEquals(String.format(NO_RESPONDENTS_FOUND_ERROR, "123456789/1234"), errors.get(0));
+        assertThat(errors.get(0), is(String.format(NO_RESPONDENTS_FOUND_ERROR, "123456789/1234")));
     }
 
     private String generateEt3Dates(String et1ServedDate, String et3DueDate, String et3ReceivedDate) {

@@ -66,15 +66,11 @@ public class Et3VettingHelper {
             return false;
         }
 
-        String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
-        for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
-            RespondentSumType respondent = respondentSumTypeItem.getValue();
-            if (respondentName.equals(respondent.getRespondentName()) && YES.equals(respondent.getResponseReceived())) {
-                return true;
-            }
-        }
+        return respondentCollection
+                .stream()
+                .anyMatch(r -> respondentExistsAndEt3Received(
+                        caseData.getEt3ChooseRespondent().getSelectedLabel(), r.getValue()));
 
-        return false;
     }
 
     private static String findEt3DueDate(String et3DueDate) {
@@ -100,13 +96,17 @@ public class Et3VettingHelper {
         String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
         for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
             RespondentSumType respondent = respondentSumTypeItem.getValue();
-            if (respondentName.equals(respondent.getRespondentName())
-                    && YES.equals(respondent.getResponseReceived()))  {
+            if (respondentExistsAndEt3Received(respondentName, respondent))  {
                 return UtilHelper.listingFormatLocalDate(respondent.getResponseReceivedDate());
             }
         }
 
         return NO;
+    }
+
+    private static boolean respondentExistsAndEt3Received(String respondentName, RespondentSumType respondent) {
+        return respondentName.equals(respondent.getRespondentName())
+                && YES.equals(respondent.getResponseReceived());
     }
 
     /**

@@ -29,6 +29,19 @@ public class Et1VettingService {
         caseDetails.getCaseData().setEt1VettingBeforeYouStart(initialBeforeYouStart(caseDetails));
     }
 
+    /**
+     * Prepare wordings to be displayed in et1VettingBeforeYouStart.
+     * Check uploaded document in documentCollection
+     *  For ET1 form
+     *  - get and display ET1 form
+     *  For Acas cert
+     *  - get and count number of Acas cert
+     *  - if 0 Acas cert, hide the Acas link
+     *  - if 1-5 Acas cert(s), display one or multi Acas link(s)
+     *  - if 6 or more Acas certs, display a link to case doc tab
+     * @param caseDetails Get caseId and documentCollection
+     * @return et1VettingBeforeYouStart
+     */
     private String initialBeforeYouStart(CaseDetails caseDetails) {
 
         String et1Display = "";

@@ -11,7 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ACAS_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LABEL_ACAS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LABEL_ACAS_OPEN_TAB;
@@ -46,8 +46,8 @@ class Et1VettingServiceTest {
         caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
 
         et1VettingService.initialiseEt1Vetting(caseDetails);
-        assertEquals(String.format(BEFORE_LABEL_TEMPLATE, String.format(BEFORE_LABEL_ET1, et1BinaryUrl1), ""),
-                caseDetails.getCaseData().getEt1VettingBeforeYouStart());
+        String expected = String.format(BEFORE_LABEL_TEMPLATE, String.format(BEFORE_LABEL_ET1, et1BinaryUrl1), "");
+        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart()).isEqualTo(expected);
     }
 
     @Test
@@ -62,14 +62,14 @@ class Et1VettingServiceTest {
         caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
 
         et1VettingService.initialiseEt1Vetting(caseDetails);
-        assertEquals(String.format(BEFORE_LABEL_TEMPLATE,
-                        String.format(BEFORE_LABEL_ET1, et1BinaryUrl1),
-                        String.format(BEFORE_LABEL_ACAS, acasBinaryUrl1, "1")
-                                + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl2, "2")
-                                + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl3, "3")
-                                + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl4, "4")
-                                + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl5, "5")),
-                caseDetails.getCaseData().getEt1VettingBeforeYouStart());
+        String expected = String.format(BEFORE_LABEL_TEMPLATE,
+                String.format(BEFORE_LABEL_ET1, et1BinaryUrl1),
+                String.format(BEFORE_LABEL_ACAS, acasBinaryUrl1, "1")
+                        + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl2, "2")
+                        + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl3, "3")
+                        + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl4, "4")
+                        + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl5, "5"));
+        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart()).isEqualTo(expected);
     }
 
     @Test
@@ -86,17 +86,17 @@ class Et1VettingServiceTest {
         caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
 
         et1VettingService.initialiseEt1Vetting(caseDetails);
-        assertEquals(String.format(BEFORE_LABEL_TEMPLATE,
-                        String.format(BEFORE_LABEL_ET1, et1BinaryUrl1),
-                        String.format(BEFORE_LABEL_ACAS_OPEN_TAB, "/cases/case-details/1655312312192821#Documents")),
-                caseDetails.getCaseData().getEt1VettingBeforeYouStart());
+        String expected = String.format(BEFORE_LABEL_TEMPLATE,
+                String.format(BEFORE_LABEL_ET1, et1BinaryUrl1),
+                String.format(BEFORE_LABEL_ACAS_OPEN_TAB, "/cases/case-details/1655312312192821#Documents"));
+        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart()).isEqualTo(expected);
     }
 
     @Test
     void initialBeforeYouStart_NoDocumentCollection_shouldReturnWithoutUrl() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
-        assertEquals(String.format(BEFORE_LABEL_TEMPLATE, "", ""),
-                caseDetails.getCaseData().getEt1VettingBeforeYouStart());
+        String expected = String.format(BEFORE_LABEL_TEMPLATE, "", "");
+        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart()).isEqualTo(expected);
     }
 
     private DocumentTypeItem createDocumentTypeItem(String typeOfDocument, String binaryLink) {

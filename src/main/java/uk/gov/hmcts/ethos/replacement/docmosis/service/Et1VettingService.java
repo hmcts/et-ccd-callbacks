@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 
+import java.util.List;
+
 @Service
 public class Et1VettingService {
 
@@ -34,16 +36,15 @@ public class Et1VettingService {
         StringBuilder acasDisplayStringBuilder = new StringBuilder();
         int acasCount = 0;
 
-        var documentCollection = caseDetails.getCaseData().getDocumentCollection();
+        List<DocumentTypeItem> documentCollection = caseDetails.getCaseData().getDocumentCollection();
         if (CollectionUtils.isNotEmpty(documentCollection)) {
             for (DocumentTypeItem d : documentCollection) {
-                if (ET1_DOC_TYPE.equals(d.getValue().getTypeOfDocument())) {
-                    et1Display = String.format(BEFORE_LABEL_ET1, createDocLinkBinary(d));
-                }
                 if (ACAS_DOC_TYPE.equals(d.getValue().getTypeOfDocument())) {
                     acasCount++;
                     acasDisplayStringBuilder.append(
                             String.format(BEFORE_LABEL_ACAS, createDocLinkBinary(d), acasCount));
+                } else if (ET1_DOC_TYPE.equals(d.getValue().getTypeOfDocument())) {
+                    et1Display = String.format(BEFORE_LABEL_ET1, createDocLinkBinary(d));
                 }
             }
         }
@@ -57,7 +58,7 @@ public class Et1VettingService {
     }
 
     private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {
-        var documentBinaryUrl = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
+        String documentBinaryUrl = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
         return documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
     }
 

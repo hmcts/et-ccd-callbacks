@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -27,14 +28,14 @@ public class Et1VettingService {
         caseDetails.getCaseData().setEt1VettingBeforeYouStart(initialBeforeYouStart(caseDetails));
     }
 
-    public String initialBeforeYouStart(CaseDetails caseDetails) {
+    private String initialBeforeYouStart(CaseDetails caseDetails) {
 
         String et1Display = "";
         StringBuilder acasDisplayStringBuilder = new StringBuilder();
         int acasCount = 0;
 
         var documentCollection = caseDetails.getCaseData().getDocumentCollection();
-        if (documentCollection != null && !documentCollection.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(documentCollection)) {
             for (DocumentTypeItem d : documentCollection) {
                 if (ET1_DOC_TYPE.equals(d.getValue().getTypeOfDocument())) {
                     et1Display = String.format(BEFORE_LABEL_ET1, createDocLinkBinary(d));

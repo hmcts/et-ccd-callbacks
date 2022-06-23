@@ -5,14 +5,16 @@ public class IntWrapper {
     private int value;
 
     public IntWrapper(int initialValue) {
-        super();
+        value = initialValue;
     }
 
     public int getValue() {
         return value;
     }
 
-    public void incrementValue() {
+    public int incrementAndReturnValue() {
         value++;
+        return value;
     }
+
 }

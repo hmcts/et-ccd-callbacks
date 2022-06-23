@@ -6,7 +6,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class Et1VettingService {
@@ -46,35 +46,30 @@ public class Et1VettingService {
      */
     private String initialBeforeYouStart(CaseDetails caseDetails) {
 
-        Optional<String> et1Display = Optional.empty();
-        StringBuilder acasDisplayStringBuilder = new StringBuilder();
+        String et1Display = "";
+        String acasDisplay = "";
         IntWrapper acasCount = new IntWrapper(0);
 
         List<DocumentTypeItem> documentCollection = caseDetails.getCaseData().getDocumentCollection();
         if (documentCollection != null) {
             et1Display = documentCollection
                     .stream()
-                    .map(d -> getInfoWithDocumentCollection(d, acasDisplayStringBuilder, acasCount))
-                    .findFirst();
+                    .filter(d -> d.getValue().getTypeOfDocument().equals(ET1_DOC_TYPE))
+                    .map(d -> String.format(BEFORE_LABEL_ET1, createDocLinkBinary(d)))
+                    .collect(Collectors.joining());
+            acasDisplay = documentCollection
+                    .stream()
+                    .filter(d -> d.getValue().getTypeOfDocument().equals(ACAS_DOC_TYPE))
+                    .map(d -> String.format(
+                            BEFORE_LABEL_ACAS, createDocLinkBinary(d), acasCount.incrementAndReturnValue()))
+                    .collect(Collectors.joining());
         }
 
-        String acasDisplay = acasCount.getValue() > 5
-                ? String.format(BEFORE_LABEL_ACAS_OPEN_TAB, caseDetails.getCaseId())
-                : acasDisplayStringBuilder.toString();
-
-        return String.format(BEFORE_LABEL_TEMPLATE, et1Display.orElse(""), acasDisplay);
-    }
-
-    private String getInfoWithDocumentCollection(DocumentTypeItem d, StringBuilder acasDisplayStringBuilder,
-                                                 IntWrapper acasCount) {
-        if (ACAS_DOC_TYPE.equals(d.getValue().getTypeOfDocument())) {
-            acasCount.incrementValue();
-            acasDisplayStringBuilder
-                    .append(String.format(BEFORE_LABEL_ACAS, createDocLinkBinary(d), acasCount));
-        } else if (ET1_DOC_TYPE.equals(d.getValue().getTypeOfDocument())) {
-            return String.format(BEFORE_LABEL_ET1, createDocLinkBinary(d));
+        if (acasCount.getValue() > 5) {
+            acasDisplay = String.format(BEFORE_LABEL_ACAS_OPEN_TAB, caseDetails.getCaseId());
         }
-        return null;
+
+        return String.format(BEFORE_LABEL_TEMPLATE, et1Display, acasDisplay);
     }
 
     private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {

@@ -12,17 +12,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ACAS_DOC_TYPE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LABEL_ACAS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LABEL_ACAS_OPEN_TAB;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LABEL_ET1;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LABEL_TEMPLATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ET1_DOC_TYPE;
 
 class Et1VettingServiceTest {
 
     private Et1VettingService et1VettingService;
     private CaseDetails caseDetails;
+
+    private static final String ET1_DOC_TYPE = "ET1";
+    private static final String ACAS_DOC_TYPE = "ACAS Certificate";
+    private static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s"
+            + "<br/>Check the Documents tab for additional ET1 documents the claimant may have uploaded.";
+    private static final String BEFORE_LABEL_ET1 =
+            "<br/><a target=\"_blank\" href=\"%s\">ET1 form (opens in new tab)</a>";
+    private static final String BEFORE_LABEL_ACAS =
+            "<br/><a target=\"_blank\" href=\"%s\">Acas certificate %s (opens in new tab)</a>";
+    private static final String BEFORE_LABEL_ACAS_OPEN_TAB =
+            "<br/><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"
+                    + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
+
     private final String et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
     private final String acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
     private final String acasBinaryUrl2 = "/documents/acas2222-4ef8ca1e3-8c60-d3d78808dca1/binary";
@@ -48,14 +55,15 @@ class Et1VettingServiceTest {
 
         et1VettingService.initialiseEt1Vetting(caseDetails);
         String expected = String.format(BEFORE_LABEL_TEMPLATE, String.format(BEFORE_LABEL_ET1, et1BinaryUrl1), "");
-        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart()).isEqualTo(expected);
+        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart())
+                .isEqualTo(expected);
     }
 
     @Test
     void initialBeforeLinkLabel_FiveAcas_shouldReturnFiveAcas() {
         List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
-        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, et1BinaryUrl1));
         documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl1));
+        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, et1BinaryUrl1));
         documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl2));
         documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl3));
         documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl4));
@@ -70,7 +78,8 @@ class Et1VettingServiceTest {
                         + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl3, "3")
                         + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl4, "4")
                         + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl5, "5"));
-        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart()).isEqualTo(expected);
+        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart())
+                .isEqualTo(expected);
     }
 
     @Test
@@ -90,14 +99,16 @@ class Et1VettingServiceTest {
         String expected = String.format(BEFORE_LABEL_TEMPLATE,
                 String.format(BEFORE_LABEL_ET1, et1BinaryUrl1),
                 String.format(BEFORE_LABEL_ACAS_OPEN_TAB, caseId));
-        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart()).isEqualTo(expected);
+        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart())
+                .isEqualTo(expected);
     }
 
     @Test
     void initialBeforeYouStart_NoDocumentCollection_shouldReturnWithoutUrl() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
         String expected = String.format(BEFORE_LABEL_TEMPLATE, "", "");
-        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart()).isEqualTo(expected);
+        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart())
+                .isEqualTo(expected);
     }
 
     private DocumentTypeItem createDocumentTypeItem(String typeOfDocument, String binaryLink) {

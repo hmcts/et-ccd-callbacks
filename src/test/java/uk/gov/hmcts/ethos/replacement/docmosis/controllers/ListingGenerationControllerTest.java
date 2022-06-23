@@ -347,7 +347,7 @@ public class ListingGenerationControllerTest {
 
     @Test
     public void generateListingsDocSingleCases() throws Exception {
-        when(listingService.setCourtAddressFromCaseData(isA(CaseData.class)))
+        when(listingService.setManagingOfficeAndCourtAddressFromCaseData(isA(CaseData.class)))
                 .thenReturn(singleListingRequest.getCaseDetails().getCaseData());
         when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
                 .thenReturn(documentInfo);
@@ -616,7 +616,7 @@ public class ListingGenerationControllerTest {
                 .thenThrow(new InternalException(ERROR_MESSAGE));
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(listingService.setCourtAddressFromCaseData(isA(CaseData.class)))
+        when(listingService.setManagingOfficeAndCourtAddressFromCaseData(isA(CaseData.class)))
                 .thenReturn(singleListingRequest.getCaseDetails().getCaseData());
 
         mvc.perform(post(GENERATE_LISTINGS_DOC_SINGLE_CASES_URL)

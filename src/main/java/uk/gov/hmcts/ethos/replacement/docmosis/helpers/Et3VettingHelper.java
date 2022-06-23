@@ -39,6 +39,29 @@ public class Et3VettingHelper {
     }
 
     /**
+     * This method will create and populate the dynamicList needed for the user to choose the respondent. It
+     * initially checks to see if the collection is empty and returns an error to the user to let them know. If it is
+     * not empty, the code continues and calls upon an existing helper class which creates the list using the
+     * respondent collection
+     * @param caseData contains all the case data
+     * @return will either return a list which contains an error message if no respondents were found or will return an
+     *         empty list showing that there were no errors
+     */
+    public static List<String> populateRespondentDynamicList(CaseData caseData) {
+        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+        if (CollectionUtils.isEmpty(respondentCollection)) {
+            return Arrays.asList(String.format(NO_RESPONDENTS_FOUND_ERROR, caseData.getEthosCaseReference()));
+        }
+
+        List<DynamicValueType> dynamicRespondentList =
+                DynamicListHelper.createDynamicRespondentName(respondentCollection);
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        dynamicFixedListType.setListItems(dynamicRespondentList);
+        caseData.setEt3ChooseRespondent(dynamicFixedListType);
+        return new ArrayList<>();
+    }
+
+    /**
      * Formats the case data into the table that is rendered on the "Is there an ET3 Response?" page.
      * @param caseData The case data containing the ET3 response
      * @return A string containing markdown for a table, will change content depending on if/when the ET3 response
@@ -72,6 +95,31 @@ public class Et3VettingHelper {
                         caseData.getEt3ChooseRespondent().getSelectedLabel(), r.getValue()));
 
     }
+
+    public static void calculateResponseTime(CaseData caseData) {
+
+        LocalDate et3DueDate = LocalDate.parse(caseData.getClaimServedDate()).plusDays(29);
+
+        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+        RespondentSumType respondentSumType = respondentCollection
+                .stream()
+                .filter(r -> respondentExistsAndEt3Received(
+                        caseData.getEt3ChooseRespondent().getSelectedLabel(), r.getValue()))
+                .findFirst().get().getValue();
+
+        LocalDate et3ReceivedDate = LocalDate.parse(respondentSumType.getResponseReceivedDate());
+
+        // TODO add code to include extension once it has been added to the payload
+        // LocalDate et3Extension = LocalDate.parse(respondentSumType.getResponseExtension()); ?
+
+        if (et3ReceivedDate.isAfter(et3DueDate)) {
+            caseData.setEt3ResponseInTime(NO);
+        } else {
+            caseData.setEt3ResponseInTime(YES);
+        }
+
+    }
+
 
     private static String findEt3DueDate(String et3DueDate) {
         return isNullOrEmpty(et3DueDate)
@@ -109,26 +157,4 @@ public class Et3VettingHelper {
                 && YES.equals(respondent.getResponseReceived());
     }
 
-    /**
-     * This method will create and populate the dynamicList needed for the user to choose the respondent. It
-     * initially checks to see if the collection is empty and returns an error to the user to let them know. If it is
-     * not empty, the code continues and calls upon an existing helper class which creates the list using the
-     * respondent collection
-     * @param caseData contains all the case data
-     * @return will either return a list which contains an error message if no respondents were found or will return an
-     *         empty list showing that there were no errors
-     */
-    public static List<String> populateRespondentDynamicList(CaseData caseData) {
-        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
-        if (CollectionUtils.isEmpty(respondentCollection)) {
-            return Arrays.asList(String.format(NO_RESPONDENTS_FOUND_ERROR, caseData.getEthosCaseReference()));
-        }
-
-        List<DynamicValueType> dynamicRespondentList =
-                DynamicListHelper.createDynamicRespondentName(respondentCollection);
-        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
-        dynamicFixedListType.setListItems(dynamicRespondentList);
-        caseData.setEt3ChooseRespondent(dynamicFixedListType);
-        return new ArrayList<>();
-    }
 }

@@ -38,6 +38,7 @@ class Et3VettingControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String POPULATE_ET3_DATES_URL = "/et3Vetting/populateEt3Dates";
     private static final String INIT_ET3_RESPONDENT_LIST_URL = "/et3Vetting/initEt3RespondentList";
+    private static final String CALCULATE_RESPONSE_TIME_URL = "/et3Vetting/calculateResponseInTime";
     @Autowired
     private WebApplicationContext applicationContext;
     @MockBean
@@ -135,6 +136,38 @@ class Et3VettingControllerTest {
     @Test
     void initEt3RespondentList_badRequest() throws Exception {
         mvc.perform(post(INIT_ET3_RESPONDENT_LIST_URL)
+                .content("garbage content")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void calculateResponseInTime_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(CALCULATE_RESPONSE_TIME_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void calculateResponseInTime_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(CALCULATE_RESPONSE_TIME_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void calculateResponseInTime_badRequest() throws Exception {
+        mvc.perform(post(CALCULATE_RESPONSE_TIME_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
@@ -127,6 +128,30 @@ class Et3VettingHelperTest {
 
         errors = Et3VettingHelper.populateRespondentDynamicList(caseDetails.getCaseData());
         assertThat(errors.get(0), is(String.format(NO_RESPONDENTS_FOUND_ERROR, "123456789/1234")));
+    }
+
+    @Test
+    void givenTheEt3IsOnTime_ResponseInTimeShouldBeYes() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withChooseEt3Respondent("John")
+                .withRespondent("John", YES, "2022-01-06")
+                .withRespondent("Jack", YES, "2022-02-02")
+                .withClaimServedDate("2022-01-01")
+                .build();
+        Et3VettingHelper.calculateResponseTime(caseData);
+        assertThat(caseData.getEt3ResponseInTime(), is(YES));
+    }
+
+    @Test
+    void givenTheEt3IsLate_ResponseInTimeShouldBeNo() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withChooseEt3Respondent("John")
+                .withRespondent("John", YES, "2022-02-06")
+                .withRespondent("Jack", YES, "2022-02-02")
+                .withClaimServedDate("2022-01-01")
+                .build();
+        Et3VettingHelper.calculateResponseTime(caseData);
+        assertThat(caseData.getEt3ResponseInTime(), is(NO));
     }
 
     private String generateEt3Dates(String et1ServedDate, String et3DueDate, String et3ReceivedDate) {

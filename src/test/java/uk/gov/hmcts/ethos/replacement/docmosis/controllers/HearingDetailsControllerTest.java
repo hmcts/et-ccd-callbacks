@@ -13,6 +13,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails.H
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.never;
@@ -97,6 +98,38 @@ public class HearingDetailsControllerTest {
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/hearingdetails/handleListingSelected")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", token)
+                .content(jsonMapper.toJson(ccdRequest)))
+
+                .andExpect(status().isForbidden());
+        verify(hearingDetailsService, never()).handleListingSelected(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    public void testhearingMidEventValidation() throws Exception {
+        var ccdRequest = CCDRequestBuilder.builder().build();
+        var token = "some-token";
+        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
+
+        mockMvc.perform(post("/hearingdetails/hearingMidEventValidation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", token)
+                .content(jsonMapper.toJson(ccdRequest)))
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(0)))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    public void testhearingMidEventValidationInvalidToken() throws Exception {
+        var ccdRequest = CCDRequestBuilder.builder().build();
+        var token = "invalid-token";
+        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
+
+        mockMvc.perform(post("/hearingdetails/hearingMidEventValidation")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", token)
                 .content(jsonMapper.toJson(ccdRequest)))

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
@@ -24,12 +25,12 @@ public class Et1VettingService {
     private static final String BEFORE_LABEL_ACAS_OPEN_TAB =
             "<br/><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"
                     + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
-    static final String CLAIMANT_DETAILS = "| Claimant | |\n"
+    private static final String CLAIMANT_DETAILS = "| Claimant | |\n"
             + "| --- | --- |\n"
             + "| First name | %s |\n"
             + "| Last name | %s |\n"
             + "| Contact address | %s |\n";
-    static final String RESPONDENT_DETAILS = "| Respondent | |\n"
+    private static final String RESPONDENT_DETAILS = "| Respondent | |\n"
             + "| --- | --- |\n"
             + "| Name | %s |\n"
             + "| Contact address | %s |";
@@ -95,10 +96,14 @@ public class Et1VettingService {
     }
 
     private String initialRespondentDetailsMarkUp(CaseData caseData) {
-        RespondentSumType respondent = caseData.getRespondentCollection().get(0).getValue();
-        return String.format(RESPONDENT_DETAILS,
-                respondent.getRespondentName(),
-                respondent.getRespondentAddress().toAddressHtml());
+        StringBuilder respondentStringBuilder = new StringBuilder();
+        for (RespondentSumTypeItem r : caseData.getRespondentCollection()) {
+            respondentStringBuilder.append(
+                    String.format(RESPONDENT_DETAILS,
+                            r.getValue().getRespondentName(),
+                            r.getValue().getRespondentAddress().toAddressHtml()));
+        }
+        return respondentStringBuilder.toString();
     }
 
     private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {

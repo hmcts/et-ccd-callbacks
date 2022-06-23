@@ -8,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails.HearingDetailsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
@@ -42,8 +43,8 @@ public class HearingDetailsControllerTest {
 
     @Test
     public void testInitialiseHearingDynamicList() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        var token = "some-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/hearingdetails/initialiseHearings")
@@ -60,8 +61,8 @@ public class HearingDetailsControllerTest {
 
     @Test
     public void testInitialiseHearingDynamicListInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        var token = "invalid-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/hearingdetails/initialiseHearings")
@@ -75,8 +76,8 @@ public class HearingDetailsControllerTest {
 
     @Test
     public void testHandleListingSelected() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        var token = "some-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/hearingdetails/handleListingSelected")
@@ -93,8 +94,8 @@ public class HearingDetailsControllerTest {
 
     @Test
     public void testHandleListingSelectedInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        var token = "invalid-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/hearingdetails/handleListingSelected")
@@ -108,8 +109,8 @@ public class HearingDetailsControllerTest {
 
     @Test
     public void testhearingMidEventValidation() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        var token = "some-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/hearingdetails/hearingMidEventValidation")
@@ -125,8 +126,8 @@ public class HearingDetailsControllerTest {
 
     @Test
     public void testhearingMidEventValidationInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        var token = "invalid-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/hearingdetails/hearingMidEventValidation")
@@ -140,8 +141,8 @@ public class HearingDetailsControllerTest {
 
     @Test
     public void testAboutToSubmit() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        var token = "some-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/hearingdetails/aboutToSubmit")
@@ -158,8 +159,8 @@ public class HearingDetailsControllerTest {
 
     @Test
     public void testAboutToSubmitInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        var token = "invalid-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/hearingdetails/aboutToSubmit")

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails.HearingDetailsService;
@@ -52,7 +53,7 @@ public class HearingDetailsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         hearingDetailsService.initialiseHearingDetails(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -73,7 +74,7 @@ public class HearingDetailsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         hearingDetailsService.handleListingSelected(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -94,7 +95,7 @@ public class HearingDetailsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = HearingsHelper.hearingTimeValidation(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
     }

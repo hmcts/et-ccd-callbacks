@@ -96,14 +96,12 @@ public class Et1VettingService {
     }
 
     private String initialRespondentDetailsMarkUp(CaseData caseData) {
-        StringBuilder respondentStringBuilder = new StringBuilder();
-        for (RespondentSumTypeItem r : caseData.getRespondentCollection()) {
-            respondentStringBuilder.append(
-                    String.format(RESPONDENT_DETAILS,
-                            r.getValue().getRespondentName(),
-                            r.getValue().getRespondentAddress().toAddressHtml()));
-        }
-        return respondentStringBuilder.toString();
+        return caseData.getRespondentCollection()
+                .stream()
+                .map(r -> String.format(RESPONDENT_DETAILS,
+                        r.getValue().getRespondentName(),
+                        r.getValue().getRespondentAddress().toAddressHtml()))
+                .collect(Collectors.joining());
     }
 
     private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {

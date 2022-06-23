@@ -8,11 +8,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails.HearingDetailsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.never;
@@ -41,8 +43,8 @@ public class HearingDetailsControllerTest {
 
     @Test
     public void testInitialiseHearingDynamicList() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        var token = "some-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/hearingdetails/initialiseHearings")
@@ -59,8 +61,8 @@ public class HearingDetailsControllerTest {
 
     @Test
     public void testInitialiseHearingDynamicListInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        var token = "invalid-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/hearingdetails/initialiseHearings")
@@ -74,8 +76,8 @@ public class HearingDetailsControllerTest {
 
     @Test
     public void testHandleListingSelected() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        var token = "some-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/hearingdetails/handleListingSelected")
@@ -92,8 +94,8 @@ public class HearingDetailsControllerTest {
 
     @Test
     public void testHandleListingSelectedInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        var token = "invalid-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/hearingdetails/handleListingSelected")
@@ -106,9 +108,41 @@ public class HearingDetailsControllerTest {
     }
 
     @Test
+    public void testhearingMidEventValidation() throws Exception {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "some-token";
+        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
+
+        mockMvc.perform(post("/hearingdetails/hearingMidEventValidation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", token)
+                .content(jsonMapper.toJson(ccdRequest)))
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(0)))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    public void testhearingMidEventValidationInvalidToken() throws Exception {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "invalid-token";
+        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
+
+        mockMvc.perform(post("/hearingdetails/hearingMidEventValidation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", token)
+                .content(jsonMapper.toJson(ccdRequest)))
+
+                .andExpect(status().isForbidden());
+        verify(hearingDetailsService, never()).handleListingSelected(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
     public void testAboutToSubmit() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        var token = "some-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/hearingdetails/aboutToSubmit")
@@ -125,8 +159,8 @@ public class HearingDetailsControllerTest {
 
     @Test
     public void testAboutToSubmitInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
-        var token = "invalid-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/hearingdetails/aboutToSubmit")

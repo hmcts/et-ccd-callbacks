@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.xpath.operations.Equals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

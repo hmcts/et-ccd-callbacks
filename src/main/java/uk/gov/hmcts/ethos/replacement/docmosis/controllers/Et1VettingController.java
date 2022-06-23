@@ -15,8 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+
+import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -56,8 +59,13 @@ public class Et1VettingController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         et1VettingService.initialBeforeYouStart(caseDetails);
 
+        List<JurCodesTypeItem> jurCodesCollection = caseDetails.getCaseData().getJurCodesCollection();
+        if (jurCodesCollection != null) {
+            caseDetails.getCaseData().setExistingJurisdictionCodes(et1VettingService.generateJurisdictionCodesHtml(jurCodesCollection));
+        }
+
+        caseDetails.getCaseData().setVettingJurisdictionCodeCollection(et1VettingService.populateJurisdictionCodesCollection());
+
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
-
     }
-
 }

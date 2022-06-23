@@ -1220,7 +1220,7 @@ public class ListingServiceTest {
     }
 
     @Test
-    public void setCourtAddressFromCaseData() {
+    public void setManagingOfficeAndCourtAddressFromCaseData() {
         String result = "ListingData(tribunalCorrespondenceAddress=Manchester Avenue, Manchester, "
                 + "tribunalCorrespondenceTelephone=null, tribunalCorrespondenceFax=null, "
                 + "tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, reportDate=null, "
@@ -1236,8 +1236,7 @@ public class ListingServiceTest {
                 + "localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, "
                 + "localReportsSummary2=null, localReportsDetailHdr=null, "
                 + "localReportsDetail=null, managingOffice=Leeds)";
-        ListingData listingData = listingService.setCourtAddressFromCaseData(caseDetails.getCaseData());
-        listingData.setManagingOffice("Leeds");
+        ListingData listingData = listingService.setManagingOfficeAndCourtAddressFromCaseData(caseDetails.getCaseData());
         assertEquals(result, listingData.toString());
     }
 

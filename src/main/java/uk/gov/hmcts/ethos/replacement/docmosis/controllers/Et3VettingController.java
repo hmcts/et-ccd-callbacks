@@ -128,7 +128,9 @@ public class Et3VettingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        Et3VettingHelper.calculateResponseTime(caseData);
+        if (YES.equals(caseData.getEt3IsThereAnEt3Response())) {
+            Et3VettingHelper.calculateResponseTime(caseData);
+        }
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 

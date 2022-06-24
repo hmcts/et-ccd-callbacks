@@ -100,6 +100,9 @@ public class CaseManagementForCaseWorkerService {
             var respondentSumType = caseData.getRespondentCollection().get(0).getValue();
             caseData.setRespondent(nullCheck(respondentSumType.getRespondentName()));
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
+                if (isNullOrEmpty(respondentSumTypeItem.getValue().getExtensionRequested())) {
+                    respondentSumTypeItem.getValue().setExtensionRequested(NO);
+                }
                 if (respondentSumTypeItem.getValue().getResponseReceived() == null) {
                     respondentSumTypeItem.getValue().setResponseReceived(NO);
                 }

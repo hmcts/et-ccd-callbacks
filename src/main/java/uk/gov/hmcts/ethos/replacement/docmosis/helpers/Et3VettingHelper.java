@@ -26,6 +26,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 public class Et3VettingHelper {
 
     static final String NO_RESPONDENTS_FOUND_ERROR = "No respondents found for case %s";
+    static final String NO_CLAIM_SERVED_DATE = "Cannot proceed as there is no claim served date";
+    static final String NO_ET3_RESPONSE = "Cannot process as there is no ET3 Response";
     static final String ET3_TABLE_DATA =
         "| Dates| |\r\n"
         + "|--|--|\r\n"
@@ -106,10 +108,13 @@ public class Et3VettingHelper {
      * a new due date is applied from the extension date
      * @param caseData this contains data from the case
      */
-    public static void calculateResponseTime(CaseData caseData) {
+    public static List<String> calculateResponseTime(CaseData caseData) {
 
-        LocalDate et3DueDate = LocalDate.parse(caseData.getClaimServedDate()).plusDays(ET3_RESPONSE_WINDOW);
+        List<String> errors = new ArrayList<>();
 
+        if (!responseInTimePreValidationCheck(caseData, errors)) {
+            return errors;
+        }
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
         RespondentSumType respondentSumType = respondentCollection
                 .stream()
@@ -117,6 +122,7 @@ public class Et3VettingHelper {
                         caseData.getEt3ChooseRespondent().getSelectedLabel(), r.getValue()))
                 .findFirst().get().getValue();
 
+        LocalDate et3DueDate = LocalDate.parse(caseData.getClaimServedDate()).plusDays(ET3_RESPONSE_WINDOW);
         LocalDate et3ReceivedDate = LocalDate.parse(respondentSumType.getResponseReceivedDate());
         if (respondentExtensionExists(respondentSumType)) {
             et3DueDate = LocalDate.parse(respondentSumType.getExtensionDate());
@@ -127,7 +133,18 @@ public class Et3VettingHelper {
         } else {
             caseData.setEt3ResponseInTime(YES);
         }
+        return errors;
 
+    }
+
+    private static boolean responseInTimePreValidationCheck(CaseData caseData, List<String> errors) {
+        if (isNullOrEmpty(caseData.getClaimServedDate())) {
+            errors.add(NO_CLAIM_SERVED_DATE);
+        }
+        if (NO.equals(findEt3ReceivedDate(caseData))) {
+            errors.add(NO_ET3_RESPONSE);
+        }
+        return errors.isEmpty();
     }
 
     private static String findEt3DueDate(String et3DueDate) {

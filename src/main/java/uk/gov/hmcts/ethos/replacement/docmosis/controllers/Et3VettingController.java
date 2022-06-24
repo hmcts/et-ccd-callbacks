@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -128,10 +129,11 @@ public class Et3VettingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = new ArrayList<>();
         if (YES.equals(caseData.getEt3IsThereAnEt3Response())) {
-            Et3VettingHelper.calculateResponseTime(caseData);
+            errors = Et3VettingHelper.calculateResponseTime(caseData);
         }
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+        return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
 }

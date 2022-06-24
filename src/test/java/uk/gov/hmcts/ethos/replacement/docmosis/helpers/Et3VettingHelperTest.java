@@ -10,12 +10,14 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.ET3_TABLE_DATA;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.NO_CLAIM_SERVED_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.NO_ET3_RESPONSE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.NO_RESPONDENTS_FOUND_ERROR;
-
 
 class Et3VettingHelperTest {
 
@@ -150,7 +152,8 @@ class Et3VettingHelperTest {
                 .withRespondent("Jack", YES, "2022-02-02", false)
                 .withClaimServedDate("2022-01-01")
                 .build();
-        Et3VettingHelper.calculateResponseTime(caseData);
+        errors = Et3VettingHelper.calculateResponseTime(caseData);
+        assertThat(errors.size(), is(0));
         assertThat(caseData.getEt3ResponseInTime(), is(YES));
     }
 
@@ -162,7 +165,8 @@ class Et3VettingHelperTest {
                 .withRespondent("Jack", YES, "2022-02-02", false)
                 .withClaimServedDate("2022-01-01")
                 .build();
-        Et3VettingHelper.calculateResponseTime(caseData);
+        errors = Et3VettingHelper.calculateResponseTime(caseData);
+        assertThat(errors.size(), is(0));
         assertThat(caseData.getEt3ResponseInTime(), is(NO));
     }
 
@@ -173,7 +177,8 @@ class Et3VettingHelperTest {
                 .withRespondent("John", YES, "2022-02-05", true)
                 .withClaimServedDate("2022-01-01")
                 .build();
-        Et3VettingHelper.calculateResponseTime(caseData);
+        errors = Et3VettingHelper.calculateResponseTime(caseData);
+        assertThat(errors.size(), is(0));
         assertThat(caseData.getEt3ResponseInTime(), is(YES));
     }
 
@@ -184,10 +189,49 @@ class Et3VettingHelperTest {
                 .withRespondent("John", YES, "2022-03-02", true)
                 .withClaimServedDate("2022-01-01")
                 .build();
-        Et3VettingHelper.calculateResponseTime(caseData);
+
+        errors = Et3VettingHelper.calculateResponseTime(caseData);
+        assertThat(errors.size(), is(0));
         assertThat(caseData.getEt3ResponseInTime(), is(NO));
     }
 
+    @Test
+    void givenClaimServedDateIsMissing_shouldReturnError() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withChooseEt3Respondent("John")
+                .withRespondent("John", YES, "2022-03-02", false)
+                .build();
+        errors = Et3VettingHelper.calculateResponseTime(caseData);
+        assertThat(errors.size(), is(1));
+        assertThat(errors.get(0), is(NO_CLAIM_SERVED_DATE));
+    }
+
+
+    @Test
+    void givenNoEt3Response_shouldReturnError() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withChooseEt3Respondent("John")
+                .withRespondent("John", NO, "2022-03-02", false)
+                .withClaimServedDate("2022-01-01")
+                .build();
+
+        errors = Et3VettingHelper.calculateResponseTime(caseData);
+        assertThat(errors.size(), is(1));
+        assertThat(errors.get(0), is(NO_ET3_RESPONSE));
+    }
+
+    @Test
+    void givenNoEt3ResponseAndNoClaimServedDate_shouldReturnMultipleErrors() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withChooseEt3Respondent("John")
+                .withRespondent("John", NO, "2022-03-02", false)
+                .build();
+
+        errors = Et3VettingHelper.calculateResponseTime(caseData);
+        assertThat(errors.size(), is(2));
+        assertTrue(errors.contains(NO_ET3_RESPONSE));
+        assertTrue(errors.contains(NO_CLAIM_SERVED_DATE));
+    }
 
     private String generateEt3Dates(String et1ServedDate, String et3DueDate, String extensionDate,String et3ReceivedDate) {
         return String.format(ET3_TABLE_DATA, et1ServedDate, et3DueDate, extensionDate, et3ReceivedDate);

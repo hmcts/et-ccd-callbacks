@@ -29,8 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-
-
 @RunWith(SpringRunner.class)
 @WebMvcTest({Et3VettingController.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
@@ -151,7 +149,7 @@ class Et3VettingControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(0)))
                 .andExpect(jsonPath("$.warnings", nullValue()));
     }
 

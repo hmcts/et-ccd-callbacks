@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -104,6 +105,34 @@ public class Et3VettingController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = Et3VettingHelper.populateRespondentDynamicList(caseData);
+        return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @PostMapping(value = "/calculateResponseInTime", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "calculate if the response was received in time")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> calculateResponseInTime(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = new ArrayList<>();
+        if (YES.equals(caseData.getEt3IsThereAnEt3Response())) {
+            errors = Et3VettingHelper.calculateResponseTime(caseData);
+        }
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 

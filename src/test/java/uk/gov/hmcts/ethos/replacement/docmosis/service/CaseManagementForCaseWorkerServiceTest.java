@@ -44,9 +44,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -652,6 +654,23 @@ public class CaseManagementForCaseWorkerServiceTest {
         assertEquals(2, errors.size());
         submitEvent.setState("Accepted");
         submitEvent.getCaseData().getRespondentCollection().get(0).getValue().setResponseReceived(YES);
+    }
+
+    @Test
+    public void respondentExtension_defaultValueNo() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
+        for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
+            assertThat(respondentSumTypeItem.getValue().getExtensionRequested(), is(NO));
+        }
+    }
+
+    @Test
+    public void respondentExtension_doesNotOverideExistingValue() {
+        CaseData caseData = scotlandCcdRequest3.getCaseDetails().getCaseData();
+        caseData.getRespondentCollection().get(0).getValue().setExtensionRequested(YES);
+        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
+        assertThat(caseData.getRespondentCollection().get(0).getValue().getExtensionRequested(), is(YES));
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

@@ -55,7 +55,7 @@ class Et3VettingControllerTest {
 
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withChooseEt3Respondent("Jack")
-                .withRespondent("Jack", YES, "2022-03-01")
+                .withRespondent("Jack", YES, "2022-03-01", false)
                 .withClaimServedDate("2022-01-01")
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 

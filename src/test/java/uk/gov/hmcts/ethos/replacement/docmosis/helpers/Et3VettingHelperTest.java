@@ -24,12 +24,12 @@ class Et3VettingHelperTest {
     void givenET3Received_datesShouldShow() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withChooseEt3Respondent("Jack")
-                .withRespondent("Jack", YES, "2022-03-01")
+                .withRespondent("Jack", YES, "2022-03-01", false)
                 .withClaimServedDate("2022-01-01")
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         String actualResult = Et3VettingHelper.getEt3DatesInMarkdown(caseDetails.getCaseData());
-        String expectedResult = generateEt3Dates("1 January 2022", "30 January 2022", "1 March 2022");
+        String expectedResult = generateEt3Dates("1 January 2022", "30 January 2022", "None",  "1 March 2022");
         assertEquals(expectedResult, actualResult);
     }
 
@@ -37,12 +37,12 @@ class Et3VettingHelperTest {
     void givenET3NotReceived_et3ShouldNotShow() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withChooseEt3Respondent("Jack")
-                .withRespondent("Jack", NO, "2022-03-01")
+                .withRespondent("Jack", NO, "2022-03-01", false)
                 .withClaimServedDate("2022-01-01")
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         String actualResult = Et3VettingHelper.getEt3DatesInMarkdown(caseDetails.getCaseData());
-        String expectedResult = generateEt3Dates("1 January 2022", "30 January 2022", NO);
+        String expectedResult = generateEt3Dates("1 January 2022", "30 January 2022", "None", NO);
         assertEquals(expectedResult, actualResult);
     }
 
@@ -50,12 +50,24 @@ class Et3VettingHelperTest {
     void givenET1isNull_et1ShouldShowError() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withChooseEt3Respondent("Jack")
-                .withRespondent("Jack", YES, "2022-03-01")
+                .withRespondent("Jack", YES, "2022-03-01", false)
                 .withClaimServedDate(null)
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         String actualResult = Et3VettingHelper.getEt3DatesInMarkdown(caseDetails.getCaseData());
-        String expectedResult = generateEt3Dates("Cannot find ET1 Served Date", "Cannot find ET3 Due Date", "1 March 2022");
+        String expectedResult = generateEt3Dates("Cannot find ET1 Served Date", "Cannot find ET3 Due Date", "None", "1 March 2022");
+        assertEquals(expectedResult, actualResult);
+    }
+
+    @Test
+    void givenAnExtensionDate_extensionDateShouldShow() {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+                .withChooseEt3Respondent("Jack")
+                .withRespondent("Jack", YES, "2022-03-01", true)
+                .withClaimServedDate("2022-01-01")
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        String actualResult = Et3VettingHelper.getEt3DatesInMarkdown(caseDetails.getCaseData());
+        String expectedResult = generateEt3Dates("1 January 2022", "30 January 2022", "1 March 2022", "1 March 2022");
         assertEquals(expectedResult, actualResult);
     }
 
@@ -66,7 +78,7 @@ class Et3VettingHelperTest {
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         String actualResult = Et3VettingHelper.getEt3DatesInMarkdown(caseDetails.getCaseData());
-        String expectedResult = generateEt3Dates("Cannot find ET1 Served Date", "Cannot find ET3 Due Date", "No");
+        String expectedResult = generateEt3Dates("Cannot find ET1 Served Date", "Cannot find ET3 Due Date", "None", "No");
         assertEquals(expectedResult, actualResult);
     }
 
@@ -74,7 +86,7 @@ class Et3VettingHelperTest {
     void ifThereIsAnEt3Response() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withChooseEt3Respondent("Jack")
-                .withRespondent("Jack", YES, "2022-03-01")
+                .withRespondent("Jack", YES, "2022-03-01", false)
                 .withClaimServedDate("2022-01-01")
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
@@ -87,7 +99,7 @@ class Et3VettingHelperTest {
     void ifThereIsNotAnEt3Response() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withChooseEt3Respondent("Jack")
-                .withRespondent("Jack", NO, "2022-03-01")
+                .withRespondent("Jack", NO, "2022-03-01", false)
                 .withClaimServedDate("2022-01-01")
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
@@ -110,9 +122,9 @@ class Et3VettingHelperTest {
     @Test
     void populateRespondentDynamicList() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
-                .withRespondent("John", YES, "2022-01-01")
-                .withRespondent("Terry", YES, "2022-03-01")
-                .withRespondent("Jack", NO, "2022-03-01")
+                .withRespondent("John", YES, "2022-01-01", false)
+                .withRespondent("Terry", YES, "2022-03-01", false)
+                .withRespondent("Jack", NO, "2022-03-01", false)
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         errors = Et3VettingHelper.populateRespondentDynamicList(caseDetails.getCaseData());
@@ -134,8 +146,8 @@ class Et3VettingHelperTest {
     void givenTheEt3IsOnTime_ResponseInTimeShouldBeYes() {
         CaseData caseData = CaseDataBuilder.builder()
                 .withChooseEt3Respondent("John")
-                .withRespondent("John", YES, "2022-01-06")
-                .withRespondent("Jack", YES, "2022-02-02")
+                .withRespondent("John", YES, "2022-01-06", false)
+                .withRespondent("Jack", YES, "2022-02-02", false)
                 .withClaimServedDate("2022-01-01")
                 .build();
         Et3VettingHelper.calculateResponseTime(caseData);
@@ -146,15 +158,38 @@ class Et3VettingHelperTest {
     void givenTheEt3IsLate_ResponseInTimeShouldBeNo() {
         CaseData caseData = CaseDataBuilder.builder()
                 .withChooseEt3Respondent("John")
-                .withRespondent("John", YES, "2022-02-06")
-                .withRespondent("Jack", YES, "2022-02-02")
+                .withRespondent("John", YES, "2022-02-06", false)
+                .withRespondent("Jack", YES, "2022-02-02", false)
                 .withClaimServedDate("2022-01-01")
                 .build();
         Et3VettingHelper.calculateResponseTime(caseData);
         assertThat(caseData.getEt3ResponseInTime(), is(NO));
     }
 
-    private String generateEt3Dates(String et1ServedDate, String et3DueDate, String et3ReceivedDate) {
-        return String.format(ET3_TABLE_DATA, et1ServedDate, et3DueDate, et3ReceivedDate);
+    @Test
+    void givenThatResponseIsBeforeExtension_responseInTimeShouldBeYes() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withChooseEt3Respondent("John")
+                .withRespondent("John", YES, "2022-02-05", true)
+                .withClaimServedDate("2022-01-01")
+                .build();
+        Et3VettingHelper.calculateResponseTime(caseData);
+        assertThat(caseData.getEt3ResponseInTime(), is(YES));
+    }
+
+    @Test
+    void givenThatResponseIsAfterExtension_responseInTimeShouldBeNo() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withChooseEt3Respondent("John")
+                .withRespondent("John", YES, "2022-03-02", true)
+                .withClaimServedDate("2022-01-01")
+                .build();
+        Et3VettingHelper.calculateResponseTime(caseData);
+        assertThat(caseData.getEt3ResponseInTime(), is(NO));
+    }
+
+
+    private String generateEt3Dates(String et1ServedDate, String et3DueDate, String extensionDate,String et3ReceivedDate) {
+        return String.format(ET3_TABLE_DATA, et1ServedDate, et3DueDate, extensionDate, et3ReceivedDate);
     }
 }

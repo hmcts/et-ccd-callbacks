@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.google.common.base.Strings;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.util.List;
@@ -17,23 +17,21 @@ public class Et1VettingService {
     private static final String ET1_DOC_TYPE = "ET1";
     private static final String ACAS_DOC_TYPE = "ACAS Certificate";
     private static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s"
-            + "<br/>Check the Documents tab for additional ET1 documents the claimant may have uploaded.";
+            + "<br>Check the Documents tab for additional ET1 documents the claimant may have uploaded.";
     private static final String BEFORE_LABEL_ET1 =
-            "<br/><a target=\"_blank\" href=\"%s\">ET1 form (opens in new tab)</a>";
+            "<br><a target=\"_blank\" href=\"%s\">ET1 form (opens in new tab)</a>";
     private static final String BEFORE_LABEL_ACAS =
-            "<br/><a target=\"_blank\" href=\"%s\">Acas certificate %s (opens in new tab)</a>";
+            "<br><a target=\"_blank\" href=\"%s\">Acas certificate %s (opens in new tab)</a>";
     private static final String BEFORE_LABEL_ACAS_OPEN_TAB =
-            "<br/><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"
+            "<br><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"
                     + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
-    private static final String CLAIMANT_DETAILS = "| Claimant | |\n"
-            + "| --- | --- |\n"
-            + "| First name | %s |\n"
-            + "| Last name | %s |\n"
-            + "| Contact address | %s |\n";
-    private static final String RESPONDENT_DETAILS = "| Respondent | |\n"
-            + "| --- | --- |\n"
-            + "| Name | %s |\n"
-            + "| Contact address | %s |";
+    private static final String CLAIMANT_DETAILS = "<hr><h3>Claimant</h3>"
+            + "<pre>First name &#09&#09&#09&#09&nbsp; %s"
+            + "<br><br>Last name &#09&#09&#09&#09&nbsp; %s"
+            + "<br><br>Contact address &#09&#09 %s</pre><hr>";
+    private static final String RESPONDENT_DETAILS = "<h3>Respondent</h3>"
+            + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
+            + "<br><br>Contact address &#09&#09 %s</pre><hr>";
 
     /**
      * Update et1VettingBeforeYouStart.
@@ -92,7 +90,7 @@ public class Et1VettingService {
         return String.format(CLAIMANT_DETAILS,
                 caseData.getClaimantIndType().getClaimantFirstNames(),
                 caseData.getClaimantIndType().getClaimantLastName(),
-                caseData.getClaimantType().getClaimantAddressUK().toAddressHtml());
+                toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()));
     }
 
     private String initialRespondentDetailsMarkUp(CaseData caseData) {
@@ -100,13 +98,28 @@ public class Et1VettingService {
                 .stream()
                 .map(r -> String.format(RESPONDENT_DETAILS,
                         r.getValue().getRespondentName(),
-                        r.getValue().getRespondentAddress().toAddressHtml()))
+                        toAddressWithTab(r.getValue().getRespondentAddress())))
                 .collect(Collectors.joining());
     }
 
     private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {
         String documentBinaryUrl = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
         return documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
+    }
+
+    public String toAddressWithTab(Address address) {
+        String brWithTab = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
+        StringBuilder claimantAddressStr = new StringBuilder();
+        claimantAddressStr.append(address.getAddressLine1());
+        if (!Strings.isNullOrEmpty(address.getAddressLine2())) {
+            claimantAddressStr.append(brWithTab).append(address.getAddressLine2());
+        }
+        if (!Strings.isNullOrEmpty(address.getAddressLine3())) {
+            claimantAddressStr.append(brWithTab).append(address.getAddressLine3());
+        }
+        claimantAddressStr.append(brWithTab).append(address.getPostTown())
+                .append(brWithTab).append(address.getPostCode());
+        return claimantAddressStr.toString();
     }
 
 }

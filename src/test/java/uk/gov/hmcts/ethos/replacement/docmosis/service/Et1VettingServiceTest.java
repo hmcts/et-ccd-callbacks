@@ -11,15 +11,32 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ACAS_DOC_TYPE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.BEFORE_LINK_LABEL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ET1_DOC_TYPE;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class Et1VettingServiceTest {
 
     private Et1VettingService et1VettingService;
     private CaseDetails caseDetails;
+
+    private static final String ET1_DOC_TYPE = "ET1";
+    private static final String ACAS_DOC_TYPE = "ACAS Certificate";
+    private static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s"
+            + "<br/>Check the Documents tab for additional ET1 documents the claimant may have uploaded.";
+    private static final String BEFORE_LABEL_ET1 =
+            "<br/><a target=\"_blank\" href=\"%s\">ET1 form (opens in new tab)</a>";
+    private static final String BEFORE_LABEL_ACAS =
+            "<br/><a target=\"_blank\" href=\"%s\">Acas certificate %s (opens in new tab)</a>";
+    private static final String BEFORE_LABEL_ACAS_OPEN_TAB =
+            "<br/><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"
+                    + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
+
+    private final String et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
+    private final String acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
+    private final String acasBinaryUrl2 = "/documents/acas2222-4ef8ca1e3-8c60-d3d78808dca1/binary";
+    private final String acasBinaryUrl3 = "/documents/acas3333-4ef8ca1e3-8c60-d3d78808dca1/binary";
+    private final String acasBinaryUrl4 = "/documents/acas4444-4ef8ca1e3-8c60-d3d78808dca1/binary";
+    private final String acasBinaryUrl5 = "/documents/acas5555-4ef8ca1e3-8c60-d3d78808dca1/binary";
+    private final String caseId = "1655312312192821";
 
     @BeforeEach
     void setUp() {
@@ -27,51 +44,78 @@ class Et1VettingServiceTest {
         caseDetails = new CaseDetails();
         CaseData caseData = new CaseData();
         caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId("1655312312192821");
+        caseDetails.setCaseId(caseId);
     }
 
     @Test
-    void initialBeforeLinkLabel_Exist_shouldReturnBinaryUrl() {
+    void initialBeforeLinkLabel_ZeroAcas_shouldReturnEt1Only() {
         List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
-        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE,
-                "http://dm-store:8080/documents/et10dcae-4efd-8886-0dca-1e3876c3178c/binary"));
+        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, et1BinaryUrl1));
+        caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
+
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        String expected = String.format(BEFORE_LABEL_TEMPLATE, String.format(BEFORE_LABEL_ET1, et1BinaryUrl1), "");
+        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart())
+                .isEqualTo(expected);
+    }
+
+    @Test
+    void initialBeforeLinkLabel_FiveAcas_shouldReturnFiveAcas() {
+        List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl1));
+        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, et1BinaryUrl1));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl2));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl3));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl4));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl5));
+        caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
+
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        String expected = String.format(BEFORE_LABEL_TEMPLATE,
+                String.format(BEFORE_LABEL_ET1, et1BinaryUrl1),
+                String.format(BEFORE_LABEL_ACAS, acasBinaryUrl1, "1")
+                        + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl2, "2")
+                        + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl3, "3")
+                        + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl4, "4")
+                        + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl5, "5"));
+        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart())
+                .isEqualTo(expected);
+    }
+
+    @Test
+    void initialBeforeLinkLabel_SixAcas_shouldReturnDocTab() {
+        List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
+        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, et1BinaryUrl1));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl1));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl2));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl3));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl4));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl5));
         documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE,
-                "http://dm-store:8080/documents/acas76ce-4ef8ca1e3-8c60-d3d78808dca1/binary"));
+                "/documents/acas6666-4ef8ca1e3-8c60-d3d78808dca1/binary"));
         caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
 
-        et1VettingService.initialBeforeYouStart(caseDetails);
-        assertEquals(String.format(BEFORE_LINK_LABEL,
-                        "/documents/et10dcae-4efd-8886-0dca-1e3876c3178c/binary",
-                        "/documents/acas76ce-4ef8ca1e3-8c60-d3d78808dca1/binary"),
-                caseDetails.getCaseData().getEt1VettingBeforeYouStart());
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        String expected = String.format(BEFORE_LABEL_TEMPLATE,
+                String.format(BEFORE_LABEL_ET1, et1BinaryUrl1),
+                String.format(BEFORE_LABEL_ACAS_OPEN_TAB, caseId));
+        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart())
+                .isEqualTo(expected);
     }
 
     @Test
-    void initialBeforeLinkLabel_NotExist_shouldReturnDefaultUrl() {
-        List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
-        caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
-
-        et1VettingService.initialBeforeYouStart(caseDetails);
-        assertEquals(String.format(BEFORE_LINK_LABEL,
-                        "/cases/case-details/1655312312192821#Documents",
-                        "/cases/case-details/1655312312192821#Documents"),
-                caseDetails.getCaseData().getEt1VettingBeforeYouStart());
-    }
-
-    @Test
-    void initialBeforeYouStart_NoDocumentCollection_shouldReturnDefaultUrl() {
-        et1VettingService.initialBeforeYouStart(caseDetails);
-        assertEquals(String.format(BEFORE_LINK_LABEL,
-                        "/cases/case-details/1655312312192821#Documents",
-                        "/cases/case-details/1655312312192821#Documents"),
-                caseDetails.getCaseData().getEt1VettingBeforeYouStart());
+    void initialBeforeYouStart_NoDocumentCollection_shouldReturnWithoutUrl() {
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        String expected = String.format(BEFORE_LABEL_TEMPLATE, "", "");
+        assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart())
+                .isEqualTo(expected);
     }
 
     private DocumentTypeItem createDocumentTypeItem(String typeOfDocument, String binaryLink) {
         DocumentType documentType = new DocumentType();
         documentType.setTypeOfDocument(typeOfDocument);
         documentType.setUploadedDocument(new UploadedDocumentType());
-        documentType.getUploadedDocument().setDocumentBinaryUrl(binaryLink);
+        documentType.getUploadedDocument().setDocumentBinaryUrl("http://dm-store:8080" + binaryLink);
         DocumentTypeItem documentTypeItem = new DocumentTypeItem();
         documentTypeItem.setValue(documentType);
         return documentTypeItem;

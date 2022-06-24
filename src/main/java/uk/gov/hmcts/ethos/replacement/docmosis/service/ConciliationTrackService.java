@@ -16,15 +16,15 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_
 @Service("conciliationTrackService")
 public class ConciliationTrackService {
 
-    private static final List<String> JUR_CODE_CONCILIATION_TRACK_OP = Arrays.asList(
+    static final List<String> JUR_CODE_CONCILIATION_TRACK_OP = Arrays.asList(
             "DAG", "DDA", "DRB", "DSO", "EQP", "PID", "RRD", "SXD");
-    private static final List<String> JUR_CODE_CONCILIATION_TRACK_ST = Arrays.asList(
+    static final List<String> JUR_CODE_CONCILIATION_TRACK_ST = Arrays.asList(
             "ADG", "APA", "AWR", "DOD", "FCT", "FLW", "FTE", "FT1", "FWP", "FWS",
             "HSD", "HSR", "IRF", "MAT", "MWD", "PAC", "PLD", "PTE", "RTR(ST)", "SUN",
             "TPE", "TT", "TUE", "TUM", "TUR", "TUS", "TXC(ST)", "UDC", "UDL", "UIA", "WTR");
-    private static final List<String> JUR_CODE_CONCILIATION_TRACK_SH = Arrays.asList(
+    static final List<String> JUR_CODE_CONCILIATION_TRACK_SH = Arrays.asList(
             "BOC", "FML", "FPA", "FTC", "FTO", "FTP", "FTR", "FTS", "FTU", "PAY", "RPT", "WA", "WTR(AL)");
-    private static final List<String> JUR_CODE_CONCILIATION_TRACK_NO = Arrays.asList(
+    static final List<String> JUR_CODE_CONCILIATION_TRACK_NO = Arrays.asList(
             "ADT", "ADT(ST)", "CCP", "COM", "EAP", "HAS", "ISV", "LEV ", "LSO", "MWA",
             "NNA", "PEN",  "RPT(S)", "RTR", "TXC", "WTA");
 

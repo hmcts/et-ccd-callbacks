@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -116,12 +117,20 @@ public class Et3VettingHelper {
             return errors;
         }
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
-        RespondentSumType respondentSumType = respondentCollection
+
+        Optional<RespondentSumTypeItem> respondentSumTypeOptional = respondentCollection
                 .stream()
                 .filter(r -> respondentExistsAndEt3Received(
                         caseData.getEt3ChooseRespondent().getSelectedLabel(), r.getValue()))
-                .findFirst().get().getValue();
+                .findFirst();
+        respondentSumTypeOptional.ifPresent(
+                respondentSumTypeItem -> setResponseInTime(caseData, respondentSumTypeItem.getValue()));
+        
+        return errors;
 
+    }
+
+    private static void setResponseInTime(CaseData caseData, RespondentSumType respondentSumType) {
         LocalDate et3DueDate = LocalDate.parse(caseData.getClaimServedDate()).plusDays(ET3_RESPONSE_WINDOW);
         LocalDate et3ReceivedDate = LocalDate.parse(respondentSumType.getResponseReceivedDate());
         if (respondentExtensionExists(respondentSumType)) {
@@ -133,8 +142,6 @@ public class Et3VettingHelper {
         } else {
             caseData.setEt3ResponseInTime(YES);
         }
-        return errors;
-
     }
 
     private static boolean responseInTimePreValidationCheck(CaseData caseData, List<String> errors) {

@@ -6,6 +6,7 @@ import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.util.List;
@@ -29,9 +30,10 @@ public class Et1VettingService {
             + "<pre>First name &#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Last name &#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Contact address &#09&#09 %s</pre><hr>";
-    private static final String RESPONDENT_DETAILS = "<h3>Respondent</h3>"
+    private static final String RESPONDENT_DETAILS = "<h3>Respondent %s</h3>"
             + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Contact address &#09&#09 %s</pre><hr>";
+    private static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
 
     /**
      * Update et1VettingBeforeYouStart.
@@ -94,12 +96,21 @@ public class Et1VettingService {
     }
 
     private String initialRespondentDetailsMarkUp(CaseData caseData) {
-        return caseData.getRespondentCollection()
-                .stream()
-                .map(r -> String.format(RESPONDENT_DETAILS,
-                        r.getValue().getRespondentName(),
-                        toAddressWithTab(r.getValue().getRespondentAddress())))
-                .collect(Collectors.joining());
+        if (caseData.getRespondentCollection().size() == 1) {
+            RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+            return String.format(RESPONDENT_DETAILS, "",
+                    respondentSumType.getRespondentName(),
+                    toAddressWithTab(respondentSumType.getRespondentAddress()));
+        } else {
+            IntWrapper count = new IntWrapper(0);
+            return caseData.getRespondentCollection()
+                    .stream()
+                    .map(r -> String.format(RESPONDENT_DETAILS,
+                            count.incrementAndReturnValue(),
+                            r.getValue().getRespondentName(),
+                            toAddressWithTab(r.getValue().getRespondentAddress())))
+                    .collect(Collectors.joining());
+        }
     }
 
     private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {
@@ -108,17 +119,16 @@ public class Et1VettingService {
     }
 
     public String toAddressWithTab(Address address) {
-        String brWithTab = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
         StringBuilder claimantAddressStr = new StringBuilder();
         claimantAddressStr.append(address.getAddressLine1());
         if (!Strings.isNullOrEmpty(address.getAddressLine2())) {
-            claimantAddressStr.append(brWithTab).append(address.getAddressLine2());
+            claimantAddressStr.append(BR_WITH_TAB).append(address.getAddressLine2());
         }
         if (!Strings.isNullOrEmpty(address.getAddressLine3())) {
-            claimantAddressStr.append(brWithTab).append(address.getAddressLine3());
+            claimantAddressStr.append(BR_WITH_TAB).append(address.getAddressLine3());
         }
-        claimantAddressStr.append(brWithTab).append(address.getPostTown())
-                .append(brWithTab).append(address.getPostCode());
+        claimantAddressStr.append(BR_WITH_TAB).append(address.getPostTown())
+                .append(BR_WITH_TAB).append(address.getPostCode());
         return claimantAddressStr.toString();
     }
 

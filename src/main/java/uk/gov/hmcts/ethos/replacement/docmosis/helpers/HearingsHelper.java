@@ -106,8 +106,9 @@ public class HearingsHelper {
         List<String> errors = new ArrayList<>();
         String hearingNumber = "Hearing ";
         if (caseData.getHearingDetailsHearing() != null) {
-            hearingNumber=  caseData.getHearingDetailsHearing().getValue().getLabel().split(",")[0];
+            hearingNumber = caseData.getHearingDetailsHearing().getValue().getLabel().split(",")[0];
         }
+
         if (HEARING_STATUS_HEARD.equals(caseData.getHearingDetailsStatus())) {
             checkStartFinishTimes(errors, caseData,
                     hearingNumber);

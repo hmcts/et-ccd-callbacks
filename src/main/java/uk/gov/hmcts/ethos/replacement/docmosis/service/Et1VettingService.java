@@ -2,6 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -27,6 +30,8 @@ public class Et1VettingService {
 
     private static final String ET1_DOC_TYPE = "ET1";
     private static final String ACAS_DOC_TYPE = "ACAS Certificate";
+    static final String TRIBUNAL_ENGLAND = "England & Wales";
+    static final String TRIBUNAL_Scotland = "Scotland";
     private static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s"
         + "<br/>Check the Documents tab for additional ET1 documents the claimant may have uploaded.";
     private static final String BEFORE_LABEL_ET1 =
@@ -36,6 +41,11 @@ public class Et1VettingService {
     private static final String BEFORE_LABEL_ACAS_OPEN_TAB =
         "<br/><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"
             + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
+    static final String TRIBUNAL_OFFICE_LOCATION = "<hr><h3>Tribunal location</h3>"
+        + "<pre>Tribunal &#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Office &#09&#09&#09&#09&#09 %s</pre><hr>";
+    static final String TRIBUNAL_LOCATION_LABEL = "**<big>%s regional office</big>**";
+
     static final String TRACk_ALLOCATION_HTML = "|||\r\n|--|--|\r\n|Tack allocation|%s|\r\n";
     static final String JUR_CODE_HTML = "<hr><h3>Jurisdiction Codes</h3>"
         + "<a href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
@@ -175,6 +185,32 @@ public class Et1VettingService {
             return String.format(TRACk_ALLOCATION_HTML, TRACK_SHORT);
         } else {
             return String.format(TRACk_ALLOCATION_HTML, TRACK_NO);
+        }
+    }
+
+    public void populateTribunalOfficeFields(CaseData caseData) {
+        String managingOffice = caseData.getManagingOffice();
+        String tribunalLocation = TribunalOffice.isScotlandOffice(managingOffice)
+            ? TRIBUNAL_Scotland : TRIBUNAL_ENGLAND;
+        caseData.setTribunalAndOfficeLocation(String
+            .format(TRIBUNAL_OFFICE_LOCATION, tribunalLocation, managingOffice));
+        caseData.setRegionalOffice(String.format(TRIBUNAL_LOCATION_LABEL, tribunalLocation));
+        caseData.setRegionalOfficeList(populateRegionalOfficeList(tribunalLocation, managingOffice));
+    }
+
+    private DynamicFixedListType populateRegionalOfficeList(String tribunalLocation, String managingOffice) {
+        if (tribunalLocation.equals(TRIBUNAL_ENGLAND)) {
+            return DynamicFixedListType.from(TribunalOffice.ENGLANDWALES_OFFICES.stream()
+                .filter(tribunalOffice -> !tribunalOffice.getOfficeName().equals(managingOffice))
+                .map(tribunalOffice ->
+                    DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
+                .collect(Collectors.toList()));
+        } else {
+            return DynamicFixedListType.from(TribunalOffice.SCOTLAND_OFFICES.stream()
+                .filter(tribunalOffice -> !tribunalOffice.getOfficeName().equals(managingOffice))
+                .map(tribunalOffice ->
+                    DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
+                .collect(Collectors.toList()));
         }
     }
 

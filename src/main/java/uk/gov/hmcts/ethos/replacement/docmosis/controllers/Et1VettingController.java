@@ -61,13 +61,15 @@ public class Et1VettingController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         et1VettingService.initialiseEt1Vetting(caseDetails);
 
-        List<JurCodesTypeItem> jurCodesCollection = caseDetails.getCaseData().getJurCodesCollection();
+        CaseData caseData = caseDetails.getCaseData();
+        List<JurCodesTypeItem> jurCodesCollection = caseData.getJurCodesCollection();
         if (jurCodesCollection != null) {
-            caseDetails.getCaseData()
-                    .setExistingJurisdictionCodes(et1VettingService.generateJurisdictionCodesHtml(jurCodesCollection));
+            caseData.setExistingJurisdictionCodes(
+                et1VettingService.generateJurisdictionCodesHtml(jurCodesCollection));
         }
+        et1VettingService.populateTribunalOfficeFields(caseData);
 
-        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     /**

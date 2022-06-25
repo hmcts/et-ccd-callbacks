@@ -24,6 +24,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.JUR_CODE_HTML;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.TRACK_OPEN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.TRACk_ALLOCATION_HTML;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.TRIBUNAL_ENGLAND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.TRIBUNAL_LOCATION_LABEL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.TRIBUNAL_OFFICE_LOCATION;
 
 class Et1VettingServiceTest {
 
@@ -32,6 +35,7 @@ class Et1VettingServiceTest {
 
     private static final String ET1_DOC_TYPE = "ET1";
     private static final String ACAS_DOC_TYPE = "ACAS Certificate";
+    private static final String OFFICE = "Manchester";
     private static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s"
             + "<br/>Check the Documents tab for additional ET1 documents the claimant may have uploaded.";
     private static final String BEFORE_LABEL_ET1 =
@@ -159,6 +163,18 @@ class Et1VettingServiceTest {
 
         assertEquals(String.format(TRACk_ALLOCATION_HTML, TRACK_OPEN),
             et1VettingService.populateEt1TrackAllocationHtml(caseData));
+    }
+
+    @Test
+    void populateTribunalOfficeFields() {
+        CaseData caseData = new CaseData();
+        caseData.setManagingOffice(OFFICE);
+
+        et1VettingService.populateTribunalOfficeFields(caseData);
+        assertEquals(String.format(TRIBUNAL_OFFICE_LOCATION, TRIBUNAL_ENGLAND, OFFICE),
+            caseData.getTribunalAndOfficeLocation());
+        assertEquals(String.format(TRIBUNAL_LOCATION_LABEL, TRIBUNAL_ENGLAND),
+            caseData.getRegionalOffice());
     }
 
 

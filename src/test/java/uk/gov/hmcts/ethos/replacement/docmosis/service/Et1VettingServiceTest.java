@@ -41,6 +41,8 @@ class Et1VettingServiceTest {
     private static final String BEFORE_LABEL_ACAS_OPEN_TAB =
             "<br/><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"
                     + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
+    private static final String DAG = JurisdictionCode.DAG.name();
+    private static final String PID = JurisdictionCode.PID.name();
 
     private final String et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
     private final String acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
@@ -49,6 +51,7 @@ class Et1VettingServiceTest {
     private final String acasBinaryUrl4 = "/documents/acas4444-4ef8ca1e3-8c60-d3d78808dca1/binary";
     private final String acasBinaryUrl5 = "/documents/acas5555-4ef8ca1e3-8c60-d3d78808dca1/binary";
     private final String caseId = "1655312312192821";
+
 
     @BeforeEach
     void setUp() {
@@ -126,24 +129,24 @@ class Et1VettingServiceTest {
     @Test
     void generateJurisdictionCodesHtml() {
         CaseData caseData = new CaseData();
-        addJurCodeToExistingCollection(caseData, "UDL");
+        addJurCodeToExistingCollection(caseData, DAG);
 
-        assertEquals(String.format(JUR_CODE_HTML, String.format(CASE_NAME_AND_DESCRIPTION_HTML, "UDL",
-                JurisdictionCode.valueOf("UDL").getDescription())),
+        assertEquals(String.format(JUR_CODE_HTML, String.format(CASE_NAME_AND_DESCRIPTION_HTML, DAG,
+                JurisdictionCode.valueOf(DAG).getDescription())),
             et1VettingService.generateJurisdictionCodesHtml(caseData.getJurCodesCollection()));
     }
 
     @Test
     void validateJurisdictionCodes() {
         CaseData caseData = new CaseData();
-        addJurCodeToExistingCollection(caseData, "DAG");
-        addJurCodeToVettingCollection(caseData, "DAG");
-        addJurCodeToVettingCollection(caseData, "PID");
-        addJurCodeToVettingCollection(caseData, "PID");
+        addJurCodeToExistingCollection(caseData, DAG);
+        addJurCodeToVettingCollection(caseData, DAG);
+        addJurCodeToVettingCollection(caseData, PID);
+        addJurCodeToVettingCollection(caseData, PID);
 
         List<String> expectedErrors = new ArrayList<>();
-        expectedErrors.add(String.format(ERROR_EXISTING_JUR_CODE, "DAG"));
-        expectedErrors.add(String.format(ERROR_SELECTED_JUR_CODE, "PID"));
+        expectedErrors.add(String.format(ERROR_EXISTING_JUR_CODE, DAG));
+        expectedErrors.add(String.format(ERROR_SELECTED_JUR_CODE, PID));
 
         assertEquals(expectedErrors, et1VettingService.validateJurisdictionCodes(caseData));
     }
@@ -151,12 +154,11 @@ class Et1VettingServiceTest {
     @Test
     void populateEt1TrackAllocationHtml() {
         CaseData caseData = new CaseData();
-        addJurCodeToVettingCollection(caseData, "DOD");
-        addJurCodeToExistingCollection(caseData, "DDA");
+        addJurCodeToVettingCollection(caseData, DAG);
+        addJurCodeToExistingCollection(caseData, PID);
 
-        et1VettingService.populateEt1TrackAllocationHtml(caseData);
         assertEquals(String.format(TRACk_ALLOCATION_HTML, TRACK_OPEN),
-            caseData.getTrackAllocation());
+            et1VettingService.populateEt1TrackAllocationHtml(caseData));
     }
 
 

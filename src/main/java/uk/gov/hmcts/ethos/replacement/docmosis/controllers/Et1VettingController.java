@@ -20,7 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
-import java.util.*;
+import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
@@ -83,9 +83,9 @@ public class Et1VettingController {
     @PostMapping(value = "/jurisdictionCodes", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Validate Jurisdiction Codes")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> jurisdictionCodes(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
@@ -98,7 +98,7 @@ public class Et1VettingController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = et1VettingService.validateJurisdictionCodes(caseData);
         if (errors.isEmpty()) {
-            et1VettingService.populateEt1TrackAllocationHtml(caseData);
+            caseData.setTrackAllocation(et1VettingService.populateEt1TrackAllocationHtml(caseData));
         }
 
         return getCallbackRespEntity(errors, ccdRequest.getCaseDetails());

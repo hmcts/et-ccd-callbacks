@@ -116,13 +116,14 @@ public class ListingService {
         return caseData;
     }
 
-    public ListingData setCourtAddressFromCaseData(CaseData caseData) {
+    public ListingData setManagingOfficeAndCourtAddressFromCaseData(CaseData caseData) {
         var listingData = caseData.getPrintHearingCollection();
         listingData.setTribunalCorrespondenceAddress(caseData.getTribunalCorrespondenceAddress());
         listingData.setTribunalCorrespondenceTelephone(caseData.getTribunalCorrespondenceTelephone());
         listingData.setTribunalCorrespondenceFax(caseData.getTribunalCorrespondenceFax());
         listingData.setTribunalCorrespondenceEmail(caseData.getTribunalCorrespondenceEmail());
         listingData.setTribunalCorrespondenceDX(caseData.getTribunalCorrespondenceDX());
+        listingData.setManagingOffice(caseData.getManagingOffice());
         return listingData;
     }
 

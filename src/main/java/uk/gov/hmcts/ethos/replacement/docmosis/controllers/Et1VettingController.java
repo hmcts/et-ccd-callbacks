@@ -59,7 +59,7 @@ public class Et1VettingController {
         }
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        et1VettingService.initialBeforeYouStart(caseDetails);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
 
         List<JurCodesTypeItem> jurCodesCollection = caseDetails.getCaseData().getJurCodesCollection();
         if (jurCodesCollection != null) {

@@ -244,19 +244,34 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withRespondent(String respondent, String responseReceived, String receivedDate) {
+    public CaseDataBuilder withRespondent(String respondent, String responseReceived, String receivedDate,
+                                          boolean extension) {
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName(respondent);
         respondentSumType.setResponseReceived(responseReceived);
         respondentSumType.setResponseReceivedDate(receivedDate);
+        if (extension) {
+            respondentSumType.setExtensionRequested(YES);
+            respondentSumType.setExtensionGranted(YES);
+            respondentSumType.setExtensionDate("2022-03-01");
+        }
 
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(respondentSumType);
 
-        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
-        respondentCollection.add(respondentSumTypeItem);
+        if (caseData.getRespondentCollection() == null) {
+            caseData.setRespondentCollection(new ArrayList<>());
+        }
+        caseData.getRespondentCollection().add(respondentSumTypeItem);
+        return this;
+    }
 
-        caseData.setRespondentCollection(respondentCollection);
+    public CaseDataBuilder withChooseEt3Respondent(String respondentName) {
+        DynamicValueType respondent = DynamicValueType.create(respondentName, respondentName);
+        DynamicFixedListType respondentList = new DynamicFixedListType();
+        respondentList.setListItems(List.of(respondent));
+        respondentList.setValue(respondent);
+        caseData.setEt3ChooseRespondent(respondentList);
         return this;
     }
 }

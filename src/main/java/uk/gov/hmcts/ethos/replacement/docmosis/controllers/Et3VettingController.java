@@ -53,7 +53,7 @@ public class Et3VettingController {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
                 @Content(mediaType = "application/json",
-                        schema = @Schema(implementation = CCDCallbackResponse.class))
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
@@ -87,10 +87,10 @@ public class Et3VettingController {
     @Operation(summary = "initialize data for et3 vetting")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CCDCallbackResponse.class))
-                }),
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -136,4 +136,28 @@ public class Et3VettingController {
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
+    @PostMapping(value = "/checkHearingListed", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "check to see if a hearing has been listed")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> checkHearingListed(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        Et3VettingHelper.checkHearingListed(caseData);
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+    }
 }

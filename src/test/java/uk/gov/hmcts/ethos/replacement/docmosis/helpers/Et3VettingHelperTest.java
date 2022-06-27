@@ -12,6 +12,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.ET3_TABLE_DATA;
@@ -231,6 +233,65 @@ class Et3VettingHelperTest {
         assertThat(errors.size(), is(2));
         assertTrue(errors.contains(NO_ET3_RESPONSE));
         assertTrue(errors.contains(NO_CLAIM_SERVED_DATE));
+    }
+
+    @Test
+    void givenHearingIsListed_SetCaseAsListed() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withHearing("1", "test", "Judy")
+                .withHearingSession(0, "1", "2021-12-25", HEARING_STATUS_LISTED, false)
+                .withConciliationTrack("Test track")
+                .build();
+        Et3VettingHelper.checkHearingListed(caseData);
+
+        assertThat(caseData.getEt3HearingDetails(), is(
+                "| Hearing Details| | \r\n" +
+                "|--|--|\r\n" +
+                "|Date| Saturday 25 December 2021|\r\n" +
+                "|Type| Test track|"
+            )
+        );
+        assertThat(caseData.getEt3IsCaseListedForHearing(), is(YES));
+    }
+
+    @Test
+    void givenHearingIsNotListed_SetCaseAsNotListed() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withHearing("1", "test", "Judy")
+                .withHearingSession(0, "1", "2021-12-25", HEARING_STATUS_POSTPONED, false)
+                .withConciliationTrack("Test track")
+                .build();
+        Et3VettingHelper.checkHearingListed(caseData);
+
+        assertThat(caseData.getEt3HearingDetails(), is("The case has not been listed"));
+        assertThat(caseData.getEt3IsCaseListedForHearing(), is(NO));
+    }
+
+    @Test
+    void givenHearingIsListedButNoTrack_SetCaseAsListedNoTrackFound() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withHearing("1", "test", "Judy")
+                .withHearingSession(0, "1", "2021-12-25", HEARING_STATUS_LISTED, false)
+                .build();
+        Et3VettingHelper.checkHearingListed(caseData);
+
+        assertThat(caseData.getEt3HearingDetails(), is(
+            "| Hearing Details| | \r\n" +
+                 "|--|--|\r\n" +
+                 "|Date| Saturday 25 December 2021|\r\n" +
+                 "|Type| Track could not be found|"
+            )
+        );
+        assertThat(caseData.getEt3IsCaseListedForHearing(), is(YES));
+    }
+
+    @Test
+    void givenNoHearings_SetCaseAsNotListed() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        Et3VettingHelper.checkHearingListed(caseData);
+
+        assertThat(caseData.getEt3HearingDetails(), is("The case has not been listed"));
+        assertThat(caseData.getEt3IsCaseListedForHearing(), is(NO));
     }
 
     private String generateEt3Dates(String et1ServedDate, String et3DueDate, String extensionDate,String et3ReceivedDate) {

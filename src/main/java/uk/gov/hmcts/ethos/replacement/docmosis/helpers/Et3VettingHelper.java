@@ -6,16 +6,21 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -36,8 +41,15 @@ public class Et3VettingHelper {
         + "|ET3 due| %s|\r\n"
         + "|Extension| %s|\r\n"
         + "|ET3 received| %s|";
+
+    private static final String ET3_HEARING_TABLE =
+            "| Hearing Details| | \r\n"
+            + "|--|--|\r\n"
+            + "|Date| %s|\r\n"
+            + "|Type| %s|";
     private static final int ET3_RESPONSE_WINDOW = 29;
     private static final String NONE = "None";
+    private static final String CASE_NOT_LISTED = "The case has not been listed";
 
     private Et3VettingHelper() {
         //Access through static methods
@@ -212,6 +224,49 @@ public class Et3VettingHelper {
 
     private static boolean respondentExtensionExists(RespondentSumType respondent) {
         return YES.equals(respondent.getExtensionRequested()) && YES.equals(respondent.getExtensionGranted());
+    }
+
+    public static void checkHearingListed(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
+            log.info(String.format("No hearings for case %s", caseData.getEthosCaseReference()));
+            caseData.setEt3HearingDetails(CASE_NOT_LISTED);
+            caseData.setEt3IsCaseListedForHearing(NO);
+            return;
+        }
+
+        String hearingDate = findHearingDate(caseData.getHearingCollection());
+
+        if (CASE_NOT_LISTED.equals(hearingDate)) {
+            caseData.setEt3HearingDetails(CASE_NOT_LISTED);
+            caseData.setEt3IsCaseListedForHearing(NO);
+            return;
+        }
+
+        String track = isNullOrEmpty(caseData.getConciliationTrack())
+                ? "Track could not be found"
+                : caseData.getConciliationTrack();
+
+        caseData.setEt3HearingDetails(String.format(ET3_HEARING_TABLE, hearingDate, track));
+        caseData.setEt3IsCaseListedForHearing(YES);
+    }
+
+    private static String findHearingDate(List<HearingTypeItem> hearingCollection) {
+        List<String> hearingDates = new ArrayList<>();
+
+        for (HearingTypeItem hearingTypeItem : hearingCollection) {
+            for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
+                if (HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus())) {
+                    hearingDates.add(dateListedTypeItem.getValue().getListedDate());
+                }
+            }
+        }
+
+        if (CollectionUtils.isEmpty(hearingDates)) {
+            return CASE_NOT_LISTED;
+        }
+
+        Collections.sort(hearingDates);
+        return LocalDate.parse(hearingDates.get(0)).format(DateTimeFormatter.ofPattern("EEEE d MMMM y"));
     }
 
 }

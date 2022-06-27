@@ -37,6 +37,7 @@ class Et3VettingControllerTest {
     private static final String POPULATE_ET3_DATES_URL = "/et3Vetting/populateEt3Dates";
     private static final String INIT_ET3_RESPONDENT_LIST_URL = "/et3Vetting/initEt3RespondentList";
     private static final String CALCULATE_RESPONSE_TIME_URL = "/et3Vetting/calculateResponseInTime";
+    private static final String CHECK_HEARING_LISTED_URL = "/et3Vetting/checkHearingListed";
     @Autowired
     private WebApplicationContext applicationContext;
     @MockBean
@@ -169,6 +170,38 @@ class Et3VettingControllerTest {
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void checkHearingListed_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(CHECK_HEARING_LISTED_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void checkHearingListed_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(CHECK_HEARING_LISTED_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void checkHearingListed_badRequest() throws Exception {
+        mvc.perform(post(CHECK_HEARING_LISTED_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 }

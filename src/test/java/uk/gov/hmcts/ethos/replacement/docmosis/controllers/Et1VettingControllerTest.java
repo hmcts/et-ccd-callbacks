@@ -22,8 +22,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.emptyArray;
-import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -78,7 +76,7 @@ class Et1VettingControllerTest {
                 .andExpect(jsonPath("$.warnings", nullValue()));
         verify(et1VettingService, times(1)).initialiseEt1Vetting(any());
         verify(et1VettingService, times(1)).generateJurisdictionCodesHtml(anyList());
-
+        verify(et1VettingService, times(1)).populateTribunalOfficeFields(any());
     }
 
     @Test

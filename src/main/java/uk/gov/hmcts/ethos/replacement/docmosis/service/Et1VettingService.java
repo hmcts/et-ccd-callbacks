@@ -8,6 +8,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
@@ -20,9 +21,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService.JUR_CODE_CONCILIATION_TRACK_OP;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService.JUR_CODE_CONCILIATION_TRACK_SH;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService.JUR_CODE_CONCILIATION_TRACK_ST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_OP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_SH;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_ST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_NO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_OPEN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_SHORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_STANDARD;
 
 @Slf4j
 @Service
@@ -30,8 +35,8 @@ public class Et1VettingService {
 
     private static final String ET1_DOC_TYPE = "ET1";
     private static final String ACAS_DOC_TYPE = "ACAS Certificate";
-    static final String TRIBUNAL_ENGLAND = "England & Wales";
-    static final String TRIBUNAL_Scotland = "Scotland";
+    private static final String CASE_TYPE_ENGLAND = "ET_EnglandWales";
+    private static final String CASE_TYPE_SCOTLAND = "ET_Scotland";
     private static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s"
         + "<br/>Check the Documents tab for additional ET1 documents the claimant may have uploaded.";
     private static final String BEFORE_LABEL_ET1 =
@@ -41,24 +46,22 @@ public class Et1VettingService {
     private static final String BEFORE_LABEL_ACAS_OPEN_TAB =
         "<br/><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"
             + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
-    static final String TRIBUNAL_OFFICE_LOCATION = "<hr><h3>Tribunal location</h3>"
+    private static final String TRIBUNAL_OFFICE_LOCATION = "<hr><h3>Tribunal location</h3>"
         + "<pre>Tribunal &#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Office &#09&#09&#09&#09&#09 %s</pre><hr>";
-    static final String TRIBUNAL_LOCATION_LABEL = "**<big>%s regional office</big>**";
+    private static final String TRIBUNAL_LOCATION_LABEL = "**<big>%s regional office</big>**";
 
-    static final String TRACk_ALLOCATION_HTML = "|||\r\n|--|--|\r\n|Tack allocation|%s|\r\n";
-    static final String JUR_CODE_HTML = "<hr><h3>Jurisdiction Codes</h3>"
+    private static final String TRACk_ALLOCATION_HTML = "|||\r\n|--|--|\r\n|Tack allocation|%s|\r\n";
+    private static final String JUR_CODE_HTML = "<hr><h3>Jurisdiction Codes</h3>"
         + "<a href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
         + "View all jurisdiction codes and descriptors (opens in new tab)</a><hr>"
         + "<h3>Codes already added</h3>%s<hr>";
-    static final String CASE_NAME_AND_DESCRIPTION_HTML = "<h4>%s</h4>%s";
-    static final String ERROR_EXISTING_JUR_CODE = "Jurisdiction code %s already exists.";
-    static final String ERROR_SELECTED_JUR_CODE = "Jurisdiction code %s is selected more than once.";
+    private static final String CASE_NAME_AND_DESCRIPTION_HTML = "<h4>%s</h4>%s";
+    private static final String ERROR_EXISTING_JUR_CODE = "Jurisdiction code %s already exists.";
+    private static final String ERROR_SELECTED_JUR_CODE = "Jurisdiction code %s is selected more than once.";
 
-    static final String TRACK_OPEN = "Open";
-    static final String TRACK_STANDARD = "Standard";
-    static final String TRACK_SHORT = "Short";
-    static final String TRACK_NO = "No track";
+    private static final String TRIBUNAL_ENGLAND = "England & Wales";
+    private static final String TRIBUNAL_Scotland = "Scotland";
 
     /**
      * Update et1VettingBeforeYouStart.
@@ -117,18 +120,8 @@ public class Et1VettingService {
     public String generateJurisdictionCodesHtml(List<JurCodesTypeItem> jurisdictionCodes) {
         StringBuilder sb = new StringBuilder();
         for (JurCodesTypeItem codeItem : jurisdictionCodes) {
-            String codeName = codeItem.getValue().getJuridictionCodesList();
-            if (codeName != null) {
-                try {
-                    sb.append(String.format(CASE_NAME_AND_DESCRIPTION_HTML, codeName,
-                        JurisdictionCode.valueOf(codeName.replaceAll("[^a-zA-Z]+", ""))
-                            .getDescription()));
-                } catch (IllegalArgumentException e) {
-                    log.warn("The jurisdiction code " + codeName + " is invalid.");
-                }
-            }
+            populateCodeNameAndDescriptionHtml(sb, codeItem.getValue().getJuridictionCodesList());
         }
-
         return String.format(JUR_CODE_HTML, sb);
     }
 
@@ -165,12 +158,7 @@ public class Et1VettingService {
     public String populateEt1TrackAllocationHtml(CaseData caseData) {
         if (caseData.getVettingJurisdictionCodeCollection() != null) {
             for (VettingJurCodesTypeItem codeItem : caseData.getVettingJurisdictionCodeCollection()) {
-                JurCodesType newCode = new JurCodesType();
-                newCode.setJuridictionCodesList(codeItem.getValue().getEt1VettingJurCodeList());
-                JurCodesTypeItem codesTypeItem = new JurCodesTypeItem();
-                codesTypeItem.setValue(newCode);
-                codesTypeItem.setId(UUID.randomUUID().toString());
-                caseData.getJurCodesCollection().add(codesTypeItem);
+                addJurCodeToExistingCollection(caseData, codeItem.getValue());
             }
         }
 
@@ -199,24 +187,40 @@ public class Et1VettingService {
     }
 
     private DynamicFixedListType populateRegionalOfficeList(String tribunalLocation, String managingOffice) {
-        if (tribunalLocation.equals(TRIBUNAL_ENGLAND)) {
-            return DynamicFixedListType.from(TribunalOffice.ENGLANDWALES_OFFICES.stream()
-                .filter(tribunalOffice -> !tribunalOffice.getOfficeName().equals(managingOffice))
-                .map(tribunalOffice ->
-                    DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
-                .collect(Collectors.toList()));
-        } else {
-            return DynamicFixedListType.from(TribunalOffice.SCOTLAND_OFFICES.stream()
-                .filter(tribunalOffice -> !tribunalOffice.getOfficeName().equals(managingOffice))
-                .map(tribunalOffice ->
-                    DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
-                .collect(Collectors.toList()));
-        }
+        List<TribunalOffice> tribunalOffices = tribunalLocation.equals(TRIBUNAL_ENGLAND)
+            ? TribunalOffice.ENGLANDWALES_OFFICES : TribunalOffice.SCOTLAND_OFFICES;
+
+        return DynamicFixedListType.from(tribunalOffices.stream()
+            .filter(tribunalOffice -> !tribunalOffice.getOfficeName().equals(managingOffice))
+            .map(tribunalOffice ->
+                DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
+            .collect(Collectors.toList()));
     }
 
     private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {
         String documentBinaryUrl = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
         return documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
+    }
+
+    private void populateCodeNameAndDescriptionHtml(StringBuilder sb, String codeName) {
+        if (codeName != null) {
+            try {
+                sb.append(String.format(CASE_NAME_AND_DESCRIPTION_HTML, codeName,
+                    JurisdictionCode.valueOf(codeName.replaceAll("[^a-zA-Z]+", ""))
+                        .getDescription()));
+            } catch (IllegalArgumentException e) {
+                log.warn("The jurisdiction code " + codeName + " is invalid.", e);
+            }
+        }
+    }
+
+    private void addJurCodeToExistingCollection(CaseData caseData, VettingJurisdictionCodesType code) {
+        JurCodesType newCode = new JurCodesType();
+        newCode.setJuridictionCodesList(code.getEt1VettingJurCodeList());
+        JurCodesTypeItem codesTypeItem = new JurCodesTypeItem();
+        codesTypeItem.setValue(newCode);
+        codesTypeItem.setId(UUID.randomUUID().toString());
+        caseData.getJurCodesCollection().add(codesTypeItem);
     }
 
 }

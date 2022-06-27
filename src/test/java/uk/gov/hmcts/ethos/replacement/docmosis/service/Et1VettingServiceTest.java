@@ -17,16 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.CASE_NAME_AND_DESCRIPTION_HTML;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ERROR_EXISTING_JUR_CODE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ERROR_SELECTED_JUR_CODE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.JUR_CODE_HTML;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.TRACK_OPEN;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.TRACk_ALLOCATION_HTML;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.TRIBUNAL_ENGLAND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.TRIBUNAL_LOCATION_LABEL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.TRIBUNAL_OFFICE_LOCATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_OPEN;
 
 class Et1VettingServiceTest {
 
@@ -56,6 +47,19 @@ class Et1VettingServiceTest {
     private final String acasBinaryUrl5 = "/documents/acas5555-4ef8ca1e3-8c60-d3d78808dca1/binary";
     private final String caseId = "1655312312192821";
 
+    private static final String CASE_NAME_AND_DESCRIPTION_HTML = "<h4>%s</h4>%s";
+    private static final String ERROR_EXISTING_JUR_CODE = "Jurisdiction code %s already exists.";
+    private static final String ERROR_SELECTED_JUR_CODE = "Jurisdiction code %s is selected more than once.";
+    private static final String TRIBUNAL_ENGLAND = "England & Wales";
+    private static final String TRIBUNAL_OFFICE_LOCATION = "<hr><h3>Tribunal location</h3>"
+        + "<pre>Tribunal &#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Office &#09&#09&#09&#09&#09 %s</pre><hr>";
+    private static final String TRIBUNAL_LOCATION_LABEL = "**<big>%s regional office</big>**";
+    private static final String TRACk_ALLOCATION_HTML = "|||\r\n|--|--|\r\n|Tack allocation|%s|\r\n";
+    private static final String JUR_CODE_HTML = "<hr><h3>Jurisdiction Codes</h3>"
+        + "<a href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
+        + "View all jurisdiction codes and descriptors (opens in new tab)</a><hr>"
+        + "<h3>Codes already added</h3>%s<hr>";
 
     @BeforeEach
     void setUp() {
@@ -134,10 +138,10 @@ class Et1VettingServiceTest {
     void generateJurisdictionCodesHtml() {
         CaseData caseData = new CaseData();
         addJurCodeToExistingCollection(caseData, DAG);
-
-        assertEquals(String.format(JUR_CODE_HTML, String.format(CASE_NAME_AND_DESCRIPTION_HTML, DAG,
-                JurisdictionCode.valueOf(DAG).getDescription())),
-            et1VettingService.generateJurisdictionCodesHtml(caseData.getJurCodesCollection()));
+        String expected = String.format(JUR_CODE_HTML, String.format(CASE_NAME_AND_DESCRIPTION_HTML, DAG,
+            JurisdictionCode.valueOf(DAG).getDescription()));
+        assertThat(et1VettingService.generateJurisdictionCodesHtml(caseData.getJurCodesCollection()))
+            .isEqualTo(expected);
     }
 
     @Test
@@ -152,7 +156,7 @@ class Et1VettingServiceTest {
         expectedErrors.add(String.format(ERROR_EXISTING_JUR_CODE, DAG));
         expectedErrors.add(String.format(ERROR_SELECTED_JUR_CODE, PID));
 
-        assertEquals(expectedErrors, et1VettingService.validateJurisdictionCodes(caseData));
+        assertThat(et1VettingService.validateJurisdictionCodes(caseData)).isEqualTo(expectedErrors);
     }
 
     @Test
@@ -161,20 +165,20 @@ class Et1VettingServiceTest {
         addJurCodeToVettingCollection(caseData, DAG);
         addJurCodeToExistingCollection(caseData, PID);
 
-        assertEquals(String.format(TRACk_ALLOCATION_HTML, TRACK_OPEN),
-            et1VettingService.populateEt1TrackAllocationHtml(caseData));
+        String expected = String.format(TRACk_ALLOCATION_HTML, TRACK_OPEN);
+        assertThat(et1VettingService.populateEt1TrackAllocationHtml(caseData)).isEqualTo(expected);
     }
 
     @Test
     void populateTribunalOfficeFields() {
         CaseData caseData = new CaseData();
         caseData.setManagingOffice(OFFICE);
-
         et1VettingService.populateTribunalOfficeFields(caseData);
-        assertEquals(String.format(TRIBUNAL_OFFICE_LOCATION, TRIBUNAL_ENGLAND, OFFICE),
-            caseData.getTribunalAndOfficeLocation());
-        assertEquals(String.format(TRIBUNAL_LOCATION_LABEL, TRIBUNAL_ENGLAND),
-            caseData.getRegionalOffice());
+
+        String expectedOfficeLocation = String.format(TRIBUNAL_OFFICE_LOCATION, TRIBUNAL_ENGLAND, OFFICE);
+        String expectedRegionalOffice = String.format(TRIBUNAL_LOCATION_LABEL, TRIBUNAL_ENGLAND);
+        assertThat(caseData.getTribunalAndOfficeLocation()).isEqualTo(expectedOfficeLocation);
+        assertThat(caseData.getRegionalOffice()).isEqualTo(expectedRegionalOffice);
     }
 
 

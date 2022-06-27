@@ -23,7 +23,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 @RestController
 public class InitialConsiderationController {
-    private static final String LOG_MESSAGE = "received notification request for case reference : ";
     private final VerifyTokenService verifyTokenService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String HORIZONTAL_RULE = "<hr>";
@@ -40,7 +39,7 @@ public class InitialConsiderationController {
     public ResponseEntity<CCDCallbackResponse> completeInitialConsideration(@RequestBody CCDRequest ccdRequest,
                                                                             @RequestHeader(value = "Authorization")
                                                                                 String userToken) {
-        log.info("GENERATE LISTINGS DOC SINGLE CASES ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("Initial consideration complete requested for case reference ---> " + ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);

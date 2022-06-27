@@ -67,17 +67,14 @@ public class Et1VettingController {
             caseData.setExistingJurisdictionCodes(
                 et1VettingService.generateJurisdictionCodesHtml(jurCodesCollection));
         }
-        et1VettingService.populateTribunalOfficeFields(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }
 
     /**
-     * Mid callback event in the Jurisdiction code page
-     * Gets userToken as a parameter for security validation and ccdRequest data which has caseData as an object.
-     * Validates the jurisdiction code that caseworker has added against the existing codes
-     * to prevent duplicate entries.
-     * Populates the track allocation html, which depends on the existing jurisdiction codes.
+     * Mid callback event in the Jurisdiction code page to set the track allocation upon the case as long based
+     * upon jurisdiction codes, also validates the jurisdiction code that caseworker has added against the existing codes
+     * to prevent duplicate entries and populates the tribunal/office location fields based on managing office location.
      * @param userToken Used for authorisation
      * @param ccdRequest CaseData which is a generic data type for most of the methods which holds ET1 case data
      * @return errors from the jurisdiction code validation (if there is any) and caseData in ccdRequest
@@ -102,6 +99,8 @@ public class Et1VettingController {
         if (errors.isEmpty()) {
             caseData.setTrackAllocation(et1VettingService.populateEt1TrackAllocationHtml(caseData));
         }
+
+        et1VettingService.populateTribunalOfficeFields(caseData);
 
         return getCallbackRespEntity(errors, ccdRequest.getCaseDetails());
     }

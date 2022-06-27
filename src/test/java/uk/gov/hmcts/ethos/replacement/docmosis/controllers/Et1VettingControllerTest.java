@@ -76,7 +76,6 @@ class Et1VettingControllerTest {
                 .andExpect(jsonPath("$.warnings", nullValue()));
         verify(et1VettingService, times(1)).initialiseEt1Vetting(any());
         verify(et1VettingService, times(1)).generateJurisdictionCodesHtml(anyList());
-        verify(et1VettingService, times(1)).populateTribunalOfficeFields(any());
     }
 
     @Test
@@ -116,6 +115,8 @@ class Et1VettingControllerTest {
             .andExpect(jsonPath("$.warnings", nullValue()));
         verify(et1VettingService, times(1)).validateJurisdictionCodes(any());
         verify(et1VettingService, times(1)).populateEt1TrackAllocationHtml(any());
+        verify(et1VettingService, times(1)).populateTribunalOfficeFields(any());
+
     }
 
     @Test

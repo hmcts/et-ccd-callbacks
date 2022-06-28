@@ -79,7 +79,8 @@ public class InitialConsiderationController {
         //modify case data
 
         caseData.setEtInitialConsiderationRespondent(InitialConsiderationHelper.getRespondentName(caseData));
-        //caseData.setEtInitialConsiderationRespondent(InitialConsiderationHelper.getHearingDetails(caseData));
+        caseData.setEtInitialConsiderationHearing(InitialConsiderationHelper.getHearingDetails(caseData));
+        caseData.setEtInitialConsiderationJurisdictionCodes(InitialConsiderationHelper.generateJurisdictionCodesHtml(caseData.getJurCodesCollection()));
 
 
         try {

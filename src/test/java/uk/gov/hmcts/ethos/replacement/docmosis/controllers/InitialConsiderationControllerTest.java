@@ -23,6 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
@@ -32,15 +33,22 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 @WebMvcTest({InitialConsiderationController.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
 class InitialConsiderationControllerTest {
-
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String COMPLETE_INITIAL_CONSIDERATION_URL = "/completeInitialConsideration";
+
     @Autowired
     private WebApplicationContext applicationContext;
+
     @MockBean
     private VerifyTokenService verifyTokenService;
+
+    @MockBean
+    private InitialConsiderationService initialConsiderationService;
+
     private MockMvc mvc;
+
     private CCDRequest ccdRequest;
+
     @Autowired
     private JsonMapper jsonMapper;
 
@@ -60,20 +68,23 @@ class InitialConsiderationControllerTest {
     }
 
     @Test
-    void initICComplete_tokenOk() throws Exception {
+    void initICCompleteTokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(initialConsiderationService.getCompletionText()).thenReturn("Some Content");
         mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.confirmation_body", notNullValue()))
-            .andExpect(jsonPath("$.confirmation_body", org.hamcrest.Matchers.containsString("What happens next")));
+            .andExpect(jsonPath("$.confirmation_body", notNullValue()));
     }
 
     @Test
-    void initICComplete_tokenFail() throws Exception {
+    void initICCompleteTokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+
+        when(initialConsiderationService.getCompletionText()).thenReturn("");
+
         mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
@@ -82,7 +93,7 @@ class InitialConsiderationControllerTest {
     }
 
     @Test
-    void initICComplete_badRequest() throws Exception {
+    void initICCompleteBadRequest() throws Exception {
         mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_URL)
                 .content("bad request")
                 .header("Authorization", AUTH_TOKEN)

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -24,11 +25,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 public class InitialConsiderationController {
     private final VerifyTokenService verifyTokenService;
+    private final InitialConsiderationService initialConsiderationService;
+
     private static final String INVALID_TOKEN = "Invalid Token {}";
-    private static final String HORIZONTAL_RULE = "<hr>";
-    private String completeICTitle = "<h3>What happens next</h3>";
-    private String completeICText =
-        "<p>A tribunal caseworker will act on any instructions set out in your initial consideration to progress the case. You can <a href=\"/cases/case-details/${[CASE_REFERENCE]}#Documents\" target=\"_blank\">view the initial consideration document in the Documents tab (opens in new tab).</a></p>";
 
     @PostMapping(value = "/completeInitialConsideration", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "completes the Initial Consideration flow")
@@ -47,7 +46,7 @@ public class InitialConsiderationController {
         }
 
         return ResponseEntity.ok(CCDCallbackResponse.builder().confirmation_body(
-                new StringBuilder().append(HORIZONTAL_RULE).append(completeICTitle).append(completeICText).toString()).
+                initialConsiderationService.getCompletionText()).
             build());
     }
 }

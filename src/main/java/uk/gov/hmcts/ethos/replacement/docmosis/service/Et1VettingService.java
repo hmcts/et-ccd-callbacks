@@ -215,6 +215,9 @@ public class Et1VettingService {
         }
     }
 
+    /**
+     * Populates tribunal office location and regional office label/list based on managing office location.
+     */
     public void populateTribunalOfficeFields(CaseData caseData) {
         String managingOffice = caseData.getManagingOffice();
         String tribunalLocation = TribunalOffice.isScotlandOffice(managingOffice)

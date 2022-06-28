@@ -161,13 +161,11 @@ class Et1VettingServiceTest {
     }
 
     @Test
-    void initialBeforeYouStart_TwoAcasNumber_shouldReturnMarkUp() throws Exception {
-        caseDetails = generateCaseDetails("et1VettingTest2.json");
+    void initialBeforeYouStart_NoAcasNumber_shouldReturnMarkUp() throws Exception {
+        caseDetails = generateCaseDetails("et1VettingTest3.json");
         et1VettingService.initialiseEt1Vetting(caseDetails);
-        String expected = String.format(ACAS_CERT_LIST_DISPLAY, "1234/5678/90")
-                + String.format(ACAS_CERT_LIST_DISPLAY, "2987/6543/01");
         assertThat(caseDetails.getCaseData().getEt1VettingAcasCertListMarkUp())
-                .isEqualTo(expected);
+                .isEqualTo("");
     }
 
     private DocumentTypeItem createDocumentTypeItem(String typeOfDocument, String binaryLink) {

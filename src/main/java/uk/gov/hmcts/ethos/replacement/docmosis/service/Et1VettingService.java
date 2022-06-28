@@ -121,7 +121,8 @@ public class Et1VettingService {
                 .filter(r -> r.getValue().getRespondentACAS() != null)
                 .map(r -> String.format(ACAS_CERT_LIST_DISPLAY,
                         r.getValue().getRespondentACAS()))
-                .collect(Collectors.joining());
+                .findFirst()
+                .orElse("");
     }
 
     private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {

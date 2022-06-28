@@ -228,6 +228,11 @@ public class Et3VettingHelper {
         return YES.equals(respondent.getExtensionRequested()) && YES.equals(respondent.getExtensionGranted());
     }
 
+    /**
+     * Finds listed hearings for a case and sets the hearing details for ExUI. Will display a table with the earliest
+     * hearing date and track type or static text saying that there are no listings for the case.
+     * @param caseData data for the current case
+     */
     public static void checkHearingListed(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
             log.info(String.format("No hearings for case %s", caseData.getEthosCaseReference()));

@@ -108,6 +108,12 @@ public class Et3VettingController {
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
+    /**
+     * Calculates whether the ET3 response was received in time or not.
+     * @param ccdRequest holds the request and case data
+     * @param userToken used for authorization
+     * @return this will call the response entity but will also display any error messages which occur.
+     */
     @PostMapping(value = "/calculateResponseInTime", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "calculate if the response was received in time")
     @ApiResponses(value = {
@@ -136,6 +142,13 @@ public class Et3VettingController {
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
+    /**
+     * Finds listed hearings for a case and sets the hearing details for ExUI. Will display a table with the earliest
+     * hearing date and track type or static text saying that there are no listings for the case.
+     * @param ccdRequest holds the request and case data
+     * @param userToken used for authorization
+     * @return this will call the response entity.
+     */
     @PostMapping(value = "/checkHearingListed", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "check to see if a hearing has been listed")
     @ApiResponses(value = {

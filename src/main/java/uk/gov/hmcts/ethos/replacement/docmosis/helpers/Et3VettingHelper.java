@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 /**
@@ -49,7 +51,7 @@ public class Et3VettingHelper {
             + "|Type| %s|";
     private static final int ET3_RESPONSE_WINDOW = 29;
     private static final String NONE = "None";
-    private static final String CASE_NOT_LISTED = "The case has not been listed";
+    private static final String CASE_NOT_LISTED = "<h2>Hearing details</h2>The case has not been listed<hr>";
 
     private Et3VettingHelper() {
         //Access through static methods
@@ -266,7 +268,8 @@ public class Et3VettingHelper {
         }
 
         Collections.sort(hearingDates);
-        return LocalDate.parse(hearingDates.get(0)).format(DateTimeFormatter.ofPattern("EEEE d MMMM y"));
-    }
+        String date = hearingDates.get(0);
 
+        return LocalDateTime.parse(date, OLD_DATE_TIME_PATTERN).format(DateTimeFormatter.ofPattern("EEEE d MMMM y"));
+    }
 }

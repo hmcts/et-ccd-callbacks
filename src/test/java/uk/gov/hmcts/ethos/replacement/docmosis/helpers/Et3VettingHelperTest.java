@@ -22,7 +22,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.N
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.NO_RESPONDENTS_FOUND_ERROR;
 
 class Et3VettingHelperTest {
-
+    private static final String CASE_NOT_LISTED = "<h2>Hearing details</h2>The case has not been listed<hr>";
     private List<String> errors;
     @Test
     void givenET3Received_datesShouldShow() {
@@ -239,7 +239,7 @@ class Et3VettingHelperTest {
     void givenHearingIsListed_SetCaseAsListed() {
         CaseData caseData = CaseDataBuilder.builder()
                 .withHearing("1", "test", "Judy")
-                .withHearingSession(0, "1", "2021-12-25", HEARING_STATUS_LISTED, false)
+                .withHearingSession(0, "1", "2021-12-25T00:00:00.000", HEARING_STATUS_LISTED, false)
                 .withConciliationTrack("Test track")
                 .build();
         Et3VettingHelper.checkHearingListed(caseData);
@@ -258,12 +258,12 @@ class Et3VettingHelperTest {
     void givenHearingIsNotListed_SetCaseAsNotListed() {
         CaseData caseData = CaseDataBuilder.builder()
                 .withHearing("1", "test", "Judy")
-                .withHearingSession(0, "1", "2021-12-25", HEARING_STATUS_POSTPONED, false)
+                .withHearingSession(0, "1", "2021-12-25T00:00:00.000", HEARING_STATUS_POSTPONED, false)
                 .withConciliationTrack("Test track")
                 .build();
         Et3VettingHelper.checkHearingListed(caseData);
 
-        assertThat(caseData.getEt3HearingDetails(), is("The case has not been listed"));
+        assertThat(caseData.getEt3HearingDetails(), is(CASE_NOT_LISTED));
         assertThat(caseData.getEt3IsCaseListedForHearing(), is(NO));
     }
 
@@ -271,7 +271,7 @@ class Et3VettingHelperTest {
     void givenHearingIsListedButNoTrack_SetCaseAsListedNoTrackFound() {
         CaseData caseData = CaseDataBuilder.builder()
                 .withHearing("1", "test", "Judy")
-                .withHearingSession(0, "1", "2021-12-25", HEARING_STATUS_LISTED, false)
+                .withHearingSession(0, "1", "2021-12-25T00:00:00.000", HEARING_STATUS_LISTED, false)
                 .build();
         Et3VettingHelper.checkHearingListed(caseData);
 
@@ -290,7 +290,7 @@ class Et3VettingHelperTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         Et3VettingHelper.checkHearingListed(caseData);
 
-        assertThat(caseData.getEt3HearingDetails(), is("The case has not been listed"));
+        assertThat(caseData.getEt3HearingDetails(), is(CASE_NOT_LISTED));
         assertThat(caseData.getEt3IsCaseListedForHearing(), is(NO));
     }
 

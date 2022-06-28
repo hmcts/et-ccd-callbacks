@@ -45,7 +45,7 @@ public class Et3VettingHelper {
         + "|ET3 received| %s|";
 
     private static final String ET3_HEARING_TABLE =
-            "| Hearing Details| | \r\n"
+            "| <h2>Hearing Details</h2>| | \r\n"
             + "|--|--|\r\n"
             + "|Date| %s|\r\n"
             + "|Type| %s|";

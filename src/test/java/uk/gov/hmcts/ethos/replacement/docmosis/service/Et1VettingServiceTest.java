@@ -40,6 +40,7 @@ class Et1VettingServiceTest {
             + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Contact address &#09&#09 %s</pre><hr>";
     private static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
+    private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br>";
 
     private final String et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
     private final String acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
@@ -142,13 +143,30 @@ class Et1VettingServiceTest {
     @Test
     void initialBeforeYouStart_TwoRespondentDetails_shouldReturnMarkUp() throws Exception {
         caseDetails = generateCaseDetails("et1VettingTest2.json");
-        caseDetails.setCaseId(caseId);
         et1VettingService.initialiseEt1Vetting(caseDetails);
         String expected = String.format(RESPONDENT_DETAILS, "1", "Antonio Vazquez",
                 "11 Small Street" + BR_WITH_TAB + "22 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M12 42R")
                 + String.format(RESPONDENT_DETAILS, "2", "Juan Garcia",
                 "12 Small Street" + BR_WITH_TAB + "24 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M12 4ED");
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentDetailsMarkUp())
+                .isEqualTo(expected);
+    }
+
+    @Test
+    void initialBeforeYouStart_OneAcasNumber_shouldReturnMarkUp() throws Exception {
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        String expected = String.format(ACAS_CERT_LIST_DISPLAY, "1234/5678/90");
+        assertThat(caseDetails.getCaseData().getEt1VettingAcasCertListMarkUp())
+                .isEqualTo(expected);
+    }
+
+    @Test
+    void initialBeforeYouStart_TwoAcasNumber_shouldReturnMarkUp() throws Exception {
+        caseDetails = generateCaseDetails("et1VettingTest2.json");
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        String expected = String.format(ACAS_CERT_LIST_DISPLAY, "1234/5678/90")
+                + String.format(ACAS_CERT_LIST_DISPLAY, "2987/6543/01");
+        assertThat(caseDetails.getCaseData().getEt1VettingAcasCertListMarkUp())
                 .isEqualTo(expected);
     }
 

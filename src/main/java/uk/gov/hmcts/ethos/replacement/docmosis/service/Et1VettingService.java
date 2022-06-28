@@ -34,6 +34,7 @@ public class Et1VettingService {
             + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Contact address &#09&#09 %s</pre><hr>";
     private static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
+    private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br>";
 
     /**
      * Update et1VettingBeforeYouStart.
@@ -45,6 +46,7 @@ public class Et1VettingService {
                 initialClaimantDetailsMarkUp(caseDetails.getCaseData()));
         caseDetails.getCaseData().setEt1VettingRespondentDetailsMarkUp(
                 initialRespondentDetailsMarkUp(caseDetails.getCaseData()));
+        caseDetails.getCaseData().setEt1VettingAcasCertListMarkUp(initialAcasCertList(caseDetails.getCaseData()));
     }
 
     /**
@@ -111,6 +113,15 @@ public class Et1VettingService {
                             toAddressWithTab(r.getValue().getRespondentAddress())))
                     .collect(Collectors.joining());
         }
+    }
+
+    private String initialAcasCertList(CaseData caseData) {
+        return caseData.getRespondentCollection()
+                .stream()
+                .filter(r -> r.getValue().getRespondentACAS() != null)
+                .map(r -> String.format(ACAS_CERT_LIST_DISPLAY,
+                        r.getValue().getRespondentACAS()))
+                .collect(Collectors.joining());
     }
 
     private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {

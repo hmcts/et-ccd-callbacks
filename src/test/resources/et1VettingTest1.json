@@ -10,10 +10,21 @@
         "Country": "United Kingdom"
       }
     },
+    "claimantIndType": {
+      "claimant_last_name": "Johnson",
+      "claimant_first_names": "Doris"
+    },
     "respondentCollection": [
       {
         "id" : "93e26d95-094d-4e11-9c60-33d27bbd1c81",
         "value" : {
+          "respondent_ACAS": "1234/5678/90",
+          "respondent_name": "Antonio Vazquez",
+          "responseContinue": "Yes",
+          "responseReceived": "No",
+          "respondent_phone1": "07577136570",
+          "responseStruckOut": "No",
+          "extensionRequested": "No",
           "respondent_address": {
             "AddressLine1": "11 Small Street",
             "AddressLine2": "22 House",
@@ -22,20 +33,10 @@
             "PostCode": "M12 42R",
             "PostTown": "Manchester"
           },
-          "respondent_name": "Antonio Vazquez",
-          "respondent_contact_preference": "Post",
-          "respondent_email": "Antonio@gmail.com",
-          "respondent_phone1": "07577136570",
-          "respondent_phone2": "07577136570",
-          "response_referred_to_judge": "2019-12-22",
-          "response_returned_from_judge": "2019-12-21",
-          "responseStruckOut": "No"
+          "respondent_ACAS_question": "Yes",
+          "responseRespondentAddress": {}
         }
       }
-    ],
-    "claimantIndType": {
-      "claimant_last_name": "Johnson",
-      "claimant_first_names": "Doris"
-    }
+    ]
   }
 }

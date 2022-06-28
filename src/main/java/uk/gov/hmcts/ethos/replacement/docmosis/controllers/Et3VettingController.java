@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +38,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 public class Et3VettingController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
+    public static final String PROCESSING_COMPLETE_HEADER = "<h2>Do this next</h2>You must:"
+            + "<ul><li>accept or reject the ET3 response or refer the response</li>"
+            + "<li>add any changed or new information to case details</li></ul>";
     private final VerifyTokenService verifyTokenService;
 
     public Et3VettingController(VerifyTokenService verifyTokenService) {
@@ -136,4 +140,38 @@ public class Et3VettingController {
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
+
+    /**
+     * This method is used to display a message to the user once the submit button has been pressed. This will show the
+     * user what the next steps are.
+     * @param ccdRequest generic request from CCD
+     * @param userToken authentication token to verify the user
+     * @return this will return and display a message to the user on the next steps.
+     */
+    @PostMapping(value = "/processingComplete", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "display the next steps after ET3 Vetting")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> processingComplete(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        // TODO refactor the PROCESSING_COMPLETE_HEADER variable. This will need to be refactored to include a
+        //  hyperlink as part of the text. See RET-2020 for what the links should be once they have been added
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .data(ccdRequest.getCaseDetails().getCaseData())
+                .confirmation_body(PROCESSING_COMPLETE_HEADER)
+                .build());
+    }
 }

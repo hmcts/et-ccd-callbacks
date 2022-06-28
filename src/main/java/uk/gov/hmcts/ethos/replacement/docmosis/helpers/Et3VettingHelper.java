@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -37,18 +38,22 @@ public class Et3VettingHelper {
     static final String NO_CLAIM_SERVED_DATE = "Cannot proceed as there is no claim served date";
     static final String NO_ET3_RESPONSE = "Cannot process as there is no ET3 Response";
     static final String ET3_TABLE_DATA =
-        "| Dates| |\r\n"
-        + "|--|--|\r\n"
-        + "|ET1 served| %s|\r\n"
-        + "|ET3 due| %s|\r\n"
-        + "|Extension| %s|\r\n"
-        + "|ET3 received| %s|";
-
+            "| Dates| |\r\n"
+            + "|--|--|\r\n"
+            + "|ET1 served| %s|\r\n"
+            + "|ET3 due| %s|\r\n"
+            + "|Extension| %s|\r\n"
+            + "|ET3 received| %s|";
     private static final String ET3_HEARING_TABLE =
-            "| <h2>Hearing Details</h2>| | \r\n"
+            "| <h2>Hearing details</h2>| | \r\n"
             + "|--|--|\r\n"
             + "|Date| %s|\r\n"
             + "|Type| %s|";
+    private static final String ET3_TRIBUNAL_TABLE =
+            "| <h2>Tribunal location</h2>| | \r\n"
+            + "|--|--|\r\n"
+            + "|Tribunal| %s|\r\n"
+            + "|Office| %s|";
     private static final int ET3_RESPONSE_WINDOW = 29;
     private static final String NONE = "None";
     private static final String CASE_NOT_LISTED = "<h2>Hearing details</h2>The case has not been listed<hr>";
@@ -255,6 +260,15 @@ public class Et3VettingHelper {
 
         caseData.setEt3HearingDetails(String.format(ET3_HEARING_TABLE, hearingDate, track));
         caseData.setEt3IsCaseListedForHearing(YES);
+    }
+
+    public static void transferApplication(CaseData caseData) {
+        String managingOffice = caseData.getManagingOffice();
+        String tribunalOffice = TribunalOffice.isEnglandWalesOffice(managingOffice)
+                ? "England & Wales"
+                : TribunalOffice.SCOTLAND.getOfficeName();
+
+        caseData.setEt3TribunalLocation(String.format(ET3_TRIBUNAL_TABLE, tribunalOffice, managingOffice));
     }
 
     private static String findHearingDate(List<HearingTypeItem> hearingCollection) {

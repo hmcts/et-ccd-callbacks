@@ -47,11 +47,7 @@ public class HearingDetailsService {
     }
 
     private String nonNull(String value) {
-        if (isNullOrEmpty(value)) {
-            return " ";
-        } else {
-            return value;
-        }
+        return isNullOrEmpty(value) ? " " : value;
     }
 
     public void updateCase(CaseDetails caseDetails) {

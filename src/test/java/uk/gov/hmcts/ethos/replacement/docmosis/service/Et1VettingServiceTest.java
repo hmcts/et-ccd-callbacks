@@ -132,7 +132,7 @@ class Et1VettingServiceTest {
     }
 
     @Test
-    void initialBeforeYouStart_OneRespondentDetails_shouldReturnMarkUp() throws Exception {
+    void initialBeforeYouStart_OneRespondentDetails_shouldReturnMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
         String expected = String.format(RESPONDENT_DETAILS, "", "Antonio Vazquez",
                 "11 Small Street" + BR_WITH_TAB + "22 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M12 42R");
@@ -153,7 +153,7 @@ class Et1VettingServiceTest {
     }
 
     @Test
-    void initialBeforeYouStart_OneAcasNumber_shouldReturnMarkUp() throws Exception {
+    void initialBeforeYouStart_OneAcasNumber_shouldReturnMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
         String expected = String.format(ACAS_CERT_LIST_DISPLAY, "1234/5678/90");
         assertThat(caseDetails.getCaseData().getEt1VettingAcasCertListMarkUp())
@@ -165,7 +165,7 @@ class Et1VettingServiceTest {
         caseDetails = generateCaseDetails("et1VettingTest3.json");
         et1VettingService.initialiseEt1Vetting(caseDetails);
         assertThat(caseDetails.getCaseData().getEt1VettingAcasCertListMarkUp())
-                .isEqualTo("");
+                .isEmpty();
     }
 
     private DocumentTypeItem createDocumentTypeItem(String typeOfDocument, String binaryLink) {

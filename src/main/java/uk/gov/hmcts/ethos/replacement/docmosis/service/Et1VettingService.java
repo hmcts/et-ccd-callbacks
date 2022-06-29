@@ -14,15 +14,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
-import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_OP;
@@ -109,7 +102,7 @@ public class Et1VettingService {
         List<DocumentTypeItem> documentCollection = caseDetails.getCaseData().getDocumentCollection();
         if (documentCollection != null) {
             et1Display = documentCollection
-                .stream()
+                    .stream()
                 .filter(d -> d.getValue().getTypeOfDocument().equals(ET1_DOC_TYPE))
                 .map(d -> String.format(BEFORE_LABEL_ET1, createDocLinkBinary(d)))
                 .collect(Collectors.joining());

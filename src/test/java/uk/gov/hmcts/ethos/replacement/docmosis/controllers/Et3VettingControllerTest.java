@@ -38,6 +38,7 @@ class Et3VettingControllerTest {
     private static final String INIT_ET3_RESPONDENT_LIST_URL = "/et3Vetting/initEt3RespondentList";
     private static final String CALCULATE_RESPONSE_TIME_URL = "/et3Vetting/calculateResponseInTime";
     private static final String ET3_PROCESSING_COMPLETE_URL = "/et3Vetting/processingComplete";
+
     @Autowired
     private WebApplicationContext applicationContext;
     @MockBean

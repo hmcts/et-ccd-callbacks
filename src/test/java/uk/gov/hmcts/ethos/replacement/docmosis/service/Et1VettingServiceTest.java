@@ -1,20 +1,18 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 class Et1VettingServiceTest {
 
@@ -51,9 +49,21 @@ class Et1VettingServiceTest {
     private final String caseId = "1655312312192821";
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         et1VettingService = new Et1VettingService();
-        caseDetails = generateCaseDetails("et1VettingTest1.json");
+        caseDetails = CaseDataBuilder.builder()
+                .withClaimantIndType("Doris", "Johnson")
+                .withClaimantType("232 Petticoat Square", "3 House", null,
+                        "London", "W10 4AG", "United Kingdom")
+                .withRespondentWithAddress("Antonio Vazquez",
+                        "11 Small Street", "22 House", null,
+                        "Manchester", "M12 42R", "United Kingdom",
+                        "1234/5678/90")
+                .withRespondentWithAddress("Juan Garcia",
+                        "32 Sweet Street", "14 House", null,
+                        "Manchester", "M11 4ED", "United Kingdom",
+                        "2987/6543/01")
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseId(caseId);
     }
 
@@ -126,13 +136,22 @@ class Et1VettingServiceTest {
     void initialBeforeYouStart_ClaimantDetails_shouldReturnMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
         String expected = String.format(CLAIMANT_DETAILS, "Doris", "Johnson",
-                "232 Petticoat Square" + BR_WITH_TAB + "22 House" + BR_WITH_TAB + "London" + BR_WITH_TAB + "W10 4AG");
+                "232 Petticoat Square" + BR_WITH_TAB + "3 House" + BR_WITH_TAB + "London" + BR_WITH_TAB + "W10 4AG");
         assertThat(caseDetails.getCaseData().getEt1VettingClaimantDetailsMarkUp())
                 .isEqualTo(expected);
     }
 
     @Test
     void initialBeforeYouStart_OneRespondentDetails_shouldReturnMarkUp() {
+        caseDetails = CaseDataBuilder.builder()
+                .withClaimantIndType("Doris", "Johnson")
+                .withClaimantType("232 Petticoat Square", "3 House", null,
+                        "London", "W10 4AG", "United Kingdom")
+                .withRespondentWithAddress("Antonio Vazquez",
+                        "11 Small Street", "22 House", null,
+                        "Manchester", "M12 42R", "United Kingdom",
+                        "1234/5678/90")
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         et1VettingService.initialiseEt1Vetting(caseDetails);
         String expected = String.format(RESPONDENT_DETAILS, "", "Antonio Vazquez",
                 "11 Small Street" + BR_WITH_TAB + "22 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M12 42R");
@@ -141,13 +160,12 @@ class Et1VettingServiceTest {
     }
 
     @Test
-    void initialBeforeYouStart_TwoRespondentDetails_shouldReturnMarkUp() throws Exception {
-        caseDetails = generateCaseDetails("et1VettingTest2.json");
+    void initialBeforeYouStart_TwoRespondentDetails_shouldReturnMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
         String expected = String.format(RESPONDENT_DETAILS, "1", "Antonio Vazquez",
                 "11 Small Street" + BR_WITH_TAB + "22 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M12 42R")
                 + String.format(RESPONDENT_DETAILS, "2", "Juan Garcia",
-                "12 Small Street" + BR_WITH_TAB + "24 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M12 4ED");
+                "32 Sweet Street" + BR_WITH_TAB + "14 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M11 4ED");
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentDetailsMarkUp())
                 .isEqualTo(expected);
     }
@@ -161,8 +179,20 @@ class Et1VettingServiceTest {
     }
 
     @Test
-    void initialBeforeYouStart_NoAcasNumber_shouldReturnMarkUp() throws Exception {
-        caseDetails = generateCaseDetails("et1VettingTest3.json");
+    void initialBeforeYouStart_NoAcasNumber_shouldReturnMarkUp() {
+        caseDetails = CaseDataBuilder.builder()
+                .withClaimantIndType("Doris", "Johnson")
+                .withClaimantType("232 Petticoat Square", "3 House", null,
+                        "London", "W10 4AG", "United Kingdom")
+                .withRespondentWithAddress("Antonio Vazquez",
+                        "11 Small Street", "22 House", null,
+                        "Manchester", "M12 42R", "United Kingdom",
+                        null)
+                .withRespondentWithAddress("Juan Garcia",
+                        "32 Sweet Street", "14 House", null,
+                        "Manchester", "M11 4ED", "United Kingdom",
+                        null)
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         et1VettingService.initialiseEt1Vetting(caseDetails);
         assertThat(caseDetails.getCaseData().getEt1VettingAcasCertListMarkUp())
                 .isEmpty();
@@ -176,13 +206,6 @@ class Et1VettingServiceTest {
         DocumentTypeItem documentTypeItem = new DocumentTypeItem();
         documentTypeItem.setValue(documentType);
         return documentTypeItem;
-    }
-
-    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
-        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource(jsonFileName)).toURI())));
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(json, CaseDetails.class);
     }
 
 }

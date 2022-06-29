@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -26,87 +27,20 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 public class Et3VettingHelper {
 
     static final String NO_RESPONDENTS_FOUND_ERROR = "No respondents found for case %s";
+    static final String NO_CLAIM_SERVED_DATE = "Cannot proceed as there is no claim served date";
+    static final String NO_ET3_RESPONSE = "Cannot process as there is no ET3 Response";
     static final String ET3_TABLE_DATA =
         "| Dates| |\r\n"
         + "|--|--|\r\n"
         + "|ET1 served| %s|\r\n"
         + "|ET3 due| %s|\r\n"
-        + "|Extension| None|\r\n"
+        + "|Extension| %s|\r\n"
         + "|ET3 received| %s|";
+    private static final int ET3_RESPONSE_WINDOW = 29;
+    private static final String NONE = "None";
 
     private Et3VettingHelper() {
         //Access through static methods
-    }
-
-    /**
-     * Formats the case data into the table that is rendered on the "Is there an ET3 Response?" page.
-     * @param caseData The case data containing the ET3 response
-     * @return A string containing markdown for a table, will change content depending on if/when the ET3 response
-     *         has been submitted
-     * */
-    public static String getEt3DatesInMarkdown(CaseData caseData) {
-        return String.format(
-                ET3_TABLE_DATA,
-                findEt1ServedDate(caseData.getClaimServedDate()),
-                findEt3DueDate(caseData.getClaimServedDate()),
-                findEt3ReceivedDate(caseData)
-        );
-    }
-
-    /**
-     * Check if an ET3 response has been submitted on a given case data.
-     * @param caseData The case data to check
-     * @return True if ET3 submitted, False if not submitted or if the respondent collection is empty
-     */
-    public static boolean isThereAnEt3Response(CaseData caseData) {
-        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
-
-        if (CollectionUtils.isEmpty(respondentCollection)) {
-            log.error("Respondent collection is empty for case ref " + caseData.getEthosCaseReference());
-            return false;
-        }
-
-        return respondentCollection
-                .stream()
-                .anyMatch(r -> respondentExistsAndEt3Received(
-                        caseData.getEt3ChooseRespondent().getSelectedLabel(), r.getValue()));
-
-    }
-
-    private static String findEt3DueDate(String et3DueDate) {
-        return isNullOrEmpty(et3DueDate)
-                ? "Cannot find ET3 Due Date"
-                : UtilHelper.formatCurrentDatePlusDays(LocalDate.parse(et3DueDate), 29);
-    }
-
-    private static String findEt1ServedDate(String date) {
-        return isNullOrEmpty(date)
-                ? "Cannot find ET1 Served Date"
-                : UtilHelper.listingFormatLocalDate(date);
-    }
-
-    private static String findEt3ReceivedDate(CaseData caseData) {
-        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
-
-        if (CollectionUtils.isEmpty(respondentCollection)) {
-            log.error("Respondent collection is empty for case ref " + caseData.getEthosCaseReference());
-            return NO;
-        }
-
-        String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
-        for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
-            RespondentSumType respondent = respondentSumTypeItem.getValue();
-            if (respondentExistsAndEt3Received(respondentName, respondent))  {
-                return UtilHelper.listingFormatLocalDate(respondent.getResponseReceivedDate());
-            }
-        }
-
-        return NO;
-    }
-
-    private static boolean respondentExistsAndEt3Received(String respondentName, RespondentSumType respondent) {
-        return respondentName.equals(respondent.getRespondentName())
-                && YES.equals(respondent.getResponseReceived());
     }
 
     /**
@@ -131,4 +65,153 @@ public class Et3VettingHelper {
         caseData.setEt3ChooseRespondent(dynamicFixedListType);
         return new ArrayList<>();
     }
+
+    /**
+     * Formats the case data into the table that is rendered on the "Is there an ET3 Response?" page.
+     * @param caseData The case data containing the ET3 response
+     * @return A string containing markdown for a table, will change content depending on if/when the ET3 response
+     *         has been submitted
+     * */
+    public static String getEt3DatesInMarkdown(CaseData caseData) {
+        return String.format(
+                ET3_TABLE_DATA,
+                findEt1ServedDate(caseData.getClaimServedDate()),
+                findEt3DueDate(caseData.getClaimServedDate()),
+                findEt3ExtensionDate(caseData),
+                findEt3ReceivedDate(caseData)
+        );
+    }
+
+    /**
+     * Check if an ET3 response has been submitted on a given case data.
+     * @param caseData The case data to check
+     * @return True if ET3 submitted, False if not submitted or if the respondent collection is empty
+     */
+    public static boolean isThereAnEt3Response(CaseData caseData) {
+        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+
+        if (CollectionUtils.isEmpty(respondentCollection)) {
+            log.error(NO_RESPONDENTS_FOUND_ERROR + caseData.getEthosCaseReference());
+            return false;
+        }
+
+        return respondentCollection
+                .stream()
+                .anyMatch(r -> respondentExistsAndEt3Received(
+                        caseData.getEt3ChooseRespondent().getSelectedLabel(), r.getValue()));
+
+    }
+
+    /**
+     * This method is used to calculate whether the response was received on time. It takes the claimServedDate and adds
+     * a set number of days to calculate the ET3 due date. It then looks at the respondent to see when the response was
+     * received as well as checking to see if an extension was request and granted. If they were granted an extension,
+     * a new due date is applied from the extension date
+     * @param caseData this contains data from the case
+     */
+    public static List<String> calculateResponseTime(CaseData caseData) {
+
+        List<String> errors = new ArrayList<>();
+
+        if (!responseInTimePreValidationCheck(caseData, errors)) {
+            return errors;
+        }
+        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+
+        Optional<RespondentSumTypeItem> respondentSumTypeOptional = respondentCollection
+                .stream()
+                .filter(r -> respondentExistsAndEt3Received(
+                        caseData.getEt3ChooseRespondent().getSelectedLabel(), r.getValue()))
+                .findFirst();
+        respondentSumTypeOptional.ifPresent(
+                respondentSumTypeItem -> setResponseInTime(caseData, respondentSumTypeItem.getValue()));
+        
+        return errors;
+
+    }
+
+    private static void setResponseInTime(CaseData caseData, RespondentSumType respondentSumType) {
+        LocalDate et3DueDate = LocalDate.parse(caseData.getClaimServedDate()).plusDays(ET3_RESPONSE_WINDOW);
+        LocalDate et3ReceivedDate = LocalDate.parse(respondentSumType.getResponseReceivedDate());
+        if (respondentExtensionExists(respondentSumType)) {
+            et3DueDate = LocalDate.parse(respondentSumType.getExtensionDate());
+        }
+
+        if (et3ReceivedDate.isAfter(et3DueDate)) {
+            caseData.setEt3ResponseInTime(NO);
+        } else {
+            caseData.setEt3ResponseInTime(YES);
+        }
+    }
+
+    private static boolean responseInTimePreValidationCheck(CaseData caseData, List<String> errors) {
+        if (isNullOrEmpty(caseData.getClaimServedDate())) {
+            errors.add(NO_CLAIM_SERVED_DATE);
+        }
+        if (NO.equals(findEt3ReceivedDate(caseData))) {
+            errors.add(NO_ET3_RESPONSE);
+        }
+        return errors.isEmpty();
+    }
+
+    private static String findEt3DueDate(String et3DueDate) {
+        return isNullOrEmpty(et3DueDate)
+                ? "Cannot find ET3 Due Date"
+                : UtilHelper.formatCurrentDatePlusDays(LocalDate.parse(et3DueDate), 29);
+    }
+
+    private static String findEt1ServedDate(String date) {
+        return isNullOrEmpty(date)
+                ? "Cannot find ET1 Served Date"
+                : UtilHelper.listingFormatLocalDate(date);
+    }
+
+    private static String findEt3ExtensionDate(CaseData caseData) {
+        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+
+        if (CollectionUtils.isEmpty(respondentCollection)) {
+            log.error(NO_RESPONDENTS_FOUND_ERROR + caseData.getEthosCaseReference());
+            return NONE;
+        }
+
+        String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
+        for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
+            RespondentSumType respondent = respondentSumTypeItem.getValue();
+            if (respondentName.equals(respondent.getRespondentName())
+                    && respondentExtensionExists(respondent))  {
+                return UtilHelper.listingFormatLocalDate(respondent.getExtensionDate());
+            }
+        }
+
+        return NONE;
+    }
+
+    private static String findEt3ReceivedDate(CaseData caseData) {
+        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+
+        if (CollectionUtils.isEmpty(respondentCollection)) {
+            log.error(NO_RESPONDENTS_FOUND_ERROR + caseData.getEthosCaseReference());
+            return NO;
+        }
+
+        String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
+        for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
+            RespondentSumType respondent = respondentSumTypeItem.getValue();
+            if (respondentExistsAndEt3Received(respondentName, respondent))  {
+                return UtilHelper.listingFormatLocalDate(respondent.getResponseReceivedDate());
+            }
+        }
+
+        return NO;
+    }
+
+    private static boolean respondentExistsAndEt3Received(String respondentName, RespondentSumType respondent) {
+        return respondentName.equals(respondent.getRespondentName())
+                && YES.equals(respondent.getResponseReceived());
+    }
+
+    private static boolean respondentExtensionExists(RespondentSumType respondent) {
+        return YES.equals(respondent.getExtensionRequested()) && YES.equals(respondent.getExtensionGranted());
+    }
+
 }

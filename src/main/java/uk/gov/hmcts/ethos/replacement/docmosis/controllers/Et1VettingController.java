@@ -54,7 +54,7 @@ public class Et1VettingController {
         }
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        et1VettingService.initialBeforeYouStart(caseDetails);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
 
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
 

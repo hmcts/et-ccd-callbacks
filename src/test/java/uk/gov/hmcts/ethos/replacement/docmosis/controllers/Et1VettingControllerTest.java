@@ -59,7 +59,7 @@ class Et1VettingControllerTest {
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(et1VettingService, times(1)).initialBeforeYouStart(ccdRequest.getCaseDetails());
+        verify(et1VettingService, times(1)).initialiseEt1Vetting(ccdRequest.getCaseDetails());
     }
 
     @Test
@@ -70,7 +70,7 @@ class Et1VettingControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
-        verify(et1VettingService, never()).initialBeforeYouStart(ccdRequest.getCaseDetails());
+        verify(et1VettingService, never()).initialiseEt1Vetting(ccdRequest.getCaseDetails());
     }
 
     @Test
@@ -81,7 +81,7 @@ class Et1VettingControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content("error"))
                 .andExpect(status().isBadRequest());
-        verify(et1VettingService, never()).initialBeforeYouStart(ccdRequest.getCaseDetails());
+        verify(et1VettingService, never()).initialiseEt1Vetting(ccdRequest.getCaseDetails());
     }
 
 }

@@ -244,11 +244,17 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withRespondent(String respondent, String responseReceived, String receivedDate) {
+    public CaseDataBuilder withRespondent(String respondent, String responseReceived, String receivedDate,
+                                          boolean extension) {
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName(respondent);
         respondentSumType.setResponseReceived(responseReceived);
         respondentSumType.setResponseReceivedDate(receivedDate);
+        if (extension) {
+            respondentSumType.setExtensionRequested(YES);
+            respondentSumType.setExtensionGranted(YES);
+            respondentSumType.setExtensionDate("2022-03-01");
+        }
 
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(respondentSumType);

@@ -29,8 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-
-
 @RunWith(SpringRunner.class)
 @WebMvcTest({Et3VettingController.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
@@ -38,6 +36,7 @@ class Et3VettingControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String POPULATE_ET3_DATES_URL = "/et3Vetting/populateEt3Dates";
     private static final String INIT_ET3_RESPONDENT_LIST_URL = "/et3Vetting/initEt3RespondentList";
+    private static final String CALCULATE_RESPONSE_TIME_URL = "/et3Vetting/calculateResponseInTime";
     @Autowired
     private WebApplicationContext applicationContext;
     @MockBean
@@ -54,7 +53,7 @@ class Et3VettingControllerTest {
 
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withChooseEt3Respondent("Jack")
-                .withRespondent("Jack", YES, "2022-03-01")
+                .withRespondent("Jack", YES, "2022-03-01", false)
                 .withClaimServedDate("2022-01-01")
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
@@ -135,6 +134,38 @@ class Et3VettingControllerTest {
     @Test
     void initEt3RespondentList_badRequest() throws Exception {
         mvc.perform(post(INIT_ET3_RESPONDENT_LIST_URL)
+                .content("garbage content")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void calculateResponseInTime_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(CALCULATE_RESPONSE_TIME_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(0)))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void calculateResponseInTime_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(CALCULATE_RESPONSE_TIME_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void calculateResponseInTime_badRequest() throws Exception {
+        mvc.perform(post(CALCULATE_RESPONSE_TIME_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))

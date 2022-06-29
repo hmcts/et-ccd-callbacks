@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -148,7 +147,7 @@ public class Et3VettingController {
      * @param userToken authentication token to verify the user
      * @return this will return and display a message to the user on the next steps.
      */
-    @PostMapping(value = "/processingComplete", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/processingComplete", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "display the next steps after ET3 Vetting")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",

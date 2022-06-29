@@ -223,7 +223,6 @@ class Et1VettingServiceTest {
         assertThat(caseData.getRegionalOffice()).isEqualTo(expectedRegionalOffice);
     }
 
-
     private DocumentTypeItem createDocumentTypeItem(String typeOfDocument, String binaryLink) {
         DocumentType documentType = new DocumentType();
         documentType.setTypeOfDocument(typeOfDocument);

@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import java.util.List;
 
-public class JurisdictionCodeTrackConstants {
+public final class JurisdictionCodeTrackConstants {
 
     public static final List<String> JUR_CODE_CONCILIATION_TRACK_OP = List.of(
         "DAG", "DDA", "DRB", "DSO", "EQP", "PID", "RRD", "SXD");

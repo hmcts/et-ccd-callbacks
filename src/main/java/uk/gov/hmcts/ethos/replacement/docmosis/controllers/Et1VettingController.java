@@ -20,14 +20,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -78,8 +74,9 @@ public class Et1VettingController {
 
     /**
      * Mid callback event in the Jurisdiction code page to set the track allocation upon the case as long based
-     * upon jurisdiction codes, also validates the jurisdiction code that caseworker has added against the existing codes
-     * to prevent duplicate entries and populates the tribunal/office location fields based on managing office location.
+     * upon jurisdiction codes, also validates the jurisdiction code that caseworker has added against the existing
+     * codes to prevent duplicate entries and populates the tribunal/office location fields based on managing
+     * office location.
      * @param userToken Used for authorisation
      * @param ccdRequest CaseData which is a generic data type for most of the methods which holds ET1 case data
      * @return errors from the jurisdiction code validation (if there is any) and caseData in ccdRequest

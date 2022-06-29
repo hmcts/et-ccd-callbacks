@@ -32,8 +32,8 @@ public class InitialConsiderationController {
     private final VerifyTokenService verifyTokenService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String HORIZONTAL_RULE = "<hr>";
-    private String completeICTitle = "<h3>What happens next</h3>";
-    private String completeICText =
+    private static final String completeICTitle = "<h3>What happens next</h3>";
+    private static final String completeICText =
             "<p>A tribunal caseworker will act on any instructions set out in your initial consideration to progress the case. You can <a href=\"/cases/case-details/${[CASE_REFERENCE]}#Documents\" target=\"_blank\">view the initial consideration document in the Documents tab (opens in new tab).</a></p>";
 
     @PostMapping(value = "/completeInitialConsideration", consumes = APPLICATION_JSON_VALUE)
@@ -66,8 +66,7 @@ public class InitialConsiderationController {
     public ResponseEntity<CCDCallbackResponse> startInitialConsideration(@RequestBody CCDRequest ccdRequest,
                                                                          @RequestHeader(value = "Authorization")
                                                                                  String userToken) {
-        log.info("Start initial consideration");
-
+        log.info("START OF INITIAL CONSIDERATION FOR CASE ---> " + ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -76,21 +75,16 @@ public class InitialConsiderationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        //modify case data
-
-        caseData.setEtInitialConsiderationRespondent(InitialConsiderationHelper.getRespondentName(caseData));
-        caseData.setEtInitialConsiderationHearing(InitialConsiderationHelper.getHearingDetails(caseData));
+        caseData.setEtInitialConsiderationRespondent(InitialConsiderationHelper.getRespondentName(caseData.getRespondentCollection()));
+        caseData.setEtInitialConsiderationHearing(InitialConsiderationHelper.getHearingDetails(caseData.getHearingCollection()));
         caseData.setEtInitialConsiderationJurisdictionCodes(InitialConsiderationHelper.generateJurisdictionCodesHtml(caseData.getJurCodesCollection()));
-
 
         try {
             log.info(new ObjectMapper().writeValueAsString(caseData));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        //return case data to ccd
+
         return getCallbackRespEntityNoErrors(caseData);
     }
-
-
 }

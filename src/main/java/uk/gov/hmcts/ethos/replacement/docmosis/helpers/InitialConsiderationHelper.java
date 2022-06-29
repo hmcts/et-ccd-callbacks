@@ -1,15 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
 
-
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,8 +17,6 @@ import java.util.Optional;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
-
-@Slf4j
 public class InitialConsiderationHelper {
 
     static final String RESPONDENT_NAME =
@@ -42,18 +37,30 @@ public class InitialConsiderationHelper {
     }
 
 
-    public static String getRespondentName(CaseData caseData) {
-        return caseData.getRespondentCollection().stream().map(
+    /**
+     * Creates the respondent detail section for Initial Consideration.
+     * Only shows details from the first record
+     * @param respondentCollection collection of respondents
+     * @return table with respondent details
+     */
+    public static String getRespondentName(List<RespondentSumTypeItem> respondentCollection) {
+        return respondentCollection.stream().map(
                         respondent -> String.format(
                                 RESPONDENT_NAME, nullCheck(respondent.getValue().getRespondentName()),
                                 nullCheck(respondent.getValue().getResponseRespondentName()))).findFirst()
                 .orElse(String.format(RESPONDENT_NAME, "", ""));
     }
 
-    public static String getHearingDetails(CaseData caseData) {
+    /**
+     * Creates hearing detail section for Initial Consideration.
+     * Display details of the hearing with the earliest hearing date from the collection of hearings
+     * @param hearingCollection the collection of hearings
+     * @return return table with details of hearing
+     */
+    public static String getHearingDetails(List<HearingTypeItem> hearingCollection) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
 
-        return caseData.getHearingCollection().stream()
+        return hearingCollection.stream()
                 .map(HearingTypeItem::getValue)
                 .filter(hearing -> hearing.getHearingDateCollection() != null && !hearing.getHearingDateCollection().isEmpty()).min(Comparator.comparing(
                         (HearingType hearing) ->
@@ -72,6 +79,11 @@ public class InitialConsiderationHelper {
     }
 
 
+    /**
+     * Creates the jurisdiction section for Initial Consideration.
+     * @param jurisdictionCodes the list of jurisdiction codes assigned to the case
+     * @return jurisdiction code section
+     */
     public static String generateJurisdictionCodesHtml(List<JurCodesTypeItem> jurisdictionCodes) {
         StringBuilder sb = new StringBuilder()
                 .append("<h2>Jurisdiction Codes</h2>")
@@ -87,7 +99,6 @@ public class InitialConsiderationHelper {
                     .append(" - ")
                     .append(JurisdictionCode.valueOf(codeName).getDescription())
                     .append("<br><br>");
-            ;
         }
 
         return sb.append("<hr>").toString();

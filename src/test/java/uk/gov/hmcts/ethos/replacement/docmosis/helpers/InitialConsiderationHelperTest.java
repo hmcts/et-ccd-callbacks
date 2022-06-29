@@ -1,9 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
@@ -20,7 +19,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class InitialConsiderationHelperTest {
 
     private CaseData caseDetails;
@@ -44,27 +42,27 @@ public class InitialConsiderationHelperTest {
             "grounds of age<br><br><strong>SXD</strong> - Discrimination, including indirect discrimination, discrimination based on association or perception, harassment " +
             "or victimisation on grounds of sex, marriage and civil partnership or gender reassignment<br><br><hr>";
 
-    @BeforeAll
+    @BeforeEach
     public void setUp() throws Exception {
-        caseDetails = generateCaseData("initialConsiderationCase1.json");
+        caseDetails = generateCaseData();
     }
 
     @Test
     public void getEarliestHearingDate() {
         assertEquals(Optional.empty(), InitialConsiderationHelper.getEarliestHearingDate(new ArrayList<>()));
-        assertEquals(LocalDate.of(2022, 01, 07), InitialConsiderationHelper.getEarliestHearingDate(generateHearingDates()).get());
-        assertEquals(LocalDate.of(2022, 01, 07), InitialConsiderationHelper.getEarliestHearingDate(generateHearingDatesWithEmpty()).get());
+        assertEquals(Optional.of(LocalDate.of(2022, 1, 7)), InitialConsiderationHelper.getEarliestHearingDate(generateHearingDates()));
+        assertEquals(Optional.of(LocalDate.of(2022, 1, 7)), InitialConsiderationHelper.getEarliestHearingDate(generateHearingDatesWithEmpty()));
     }
 
     @Test
     public void getHearingDetailsTest() {
-        String hearingDetails = InitialConsiderationHelper.getHearingDetails(caseDetails);
+        String hearingDetails = InitialConsiderationHelper.getHearingDetails(caseDetails.getHearingCollection());
         assertEquals(EXPECTED_HEARING_STRING, hearingDetails);
     }
 
     @Test
     public void getRespondentNameTest() {
-        String respondentName = InitialConsiderationHelper.getRespondentName(caseDetails);
+        String respondentName = InitialConsiderationHelper.getRespondentName(caseDetails.getRespondentCollection());
         assertEquals(EXPECTED_RESPONDENT_NAME, respondentName);
     }
 
@@ -74,7 +72,6 @@ public class InitialConsiderationHelperTest {
         System.out.println(jurisdictionCodesHtml);
         assertEquals(EXPECTED_JURISDICTION_HTML, jurisdictionCodesHtml);
     }
-
 
     private List<JurCodesTypeItem> generateJurisdictionCodes() {
         return List.of(generateJurisdictionCode("DAG"),
@@ -91,9 +88,9 @@ public class InitialConsiderationHelperTest {
     }
 
 
-    private CaseData generateCaseData(String jsonFileName) throws Exception {
+    private CaseData generateCaseData() throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource(jsonFileName)).toURI())));
+                .getResource("initialConsiderationCase1.json")).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseData.class);
     }

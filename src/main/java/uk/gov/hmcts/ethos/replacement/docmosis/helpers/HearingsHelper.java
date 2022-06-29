@@ -27,12 +27,12 @@ public class HearingsHelper {
     public static final String HEARING_CREATION_DAY_ERROR = "A new day for a hearing can "
             + "only be added from the List Hearing menu item";
     public static final String HEARING_FINISH_INVALID = "The finish time for a hearing cannot be the "
-            + "same or before the start time for Hearing ";
+            + "same or before the start time for %s";
     public static final String HEARING_START_FUTURE = "Start time can't be in future";
     public static final String HEARING_FINISH_FUTURE = "Finish time can't be in future";
     public static final String HEARING_BREAK_FUTURE = "Break time can't be in future";
     public static final String HEARING_RESUME_FUTURE = "Resume time can't be in future";
-    public static final String HEARING_BREAK_RESUME_INVALID = "Hearing %s contains a hearing with break and "
+    public static final String HEARING_BREAK_RESUME_INVALID = "%s contains a hearing with break and "
             + "resume times of 00:00:00. If the hearing had a break then please update the times. If there was no "
             + "break, please remove the hearing date and times from the break and resume fields before continuing.";
 
@@ -40,7 +40,7 @@ public class HearingsHelper {
         if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                 for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
-                    var listedDate = dateListedTypeItem.getValue().getListedDate().substring(0, 10);
+                    String listedDate = dateListedTypeItem.getValue().getListedDate().substring(0, 10);
                     if (listedDate.equals(hearingDate)) {
                         return hearingTypeItem.getValue().getHearingNumber();
                     }
@@ -85,7 +85,7 @@ public class HearingsHelper {
                 if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
                     for (DateListedTypeItem dateListedTypeItem
                             : hearingTypeItem.getValue().getHearingDateCollection()) {
-                        var dateListedType = dateListedTypeItem.getValue();
+                        DateListedType dateListedType = dateListedTypeItem.getValue();
                         if (isHearingStatusPostponed(dateListedType) && dateListedType.getPostponedDate() == null) {
                             dateListedType.setPostponedDate(UtilHelper.formatCurrentDate2(LocalDate.now()));
                         }
@@ -104,50 +104,44 @@ public class HearingsHelper {
 
     public static List<String> hearingTimeValidation(CaseData caseData) {
         List<String> errors = new ArrayList<>();
-        if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
-            return errors;
+        String hearingNumber = "Hearing ";
+        if (caseData.getHearingDetailsHearing() != null) {
+            hearingNumber = caseData.getHearingDetailsHearing().getValue().getLabel().split(",")[0];
         }
-        for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-            if (CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
-                continue;
-            }
-            for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
-                var dateListedType = dateListedTypeItem.getValue();
-                if (HEARING_STATUS_HEARD.equals(dateListedType.getHearingStatus())) {
-                    checkStartFinishTimes(errors, dateListedType,
-                            hearingTypeItem.getValue().getHearingNumber());
-                    checkIfDateInFuture(errors, dateListedType);
-                    checkBreakResumeTimes(errors, dateListedType,
-                            hearingTypeItem.getValue().getHearingNumber());
-                }
-            }
+
+        if (HEARING_STATUS_HEARD.equals(caseData.getHearingDetailsStatus())) {
+            checkStartFinishTimes(errors, caseData,
+                    hearingNumber);
+            checkIfDateInFuture(errors, caseData);
+            checkBreakResumeTimes(errors, caseData,
+                    hearingNumber);
         }
         return errors;
     }
 
-    private static void checkBreakResumeTimes(List<String> errors, DateListedType dateListedType,
+    private static void checkBreakResumeTimes(List<String> errors, CaseData caseData,
                                               String hearingNumber) {
-        var breakTime = !isNullOrEmpty(dateListedType.getHearingTimingBreak())
-                ? LocalDateTime.parse(dateListedType.getHearingTimingBreak()).toLocalTime() : null;
-        var resumeTime = !isNullOrEmpty(dateListedType.getHearingTimingResume())
-                ? LocalDateTime.parse(dateListedType.getHearingTimingResume()).toLocalTime() : null;
-        var invalidTime = LocalTime.of(0, 0, 0, 0);
+        LocalTime breakTime = !isNullOrEmpty(caseData.getHearingDetailsTimingBreak())
+                ? LocalDateTime.parse(caseData.getHearingDetailsTimingBreak()).toLocalTime() : null;
+        LocalTime resumeTime = !isNullOrEmpty(caseData.getHearingDetailsTimingResume())
+                ? LocalDateTime.parse(caseData.getHearingDetailsTimingResume()).toLocalTime() : null;
+        LocalTime invalidTime = LocalTime.of(0, 0, 0, 0);
         if (invalidTime.equals(breakTime) || invalidTime.equals(resumeTime)) {
             errors.add(String.format(HEARING_BREAK_RESUME_INVALID, hearingNumber));
         }
     }
 
-    private static void checkIfDateInFuture(List<String> errors, DateListedType dateListedType) {
-        if (isDateInFuture(dateListedType.getHearingTimingStart(), LocalDateTime.now())) {
+    private static void checkIfDateInFuture(List<String> errors, CaseData caseData) {
+        if (isDateInFuture(caseData.getHearingDetailsTimingStart(), LocalDateTime.now())) {
             errors.add(HEARING_START_FUTURE);
         }
-        if (isDateInFuture(dateListedType.getHearingTimingResume(), LocalDateTime.now())) {
+        if (isDateInFuture(caseData.getHearingDetailsTimingResume(), LocalDateTime.now())) {
             errors.add(HEARING_RESUME_FUTURE);
         }
-        if (isDateInFuture(dateListedType.getHearingTimingBreak(), LocalDateTime.now())) {
+        if (isDateInFuture(caseData.getHearingDetailsTimingBreak(), LocalDateTime.now())) {
             errors.add(HEARING_BREAK_FUTURE);
         }
-        if (isDateInFuture(dateListedType.getHearingTimingFinish(), LocalDateTime.now())) {
+        if (isDateInFuture(caseData.getHearingDetailsTimingFinish(), LocalDateTime.now())) {
             errors.add(HEARING_FINISH_FUTURE);
         }
     }
@@ -159,12 +153,16 @@ public class HearingsHelper {
                 .isAfter(now.atZone(ZoneId.of("UTC")));
     }
 
-    private static void checkStartFinishTimes(List<String> errors, DateListedType dateListedType,
+    private static void checkStartFinishTimes(List<String> errors, CaseData caseData,
                                               String hearingNumber) {
-        var startTime = LocalDateTime.parse(dateListedType.getHearingTimingStart());
-        var finishTime = LocalDateTime.parse(dateListedType.getHearingTimingFinish());
-        if (!finishTime.isAfter(startTime)) {
-            errors.add(HEARING_FINISH_INVALID + hearingNumber);
+        if (!isNullOrEmpty(caseData.getHearingDetailsTimingStart())
+                && !isNullOrEmpty(caseData.getHearingDetailsTimingFinish())) {
+            LocalDateTime startTime = LocalDateTime.parse(caseData.getHearingDetailsTimingStart());
+            LocalDateTime finishTime = LocalDateTime.parse(caseData.getHearingDetailsTimingFinish());
+            if (!finishTime.isAfter(startTime)) {
+                errors.add(String.format(HEARING_FINISH_INVALID, hearingNumber));
+            }
         }
+
     }
 }

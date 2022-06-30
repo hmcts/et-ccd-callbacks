@@ -21,7 +21,7 @@ public class FileUtil {
     public static String downloadFileFromUrl(String strUrl, String authToken) throws IOException {
         InputStream in = null;
         try {
-            var url = new URL(strUrl.replace("127.0.0.1", "localhost"));
+            URL url = new URL(strUrl.replace("127.0.0.1", "localhost"));
             URLConnection uc = url.openConnection();
             uc.setRequestProperty("Authorization", authToken);
             uc.connect();

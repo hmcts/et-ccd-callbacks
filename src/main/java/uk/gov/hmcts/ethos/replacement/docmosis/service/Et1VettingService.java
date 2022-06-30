@@ -189,7 +189,7 @@ public class Et1VettingService {
     public List<String> validateJurisdictionCodes(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         List<VettingJurCodesTypeItem> codeList = caseData.getVettingJurisdictionCodeCollection();
-        if (codeList != null) {
+        if (!codeList.isEmpty()) {
             codeList.stream().filter(codesTypeItem -> caseData.getJurCodesCollection().stream()
                     .map(existingCode -> existingCode.getValue().getJuridictionCodesList())
                     .collect(Collectors.toList()).stream()
@@ -211,7 +211,7 @@ public class Et1VettingService {
      * Set the Track Allocation field which default the longest track for a claim based on the jurisdiction codes
      */
     public String populateEt1TrackAllocationHtml(CaseData caseData) {
-        if (caseData.getVettingJurisdictionCodeCollection() != null) {
+        if (!caseData.getVettingJurisdictionCodeCollection().isEmpty()) {
             for (VettingJurCodesTypeItem codeItem : caseData.getVettingJurisdictionCodeCollection()) {
                 addJurCodeToExistingCollection(caseData, codeItem.getValue());
             }
@@ -255,11 +255,6 @@ public class Et1VettingService {
             .collect(Collectors.toList()));
     }
 
-    private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {
-        String documentBinaryUrl = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
-        return documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
-    }
-
     public String toAddressWithTab(Address address) {
         StringBuilder claimantAddressStr = new StringBuilder();
         claimantAddressStr.append(address.getAddressLine1());
@@ -290,7 +285,9 @@ public class Et1VettingService {
     }
 
     private void populateCodeNameAndDescriptionHtml(StringBuilder sb, String codeName) {
-        if (codeName != null) {
+        if (codeName == null) {
+            return;
+        } else {
             try {
                 sb.append(String.format(CASE_NAME_AND_DESCRIPTION_HTML, codeName,
                     JurisdictionCode.valueOf(codeName.replaceAll("[^a-zA-Z]+", ""))

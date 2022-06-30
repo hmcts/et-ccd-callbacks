@@ -97,7 +97,7 @@ public class Et1VettingController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = et1VettingService.validateJurisdictionCodes(caseData);
-        if (errors.isEmpty()) {
+        if (errors.isEmpty() && caseData.getJurCodesCollection() != null) {
             caseData.setTrackAllocation(et1VettingService.populateEt1TrackAllocationHtml(caseData));
         }
 

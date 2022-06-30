@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -14,8 +15,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -244,7 +248,8 @@ class Et1VettingServiceTest {
         expectedErrors.add(String.format(ERROR_EXISTING_JUR_CODE, DAG));
         expectedErrors.add(String.format(ERROR_SELECTED_JUR_CODE, PID));
 
-        assertThat(et1VettingService.validateJurisdictionCodes(caseData)).isEqualTo(expectedErrors);
+        assertThat(et1VettingService.validateJurisdictionCodes(caseData))
+            .isEqualTo(expectedErrors);
     }
 
     @Test
@@ -254,7 +259,8 @@ class Et1VettingServiceTest {
         addJurCodeToExistingCollection(caseData, PID);
 
         String expected = String.format(TRACk_ALLOCATION_HTML, TRACK_OPEN);
-        assertThat(et1VettingService.populateEt1TrackAllocationHtml(caseData)).isEqualTo(expected);
+        assertThat(et1VettingService.populateEt1TrackAllocationHtml(caseData))
+            .isEqualTo(expected);
     }
 
     @Test
@@ -265,10 +271,11 @@ class Et1VettingServiceTest {
 
         String expectedOfficeLocation = String.format(TRIBUNAL_OFFICE_LOCATION, TRIBUNAL_ENGLAND, OFFICE);
         String expectedRegionalOffice = String.format(TRIBUNAL_LOCATION_LABEL, TRIBUNAL_ENGLAND);
-        assertThat(caseData.getTribunalAndOfficeLocation()).isEqualTo(expectedOfficeLocation);
-        assertThat(caseData.getRegionalOffice()).isEqualTo(expectedRegionalOffice);
+        assertThat(caseData.getTribunalAndOfficeLocation())
+            .isEqualTo(expectedOfficeLocation);
+        assertThat(caseData.getRegionalOffice())
+            .isEqualTo(expectedRegionalOffice);
     }
-
 
     private DocumentTypeItem createDocumentTypeItem(String typeOfDocument, String binaryLink) {
         DocumentType documentType = new DocumentType();

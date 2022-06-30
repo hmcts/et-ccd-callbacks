@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -13,14 +12,13 @@ import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_OPEN;
 
 class Et1VettingServiceTest {
@@ -50,6 +48,7 @@ class Et1VettingServiceTest {
     private static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
     private static final String DAG = JurisdictionCode.DAG.name();
     private static final String PID = JurisdictionCode.PID.name();
+    private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br>";
 
     private final String et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
     private final String acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
@@ -74,9 +73,21 @@ class Et1VettingServiceTest {
         + "<h3>Codes already added</h3>%s<hr>";
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         et1VettingService = new Et1VettingService();
-        caseDetails = generateCaseDetails("et1VettingTest1.json");
+        caseDetails = CaseDataBuilder.builder()
+                .withClaimantIndType("Doris", "Johnson")
+                .withClaimantType("232 Petticoat Square", "3 House", null,
+                        "London", "W10 4AG", "United Kingdom")
+                .withRespondentWithAddress("Antonio Vazquez",
+                        "11 Small Street", "22 House", null,
+                        "Manchester", "M12 42R", "United Kingdom",
+                        "1234/5678/90")
+                .withRespondentWithAddress("Juan Garcia",
+                        "32 Sweet Street", "14 House", null,
+                        "Manchester", "M11 4ED", "United Kingdom",
+                        "2987/6543/01")
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseId(caseId);
     }
 
@@ -149,13 +160,22 @@ class Et1VettingServiceTest {
     void initialBeforeYouStart_ClaimantDetails_shouldReturnMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
         String expected = String.format(CLAIMANT_DETAILS, "Doris", "Johnson",
-                "232 Petticoat Square" + BR_WITH_TAB + "22 House" + BR_WITH_TAB + "London" + BR_WITH_TAB + "W10 4AG");
+                "232 Petticoat Square" + BR_WITH_TAB + "3 House" + BR_WITH_TAB + "London" + BR_WITH_TAB + "W10 4AG");
         assertThat(caseDetails.getCaseData().getEt1VettingClaimantDetailsMarkUp())
                 .isEqualTo(expected);
     }
 
     @Test
-    void initialBeforeYouStart_OneRespondentDetails_shouldReturnMarkUp() throws Exception {
+    void initialBeforeYouStart_OneRespondentDetails_shouldReturnMarkUp() {
+        caseDetails = CaseDataBuilder.builder()
+                .withClaimantIndType("Doris", "Johnson")
+                .withClaimantType("232 Petticoat Square", "3 House", null,
+                        "London", "W10 4AG", "United Kingdom")
+                .withRespondentWithAddress("Antonio Vazquez",
+                        "11 Small Street", "22 House", null,
+                        "Manchester", "M12 42R", "United Kingdom",
+                        "1234/5678/90")
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         et1VettingService.initialiseEt1Vetting(caseDetails);
         String expected = String.format(RESPONDENT_DETAILS, "", "Antonio Vazquez",
                 "11 Small Street" + BR_WITH_TAB + "22 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M12 42R");
@@ -164,16 +184,42 @@ class Et1VettingServiceTest {
     }
 
     @Test
-    void initialBeforeYouStart_TwoRespondentDetails_shouldReturnMarkUp() throws Exception {
-        caseDetails = generateCaseDetails("et1VettingTest2.json");
-        caseDetails.setCaseId(caseId);
+    void initialBeforeYouStart_TwoRespondentDetails_shouldReturnMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
         String expected = String.format(RESPONDENT_DETAILS, "1", "Antonio Vazquez",
                 "11 Small Street" + BR_WITH_TAB + "22 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M12 42R")
                 + String.format(RESPONDENT_DETAILS, "2", "Juan Garcia",
-                "12 Small Street" + BR_WITH_TAB + "24 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M12 4ED");
+                "32 Sweet Street" + BR_WITH_TAB + "14 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M11 4ED");
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentDetailsMarkUp())
                 .isEqualTo(expected);
+    }
+
+    @Test
+    void initialBeforeYouStart_OneAcasNumber_shouldReturnMarkUp() {
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        String expected = String.format(ACAS_CERT_LIST_DISPLAY, "1234/5678/90");
+        assertThat(caseDetails.getCaseData().getEt1VettingAcasCertListMarkUp())
+                .isEqualTo(expected);
+    }
+
+    @Test
+    void initialBeforeYouStart_NoAcasNumber_shouldReturnMarkUp() {
+        caseDetails = CaseDataBuilder.builder()
+                .withClaimantIndType("Doris", "Johnson")
+                .withClaimantType("232 Petticoat Square", "3 House", null,
+                        "London", "W10 4AG", "United Kingdom")
+                .withRespondentWithAddress("Antonio Vazquez",
+                        "11 Small Street", "22 House", null,
+                        "Manchester", "M12 42R", "United Kingdom",
+                        null)
+                .withRespondentWithAddress("Juan Garcia",
+                        "32 Sweet Street", "14 House", null,
+                        "Manchester", "M11 4ED", "United Kingdom",
+                        null)
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1VettingAcasCertListMarkUp())
+                .isEmpty();
     }
 
     @Test

@@ -326,27 +326,7 @@ class Et3VettingHelperTest {
 
         assertNull(caseData.getEt3NameAddressRespondent());
     }
-
-    @Test
-    void givenNoNameNoAddress_shouldReturnMarkupWithNoNameNoAddress() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .withChooseEt3Respondent("John")
-            .withRespondent(RespondentBuilder.builder()
-                .withName("John")
-                .withReceived(YES, "2022-02-05")
-                .withExtension()
-                .build()
-            )
-            .withClaimServedDate("2022-01-01")
-            .build();
-
-        Et3VettingHelper.getRespondentNameAndAddress(caseData);
-        String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp;"
-            + " None Given<br><br>Contact address &#09&#09 None Given</pre><hr>";
-
-        assertThat(caseData.getEt3NameAddressRespondent(), is(expected));
-    }
-
+    
     @Test
     void givenNameAndAddress_shouldReturnMarkupWithNameAndAddress() {
         CaseData caseData = CaseDataBuilder.builder()
@@ -408,7 +388,7 @@ class Et3VettingHelperTest {
             .build();
 
         Et3VettingHelper.getRespondentNameAndAddress(caseData);
-        String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; None Given<br><br>"
+        String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>"
             + "Contact address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09Erith<br>&#09&#09&#09"
             + "&#09&#09&#09&#09&#09&#09<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09DA8 2DE</pre><hr>";
 
@@ -430,7 +410,7 @@ class Et3VettingHelperTest {
             .build();
 
         Et3VettingHelper.getRespondentNameAndAddress(caseData);
-        String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; None Given<br><br>Contact "
+        String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>Contact "
             + "address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09Erith<br>&#09&#09&#09&#09&#09"
             + "&#09&#09&#09&#09Erith<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09Erith<br>&#09&#09&#09&#09&#09&#09&#09&#09"
             + "&#09DA8 2DE</pre><hr>";
@@ -454,7 +434,7 @@ class Et3VettingHelperTest {
 
         Et3VettingHelper.getRespondentNameAndAddress(caseData);
 
-        String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; None Given<br><br>Contact"
+        String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>Contact"
             + " address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09Erith<br>&#09&#09&#09&#09&#09"
             + "&#09&#09&#09&#09<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09DA8 2DE</pre><hr>";
 

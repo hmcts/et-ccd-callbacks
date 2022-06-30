@@ -244,27 +244,19 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withRespondent(String respondent, String responseReceived, String receivedDate,
-                                          boolean extension) {
-        RespondentSumType respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentName(respondent);
-        respondentSumType.setResponseReceived(responseReceived);
-        respondentSumType.setResponseReceivedDate(receivedDate);
-        if (extension) {
-            respondentSumType.setExtensionRequested(YES);
-            respondentSumType.setExtensionGranted(YES);
-            respondentSumType.setExtensionDate("2022-03-01");
-        }
-
+    public CaseDataBuilder withRespondent(RespondentSumType respondent) {
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
-        respondentSumTypeItem.setValue(respondentSumType);
+        respondentSumTypeItem.setValue(respondent);
 
         if (caseData.getRespondentCollection() == null) {
             caseData.setRespondentCollection(new ArrayList<>());
         }
+
         caseData.getRespondentCollection().add(respondentSumTypeItem);
         return this;
     }
+
+
 
     public CaseDataBuilder withChooseEt3Respondent(String respondentName) {
         DynamicValueType respondent = DynamicValueType.create(respondentName, respondentName);

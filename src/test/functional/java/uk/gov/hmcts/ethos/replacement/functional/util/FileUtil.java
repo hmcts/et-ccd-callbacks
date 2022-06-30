@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.functional.util;
 
 import java.io.InputStream;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import java.io.IOException;
 import java.net.URL;

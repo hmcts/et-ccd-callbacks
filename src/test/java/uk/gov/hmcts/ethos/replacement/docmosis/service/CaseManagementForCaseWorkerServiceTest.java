@@ -436,7 +436,7 @@ public class CaseManagementForCaseWorkerServiceTest {
                 "<font size='5'> - </font>" +
                 "<font color='SlateGray' size='5'> DIGITAL FILE </font>" +
                 "<font size='5'> - </font>" +
-                "<font color='Yellow' size='5'> REASONABLE ADJUSTMENT </font>";
+                "<font color='DarkSlateBlue' size='5'> REASONABLE ADJUSTMENT </font>";
         assertEquals(expected, caseDetails.getCaseData().getFlagsImageAltText());
         assertEquals("EMP-TRIB-0111111111.jpg", caseDetails.getCaseData().getFlagsImageFileName());
     }

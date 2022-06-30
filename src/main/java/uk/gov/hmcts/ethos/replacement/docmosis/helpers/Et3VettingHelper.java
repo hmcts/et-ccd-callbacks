@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -36,8 +38,14 @@ public class Et3VettingHelper {
         + "|ET3 due| %s|\r\n"
         + "|Extension| %s|\r\n"
         + "|ET3 received| %s|";
-    private static final int ET3_RESPONSE_WINDOW = 29;
+
+    private static final String RESPONDENT_DETAILS = "<h2>Respondent</h2>"
+        + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Contact address &#09&#09 %s</pre><hr>";
+    private static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09";
+    private static final int ET3_RESPONSE_WINDOW = 28;
     private static final String NONE = "None";
+    private static final String NONE_GIVEN = "None Given";
 
     private Et3VettingHelper() {
         //Access through static methods
@@ -59,11 +67,83 @@ public class Et3VettingHelper {
         }
 
         List<DynamicValueType> dynamicRespondentList =
-                DynamicListHelper.createDynamicRespondentName(respondentCollection);
+            DynamicListHelper.createDynamicRespondentName(respondentCollection);
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(dynamicRespondentList);
         caseData.setEt3ChooseRespondent(dynamicFixedListType);
         return new ArrayList<>();
+    }
+
+    /**
+     * Sets the "Et3NameAddressRespondent" property on CaseData to the HTML representation of the respondent's name
+     * and address in table form. Will log an error if no respondents are found and use "None Given" if name and/or
+     * address data are unavailable
+     * @param caseData contains all the case data
+     */
+    public static void getRespondentNameAndAddress(CaseData caseData) {
+        String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
+        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+
+        if (CollectionUtils.isEmpty(respondentCollection))  {
+            log.error(String.format(NO_RESPONDENTS_FOUND_ERROR, caseData.getEthosCaseReference()));
+            return;
+        }
+
+        Optional<RespondentSumTypeItem> respondentSumTypeOptional = respondentCollection
+            .stream()
+            .filter(r -> respondentExistsAndEt3Received(respondentName, r.getValue()))
+            .findFirst();
+
+        respondentSumTypeOptional.ifPresent(
+            respondentSumTypeItem -> setRespondentNameAddress(caseData, respondentSumTypeItem));
+    }
+
+    private static void setRespondentNameAddress(CaseData caseData, RespondentSumTypeItem respondentSumTypeItem) {
+        String respondentName = isNullOrEmpty(respondentSumTypeItem.getValue().getRespondentName())
+            ? NONE_GIVEN
+            : respondentSumTypeItem.getValue().getRespondentName();
+
+        Address address = respondentSumTypeItem.getValue().getResponseRespondentAddress();
+
+        String respondentAddress = address == null || isNullOrEmpty(address.toString())
+            ? NONE_GIVEN
+            : address.toAddressHtml();
+
+        caseData.setEt3NameAddressRespondent(
+            String.format(
+                RESPONDENT_DETAILS,
+                respondentName,
+                address == null ? NONE_GIVEN : formatAddressToHtml(address)
+            )
+        );
+
+        caseData.setEt3DoWeHaveRespondentsName(respondentName.equals(NONE_GIVEN)
+            ? NO
+            : YES);
+
+        caseData.setEt3DoWeHaveRespondentsAddress(respondentAddress.equals(NONE_GIVEN)
+            ? NO
+            : YES);
+    }
+
+    /**
+     * Formats an Address into HTML for ExUI to display. It's expected that an address will always have a Line 1,
+     * Post Town and Postcode.
+     * @param address Address object to format
+     * @return String representing address in HTML form.
+     */
+    public static String formatAddressToHtml(Address address) {
+        StringBuilder addressBuilder = new StringBuilder();
+        addressBuilder.append(address.getAddressLine1());
+        if (!Strings.isNullOrEmpty(address.getAddressLine2())) {
+            addressBuilder.append(BR_WITH_TAB).append(address.getAddressLine2());
+        }
+        if (!Strings.isNullOrEmpty(address.getAddressLine3())) {
+            addressBuilder.append(BR_WITH_TAB).append(address.getAddressLine3());
+        }
+        addressBuilder.append(BR_WITH_TAB).append(address.getPostTown())
+            .append(BR_WITH_TAB).append(address.getPostCode());
+        return addressBuilder.toString();
     }
 
     /**
@@ -74,11 +154,11 @@ public class Et3VettingHelper {
      * */
     public static String getEt3DatesInMarkdown(CaseData caseData) {
         return String.format(
-                ET3_TABLE_DATA,
-                findEt1ServedDate(caseData.getClaimServedDate()),
-                findEt3DueDate(caseData.getClaimServedDate()),
-                findEt3ExtensionDate(caseData),
-                findEt3ReceivedDate(caseData)
+            ET3_TABLE_DATA,
+            findEt1ServedDate(caseData.getClaimServedDate()),
+            findEt3DueDate(caseData.getClaimServedDate()),
+            findEt3ExtensionDate(caseData),
+            findEt3ReceivedDate(caseData)
         );
     }
 
@@ -91,14 +171,15 @@ public class Et3VettingHelper {
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
 
         if (CollectionUtils.isEmpty(respondentCollection)) {
-            log.error(NO_RESPONDENTS_FOUND_ERROR + caseData.getEthosCaseReference());
+            log.error(String.format(NO_RESPONDENTS_FOUND_ERROR, caseData.getEthosCaseReference()));
+
             return false;
         }
 
         return respondentCollection
-                .stream()
-                .anyMatch(r -> respondentExistsAndEt3Received(
-                        caseData.getEt3ChooseRespondent().getSelectedLabel(), r.getValue()));
+            .stream()
+            .anyMatch(r -> respondentExistsAndEt3Received(
+                caseData.getEt3ChooseRespondent().getSelectedLabel(), r.getValue()));
 
     }
 
@@ -110,7 +191,6 @@ public class Et3VettingHelper {
      * @param caseData this contains data from the case
      */
     public static List<String> calculateResponseTime(CaseData caseData) {
-
         List<String> errors = new ArrayList<>();
 
         if (!responseInTimePreValidationCheck(caseData, errors)) {
@@ -119,13 +199,13 @@ public class Et3VettingHelper {
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
 
         Optional<RespondentSumTypeItem> respondentSumTypeOptional = respondentCollection
-                .stream()
-                .filter(r -> respondentExistsAndEt3Received(
-                        caseData.getEt3ChooseRespondent().getSelectedLabel(), r.getValue()))
-                .findFirst();
+            .stream()
+            .filter(r -> respondentExistsAndEt3Received(
+                caseData.getEt3ChooseRespondent().getSelectedLabel(), r.getValue()))
+            .findFirst();
         respondentSumTypeOptional.ifPresent(
-                respondentSumTypeItem -> setResponseInTime(caseData, respondentSumTypeItem.getValue()));
-        
+            respondentSumTypeItem -> setResponseInTime(caseData, respondentSumTypeItem.getValue()));
+
         return errors;
 
     }
@@ -156,21 +236,21 @@ public class Et3VettingHelper {
 
     private static String findEt3DueDate(String et3DueDate) {
         return isNullOrEmpty(et3DueDate)
-                ? "Cannot find ET3 Due Date"
-                : UtilHelper.formatCurrentDatePlusDays(LocalDate.parse(et3DueDate), 29);
+            ? "Cannot find ET3 Due Date"
+            : UtilHelper.formatCurrentDatePlusDays(LocalDate.parse(et3DueDate), ET3_RESPONSE_WINDOW);
     }
 
     private static String findEt1ServedDate(String date) {
         return isNullOrEmpty(date)
-                ? "Cannot find ET1 Served Date"
-                : UtilHelper.listingFormatLocalDate(date);
+            ? "Cannot find ET1 Served Date"
+            : UtilHelper.listingFormatLocalDate(date);
     }
 
     private static String findEt3ExtensionDate(CaseData caseData) {
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
 
         if (CollectionUtils.isEmpty(respondentCollection)) {
-            log.error(NO_RESPONDENTS_FOUND_ERROR + caseData.getEthosCaseReference());
+            log.error(String.format(NO_RESPONDENTS_FOUND_ERROR, caseData.getEthosCaseReference()));
             return NONE;
         }
 
@@ -178,7 +258,7 @@ public class Et3VettingHelper {
         for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
             RespondentSumType respondent = respondentSumTypeItem.getValue();
             if (respondentName.equals(respondent.getRespondentName())
-                    && respondentExtensionExists(respondent))  {
+                && respondentExtensionExists(respondent))  {
                 return UtilHelper.listingFormatLocalDate(respondent.getExtensionDate());
             }
         }
@@ -190,7 +270,7 @@ public class Et3VettingHelper {
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
 
         if (CollectionUtils.isEmpty(respondentCollection)) {
-            log.error(NO_RESPONDENTS_FOUND_ERROR + caseData.getEthosCaseReference());
+            log.error(String.format(NO_RESPONDENTS_FOUND_ERROR, caseData.getEthosCaseReference()));
             return NO;
         }
 
@@ -207,7 +287,7 @@ public class Et3VettingHelper {
 
     private static boolean respondentExistsAndEt3Received(String respondentName, RespondentSumType respondent) {
         return respondentName.equals(respondent.getRespondentName())
-                && YES.equals(respondent.getResponseReceived());
+            && YES.equals(respondent.getResponseReceived());
     }
 
     private static boolean respondentExtensionExists(RespondentSumType respondent) {

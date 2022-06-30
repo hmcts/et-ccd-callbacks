@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
+import com.google.common.base.Strings;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -13,6 +15,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
@@ -244,6 +248,35 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withClaimantIndType(String claimantFirstNames, String claimantLastName) {
+        ClaimantIndType claimantIndType = new ClaimantIndType();
+        claimantIndType.setClaimantFirstNames(claimantFirstNames);
+        claimantIndType.setClaimantLastName(claimantLastName);
+        caseData.setClaimantIndType(claimantIndType);
+        return this;
+    }
+
+    public CaseDataBuilder withClaimantType(String addressLine1, String addressLine2, String addressLine3,
+                                            String postTown, String postCode, String country) {
+        ClaimantType claimantType = new ClaimantType();
+        claimantType.setClaimantAddressUK(
+                createAddress(addressLine1, addressLine2, addressLine3, postTown, null, postCode, country));
+        caseData.setClaimantType(claimantType);
+        return this;
+    }
+
+    public CaseDataBuilder withRespondent(RespondentSumType respondent) {
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(respondent);
+
+        if (caseData.getRespondentCollection() == null) {
+            caseData.setRespondentCollection(new ArrayList<>());
+        }
+
+        caseData.getRespondentCollection().add(respondentSumTypeItem);
+        return this;
+    }
+
     public CaseDataBuilder withRespondent(String respondent, String responseReceived, String receivedDate,
                                           boolean extension) {
         RespondentSumType respondentSumType = new RespondentSumType();
@@ -264,6 +297,49 @@ public class CaseDataBuilder {
         }
         caseData.getRespondentCollection().add(respondentSumTypeItem);
         return this;
+    }
+
+    public CaseDataBuilder withRespondentWithAddress(String respondentName, String addressLine1, String addressLine2,
+                                                     String addressLine3, String postTown, String postCode,
+                                                     String country, String responseAcas) {
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName(respondentName);
+
+        respondentSumType.setRespondentAddress(
+                createAddress(addressLine1, addressLine2, addressLine3, postTown, null, postCode, country));
+
+        if (!Strings.isNullOrEmpty(responseAcas)) {
+            respondentSumType.setRespondentACAS(responseAcas);
+        }
+
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(respondentSumType);
+
+        if (caseData.getRespondentCollection() == null) {
+            caseData.setRespondentCollection(new ArrayList<>());
+        }
+        caseData.getRespondentCollection().add(respondentSumTypeItem);
+        return this;
+    }
+
+    private Address createAddress(String addressLine1, String addressLine2, String addressLine3,
+                                  String postTown, String county, String postCode, String country) {
+        Address address = new Address();
+        address.setAddressLine1(addressLine1);
+        if (!Strings.isNullOrEmpty(addressLine2)) {
+            address.setAddressLine2(addressLine2);
+        }
+        if (!Strings.isNullOrEmpty(addressLine3)) {
+            address.setAddressLine3(addressLine3);
+        }
+        address.setPostTown(postTown);
+        if (!Strings.isNullOrEmpty(county)) {
+            address.setCounty(county);
+        }
+        address.setCounty(county);
+        address.setPostCode(postCode);
+        address.setCountry(country);
+        return address;
     }
 
     public CaseDataBuilder withChooseEt3Respondent(String respondentName) {

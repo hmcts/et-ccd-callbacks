@@ -1,18 +1,29 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_OPEN;
 
 class Et1VettingServiceTest {
 
@@ -21,6 +32,7 @@ class Et1VettingServiceTest {
 
     private static final String ET1_DOC_TYPE = "ET1";
     private static final String ACAS_DOC_TYPE = "ACAS Certificate";
+    private static final String OFFICE = "Manchester";
     private static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s"
             + "<br>Check the Documents tab for additional ET1 documents the claimant may have uploaded.";
     private static final String BEFORE_LABEL_ET1 =
@@ -38,6 +50,8 @@ class Et1VettingServiceTest {
             + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Contact address &#09&#09 %s</pre><hr>";
     private static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
+    private static final String DAG = JurisdictionCode.DAG.name();
+    private static final String PID = JurisdictionCode.PID.name();
     private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br>";
 
     private final String et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
@@ -47,6 +61,20 @@ class Et1VettingServiceTest {
     private final String acasBinaryUrl4 = "/documents/acas4444-4ef8ca1e3-8c60-d3d78808dca1/binary";
     private final String acasBinaryUrl5 = "/documents/acas5555-4ef8ca1e3-8c60-d3d78808dca1/binary";
     private final String caseId = "1655312312192821";
+
+    private static final String CASE_NAME_AND_DESCRIPTION_HTML = "<h4>%s</h4>%s";
+    private static final String ERROR_EXISTING_JUR_CODE = "Jurisdiction code %s already exists.";
+    private static final String ERROR_SELECTED_JUR_CODE = "Jurisdiction code %s is selected more than once.";
+    private static final String TRIBUNAL_ENGLAND = "England & Wales";
+    private static final String TRIBUNAL_OFFICE_LOCATION = "<hr><h3>Tribunal location</h3>"
+        + "<pre>Tribunal &#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Office &#09&#09&#09&#09&#09 %s</pre><hr>";
+    private static final String TRIBUNAL_LOCATION_LABEL = "**<big>%s regional office</big>**";
+    private static final String TRACk_ALLOCATION_HTML = "|||\r\n|--|--|\r\n|Tack allocation|%s|\r\n";
+    private static final String JUR_CODE_HTML = "<hr><h3>Jurisdiction Codes</h3>"
+        + "<a href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
+        + "View all jurisdiction codes and descriptors (opens in new tab)</a><hr>"
+        + "<h3>Codes already added</h3>%s<hr>";
 
     @BeforeEach
     void setUp() {
@@ -198,6 +226,57 @@ class Et1VettingServiceTest {
                 .isEmpty();
     }
 
+    @Test
+    void generateJurisdictionCodesHtml() {
+        CaseData caseData = new CaseData();
+        addJurCodeToExistingCollection(caseData, DAG);
+        String expected = String.format(JUR_CODE_HTML, String.format(CASE_NAME_AND_DESCRIPTION_HTML, DAG,
+            JurisdictionCode.valueOf(DAG).getDescription()));
+        assertThat(et1VettingService.generateJurisdictionCodesHtml(caseData.getJurCodesCollection()))
+            .isEqualTo(expected);
+    }
+
+    @Test
+    void validateJurisdictionCodes() {
+        CaseData caseData = new CaseData();
+        addJurCodeToExistingCollection(caseData, DAG);
+        addJurCodeToVettingCollection(caseData, DAG);
+        addJurCodeToVettingCollection(caseData, PID);
+        addJurCodeToVettingCollection(caseData, PID);
+
+        List<String> expectedErrors = new ArrayList<>();
+        expectedErrors.add(String.format(ERROR_EXISTING_JUR_CODE, DAG));
+        expectedErrors.add(String.format(ERROR_SELECTED_JUR_CODE, PID));
+
+        assertThat(et1VettingService.validateJurisdictionCodes(caseData))
+            .isEqualTo(expectedErrors);
+    }
+
+    @Test
+    void populateEt1TrackAllocationHtml() {
+        CaseData caseData = new CaseData();
+        addJurCodeToVettingCollection(caseData, DAG);
+        addJurCodeToExistingCollection(caseData, PID);
+
+        String expected = String.format(TRACk_ALLOCATION_HTML, TRACK_OPEN);
+        assertThat(et1VettingService.populateEt1TrackAllocationHtml(caseData))
+            .isEqualTo(expected);
+    }
+
+    @Test
+    void populateTribunalOfficeFields() {
+        CaseData caseData = new CaseData();
+        caseData.setManagingOffice(OFFICE);
+        et1VettingService.populateTribunalOfficeFields(caseData);
+
+        String expectedOfficeLocation = String.format(TRIBUNAL_OFFICE_LOCATION, TRIBUNAL_ENGLAND, OFFICE);
+        String expectedRegionalOffice = String.format(TRIBUNAL_LOCATION_LABEL, TRIBUNAL_ENGLAND);
+        assertThat(caseData.getTribunalAndOfficeLocation())
+            .isEqualTo(expectedOfficeLocation);
+        assertThat(caseData.getRegionalOffice())
+            .isEqualTo(expectedRegionalOffice);
+    }
+
     private DocumentTypeItem createDocumentTypeItem(String typeOfDocument, String binaryLink) {
         DocumentType documentType = new DocumentType();
         documentType.setTypeOfDocument(typeOfDocument);
@@ -206,6 +285,33 @@ class Et1VettingServiceTest {
         DocumentTypeItem documentTypeItem = new DocumentTypeItem();
         documentTypeItem.setValue(documentType);
         return documentTypeItem;
+    }
+
+    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
+        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+                .getResource(jsonFileName)).toURI())));
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(json, CaseDetails.class);
+    }
+
+    private void addJurCodeToExistingCollection(CaseData caseData, String code) {
+        JurCodesType newCode = new JurCodesType();
+        newCode.setJuridictionCodesList(code);
+        JurCodesTypeItem codesTypeItem = new JurCodesTypeItem();
+        codesTypeItem.setValue(newCode);
+        caseData.setJurCodesCollection(new ArrayList<>());
+        caseData.getJurCodesCollection().add(codesTypeItem);
+    }
+
+    private void addJurCodeToVettingCollection(CaseData caseData, String code) {
+        VettingJurisdictionCodesType newCode = new VettingJurisdictionCodesType();
+        newCode.setEt1VettingJurCodeList(code);
+        VettingJurCodesTypeItem codesTypeItem = new VettingJurCodesTypeItem();
+        codesTypeItem.setValue(newCode);
+        if (caseData.getVettingJurisdictionCodeCollection() == null) {
+            caseData.setVettingJurisdictionCodeCollection(new ArrayList<>());
+        }
+        caseData.getVettingJurisdictionCodeCollection().add(codesTypeItem);
     }
 
 }

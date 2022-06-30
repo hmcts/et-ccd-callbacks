@@ -331,7 +331,7 @@ class Et3VettingHelperTest {
 
         assertNull(caseData.getEt3NameAddressRespondent());
     }
-
+    
     @Test
     void givenNameAndAddress_shouldReturnMarkupWithNameAndAddress() {
         CaseData caseData = CaseDataBuilder.builder()
@@ -505,7 +505,6 @@ class Et3VettingHelperTest {
         assertThat(caseData.getEt3IsCaseListedForHearing(), is(NO));
     }
 
-    ///////////////////////////////////////
     @Test
     void givenManagingOfficeEnglandWales_returnExpectedTable() {
         CaseData caseData = CaseDataBuilder.builder()

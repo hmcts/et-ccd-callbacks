@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -24,10 +23,14 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 @RestController
 public class InitialConsiderationController {
-    private final VerifyTokenService verifyTokenService;
-    private final InitialConsiderationService initialConsiderationService;
 
+    private final VerifyTokenService verifyTokenService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
+    private static final String COMPLETE_IC_BODY = "<hr>" +
+        "<h3>What happens next</h3>" +
+        "<p>A tribunal caseworker will act on any instructions set out in your initial consideration to progress the case. " +
+        "You can <a href=\"/cases/case-details/${[CASE_REFERENCE]}#Documents\" target=\"_blank\">view the initial " +
+        "consideration document in the Documents tab (opens in new tab).</a></p>";
 
     @PostMapping(value = "/completeInitialConsideration", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "completes the Initial Consideration flow")
@@ -38,7 +41,9 @@ public class InitialConsiderationController {
     public ResponseEntity<CCDCallbackResponse> completeInitialConsideration(@RequestBody CCDRequest ccdRequest,
                                                                             @RequestHeader(value = "Authorization")
                                                                                 String userToken) {
-        log.info("Initial consideration complete requested for case reference ---> " + ccdRequest.getCaseDetails().getCaseId());
+
+        log.info("Initial consideration complete requested for case reference ---> {}",
+            ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -46,7 +51,7 @@ public class InitialConsiderationController {
         }
 
         return ResponseEntity.ok(CCDCallbackResponse.builder().confirmation_body(
-                initialConsiderationService.getCompletionText()).
+                COMPLETE_IC_BODY).
             build());
     }
 }

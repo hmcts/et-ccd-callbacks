@@ -23,7 +23,6 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
@@ -42,9 +41,6 @@ class InitialConsiderationControllerTest {
     @MockBean
     private VerifyTokenService verifyTokenService;
 
-    @MockBean
-    private InitialConsiderationService initialConsiderationService;
-
     private MockMvc mvc;
 
     private CCDRequest ccdRequest;
@@ -58,7 +54,7 @@ class InitialConsiderationControllerTest {
 
         CaseDetails caseDetails = CaseDataBuilder.builder()
             .withChooseEt3Respondent("Jack")
-            .withRespondent("Jack", YES, "2022-03-01")
+            .withRespondent("Jack", YES, "2022-03-01",  false)
             .withClaimServedDate("2022-01-01")
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
@@ -70,7 +66,6 @@ class InitialConsiderationControllerTest {
     @Test
     void initICCompleteTokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(initialConsiderationService.getCompletionText()).thenReturn("Some Content");
         mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
@@ -82,9 +77,6 @@ class InitialConsiderationControllerTest {
     @Test
     void initICCompleteTokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-
-        when(initialConsiderationService.getCompletionText()).thenReturn("");
-
         mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)

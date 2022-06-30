@@ -39,8 +39,8 @@ public class HearingDetailsService {
         caseData.setHearingDetailsAttendeeRespAndRep(nonNull(selectedListing.getAttendeeRespAndRep()));
         caseData.setHearingDetailsAttendeeRepOnly(nonNull(selectedListing.getAttendeeRepOnly()));
         caseData.setHearingDetailsTimingStart(nonNull(selectedListing.getHearingTimingStart()));
-        caseData.setHearingDetailsTimingBreak(nonNull(selectedListing.getHearingTimingBreak()));
-        caseData.setHearingDetailsTimingResume(nonNull(selectedListing.getHearingTimingResume()));
+        caseData.setHearingDetailsTimingBreak(selectedListing.getHearingTimingBreak());
+        caseData.setHearingDetailsTimingResume(selectedListing.getHearingTimingResume());
         caseData.setHearingDetailsTimingFinish(nonNull(selectedListing.getHearingTimingFinish()));
         caseData.setHearingDetailsTimingDuration(nonNull(selectedListing.getHearingTimingDuration()));
         caseData.setHearingDetailsHearingNotes2(nonNull(selectedListing.getHearingNotes2()));

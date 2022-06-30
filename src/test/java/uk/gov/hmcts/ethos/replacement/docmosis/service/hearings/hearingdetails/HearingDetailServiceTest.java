@@ -105,8 +105,6 @@ public class HearingDetailServiceTest {
         selectedListing.setAttendeeRespAndRep(null);
         selectedListing.setAttendeeRepOnly(null);
         selectedListing.setHearingTimingStart(null);
-        selectedListing.setHearingTimingBreak(null);
-        selectedListing.setHearingTimingResume(null);
         selectedListing.setHearingTimingFinish(null);
         selectedListing.setHearingTimingDuration(null);
         selectedListing.setHearingNotes2(null);
@@ -123,8 +121,6 @@ public class HearingDetailServiceTest {
         assertEquals(" ", caseData.getHearingDetailsAttendeeRespAndRep());
         assertEquals(" ", caseData.getHearingDetailsAttendeeRepOnly());
         assertEquals(" ", caseData.getHearingDetailsTimingStart());
-        assertEquals(" ", caseData.getHearingDetailsTimingBreak());
-        assertEquals(" ", caseData.getHearingDetailsTimingResume());
         assertEquals(" ", caseData.getHearingDetailsTimingFinish());
         assertEquals(" ", caseData.getHearingDetailsTimingDuration());
         assertEquals(" ", caseData.getHearingDetailsHearingNotes2());

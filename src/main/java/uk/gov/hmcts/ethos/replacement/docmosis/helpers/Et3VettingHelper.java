@@ -19,9 +19,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
@@ -344,15 +346,13 @@ public class Et3VettingHelper {
     }
 
     private static String findHearingDate(List<HearingTypeItem> hearingCollection) {
-        List<String> hearingDates = new ArrayList<>();
-
-        for (HearingTypeItem hearingTypeItem : hearingCollection) {
-            for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
-                if (HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus())) {
-                    hearingDates.add(dateListedTypeItem.getValue().getListedDate());
-                }
-            }
-        }
+        List<String> hearingDates = hearingCollection.stream()
+            .map(hearing -> hearing.getValue().getHearingDateCollection().stream()
+                .filter(date -> HEARING_STATUS_LISTED.equals(date.getValue().getHearingStatus()))
+                .collect(Collectors.toList()))
+            .flatMap(Collection::stream)
+            .map(date -> date.getValue().getListedDate())
+            .collect(Collectors.toList());
 
         if (CollectionUtils.isEmpty(hearingDates)) {
             return CASE_NOT_LISTED;

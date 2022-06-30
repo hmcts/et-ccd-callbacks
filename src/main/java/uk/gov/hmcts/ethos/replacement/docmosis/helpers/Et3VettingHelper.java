@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
@@ -47,11 +48,16 @@ public class Et3VettingHelper {
         + "|ET3 received| %s|";
 
     private static final String ET3_HEARING_TABLE =
-        "| <h2>Hearing Details</h2>| | \r\n"
+        "| <h2>Hearing details</h2>| | \r\n"
         + "|--|--|\r\n"
         + "|Date| %s|\r\n"
         + "|Type| %s|";
 
+    private static final String ET3_TRIBUNAL_TABLE =
+        "| <h2>Tribunal location</h2>| | \r\n"
+            + "|--|--|\r\n"
+            + "|Tribunal| %s|\r\n"
+            + "|Office| %s|";
     private static final String RESPONDENT_DETAILS = "<h2>Respondent</h2>"
         + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Contact address &#09&#09 %s</pre><hr>";
@@ -357,4 +363,14 @@ public class Et3VettingHelper {
 
         return LocalDateTime.parse(date, OLD_DATE_TIME_PATTERN).format(DateTimeFormatter.ofPattern("EEEE d MMMM y"));
     }
+
+    public static void transferApplication(CaseData caseData) {
+        String managingOffice = caseData.getManagingOffice();
+        String tribunalOffice = TribunalOffice.isEnglandWalesOffice(managingOffice)
+            ? "England & Wales"
+            : TribunalOffice.SCOTLAND.getOfficeName();
+
+        caseData.setEt3TribunalLocation(String.format(ET3_TRIBUNAL_TABLE, tribunalOffice, managingOffice));
+    }
+
 }

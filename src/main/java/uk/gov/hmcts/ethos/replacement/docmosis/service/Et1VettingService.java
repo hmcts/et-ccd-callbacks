@@ -34,6 +34,7 @@ public class Et1VettingService {
             + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Contact address &#09&#09 %s</pre><hr>";
     private static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
+    private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br>";
 
     /**
      * Update et1VettingBeforeYouStart.
@@ -45,6 +46,7 @@ public class Et1VettingService {
                 initialClaimantDetailsMarkUp(caseDetails.getCaseData()));
         caseDetails.getCaseData().setEt1VettingRespondentDetailsMarkUp(
                 initialRespondentDetailsMarkUp(caseDetails.getCaseData()));
+        caseDetails.getCaseData().setEt1VettingAcasCertListMarkUp(initialAcasCertList(caseDetails.getCaseData()));
     }
 
     /**
@@ -88,6 +90,16 @@ public class Et1VettingService {
         return String.format(BEFORE_LABEL_TEMPLATE, et1Display, acasDisplay);
     }
 
+    private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {
+        String documentBinaryUrl = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
+        return documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
+    }
+
+    /**
+     * Prepare wordings to be displayed in et1VettingClaimantDetailsMarkUp.
+     * @param caseData Get ClaimantIndType and ClaimantType
+     * @return et1VettingClaimantDetailsMarkUp
+     */
     private String initialClaimantDetailsMarkUp(CaseData caseData) {
         return String.format(CLAIMANT_DETAILS,
                 caseData.getClaimantIndType().getClaimantFirstNames(),
@@ -95,6 +107,11 @@ public class Et1VettingService {
                 toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()));
     }
 
+    /**
+     * Prepare wordings to be displayed in et1VettingRespondentDetailsMarkUp.
+     * @param caseData Get RespondentCollection
+     * @return et1VettingRespondentDetailsMarkUp
+     */
     private String initialRespondentDetailsMarkUp(CaseData caseData) {
         if (caseData.getRespondentCollection().size() == 1) {
             RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
@@ -113,11 +130,6 @@ public class Et1VettingService {
         }
     }
 
-    private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {
-        String documentBinaryUrl = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
-        return documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
-    }
-
     public String toAddressWithTab(Address address) {
         StringBuilder claimantAddressStr = new StringBuilder();
         claimantAddressStr.append(address.getAddressLine1());
@@ -130,6 +142,21 @@ public class Et1VettingService {
         claimantAddressStr.append(BR_WITH_TAB).append(address.getPostTown())
                 .append(BR_WITH_TAB).append(address.getPostCode());
         return claimantAddressStr.toString();
+    }
+
+    /**
+     * Prepare wordings to be displayed in et1VettingAcasCertListMarkUp.
+     * @param caseData Get RespondentCollection
+     * @return et1VettingAcasCertListMarkUp
+     */
+    private String initialAcasCertList(CaseData caseData) {
+        return caseData.getRespondentCollection()
+                .stream()
+                .filter(r -> r.getValue().getRespondentACAS() != null)
+                .map(r -> String.format(ACAS_CERT_LIST_DISPLAY,
+                        r.getValue().getRespondentACAS()))
+                .findFirst()
+                .orElse("");
     }
 
 }

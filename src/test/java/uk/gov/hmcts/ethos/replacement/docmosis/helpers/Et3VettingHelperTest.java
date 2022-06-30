@@ -456,10 +456,10 @@ class Et3VettingHelperTest {
         Et3VettingHelper.checkHearingListed(caseData);
 
         assertThat(caseData.getEt3HearingDetails(), is(
-                "| <h2>Hearing details</h2>| | \r\n" +
-                    "|--|--|\r\n" +
-                    "|Date| Saturday 25 December 2021|\r\n" +
-                    "|Type| Test track|"
+                "| <h2>Hearing details</h2>| | \r\n"
+                    + "|--|--|\r\n"
+                    + "|Date| Saturday 25 December 2021|\r\n"
+                    + "|Type| Test track|"
             )
         );
         assertThat(caseData.getEt3IsCaseListedForHearing(), is(YES));
@@ -487,10 +487,10 @@ class Et3VettingHelperTest {
         Et3VettingHelper.checkHearingListed(caseData);
 
         assertThat(caseData.getEt3HearingDetails(), is(
-                "| <h2>Hearing details</h2>| | \r\n" +
-                    "|--|--|\r\n" +
-                    "|Date| Saturday 25 December 2021|\r\n" +
-                    "|Type| Track could not be found|"
+                "| <h2>Hearing details</h2>| | \r\n"
+                    + "|--|--|\r\n"
+                    + "|Date| Saturday 25 December 2021|\r\n"
+                    + "|Type| Track could not be found|"
             )
         );
         assertThat(caseData.getEt3IsCaseListedForHearing(), is(YES));
@@ -513,10 +513,10 @@ class Et3VettingHelperTest {
         Et3VettingHelper.transferApplication(caseData);
 
         assertThat(caseData.getEt3TribunalLocation(), is(
-            "| <h2>Tribunal location</h2>| | \r\n" +
-                "|--|--|\r\n" +
-                "|Tribunal| England & Wales|\r\n" +
-                "|Office| Manchester|"
+            "| <h2>Tribunal location</h2>| | \r\n"
+                + "|--|--|\r\n"
+                + "|Tribunal| England & Wales|\r\n"
+                + "|Office| Manchester|"
         ));
     }
 
@@ -528,10 +528,10 @@ class Et3VettingHelperTest {
         Et3VettingHelper.transferApplication(caseData);
 
         assertThat(caseData.getEt3TribunalLocation(), is(
-            "| <h2>Tribunal location</h2>| | \r\n" +
-                "|--|--|\r\n" +
-                "|Tribunal| Scotland|\r\n" +
-                "|Office| Glasgow|"
+            "| <h2>Tribunal location</h2>| | \r\n"
+                + "|--|--|\r\n"
+                + "|Tribunal| Scotland|\r\n"
+                + "|Office| Glasgow|"
         ));
     }
 

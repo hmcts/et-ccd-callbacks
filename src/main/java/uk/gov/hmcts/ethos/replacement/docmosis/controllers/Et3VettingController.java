@@ -211,6 +211,12 @@ public class Et3VettingController {
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
+    /**
+     * Creates a table for ExUI representing the case's current tribunal and office.
+     * @param ccdRequest holds the request and case data
+     * @param userToken used for authorization
+     * @return this will call the response entity.
+     */
     @PostMapping(value = "/transferApplication", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Request a transfer of tribunal office")
     @ApiResponses(value = {

@@ -364,6 +364,10 @@ public class Et3VettingHelper {
         return LocalDateTime.parse(date, OLD_DATE_TIME_PATTERN).format(DateTimeFormatter.ofPattern("EEEE d MMMM y"));
     }
 
+    /**
+     * Creates a table for ExUI representing the case's current tribunal and office.
+     * @param caseData data for the current case
+     */
     public static void transferApplication(CaseData caseData) {
         String managingOffice = caseData.getManagingOffice();
         String tribunalOffice = TribunalOffice.isEnglandWalesOffice(managingOffice)

@@ -29,7 +29,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
- * Rest controller for the ET3 Vetting pages, provides access to the state of the ET3 Response
+ * REST controller for the ET3 Vetting pages, provides access to the state of the ET3 Response
  * and formats data appropriately for rendering on the front end.
  */
 @Slf4j
@@ -47,7 +47,7 @@ public class Et3VettingController {
     }
 
     /**
-     * Method calls when the Is there an ET3 Response?" page is loaded, will generate a table
+     * Method calls when the "Is there an ET3 Response?" page is loaded, will generate a table
      * for displaying the state of the ET3 response and set if the response has been received.
      */
     @PostMapping(value = "/populateEt3Dates", consumes = APPLICATION_JSON_VALUE)
@@ -80,8 +80,8 @@ public class Et3VettingController {
     }
 
     /**
-     * Creates a DynamicList containing a list of all the respondents which the user will be able to select as part of
-     * the ET3 Vetting Process.
+     * Called for the ET3 "Select Respondent" page. Creates a DynamicList containing a list of all the respondents
+     * which the user will be able to select as part of the ET3 Vetting Process.
      * @param ccdRequest holds the request and case data
      * @param userToken used for authorization
      * @return this will call the response entity but will also display any error messages which occur.
@@ -111,6 +111,13 @@ public class Et3VettingController {
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
+    /**
+     * Called for the ET3 "Did we receive the ET3 response in time?" page. Calculates whether the response is in time
+     * by checking if the received date is before 28 days from the served date or the extension time.
+     * @param ccdRequest holds the request and case data
+     * @param userToken used for authorization
+     * @return Callback response entity with case data and errors attached.
+     */
     @PostMapping(value = "/calculateResponseInTime", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "calculate if the response was received in time")
     @ApiResponses(value = {
@@ -139,6 +146,38 @@ public class Et3VettingController {
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
+    /**
+     * Called for the ET3 "Do the respondents name and address match" pages. Looks up the selected respondents name
+     * and address and formats them for ExUI to display. Will show "None given" where this information is not available.
+     * @param ccdRequest holds the request and case data
+     * @param userToken used for authorization
+     * @return Callback response entity with case data.
+     */
+    @PostMapping(value = "/initRespondentDetails", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get the details of the respondent for the respondent name and address pages")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> initRespondentDetails(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        Et3VettingHelper.getRespondentNameAndAddress(caseData);
+
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+    }
 
     /**
      * This method is used to display a message to the user once the submit button has been pressed. This will show the

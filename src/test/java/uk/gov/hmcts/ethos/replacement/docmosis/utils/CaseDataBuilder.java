@@ -265,6 +265,18 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withRespondent(RespondentSumType respondent) {
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(respondent);
+
+        if (caseData.getRespondentCollection() == null) {
+            caseData.setRespondentCollection(new ArrayList<>());
+        }
+
+        caseData.getRespondentCollection().add(respondentSumTypeItem);
+        return this;
+    }
+
     public CaseDataBuilder withRespondent(String respondent, String responseReceived, String receivedDate,
                                           boolean extension) {
         RespondentSumType respondentSumType = new RespondentSumType();

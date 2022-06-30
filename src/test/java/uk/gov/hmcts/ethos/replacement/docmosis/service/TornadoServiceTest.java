@@ -16,16 +16,13 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.MockHttpURLConnectionFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.junit.Assert.assertEquals;
@@ -51,7 +48,7 @@ public class TornadoServiceTest {
     private UserService userService;
     private DefaultValuesReaderService defaultValuesReaderService;
     private VenueAddressReaderService venueAddressReaderService;
-    private HttpURLConnection mockConnection;
+    private MockHttpURLConnection mockConnection;
     private final String authToken = "a-test-auth-token";
     private final String documentInfoMarkup = "<a>some test markup</a>";
 
@@ -63,7 +60,8 @@ public class TornadoServiceTest {
         mockDefaultValuesReaderService();
         mockVenueAddressReaderService();
 
-        tornadoService = new TornadoService(tornadoConnection, documentManagementService, userService, defaultValuesReaderService, venueAddressReaderService);
+        tornadoService = new TornadoService(tornadoConnection, documentManagementService,
+                userService, defaultValuesReaderService, venueAddressReaderService);
     }
 
     @Test(expected = IOException.class)
@@ -188,7 +186,7 @@ public class TornadoServiceTest {
     }
 
     private void mockTornadoConnection() throws IOException {
-        mockConnection = MockHttpURLConnectionFactory.create("http://testdocmosis");
+        mockConnection = new MockHttpURLConnection(new URL("http://testdocmosis"));
         tornadoConnection = mock(TornadoConnection.class);
         when(tornadoConnection.createConnection()).thenReturn(mockConnection);
     }
@@ -197,7 +195,8 @@ public class TornadoServiceTest {
         documentManagementService = mock(DocumentManagementService.class);
         var documentUrl = "http://testdocumentserver/testdocument";
         var uri = URI.create(documentUrl);
-        when(documentManagementService.uploadDocument(anyString(), any(byte[].class), anyString(), anyString(), anyString())).thenReturn(uri);
+        when(documentManagementService.uploadDocument(anyString(), any(byte[].class),
+                anyString(), anyString(), anyString())).thenReturn(uri);
         when(documentManagementService.generateDownloadableURL(uri)).thenReturn(documentUrl);
         when(documentManagementService.generateMarkupDocument(anyString())).thenReturn(documentInfoMarkup);
     }
@@ -211,31 +210,31 @@ public class TornadoServiceTest {
     }
 
     private void mockConnectionSuccess() throws IOException {
-        var mockInputStream = mock(InputStream.class);
-        when(mockInputStream.read(any(byte[].class))).thenReturn(-1);
-        var mockOutputStream = mock(OutputStream.class);
-        when(mockConnection.getInputStream()).thenReturn(mockInputStream);
-        when(mockConnection.getOutputStream()).thenReturn(mockOutputStream);
-        when(mockConnection.getResponseCode()).thenReturn(HTTP_OK);
+        InputStream inputStream = mock(InputStream.class);
+        OutputStream outputStream = mock(OutputStream.class);
+        when(inputStream.read(any(byte[].class))).thenReturn(-1);
+        mockConnection.setInputStream(inputStream);
+        mockConnection.setOutputStream(outputStream);
+        mockConnection.setResponseCode(HTTP_OK);
     }
 
     private void mockConnectionError() throws IOException {
-        var mockInputStream = mock(InputStream.class);
+        InputStream mockInputStream = mock(InputStream.class);
         when(mockInputStream.read(any(byte[].class))).thenReturn(-1);
         when(mockInputStream.read(any(byte[].class), anyInt(), anyInt())).thenReturn(-1);
-        var mockOutputStream = mock(OutputStream.class);
-        when(mockConnection.getErrorStream()).thenReturn(mockInputStream);
-        when(mockConnection.getOutputStream()).thenReturn(mockOutputStream);
-        when(mockConnection.getResponseCode()).thenReturn(HTTP_INTERNAL_ERROR);
+        OutputStream mockOutputStream = mock(OutputStream.class);
+        mockConnection.setErrorStream(mockInputStream);
+        mockConnection.setOutputStream(mockOutputStream);
+        mockConnection.setResponseCode(HTTP_INTERNAL_ERROR);
     }
 
     private ListingData createListingData() {
-        var listingData = new ListingData();
         var listingTypeItem = new ListingTypeItem();
         var listingType = new ListingType();
         listingType.setCauseListDate("2019-12-12");
         listingTypeItem.setId("1111");
         listingTypeItem.setValue(listingType);
+        var listingData = new ListingData();
         listingData.setHearingDocType(HEARING_DOC_ETCL);
         listingData.setHearingDocETCL(HEARING_ETCL_STAFF);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);

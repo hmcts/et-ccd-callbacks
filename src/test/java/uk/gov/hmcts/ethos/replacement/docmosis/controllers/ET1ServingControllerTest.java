@@ -40,7 +40,7 @@ class ET1ServingControllerTest {
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
-    private ET1ServingService ET1ServingService;
+    private ET1ServingService et1ServingService;
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -53,10 +53,10 @@ class ET1ServingControllerTest {
         ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
     }
 
-        @Test
+    @Test
     void midServingDocumentOtherTypeNames() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(ET1ServingService.generateOtherTypeDocumentName(anyList())).thenReturn("expectedDocumentName");
+        when(et1ServingService.generateOtherTypeDocumentName(anyList())).thenReturn("expectedDocumentName");
         mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
@@ -65,15 +65,15 @@ class ET1ServingControllerTest {
                 .andExpect(jsonPath("$.data.otherTypeDocumentName", notNullValue()))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(ET1ServingService, times(1)).generateOtherTypeDocumentName(anyList());
+        verify(et1ServingService, times(1)).generateOtherTypeDocumentName(anyList());
 
     }
 
     @Test
     void midServingDocumentRecipient() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(ET1ServingService.generateEmailLinkToAcas(any())).thenReturn("expectedLink");
-        when(ET1ServingService.generateClaimantAndRespondentAddress(any())).thenReturn("expectedAddresses");
+        when(et1ServingService.generateEmailLinkToAcas(any())).thenReturn("expectedLink");
+        when(et1ServingService.generateClaimantAndRespondentAddress(any())).thenReturn("expectedAddresses");
 
         mvc.perform(post(SERVING_DOCUMENT_RECIPIENT_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -84,8 +84,8 @@ class ET1ServingControllerTest {
                 .andExpect(jsonPath("$.data.emailLinkToAcas", notNullValue()))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(ET1ServingService, times(1)).generateEmailLinkToAcas(any());
-        verify(ET1ServingService, times(1)).generateClaimantAndRespondentAddress(any());
+        verify(et1ServingService, times(1)).generateEmailLinkToAcas(any());
+        verify(et1ServingService, times(1)).generateClaimantAndRespondentAddress(any());
 
     }
 

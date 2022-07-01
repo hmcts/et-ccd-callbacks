@@ -180,6 +180,69 @@ public class Et3VettingController {
     }
 
     /**
+     * Finds listed hearings for a case and sets the hearing details for ExUI. Will display a table with the earliest
+     * hearing date and track type or static text saying that there are no listings for the case.
+     * @param ccdRequest holds the request and case data
+     * @param userToken used for authorization
+     * @return this will call the response entity.
+     */
+    @PostMapping(value = "/checkHearingListed", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "check to see if a hearing has been listed")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> checkHearingListed(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        Et3VettingHelper.checkHearingListed(caseData);
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    /**
+     * Creates a table for ExUI representing the case's current tribunal and office.
+     * @param ccdRequest holds the request and case data
+     * @param userToken used for authorization
+     * @return this will call the response entity.
+     */
+    @PostMapping(value = "/transferApplication", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Request a transfer of tribunal office")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> transferApplication(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        Et3VettingHelper.transferApplication(caseData);
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    /**
      * This method is used to display a message to the user once the submit button has been pressed. This will show the
      * user what the next steps are.
      * @param ccdRequest generic request from CCD

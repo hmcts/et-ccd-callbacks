@@ -4,21 +4,31 @@ import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 /**
@@ -32,13 +42,24 @@ public class Et3VettingHelper {
     static final String NO_CLAIM_SERVED_DATE = "Cannot proceed as there is no claim served date";
     static final String NO_ET3_RESPONSE = "Cannot process as there is no ET3 Response";
     static final String ET3_TABLE_DATA =
-        "| Dates| |\r\n"
+        "| <h2>Dates</h2>| |\r\n"
         + "|--|--|\r\n"
         + "|ET1 served| %s|\r\n"
         + "|ET3 due| %s|\r\n"
         + "|Extension| %s|\r\n"
         + "|ET3 received| %s|";
 
+    private static final String ET3_HEARING_TABLE =
+        "| <h2>Hearing details</h2>| | \r\n"
+        + "|--|--|\r\n"
+        + "|Date| %s|\r\n"
+        + "|Type| %s|";
+
+    private static final String ET3_TRIBUNAL_TABLE =
+        "| <h2>Tribunal location</h2>| | \r\n"
+            + "|--|--|\r\n"
+            + "|Tribunal| %s|\r\n"
+            + "|Office| %s|";
     private static final String RESPONDENT_DETAILS = "<h2>Respondent</h2>"
         + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Contact address &#09&#09 %s</pre><hr>";
@@ -46,6 +67,7 @@ public class Et3VettingHelper {
     private static final int ET3_RESPONSE_WINDOW = 28;
     private static final String NONE = "None";
     private static final String NONE_GIVEN = "None Given";
+    private static final String CASE_NOT_LISTED = "<h2>Hearing details</h2>The case has not been listed<hr>";
 
     private Et3VettingHelper() {
         //Access through static methods
@@ -292,6 +314,69 @@ public class Et3VettingHelper {
 
     private static boolean respondentExtensionExists(RespondentSumType respondent) {
         return YES.equals(respondent.getExtensionRequested()) && YES.equals(respondent.getExtensionGranted());
+    }
+
+    /**
+     * Finds listed hearings for a case and sets the hearing details for ExUI. Will display a table with the earliest
+     * hearing date and track type or static text saying that there are no listings for the case.
+     * @param caseData data for the current case
+     */
+    public static void checkHearingListed(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
+            log.info(String.format("No hearings for case %s", caseData.getEthosCaseReference()));
+            caseData.setEt3HearingDetails(CASE_NOT_LISTED);
+            caseData.setEt3IsCaseListedForHearing(NO);
+            return;
+        }
+
+        String hearingDate = findHearingDate(caseData.getHearingCollection());
+
+        if (CASE_NOT_LISTED.equals(hearingDate)) {
+            caseData.setEt3HearingDetails(CASE_NOT_LISTED);
+            caseData.setEt3IsCaseListedForHearing(NO);
+            return;
+        }
+
+        String track = isNullOrEmpty(caseData.getConciliationTrack())
+            ? "Track could not be found"
+            : caseData.getConciliationTrack();
+
+        caseData.setEt3HearingDetails(String.format(ET3_HEARING_TABLE, hearingDate, track));
+        caseData.setEt3IsCaseListedForHearing(YES);
+    }
+
+    private static String findHearingDate(List<HearingTypeItem> hearingCollection) {
+        List<String> hearingDates = new ArrayList<>();
+
+        hearingCollection.forEach(item -> addListedDates(hearingDates, item.getValue().getHearingDateCollection()));
+
+        if (CollectionUtils.isEmpty(hearingDates)) {
+            return CASE_NOT_LISTED;
+        }
+
+        Collections.sort(hearingDates);
+        String date = hearingDates.get(0);
+
+        return LocalDateTime.parse(date, OLD_DATE_TIME_PATTERN).format(DateTimeFormatter.ofPattern("EEEE d MMMM y"));
+    }
+
+    private static void addListedDates(List<String> hearingDates, List<DateListedTypeItem> hearingCollection) {
+        hearingCollection.stream()
+            .filter(item -> HEARING_STATUS_LISTED.equals(item.getValue().getHearingStatus()))
+            .forEach(item -> hearingDates.add(item.getValue().getListedDate()));
+    }
+
+    /**
+     * Creates a table for ExUI representing the case's current tribunal and office.
+     * @param caseData data for the current case
+     */
+    public static void transferApplication(CaseData caseData) {
+        String managingOffice = caseData.getManagingOffice();
+        String tribunalOffice = TribunalOffice.isEnglandWalesOffice(managingOffice)
+            ? "England & Wales"
+            : TribunalOffice.SCOTLAND.getOfficeName();
+
+        caseData.setEt3TribunalLocation(String.format(ET3_TRIBUNAL_TABLE, tribunalOffice, managingOffice));
     }
 
 }

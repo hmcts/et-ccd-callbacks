@@ -21,12 +21,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InitialConsiderationHelperTest {
 
-    private CaseData caseDetails;
-
     private static final String EXPECTED_RESPONDENT_NAME =
             "| Respondent name given | |\r\n"
                     + "|-------------|:------------|\r\n"
                     + "|In Et1 by claimant | Test Corp|\r\n"
+                    + "|In Et3 by Respondent | |";
+
+    private static final String EXPECTED_RESPONDENT_NAME_BLANK =
+            "| Respondent name given | |\r\n"
+                    + "|-------------|:------------|\r\n"
+                    + "|In Et1 by claimant | |\r\n"
                     + "|In Et3 by Respondent | |";
 
     private static final String EXPECTED_HEARING_STRING =
@@ -36,15 +40,26 @@ public class InitialConsiderationHelperTest {
                     + "|Type | Preliminary Hearing(CM)|\r\n"
                     + "|Duration | 1.5 Hours|";
 
+    private static final String EXPECTED_HEARING_BLANK =
+            "|Hearing Details | |\r\n"
+                    + "|-------------|:------------|\r\n"
+                    + "|Date | |\r\n"
+                    + "|Type | |\r\n"
+                    + "|Duration | |";
+
     private static final String EXPECTED_JURISDICTION_HTML = "<h2>Jurisdiction Codes</h2><a target=\"_blank\" " +
             "href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">View all jurisdiction codes and descriptors (opens in new tab)</a><br><br>" +
             "<strong>DAG</strong> - Discrimination, including indirect discrimination, harassment or victimisation or discrimination based on association or perception on " +
             "grounds of age<br><br><strong>SXD</strong> - Discrimination, including indirect discrimination, discrimination based on association or perception, harassment " +
             "or victimisation on grounds of sex, marriage and civil partnership or gender reassignment<br><br><hr>";
 
+    private CaseData caseDetailsEmpty;
+    private CaseData caseDetails;
+
     @BeforeEach
     public void setUp() throws Exception {
-        caseDetails = generateCaseData();
+        caseDetails = generateCaseData("initialConsiderationCase1.json");
+        caseDetailsEmpty = generateCaseData("initialConsiderationCase2.json");
     }
 
     @Test
@@ -73,6 +88,24 @@ public class InitialConsiderationHelperTest {
         assertEquals(EXPECTED_JURISDICTION_HTML, jurisdictionCodesHtml);
     }
 
+    @Test
+    public void missingHearingCollectionTest() {
+        String hearingDetails = InitialConsiderationHelper.getHearingDetails(caseDetailsEmpty.getHearingCollection());
+        assertEquals(EXPECTED_HEARING_BLANK, hearingDetails);
+    }
+
+    @Test
+    public void missingJurisdictionCollectionTest() {
+        String jurisdictionCodesHtml = InitialConsiderationHelper.generateJurisdictionCodesHtml(caseDetailsEmpty.getJurCodesCollection());
+        assertEquals("", jurisdictionCodesHtml);
+    }
+
+    @Test
+    public void missingRespondentCollectionTest() {
+        String respondentName = InitialConsiderationHelper.getRespondentName(caseDetailsEmpty.getRespondentCollection());
+        assertEquals(EXPECTED_RESPONDENT_NAME_BLANK, respondentName);
+    }
+
     private List<JurCodesTypeItem> generateJurisdictionCodes() {
         return List.of(generateJurisdictionCode("DAG"),
                 generateJurisdictionCode("SXD"));
@@ -87,10 +120,9 @@ public class InitialConsiderationHelperTest {
         return jurCodesTypeItem;
     }
 
-
-    private CaseData generateCaseData() throws Exception {
+    private CaseData generateCaseData(String fileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("initialConsiderationCase1.json")).toURI())));
+                .getResource(fileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseData.class);
     }
@@ -103,7 +135,6 @@ public class InitialConsiderationHelperTest {
                 createDate("2022-01-07T10:00:00.000"));
     }
 
-
     private List<DateListedTypeItem> generateHearingDatesWithEmpty() {
         return List.of(createDate("2022-07-15T10:00:00.000"),
                 createDate("2022-07-15T10:00:00.000"),
@@ -111,7 +142,6 @@ public class InitialConsiderationHelperTest {
                 createDate("2022-03-22T10:00:00.000"),
                 createDate("2022-01-07T10:00:00.000"));
     }
-
 
     private DateListedTypeItem createDate(String dateString) {
         DateListedTypeItem hearingDate = new DateListedTypeItem();

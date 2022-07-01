@@ -32,10 +32,11 @@ public class InitialConsiderationHelper {
                     + "|Type | %s|\r\n"
                     + "|Duration | %s|";
 
+    static final String HEARING_MISSING = String.format(HEARING_DETAILS, "", "", "");
+    static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "");
 
     private InitialConsiderationHelper() {
     }
-
 
     /**
      * Creates the respondent detail section for Initial Consideration.
@@ -44,11 +45,15 @@ public class InitialConsiderationHelper {
      * @return table with respondent details
      */
     public static String getRespondentName(List<RespondentSumTypeItem> respondentCollection) {
+        if (respondentCollection == null){
+            return RESPONDENT_MISSING;
+        }
+
         return respondentCollection.stream().map(
                         respondent -> String.format(
                                 RESPONDENT_NAME, nullCheck(respondent.getValue().getRespondentName()),
                                 nullCheck(respondent.getValue().getResponseRespondentName()))).findFirst()
-                .orElse(String.format(RESPONDENT_NAME, "", ""));
+                .orElse(RESPONDENT_MISSING);
     }
 
     /**
@@ -58,9 +63,14 @@ public class InitialConsiderationHelper {
      * @return return table with details of hearing
      */
     public static String getHearingDetails(List<HearingTypeItem> hearingCollection) {
+        if (hearingCollection == null){
+            return HEARING_MISSING;
+        }
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
 
         return hearingCollection.stream()
+                .filter(hearingTypeItem -> hearingTypeItem != null && hearingTypeItem.getValue() != null)
                 .map(HearingTypeItem::getValue)
                 .filter(hearing -> hearing.getHearingDateCollection() != null && !hearing.getHearingDateCollection().isEmpty()).min(Comparator.comparing(
                         (HearingType hearing) ->
@@ -69,15 +79,16 @@ public class InitialConsiderationHelper {
                         getEarliestHearingDate(hearing.getHearingDateCollection()).map(formatter::format).orElse(""),
                         hearing.getHearingType(),
                         getHearingDuration(hearing)))
-                .orElse(String.format(HEARING_DETAILS, "", "", ""));
+                .orElse(HEARING_MISSING);
     }
 
     public static Optional<LocalDate> getEarliestHearingDate(List<DateListedTypeItem> hearingDates) {
         return hearingDates.stream()
-                .filter(hearingDate -> hearingDate.getValue() != null && hearingDate.getValue().getListedDate() != null && !hearingDate.getValue().getListedDate().isEmpty())
-                .map(hearingDateItem -> LocalDateTime.parse(hearingDateItem.getValue().getListedDate()).toLocalDate()).min(Comparator.naturalOrder());
+                .filter(dateListedTypeItem -> dateListedTypeItem != null && dateListedTypeItem.getValue() != null)
+                .map(DateListedTypeItem::getValue)
+                .filter(hearingDate ->  hearingDate.getListedDate() != null && !hearingDate.getListedDate().isEmpty())
+                .map(hearingDateItem -> LocalDateTime.parse(hearingDateItem.getListedDate()).toLocalDate()).min(Comparator.naturalOrder());
     }
-
 
     /**
      * Creates the jurisdiction section for Initial Consideration.
@@ -85,6 +96,9 @@ public class InitialConsiderationHelper {
      * @return jurisdiction code section
      */
     public static String generateJurisdictionCodesHtml(List<JurCodesTypeItem> jurisdictionCodes) {
+        if (jurisdictionCodes == null){
+            return "";
+        }
         StringBuilder sb = new StringBuilder()
                 .append("<h2>Jurisdiction Codes</h2>")
                 .append("<a target=\"_blank\" href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">")

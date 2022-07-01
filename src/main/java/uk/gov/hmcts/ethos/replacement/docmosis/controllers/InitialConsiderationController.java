@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -79,12 +80,6 @@ public class InitialConsiderationController {
         caseData.setEtInitialConsiderationRespondent(InitialConsiderationHelper.getRespondentName(caseData.getRespondentCollection()));
         caseData.setEtInitialConsiderationHearing(InitialConsiderationHelper.getHearingDetails(caseData.getHearingCollection()));
         caseData.setEtInitialConsiderationJurisdictionCodes(InitialConsiderationHelper.generateJurisdictionCodesHtml(caseData.getJurCodesCollection()));
-
-        try {
-            log.info(new ObjectMapper().writeValueAsString(caseData));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }

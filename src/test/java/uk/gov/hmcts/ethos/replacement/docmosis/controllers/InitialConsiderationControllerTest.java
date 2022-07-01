@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
@@ -34,6 +37,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 class InitialConsiderationControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String COMPLETE_INITIAL_CONSIDERATION_URL = "/completeInitialConsideration";
+    private static final String START_INITIAL_CONSIDERATION_URL = "/startInitialConsideration";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -52,10 +56,15 @@ class InitialConsiderationControllerTest {
     void setUp() throws Exception {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
 
+        String hearingNumber = "123";
+        String venue = "Some venue";
+
         CaseDetails caseDetails = CaseDataBuilder.builder()
             .withChooseEt3Respondent("Jack")
             .withRespondent("Jack", YES, "2022-03-01", false)
             .withClaimServedDate("2022-01-01")
+            .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge", venue)
+            .withHearingSession(0, hearingNumber, "2019-11-25T12:11:00.000", Constants.HEARING_STATUS_LISTED, false)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         ccdRequest = CCDRequestBuilder.builder()
@@ -91,5 +100,19 @@ class InitialConsiderationControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void startInitialConsiderationTest() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(START_INITIAL_CONSIDERATION_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.data.etInitialConsiderationRespondent", notNullValue()))
+            .andExpect(jsonPath("$.data.etInitialConsiderationHearing", notNullValue()))
+            .andExpect(jsonPath("$.data.etInitialConsiderationJurisdictionCodes", notNullValue()));
     }
 }

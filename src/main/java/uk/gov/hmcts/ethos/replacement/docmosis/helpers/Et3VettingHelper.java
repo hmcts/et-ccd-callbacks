@@ -346,13 +346,9 @@ public class Et3VettingHelper {
     }
 
     private static String findHearingDate(List<HearingTypeItem> hearingCollection) {
-        List<String> hearingDates = hearingCollection.stream()
-            .map(hearing -> hearing.getValue().getHearingDateCollection().stream()
-                .filter(date -> HEARING_STATUS_LISTED.equals(date.getValue().getHearingStatus()))
-                .collect(Collectors.toList()))
-            .flatMap(Collection::stream)
-            .map(date -> date.getValue().getListedDate())
-            .collect(Collectors.toList());
+        List<String> hearingDates = new ArrayList<>();
+
+        hearingCollection.forEach(item -> addListedDates(hearingDates, item.getValue().getHearingDateCollection()));
 
         if (CollectionUtils.isEmpty(hearingDates)) {
             return CASE_NOT_LISTED;
@@ -362,6 +358,12 @@ public class Et3VettingHelper {
         String date = hearingDates.get(0);
 
         return LocalDateTime.parse(date, OLD_DATE_TIME_PATTERN).format(DateTimeFormatter.ofPattern("EEEE d MMMM y"));
+    }
+
+    private static void addListedDates(List<String> hearingDates, List<DateListedTypeItem> hearingCollection) {
+        hearingCollection.stream()
+            .filter(item -> HEARING_STATUS_LISTED.equals(item.getValue().getHearingStatus()))
+            .forEach(item -> hearingDates.add(item.getValue().getListedDate()));
     }
 
     /**

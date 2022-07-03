@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -42,6 +43,8 @@ class Et1VettingControllerTest {
 
     private static final String INIT_CASE_VETTING_ENDPOINT = "/initialiseEt1Vetting";
     private static final String JURISDICTION_CODE_ENDPOINT = "/jurisdictionCodes";
+
+    private static final String ET1_PROCESSING_COMPLETE_URL = "/finishEt1Vetting";
     private static final String AUTH_TOKEN = "some-token";
     private CCDRequest ccdRequest;
 
@@ -140,4 +143,35 @@ class Et1VettingControllerTest {
         caseData.getJurCodesCollection().add(codesTypeItem);
     }
 
+    @Test
+    void et1ProcessingComplete_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(ET1_PROCESSING_COMPLETE_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void et1ProcessingComplete_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(ET1_PROCESSING_COMPLETE_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void et1ProcessingComplete_badRequest() throws Exception {
+        mockMvc.perform(post(ET1_PROCESSING_COMPLETE_URL)
+                .content("garbage content")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+    }
 }

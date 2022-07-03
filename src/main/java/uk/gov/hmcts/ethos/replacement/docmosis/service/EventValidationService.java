@@ -1,11 +1,15 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.google.common.base.Strings;
+import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -15,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 
 import java.time.LocalDate;
@@ -69,6 +74,8 @@ public class EventValidationService {
 
     private static final List<String> INVALID_STATES_FOR_CLOSED_CURRENT_POSITION = List.of(
             SUBMITTED_STATE, ACCEPTED_STATE, REJECTED_STATE);
+    public static final String DISPOSAL_DATE_IN_FUTURE = "Disposal Data can't be in future.";
+    public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "Disposal Date must match any of the hearing dates";
 
     public List<String> validateReceiptDate(CaseData caseData) {
         List<String> errors = new ArrayList<>();
@@ -191,6 +198,39 @@ public class EventValidationService {
     public void validateJurisdictionCodes(CaseData caseData, List<String> errors) {
         validateDuplicatedJurisdictionCodes(caseData, errors);
         validateJurisdictionCodesExistenceInJudgement(caseData, errors);
+        validateDisposalDate(caseData, errors);
+    }
+
+    private void validateDisposalDate(CaseData caseData, List<String> errors) {
+        if (CollectionUtils.isNotEmpty(caseData.getJurCodesCollection())) {
+            for (JurCodesTypeItem jurCodesTypeItem : caseData.getJurCodesCollection()) {
+                String disposalDate = jurCodesTypeItem.getValue().getDisposalDate();
+                if (!Strings.isNullOrEmpty(disposalDate) && CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
+                    addInvalidDisposalDateError(caseData.getHearingCollection(), disposalDate, errors);
+                }
+            }
+        }
+    }
+
+    private void addInvalidDisposalDateError(List<HearingTypeItem> hearingTypeItems, String disposalDate, List<String> errors) {
+        boolean disposalDateMatches = false;
+        if (HearingsHelper.isDateInFuture(disposalDate, LocalDateTime.now())) {
+            errors.add(DISPOSAL_DATE_IN_FUTURE);
+            return;
+        }
+        for (HearingTypeItem hearingTypeItem : hearingTypeItems) {
+            if (CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
+                continue;
+            }
+            for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
+                if (disposalDate.equals(dateListedTypeItem.getValue().getListedDate())) {
+                    disposalDateMatches = true;
+                }
+            }
+        }
+      if (!disposalDateMatches) {
+          errors.add(DISPOSAL_DATE_HEARING_DATE_MATCH);
+      }
     }
 
     private void validateJurisdictionCodesExistenceInJudgement(CaseData caseData, List<String> errors) {

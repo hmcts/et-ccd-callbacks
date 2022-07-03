@@ -391,6 +391,22 @@ class EventValidationServiceTest {
         assertEquals(0, errors.size());
     }
 
+    @Test
+    void shouldValidateDisposalDateInFuture() {
+        List<String> errors = new ArrayList<>();
+        caseDetails1.getCaseData().getJurCodesCollection().get(0).getValue().setDisposalDate("2777-06-22");
+        eventValidationService.validateJurisdictionCodes(caseDetails1.getCaseData(), errors);
+        assertEquals(EventValidationService.DISPOSAL_DATE_IN_FUTURE, errors.get(0));
+    }
+
+    @Test
+    void shouldValidateDisposalDateMatchWithHearingDate() {
+        List<String> errors = new ArrayList<>();
+        caseDetails1.getCaseData().getJurCodesCollection().get(0).getValue().setDisposalDate("2022-06-30");
+        eventValidationService.validateJurisdictionCodes(caseDetails1.getCaseData(), errors);
+        assertEquals(EventValidationService.DISPOSAL_DATE_HEARING_DATE_MATCH, errors.get(0));
+    }
+
     @ParameterizedTest
     @CsvSource({"false,false", "true,false", "false,true", "true,true"})
     void shouldValidateJurisdictionOutcomePresentAndMissing(boolean isRejected, boolean partOfMultiple) {

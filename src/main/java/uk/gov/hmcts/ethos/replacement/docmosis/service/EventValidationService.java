@@ -205,7 +205,7 @@ public class EventValidationService {
         if (CollectionUtils.isNotEmpty(caseData.getJurCodesCollection())) {
             for (JurCodesTypeItem jurCodesTypeItem : caseData.getJurCodesCollection()) {
                 String disposalDate = jurCodesTypeItem.getValue().getDisposalDate();
-                if (!Strings.isNullOrEmpty(disposalDate) && CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
+                if (!Strings.isNullOrEmpty(disposalDate)) {
                     addInvalidDisposalDateError(caseData.getHearingCollection(), disposalDate, errors);
                 }
             }
@@ -218,13 +218,15 @@ public class EventValidationService {
             errors.add(DISPOSAL_DATE_IN_FUTURE);
             return;
         }
-        for (HearingTypeItem hearingTypeItem : hearingTypeItems) {
-            if (CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
-                continue;
-            }
-            for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
-                if (disposalDate.equals(dateListedTypeItem.getValue().getListedDate())) {
-                    disposalDateMatches = true;
+        if (CollectionUtils.isNotEmpty(hearingTypeItems)) {
+            for (HearingTypeItem hearingTypeItem : hearingTypeItems) {
+                if (CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
+                    continue;
+                }
+                for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
+                    if (disposalDate.equals(dateListedTypeItem.getValue().getListedDate())) {
+                        disposalDateMatches = true;
+                    }
                 }
             }
         }

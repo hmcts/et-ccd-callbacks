@@ -60,6 +60,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MISSING_JURISDICTIO
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MISSING_JURISDICTION_OUTCOME_ERROR_MESSAGE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_ALLOCATED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RECEIPT_DATE_LATER_THAN_ACCEPTED_ERROR_MESSAGE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
@@ -213,7 +214,12 @@ public class EventValidationService {
     }
 
     private void addInvalidDisposalDateError(List<HearingTypeItem> hearingTypeItems, String disposalDate, List<String> errors) {
-        if (HearingsHelper.isDateInFuture(disposalDate, LocalDateTime.now())) {
+
+        if (HearingsHelper.isDateInFuture(
+                LocalDateTime.parse(
+                        disposalDate, OLD_DATE_TIME_PATTERN
+                ).toLocalDate().toString(), LocalDateTime.now())
+        ) {
             errors.add(DISPOSAL_DATE_IN_FUTURE);
             return;
         }

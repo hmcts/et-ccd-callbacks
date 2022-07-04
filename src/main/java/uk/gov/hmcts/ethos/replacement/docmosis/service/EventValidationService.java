@@ -74,8 +74,8 @@ public class EventValidationService {
 
     private static final List<String> INVALID_STATES_FOR_CLOSED_CURRENT_POSITION = List.of(
             SUBMITTED_STATE, ACCEPTED_STATE, REJECTED_STATE);
-    public static final String DISPOSAL_DATE_IN_FUTURE = "Disposal Data can't be in future.";
-    public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "Disposal Date must match any of the hearing dates";
+    public static final String DISPOSAL_DATE_IN_FUTURE = "Disposal Date can't be in the future.";
+    public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "Disposal Date must match one of the hearing dates";
 
     public List<String> validateReceiptDate(CaseData caseData) {
         List<String> errors = new ArrayList<>();
@@ -195,7 +195,7 @@ public class EventValidationService {
         return errors;
     }
 
-    public void validateJurisdictionCodes(CaseData caseData, List<String> errors) {
+    public void validateJurisdiction(CaseData caseData, List<String> errors) {
         validateDuplicatedJurisdictionCodes(caseData, errors);
         validateJurisdictionCodesExistenceInJudgement(caseData, errors);
         validateDisposalDate(caseData, errors);
@@ -213,7 +213,6 @@ public class EventValidationService {
     }
 
     private void addInvalidDisposalDateError(List<HearingTypeItem> hearingTypeItems, String disposalDate, List<String> errors) {
-        boolean disposalDateMatches = false;
         if (HearingsHelper.isDateInFuture(disposalDate, LocalDateTime.now())) {
             errors.add(DISPOSAL_DATE_IN_FUTURE);
             return;
@@ -225,14 +224,13 @@ public class EventValidationService {
                 }
                 for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
                     if (disposalDate.equals(dateListedTypeItem.getValue().getListedDate())) {
-                        disposalDateMatches = true;
+                        return;
                     }
                 }
             }
         }
-      if (!disposalDateMatches) {
           errors.add(DISPOSAL_DATE_HEARING_DATE_MATCH);
-      }
+
     }
 
     private void validateJurisdictionCodesExistenceInJudgement(CaseData caseData, List<String> errors) {

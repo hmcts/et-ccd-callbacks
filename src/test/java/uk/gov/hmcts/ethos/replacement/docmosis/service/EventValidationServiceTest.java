@@ -356,7 +356,7 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateJurisdictionCodesWithDuplicatesCodesAndExistenceJudgement() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdictionCodes(caseDetails1.getCaseData(), errors);
+        eventValidationService.validateJurisdiction(caseDetails1.getCaseData(), errors);
 
         assertEquals(2, errors.size());
         assertEquals(DUPLICATE_JURISDICTION_CODE_ERROR_MESSAGE + " \"COM\" in Jurisdiction 3 "
@@ -367,7 +367,7 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateJurisdictionCodesWithUniqueCodes() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdictionCodes(caseDetails2.getCaseData(), errors);
+        eventValidationService.validateJurisdiction(caseDetails2.getCaseData(), errors);
 
         assertEquals(0, errors.size());
     }
@@ -388,7 +388,7 @@ class EventValidationServiceTest {
     void shouldValidateJurisdictionCodesWithEmptyCodes() {
         List<String> errors = new ArrayList<>();
         caseDetails3.getCaseData().setJudgementCollection(new ArrayList<>());
-        eventValidationService.validateJurisdictionCodes(caseDetails3.getCaseData(), errors);
+        eventValidationService.validateJurisdiction(caseDetails3.getCaseData(), errors);
 
         assertEquals(0, errors.size());
     }
@@ -396,7 +396,7 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateDisposalDateInFuture() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdictionCodes(setCaseDataForDisposalDateTest("2777-12-23T11:15:00.000"), errors);
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest("2777-12-23T11:15:00.000"), errors);
         assertEquals(EventValidationService.DISPOSAL_DATE_IN_FUTURE, errors.get(0));
     }
 
@@ -405,7 +405,7 @@ class EventValidationServiceTest {
         JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
         jurCodesTypeItem.setId(UUID.randomUUID().toString());
         JurCodesType jurCodesType = new JurCodesType();
-        jurCodesType.setJuridictionCodesList("bla bla");
+        jurCodesType.setJuridictionCodesList("blah blah");
         jurCodesType.setDisposalDate(date);
         jurCodesTypeItem.setValue(jurCodesType);
         caseData.setJurCodesCollection(Collections.singletonList(jurCodesTypeItem));
@@ -415,7 +415,7 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateDisposalDateMatchWithHearingDate() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdictionCodes(setCaseDataForDisposalDateTest("2022-06-30T10:20:00.000"), errors);
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest("2022-06-30T10:20:00.000"), errors);
         assertEquals(EventValidationService.DISPOSAL_DATE_HEARING_DATE_MATCH, errors.get(0));
     }
 

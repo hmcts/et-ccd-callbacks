@@ -1,6 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,12 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,6 +28,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class InitialConsiderationController {
 
     private final VerifyTokenService verifyTokenService;
+    private final InitialConsiderationService initialConsiderationService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String COMPLETE_IC_BODY = "<hr>" +
         "<h3>What happens next</h3>" +
@@ -45,7 +45,6 @@ public class InitialConsiderationController {
     public ResponseEntity<CCDCallbackResponse> completeInitialConsideration(@RequestBody CCDRequest ccdRequest,
                                                                             @RequestHeader(value = "Authorization")
                                                                                 String userToken) {
-
         log.info("Initial consideration complete requested for case reference ---> {}",
             ccdRequest.getCaseDetails().getCaseId());
 
@@ -62,13 +61,13 @@ public class InitialConsiderationController {
     @PostMapping(value = "/startInitialConsideration", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "start the Initial Consideration flow")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
-            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")})
+        @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<CCDCallbackResponse> startInitialConsideration(@RequestBody CCDRequest ccdRequest,
                                                                          @RequestHeader(value = "Authorization")
-                                                                                 String userToken) {
-        log.info("START OF INITIAL CONSIDERATION FOR CASE ---> " + ccdRequest.getCaseDetails().getCaseId());
+                                                                             String userToken) {
+        log.info("START OF INITIAL CONSIDERATION FOR CASE ---> {}", ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -77,9 +76,12 @@ public class InitialConsiderationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        caseData.setEtInitialConsiderationRespondent(InitialConsiderationHelper.getRespondentName(caseData.getRespondentCollection()));
-        caseData.setEtInitialConsiderationHearing(InitialConsiderationHelper.getHearingDetails(caseData.getHearingCollection()));
-        caseData.setEtInitialConsiderationJurisdictionCodes(InitialConsiderationHelper.generateJurisdictionCodesHtml(caseData.getJurCodesCollection()));
+        caseData.setEtInitialConsiderationRespondent(
+            initialConsiderationService.getRespondentName(caseData.getRespondentCollection()));
+        caseData.setEtInitialConsiderationHearing(
+            initialConsiderationService.getHearingDetails(caseData.getHearingCollection()));
+        caseData.setEtInitialConsiderationJurisdictionCodes(
+            initialConsiderationService.generateJurisdictionCodesHtml(caseData.getJurCodesCollection()));
 
         return getCallbackRespEntityNoErrors(caseData);
     }

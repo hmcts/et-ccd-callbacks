@@ -507,7 +507,7 @@ public class DocumentHelper {
         return sb.toString();
     }
 
-    static String getHearingDuration(HearingType hearingType) {
+    public static String getHearingDuration(HearingType hearingType) {
         String numType = hearingType.getHearingEstLengthNumType();
         try {
             int tmp = Integer.parseInt(hearingType.getHearingEstLengthNum());

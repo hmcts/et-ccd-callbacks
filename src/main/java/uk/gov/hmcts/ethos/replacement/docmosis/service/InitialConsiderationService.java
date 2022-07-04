@@ -1,5 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,14 +16,6 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
-
-import org.springframework.stereotype.Service;
-import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
 
 @Service
 public class InitialConsiderationService {
@@ -33,9 +32,9 @@ public class InitialConsiderationService {
             + "|Type | %s|\r\n"
             + "|Duration | %s|";
 
-    static final String JURISDICTION_HEADER = "<h2>Jurisdiction Codes</h2><a target=\"_blank\" " +
-        "href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">View all " +
-        "jurisdiction codes and descriptors (opens in new tab)</a><br><br>";
+    static final String JURISDICTION_HEADER = "<h2>Jurisdiction Codes</h2><a target=\"_blank\" "
+        + "href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">View all "
+        + "jurisdiction codes and descriptors (opens in new tab)</a><br><br>";
     static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
     static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "");
 

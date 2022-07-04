@@ -1,5 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -9,15 +17,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
-import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 
 public class InitialConsiderationServiceTest {
     static final String EXPECTED_RESPONDENT_NAME =
@@ -46,16 +45,17 @@ public class InitialConsiderationServiceTest {
             + "|Type | -|\r\n"
             + "|Duration | -|";
 
-    static final String EXPECTED_JURISDICTION_HTML = "<h2>Jurisdiction Codes</h2><a target=\"_blank\" " +
-        "href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">View all jurisdiction codes and descriptors (opens in new tab)</a><br><br>" +
-        "<strong>DAG</strong> - Discrimination, including indirect discrimination, harassment or victimisation or discrimination based on association or perception on " +
-        "grounds of age<br><br><strong>SXD</strong> - Discrimination, including indirect discrimination, discrimination based on association or perception, harassment " +
-        "or victimisation on grounds of sex, marriage and civil partnership or gender reassignment<br><br><hr>";
+    static final String EXPECTED_JURISDICTION_HTML = "<h2>Jurisdiction Codes</h2><a target=\"_blank\" "
+        + "href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">View all "
+        + "jurisdiction codes and descriptors (opens in new tab)</a><br><br><strong>DAG</strong> - "
+        + "Discrimination, including indirect discrimination, harassment or victimisation or discrimination "
+        + "based on association or perception on grounds of age<br><br><strong>SXD</strong> - Discrimination, "
+        + "including indirect discrimination, discrimination based on association or perception, harassment "
+        + "or victimisation on grounds of sex, marriage and civil partnership or gender reassignment<br><br><hr>";
 
     CaseData caseDetailsEmpty;
     CaseData caseDetails;
     InitialConsiderationService initialConsiderationService;
-
 
     @BeforeEach
     void setUp() throws Exception {
@@ -73,7 +73,6 @@ public class InitialConsiderationServiceTest {
         assertThat(initialConsiderationService.getEarliestHearingDate(generateHearingDatesWithEmpty()))
             .isEqualTo(Optional.of(LocalDate.of(2022, 1, 7)));
     }
-
 
     @Test
     void getHearingDetailsTest() {

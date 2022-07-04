@@ -70,7 +70,7 @@ class Et1VettingServiceTest {
         + "<pre>Tribunal &#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Office &#09&#09&#09&#09&#09 %s</pre><hr>";
     private static final String TRIBUNAL_LOCATION_LABEL = "**<big>%s regional office</big>**";
-    private static final String TRACk_ALLOCATION_HTML = "|||\r\n|--|--|\r\n|Track allocation|%s|\r\n";
+    private static final String TRACK_ALLOCATION_HTML = "|||\r\n|--|--|\r\n|Track allocation|%s|\r\n";
     private static final String JUR_CODE_HTML = "<hr><h3>Jurisdiction Codes</h3>"
         + "<a href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
         + "View all jurisdiction codes and descriptors (opens in new tab)</a><hr>"

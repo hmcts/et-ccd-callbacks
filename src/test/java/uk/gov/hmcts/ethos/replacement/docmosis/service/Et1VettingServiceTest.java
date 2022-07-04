@@ -258,7 +258,7 @@ class Et1VettingServiceTest {
         addJurCodeToVettingCollection(caseData, DAG);
         addJurCodeToExistingCollection(caseData, PID);
 
-        String expected = String.format(TRACk_ALLOCATION_HTML, TRACK_OPEN);
+        String expected = String.format(TRACK_ALLOCATION_HTML, TRACK_OPEN);
         assertThat(et1VettingService.populateEt1TrackAllocationHtml(caseData))
             .isEqualTo(expected);
     }

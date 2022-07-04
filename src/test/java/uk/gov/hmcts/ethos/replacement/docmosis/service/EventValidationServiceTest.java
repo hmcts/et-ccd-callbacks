@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.lang.reflect.Array;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,8 +13,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
+import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.listing.ListingRequest;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
@@ -20,10 +24,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -394,16 +394,26 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateDisposalDateInFuture() {
         List<String> errors = new ArrayList<>();
-        caseDetails1.getCaseData().getJurCodesCollection().get(0).getValue().setDisposalDate("2777-06-22");
-        eventValidationService.validateJurisdictionCodes(caseDetails1.getCaseData(), errors);
+        eventValidationService.validateJurisdictionCodes(setCaseDataForDisposalDateTest("2777-12-23T11:15:00.000"), errors);
         assertEquals(EventValidationService.DISPOSAL_DATE_IN_FUTURE, errors.get(0));
+    }
+
+    private CaseData setCaseDataForDisposalDateTest(String date) {
+        CaseData caseData = new CaseData();
+        JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
+        jurCodesTypeItem.setId(UUID.randomUUID().toString());
+        JurCodesType jurCodesType = new JurCodesType();
+        jurCodesType.setJuridictionCodesList("bla bla");
+        jurCodesType.setDisposalDate(date);
+        jurCodesTypeItem.setValue(jurCodesType);
+        caseData.setJurCodesCollection(Collections.singletonList(jurCodesTypeItem));
+        return caseData;
     }
 
     @Test
     void shouldValidateDisposalDateMatchWithHearingDate() {
         List<String> errors = new ArrayList<>();
-        caseDetails1.getCaseData().getJurCodesCollection().get(0).getValue().setDisposalDate("2022-06-30");
-        eventValidationService.validateJurisdictionCodes(caseDetails1.getCaseData(), errors);
+        eventValidationService.validateJurisdictionCodes(setCaseDataForDisposalDateTest("2022-06-30T10:20:00.000"), errors);
         assertEquals(EventValidationService.DISPOSAL_DATE_HEARING_DATE_MATCH, errors.get(0));
     }
 

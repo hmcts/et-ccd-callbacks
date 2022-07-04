@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,9 +42,9 @@ public class InitialConsiderationServiceTest {
     static final String EXPECTED_HEARING_BLANK =
         "|Hearing Details | |\r\n"
             + "|-------------|:------------|\r\n"
-            + "|Date | - |\r\n"
-            + "|Type | - |\r\n"
-            + "|Duration | - |";
+            + "|Date | -|\r\n"
+            + "|Type | -|\r\n"
+            + "|Duration | -|";
 
     static final String EXPECTED_JURISDICTION_HTML = "<h2>Jurisdiction Codes</h2><a target=\"_blank\" " +
         "href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">View all jurisdiction codes and descriptors (opens in new tab)</a><br><br>" +
@@ -66,46 +66,58 @@ public class InitialConsiderationServiceTest {
 
     @Test
     void getEarliestHearingDate() {
-        assertEquals(Optional.empty(), initialConsiderationService.getEarliestHearingDate(new ArrayList<>()));
-        assertEquals(Optional.of(LocalDate.of(2022, 1, 7)), initialConsiderationService.getEarliestHearingDate(generateHearingDates()));
-        assertEquals(Optional.of(LocalDate.of(2022, 1, 7)), initialConsiderationService.getEarliestHearingDate(generateHearingDatesWithEmpty()));
+        assertThat(initialConsiderationService.getEarliestHearingDate(new ArrayList<>()))
+            .isEmpty();
+        assertThat(initialConsiderationService.getEarliestHearingDate(generateHearingDates()))
+            .isEqualTo(Optional.of(LocalDate.of(2022, 1, 7)));
+        assertThat(initialConsiderationService.getEarliestHearingDate(generateHearingDatesWithEmpty()))
+            .isEqualTo(Optional.of(LocalDate.of(2022, 1, 7)));
     }
+
 
     @Test
     void getHearingDetailsTest() {
         String hearingDetails = initialConsiderationService.getHearingDetails(caseDetails.getHearingCollection());
-        assertEquals(EXPECTED_HEARING_STRING, hearingDetails);
+        assertThat(hearingDetails)
+            .isEqualTo(EXPECTED_HEARING_STRING);
     }
 
     @Test
     void getRespondentNameTest() {
         String respondentName = initialConsiderationService.getRespondentName(caseDetails.getRespondentCollection());
-        assertEquals(EXPECTED_RESPONDENT_NAME, respondentName);
+        assertThat(respondentName)
+            .isEqualTo(EXPECTED_RESPONDENT_NAME);
     }
 
     @Test
     void generateJurisdictionCodesHtmlTest() {
-        String jurisdictionCodesHtml = initialConsiderationService.generateJurisdictionCodesHtml(generateJurisdictionCodes());
-        System.out.println(jurisdictionCodesHtml);
-        assertEquals(EXPECTED_JURISDICTION_HTML, jurisdictionCodesHtml);
+        String jurisdictionCodesHtml =
+            initialConsiderationService.generateJurisdictionCodesHtml(generateJurisdictionCodes());
+        assertThat(jurisdictionCodesHtml)
+            .isEqualTo(EXPECTED_JURISDICTION_HTML);
     }
 
     @Test
     void missingHearingCollectionTest() {
         String hearingDetails = initialConsiderationService.getHearingDetails(caseDetailsEmpty.getHearingCollection());
-        assertEquals(EXPECTED_HEARING_BLANK, hearingDetails);
+        assertThat(hearingDetails)
+            .isEqualTo(EXPECTED_HEARING_BLANK);
     }
 
     @Test
     void missingJurisdictionCollectionTest() {
-        String jurisdictionCodesHtml = initialConsiderationService.generateJurisdictionCodesHtml(caseDetailsEmpty.getJurCodesCollection());
-        assertEquals("", jurisdictionCodesHtml);
+        String jurisdictionCodesHtml =
+            initialConsiderationService.generateJurisdictionCodesHtml(caseDetailsEmpty.getJurCodesCollection());
+        assertThat(jurisdictionCodesHtml)
+            .isEqualTo("");
     }
 
     @Test
     void missingRespondentCollectionTest() {
-        String respondentName = initialConsiderationService.getRespondentName(caseDetailsEmpty.getRespondentCollection());
-        assertEquals(EXPECTED_RESPONDENT_NAME_BLANK, respondentName);
+        String respondentName =
+            initialConsiderationService.getRespondentName(caseDetailsEmpty.getRespondentCollection());
+        assertThat(respondentName)
+            .isEqualTo(EXPECTED_RESPONDENT_NAME_BLANK);
     }
 
     private List<JurCodesTypeItem> generateJurisdictionCodes() {

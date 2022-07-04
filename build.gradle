@@ -333,6 +333,7 @@ dependencies {
     testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine', version: junitJupiterVersion
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.17.1'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.23.1'
 
     // Contract Tests
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: pact_version

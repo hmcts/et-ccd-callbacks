@@ -22,6 +22,11 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+
+/**
+ * REST controller for the ET3 Initial Consideration pages. Provides custom formatting for content
+ * at the start of the event and after completion.
+ */
 @Slf4j
 @RequiredArgsConstructor
 @RestController

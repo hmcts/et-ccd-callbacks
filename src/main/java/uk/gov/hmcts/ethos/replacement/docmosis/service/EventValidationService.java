@@ -194,10 +194,10 @@ public class EventValidationService {
     /**
      * Jurisdiction list is checked for duplicate values, codes existing
      * in judgment and disposal date
-     * @param  caseData        CaseData which is a generic data type
+     * @param  caseData     CaseData which is a generic data type
      *
      * @param errors        List of errors which will hold the errors being shown
-     *                          if the validation fails
+     *                      if the validation fails
      */
     public void validateJurisdiction(CaseData caseData, List<String> errors) {
         validateDuplicatedJurisdictionCodes(caseData, errors);
@@ -208,7 +208,7 @@ public class EventValidationService {
     /**
      * Disposal date is validated here. It should not be in future
      * and should match one of the hearing dates.
-     * @param  caseData        CaseData which is a generic data type
+     * @param  caseData     CaseData which is a generic data type
      *
      * @param errors        List of errors which will hold the errors being shown
      *                      if the disposal date is either in future or doesn't

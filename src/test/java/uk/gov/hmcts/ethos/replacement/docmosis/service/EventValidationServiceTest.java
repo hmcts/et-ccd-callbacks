@@ -449,8 +449,7 @@ class EventValidationServiceTest {
     void disposalDateMatchWithHearingDate() {
         List<String> errors = new ArrayList<>();
         eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(DISPOSAL_DATE), errors);
-        assertThat(errors).asList()
-                .isEmpty();
+        assertThat(errors).isEmpty();
     }
 
     @ParameterizedTest
@@ -749,8 +748,10 @@ class EventValidationServiceTest {
         List<String> errors = new ArrayList<>();
         var invalidCase = invalidJudgeAllocationCaseDetails.getCaseData();
         eventValidationService.validateHearingJudgeAllocationForCaseCloseEvent(invalidCase, errors);
-        assertThat(errors.size()).isEqualTo(1);
-        assertThat(errors.get(0)).isEqualTo(CLOSING_HEARD_CASE_WITH_NO_JUDGE_ERROR);
+        assertThat(errors.size())
+                .isEqualTo(1);
+        assertThat(errors.get(0))
+                .isEqualTo(CLOSING_HEARD_CASE_WITH_NO_JUDGE_ERROR);
     }
 
     @Test

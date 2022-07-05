@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,10 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -368,7 +366,7 @@ public class BulkCreationServiceTest {
     public void bulkCreationLogic() {
         BulkRequestPayload bulkRequestPayload = bulkCreationService.bulkCreationLogic(getBulkDetails(YES, "Single"),
                 bulkCasesPayload, "authToken", BULK_CREATION_STEP);
-        assertEquals(RESULT, bulkRequestPayload.getBulkDetails().toString());
+        assertThat(bulkRequestPayload.getBulkDetails().toString()).hasToString(RESULT);
     }
 
     @Test
@@ -422,7 +420,7 @@ public class BulkCreationServiceTest {
                 "respondentOrg=null, state=null, flag1Update=null, flag2Update=null, EQPUpdate=null, jurCodesDynamicList=null, outcomeUpdate=null, " +
                 "filterCases=null, docMarkUp=null, multipleSource=Manually Created))";
         BulkRequestPayload bulkRequestPayload = bulkCreationService.bulkUpdateCaseIdsLogic(bulkRequest, "authToken", false);
-        assertEquals(result, bulkRequestPayload.getBulkDetails().toString());
+        assertThat(bulkRequestPayload.getBulkDetails().toString()).isEqualTo(result);
     }
 
     @Test

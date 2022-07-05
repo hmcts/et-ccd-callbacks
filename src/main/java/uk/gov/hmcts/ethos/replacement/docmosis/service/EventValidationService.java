@@ -217,19 +217,25 @@ public class EventValidationService {
         if(Strings.isNullOrEmpty(disposalDate) || isDisposalDateInFuture(disposalDate, errors)) {
             return;
         }
-        if (CollectionUtils.isNotEmpty(hearingTypeItems)) {
-            for (HearingTypeItem hearingTypeItem : hearingTypeItems) {
-                if (CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
-                    continue;
-                }
-                for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
-                    if (areDatesEqual(disposalDate, dateListedTypeItem.getValue().getListedDate())) {
-                        return;
-                    }
+
+         if (CollectionUtils.isEmpty(hearingTypeItems) ||
+                 !checkIfHearingDateMatchesWithDisposalDate(hearingTypeItems, disposalDate)) {
+             errors.add(DISPOSAL_DATE_HEARING_DATE_MATCH);
+         }
+    }
+
+    private boolean checkIfHearingDateMatchesWithDisposalDate(List<HearingTypeItem> hearingTypeItems, String disposalDate) {
+        for (HearingTypeItem hearingTypeItem : hearingTypeItems) {
+            if (CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
+                continue;
+            }
+            for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
+                if (areDatesEqual(disposalDate, dateListedTypeItem.getValue().getListedDate())) {
+                    return true;
                 }
             }
         }
-        errors.add(DISPOSAL_DATE_HEARING_DATE_MATCH);
+        return false;
     }
 
     private boolean isDisposalDateInFuture(String disposalDate, List<String> errors) {

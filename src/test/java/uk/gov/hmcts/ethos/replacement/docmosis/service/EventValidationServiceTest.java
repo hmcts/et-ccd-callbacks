@@ -11,16 +11,18 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
+import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.listing.ListingRequest;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
-
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -160,10 +162,10 @@ class EventValidationServiceTest {
 
     @ParameterizedTest
     @CsvSource({
-        MULTIPLE_CASE_TYPE + "," + SUBMITTED_STATE,
-        MULTIPLE_CASE_TYPE + "," + ACCEPTED_STATE,
-        SINGLE_CASE_TYPE + "," + SUBMITTED_STATE,
-        SINGLE_CASE_TYPE + "," + ACCEPTED_STATE
+            MULTIPLE_CASE_TYPE + "," + SUBMITTED_STATE,
+            MULTIPLE_CASE_TYPE + "," + ACCEPTED_STATE,
+            SINGLE_CASE_TYPE + "," + SUBMITTED_STATE,
+            SINGLE_CASE_TYPE + "," + ACCEPTED_STATE
     })
     void shouldValidateCaseState(String caseType, String caseState) {
         caseDetails1.getCaseData().setEcmCaseType(caseType);
@@ -354,7 +356,7 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateJurisdictionCodesWithDuplicatesCodesAndExistenceJudgement() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdictionCodes(caseDetails1.getCaseData(), errors);
+        eventValidationService.validateJurisdiction(caseDetails1.getCaseData(), errors);
 
         assertEquals(2, errors.size());
         assertEquals(DUPLICATE_JURISDICTION_CODE_ERROR_MESSAGE + " \"COM\" in Jurisdiction 3 "
@@ -365,7 +367,7 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateJurisdictionCodesWithUniqueCodes() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdictionCodes(caseDetails2.getCaseData(), errors);
+        eventValidationService.validateJurisdiction(caseDetails2.getCaseData(), errors);
 
         assertEquals(0, errors.size());
     }
@@ -386,9 +388,35 @@ class EventValidationServiceTest {
     void shouldValidateJurisdictionCodesWithEmptyCodes() {
         List<String> errors = new ArrayList<>();
         caseDetails3.getCaseData().setJudgementCollection(new ArrayList<>());
-        eventValidationService.validateJurisdictionCodes(caseDetails3.getCaseData(), errors);
+        eventValidationService.validateJurisdiction(caseDetails3.getCaseData(), errors);
 
         assertEquals(0, errors.size());
+    }
+
+    @Test
+    void shouldValidateDisposalDateInFuture() {
+        List<String> errors = new ArrayList<>();
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest("2777-12-23"), errors);
+        assertEquals(EventValidationService.DISPOSAL_DATE_IN_FUTURE, errors.get(0));
+    }
+
+    private CaseData setCaseDataForDisposalDateTest(String date) {
+        CaseData caseData = new CaseData();
+        JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
+        jurCodesTypeItem.setId(UUID.randomUUID().toString());
+        JurCodesType jurCodesType = new JurCodesType();
+        jurCodesType.setJuridictionCodesList("blah blah");
+        jurCodesType.setDisposalDate(date);
+        jurCodesTypeItem.setValue(jurCodesType);
+        caseData.setJurCodesCollection(Collections.singletonList(jurCodesTypeItem));
+        return caseData;
+    }
+
+    @Test
+    void shouldValidateDisposalDateMatchWithHearingDate() {
+        List<String> errors = new ArrayList<>();
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest("2022-06-30"), errors);
+        assertEquals(EventValidationService.DISPOSAL_DATE_HEARING_DATE_MATCH, errors.get(0));
     }
 
     @ParameterizedTest

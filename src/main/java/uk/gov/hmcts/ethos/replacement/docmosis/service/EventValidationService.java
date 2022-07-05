@@ -1,11 +1,15 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.google.common.base.Strings;
+import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -15,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 
 import java.time.LocalDate;
@@ -69,6 +74,8 @@ public class EventValidationService {
 
     private static final List<String> INVALID_STATES_FOR_CLOSED_CURRENT_POSITION = List.of(
             SUBMITTED_STATE, ACCEPTED_STATE, REJECTED_STATE);
+    public static final String DISPOSAL_DATE_IN_FUTURE = "Disposal Date can't be in the future.";
+    public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "Disposal Date must match one of the hearing dates";
 
     public List<String> validateReceiptDate(CaseData caseData) {
         List<String> errors = new ArrayList<>();
@@ -188,9 +195,51 @@ public class EventValidationService {
         return errors;
     }
 
-    public void validateJurisdictionCodes(CaseData caseData, List<String> errors) {
+    public void validateJurisdiction(CaseData caseData, List<String> errors) {
         validateDuplicatedJurisdictionCodes(caseData, errors);
         validateJurisdictionCodesExistenceInJudgement(caseData, errors);
+        validateDisposalDate(caseData, errors);
+    }
+
+    private void validateDisposalDate(CaseData caseData, List<String> errors) {
+        if (CollectionUtils.isNotEmpty(caseData.getJurCodesCollection())) {
+            for (JurCodesTypeItem jurCodesTypeItem : caseData.getJurCodesCollection()) {
+                String disposalDate = jurCodesTypeItem.getValue().getDisposalDate();
+                if (!Strings.isNullOrEmpty(disposalDate)) {
+                    addInvalidDisposalDateError(caseData.getHearingCollection(), disposalDate, errors);
+                }
+            }
+        }
+    }
+
+    private void addInvalidDisposalDateError(List<HearingTypeItem> hearingTypeItems, String disposalDate, List<String> errors) {
+
+        LocalDate d = LocalDate.parse(disposalDate);
+        LocalDateTime dt = d.atTime(0,0, 0, 0);
+        if (HearingsHelper.isDateInFuture(
+                dt.toString(), LocalDateTime.now())
+        ) {
+            errors.add(DISPOSAL_DATE_IN_FUTURE);
+            return;
+        }
+        if (CollectionUtils.isNotEmpty(hearingTypeItems)) {
+            for (HearingTypeItem hearingTypeItem : hearingTypeItems) {
+                if (CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
+                    continue;
+                }
+                for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
+                    if (areDatesEqual(disposalDate, dateListedTypeItem.getValue().getListedDate())) {
+                        return;
+                    }
+                }
+            }
+        }
+        errors.add(DISPOSAL_DATE_HEARING_DATE_MATCH);
+
+    }
+
+    private boolean areDatesEqual(String disposalDate, String hearingDate)  {
+        return disposalDate.split("T")[0].equals(hearingDate.split("T")[0]);
     }
 
     private void validateJurisdictionCodesExistenceInJudgement(CaseData caseData, List<String> errors) {

@@ -50,19 +50,20 @@ public class Et1VettingService {
             "<br><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"
                     + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
 
-    private static final String HEARING_VENUES_TITLE = "<hr><h2>Listing details<hr>";
     private static final String CLAIMANT_DETAILS = "<hr><h3>Claimant</h3>"
             + "<pre>First name &#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Last name &#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Contact address &#09&#09 %s</pre><hr>";
-    private static final String CLAIMANT_CONTACT_ADDRESS = "<h3>Claimant</h3>"
-        + "<pre>Contact address &#09&#09 %s</pre>";
-    private static final String CLAIMANT_WORK_ADDRESS = "<br><pre>Work address &#09&#09&#09 %s</pre><hr>";
+
+    private static final String CLAIMANT_AND_RESPONDENT_ADDRESSES = "<hr><h2>Listing details<hr><h3>Claimant</h3>"
+        + "<pre>Contact address &#09&#09 %s</pre>"
+        + "<br><pre>Work address &#09&#09&#09 %s</pre><hr>"
+        + "<h3>Respondent</h3>"
+        + "<pre>Contact address &#09&#09 %s</pre><hr>";
+
     private static final String RESPONDENT_DETAILS = "<h3>Respondent %s</h3>"
             + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Contact address &#09&#09 %s</pre><hr>";
-    private static final String RESPONDENT_ADDRESS = "<h3>Respondent</h3>"
-            + "<pre>Contact address &#09&#09 %s</pre><hr>";
     private static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
     private static final String TRIBUNAL_OFFICE_LOCATION = "<hr><h3>Tribunal location</h3>"
         + "<pre>Tribunal &#09&#09&#09&#09&nbsp; %s"
@@ -315,23 +316,20 @@ public class Et1VettingService {
     }
 
     public DynamicFixedListType getHearingVenuesList(CaseData caseData) {
-        var dynamicListingVenues = new DynamicFixedListType();
+        DynamicFixedListType dynamicListingVenues = new DynamicFixedListType();
 
-        dynamicListingVenues.setListItems(new ArrayList<>(
+        dynamicListingVenues.setListItems(
             jpaVenueService.getVenues(TribunalOffice.valueOfOfficeName(caseData.getManagingOffice()))
-        ));
+        );
 
         return dynamicListingVenues;
     }
 
     public String getAddressesHtml(CaseData caseData) {
-        Address claimantAddressUK = caseData.getClaimantType().getClaimantAddressUK();
-        Address claimantWorkAddress = caseData.getClaimantWorkAddress().getClaimantWorkAddress();
-        Address respondentAddress = caseData.getRespondentCollection().get(0).getValue().getRespondentAddress();
-
-        return HEARING_VENUES_TITLE
-            + String.format(CLAIMANT_CONTACT_ADDRESS, toAddressWithTab(claimantAddressUK))
-            + String.format(CLAIMANT_WORK_ADDRESS, toAddressWithTab(claimantWorkAddress))
-            + String.format(RESPONDENT_ADDRESS, toAddressWithTab(respondentAddress));
+        return String.format(CLAIMANT_AND_RESPONDENT_ADDRESSES,
+            toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()),
+            toAddressWithTab(caseData.getClaimantWorkAddress().getClaimantWorkAddress()),
+            toAddressWithTab(caseData.getRespondentCollection().get(0).getValue().getRespondentAddress())
+        );
     }
 }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import com.google.common.base.Strings;
+import lombok.val;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -136,8 +137,6 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withHearingSession(int hearingIndex, String number, String listedDate, String hearingStatus,
                                               boolean disposed) {
-        final var hearing = caseData.getHearingCollection().get(hearingIndex);
-
         var dateListedType = new DateListedType();
         dateListedType.setListedDate(listedDate);
         dateListedType.setHearingStatus(hearingStatus);
@@ -145,6 +144,7 @@ public class CaseDataBuilder {
         var dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setValue(dateListedType);
 
+        val hearing = caseData.getHearingCollection().get(hearingIndex);
         if (hearing.getValue().getHearingDateCollection() == null) {
             hearing.getValue().setHearingDateCollection(new ArrayList<>());
         }

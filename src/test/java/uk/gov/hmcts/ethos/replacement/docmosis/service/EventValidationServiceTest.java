@@ -396,7 +396,7 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateDisposalDateInFuture() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest("2777-12-23T11:15:00.000"), errors);
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest("2777-12-23"), errors);
         assertEquals(EventValidationService.DISPOSAL_DATE_IN_FUTURE, errors.get(0));
     }
 
@@ -415,7 +415,7 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateDisposalDateMatchWithHearingDate() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest("2022-06-30T10:20:00.000"), errors);
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest("2022-06-30"), errors);
         assertEquals(EventValidationService.DISPOSAL_DATE_HEARING_DATE_MATCH, errors.get(0));
     }
 

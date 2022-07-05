@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -52,10 +53,13 @@ public class Et1VettingService {
     private static final String CLAIMANT_DETAILS = "<hr><h3>Claimant</h3>"
             + "<pre>First name &#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Last name &#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Contact address &#09&#09 %s</pre><hr>";
+            + "<br><br>Contact address &#09&#09 %s</pre>";
     private static final String RESPONDENT_DETAILS = "<h3>Respondent %s</h3>"
-            + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Contact address &#09&#09 %s</pre><hr>";
+        + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Contact address &#09&#09 %s</pre><hr>";
+    private static final String RESPONDENT_ACAS_DETAILS = "<hr><h3>Respondent %o</h3>"
+        + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Contact address &#09&#09 %s</pre><h3>Acas certificate</h3>";
     private static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
     private static final String TRIBUNAL_OFFICE_LOCATION = "<hr><h3>Tribunal location</h3>"
         + "<pre>Tribunal &#09&#09&#09&#09&nbsp; %s"
@@ -73,7 +77,8 @@ public class Et1VettingService {
 
     private static final String TRIBUNAL_ENGLAND = "England & Wales";
     private static final String TRIBUNAL_Scotland = "Scotland";
-    private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br>";
+    private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br><br><br>";
+    private static final String NO_ACAS_CERT_DISPLAY = "No certificate has been provided.<br><br><br>";
 
     /**
      * Update et1VettingBeforeYouStart.
@@ -84,8 +89,8 @@ public class Et1VettingService {
         caseDetails.getCaseData().setEt1VettingClaimantDetailsMarkUp(
                 initialClaimantDetailsMarkUp(caseDetails.getCaseData()));
         caseDetails.getCaseData().setEt1VettingRespondentDetailsMarkUp(
-                initialRespondentDetailsMarkUp(caseDetails.getCaseData()));
-        caseDetails.getCaseData().setEt1VettingAcasCertListMarkUp(initialAcasCertList(caseDetails.getCaseData()));
+            initialRespondentDetailsMarkUp(caseDetails.getCaseData()));
+        populateRespondentAcasDetailsMarkUp(caseDetails.getCaseData());
     }
 
     /**
@@ -155,19 +160,58 @@ public class Et1VettingService {
         if (caseData.getRespondentCollection().size() == 1) {
             RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
             return String.format(RESPONDENT_DETAILS, "",
-                    respondentSumType.getRespondentName(),
-                    toAddressWithTab(respondentSumType.getRespondentAddress()));
+                respondentSumType.getRespondentName(),
+                toAddressWithTab(respondentSumType.getRespondentAddress()));
         } else {
             IntWrapper count = new IntWrapper(0);
             return caseData.getRespondentCollection()
-                    .stream()
-                    .map(r -> String.format(RESPONDENT_DETAILS,
-                            count.incrementAndReturnValue(),
-                            r.getValue().getRespondentName(),
-                            toAddressWithTab(r.getValue().getRespondentAddress())))
-                    .collect(Collectors.joining());
+                .stream()
+                .map(r -> String.format(RESPONDENT_DETAILS,
+                    count.incrementAndReturnValue(),
+                    r.getValue().getRespondentName(),
+                    toAddressWithTab(r.getValue().getRespondentAddress())))
+                .collect(Collectors.joining());
         }
     }
+
+    private void populateRespondentAcasDetailsMarkUp(CaseData caseData) {
+        List<RespondentSumTypeItem> respondentList = caseData.getRespondentCollection();
+        if (respondentList.size() > 0) {
+            caseData.setEt1VettingRespondentAcasDetails1(
+                generateRespondentAndAcasDetails(respondentList.get(0).getValue(), 1));
+        }
+        if (respondentList.size() > 1) {
+            caseData.setEt1VettingRespondentAcasDetails2(
+                generateRespondentAndAcasDetails(respondentList.get(1).getValue(), 2));
+        }
+        if (respondentList.size() > 2) {
+            caseData.setEt1VettingRespondentAcasDetails3(
+                generateRespondentAndAcasDetails(respondentList.get(2).getValue(), 3));
+        }
+        if (respondentList.size() > 3) {
+            caseData.setEt1VettingRespondentAcasDetails4(
+                generateRespondentAndAcasDetails(respondentList.get(3).getValue(), 4));
+        }
+        if (respondentList.size() > 4) {
+            caseData.setEt1VettingRespondentAcasDetails5(
+                generateRespondentAndAcasDetails(respondentList.get(4).getValue(), 5));
+        }
+        if (respondentList.size() > 5) {
+            caseData.setEt1VettingRespondentAcasDetails6(
+                generateRespondentAndAcasDetails(respondentList.get(5).getValue(), 6));
+        }
+    }
+
+    private String generateRespondentAndAcasDetails(RespondentSumType respondent, int respondentNumber) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format(RESPONDENT_ACAS_DETAILS, respondentNumber, respondent.getRespondentName(),
+            toAddressWithTab(respondent.getRespondentAddress())));
+        sb.append(respondent.getRespondentACAS() == null
+            ? NO_ACAS_CERT_DISPLAY : String.format(ACAS_CERT_LIST_DISPLAY, respondent.getRespondentACAS()));
+
+        return sb.toString();
+    }
+
 
     /**
      * Generate the Existing Jurisdiction Code list in HTML.
@@ -267,21 +311,6 @@ public class Et1VettingService {
         claimantAddressStr.append(BR_WITH_TAB).append(address.getPostTown())
                 .append(BR_WITH_TAB).append(address.getPostCode());
         return claimantAddressStr.toString();
-    }
-
-    /**
-     * Prepare wordings to be displayed in et1VettingAcasCertListMarkUp.
-     * @param caseData Get RespondentCollection
-     * @return et1VettingAcasCertListMarkUp
-     */
-    private String initialAcasCertList(CaseData caseData) {
-        return caseData.getRespondentCollection()
-                .stream()
-                .filter(r -> r.getValue().getRespondentACAS() != null)
-                .map(r -> String.format(ACAS_CERT_LIST_DISPLAY,
-                        r.getValue().getRespondentACAS()))
-                .findFirst()
-                .orElse("");
     }
 
     private void populateCodeNameAndDescriptionHtml(StringBuilder sb, String codeName) {

@@ -45,14 +45,13 @@ class Et1VettingServiceTest {
     private static final String CLAIMANT_DETAILS = "<hr><h3>Claimant</h3>"
             + "<pre>First name &#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Last name &#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Contact address &#09&#09 %s</pre><hr>";
+            + "<br><br>Contact address &#09&#09 %s</pre>";
     private static final String RESPONDENT_DETAILS = "<h3>Respondent %s</h3>"
             + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Contact address &#09&#09 %s</pre><hr>";
     private static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
     private static final String DAG = JurisdictionCode.DAG.name();
     private static final String PID = JurisdictionCode.PID.name();
-    private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br>";
 
     private final String et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
     private final String acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
@@ -75,6 +74,10 @@ class Et1VettingServiceTest {
         + "<a href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
         + "View all jurisdiction codes and descriptors (opens in new tab)</a><hr>"
         + "<h3>Codes already added</h3>%s<hr>";
+    private static final String RESPONDENT_ACAS_DETAILS = "<hr><h3>Respondent %o</h3>"
+        + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Contact address &#09&#09 %s</pre><h3>Acas certificate</h3>" +
+        "Certificate number %s has been provided.<br><br><br>";
 
     @BeforeEach
     void setUp() {
@@ -199,31 +202,19 @@ class Et1VettingServiceTest {
     }
 
     @Test
-    void initialBeforeYouStart_OneAcasNumber_shouldReturnMarkUp() {
+    void initialBeforeYouStart_returnRespondentAcasDetailsMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
-        String expected = String.format(ACAS_CERT_LIST_DISPLAY, "1234/5678/90");
-        assertThat(caseDetails.getCaseData().getEt1VettingAcasCertListMarkUp())
-                .isEqualTo(expected);
-    }
 
-    @Test
-    void initialBeforeYouStart_NoAcasNumber_shouldReturnMarkUp() {
-        caseDetails = CaseDataBuilder.builder()
-                .withClaimantIndType("Doris", "Johnson")
-                .withClaimantType("232 Petticoat Square", "3 House", null,
-                        "London", "W10 4AG", "United Kingdom")
-                .withRespondentWithAddress("Antonio Vazquez",
-                        "11 Small Street", "22 House", null,
-                        "Manchester", "M12 42R", "United Kingdom",
-                        null)
-                .withRespondentWithAddress("Juan Garcia",
-                        "32 Sweet Street", "14 House", null,
-                        "Manchester", "M11 4ED", "United Kingdom",
-                        null)
-                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
-        et1VettingService.initialiseEt1Vetting(caseDetails);
-        assertThat(caseDetails.getCaseData().getEt1VettingAcasCertListMarkUp())
-                .isEmpty();
+        String expectedRespondentAcasDetails1 = String.format(RESPONDENT_ACAS_DETAILS, 1, "Antonio Vazquez",
+            "11 Small Street" + BR_WITH_TAB + "22 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M12 42R",
+            "1234/5678/90");
+        String expectedRespondentAcasDetails2 = String.format(RESPONDENT_ACAS_DETAILS, 2, "Juan Garcia",
+            "32 Sweet Street" + BR_WITH_TAB + "14 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M11 4ED",
+            "2987/6543/01");
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
+            .isEqualTo(expectedRespondentAcasDetails1);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails2())
+            .isEqualTo(expectedRespondentAcasDetails2);
     }
 
     @Test

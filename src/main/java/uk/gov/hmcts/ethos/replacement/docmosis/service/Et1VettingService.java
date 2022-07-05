@@ -62,7 +62,7 @@ public class Et1VettingService {
         + "<br><br>Office &#09&#09&#09&#09&#09 %s</pre><hr>";
     private static final String TRIBUNAL_LOCATION_LABEL = "**<big>%s regional office</big>**";
 
-    private static final String TRACk_ALLOCATION_HTML = "|||\r\n|--|--|\r\n|Tack allocation|%s|\r\n";
+    private static final String TRACK_ALLOCATION_HTML = "|||\r\n|--|--|\r\n|Track allocation|%s|\r\n";
     private static final String JUR_CODE_HTML = "<hr><h3>Jurisdiction Codes</h3>"
         + "<a href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
         + "View all jurisdiction codes and descriptors (opens in new tab)</a><hr>"
@@ -219,15 +219,15 @@ public class Et1VettingService {
 
         if (caseData.getJurCodesCollection().stream()
             .anyMatch(c -> JUR_CODE_CONCILIATION_TRACK_OP.contains(c.getValue().getJuridictionCodesList()))) {
-            return String.format(TRACk_ALLOCATION_HTML, TRACK_OPEN);
+            return String.format(TRACK_ALLOCATION_HTML, TRACK_OPEN);
         } else if (caseData.getJurCodesCollection().stream()
             .anyMatch(c -> JUR_CODE_CONCILIATION_TRACK_ST.contains(c.getValue().getJuridictionCodesList()))) {
-            return String.format(TRACk_ALLOCATION_HTML, TRACK_STANDARD);
+            return String.format(TRACK_ALLOCATION_HTML, TRACK_STANDARD);
         } else if (caseData.getJurCodesCollection().stream()
             .anyMatch(c -> JUR_CODE_CONCILIATION_TRACK_SH.contains(c.getValue().getJuridictionCodesList()))) {
-            return String.format(TRACk_ALLOCATION_HTML, TRACK_SHORT);
+            return String.format(TRACK_ALLOCATION_HTML, TRACK_SHORT);
         } else {
-            return String.format(TRACk_ALLOCATION_HTML, TRACK_NO);
+            return String.format(TRACK_ALLOCATION_HTML, TRACK_NO);
         }
     }
 

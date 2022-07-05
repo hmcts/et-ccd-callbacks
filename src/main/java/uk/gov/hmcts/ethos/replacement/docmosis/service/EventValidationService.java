@@ -246,9 +246,7 @@ public class EventValidationService {
         ) {
             errors.add(DISPOSAL_DATE_IN_FUTURE);
             return true;
-        }
-
-        else {
+        } else {
             return false;
         }
     }

@@ -191,13 +191,29 @@ public class EventValidationService {
         }
         return errors;
     }
-
+    /**
+     * Jurisdiction list is checked for duplicate values, codes existing
+     * in judgment and disposal date
+     * @param  caseData        CaseData which is a generic data type
+     *
+     * @param errors        List of errors which will hold the errors being shown
+     *                          if the validation fails
+     */
     public void validateJurisdiction(CaseData caseData, List<String> errors) {
         validateDuplicatedJurisdictionCodes(caseData, errors);
         validateJurisdictionCodesExistenceInJudgement(caseData, errors);
         validateDisposalDate(caseData, errors);
     }
 
+    /**
+     * Disposal date is validated here. It should not be in future
+     * and should match one of the hearing dates.
+     * @param  caseData        CaseData which is a generic data type
+     *
+     * @param errors        List of errors which will hold the errors being shown
+     *                      if the disposal date is either in future or doesn't
+     *                      match one of the hearing dates
+     */
     private void validateDisposalDate(CaseData caseData, List<String> errors) {
         if (caseData.getJurCodesCollection() == null) {
             return;

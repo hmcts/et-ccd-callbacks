@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -19,11 +20,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
@@ -121,7 +120,7 @@ public class Et3VettingHelper {
     }
 
     private static void setRespondentNameAddress(CaseData caseData, RespondentSumTypeItem respondentSumTypeItem) {
-        String respondentName = isNullOrEmpty(respondentSumTypeItem.getValue().getRespondentName())
+        String respondentName = isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentName())
             ? NONE_GIVEN
             : respondentSumTypeItem.getValue().getRespondentName();
 
@@ -218,6 +217,7 @@ public class Et3VettingHelper {
         if (!responseInTimePreValidationCheck(caseData, errors)) {
             return errors;
         }
+
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
 
         Optional<RespondentSumTypeItem> respondentSumTypeOptional = respondentCollection
@@ -225,11 +225,10 @@ public class Et3VettingHelper {
             .filter(r -> respondentExistsAndEt3Received(
                 caseData.getEt3ChooseRespondent().getSelectedLabel(), r.getValue()))
             .findFirst();
-        respondentSumTypeOptional.ifPresent(
-            respondentSumTypeItem -> setResponseInTime(caseData, respondentSumTypeItem.getValue()));
+
+        respondentSumTypeOptional.ifPresent(respondent -> setResponseInTime(caseData, respondent.getValue()));
 
         return errors;
-
     }
 
     private static void setResponseInTime(CaseData caseData, RespondentSumType respondentSumType) {
@@ -298,13 +297,24 @@ public class Et3VettingHelper {
 
         String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
         for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
-            RespondentSumType respondent = respondentSumTypeItem.getValue();
-            if (respondentExistsAndEt3Received(respondentName, respondent))  {
-                return UtilHelper.listingFormatLocalDate(respondent.getResponseReceivedDate());
+            String date = getEt3ReceivedDateForRespondent(respondentName, respondentSumTypeItem);
+            if (date != null) {
+                return date;
             }
         }
 
         return NO;
+    }
+
+    @Nullable
+    private static String getEt3ReceivedDateForRespondent(String respondentName, RespondentSumTypeItem respondent) {
+        if (respondentExistsAndEt3Received(respondentName, respondent.getValue()))  {
+            String date = UtilHelper.listingFormatLocalDate(respondent.getValue().getResponseReceivedDate());
+            if (!isNullOrEmpty(date)) {
+                return date;
+            }
+        }
+        return null;
     }
 
     private static boolean respondentExistsAndEt3Received(String respondentName, RespondentSumType respondent) {
@@ -321,7 +331,7 @@ public class Et3VettingHelper {
      * hearing date and track type or static text saying that there are no listings for the case.
      * @param caseData data for the current case
      */
-    public static void checkHearingListed(CaseData caseData) {
+    public static void setHearingListedForExUi(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
             log.info(String.format("No hearings for case %s", caseData.getEthosCaseReference()));
             caseData.setEt3HearingDetails(CASE_NOT_LISTED);

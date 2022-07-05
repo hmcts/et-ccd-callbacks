@@ -36,11 +36,12 @@ public class InitialConsiderationController {
     private final InitialConsiderationService initialConsiderationService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String COMPLETE_IC_HDR = "<h1>Initial consideration complete</h1>";
-    private static final String COMPLETE_IC_BODY = "<hr>" +
-        "<h3>What happens next</h3>" +
-        "<p>A tribunal caseworker will act on any instructions set out in your initial consideration to progress the case. " +
-        "You can <a href=\"/cases/case-details/${[CASE_REFERENCE]}#Documents\" target=\"_blank\">view the initial " +
-        "consideration document in the Documents tab (opens in new tab).</a></p>";
+    private static final String COMPLETE_IC_BODY = "<hr>"
+        + "<h3>What happens next</h3>"
+        + "<p>A tribunal caseworker will act on any instructions set out in your initial consideration to progress "
+        + "the case. "
+        + "You can <a href=\"/cases/case-details/${[CASE_REFERENCE]}#Documents\" target=\"_blank\">view the initial "
+        + "consideration document in the Documents tab (opens in new tab).</a></p>";
 
     @PostMapping(value = "/completeInitialConsideration", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "completes the Initial Consideration flow")
@@ -59,9 +60,10 @@ public class InitialConsiderationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        return ResponseEntity.ok(CCDCallbackResponse.builder().confirmation_header(COMPLETE_IC_HDR).confirmation_body(
-                COMPLETE_IC_BODY).
-            build());
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+            .confirmation_header(COMPLETE_IC_HDR)
+            .confirmation_body(COMPLETE_IC_BODY)
+            .build());
     }
 
     @PostMapping(value = "/startInitialConsideration", consumes = APPLICATION_JSON_VALUE)

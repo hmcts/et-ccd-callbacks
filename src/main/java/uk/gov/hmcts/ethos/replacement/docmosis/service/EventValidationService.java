@@ -215,10 +215,10 @@ public class EventValidationService {
 
     private void addInvalidDisposalDateError(List<HearingTypeItem> hearingTypeItems, String disposalDate, List<String> errors) {
 
+        LocalDate d = LocalDate.parse(disposalDate);
+        LocalDateTime dt = d.atTime(0,0, 0, 0);
         if (HearingsHelper.isDateInFuture(
-                LocalDateTime.parse(
-                        disposalDate, OLD_DATE_TIME_PATTERN
-                ).toLocalDate().toString(), LocalDateTime.now())
+                dt.toString(), LocalDateTime.now())
         ) {
             errors.add(DISPOSAL_DATE_IN_FUTURE);
             return;
@@ -229,7 +229,7 @@ public class EventValidationService {
                     continue;
                 }
                 for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
-                    if (disposalDate.equals(dateListedTypeItem.getValue().getListedDate())) {
+                    if (areDatesEqual(disposalDate, dateListedTypeItem.getValue().getListedDate())) {
                         return;
                     }
                 }
@@ -237,6 +237,10 @@ public class EventValidationService {
         }
           errors.add(DISPOSAL_DATE_HEARING_DATE_MATCH);
 
+    }
+
+    private boolean areDatesEqual(String disposalDate, String hearingDate)  {
+        return disposalDate.split("T")[0].equals(hearingDate.split("T")[0]);
     }
 
     private void validateJurisdictionCodesExistenceInJudgement(CaseData caseData, List<String> errors) {

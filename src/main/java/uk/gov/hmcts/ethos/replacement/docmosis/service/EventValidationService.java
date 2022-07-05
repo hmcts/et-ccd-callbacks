@@ -2,13 +2,14 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.base.Strings;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
@@ -202,7 +203,7 @@ public class EventValidationService {
     }
 
     private void validateDisposalDate(CaseData caseData, List<String> errors) {
-        if (CollectionUtils.isEmpty(caseData.getJurCodesCollection())) {
+        if (caseData.getJurCodesCollection() == null) {
             return;
         }
         caseData.getJurCodesCollection()
@@ -225,25 +226,25 @@ public class EventValidationService {
     }
 
     private boolean checkIfHearingDateMatchesWithDisposalDate(List<HearingTypeItem> hearingTypeItems, String disposalDate) {
-        for (HearingTypeItem hearingTypeItem : hearingTypeItems) {
-            if (CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
-                continue;
-            }
-            for (DateListedTypeItem dateListedTypeItem : hearingTypeItem.getValue().getHearingDateCollection()) {
-                if (areDatesEqual(disposalDate, dateListedTypeItem.getValue().getListedDate())) {
-                    return true;
-                }
-            }
+        return hearingTypeItems.stream().anyMatch(i -> compareHearingDates(i, disposalDate));
+    }
+
+    private boolean compareHearingDates(HearingTypeItem hearingTypeItem, String disposalDate) {
+        if (hearingTypeItem.getValue().getHearingDateCollection() == null) {
+            return false;
         }
-        return false;
+        return hearingTypeItem.getValue()
+                .getHearingDateCollection()
+                .stream()
+                .anyMatch(
+                        i -> areDatesEqual(disposalDate,
+                                i.getValue().getListedDate()));
     }
 
     private boolean isDisposalDateInFuture(String disposalDate, List<String> errors) {
-        LocalDate d = LocalDate.parse(disposalDate);
-        LocalDateTime dt = d.atTime(0,0, 0, 0);
-        if (HearingsHelper.isDateInFuture(
-                dt.toString(), LocalDateTime.now())
-        ) {
+        LocalDateTime dateTime = LocalDate.parse(disposalDate).atStartOfDay();
+        if (dateTime.atZone(ZoneId.of("Europe/London"))
+                .isAfter(LocalDateTime.now().atZone(ZoneId.of("UTC")))) {
             errors.add(DISPOSAL_DATE_IN_FUTURE);
             return true;
         } else {
@@ -252,7 +253,9 @@ public class EventValidationService {
     }
 
     private boolean areDatesEqual(String disposalDate, String hearingDate)  {
-        return LocalDate.parse(disposalDate).equals(LocalDateTime.parse(hearingDate).toLocalDate());
+        LocalDate dDate = LocalDate.parse(disposalDate);
+        LocalDate hDate = LocalDateTime.parse(hearingDate).toLocalDate();
+        return dDate.compareTo(hDate) == 0;
     }
 
     private void validateJurisdictionCodesExistenceInJudgement(CaseData caseData, List<String> errors) {

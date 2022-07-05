@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -404,7 +404,8 @@ class EventValidationServiceTest {
     void shouldValidateDisposalDateInFuture() {
         List<String> errors = new ArrayList<>();
         eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(FUTURE_RECEIPT_DATE.toString()), errors);
-        assertThat(errors.get(0)).isEqualTo(EventValidationService.DISPOSAL_DATE_IN_FUTURE);
+        assertThat(errors.get(0))
+                .isEqualTo(EventValidationService.DISPOSAL_DATE_IN_FUTURE);
     }
 
     private HearingTypeItem setHearing(String hearingDate) {
@@ -440,14 +441,16 @@ class EventValidationServiceTest {
     void disposalDateNoMatchWithHearingDate() {
         List<String> errors = new ArrayList<>();
         eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(DISPOSAL_DATE_NO_MATCH), errors);
-        assertThat(errors.get(0)).isEqualTo(EventValidationService.DISPOSAL_DATE_HEARING_DATE_MATCH);
+        assertThat(errors.get(0))
+                .isEqualTo(EventValidationService.DISPOSAL_DATE_HEARING_DATE_MATCH);
     }
 
     @Test
     void disposalDateMatchWithHearingDate() {
         List<String> errors = new ArrayList<>();
         eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(DISPOSAL_DATE), errors);
-        assertThat(errors).asList().isEmpty();
+        assertThat(errors).asList()
+                .isEmpty();
     }
 
     @ParameterizedTest
@@ -756,6 +759,7 @@ class EventValidationServiceTest {
         var caseWithNoHearings = invalidJudgeAllocationCaseDetails.getCaseData();
         caseWithNoHearings.getHearingCollection().clear();
         eventValidationService.validateHearingJudgeAllocationForCaseCloseEvent(caseWithNoHearings, errors);
-        assertThat(errors).asList().isEmpty();
+        assertThat(errors)
+                .isEmpty();
     }
 }

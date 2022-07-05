@@ -379,7 +379,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
      void bulkCreationLogic() {
         BulkRequestPayload bulkRequestPayload = bulkCreationService.bulkCreationLogic(getBulkDetails(YES, "Single"),
                 bulkCasesPayload, "authToken", BULK_CREATION_STEP);
-        assertThat(bulkRequestPayload.getBulkDetails().toString()).hasToString(RESULT);
+        assertThat(bulkRequestPayload.getBulkDetails().toString())
+        .hasToString(RESULT);
     }
 
     @Test

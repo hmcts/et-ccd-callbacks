@@ -78,9 +78,10 @@ class EventValidationServiceTest {
     private static final LocalDate PAST_RESPONSE_RECEIVED_DATE = LocalDate.now().minusDays(1);
     private static final LocalDate CURRENT_RESPONSE_RECEIVED_DATE = LocalDate.now();
     private static final LocalDate FUTURE_RESPONSE_RECEIVED_DATE = LocalDate.now().plusDays(1);
-    private static final String DISPOSAL_DATE = "2022-06-30";
-    private static final String HEARING_DATE = "2020-05-01T10:10:00.000";
-
+    private static final String DISPOSAL_DATE = "2022-05-01";
+    private static final String DISPOSAL_DATE_NO_MATCH = "2022-05-15";
+    private static final String HEARING_DATE = "2022-05-01T10:10:00.000";
+    private static final String HEARING_DATE2 = "2022-06-30T10:10:00.000";
     private EventValidationService eventValidationService;
 
     private CaseDetails caseDetails1;
@@ -402,7 +403,7 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateDisposalDateInFuture() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(FUTURE_RECEIPT_DATE.toString(), HEARING_DATE), errors);
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(FUTURE_RECEIPT_DATE.toString()), errors);
         assertThat(errors.get(0)).isEqualTo(EventValidationService.DISPOSAL_DATE_IN_FUTURE);
     }
 
@@ -420,9 +421,9 @@ class EventValidationServiceTest {
         return hearingTypeItem;
     }
 
-    private CaseData setCaseDataForDisposalDateTest(String disposalDate, String hearingDate) {
+    private CaseData setCaseDataForDisposalDateTest(String disposalDate) {
         CaseData caseData = new CaseData();
-        HearingTypeItem hearingTypeItem1 = setHearing(hearingDate);
+        HearingTypeItem hearingTypeItem1 = setHearing(HEARING_DATE2);
         HearingTypeItem hearingTypeItem2 = setHearing(HEARING_DATE);
         caseData.setHearingCollection(Arrays.asList(hearingTypeItem1, hearingTypeItem2));
         JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
@@ -438,14 +439,14 @@ class EventValidationServiceTest {
     @Test
     void disposalDateNoMatchWithHearingDate() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(DISPOSAL_DATE, HEARING_DATE), errors);
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(DISPOSAL_DATE_NO_MATCH), errors);
         assertThat(errors.get(0)).isEqualTo(EventValidationService.DISPOSAL_DATE_HEARING_DATE_MATCH);
     }
 
     @Test
     void disposalDateMatchWithHearingDate() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(DISPOSAL_DATE, DISPOSAL_DATE), errors);
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(DISPOSAL_DATE), errors);
         assertThat(errors).asList().isEmpty();
     }
 

@@ -80,6 +80,7 @@ class EventValidationServiceTest {
     private static final LocalDate CURRENT_RESPONSE_RECEIVED_DATE = LocalDate.now();
     private static final LocalDate FUTURE_RESPONSE_RECEIVED_DATE = LocalDate.now().plusDays(1);
     private static final String DISPOSAL_DATE = "2022-06-30";
+    private static final String HEARING_DATE = "2020-05-01T10:10:00.000";
 
     private EventValidationService eventValidationService;
 
@@ -402,7 +403,7 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateDisposalDateInFuture() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest("2777-12-23", "2022-01-20T00:00:00.000"), errors);
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(FUTURE_RECEIPT_DATE.toString(), HEARING_DATE), errors);
         assertThat(errors.get(0)).isEqualTo(EventValidationService.DISPOSAL_DATE_IN_FUTURE);
     }
 
@@ -423,7 +424,7 @@ class EventValidationServiceTest {
     private CaseData setCaseDataForDisposalDateTest(String disposalDate, String hearingDate) {
         CaseData caseData = new CaseData();
         HearingTypeItem hearingTypeItem1 = setHearing(hearingDate);
-        HearingTypeItem hearingTypeItem2 = setHearing("2021-01-01T00:00:00.000");
+        HearingTypeItem hearingTypeItem2 = setHearing(HEARING_DATE);
         caseData.setHearingCollection(Arrays.asList(hearingTypeItem1, hearingTypeItem2));
         JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
         jurCodesTypeItem.setId(UUID.randomUUID().toString());
@@ -438,14 +439,14 @@ class EventValidationServiceTest {
     @Test
     void disposalDateNoMatchWithHearingDate() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest("2022-06-30", "2020-05-01T10:10:00.000"), errors);
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(DISPOSAL_DATE, HEARING_DATE), errors);
         assertThat(errors.get(0)).isEqualTo(EventValidationService.DISPOSAL_DATE_HEARING_DATE_MATCH);
     }
 
     @Test
     void disposalDateMatchWithHearingDate() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest("2022-06-30", "2022-06-30T00:00:00.000"), errors);
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(DISPOSAL_DATE, DISPOSAL_DATE), errors);
         assertThat(errors).asList().isEmpty();
     }
 

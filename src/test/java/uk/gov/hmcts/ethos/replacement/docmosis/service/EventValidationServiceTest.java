@@ -79,6 +79,7 @@ class EventValidationServiceTest {
     private static final LocalDate PAST_RESPONSE_RECEIVED_DATE = LocalDate.now().minusDays(1);
     private static final LocalDate CURRENT_RESPONSE_RECEIVED_DATE = LocalDate.now();
     private static final LocalDate FUTURE_RESPONSE_RECEIVED_DATE = LocalDate.now().plusDays(1);
+    private static final String DISPOSAL_DATE = "2022-06-30";
 
     private EventValidationService eventValidationService;
 
@@ -401,7 +402,7 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateDisposalDateInFuture() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest("2777-12-23","2022-01-20T00:00:00.000"), errors);
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest("2777-12-23", "2022-01-20T00:00:00.000"), errors);
         assertEquals(EventValidationService.DISPOSAL_DATE_IN_FUTURE, errors.get(0));
     }
 
@@ -744,8 +745,8 @@ class EventValidationServiceTest {
         List<String> errors = new ArrayList<>();
         var invalidCase = invalidJudgeAllocationCaseDetails.getCaseData();
         eventValidationService.validateHearingJudgeAllocationForCaseCloseEvent(invalidCase, errors);
-        assertEquals(1, errors.size());
-        assertEquals(CLOSING_HEARD_CASE_WITH_NO_JUDGE_ERROR, errors.get(0));
+        assertThat(errors.size()).isEqualTo(1);
+        assertThat(errors.get(0)).isEqualTo(CLOSING_HEARD_CASE_WITH_NO_JUDGE_ERROR);
     }
 
     @Test
@@ -754,7 +755,6 @@ class EventValidationServiceTest {
         var caseWithNoHearings = invalidJudgeAllocationCaseDetails.getCaseData();
         caseWithNoHearings.getHearingCollection().clear();
         eventValidationService.validateHearingJudgeAllocationForCaseCloseEvent(caseWithNoHearings, errors);
-        assertEquals(0, errors.size());
+        assertThat(errors).asList().isEmpty();
     }
-
 }

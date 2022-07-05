@@ -202,24 +202,19 @@ public class EventValidationService {
     }
 
     private void validateDisposalDate(CaseData caseData, List<String> errors) {
-        if (CollectionUtils.isNotEmpty(caseData.getJurCodesCollection())) {
-            for (JurCodesTypeItem jurCodesTypeItem : caseData.getJurCodesCollection()) {
-                String disposalDate = jurCodesTypeItem.getValue().getDisposalDate();
-                if (!Strings.isNullOrEmpty(disposalDate)) {
-                    addInvalidDisposalDateError(caseData.getHearingCollection(), disposalDate, errors);
-                }
-            }
+        if (CollectionUtils.isEmpty(caseData.getJurCodesCollection())) {
+            return;
         }
+        caseData.getJurCodesCollection()
+                        .forEach(item -> addInvalidDisposalDateError(
+                                caseData.getHearingCollection(),
+                                item.getValue().getDisposalDate(),
+                                errors));
     }
 
     private void addInvalidDisposalDateError(List<HearingTypeItem> hearingTypeItems, String disposalDate, List<String> errors) {
 
-        LocalDate d = LocalDate.parse(disposalDate);
-        LocalDateTime dt = d.atTime(0,0, 0, 0);
-        if (HearingsHelper.isDateInFuture(
-                dt.toString(), LocalDateTime.now())
-        ) {
-            errors.add(DISPOSAL_DATE_IN_FUTURE);
+        if(Strings.isNullOrEmpty(disposalDate) || isDisposalDateInFuture(disposalDate, errors)) {
             return;
         }
         if (CollectionUtils.isNotEmpty(hearingTypeItems)) {
@@ -235,11 +230,25 @@ public class EventValidationService {
             }
         }
         errors.add(DISPOSAL_DATE_HEARING_DATE_MATCH);
+    }
 
+    private boolean isDisposalDateInFuture(String disposalDate, List<String> errors) {
+        LocalDate d = LocalDate.parse(disposalDate);
+        LocalDateTime dt = d.atTime(0,0, 0, 0);
+        if (HearingsHelper.isDateInFuture(
+                dt.toString(), LocalDateTime.now())
+        ) {
+            errors.add(DISPOSAL_DATE_IN_FUTURE);
+            return true;
+        }
+
+        else {
+            return false;
+        }
     }
 
     private boolean areDatesEqual(String disposalDate, String hearingDate)  {
-        return disposalDate.split("T")[0].equals(hearingDate.split("T")[0]);
+        return LocalDate.parse(disposalDate).equals(LocalDateTime.parse(hearingDate).toLocalDate());
     }
 
     private void validateJurisdictionCodesExistenceInJudgement(CaseData caseData, List<String> errors) {

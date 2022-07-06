@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.base.Strings;
+import java.time.ZonedDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -254,9 +255,11 @@ public class EventValidationService {
     }
 
     private boolean isDisposalDateInFuture(String disposalDate, List<String> errors) {
-        LocalDateTime dateTime = LocalDate.parse(disposalDate).atStartOfDay();
-        if (dateTime.atZone(ZoneId.of("Europe/London"))
-                .isAfter(LocalDateTime.now().atZone(ZoneId.of("UTC")))) {
+        //During day light saving times, the comparison won't work if we don't consider zones while comparing them
+        // Azure has always UTC time but user's times change in summer and winters, we need to use ZonedDateTime.
+        ZonedDateTime disposalDateTime = LocalDate.parse(disposalDate).atStartOfDay().atZone(ZoneId.of("Europe/London"));
+        ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.of("UTC"));
+        if (disposalDateTime.isAfter(now)) {
             errors.add(DISPOSAL_DATE_IN_FUTURE);
             return true;
         } else {

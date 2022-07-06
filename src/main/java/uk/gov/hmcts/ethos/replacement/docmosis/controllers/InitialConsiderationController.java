@@ -60,11 +60,9 @@ public class InitialConsiderationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        String.format(COMPLETE_IC_BODY, ccdRequest.getCaseDetails().getCaseId());
-
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .confirmation_header(COMPLETE_IC_HDR)
-            .confirmation_body(COMPLETE_IC_BODY)
+            .confirmation_body(String.format(COMPLETE_IC_BODY, ccdRequest.getCaseDetails().getCaseId()))
             .build());
     }
 

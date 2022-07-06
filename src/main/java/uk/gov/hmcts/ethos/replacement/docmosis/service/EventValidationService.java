@@ -72,8 +72,9 @@ public class EventValidationService {
 
     private static final List<String> INVALID_STATES_FOR_CLOSED_CURRENT_POSITION = List.of(
             SUBMITTED_STATE, ACCEPTED_STATE, REJECTED_STATE);
-    public static final String DISPOSAL_DATE_IN_FUTURE = "Disposal Date can't be in the future.";
-    public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "Disposal Date must match one of the hearing dates";
+    public static final String DISPOSAL_DATE_IN_FUTURE = "Disposal Date can't be in the future for jurisdiction code %s.";
+    public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "Disposal Date must match one of the " +
+            "hearing dates for jurisdiction code %s.";
 
     public List<String> validateReceiptDate(CaseData caseData) {
         List<String> errors = new ArrayList<>();
@@ -223,18 +224,19 @@ public class EventValidationService {
                         .forEach(item -> addInvalidDisposalDateError(
                                 caseData.getHearingCollection(),
                                 item.getValue().getDisposalDate(),
-                                errors));
+                                errors, item.getValue().getJuridictionCodesList()));
     }
 
-    private void addInvalidDisposalDateError(List<HearingTypeItem> hearingTypeItems, String disposalDate, List<String> errors) {
+    private void addInvalidDisposalDateError(List<HearingTypeItem> hearingTypeItems,
+                                             String disposalDate, List<String> errors, String jurCode) {
 
-        if(Strings.isNullOrEmpty(disposalDate) || isDisposalDateInFuture(disposalDate, errors)) {
+        if(Strings.isNullOrEmpty(disposalDate) || isDisposalDateInFuture(disposalDate, errors, jurCode)) {
             return;
         }
 
          if (CollectionUtils.isEmpty(hearingTypeItems) ||
                  !checkIfHearingDateMatchesWithDisposalDate(hearingTypeItems, disposalDate)) {
-             errors.add(DISPOSAL_DATE_HEARING_DATE_MATCH);
+             errors.add(String.format(DISPOSAL_DATE_HEARING_DATE_MATCH, jurCode));
          }
     }
 
@@ -254,13 +256,13 @@ public class EventValidationService {
                                 i.getValue().getListedDate()));
     }
 
-    private boolean isDisposalDateInFuture(String disposalDate, List<String> errors) {
+    private boolean isDisposalDateInFuture(String disposalDate, List<String> errors, String jurCode) {
         //During day light saving times, the comparison won't work if we don't consider zones while comparing them
         // Azure has always UTC time but user's times change in summer and winters, we need to use ZonedDateTime.
         ZonedDateTime disposalDateTime = LocalDate.parse(disposalDate).atStartOfDay().atZone(ZoneId.of("Europe/London"));
         ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.of("UTC"));
         if (disposalDateTime.isAfter(now)) {
-            errors.add(DISPOSAL_DATE_IN_FUTURE);
+            errors.add(String.format(DISPOSAL_DATE_IN_FUTURE, jurCode));
             return true;
         }
             return false;

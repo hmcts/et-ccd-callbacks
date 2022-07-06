@@ -176,42 +176,35 @@ public class Et1VettingService {
 
     private void populateRespondentAcasDetailsMarkUp(CaseData caseData) {
         List<RespondentSumTypeItem> respondentList = caseData.getRespondentCollection();
-        if (respondentList.size() > 0) {
-            caseData.setEt1VettingRespondentAcasDetails1(
-                generateRespondentAndAcasDetails(respondentList.get(0).getValue(), 1));
-        }
-        if (respondentList.size() > 1) {
-            caseData.setEt1VettingRespondentAcasDetails2(
-                generateRespondentAndAcasDetails(respondentList.get(1).getValue(), 2));
-        }
-        if (respondentList.size() > 2) {
-            caseData.setEt1VettingRespondentAcasDetails3(
-                generateRespondentAndAcasDetails(respondentList.get(2).getValue(), 3));
-        }
-        if (respondentList.size() > 3) {
-            caseData.setEt1VettingRespondentAcasDetails4(
-                generateRespondentAndAcasDetails(respondentList.get(3).getValue(), 4));
-        }
-        if (respondentList.size() > 4) {
-            caseData.setEt1VettingRespondentAcasDetails5(
-                generateRespondentAndAcasDetails(respondentList.get(4).getValue(), 5));
-        }
-        if (respondentList.size() > 5) {
-            caseData.setEt1VettingRespondentAcasDetails6(
-                generateRespondentAndAcasDetails(respondentList.get(5).getValue(), 6));
+        switch (respondentList.size()) {
+            case 6:
+                caseData.setEt1VettingRespondentAcasDetails6(
+                    generateRespondentAndAcasDetails(respondentList.get(5).getValue(), 6));
+            case 5:
+                caseData.setEt1VettingRespondentAcasDetails5(
+                    generateRespondentAndAcasDetails(respondentList.get(4).getValue(), 5));
+            case 4:
+                caseData.setEt1VettingRespondentAcasDetails4(
+                    generateRespondentAndAcasDetails(respondentList.get(3).getValue(), 4));
+            case 3:
+                caseData.setEt1VettingRespondentAcasDetails3(
+                    generateRespondentAndAcasDetails(respondentList.get(2).getValue(), 3));
+            case 2:
+                caseData.setEt1VettingRespondentAcasDetails2(
+                    generateRespondentAndAcasDetails(respondentList.get(1).getValue(), 2));
+            case 1:
+                caseData.setEt1VettingRespondentAcasDetails1(
+                    generateRespondentAndAcasDetails(respondentList.get(0).getValue(), 1));
+                break;
         }
     }
 
     private String generateRespondentAndAcasDetails(RespondentSumType respondent, int respondentNumber) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format(RESPONDENT_ACAS_DETAILS, respondentNumber, respondent.getRespondentName(),
-            toAddressWithTab(respondent.getRespondentAddress())));
-        sb.append(respondent.getRespondentACAS() == null
+        return String.format(RESPONDENT_ACAS_DETAILS, respondentNumber, respondent.getRespondentName(),
+            toAddressWithTab(respondent.getRespondentAddress()))
+            + (respondent.getRespondentACAS() == null
             ? NO_ACAS_CERT_DISPLAY : String.format(ACAS_CERT_LIST_DISPLAY, respondent.getRespondentACAS()));
-
-        return sb.toString();
     }
-
 
     /**
      * Generate the Existing Jurisdiction Code list in HTML.

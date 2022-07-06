@@ -199,11 +199,13 @@ class Et1VettingServiceTest {
     }
 
     @Test
-    void initialBeforeYouStart_TwoRespondentDetails_shouldReturnMarkUp() {
+    void initialBeforeYouStart_returnRespondentDetailsMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
         String expected = String.format(RESPONDENT_DETAILS, "1", "Antonio Vazquez",
                 "11 Small Street" + BR_WITH_TAB + "22 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M12 42R")
                 + String.format(RESPONDENT_DETAILS, "2", "Juan Garcia",
+                "32 Sweet Street" + BR_WITH_TAB + "14 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M11 4ED")
+                + String.format(RESPONDENT_DETAILS, "3", "Juan Garcia",
                 "32 Sweet Street" + BR_WITH_TAB + "14 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M11 4ED");
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentDetailsMarkUp())
                 .isEqualTo(expected);

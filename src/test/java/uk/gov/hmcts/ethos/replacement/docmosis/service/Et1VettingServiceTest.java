@@ -22,7 +22,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -72,7 +71,45 @@ class Et1VettingServiceTest {
         + "<h3>Respondent</h3><pre>Contact address &#09&#09 11 Small Street"
         + "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 22 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
         + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M12 42R</pre><hr>";
-
+    private static final String EXPECTED_RESPONDENT1_ACAS_DETAILS = "<hr><h3>Respondent 1</h3><pre>Name "
+        + "&#09&#09&#09&#09&#09&#09&nbsp; Antonio Vazquez<br><br>Contact address &#09&#09 11 Small Street<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 22 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M12 42R</pre><h3>Acas certificate</h3>Certificate number 1234/5678/90 "
+        + "has been provided.<br><br><br>";
+    private static final String EXPECTED_RESPONDENT2_ACAS_DETAILS = "<hr><h3>Respondent 2</h3><pre>Name "
+        + "&#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><h3>Acas certificate</h3>Certificate number 2987/6543/01 "
+        + "has been provided.<br><br><br>";
+    private static final String EXPECTED_RESPONDENT3_ACAS_DETAILS = "<hr><h3>Respondent 3</h3><pre>Name "
+        + "&#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><h3>Acas certificate</h3>No certificate has been provided."
+        + "<br><br><br>";
+    private static final String EXPECTED_RESPONDENT4_ACAS_DETAILS = "<hr><h3>Respondent 4</h3><pre>Name "
+        + "&#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><h3>Acas certificate</h3>No certificate has been provided."
+        + "<br><br><br>";
+    private static final String EXPECTED_RESPONDENT5_ACAS_DETAILS = "<hr><h3>Respondent 5</h3><pre>Name "
+        + "&#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><h3>Acas certificate</h3>No certificate has been provided."
+        + "<br><br><br>";
+    private static final String EXPECTED_RESPONDENT_DETAILS = "<h3>Respondent 1</h3><pre>Name &#09&#09&#09&#09&#09&#0"
+        + "9&nbsp; Antonio Vazquez<br><br>Contact address &#09&#09 11 Small Street<br>&#09&#09&#09&#09&#09&#09&#09&#09&"
+        + "#09 22 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 M12 "
+        + "42R</pre><hr><h3>Respondent 2</h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact addres"
+        + "s &#09&#09 32 Sweet Street<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&"
+        + "#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><hr><h3>Respondent 3</h3><pre>Name &"
+        + "#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>&#09&#09&#09&#0"
+        + "9&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#0"
+        + "9&#09&#09&#09 M11 4ED</pre><hr><h3>Respondent 4</h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br>"
+        + "<br>Contact address &#09&#09 32 Sweet Street<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#0"
+        + "9&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><hr><h3>Respondent"
+        + " 5</h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<"
+        + "br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&"
+        + "#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><hr>";
     private final String et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
     private final String acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
     private final String acasBinaryUrl2 = "/documents/acas2222-4ef8ca1e3-8c60-d3d78808dca1/binary";
@@ -124,6 +161,14 @@ class Et1VettingServiceTest {
                     "32 Sweet Street", "14 House", null,
                     "Manchester", "M11 4ED", "United Kingdom",
                     null)
+            .withRespondentWithAddress("Juan Garcia",
+                "32 Sweet Street", "14 House", null,
+                "Manchester", "M11 4ED", "United Kingdom",
+                null)
+            .withRespondentWithAddress("Juan Garcia",
+                "32 Sweet Street", "14 House", null,
+                "Manchester", "M11 4ED", "United Kingdom",
+                null)
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseId(caseId);
     }
@@ -223,33 +268,23 @@ class Et1VettingServiceTest {
     @Test
     void initialBeforeYouStart_returnRespondentDetailsMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
-        String expected = String.format(RESPONDENT_DETAILS, "1", "Antonio Vazquez",
-                "11 Small Street" + BR_WITH_TAB + "22 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M12 42R")
-                + String.format(RESPONDENT_DETAILS, "2", "Juan Garcia",
-                "32 Sweet Street" + BR_WITH_TAB + "14 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M11 4ED")
-                + String.format(RESPONDENT_DETAILS, "3", "Juan Garcia",
-                "32 Sweet Street" + BR_WITH_TAB + "14 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M11 4ED");
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentDetailsMarkUp())
-                .isEqualTo(expected);
+                .isEqualTo(EXPECTED_RESPONDENT_DETAILS);
     }
 
     @Test
     void initialBeforeYouStart_returnRespondentAcasDetailsMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
-        String expectedRespondentAcasDetails1 = String.format(RESPONDENT_ACAS_DETAILS, 1, "Antonio Vazquez",
-            "11 Small Street" + BR_WITH_TAB + "22 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M12 42R",
-            "1234/5678/90");
-        String expectedRespondentAcasDetails2 = String.format(RESPONDENT_ACAS_DETAILS, 2, "Juan Garcia",
-            "32 Sweet Street" + BR_WITH_TAB + "14 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M11 4ED",
-            "2987/6543/01");
-        String expectedRespondentAcasDetails3 = String.format(RESPONDENT_NO_ACAS_DETAILS, 3, "Juan Garcia",
-            "32 Sweet Street" + BR_WITH_TAB + "14 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M11 4ED");
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
-            .isEqualTo(expectedRespondentAcasDetails1);
+            .isEqualTo(EXPECTED_RESPONDENT1_ACAS_DETAILS);
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails2())
-            .isEqualTo(expectedRespondentAcasDetails2);
+            .isEqualTo(EXPECTED_RESPONDENT2_ACAS_DETAILS);
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails3())
-            .isEqualTo(expectedRespondentAcasDetails3);
+            .isEqualTo(EXPECTED_RESPONDENT3_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails4())
+            .isEqualTo(EXPECTED_RESPONDENT4_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails5())
+            .isEqualTo(EXPECTED_RESPONDENT5_ACAS_DETAILS);
     }
 
     @Test

@@ -11,6 +11,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,7 +46,8 @@ class Et3VettingServiceTest {
         et3VettingService.saveEt3VettingToRespondent(caseData);
         var result = caseData.getRespondentCollection().get(0).getValue();
 
-        assertThat(result.getEt3VettingCompleted(), is(YES));
+        assertThat(result.getEt3VettingCompleted(),
+            equalTo(YES));
     }
 
     @Test
@@ -73,6 +75,7 @@ class Et3VettingServiceTest {
         caseData.setEt3ChooseRespondent(respondentList);
 
         et3VettingService.restoreEt3VettingFromRespondentOntoCaseData(caseData);
-        assertThat(caseData.getEt3NoEt3Response(), is("Test data"));
+        assertThat(caseData.getEt3NoEt3Response(),
+            equalTo("Test data"));
     }
 }

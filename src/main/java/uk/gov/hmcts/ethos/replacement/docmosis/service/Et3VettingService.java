@@ -14,7 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
 import java.util.Optional;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.objectMapper;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.intersectProperties;
 
 @Slf4j
 @Service()
@@ -58,8 +58,8 @@ public class Et3VettingService {
         try {
             mapper.updateValue(caseData, et3VettingType);
         } catch (JsonMappingException e) {
-            log.error(String.format("Failed to restore et3 data for case %s because %s",
-                caseData.getEthosCaseReference(), e.getMessage()));
+            log.error(String.format("Failed to restore et3 data for case %s: %s",
+                caseData.getEthosCaseReference(), e));
         }
     }
 
@@ -88,6 +88,6 @@ public class Et3VettingService {
     }
 
     private Et3VettingType copyEt3FieldsFromCaseDataToRespondent(CaseData caseData) {
-        return (Et3VettingType) objectMapper(caseData, Et3VettingType.class);
+        return (Et3VettingType) intersectProperties(caseData, Et3VettingType.class);
     }
 }

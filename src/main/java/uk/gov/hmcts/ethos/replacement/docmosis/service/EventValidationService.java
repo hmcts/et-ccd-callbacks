@@ -262,9 +262,8 @@ public class EventValidationService {
         if (disposalDateTime.isAfter(now)) {
             errors.add(DISPOSAL_DATE_IN_FUTURE);
             return true;
-        } else {
-            return false;
         }
+            return false;
     }
 
     private boolean areDatesEqual(String disposalDate, String hearingDate)  {

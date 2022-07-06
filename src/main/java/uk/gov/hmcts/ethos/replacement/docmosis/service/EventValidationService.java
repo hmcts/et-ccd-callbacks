@@ -76,6 +76,7 @@ public class EventValidationService {
     public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "Disposal Date must match one of the " +
             "hearing dates for jurisdiction code %s.";
 
+
     public List<String> validateReceiptDate(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         var dateOfReceipt = LocalDate.parse(caseData.getReceiptDate());
@@ -231,12 +232,14 @@ public class EventValidationService {
                                              String disposalDate, List<String> errors, String jurCode) {
 
         if(Strings.isNullOrEmpty(disposalDate) || isDisposalDateInFuture(disposalDate, errors, jurCode)) {
+
             return;
         }
 
          if (CollectionUtils.isEmpty(hearingTypeItems) ||
                  !checkIfHearingDateMatchesWithDisposalDate(hearingTypeItems, disposalDate)) {
              errors.add(String.format(DISPOSAL_DATE_HEARING_DATE_MATCH, jurCode));
+
          }
     }
 
@@ -257,12 +260,14 @@ public class EventValidationService {
     }
 
     private boolean isDisposalDateInFuture(String disposalDate, List<String> errors, String jurCode) {
+
         //During day light saving times, the comparison won't work if we don't consider zones while comparing them
         // Azure has always UTC time but user's times change in summer and winters, we need to use ZonedDateTime.
         ZonedDateTime disposalDateTime = LocalDate.parse(disposalDate).atStartOfDay().atZone(ZoneId.of("Europe/London"));
         ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.of("UTC"));
         if (disposalDateTime.isAfter(now)) {
             errors.add(String.format(DISPOSAL_DATE_IN_FUTURE, jurCode));
+
             return true;
         }
             return false;

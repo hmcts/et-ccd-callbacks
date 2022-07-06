@@ -406,6 +406,7 @@ class EventValidationServiceTest {
         eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(FUTURE_RECEIPT_DATE.toString()), errors);
         assertThat(errors.get(0))
                 .isEqualTo(String.format(EventValidationService.DISPOSAL_DATE_IN_FUTURE, "blah blah"));
+
     }
 
     private HearingTypeItem setHearing(String hearingDate) {
@@ -443,6 +444,7 @@ class EventValidationServiceTest {
         eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(DISPOSAL_DATE_NO_MATCH), errors);
         assertThat(errors.get(0))
                 .isEqualTo(String.format(EventValidationService.DISPOSAL_DATE_HEARING_DATE_MATCH, "blah blah"));
+
     }
 
     @Test

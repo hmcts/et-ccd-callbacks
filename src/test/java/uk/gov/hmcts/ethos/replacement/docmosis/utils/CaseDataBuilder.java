@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import com.google.common.base.Strings;
+import lombok.val;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
@@ -135,15 +137,15 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withHearingSession(int hearingIndex, String number, String listedDate, String hearingStatus,
                                               boolean disposed) {
-        var hearing = caseData.getHearingCollection().get(hearingIndex);
-
-        var dateListedType = new DateListedType();
+        DateListedType dateListedType = new DateListedType();
         dateListedType.setListedDate(listedDate);
         dateListedType.setHearingStatus(hearingStatus);
         dateListedType.setHearingCaseDisposed(disposed ? YES : NO);
-        var dateListedTypeItem = new DateListedTypeItem();
+
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setValue(dateListedType);
 
+        HearingTypeItem hearing = caseData.getHearingCollection().get(hearingIndex);
         if (hearing.getValue().getHearingDateCollection() == null) {
             hearing.getValue().setHearingDateCollection(new ArrayList<>());
         }
@@ -262,6 +264,16 @@ public class CaseDataBuilder {
         claimantType.setClaimantAddressUK(
                 createAddress(addressLine1, addressLine2, addressLine3, postTown, null, postCode, country));
         caseData.setClaimantType(claimantType);
+        return this;
+    }
+
+    public CaseDataBuilder withClaimantWorkAddress(String addressLine1, String addressLine2, String addressLine3,
+                                                   String postTown, String postCode, String country) {
+        ClaimantWorkAddressType claimantWorkAddress = new ClaimantWorkAddressType();
+        claimantWorkAddress.setClaimantWorkAddress(
+            createAddress(addressLine1, addressLine2, addressLine3, postTown, null, postCode, country)
+        );
+        caseData.setClaimantWorkAddress(claimantWorkAddress);
         return this;
     }
 

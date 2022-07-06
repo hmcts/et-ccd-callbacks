@@ -1,8 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -13,22 +17,29 @@ import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice.JpaVenueService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.MANCHESTER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_OPEN;
 
+@ExtendWith(SpringExtension.class)
 class Et1VettingServiceTest {
 
+    @InjectMocks
     private Et1VettingService et1VettingService;
+
     private CaseDetails caseDetails;
+
+    @Mock
+    private JpaVenueService jpaVenueService;
 
     private static final String ET1_DOC_TYPE = "ET1";
     private static final String ACAS_DOC_TYPE = "ACAS Certificate";
@@ -52,6 +63,15 @@ class Et1VettingServiceTest {
     private static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
     private static final String DAG = JurisdictionCode.DAG.name();
     private static final String PID = JurisdictionCode.PID.name();
+
+    private static final String EXPECTED_ADDRESSES_HTML = "<hr><h2>Listing details<hr><h3>Claimant</h3>"
+        + "<pre>Contact address &#09&#09 232 Petticoat Square<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 3 House<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 London<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 W10 4AG</pre><br>"
+        + "<pre>Work address &#09&#09&#09 11 Small Street<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 22 House<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 M12 42R</pre><hr>"
+        + "<h3>Respondent</h3><pre>Contact address &#09&#09 11 Small Street"
+        + "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 22 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M12 42R</pre><hr>";
 
     private final String et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
     private final String acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
@@ -85,20 +105,22 @@ class Et1VettingServiceTest {
 
     @BeforeEach
     void setUp() {
-        et1VettingService = new Et1VettingService();
+        et1VettingService = new Et1VettingService(jpaVenueService);
         caseDetails = CaseDataBuilder.builder()
-                .withClaimantIndType("Doris", "Johnson")
-                .withClaimantType("232 Petticoat Square", "3 House", null,
+            .withClaimantIndType("Doris", "Johnson")
+            .withClaimantType("232 Petticoat Square", "3 House", null,
                         "London", "W10 4AG", "United Kingdom")
-                .withRespondentWithAddress("Antonio Vazquez",
-                        "11 Small Street", "22 House", null,
-                        "Manchester", "M12 42R", "United Kingdom",
-                        "1234/5678/90")
-                .withRespondentWithAddress("Juan Garcia",
-                        "32 Sweet Street", "14 House", null,
-                        "Manchester", "M11 4ED", "United Kingdom",
-                        "2987/6543/01")
-                .withRespondentWithAddress("Juan Garcia",
+            .withClaimantWorkAddress("11 Small Street", "22 House", null,
+                "Manchester", "M12 42R", "United Kingdom")
+            .withRespondentWithAddress("Antonio Vazquez",
+                    "11 Small Street", "22 House", null,
+                    "Manchester", "M12 42R", "United Kingdom",
+                    "1234/5678/90")
+            .withRespondentWithAddress("Juan Garcia",
+                    "32 Sweet Street", "14 House", null,
+                    "Manchester", "M11 4ED", "United Kingdom",
+                    "2987/6543/01")
+            .withRespondentWithAddress("Juan Garcia",
                     "32 Sweet Street", "14 House", null,
                     "Manchester", "M11 4ED", "United Kingdom",
                     null)
@@ -257,6 +279,25 @@ class Et1VettingServiceTest {
     }
 
     @Test
+    void testGettingHearingVenueAddressesHtml() {
+        caseDetails.getCaseData().setManagingOffice("Manchester");
+
+        assertThat(et1VettingService.getAddressesHtml(caseDetails.getCaseData()))
+            .isEqualTo(EXPECTED_ADDRESSES_HTML);
+    }
+
+    @Test
+    void testGeneratingHearingVenueList() {
+        caseDetails.getCaseData().setManagingOffice("Manchester");
+        DynamicValueType expectedHearingVenue = DynamicValueType.create("code", "Manchester hearing venue");
+
+        when(jpaVenueService.getVenues(MANCHESTER)).thenReturn(List.of(expectedHearingVenue));
+
+        assertThat(et1VettingService.getHearingVenuesList(caseDetails.getCaseData()).getListItems().get(0))
+            .isEqualTo(expectedHearingVenue);
+    }
+
+    @Test
     void populateEt1TrackAllocationHtml() {
         CaseData caseData = new CaseData();
         addJurCodeToVettingCollection(caseData, DAG);
@@ -289,13 +330,6 @@ class Et1VettingServiceTest {
         DocumentTypeItem documentTypeItem = new DocumentTypeItem();
         documentTypeItem.setValue(documentType);
         return documentTypeItem;
-    }
-
-    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
-        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource(jsonFileName)).toURI())));
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(json, CaseDetails.class);
     }
 
     private void addJurCodeToExistingCollection(CaseData caseData, String code) {

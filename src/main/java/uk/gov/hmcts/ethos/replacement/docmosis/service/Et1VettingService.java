@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.base.Strings;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice.JpaVenueService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.util.ArrayList;
@@ -35,12 +37,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrac
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class Et1VettingService {
-
     private static final String ET1_DOC_TYPE = "ET1";
     private static final String ACAS_DOC_TYPE = "ACAS Certificate";
-    private static final String CASE_TYPE_ENGLAND = "ET_EnglandWales";
-    private static final String CASE_TYPE_SCOTLAND = "ET_Scotland";
     private static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s"
             + "<br>Check the Documents tab for additional ET1 documents the claimant may have uploaded.";
     private static final String BEFORE_LABEL_ET1 =
@@ -50,10 +50,18 @@ public class Et1VettingService {
     private static final String BEFORE_LABEL_ACAS_OPEN_TAB =
             "<br><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"
                     + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
+
     private static final String CLAIMANT_DETAILS = "<hr><h3>Claimant</h3>"
             + "<pre>First name &#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Last name &#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Contact address &#09&#09 %s</pre>";
+
+    private static final String CLAIMANT_AND_RESPONDENT_ADDRESSES = "<hr><h2>Listing details<hr><h3>Claimant</h3>"
+        + "<pre>Contact address &#09&#09 %s</pre>"
+        + "<br><pre>Work address &#09&#09&#09 %s</pre><hr>"
+        + "<h3>Respondent</h3>"
+        + "<pre>Contact address &#09&#09 %s</pre><hr>";
+
     private static final String RESPONDENT_DETAILS = "<h3>Respondent %s</h3>"
         + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Contact address &#09&#09 %s</pre><hr>";
@@ -76,9 +84,11 @@ public class Et1VettingService {
     private static final String ERROR_SELECTED_JUR_CODE = "Jurisdiction code %s is selected more than once.";
 
     private static final String TRIBUNAL_ENGLAND = "England & Wales";
-    private static final String TRIBUNAL_Scotland = "Scotland";
+    private static final String TRIBUNAL_SCOTLAND = "Scotland";
     private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br><br><br>";
     private static final String NO_ACAS_CERT_DISPLAY = "No certificate has been provided.<br><br><br>";
+
+    private final JpaVenueService jpaVenueService;
 
     /**
      * Update et1VettingBeforeYouStart.
@@ -160,17 +170,17 @@ public class Et1VettingService {
         if (caseData.getRespondentCollection().size() == 1) {
             RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
             return String.format(RESPONDENT_DETAILS, "",
-                respondentSumType.getRespondentName(),
-                toAddressWithTab(respondentSumType.getRespondentAddress()));
+                    respondentSumType.getRespondentName(),
+                    toAddressWithTab(respondentSumType.getRespondentAddress()));
         } else {
             IntWrapper count = new IntWrapper(0);
             return caseData.getRespondentCollection()
-                .stream()
-                .map(r -> String.format(RESPONDENT_DETAILS,
-                    count.incrementAndReturnValue(),
-                    r.getValue().getRespondentName(),
-                    toAddressWithTab(r.getValue().getRespondentAddress())))
-                .collect(Collectors.joining());
+                    .stream()
+                    .map(r -> String.format(RESPONDENT_DETAILS,
+                            count.incrementAndReturnValue(),
+                            r.getValue().getRespondentName(),
+                            toAddressWithTab(r.getValue().getRespondentAddress())))
+                    .collect(Collectors.joining());
         }
     }
 
@@ -274,7 +284,7 @@ public class Et1VettingService {
     public void populateTribunalOfficeFields(CaseData caseData) {
         String managingOffice = caseData.getManagingOffice();
         String tribunalLocation = TribunalOffice.isScotlandOffice(managingOffice)
-            ? TRIBUNAL_Scotland : TRIBUNAL_ENGLAND;
+            ? TRIBUNAL_SCOTLAND : TRIBUNAL_ENGLAND;
         caseData.setTribunalAndOfficeLocation(String
             .format(TRIBUNAL_OFFICE_LOCATION, tribunalLocation, managingOffice));
         caseData.setRegionalOffice(String.format(TRIBUNAL_LOCATION_LABEL, tribunalLocation));
@@ -307,9 +317,7 @@ public class Et1VettingService {
     }
 
     private void populateCodeNameAndDescriptionHtml(StringBuilder sb, String codeName) {
-        if (codeName == null) {
-            return;
-        } else {
+        if (codeName != null) {
             try {
                 sb.append(String.format(CASE_NAME_AND_DESCRIPTION_HTML, codeName,
                     JurisdictionCode.valueOf(codeName.replaceAll("[^a-zA-Z]+", ""))
@@ -329,4 +337,21 @@ public class Et1VettingService {
         caseData.getJurCodesCollection().add(codesTypeItem);
     }
 
+    public DynamicFixedListType getHearingVenuesList(CaseData caseData) {
+        DynamicFixedListType dynamicListingVenues = new DynamicFixedListType();
+
+        dynamicListingVenues.setListItems(
+            jpaVenueService.getVenues(TribunalOffice.valueOfOfficeName(caseData.getManagingOffice()))
+        );
+
+        return dynamicListingVenues;
+    }
+
+    public String getAddressesHtml(CaseData caseData) {
+        return String.format(CLAIMANT_AND_RESPONDENT_ADDRESSES,
+            toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()),
+            toAddressWithTab(caseData.getClaimantWorkAddress().getClaimantWorkAddress()),
+            toAddressWithTab(caseData.getRespondentCollection().get(0).getValue().getRespondentAddress())
+        );
+    }
 }

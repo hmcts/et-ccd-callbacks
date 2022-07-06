@@ -1,11 +1,14 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.google.common.base.Strings;
+import java.time.ZonedDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -16,8 +19,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
-
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,7 +31,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.stream.Collectors.joining;
@@ -69,6 +72,8 @@ public class EventValidationService {
 
     private static final List<String> INVALID_STATES_FOR_CLOSED_CURRENT_POSITION = List.of(
             SUBMITTED_STATE, ACCEPTED_STATE, REJECTED_STATE);
+    public static final String DISPOSAL_DATE_IN_FUTURE = "Disposal Date can't be in the future.";
+    public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "Disposal Date must match one of the hearing dates";
 
     public List<String> validateReceiptDate(CaseData caseData) {
         List<String> errors = new ArrayList<>();
@@ -187,10 +192,84 @@ public class EventValidationService {
         }
         return errors;
     }
-
-    public void validateJurisdictionCodes(CaseData caseData, List<String> errors) {
+    /**
+     * Jurisdiction list is checked for duplicate values, codes existing
+     * in judgment and disposal date
+     * @param  caseData     CaseData which is a generic data type
+     *
+     * @param errors        List of errors which will hold the errors being shown
+     *                      if the validation fails
+     */
+    public void validateJurisdiction(CaseData caseData, List<String> errors) {
         validateDuplicatedJurisdictionCodes(caseData, errors);
         validateJurisdictionCodesExistenceInJudgement(caseData, errors);
+        validateDisposalDate(caseData, errors);
+    }
+
+    /**
+     * Disposal date is validated here. It should not be in future
+     * and should match one of the hearing dates.
+     * @param  caseData     CaseData which is a generic data type
+     *
+     * @param errors        List of errors which will hold the errors being shown
+     *                      if the disposal date is either in future or doesn't
+     *                      match one of the hearing dates
+     */
+    private void validateDisposalDate(CaseData caseData, List<String> errors) {
+        if (caseData.getJurCodesCollection() == null) {
+            return;
+        }
+        caseData.getJurCodesCollection()
+                        .forEach(item -> addInvalidDisposalDateError(
+                                caseData.getHearingCollection(),
+                                item.getValue().getDisposalDate(),
+                                errors));
+    }
+
+    private void addInvalidDisposalDateError(List<HearingTypeItem> hearingTypeItems, String disposalDate, List<String> errors) {
+
+        if(Strings.isNullOrEmpty(disposalDate) || isDisposalDateInFuture(disposalDate, errors)) {
+            return;
+        }
+
+         if (CollectionUtils.isEmpty(hearingTypeItems) ||
+                 !checkIfHearingDateMatchesWithDisposalDate(hearingTypeItems, disposalDate)) {
+             errors.add(DISPOSAL_DATE_HEARING_DATE_MATCH);
+         }
+    }
+
+    private boolean checkIfHearingDateMatchesWithDisposalDate(List<HearingTypeItem> hearingTypeItems, String disposalDate) {
+        return hearingTypeItems.stream().anyMatch(i -> compareHearingDates(i, disposalDate));
+    }
+
+    private boolean compareHearingDates(HearingTypeItem hearingTypeItem, String disposalDate) {
+        if (hearingTypeItem.getValue().getHearingDateCollection() == null) {
+            return false;
+        }
+        return hearingTypeItem.getValue()
+                .getHearingDateCollection()
+                .stream()
+                .anyMatch(
+                        i -> areDatesEqual(disposalDate,
+                                i.getValue().getListedDate()));
+    }
+
+    private boolean isDisposalDateInFuture(String disposalDate, List<String> errors) {
+        //During day light saving times, the comparison won't work if we don't consider zones while comparing them
+        // Azure has always UTC time but user's times change in summer and winters, we need to use ZonedDateTime.
+        ZonedDateTime disposalDateTime = LocalDate.parse(disposalDate).atStartOfDay().atZone(ZoneId.of("Europe/London"));
+        ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.of("UTC"));
+        if (disposalDateTime.isAfter(now)) {
+            errors.add(DISPOSAL_DATE_IN_FUTURE);
+            return true;
+        }
+            return false;
+    }
+
+    private boolean areDatesEqual(String disposalDate, String hearingDate)  {
+        LocalDate dDate = LocalDate.parse(disposalDate);
+        LocalDate hDate = LocalDateTime.parse(hearingDate).toLocalDate();
+        return dDate.compareTo(hDate) == 0;
     }
 
     private void validateJurisdictionCodesExistenceInJudgement(CaseData caseData, List<String> errors) {

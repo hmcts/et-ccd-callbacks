@@ -55,14 +55,13 @@ class Et1VettingServiceTest {
     private static final String CLAIMANT_DETAILS = "<hr><h3>Claimant</h3>"
             + "<pre>First name &#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Last name &#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Contact address &#09&#09 %s</pre><hr>";
+            + "<br><br>Contact address &#09&#09 %s</pre>";
     private static final String RESPONDENT_DETAILS = "<h3>Respondent %s</h3>"
             + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Contact address &#09&#09 %s</pre><hr>";
     private static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
     private static final String DAG = JurisdictionCode.DAG.name();
     private static final String PID = JurisdictionCode.PID.name();
-    private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br>";
 
     private static final String EXPECTED_ADDRESSES_HTML = "<hr><h2>Listing details<hr><h3>Claimant</h3>"
         + "<pre>Contact address &#09&#09 232 Petticoat Square<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 3 House<br>"
@@ -72,7 +71,53 @@ class Et1VettingServiceTest {
         + "<h3>Respondent</h3><pre>Contact address &#09&#09 11 Small Street"
         + "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 22 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
         + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M12 42R</pre><hr>";
-
+    private static final String EXPECTED_RESPONDENT1_ACAS_DETAILS = "<hr><h3>Respondent 1</h3><pre>Name "
+        + "&#09&#09&#09&#09&#09&#09&nbsp; Antonio Vazquez<br><br>Contact address &#09&#09 11 Small Street<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 22 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M12 42R</pre><h3>Acas certificate</h3>Certificate number 1234/5678/90 "
+        + "has been provided.<br><br><br>";
+    private static final String EXPECTED_RESPONDENT2_ACAS_DETAILS = "<hr><h3>Respondent 2</h3><pre>Name "
+        + "&#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><h3>Acas certificate</h3>Certificate number 2987/6543/01 "
+        + "has been provided.<br><br><br>";
+    private static final String EXPECTED_RESPONDENT3_ACAS_DETAILS = "<hr><h3>Respondent 3</h3><pre>Name "
+        + "&#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><h3>Acas certificate</h3>No certificate has been provided."
+        + "<br><br><br>";
+    private static final String EXPECTED_RESPONDENT4_ACAS_DETAILS = "<hr><h3>Respondent 4</h3><pre>Name "
+        + "&#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><h3>Acas certificate</h3>No certificate has been provided."
+        + "<br><br><br>";
+    private static final String EXPECTED_RESPONDENT5_ACAS_DETAILS = "<hr><h3>Respondent 5</h3><pre>Name "
+        + "&#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><h3>Acas certificate</h3>No certificate has been provided."
+        + "<br><br><br>";
+    private static final String EXPECTED_RESPONDENT6_ACAS_DETAILS = "<hr><h3>Respondent 6</h3><pre>Name "
+        + "&#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><h3>Acas certificate</h3>No certificate has been provided."
+        + "<br><br><br>";
+    private static final String EXPECTED_RESPONDENT_DETAILS = "<h3>Respondent 1</h3><pre>Name &#09&#09&#09&#09&#09&#0"
+        + "9&nbsp; Antonio Vazquez<br><br>Contact address &#09&#09 11 Small Street<br>&#09&#09&#09&#09&#09&#09&#09&#09"
+        + "&#09 22 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 M1"
+        + "2 42R</pre><hr><h3>Respondent 2</h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact add"
+        + "ress &#09&#09 32 Sweet Street<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&"
+        + "#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><hr><h3>Respondent 3</h3><pre>N"
+        + "ame &#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>&#09&#09&"
+        + "#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09"
+        + "&#09&#09&#09&#09&#09 M11 4ED</pre><hr><h3>Respondent 4</h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Juan Ga"
+        + "rcia<br><br>Contact address &#09&#09 32 Sweet Street<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#"
+        + "09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><hr><h3>R"
+        + "espondent 5</h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Swe"
+        + "et Street<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchest"
+        + "er<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><hr><h3>Respondent 6</h3><pre>Name &#09&#09&#09&#09"
+        + "&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>&#09&#09&#09&#09&#09&#09&#09&"
+        + "#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09"
+        + " M11 4ED</pre><hr>";
     private final String et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
     private final String acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
     private final String acasBinaryUrl2 = "/documents/acas2222-4ef8ca1e3-8c60-d3d78808dca1/binary";
@@ -94,6 +139,14 @@ class Et1VettingServiceTest {
         + "<a href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
         + "View all jurisdiction codes and descriptors (opens in new tab)</a><hr>"
         + "<h3>Codes already added</h3>%s<hr>";
+    private static final String RESPONDENT_ACAS_DETAILS = "<hr><h3>Respondent %o</h3>"
+        + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Contact address &#09&#09 %s</pre><h3>Acas certificate</h3>"
+        + "Certificate number %s has been provided.<br><br><br>";
+    private static final String RESPONDENT_NO_ACAS_DETAILS = "<hr><h3>Respondent %o</h3>"
+        + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Contact address &#09&#09 %s</pre><h3>Acas certificate</h3>"
+        + "No certificate has been provided.<br><br><br>";
 
     @BeforeEach
     void setUp() {
@@ -112,7 +165,23 @@ class Et1VettingServiceTest {
                     "32 Sweet Street", "14 House", null,
                     "Manchester", "M11 4ED", "United Kingdom",
                     "2987/6543/01")
-            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+            .withRespondentWithAddress("Juan Garcia",
+                    "32 Sweet Street", "14 House", null,
+                    "Manchester", "M11 4ED", "United Kingdom",
+                    null)
+            .withRespondentWithAddress("Juan Garcia",
+                "32 Sweet Street", "14 House", null,
+                "Manchester", "M11 4ED", "United Kingdom",
+                null)
+            .withRespondentWithAddress("Juan Garcia",
+                "32 Sweet Street", "14 House", null,
+                "Manchester", "M11 4ED", "United Kingdom",
+                null)
+            .withRespondentWithAddress("Juan Garcia",
+                "32 Sweet Street", "14 House", null,
+                "Manchester", "M11 4ED", "United Kingdom",
+                null)
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseId(caseId);
     }
 
@@ -209,42 +278,27 @@ class Et1VettingServiceTest {
     }
 
     @Test
-    void initialBeforeYouStart_TwoRespondentDetails_shouldReturnMarkUp() {
+    void initialBeforeYouStart_returnRespondentDetailsMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
-        String expected = String.format(RESPONDENT_DETAILS, "1", "Antonio Vazquez",
-                "11 Small Street" + BR_WITH_TAB + "22 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M12 42R")
-                + String.format(RESPONDENT_DETAILS, "2", "Juan Garcia",
-                "32 Sweet Street" + BR_WITH_TAB + "14 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M11 4ED");
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentDetailsMarkUp())
-                .isEqualTo(expected);
+                .isEqualTo(EXPECTED_RESPONDENT_DETAILS);
     }
 
     @Test
-    void initialBeforeYouStart_OneAcasNumber_shouldReturnMarkUp() {
+    void initialBeforeYouStart_returnRespondentAcasDetailsMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
-        String expected = String.format(ACAS_CERT_LIST_DISPLAY, "1234/5678/90");
-        assertThat(caseDetails.getCaseData().getEt1VettingAcasCertListMarkUp())
-                .isEqualTo(expected);
-    }
-
-    @Test
-    void initialBeforeYouStart_NoAcasNumber_shouldReturnMarkUp() {
-        caseDetails = CaseDataBuilder.builder()
-                .withClaimantIndType("Doris", "Johnson")
-                .withClaimantType("232 Petticoat Square", "3 House", null,
-                        "London", "W10 4AG", "United Kingdom")
-                .withRespondentWithAddress("Antonio Vazquez",
-                        "11 Small Street", "22 House", null,
-                        "Manchester", "M12 42R", "United Kingdom",
-                        null)
-                .withRespondentWithAddress("Juan Garcia",
-                        "32 Sweet Street", "14 House", null,
-                        "Manchester", "M11 4ED", "United Kingdom",
-                        null)
-                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
-        et1VettingService.initialiseEt1Vetting(caseDetails);
-        assertThat(caseDetails.getCaseData().getEt1VettingAcasCertListMarkUp())
-                .isEmpty();
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
+            .isEqualTo(EXPECTED_RESPONDENT1_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails2())
+            .isEqualTo(EXPECTED_RESPONDENT2_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails3())
+            .isEqualTo(EXPECTED_RESPONDENT3_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails4())
+            .isEqualTo(EXPECTED_RESPONDENT4_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails5())
+            .isEqualTo(EXPECTED_RESPONDENT5_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails6())
+            .isEqualTo(EXPECTED_RESPONDENT6_ACAS_DETAILS);
     }
 
     @Test

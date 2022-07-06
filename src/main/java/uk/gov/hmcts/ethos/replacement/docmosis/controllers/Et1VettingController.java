@@ -112,6 +112,37 @@ public class Et1VettingController {
     }
 
     /**
+     * Mid callback event in the hearing venue page to set the information of the claimant and respondents, the location
+     * of the tribunal, and popular the dynamic list of hearing venues for that tribunal location.
+     * @param userToken Used for authorisation
+     * @param ccdRequest CaseData which is a generic data type for most of the methods which holds ET1 case data
+     * @return caseData in ccdRequest
+     */
+    @PostMapping(value = "/et1HearingVenue", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Return listing details and hearing venues.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> et1HearingVenue(
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
+        @RequestBody CCDRequest ccdRequest) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        caseData.setEt1AddressDetails(et1VettingService.getAddressesHtml(caseData));
+        caseData.setEt1TribunalRegion(caseData.getManagingOffice());
+        caseData.setEt1HearingVenues(et1VettingService.getHearingVenuesList(caseData));
+
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    /**
      * Return the next-steps that the user must carry out after the ET1 vetting process.
      * @param ccdRequest CaseData which is a generic data type for most of the methods which holds ET1 case data
      * @param userToken Used for authorisation

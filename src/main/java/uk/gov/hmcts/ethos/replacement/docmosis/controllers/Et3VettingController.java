@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.ArrayList;
@@ -28,6 +31,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
+
 /**
  * REST controller for the ET3 Vetting pages, provides access to the state of the ET3 Response
  * and formats data appropriately for rendering on the front end.
@@ -35,22 +39,59 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequestMapping("/et3Vetting")
 @RestController
+@RequiredArgsConstructor
 public class Et3VettingController {
+
     private static final String INVALID_TOKEN = "Invalid Token {}";
-    public static final String PROCESSING_COMPLETE_HEADER = "<h2>Do this next</h2>You must:"
+    private static final String PROCESSING_COMPLETE_HEADER = "<h1>ET3 Processing complete</h1>";
+    public static final String PROCESSING_COMPLETE_BODY = "<h2>Do this next</h2>You must:"
             + "<ul><li>accept or reject the ET3 response or refer the response</li>"
             + "<li>add any changed or new information to case details</li></ul>";
     private final VerifyTokenService verifyTokenService;
+    private final Et3VettingService et3VettingService;
 
-    public Et3VettingController(VerifyTokenService verifyTokenService) {
-        this.verifyTokenService = verifyTokenService;
+    /**
+     * Called for the ET3 "Select Respondent" page. Creates a DynamicList containing a list of all the respondents
+     * which the user will be able to select as part of the ET3 Vetting Process.
+     * @param ccdRequest holds the request and case data
+     * @param userToken used for authorization
+     * @return Callback response entity with case data and errors attached.
+     */
+    @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "initialize data for et3 vetting")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> initEt3RespondentList(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        et3VettingService.updateValuesOnObject(caseData, new Et3VettingType());
+        List<String> errors = Et3VettingHelper.populateRespondentDynamicList(caseData);
+        return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
     /**
-     * Method calls when the "Is there an ET3 Response?" page is loaded, will generate a table
-     * for displaying the state of the ET3 response and set if the response has been received.
+     * Called after respondent is selected on the ET3 vetting page, populates data needed for
+     * ET3 vetting a particular respondent, will recover information if the respondent has
+     * previously been vetted.
+     * @param ccdRequest holds the request and case data
+     * @param userToken used for authorization
+     * @return Callback response entity with case data and errors attached.
      */
-    @PostMapping(value = "/populateEt3Dates", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/midPopulateRespondentEt3Response", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populate dates for ET3 vetting")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
@@ -71,44 +112,16 @@ public class Et3VettingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        et3VettingService.restoreEt3VettingFromRespondentOntoCaseData(caseData);
+
         caseData.setEt3Date(Et3VettingHelper.getEt3DatesInMarkdown(caseData));
         caseData.setEt3IsThereAnEt3Response(Et3VettingHelper.isThereAnEt3Response(caseData)
             ? YES
             : NO
         );
+
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    /**
-     * Called for the ET3 "Select Respondent" page. Creates a DynamicList containing a list of all the respondents
-     * which the user will be able to select as part of the ET3 Vetting Process.
-     * @param ccdRequest holds the request and case data
-     * @param userToken used for authorization
-     * @return this will call the response entity but will also display any error messages which occur.
-     */
-    @PostMapping(value = "/initEt3RespondentList", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "initialize data for et3 vetting")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CCDCallbackResponse.class))
-                }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> initEt3RespondentList(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = Et3VettingHelper.populateRespondentDynamicList(caseData);
-        return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
     /**
@@ -118,7 +131,7 @@ public class Et3VettingController {
      * @param userToken used for authorization
      * @return Callback response entity with case data and errors attached.
      */
-    @PostMapping(value = "/calculateResponseInTime", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/midCalculateResponseInTime", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "calculate if the response was received in time")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
@@ -143,6 +156,7 @@ public class Et3VettingController {
         if (YES.equals(caseData.getEt3IsThereAnEt3Response())) {
             errors = Et3VettingHelper.calculateResponseTime(caseData);
         }
+
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
@@ -153,8 +167,8 @@ public class Et3VettingController {
      * @param userToken used for authorization
      * @return Callback response entity with case data.
      */
-    @PostMapping(value = "/initRespondentDetails", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get the details of the respondent for the respondent name and address pages")
+    @PostMapping(value = "/midRespondentNameAndAddressTable", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Create a table with the respondent's name and address")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -186,7 +200,7 @@ public class Et3VettingController {
      * @param userToken used for authorization
      * @return this will call the response entity.
      */
-    @PostMapping(value = "/checkHearingListed", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/midHearingListedTable", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "check to see if a hearing has been listed")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
@@ -207,17 +221,17 @@ public class Et3VettingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        Et3VettingHelper.checkHearingListed(caseData);
+        Et3VettingHelper.setHearingListedForExUi(caseData);
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
     /**
      * Creates a table for ExUI representing the case's current tribunal and office.
-     * @param ccdRequest holds the request and case data
+     * @param ccdRequest holds the request and case data.
      * @param userToken used for authorization
      * @return this will call the response entity.
      */
-    @PostMapping(value = "/transferApplication", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/midTransferApplicationTable", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Request a transfer of tribunal office")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
@@ -243,8 +257,40 @@ public class Et3VettingController {
     }
 
     /**
-     * This method is used to display a message to the user once the submit button has been pressed. This will show the
-     * user what the next steps are.
+     * During processing the ET3 journey data is stored onto case data, this method saves that information onto the
+     * respondent selected at the start of vetting. The leftover information on case data will be deleted.
+     * @param ccdRequest generic request from CCD
+     * @param userToken authentication token to verify the user
+     * @return this will return and display a message to the user on the next steps.
+     */
+    @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Save answers to the given specific respondent")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        et3VettingService.saveEt3VettingToRespondent(caseData);
+
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    /**
+     * Generates the confirmation page for the ET3 vetting journey, with instructions on what to do next.
      * @param ccdRequest generic request from CCD
      * @param userToken authentication token to verify the user
      * @return this will return and display a message to the user on the next steps.
@@ -272,7 +318,8 @@ public class Et3VettingController {
         //  hyperlink as part of the text. See RET-2020 for what the links should be once they have been added
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
-                .confirmation_body(PROCESSING_COMPLETE_HEADER)
+                .confirmation_header(PROCESSING_COMPLETE_HEADER)
+                .confirmation_body(PROCESSING_COMPLETE_BODY)
                 .build());
     }
 }

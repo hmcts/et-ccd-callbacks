@@ -137,14 +137,15 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withHearingSession(int hearingIndex, String number, String listedDate, String hearingStatus,
                                               boolean disposed) {
-        var dateListedType = new DateListedType();
+        DateListedType dateListedType = new DateListedType();
         dateListedType.setListedDate(listedDate);
         dateListedType.setHearingStatus(hearingStatus);
         dateListedType.setHearingCaseDisposed(disposed ? YES : NO);
-        var dateListedTypeItem = new DateListedTypeItem();
+
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setValue(dateListedType);
 
-        val hearing = caseData.getHearingCollection().get(hearingIndex);
+        HearingTypeItem hearing = caseData.getHearingCollection().get(hearingIndex);
         if (hearing.getValue().getHearingDateCollection() == null) {
             hearing.getValue().setHearingDateCollection(new ArrayList<>());
         }

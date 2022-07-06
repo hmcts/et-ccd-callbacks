@@ -76,8 +76,12 @@ class Et1VettingServiceTest {
         + "<h3>Codes already added</h3>%s<hr>";
     private static final String RESPONDENT_ACAS_DETAILS = "<hr><h3>Respondent %o</h3>"
         + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
-        + "<br><br>Contact address &#09&#09 %s</pre><h3>Acas certificate</h3>" +
-        "Certificate number %s has been provided.<br><br><br>";
+        + "<br><br>Contact address &#09&#09 %s</pre><h3>Acas certificate</h3>"
+        + "Certificate number %s has been provided.<br><br><br>";
+    private static final String RESPONDENT_NO_ACAS_DETAILS = "<hr><h3>Respondent %o</h3>"
+        + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Contact address &#09&#09 %s</pre><h3>Acas certificate</h3>"
+        + "No certificate has been provided.<br><br><br>";
 
     @BeforeEach
     void setUp() {
@@ -94,6 +98,10 @@ class Et1VettingServiceTest {
                         "32 Sweet Street", "14 House", null,
                         "Manchester", "M11 4ED", "United Kingdom",
                         "2987/6543/01")
+                .withRespondentWithAddress("Juan Garcia",
+                    "32 Sweet Street", "14 House", null,
+                    "Manchester", "M11 4ED", "United Kingdom",
+                    null)
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseId(caseId);
     }
@@ -204,17 +212,20 @@ class Et1VettingServiceTest {
     @Test
     void initialBeforeYouStart_returnRespondentAcasDetailsMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
-
         String expectedRespondentAcasDetails1 = String.format(RESPONDENT_ACAS_DETAILS, 1, "Antonio Vazquez",
             "11 Small Street" + BR_WITH_TAB + "22 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M12 42R",
             "1234/5678/90");
         String expectedRespondentAcasDetails2 = String.format(RESPONDENT_ACAS_DETAILS, 2, "Juan Garcia",
             "32 Sweet Street" + BR_WITH_TAB + "14 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M11 4ED",
             "2987/6543/01");
+        String expectedRespondentAcasDetails3 = String.format(RESPONDENT_NO_ACAS_DETAILS, 3, "Juan Garcia",
+            "32 Sweet Street" + BR_WITH_TAB + "14 House" + BR_WITH_TAB + "Manchester" + BR_WITH_TAB + "M11 4ED");
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
             .isEqualTo(expectedRespondentAcasDetails1);
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails2())
             .isEqualTo(expectedRespondentAcasDetails2);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails3())
+            .isEqualTo(expectedRespondentAcasDetails3);
     }
 
     @Test

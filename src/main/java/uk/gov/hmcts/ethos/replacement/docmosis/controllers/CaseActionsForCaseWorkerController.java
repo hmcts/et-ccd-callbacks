@@ -694,7 +694,7 @@ public class CaseActionsForCaseWorkerController {
 
         List<String> errors = new ArrayList<>();
         var caseData =  ccdRequest.getCaseDetails().getCaseData();
-        eventValidationService.validateJurisdictionCodes(caseData, errors);
+        eventValidationService.validateJurisdiction(caseData, errors);
         log.info(EVENT_FIELDS_VALIDATION + errors);
 
         return getCallbackRespEntityErrors(errors, caseData);

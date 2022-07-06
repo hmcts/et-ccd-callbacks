@@ -40,7 +40,7 @@ public class InitialConsiderationController {
         + "<h3>What happens next</h3>"
         + "<p>A tribunal caseworker will act on any instructions set out in your initial consideration to progress "
         + "the case. "
-        + "You can <a href=\"/cases/case-details/${[CASE_REFERENCE]}#Documents\" target=\"_blank\">view the initial "
+        + "You can <a href=\"/cases/case-details/%s#Documents\" target=\"_blank\">view the initial "
         + "consideration document in the Documents tab (opens in new tab).</a></p>";
 
     @PostMapping(value = "/completeInitialConsideration", consumes = APPLICATION_JSON_VALUE)
@@ -62,7 +62,7 @@ public class InitialConsiderationController {
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .confirmation_header(COMPLETE_IC_HDR)
-            .confirmation_body(COMPLETE_IC_BODY)
+            .confirmation_body(String.format(COMPLETE_IC_BODY, ccdRequest.getCaseDetails().getCaseId()))
             .build());
     }
 

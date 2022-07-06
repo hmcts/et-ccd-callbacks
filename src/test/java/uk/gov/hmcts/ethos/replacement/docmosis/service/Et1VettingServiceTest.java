@@ -96,20 +96,28 @@ class Et1VettingServiceTest {
         + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
         + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><h3>Acas certificate</h3>No certificate has been provided."
         + "<br><br><br>";
+    private static final String EXPECTED_RESPONDENT6_ACAS_DETAILS = "<hr><h3>Respondent 6</h3><pre>Name "
+        + "&#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
+        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><h3>Acas certificate</h3>No certificate has been provided."
+        + "<br><br><br>";
     private static final String EXPECTED_RESPONDENT_DETAILS = "<h3>Respondent 1</h3><pre>Name &#09&#09&#09&#09&#09&#0"
-        + "9&nbsp; Antonio Vazquez<br><br>Contact address &#09&#09 11 Small Street<br>&#09&#09&#09&#09&#09&#09&#09&#09&"
-        + "#09 22 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 M12 "
-        + "42R</pre><hr><h3>Respondent 2</h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact addres"
-        + "s &#09&#09 32 Sweet Street<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&"
-        + "#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><hr><h3>Respondent 3</h3><pre>Name &"
-        + "#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>&#09&#09&#09&#0"
-        + "9&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#0"
-        + "9&#09&#09&#09 M11 4ED</pre><hr><h3>Respondent 4</h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br>"
-        + "<br>Contact address &#09&#09 32 Sweet Street<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#0"
-        + "9&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><hr><h3>Respondent"
-        + " 5</h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<"
-        + "br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&"
-        + "#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><hr>";
+        + "9&nbsp; Antonio Vazquez<br><br>Contact address &#09&#09 11 Small Street<br>&#09&#09&#09&#09&#09&#09&#09&#09"
+        + "&#09 22 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 M1"
+        + "2 42R</pre><hr><h3>Respondent 2</h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact add"
+        + "ress &#09&#09 32 Sweet Street<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&"
+        + "#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><hr><h3>Respondent 3</h3><pre>N"
+        + "ame &#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>&#09&#09&"
+        + "#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09"
+        + "&#09&#09&#09&#09&#09 M11 4ED</pre><hr><h3>Respondent 4</h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Juan Ga"
+        + "rcia<br><br>Contact address &#09&#09 32 Sweet Street<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#"
+        + "09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><hr><h3>R"
+        + "espondent 5</h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Swe"
+        + "et Street<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchest"
+        + "er<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 M11 4ED</pre><hr><h3>Respondent 6</h3><pre>Name &#09&#09&#09&#09"
+        + "&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>&#09&#09&#09&#09&#09&#09&#09&"
+        + "#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09"
+        + " M11 4ED</pre><hr>";
     private final String et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
     private final String acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
     private final String acasBinaryUrl2 = "/documents/acas2222-4ef8ca1e3-8c60-d3d78808dca1/binary";
@@ -161,6 +169,10 @@ class Et1VettingServiceTest {
                     "32 Sweet Street", "14 House", null,
                     "Manchester", "M11 4ED", "United Kingdom",
                     null)
+            .withRespondentWithAddress("Juan Garcia",
+                "32 Sweet Street", "14 House", null,
+                "Manchester", "M11 4ED", "United Kingdom",
+                null)
             .withRespondentWithAddress("Juan Garcia",
                 "32 Sweet Street", "14 House", null,
                 "Manchester", "M11 4ED", "United Kingdom",
@@ -285,6 +297,8 @@ class Et1VettingServiceTest {
             .isEqualTo(EXPECTED_RESPONDENT4_ACAS_DETAILS);
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails5())
             .isEqualTo(EXPECTED_RESPONDENT5_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails6())
+            .isEqualTo(EXPECTED_RESPONDENT6_ACAS_DETAILS);
     }
 
     @Test

@@ -330,7 +330,7 @@ public class ListingService {
         return false;
     }
 
-    private boolean isListingVenueValid(ListingData listingData,
+    public boolean isListingVenueValid(ListingData listingData,
                                         DateListedTypeItem dateListedTypeItem,
                                         String caseTypeId,
                                         String caseReference) {

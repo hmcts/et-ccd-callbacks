@@ -90,6 +90,8 @@ public class ListingService {
     private final VenueService venueService;
     private static final String MISSING_DOCUMENT_NAME = "Missing document name";
     private static final String MESSAGE = "Failed to generate document for case id : ";
+    public static final String ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND =
+            "data.hearingCollection.value.Hearing_venue_Scotland";
 
     public ListingData listingCaseCreation(ListingDetails listingDetails) {
 
@@ -207,7 +209,7 @@ public class ListingService {
         if (ALL_VENUES.equals(venueToSearch)
                 && UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()).equals(SCOTLAND_CASE_TYPE_ID)) {
             venueToSearch = listingData.getManagingOffice();
-            venueToSearchMapping = "data.hearingCollection.value.Hearing_venue_Scotland";
+            venueToSearchMapping = ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND;
         }
            return ccdClient.buildAndGetElasticSearchRequest(authToken,
                    UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()), getESQuery(dateFrom,

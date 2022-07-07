@@ -350,6 +350,8 @@ dependencies {
 
     integrationTestImplementation sourceSets.main.runtimeClasspath
     integrationTestImplementation sourceSets.test.runtimeClasspath
+
+    testCompile 'com.github.hmcts:fortify-client:1.2.2:all'
 }
 
 bootJar {

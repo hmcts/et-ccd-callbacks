@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -116,7 +117,7 @@ public class ListingService {
                 if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
                     log.info("Processing listing single cases");
                     listingTypeItems.addAll(getListingTypeItems(hearingTypeItem,
-                            caseData.getPrintHearingDetails(), caseData));
+                            caseData.getPrintHearingDetails(), caseData, true));
                 }
             }
         }
@@ -184,7 +185,7 @@ public class ListingService {
         for (HearingTypeItem hearingTypeItem : submitEvent.getCaseData().getHearingCollection()) {
             if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
                 listingTypeItems.addAll(getListingTypeItems(hearingTypeItem,
-                        listingDetails.getCaseData(), submitEvent.getCaseData()));
+                        listingDetails.getCaseData(), submitEvent.getCaseData(), false));
             }
         }
     }
@@ -227,10 +228,25 @@ public class ListingService {
                 .query(boolQueryBuilder).toString();
     }
 
-    private List<ListingTypeItem> getListingTypeItems(HearingTypeItem hearingTypeItem,
-                                                      ListingData listingData, CaseData caseData) {
+    public String getSelectedOfficeFromPrintingDetails(CaseData caseData) {
+        if (caseData.getPrintHearingDetails().getListingVenue() != null) {
+            return caseData.getManagingOffice();
+        } else if (!Strings.isNullOrEmpty(caseData.getPrintHearingDetails().getListingVenueScotland()) ) {
+            return caseData.getPrintHearingDetails().getListingVenueScotland();
+        } else {
+           throw new IllegalStateException("Unable to get selected office from "
+                   + "printing details for case reference " + caseData.getEthosCaseReference());
+        }
+    }
 
-        String caseTypeId = TribunalOffice.getCaseTypeId(listingData.getManagingOffice());
+    private List<ListingTypeItem> getListingTypeItems(HearingTypeItem hearingTypeItem,
+                                                      ListingData listingData, CaseData caseData, boolean singleCase) {
+        String caseTypeId = "";
+        if (singleCase) {
+             caseTypeId = TribunalOffice.getCaseTypeId(getSelectedOfficeFromPrintingDetails(caseData));
+        } else {
+             caseTypeId = TribunalOffice.getCaseTypeId(listingData.getManagingOffice());
+        }
         List<ListingTypeItem> listingTypeItems = new ArrayList<>();
         if (isHearingTypeValid(listingData, hearingTypeItem)) {
             int hearingDateCollectionSize = hearingTypeItem.getValue().getHearingDateCollection().size();

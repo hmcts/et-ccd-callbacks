@@ -679,6 +679,43 @@ public class ListingHelper {
         return " ";
     }
 
+    public static String getVenueCodeFromDateListedType(DateListedType dateListedType) {
+        // EnglandWales
+        if (dateListedType.hasHearingVenue()) {
+            return dateListedType.getHearingVenueDay().getValue().getCode();
+        }
+
+        // Scotland
+        var hearingVenueScotland = dateListedType.getHearingVenueDayScotland();
+        final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(hearingVenueScotland);
+        switch (tribunalOffice) {
+            case GLASGOW:
+                if (dateListedType.hasHearingGlasgow()) {
+                    return dateListedType.getHearingGlasgow().getSelectedCode();
+                }
+                break;
+            case ABERDEEN:
+                if (dateListedType.hasHearingAberdeen()) {
+                    return dateListedType.getHearingAberdeen().getSelectedCode();
+                }
+                break;
+            case DUNDEE:
+                if (dateListedType.hasHearingDundee()) {
+                    return dateListedType.getHearingDundee().getSelectedCode();
+                }
+                break;
+            case EDINBURGH:
+                if (dateListedType.hasHearingEdinburgh()) {
+                    return dateListedType.getHearingEdinburgh().getSelectedCode();
+                }
+                break;
+            default:
+                break;
+        }
+
+        return " ";
+    }
+
     private static String getRespOthersName(CaseData caseData) {
         if (caseData.getRespondentCollection() != null) {
             List<String> respOthers = caseData.getRespondentCollection()

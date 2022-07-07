@@ -649,7 +649,7 @@ public class ListingHelper {
         }
 
         // Scotland
-        var hearingVenueScotland = dateListedType.getHearingVenueDayScotland();
+        String hearingVenueScotland = dateListedType.getHearingVenueDayScotland();
         final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(hearingVenueScotland);
         switch (tribunalOffice) {
             case GLASGOW:
@@ -686,7 +686,7 @@ public class ListingHelper {
         }
 
         // Scotland
-        var hearingVenueScotland = dateListedType.getHearingVenueDayScotland();
+        String hearingVenueScotland = dateListedType.getHearingVenueDayScotland();
         final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(hearingVenueScotland);
         switch (tribunalOffice) {
             case GLASGOW:

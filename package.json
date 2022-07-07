@@ -59,6 +59,7 @@
     "mem": "^9.0.2",
     "merge": "^2.1.1",
     "minimist": "^1.2.6",
-    "yargs-parser": "^21.0.1"
+    "yargs-parser": "^21.0.1",
+    "moment": "^2.29.2"
   }
 }

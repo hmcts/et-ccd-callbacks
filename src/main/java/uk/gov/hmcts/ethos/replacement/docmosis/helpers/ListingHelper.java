@@ -649,7 +649,7 @@ public class ListingHelper {
         }
 
         // Scotland
-        var hearingVenueScotland = dateListedType.getHearingVenueDayScotland();
+        String hearingVenueScotland = dateListedType.getHearingVenueDayScotland();
         final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(hearingVenueScotland);
         switch (tribunalOffice) {
             case GLASGOW:
@@ -677,6 +677,48 @@ public class ListingHelper {
         }
 
         return " ";
+    }
+
+    /**
+     * Returns Venue code from DateListedType's hearingVenue dynamic fixed list.
+     * This returns the dynamicFixedListCodes for the hearingVenues to be compared
+     * with the ones which needs to be in report.
+     * @param dateListedType Hearing date listed type to get the hearing venue
+     */
+    public static String getVenueCodeFromDateListedType(DateListedType dateListedType) {
+        // EnglandWales
+        if (dateListedType.hasHearingVenue()) {
+            return dateListedType.getHearingVenueDay().getValue().getCode();
+        }
+
+        // Scotland
+        String hearingVenueScotland = dateListedType.getHearingVenueDayScotland();
+        final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(hearingVenueScotland);
+        switch (tribunalOffice) {
+            case GLASGOW:
+                if (dateListedType.hasHearingGlasgow()) {
+                    return dateListedType.getHearingGlasgow().getSelectedCode();
+                }
+                break;
+            case ABERDEEN:
+                if (dateListedType.hasHearingAberdeen()) {
+                    return dateListedType.getHearingAberdeen().getSelectedCode();
+                }
+                break;
+            case DUNDEE:
+                if (dateListedType.hasHearingDundee()) {
+                    return dateListedType.getHearingDundee().getSelectedCode();
+                }
+                break;
+            case EDINBURGH:
+                if (dateListedType.hasHearingEdinburgh()) {
+                    return dateListedType.getHearingEdinburgh().getSelectedCode();
+                }
+                break;
+            default:
+                break;
+        }
+        throw new IllegalStateException();
     }
 
     private static String getRespOthersName(CaseData caseData) {

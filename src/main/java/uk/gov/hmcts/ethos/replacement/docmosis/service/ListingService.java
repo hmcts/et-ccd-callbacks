@@ -211,9 +211,9 @@ public class ListingService {
             venueToSearch = listingData.getManagingOffice();
             venueToSearchMapping = ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND;
         }
-           return ccdClient.buildAndGetElasticSearchRequest(authToken,
-                   UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()), getESQuery(dateFrom,
-                           dateTo, venueToSearchMapping, venueToSearch));
+        return ccdClient.buildAndGetElasticSearchRequest(authToken,
+                UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()),
+                getESQuery(dateFrom, dateTo, venueToSearchMapping, venueToSearch));
     }
 
     private String getESQuery(String dateFrom, String dateTo, String key, String venue) {

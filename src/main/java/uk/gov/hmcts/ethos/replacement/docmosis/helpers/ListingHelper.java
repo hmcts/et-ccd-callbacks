@@ -679,6 +679,12 @@ public class ListingHelper {
         return " ";
     }
 
+    /**
+     * Returns Venue code from DateListedType's hearingVenue dynamic fixed list.
+     * This returns the dynamicFixedListCodes for the hearingVenues to be compared
+     * with the ones which needs to be in report.
+     * @param dateListedType Hearing date listed type to get the hearing venue
+     */
     public static String getVenueCodeFromDateListedType(DateListedType dateListedType) {
         // EnglandWales
         if (dateListedType.hasHearingVenue()) {

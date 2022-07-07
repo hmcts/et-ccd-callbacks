@@ -239,7 +239,8 @@ public class ListingService {
                 hearingTypeItem.getValue().getHearingNumber();
                 log.info("Hearing number: " + hearingTypeItem.getValue().getHearingNumber());
                 var dateListedTypeItem = hearingTypeItem.getValue().getHearingDateCollection().get(i);
-                boolean isListingVenueValid = isListingVenueValid(listingData, dateListedTypeItem, caseTypeId);
+                boolean isListingVenueValid = isListingVenueValid(listingData, dateListedTypeItem,
+                        caseTypeId, caseData.getEthosCaseReference());
                 boolean isListingDateValid = isListingDateValid(listingData, dateListedTypeItem);
                 log.info("isListingVenueValid: " + isListingVenueValid);
                 log.info("isListingDateValid: " + isListingDateValid);
@@ -329,7 +330,10 @@ public class ListingService {
         return false;
     }
 
-    private boolean isListingVenueValid(ListingData listingData, DateListedTypeItem dateListedTypeItem, String caseTypeId) {
+    private boolean isListingVenueValid(ListingData listingData,
+                                        DateListedTypeItem dateListedTypeItem,
+                                        String caseTypeId,
+                                        String caseReference) {
         if (areAllVenuesSelected(listingData, dateListedTypeItem, caseTypeId)) {
             return true;
         } else {
@@ -346,7 +350,7 @@ public class ListingService {
                 try {
                     venueSearched = ListingHelper.getVenueCodeFromDateListedType(dateListedTypeItem.getValue());
                 } catch (IllegalStateException ex) {
-                    log.error("Unable to get venue code", ex);
+                    log.error("Unable to get venue code for case reference " + caseReference, ex);
                     return false;
                 }
 

@@ -335,7 +335,6 @@ public class ListingHelperTest {
 
     @Test
     public void buildCaseCauseListWithNoDocumentAndRangeAndScotland() {
-        listingDetails.getCaseData().setManagingOffice("Scotland");
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\".docx\",\n"
@@ -356,11 +355,15 @@ public class ListingHelperTest {
                 + "\"listing_logo\":\"[userImage:schmcts.png]\",\n"
                 + "\"Office_name\":\"Scotland\",\n"
                 + "\"Hearing_location\":\"Manchester\",\n"
-                + "\"Listed_date\":\"12 October 2020\",\n"
-                + "\"Clerk\":\"Mike Jordan\",\n"
+                + "\"Listed_date_from\":\"2 January 2020\",\n"
+                + "\"Listed_date_to\":\"1 March 2020\",\n"                + "\"Clerk\":\"Mike Jordan\",\n"
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
                 + "}\n"
                 + "}\n";
+        listingDetails.getCaseData().setHearingDateType(RANGE_HEARING_DATE_TYPE);
+        listingDetails.getCaseData().setListingDateFrom("2020-01-02");
+        listingDetails.getCaseData().setListingDateTo("2020-03-01");
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.SCOTLAND.getOfficeName());
         assertEquals(expected, ListingHelper.buildListingDocumentContent(listingDetails.getCaseData(),
                 "", "", userDetails, SCOTLAND_LISTING_CASE_TYPE_ID).toString());
     }

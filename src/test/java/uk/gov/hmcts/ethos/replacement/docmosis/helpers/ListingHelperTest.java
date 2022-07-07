@@ -335,6 +335,7 @@ public class ListingHelperTest {
 
     @Test
     public void buildCaseCauseListWithNoDocumentAndRangeAndScotland() {
+        listingDetails.getCaseData().setManagingOffice("Scotland");
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\".docx\",\n"
@@ -355,8 +356,7 @@ public class ListingHelperTest {
                 + "\"listing_logo\":\"[userImage:schmcts.png]\",\n"
                 + "\"Office_name\":\"Scotland\",\n"
                 + "\"Hearing_location\":\"Manchester\",\n"
-                + "\"Listed_date_from\":\"2 January 2020\",\n"
-                + "\"Listed_date_to\":\"1 March 2020\",\n"
+                + "\"Listed_date\":\"12 October 2020\",\n"
                 + "\"Clerk\":\"Mike Jordan\",\n"
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
                 + "}\n"

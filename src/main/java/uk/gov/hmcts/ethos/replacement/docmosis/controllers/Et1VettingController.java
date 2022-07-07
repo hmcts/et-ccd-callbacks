@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequiredArgsConstructor
 public class Et1VettingController {
+    public static final String PROCESSING_COMPLETE_TEXT = "<hr><h2>Do this next</h2>:"
+        + "<p>You must <a href=\"/cases/case-details/%s/trigger/preAcceptanceCase/preAcceptanceCase1\">"
+        + "accept or reject the case</a> or refer the case.</p>";
 
     private final VerifyTokenService verifyTokenService;
     private final Et1VettingService et1VettingService;
@@ -104,5 +109,68 @@ public class Et1VettingController {
         et1VettingService.populateTribunalOfficeFields(caseData);
 
         return getCallbackRespEntity(errors, ccdRequest.getCaseDetails());
+    }
+
+    /**
+     * Mid callback event in the hearing venue page to set the information of the claimant and respondents, the location
+     * of the tribunal, and popular the dynamic list of hearing venues for that tribunal location.
+     * @param userToken Used for authorisation
+     * @param ccdRequest CaseData which is a generic data type for most of the methods which holds ET1 case data
+     * @return caseData in ccdRequest
+     */
+    @PostMapping(value = "/et1HearingVenue", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Return listing details and hearing venues.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> et1HearingVenue(
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
+        @RequestBody CCDRequest ccdRequest) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        caseData.setEt1AddressDetails(et1VettingService.getAddressesHtml(caseData));
+        caseData.setEt1TribunalRegion(caseData.getManagingOffice());
+        caseData.setEt1HearingVenues(et1VettingService.getHearingVenuesList(caseData));
+
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    /**
+     * Return the next-steps that the user must carry out after the ET1 vetting process.
+     * @param ccdRequest CaseData which is a generic data type for most of the methods which holds ET1 case data
+     * @param userToken Used for authorisation
+     * @return this will return and display a message to the user regarding the next steps.
+     */
+    @PostMapping(value = "/finishEt1Vetting", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "display the next steps after ET1 Vetting")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> processingComplete(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
+        }
+
+        String caseNumber = ccdRequest.getCaseDetails().getCaseId();
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+            .data(ccdRequest.getCaseDetails().getCaseData())
+            .confirmation_body(String.format(PROCESSING_COMPLETE_TEXT, caseNumber))
+            .build());
     }
 }

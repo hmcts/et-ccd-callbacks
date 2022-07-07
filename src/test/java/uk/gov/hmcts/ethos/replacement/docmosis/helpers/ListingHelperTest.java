@@ -3,6 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -25,7 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
+import java.util.UUID;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -59,6 +62,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.STAFF_CASE_CAUSE_LI
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.STAFF_CASE_CAUSE_LIST_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TIME_TO_FIRST_HEARING_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.GLASGOW;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AWAITING_JUDGMENT_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
@@ -352,8 +356,7 @@ public class ListingHelperTest {
                 + "\"Office_name\":\"Scotland\",\n"
                 + "\"Hearing_location\":\"Manchester\",\n"
                 + "\"Listed_date_from\":\"2 January 2020\",\n"
-                + "\"Listed_date_to\":\"1 March 2020\",\n"
-                + "\"Clerk\":\"Mike Jordan\",\n"
+                + "\"Listed_date_to\":\"1 March 2020\",\n"                + "\"Clerk\":\"Mike Jordan\",\n"
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
                 + "}\n"
                 + "}\n";
@@ -1097,7 +1100,7 @@ public class ListingHelperTest {
 
         dateListedType.setHearingRoom(new DynamicFixedListType("Tribunal 5"));
         dateListedType.setHearingDundee(null);
-        dateListedType.setHearingVenueDay(new DynamicFixedListType(TribunalOffice.GLASGOW.getOfficeName()));
+        dateListedType.setHearingVenueDay(new DynamicFixedListType(GLASGOW.getOfficeName()));
         dateListedType.setHearingGlasgow(new DynamicFixedListType("GlasgowVenue"));
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=Glasgow, "
                 + "elmoCaseReference=null, jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
@@ -1157,7 +1160,7 @@ public class ListingHelperTest {
                 "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom= , respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData, hearingType, dateListedType, 1, 3).toString());
 
-        dateListedType.setHearingVenueDayScotland(TribunalOffice.GLASGOW.getOfficeName());
+        dateListedType.setHearingVenueDayScotland(GLASGOW.getOfficeName());
         dateListedType.setHearingEdinburgh(null);
         dateListedType.setHearingGlasgow(new DynamicFixedListType("GlasgowVenue"));
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=GlasgowVenue, elmoCaseReference=null, " +
@@ -1310,9 +1313,58 @@ public class ListingHelperTest {
     }
 
     @Test
+    public void getVenueCodeFromDateListedTypeEWTest() {
+        String office = "Leeds";
+        DateListedTypeItem dateListedTypeItem = setDateListedTimeItem(false, office);
+        String result = ListingHelper.getVenueCodeFromDateListedType(dateListedTypeItem.getValue());
+        assertThat(result)
+                .isEqualTo(office);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"Glasgow", "Aberdeen", "Edinburgh", "Dundee"})
+    public void getVenueCodeFromDateListedTypeScotlandTest(String office) {
+        DateListedTypeItem dateListedTypeItem = setDateListedTimeItem(true, office);
+        String result = ListingHelper.getVenueCodeFromDateListedType(dateListedTypeItem.getValue());
+        assertThat(result)
+                .isEqualTo(office);
+    }
+
+    private DateListedTypeItem setDateListedTimeItem(boolean scotland, String office) {
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setId(UUID.randomUUID().toString());
+        DateListedType dateListedType = new DateListedType();
+        if (!scotland) {
+            dateListedType.setHearingVenueDay(new DynamicFixedListType(office));
+        } else {
+            dateListedType.setHearingVenueDayScotland(office);
+            final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(office);
+            switch (tribunalOffice) {
+                case GLASGOW:
+                    dateListedType.setHearingGlasgow(new DynamicFixedListType("Glasgow"));
+                    break;
+                case ABERDEEN:
+                    dateListedType.setHearingAberdeen(new DynamicFixedListType("Aberdeen"));
+                    break;
+                case DUNDEE:
+                    dateListedType.setHearingDundee(new DynamicFixedListType("Dundee"));
+                    break;
+                case EDINBURGH:
+                    dateListedType.setHearingEdinburgh(new DynamicFixedListType("Edinburgh"));
+                    break;
+                default:
+                    break;
+            }
+        }
+        dateListedTypeItem.setValue(dateListedType);
+        return dateListedTypeItem;
+    }
+
+    @Test
     public void getRespondentOthersWithLineBreaksForNoRespondents() {
         String expected = "";
-        String actual = ListingHelper.getRespondentOthersWithLineBreaks(listingDetails.getCaseData().getListingCollection().get(3).getValue());
+        String actual = ListingHelper.getRespondentOthersWithLineBreaks(listingDetails.getCaseData()
+                .getListingCollection().get(3).getValue());
 
         assertEquals(expected, actual);
     }

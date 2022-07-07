@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
@@ -50,7 +52,10 @@ public class Helper {
     public static final String HEARING_CREATION_DAY_ERROR = "A new day for a hearing can "
             + "only be added from the List Hearing menu item";
 
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     private Helper() {
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     public static String nullCheck(String value) {
@@ -245,4 +250,13 @@ public class Helper {
                 : new ArrayList<>();
     }
 
+    /**
+     * Creates an object of targetClassType that contains the properties with common names from the sourceObject passed.
+     * @param sourceObject The object to copy values from
+     * @param targetClassType The new object type
+     * @return A new object that has a subset of data from the source object dependent on the class passed
+     */
+    public static Object intersectProperties(Object sourceObject, Class<?> targetClassType) {
+        return mapper.convertValue(sourceObject, targetClassType);
+    }
 }

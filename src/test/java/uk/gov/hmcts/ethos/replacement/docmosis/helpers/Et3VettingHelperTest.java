@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
@@ -12,8 +13,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.ET3_TABLE_DATA;
@@ -22,6 +26,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.N
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.NO_RESPONDENTS_FOUND_ERROR;
 
 class Et3VettingHelperTest {
+    private static final String CASE_NOT_LISTED = "<h2>Hearing details</h2>The case has not been listed<hr>";
     private List<String> errors;
 
     @Test
@@ -326,7 +331,7 @@ class Et3VettingHelperTest {
 
         assertNull(caseData.getEt3NameAddressRespondent());
     }
-    
+
     @Test
     void givenNameAndAddress_shouldReturnMarkupWithNameAndAddress() {
         CaseData caseData = CaseDataBuilder.builder()
@@ -388,7 +393,7 @@ class Et3VettingHelperTest {
             .build();
 
         Et3VettingHelper.getRespondentNameAndAddress(caseData);
-        String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; John<br><br>"
+        String expected = "<h2>Respondent</h2><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; None Given<br><br>"
             + "Contact address &#09&#09 32 Bridge Road<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09Erith<br>&#09&#09&#09"
             + "&#09&#09&#09&#09&#09&#09<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09DA8 2DE</pre><hr>";
 
@@ -403,6 +408,7 @@ class Et3VettingHelperTest {
                 .withName("John")
                 .withReceived(YES, "2022-02-05")
                 .withExtension()
+                .withET3ResponseRespondentName("John")
                 .withET3ResponseRespondentAddress("32 Bridge Road", "Erith", "Erith", "Erith", "DA8 2DE")
                 .build()
             )
@@ -426,6 +432,7 @@ class Et3VettingHelperTest {
                 .withName("John")
                 .withReceived(YES, "2022-02-05")
                 .withExtension()
+                .withET3ResponseRespondentName("John")
                 .withET3ResponseRespondentAddress("32 Bridge Road", "", "Erith", "", "DA8 2DE")
                 .build()
             )
@@ -439,5 +446,100 @@ class Et3VettingHelperTest {
             + "&#09&#09&#09&#09<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09DA8 2DE</pre><hr>";
 
         assertThat(caseData.getEt3NameAddressRespondent(), is(expected));
+    }
+
+    @Test
+    void givenHearingIsListed_SetCaseAsListed() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .withHearing("1", "test", "Judy")
+            .withHearingSession(0, "1", "2021-12-25T00:00:00.000", HEARING_STATUS_LISTED, false)
+            .withConciliationTrack("Test track")
+            .build();
+        Et3VettingHelper.setHearingListedForExUi(caseData);
+
+        assertThat(caseData.getEt3HearingDetails(), is(
+                "| <h2>Hearing details</h2>| | \r\n"
+                    + "|--|--|\r\n"
+                    + "|Date| Saturday 25 December 2021|\r\n"
+                    + "|Type| Test track|"
+            )
+        );
+        assertThat(caseData.getEt3IsCaseListedForHearing(), is(YES));
+    }
+
+    @Test
+    void givenHearingIsNotListed_SetCaseAsNotListed() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .withHearing("1", "test", "Judy")
+            .withHearingSession(0, "1", "2021-12-25T00:00:00.000", HEARING_STATUS_POSTPONED, false)
+            .withConciliationTrack("Test track")
+            .build();
+        Et3VettingHelper.setHearingListedForExUi(caseData);
+
+        assertThat(caseData.getEt3HearingDetails(), is(CASE_NOT_LISTED));
+        assertThat(caseData.getEt3IsCaseListedForHearing(), is(NO));
+    }
+
+    @Test
+    void givenHearingIsListedButNoTrack_SetCaseAsListedNoTrackFound() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .withHearing("1", "test", "Judy")
+            .withHearingSession(0, "1", "2021-12-25T00:00:00.000", HEARING_STATUS_LISTED, false)
+            .build();
+        Et3VettingHelper.setHearingListedForExUi(caseData);
+
+        assertThat(caseData.getEt3HearingDetails(), is(
+                "| <h2>Hearing details</h2>| | \r\n"
+                    + "|--|--|\r\n"
+                    + "|Date| Saturday 25 December 2021|\r\n"
+                    + "|Type| Track could not be found|"
+            )
+        );
+        assertThat(caseData.getEt3IsCaseListedForHearing(), is(YES));
+    }
+
+    @Test
+    void givenNoHearings_SetCaseAsNotListed() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        Et3VettingHelper.setHearingListedForExUi(caseData);
+
+        assertThat(caseData.getEt3HearingDetails(), is(CASE_NOT_LISTED));
+        assertThat(caseData.getEt3IsCaseListedForHearing(), is(NO));
+    }
+
+    @Test
+    void givenManagingOfficeEnglandWales_returnExpectedTable() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .withManagingOffice(TribunalOffice.MANCHESTER.getOfficeName())
+            .build();
+        Et3VettingHelper.transferApplication(caseData);
+
+        assertThat(caseData.getEt3TribunalLocation(), is(
+            "| <h2>Tribunal location</h2>| | \r\n"
+                + "|--|--|\r\n"
+                + "|Tribunal| England & Wales|\r\n"
+                + "|Office| Manchester|"
+        ));
+    }
+
+    @Test
+    void givenManagingOfficeScotland_returnExpectedTable() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .withManagingOffice(TribunalOffice.GLASGOW.getOfficeName())
+            .build();
+        Et3VettingHelper.transferApplication(caseData);
+
+        assertThat(caseData.getEt3TribunalLocation(), is(
+            "| <h2>Tribunal location</h2>| | \r\n"
+                + "|--|--|\r\n"
+                + "|Tribunal| Scotland|\r\n"
+                + "|Office| Glasgow|"
+        ));
+    }
+
+    @Test
+    void givenNoManagingOffice_returnIllegalArgumentException() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        assertThrows(IllegalArgumentException.class, () -> Et3VettingHelper.transferApplication(caseData));
     }
 }

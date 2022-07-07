@@ -343,8 +343,13 @@ public class ListingService {
                         : " ";
                 log.info("Checking venue for all scottish level (HearingVenueDay): " + venueSearched);
             } else {
-                venueSearched = ListingHelper.getVenueCodeFromDateListedType(dateListedTypeItem.getValue());
-                log.info("Checking venue low level: " + venueSearched);
+                try {
+                    venueSearched = ListingHelper.getVenueCodeFromDateListedType(dateListedTypeItem.getValue());
+                } catch (IllegalStateException ex) {
+                    log.error("Unable to get venue code", ex);
+                    return false;
+                }
+
             }
             return venueSearched.trim().equals(venueToSearch.trim());
         }

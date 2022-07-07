@@ -718,8 +718,7 @@ public class ListingHelper {
             default:
                 break;
         }
-
-        return " ";
+        throw new IllegalStateException();
     }
 
     private static String getRespOthersName(CaseData caseData) {

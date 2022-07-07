@@ -204,7 +204,7 @@ public class ListingService {
             dateFrom = listingData.getListingDate();
             dateTo = listingData.getListingDate();
         }
-        if ("All".equals(venueToSearch)
+        if (ALL_VENUES.equals(venueToSearch)
                 && UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()).equals(SCOTLAND_CASE_TYPE_ID)) {
             venueToSearch = listingData.getManagingOffice();
             venueToSearchMapping = "data.hearingCollection.value.Hearing_venue_Scotland";

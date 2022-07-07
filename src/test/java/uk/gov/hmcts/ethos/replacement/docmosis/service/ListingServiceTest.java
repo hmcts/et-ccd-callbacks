@@ -1250,7 +1250,7 @@ public class ListingServiceTest {
         listingData.setListingVenue(new DynamicFixedListType("blah blah"));
         caseData.setManagingOffice(BRISTOL.getOfficeName());
         caseData.setPrintHearingDetails(listingData);
-        assertEquals(BRISTOL.getOfficeName(), listingService.getSelectedOfficeFromPrintingDetails(caseData));
+        assertEquals(BRISTOL.getOfficeName(), listingService.getSelectedOfficeForPrintLists(caseData));
     }
 
     @Test
@@ -1259,14 +1259,14 @@ public class ListingServiceTest {
         ListingData listingData = new ListingData();
         listingData.setListingVenueScotland(DUNDEE.getOfficeName());
         caseData.setPrintHearingDetails(listingData);
-        assertEquals(DUNDEE.getOfficeName(), listingService.getSelectedOfficeFromPrintingDetails(caseData));
+        assertEquals(DUNDEE.getOfficeName(), listingService.getSelectedOfficeForPrintLists(caseData));
     }
 
     @Test
     public void getSelectedOfficeFromPrintingDetailsExceptionTest() {
         CaseData caseData = new CaseData();
         caseData.setPrintHearingDetails(new ListingData());
-        assertThrows(IllegalStateException.class, () -> listingService.getSelectedOfficeFromPrintingDetails(caseData));
+        assertThrows(IllegalStateException.class, () -> listingService.getSelectedOfficeForPrintLists(caseData));
     }
 
     @Test

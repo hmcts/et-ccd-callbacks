@@ -228,7 +228,7 @@ public class ListingService {
                 .query(boolQueryBuilder).toString();
     }
 
-    public String getSelectedOfficeFromPrintingDetails(CaseData caseData) {
+    public String getSelectedOfficeForPrintLists(CaseData caseData) {
         if (caseData.getPrintHearingDetails().getListingVenue() != null) {
             return caseData.getManagingOffice();
         } else if (!Strings.isNullOrEmpty(caseData.getPrintHearingDetails().getListingVenueScotland()) ) {
@@ -243,7 +243,7 @@ public class ListingService {
                                                       ListingData listingData, CaseData caseData, boolean singleCase) {
         String caseTypeId = "";
         if (singleCase) {
-             caseTypeId = TribunalOffice.getCaseTypeId(getSelectedOfficeFromPrintingDetails(caseData));
+             caseTypeId = TribunalOffice.getCaseTypeId(getSelectedOfficeForPrintLists(caseData));
         } else {
              caseTypeId = TribunalOffice.getCaseTypeId(listingData.getManagingOffice());
         }

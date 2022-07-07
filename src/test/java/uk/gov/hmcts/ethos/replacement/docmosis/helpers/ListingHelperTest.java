@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
-import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.*;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -63,6 +62,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.STAFF_CASE_CAUSE_LI
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.STAFF_CASE_CAUSE_LIST_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TIME_TO_FIRST_HEARING_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.GLASGOW;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AWAITING_JUDGMENT_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
@@ -361,10 +361,6 @@ public class ListingHelperTest {
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
                 + "}\n"
                 + "}\n";
-        listingDetails.getCaseData().setHearingDateType(RANGE_HEARING_DATE_TYPE);
-        listingDetails.getCaseData().setListingDateFrom("2020-01-02");
-        listingDetails.getCaseData().setListingDateTo("2020-03-01");
-        listingDetails.getCaseData().setManagingOffice(TribunalOffice.SCOTLAND.getOfficeName());
         assertEquals(expected, ListingHelper.buildListingDocumentContent(listingDetails.getCaseData(),
                 "", "", userDetails, SCOTLAND_LISTING_CASE_TYPE_ID).toString());
     }
@@ -1325,7 +1321,7 @@ public class ListingHelperTest {
     @ParameterizedTest
     @CsvSource({"Glasgow", "Aberdeen", "Edinburgh", "Dundee"})
     public void getVenueCodeFromDateListedTypeScotlandTest(String office) {
-       DateListedTypeItem dateListedTypeItem = setDateListedTimeItem(true, office);
+        DateListedTypeItem dateListedTypeItem = setDateListedTimeItem(true, office);
         String result = ListingHelper.getVenueCodeFromDateListedType(dateListedTypeItem.getValue());
         assertThat(result)
                 .isEqualTo(office);
@@ -1357,14 +1353,15 @@ public class ListingHelperTest {
                     break;
             }
         }
-       dateListedTypeItem.setValue(dateListedType);
+        dateListedTypeItem.setValue(dateListedType);
         return dateListedTypeItem;
     }
 
     @Test
     public void getRespondentOthersWithLineBreaksForNoRespondents() {
         String expected = "";
-        String actual = ListingHelper.getRespondentOthersWithLineBreaks(listingDetails.getCaseData().getListingCollection().get(3).getValue());
+        String actual = ListingHelper.getRespondentOthersWithLineBreaks(listingDetails.getCaseData()
+                .getListingCollection().get(3).getValue());
 
         assertEquals(expected, actual);
     }

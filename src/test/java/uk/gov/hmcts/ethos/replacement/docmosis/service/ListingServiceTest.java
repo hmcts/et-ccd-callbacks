@@ -146,6 +146,7 @@ public class ListingServiceTest {
         dateListedType.setHearingRoom(new DynamicFixedListType("Tribunal 4"));
         dateListedType.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue"));
         dateListedType.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
+        dateListedType.setHearingVenueDayScotland("Aberdeen");
         dateListedType.setListedDate("2019-12-12T12:11:00.000");
         dateListedType.setHearingTimingStart("2019-12-12T12:11:00.000");
         dateListedType.setHearingTimingBreak("2019-12-12T12:11:00.000");
@@ -161,6 +162,7 @@ public class ListingServiceTest {
         dateListedType1.setHearingRoom(new DynamicFixedListType("Tribunal 4"));
         dateListedType1.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue"));
         dateListedType1.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
+        dateListedType1.setHearingVenueDayScotland("Aberdeen");
         dateListedType1.setListedDate("2019-12-10T12:11:00.000");
         dateListedType1.setHearingTimingStart("2019-12-10T11:00:00.000");
         dateListedType1.setHearingTimingBreak("2019-12-10T12:00:00.000");
@@ -177,6 +179,7 @@ public class ListingServiceTest {
         dateListedType2.setHearingRoom(new DynamicFixedListType("Tribunal 5"));
         dateListedType2.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue2"));
         dateListedType2.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
+        dateListedType2.setHearingVenueDayScotland("Aberdeen");
         dateListedType2.setListedDate("2019-12-12T12:11:30.000");
         DateListedTypeItem dateListedTypeItem2 = new DateListedTypeItem();
         dateListedTypeItem2.setId("124");
@@ -189,6 +192,7 @@ public class ListingServiceTest {
         dateListedType3.setHearingRoom(new DynamicFixedListType("Tribunal 5"));
         dateListedType3.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue2"));
         dateListedType3.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
+        dateListedType3.setHearingVenueDayScotland("Aberdeen");
         dateListedType3.setListedDate("2019-12-12T12:11:55.000");
         dateListedType3.setHearingTimingStart("2019-12-12T14:11:55.000");
         dateListedType3.setHearingTimingBreak("2019-12-12T15:11:55.000");

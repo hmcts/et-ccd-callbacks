@@ -123,7 +123,6 @@ public class ListingService {
         }
         caseData.setPrintHearingCollection(caseData.getPrintHearingDetails());
         caseData.getPrintHearingCollection().setListingCollection(listingTypeItems);
-        caseData.getPrintHearingCollection().clearReportFields();
 
         return caseData;
     }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 
@@ -13,6 +14,7 @@ import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_GLASGOW_VENUE_FIE
 import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_VENUE_FIELD_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
 
+@Slf4j
 public class ListingVenueHelper {
 
     private ListingVenueHelper() {
@@ -60,10 +62,17 @@ public class ListingVenueHelper {
     }
 
     public static Map<String, String> getListingVenueLabelToSearch(ListingData listingData) {
-        if (listingData.hasListingVenue() && ALL_VENUES.equals(listingData.getListingVenue().getSelectedLabel())) {
-            return Map.of(ALL_VENUES, ALL_VENUES);
-        } else {
-            return getVenueLabelToSearch(listingData);
+        try {
+            if (listingData.hasListingVenue() && ALL_VENUES.equals(listingData.getListingVenue().getSelectedLabel())) {
+                return Map.of(ALL_VENUES, ALL_VENUES);
+            } else {
+                return getVenueLabelToSearch(listingData);
+            }
+        }
+        catch (IllegalStateException ex) {
+            log.error("Unable to find venue", ex);
+            return Map.of("", "");
+
         }
     }
 
@@ -79,7 +88,7 @@ public class ListingVenueHelper {
         } else if (listingData.hasListingVenue()) {
             return Map.of(LISTING_VENUE_FIELD_NAME, listingData.getListingVenue().getSelectedLabel());
         } else {
-            return Map.of("", "");
+            throw new IllegalStateException();
         }
     }
 

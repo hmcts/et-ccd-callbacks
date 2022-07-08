@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -47,7 +46,6 @@ class ListingVenueHelperTest {
     void testGetListingVenueLabels(ListingData listingData, String expected) {
         assertEquals(expected, ListingVenueHelper.getListingVenueLabel(listingData));
     }
-
 
     private static Stream<Arguments> testGetListingVenueLabels() {
         return Stream.of(

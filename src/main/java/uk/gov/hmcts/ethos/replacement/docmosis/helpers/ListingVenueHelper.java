@@ -61,12 +61,6 @@ public class ListingVenueHelper {
         return venueToSearchMap.entrySet().iterator().next().getValue();
     }
 
-    /**
-     * Gets Listing Venue label from listing data.
-     * It would search for either all venues are searched for, then return All, if not
-     * will return the venue.
-     * @param listingData print hearing details from the case data
-     */
     private static Map<String, String> getListingVenueLabelToSearch(ListingData listingData) {
         try {
             if (listingData.hasListingVenue() && ALL_VENUES.equals(listingData.getListingVenue().getSelectedLabel())) {

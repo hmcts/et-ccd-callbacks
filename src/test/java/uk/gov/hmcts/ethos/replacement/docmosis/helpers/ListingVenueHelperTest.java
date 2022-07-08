@@ -86,27 +86,6 @@ class ListingVenueHelperTest {
 
     @ParameterizedTest
     @MethodSource
-    void testGetListingVenueLabelToSearch(ListingData listingData, Map<String, String> expected) {
-        assertEquals(expected, ListingVenueHelper.getListingVenueLabelToSearch(listingData));
-    }
-
-    private static Stream<Arguments> testGetListingVenueLabelToSearch() {
-        return Stream.of(
-                Arguments.of(createAberdeen(VENUE_NAME), Map.of(LISTING_ABERDEEN_VENUE_FIELD_NAME, VENUE_NAME)),
-                Arguments.of(createAberdeen(ALL_VENUES), Map.of("", "")),
-                Arguments.of(createDundee(VENUE_NAME), Map.of(LISTING_DUNDEE_VENUE_FIELD_NAME, VENUE_NAME)),
-                Arguments.of(createDundee(ALL_VENUES), Map.of("", "")),
-                Arguments.of(createEdinburgh(VENUE_NAME), Map.of(LISTING_EDINBURGH_VENUE_FIELD_NAME, VENUE_NAME)),
-                Arguments.of(createEdinburgh(ALL_VENUES), Map.of("", "")),
-                Arguments.of(createGlasgow(VENUE_NAME), Map.of(LISTING_GLASGOW_VENUE_FIELD_NAME, VENUE_NAME)),
-                Arguments.of(createGlasgow(ALL_VENUES), Map.of("", "")),
-                Arguments.of(createEnglandWales(VENUE_NAME), Map.of(LISTING_VENUE_FIELD_NAME, VENUE_NAME)),
-                Arguments.of(createEnglandWales(ALL_VENUES), Map.of(ALL_VENUES, ALL_VENUES))
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource
     void testIsAllScottishVenues(ListingData listingData, boolean expected) {
         assertEquals(expected, ListingVenueHelper.isAllScottishVenues(listingData));
     }

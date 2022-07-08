@@ -67,7 +67,7 @@ public class ListingVenueHelper {
      * will return the venue.
      * @param listingData print hearing details from the case data
      */
-    public static Map<String, String> getListingVenueLabelToSearch(ListingData listingData) {
+    private static Map<String, String> getListingVenueLabelToSearch(ListingData listingData) {
         try {
             if (listingData.hasListingVenue() && ALL_VENUES.equals(listingData.getListingVenue().getSelectedLabel())) {
                 return Map.of(ALL_VENUES, ALL_VENUES);

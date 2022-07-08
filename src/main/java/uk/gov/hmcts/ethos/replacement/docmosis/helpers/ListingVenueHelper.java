@@ -61,6 +61,12 @@ public class ListingVenueHelper {
         return venueToSearchMap.entrySet().iterator().next().getValue();
     }
 
+    /**
+     * Gets Listing Venue label from listing data.
+     * It would search for either all venues are searched for, then return All, if not
+     * will return the venue.
+     * @param listingData print hearing details from the case data
+     */
     public static Map<String, String> getListingVenueLabelToSearch(ListingData listingData) {
         try {
             if (listingData.hasListingVenue() && ALL_VENUES.equals(listingData.getListingVenue().getSelectedLabel())) {
@@ -76,7 +82,7 @@ public class ListingVenueHelper {
         }
     }
 
-    public static Map<String, String> getVenueLabelToSearch(ListingData listingData) {
+    private static Map<String, String> getVenueLabelToSearch(ListingData listingData) {
         if (isNotAllVenuesValue(listingData.getVenueGlasgow())) {
             return Map.of(LISTING_GLASGOW_VENUE_FIELD_NAME, listingData.getVenueGlasgow().getSelectedLabel());
         } else if (isNotAllVenuesValue(listingData.getVenueAberdeen())) {

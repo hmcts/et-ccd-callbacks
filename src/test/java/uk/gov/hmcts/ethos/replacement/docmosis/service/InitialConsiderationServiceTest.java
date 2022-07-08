@@ -23,29 +23,29 @@ public class InitialConsiderationServiceTest {
         "| Respondent name given | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | Test Corp|\r\n"
-            + "|In ET3 by Respondent | |";
+            + "|In ET3 by respondent | |";
 
     static final String EXPECTED_RESPONDENT_NAME_BLANK =
         "| Respondent name given | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | |\r\n"
-            + "|In ET3 by Respondent | |";
+            + "|In ET3 by respondent | |";
 
     static final String EXPECTED_HEARING_STRING =
-        "|Hearing Details | |\r\n"
+        "|Hearing details | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|Date | 01 Jul 2022|\r\n"
             + "|Type | Preliminary Hearing(CM)|\r\n"
             + "|Duration | 1.5 Hours|";
 
     static final String EXPECTED_HEARING_BLANK =
-        "|Hearing Details | |\r\n"
+        "|Hearing details | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|Date | -|\r\n"
             + "|Type | -|\r\n"
             + "|Duration | -|";
 
-    static final String EXPECTED_JURISDICTION_HTML = "<h2>Jurisdiction Codes</h2><a target=\"_blank\" "
+    static final String EXPECTED_JURISDICTION_HTML = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
         + "href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">View all "
         + "jurisdiction codes and descriptors (opens in new tab)</a><br><br><strong>DAG</strong> - "
         + "Discrimination, including indirect discrimination, harassment or victimisation or discrimination "

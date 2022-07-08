@@ -74,8 +74,7 @@ public class ListingVenueHelper {
             } else {
                 return getVenueLabelToSearch(listingData);
             }
-        }
-        catch (IllegalStateException ex) {
+        } catch (IllegalStateException ex) {
             log.error("Unable to find venue", ex);
             return Map.of("", "");
 

@@ -41,7 +41,7 @@ public class ClaimantHearingPreferencesController {
      * @return ResponseEntity  CCD callback response
      */
     @PostMapping(value = "/midEventHearingPreferences", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "return serving document other type names")
+    @Operation(summary = "validates claimant hearing preferences")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {

@@ -48,6 +48,41 @@ public class ListingVenueHelper {
         }
     }
 
+    /**
+     * Returns Venue label from listing venue dynamic fixed list Item.
+     * This returns the dynamicFixedList labels for the hearingVenues
+     * with the ones which needs to be in report.
+     * @param listingData print hearing details from the case data
+     */
+    public static String getListingVenueLabel(ListingData listingData) {
+        Map<String, String> venueToSearchMap = getListingVenueLabelToSearch(listingData);
+        return venueToSearchMap.entrySet().iterator().next().getValue();
+    }
+
+    public static Map<String, String> getListingVenueLabelToSearch(ListingData listingData) {
+        if (listingData.hasListingVenue() && ALL_VENUES.equals(listingData.getListingVenue().getSelectedLabel())) {
+            return Map.of(ALL_VENUES, ALL_VENUES);
+        } else {
+            return getVenueLabelToSearch(listingData);
+        }
+    }
+
+    public static Map<String, String> getVenueLabelToSearch(ListingData listingData) {
+        if (isNotAllVenuesValue(listingData.getVenueGlasgow())) {
+            return Map.of(LISTING_GLASGOW_VENUE_FIELD_NAME, listingData.getVenueGlasgow().getSelectedLabel());
+        } else if (isNotAllVenuesValue(listingData.getVenueAberdeen())) {
+            return Map.of(LISTING_ABERDEEN_VENUE_FIELD_NAME, listingData.getVenueAberdeen().getSelectedLabel());
+        } else if (isNotAllVenuesValue(listingData.getVenueDundee())) {
+            return Map.of(LISTING_DUNDEE_VENUE_FIELD_NAME, listingData.getVenueDundee().getSelectedLabel());
+        } else if (isNotAllVenuesValue(listingData.getVenueEdinburgh())) {
+            return Map.of(LISTING_EDINBURGH_VENUE_FIELD_NAME, listingData.getVenueEdinburgh().getSelectedLabel());
+        } else if (listingData.hasListingVenue()) {
+            return Map.of(LISTING_VENUE_FIELD_NAME, listingData.getListingVenue().getSelectedLabel());
+        } else {
+            return Map.of("", "");
+        }
+    }
+
     public static boolean isAllScottishVenues(ListingData listingData) {
         var venues = new ArrayList<DynamicFixedListType>();
         venues.add(listingData.getVenueGlasgow());

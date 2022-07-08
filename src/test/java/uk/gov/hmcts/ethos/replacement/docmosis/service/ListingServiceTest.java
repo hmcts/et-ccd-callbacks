@@ -53,6 +53,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -84,6 +85,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CA
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.BRISTOL;
+import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.DUNDEE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper.CAUSE_LIST_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
@@ -1238,6 +1241,32 @@ public class ListingServiceTest {
         ListingData listingData = listingService.setManagingOfficeAndCourtAddressFromCaseData(
                 caseDetails.getCaseData());
         assertEquals(result, listingData.toString());
+    }
+
+    @Test
+    public void getSelectedOfficeFromPrintingDetailsEWTest() {
+        CaseData caseData = new CaseData();
+        ListingData listingData = new ListingData();
+        listingData.setListingVenue(new DynamicFixedListType("blah blah"));
+        caseData.setManagingOffice(BRISTOL.getOfficeName());
+        caseData.setPrintHearingDetails(listingData);
+        assertEquals(BRISTOL.getOfficeName(), listingService.getSelectedOfficeForPrintLists(caseData));
+    }
+
+    @Test
+    public void getSelectedOfficeFromPrintingDetailsScotlandTest() {
+        CaseData caseData = new CaseData();
+        ListingData listingData = new ListingData();
+        listingData.setListingVenueScotland(DUNDEE.getOfficeName());
+        caseData.setPrintHearingDetails(listingData);
+        assertEquals(DUNDEE.getOfficeName(), listingService.getSelectedOfficeForPrintLists(caseData));
+    }
+
+    @Test
+    public void getSelectedOfficeFromPrintingDetailsExceptionTest() {
+        CaseData caseData = new CaseData();
+        caseData.setPrintHearingDetails(new ListingData());
+        assertThrows(IllegalStateException.class, () -> listingService.getSelectedOfficeForPrintLists(caseData));
     }
 
     @Test

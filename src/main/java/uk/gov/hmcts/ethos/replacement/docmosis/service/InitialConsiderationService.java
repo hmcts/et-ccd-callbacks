@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
@@ -22,8 +25,8 @@ public class InitialConsiderationService {
     static final String RESPONDENT_NAME =
         "| Respondent name given | |\r\n"
             + "|-------------|:------------|\r\n"
-            + "|In Et1 by claimant | %s|\r\n"
-            + "|In Et3 by Respondent | %s|";
+            + "|In ET1 by claimant | %s|\r\n"
+            + "|In ET3 by Respondent | %s|";
 
     static final String HEARING_DETAILS =
         "|Hearing Details | |\r\n"
@@ -108,18 +111,25 @@ public class InitialConsiderationService {
             return "";
         }
 
+        List<String> validJurisdictionCodes = jurisdictionCodes.stream().map(JurCodesTypeItem::getValue)
+            .map(JurCodesType::getJuridictionCodesList)
+            .filter(code -> EnumUtils.isValidEnum(JurisdictionCode.class, code))
+            .collect(Collectors.toList());
+
+        if (validJurisdictionCodes.isEmpty()) {
+            return  "";
+        }
+
         StringBuilder sb = new StringBuilder()
             .append(JURISDICTION_HEADER);
 
-        for (JurCodesTypeItem codeItem : jurisdictionCodes) {
-            String codeName = codeItem.getValue().getJuridictionCodesList();
-            sb.append("<strong>")
+        validJurisdictionCodes
+            .forEach(codeName -> sb.append("<strong>")
                 .append(codeName)
                 .append("</strong>")
                 .append(" - ")
                 .append(JurisdictionCode.valueOf(codeName).getDescription())
-                .append("<br><br>");
-        }
+                .append("<br><br>"));
 
         return sb.append("<hr>").toString();
     }

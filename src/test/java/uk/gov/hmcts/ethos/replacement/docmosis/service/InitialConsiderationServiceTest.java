@@ -22,14 +22,14 @@ public class InitialConsiderationServiceTest {
     static final String EXPECTED_RESPONDENT_NAME =
         "| Respondent name given | |\r\n"
             + "|-------------|:------------|\r\n"
-            + "|In Et1 by claimant | Test Corp|\r\n"
-            + "|In Et3 by Respondent | |";
+            + "|In ET1 by claimant | Test Corp|\r\n"
+            + "|In ET3 by Respondent | |";
 
     static final String EXPECTED_RESPONDENT_NAME_BLANK =
         "| Respondent name given | |\r\n"
             + "|-------------|:------------|\r\n"
-            + "|In Et1 by claimant | |\r\n"
-            + "|In Et3 by Respondent | |";
+            + "|In ET1 by claimant | |\r\n"
+            + "|In ET3 by Respondent | |";
 
     static final String EXPECTED_HEARING_STRING =
         "|Hearing Details | |\r\n"
@@ -112,6 +112,22 @@ public class InitialConsiderationServiceTest {
     }
 
     @Test
+    void invalidJurisdictionCollectionTest() {
+        String jurisdictionCodesHtml =
+            initialConsiderationService.generateJurisdictionCodesHtml(generateInvalidJurisdictionCodes());
+        assertThat(jurisdictionCodesHtml)
+            .isEqualTo("");
+    }
+
+    @Test
+    void invalidAndValidJurisdictionCollectionTest() {
+        String jurisdictionCodesHtml =
+            initialConsiderationService.generateJurisdictionCodesHtml(generateValidInvalidJurisdictionCodes());
+        assertThat(jurisdictionCodesHtml)
+            .isEqualTo(EXPECTED_JURISDICTION_HTML);
+    }
+
+    @Test
     void missingRespondentCollectionTest() {
         String respondentName =
             initialConsiderationService.getRespondentName(caseDetailsEmpty.getRespondentCollection());
@@ -122,6 +138,18 @@ public class InitialConsiderationServiceTest {
     private List<JurCodesTypeItem> generateJurisdictionCodes() {
         return List.of(generateJurisdictionCode("DAG"),
             generateJurisdictionCode("SXD"));
+    }
+
+    private List<JurCodesTypeItem> generateInvalidJurisdictionCodes() {
+        return List.of(generateJurisdictionCode("PGA"),
+            generateJurisdictionCode("CGA"));
+    }
+
+    private List<JurCodesTypeItem> generateValidInvalidJurisdictionCodes() {
+        return List.of(generateJurisdictionCode("DAG"),
+            generateJurisdictionCode("SXD"),
+            generateJurisdictionCode("PGA"),
+            generateJurisdictionCode("CGA"));
     }
 
     private JurCodesTypeItem generateJurisdictionCode(String codeString) {

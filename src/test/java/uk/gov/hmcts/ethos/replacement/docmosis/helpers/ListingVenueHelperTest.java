@@ -1,15 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
-
 import java.util.Map;
 import java.util.stream.Stream;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_ABERDEEN_VENUE_FIELD_NAME;
 import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_DUNDEE_VENUE_FIELD_NAME;
@@ -30,17 +27,39 @@ class ListingVenueHelperTest {
 
     private static Stream<Arguments> testGetListingVenue() {
         return Stream.of(
-            Arguments.of(createEnglandWales(VENUE_NAME), VENUE_NAME),
-            Arguments.of(createEnglandWales(ALL_VENUES), ALL_VENUES),
-            Arguments.of(createEnglandWales(null), ""),
-            Arguments.of(createAberdeen(VENUE_NAME), VENUE_NAME),
-            Arguments.of(createAberdeen(ALL_VENUES), ""),
-            Arguments.of(createDundee(VENUE_NAME), VENUE_NAME),
-            Arguments.of(createDundee(ALL_VENUES), ""),
-            Arguments.of(createEdinburgh(VENUE_NAME), VENUE_NAME),
-            Arguments.of(createEdinburgh(ALL_VENUES), ""),
-            Arguments.of(createGlasgow(VENUE_NAME), VENUE_NAME),
-            Arguments.of(createGlasgow(ALL_VENUES), "")
+                Arguments.of(createEnglandWales(VENUE_NAME), VENUE_NAME),
+                Arguments.of(createEnglandWales(ALL_VENUES), ALL_VENUES),
+                Arguments.of(createEnglandWales(null), ""),
+                Arguments.of(createAberdeen(VENUE_NAME), VENUE_NAME),
+                Arguments.of(createAberdeen(ALL_VENUES), ""),
+                Arguments.of(createDundee(VENUE_NAME), VENUE_NAME),
+                Arguments.of(createDundee(ALL_VENUES), ""),
+                Arguments.of(createEdinburgh(VENUE_NAME), VENUE_NAME),
+                Arguments.of(createEdinburgh(ALL_VENUES), ""),
+                Arguments.of(createGlasgow(VENUE_NAME), VENUE_NAME),
+                Arguments.of(createGlasgow(ALL_VENUES), "")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void testGetListingVenueLabels(ListingData listingData, String expected) {
+        assertEquals(expected, ListingVenueHelper.getListingVenueLabel(listingData));
+    }
+
+    private static Stream<Arguments> testGetListingVenueLabels() {
+        return Stream.of(
+                Arguments.of(createEnglandWales(VENUE_NAME), VENUE_NAME),
+                Arguments.of(createEnglandWales(ALL_VENUES), ALL_VENUES),
+                Arguments.of(createEnglandWales(null), ""),
+                Arguments.of(createAberdeen(VENUE_NAME), VENUE_NAME),
+                Arguments.of(createAberdeen(ALL_VENUES), ""),
+                Arguments.of(createDundee(VENUE_NAME), VENUE_NAME),
+                Arguments.of(createDundee(ALL_VENUES), ""),
+                Arguments.of(createEdinburgh(VENUE_NAME), VENUE_NAME),
+                Arguments.of(createEdinburgh(ALL_VENUES), ""),
+                Arguments.of(createGlasgow(VENUE_NAME), VENUE_NAME),
+                Arguments.of(createGlasgow(ALL_VENUES), "")
         );
     }
 
@@ -52,16 +71,16 @@ class ListingVenueHelperTest {
 
     private static Stream<Arguments> testGetListingVenueToSearch() {
         return Stream.of(
-            Arguments.of(createAberdeen(VENUE_NAME), Map.of(LISTING_ABERDEEN_VENUE_FIELD_NAME, VENUE_NAME)),
-            Arguments.of(createAberdeen(ALL_VENUES), Map.of("", "")),
-            Arguments.of(createDundee(VENUE_NAME), Map.of(LISTING_DUNDEE_VENUE_FIELD_NAME, VENUE_NAME)),
-            Arguments.of(createDundee(ALL_VENUES), Map.of("", "")),
-            Arguments.of(createEdinburgh(VENUE_NAME), Map.of(LISTING_EDINBURGH_VENUE_FIELD_NAME, VENUE_NAME)),
-            Arguments.of(createEdinburgh(ALL_VENUES), Map.of("", "")),
-            Arguments.of(createGlasgow(VENUE_NAME), Map.of(LISTING_GLASGOW_VENUE_FIELD_NAME, VENUE_NAME)),
-            Arguments.of(createGlasgow(ALL_VENUES), Map.of("", "")),
-            Arguments.of(createEnglandWales(VENUE_NAME), Map.of(LISTING_VENUE_FIELD_NAME, VENUE_NAME)),
-            Arguments.of(createEnglandWales(ALL_VENUES), Map.of(ALL_VENUES, ALL_VENUES))
+                Arguments.of(createAberdeen(VENUE_NAME), Map.of(LISTING_ABERDEEN_VENUE_FIELD_NAME, VENUE_NAME)),
+                Arguments.of(createAberdeen(ALL_VENUES), Map.of("", "")),
+                Arguments.of(createDundee(VENUE_NAME), Map.of(LISTING_DUNDEE_VENUE_FIELD_NAME, VENUE_NAME)),
+                Arguments.of(createDundee(ALL_VENUES), Map.of("", "")),
+                Arguments.of(createEdinburgh(VENUE_NAME), Map.of(LISTING_EDINBURGH_VENUE_FIELD_NAME, VENUE_NAME)),
+                Arguments.of(createEdinburgh(ALL_VENUES), Map.of("", "")),
+                Arguments.of(createGlasgow(VENUE_NAME), Map.of(LISTING_GLASGOW_VENUE_FIELD_NAME, VENUE_NAME)),
+                Arguments.of(createGlasgow(ALL_VENUES), Map.of("", "")),
+                Arguments.of(createEnglandWales(VENUE_NAME), Map.of(LISTING_VENUE_FIELD_NAME, VENUE_NAME)),
+                Arguments.of(createEnglandWales(ALL_VENUES), Map.of(ALL_VENUES, ALL_VENUES))
         );
     }
 

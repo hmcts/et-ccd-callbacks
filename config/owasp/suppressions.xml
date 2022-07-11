@@ -247,10 +247,9 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: log4j-api-2.17.2.jar
-   ]]> 
-        </notes>
-    <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j\-api@.*$</packageUrl>
-    <cve>CVE-2022-33915</cve>
-</suppress>
+   file name: moment:2.29.2
+   ]]></notes>
+        <packageUrl regex="true">^pkg:npm/moment@.*$</packageUrl>
+        <vulnerabilityName>1080944</vulnerabilityName>
+    </suppress>
 </suppressions>

@@ -237,13 +237,14 @@ public class Et1VettingService {
         List<String> errors = new ArrayList<>();
         List<VettingJurCodesTypeItem> codeList = caseData.getVettingJurisdictionCodeCollection();
         if (!codeList.isEmpty()) {
-            codeList.stream().filter(codesTypeItem -> caseData.getJurCodesCollection().stream()
-                    .map(existingCode -> existingCode.getValue().getJuridictionCodesList())
-                    .collect(Collectors.toList()).stream()
-                    .anyMatch(code -> code.equals(codesTypeItem.getValue().getEt1VettingJurCodeList())))
-                .forEach(c -> errors
-                    .add(String.format(ERROR_EXISTING_JUR_CODE, c.getValue().getEt1VettingJurCodeList())));
-
+            if (caseData.getJurCodesCollection() != null && !caseData.getJurCodesCollection().isEmpty()) {
+                codeList.stream().filter(codesTypeItem -> caseData.getJurCodesCollection().stream()
+                        .map(existingCode -> existingCode.getValue().getJuridictionCodesList())
+                        .collect(Collectors.toList()).stream()
+                        .anyMatch(code -> code.equals(codesTypeItem.getValue().getEt1VettingJurCodeList())))
+                    .forEach(c -> errors
+                        .add(String.format(ERROR_EXISTING_JUR_CODE, c.getValue().getEt1VettingJurCodeList())));
+            }
             codeList.stream()
                 .filter(code -> Collections.frequency(codeList, code) > 1).collect(Collectors.toSet())
                 .forEach(c -> errors

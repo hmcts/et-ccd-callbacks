@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -237,7 +238,7 @@ public class Et1VettingService {
         List<String> errors = new ArrayList<>();
         List<VettingJurCodesTypeItem> codeList = caseData.getVettingJurisdictionCodeCollection();
         if (!codeList.isEmpty()) {
-            if (caseData.getJurCodesCollection() != null && !caseData.getJurCodesCollection().isEmpty()) {
+            if (CollectionUtils.isNotEmpty(caseData.getJurCodesCollection())) {
                 codeList.stream().filter(codesTypeItem -> caseData.getJurCodesCollection().stream()
                         .map(existingCode -> existingCode.getValue().getJuridictionCodesList())
                         .collect(Collectors.toList()).stream()

@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.functional.util;
 
-import java.io.InputStream;
 import org.apache.commons.lang3.RandomStringUtils;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;

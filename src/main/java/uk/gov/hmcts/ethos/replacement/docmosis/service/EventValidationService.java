@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.base.Strings;
-import java.time.ZonedDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,9 +18,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.stream.Collectors.joining;
@@ -72,10 +74,10 @@ public class EventValidationService {
 
     private static final List<String> INVALID_STATES_FOR_CLOSED_CURRENT_POSITION = List.of(
             SUBMITTED_STATE, ACCEPTED_STATE, REJECTED_STATE);
-    public static final String DISPOSAL_DATE_IN_FUTURE = "Disposal Date can't be in the future for jurisdiction code %s.";
-    public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "Disposal Date must match one of the " +
-            "hearing dates for jurisdiction code %s.";
-
+    public static final String DISPOSAL_DATE_IN_FUTURE = "Disposal Date can't be in the future for "
+            + "jurisdiction code %s.";
+    public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "Disposal Date must match one of the "
+            + "hearing dates for jurisdiction code %s.";
 
     public List<String> validateReceiptDate(CaseData caseData) {
         List<String> errors = new ArrayList<>();
@@ -194,9 +196,9 @@ public class EventValidationService {
         }
         return errors;
     }
+
     /**
-     * Jurisdiction list is checked for duplicate values, codes existing
-     * in judgment and disposal date
+     * Jurisdiction list is checked for duplicate values, codes existing in judgment and disposal date.
      * @param  caseData     CaseData which is a generic data type
      *
      * @param errors        List of errors which will hold the errors being shown
@@ -231,19 +233,18 @@ public class EventValidationService {
     private void addInvalidDisposalDateError(List<HearingTypeItem> hearingTypeItems,
                                              String disposalDate, List<String> errors, String jurCode) {
 
-        if(Strings.isNullOrEmpty(disposalDate) || isDisposalDateInFuture(disposalDate, errors, jurCode)) {
-
+        if (Strings.isNullOrEmpty(disposalDate) || isDisposalDateInFuture(disposalDate, errors, jurCode)) {
             return;
         }
 
-         if (CollectionUtils.isEmpty(hearingTypeItems) ||
-                 !checkIfHearingDateMatchesWithDisposalDate(hearingTypeItems, disposalDate)) {
-             errors.add(String.format(DISPOSAL_DATE_HEARING_DATE_MATCH, jurCode));
-
-         }
+        if (CollectionUtils.isEmpty(hearingTypeItems)
+                 || !checkIfHearingDateMatchesWithDisposalDate(hearingTypeItems, disposalDate)) {
+            errors.add(String.format(DISPOSAL_DATE_HEARING_DATE_MATCH, jurCode));
+        }
     }
 
-    private boolean checkIfHearingDateMatchesWithDisposalDate(List<HearingTypeItem> hearingTypeItems, String disposalDate) {
+    private boolean checkIfHearingDateMatchesWithDisposalDate(List<HearingTypeItem> hearingTypeItems,
+                                                              String disposalDate) {
         return hearingTypeItems.stream().anyMatch(i -> compareHearingDates(i, disposalDate));
     }
 
@@ -263,14 +264,15 @@ public class EventValidationService {
 
         //During day light saving times, the comparison won't work if we don't consider zones while comparing them
         // Azure has always UTC time but user's times change in summer and winters, we need to use ZonedDateTime.
-        ZonedDateTime disposalDateTime = LocalDate.parse(disposalDate).atStartOfDay().atZone(ZoneId.of("Europe/London"));
+        ZonedDateTime disposalDateTime = LocalDate.parse(disposalDate).atStartOfDay()
+                .atZone(ZoneId.of("Europe/London"));
         ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.of("UTC"));
         if (disposalDateTime.isAfter(now)) {
             errors.add(String.format(DISPOSAL_DATE_IN_FUTURE, jurCode));
 
             return true;
         }
-            return false;
+        return false;
     }
 
     private boolean areDatesEqual(String disposalDate, String hearingDate)  {
@@ -289,6 +291,7 @@ public class EventValidationService {
                         Helper.getJurCodesCollection(judgementTypeItem.getValue().getJurisdictionCodes()));
             }
         }
+
         log.info("Check if all jurCodesCollectionWithinJudgement are in jurCodesCollection");
         Set<String> result = jurCodesCollectionWithinJudgement.stream()
                 .distinct()

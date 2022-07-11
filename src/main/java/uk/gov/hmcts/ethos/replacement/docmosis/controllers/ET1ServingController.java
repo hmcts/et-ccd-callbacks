@@ -22,7 +22,6 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
-
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -47,12 +46,13 @@ public class ET1ServingController {
     @PostMapping(value = "/midServingDocumentOtherTypeNames", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "return serving document other type names")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> midServingDocumentOtherTypeNames(
             @RequestBody CCDRequest ccdRequest,
@@ -64,7 +64,8 @@ public class ET1ServingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setOtherTypeDocumentName(ET1ServingService.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
+        caseData.setOtherTypeDocumentName(
+                ET1ServingService.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
@@ -84,12 +85,12 @@ public class ET1ServingController {
     @PostMapping(value = "/midServingDocumentRecipient", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "return serving document other type recipient's addresses")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> midServingDocumentRecipient(
             @RequestBody CCDRequest ccdRequest,

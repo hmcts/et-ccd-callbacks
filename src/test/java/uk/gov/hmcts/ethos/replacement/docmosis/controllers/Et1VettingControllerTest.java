@@ -60,7 +60,7 @@ class Et1VettingControllerTest {
 
     @BeforeEach
     void setUp() {
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setManagingOffice("Manchester");
         addJurCodeToExistingCollection(caseData, JurisdictionCode.DOD.name());
         ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();

@@ -57,52 +57,27 @@ class ET1ServingControllerTest {
     void midServingDocumentOtherTypeNames() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(et1ServingService.generateOtherTypeDocumentName(anyList())).thenReturn("expectedDocumentName");
+        when(et1ServingService.generateEmailLinkToAcas(any())).thenReturn("expectedLink");
+        when(et1ServingService.generateClaimantAndRespondentAddress(any())).thenReturn("expectedAddresses");
         mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.otherTypeDocumentName", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(et1ServingService, times(1)).generateOtherTypeDocumentName(anyList());
-
-    }
-
-    @Test
-    void midServingDocumentRecipient() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(et1ServingService.generateEmailLinkToAcas(any())).thenReturn("expectedLink");
-        when(et1ServingService.generateClaimantAndRespondentAddress(any())).thenReturn("expectedAddresses");
-
-        mvc.perform(post(SERVING_DOCUMENT_RECIPIENT_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.claimantAndRespondentAddresses", notNullValue()))
                 .andExpect(jsonPath("$.data.emailLinkToAcas", notNullValue()))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(et1ServingService, times(1)).generateOtherTypeDocumentName(anyList());
         verify(et1ServingService, times(1)).generateEmailLinkToAcas(any());
         verify(et1ServingService, times(1)).generateClaimantAndRespondentAddress(any());
-
     }
 
     @Test
     void midServingDocumentOtherTypeNamesForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void midServingDocumentRecipientForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(SERVING_DOCUMENT_RECIPIENT_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))

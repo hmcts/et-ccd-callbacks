@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import com.google.common.base.Strings;
-import lombok.val;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;

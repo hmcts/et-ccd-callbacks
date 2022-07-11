@@ -220,11 +220,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
      void caseCreationRequestException() throws IOException {
         when(ccdClient.retrieveCases(anyString(), anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
         assertThrows(CaseCreationException.class,
-                ()->{
-                    bulkSearchService.bulkCasesRetrievalRequest(
-                            getBulkDetails(YES, "Single"), "authToken", true);
-
-                });
+                ()-> bulkSearchService.bulkCasesRetrievalRequest(getBulkDetails(YES, "Single"), "authToken", true));
     }
 
     @Test
@@ -260,10 +256,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
         when(ccdClient.retrieveCasesElasticSearchForCreation(anyString(), anyString(), anyList(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         assertThrows(CaseCreationException.class,
-                ()->{
-                    bulkSearchService.bulkCasesRetrievalRequestElasticSearch(
-                            getBulkDetails(YES, "Single"), "authToken", true, true);
-                });
+                ()-> bulkSearchService.bulkCasesRetrievalRequestElasticSearch(getBulkDetails(YES, "Single"), "authToken", true, true));
     }
 
     @Test

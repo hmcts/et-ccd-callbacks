@@ -14,10 +14,10 @@ public class ET1ServingService {
     public static final String SERVING_DOCUMENT_OTHER_TYPE = "Another type of document";
     private static final String SERVING_RECIPIENT_CLAIMANT = "Claimant";
     private static final String SERVING_RECIPIENT_RESPONDENT = "Respondent";
-    private static final String ACAS_MAILTO_LINK = "mailto:ET3@acas.org.uk?subject={0}&body=Parties%20in%20claim" +
-            "%3A%20{1}%20vs%20{2}%0D%0ACase%20reference%20number%3A%20{3}%0D%0A%0D%0ADear%20Acas%2C%0D%0A%0D%0AThe%" +
-            "20tribunal%20has%20completed%20ET1%20serving%20to%20the%20respondent.%0D%0A%0D%0AThe%20documents%20we" +
-            "%20sent%20are%20attached%20to%20this%20email.%0D%0A%0D%0A";
+    private static final String ACAS_MAILTO_LINK = "mailto:ET3@acas.org.uk?subject={0}&body=Parties%20in%20claim"
+            + "%3A%20{1}%20vs%20{2}%0D%0ACase%20reference%20number%3A%20{3}%0D%0A%0D%0ADear%20Acas%2C%0D%0A%0D%0AThe%"
+            + "20tribunal%20has%20completed%20ET1%20serving%20to%20the%20respondent.%0D%0A%0D%0AThe%20documents%20we"
+            + "%20sent%20are%20attached%20to%20this%20email.%0D%0A%0D%0A";
     private static final String OTHER_TYPE_DOCUMENT_NAME = "**<big>%s</big>**<br/><small>%s</small><br/>";
     private static final String CLAIMANT_ADDRESS = "**<big>Claimant</big>**<br/>%s %s%s";
     private static final String RESPONDENT_ADDRESS = "**<big>Respondent %x</big>**<br/>%s%s";

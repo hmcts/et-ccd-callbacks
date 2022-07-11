@@ -63,13 +63,13 @@ public class FileLocationController {
     @PostMapping(value = "/initAdminData", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise file location data to null values")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initAdminData(
             @RequestHeader("Authorization") String userToken,
@@ -103,12 +103,12 @@ public class FileLocationController {
     @PostMapping(value = "/addFileLocation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add File Location")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                 content = {
-                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-                 }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+             content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+             }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> addFileLocation(
             @RequestHeader("Authorization") String userToken,
@@ -148,9 +148,9 @@ public class FileLocationController {
     @PostMapping(value = "/midEventSelectTribunalOffice", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates the dynamicList for file location when tribunal office selected")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> midEventSelectTribunalOffice(
             @RequestHeader("Authorization") String userToken,
@@ -186,9 +186,9 @@ public class FileLocationController {
     @PostMapping(value = "/midEventSelectFileLocation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates File Location Code and File Location Name according to selected Tribunal Office")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> midEventSelectFileLocation(
             @RequestHeader("Authorization") String userToken,
@@ -225,9 +225,9 @@ public class FileLocationController {
     @PostMapping(value = "/updateFileLocation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update file location")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> updateFileLocation(
             @RequestHeader("Authorization") String userToken,

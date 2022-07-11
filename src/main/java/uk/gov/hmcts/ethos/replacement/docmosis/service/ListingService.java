@@ -230,10 +230,10 @@ public class ListingService {
     public String getSelectedOfficeForPrintLists(CaseData caseData) {
         if (caseData.getPrintHearingDetails().getListingVenue() != null) {
             return caseData.getManagingOffice();
-        } else if (!Strings.isNullOrEmpty(caseData.getPrintHearingDetails().getListingVenueScotland()) ) {
+        } else if (!Strings.isNullOrEmpty(caseData.getPrintHearingDetails().getListingVenueScotland())) {
             return caseData.getPrintHearingDetails().getListingVenueScotland();
         } else {
-           throw new IllegalStateException("Unable to get selected office from "
+            throw new IllegalStateException("Unable to get selected office from "
                    + "printing details for case reference " + caseData.getEthosCaseReference());
         }
     }
@@ -242,9 +242,9 @@ public class ListingService {
                                                       ListingData listingData, CaseData caseData, boolean singleCase) {
         String caseTypeId = "";
         if (singleCase) {
-             caseTypeId = TribunalOffice.getCaseTypeId(getSelectedOfficeForPrintLists(caseData));
+            caseTypeId = TribunalOffice.getCaseTypeId(getSelectedOfficeForPrintLists(caseData));
         } else {
-             caseTypeId = TribunalOffice.getCaseTypeId(listingData.getManagingOffice());
+            caseTypeId = TribunalOffice.getCaseTypeId(listingData.getManagingOffice());
         }
         List<ListingTypeItem> listingTypeItems = new ArrayList<>();
         if (isHearingTypeValid(listingData, hearingTypeItem)) {

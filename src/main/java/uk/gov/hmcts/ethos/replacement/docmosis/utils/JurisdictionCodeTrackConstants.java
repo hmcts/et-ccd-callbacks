@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import java.util.List;
 
+@SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 public final class JurisdictionCodeTrackConstants {
 
     public static final List<String> JUR_CODE_CONCILIATION_TRACK_OP = List.of(

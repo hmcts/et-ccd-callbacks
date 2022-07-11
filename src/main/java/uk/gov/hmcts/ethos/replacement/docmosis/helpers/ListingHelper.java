@@ -296,7 +296,8 @@ public class ListingHelper {
         sb.append("\"Office_name\":\"").append(listingData.getManagingOffice())
                 .append(NEW_LINE);
         log.info("Hearing location");
-        sb.append("\"Hearing_location\":\"").append(ListingVenueHelper.getListingVenueLabel(listingData)).append(NEW_LINE);
+        sb.append("\"Hearing_location\":\"").append(ListingVenueHelper.getListingVenueLabel(listingData))
+                .append(NEW_LINE);
         log.info("Listings dates");
         sb.append(getListingDate(listingData));
         log.info("Clerk");

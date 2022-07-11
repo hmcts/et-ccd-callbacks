@@ -54,7 +54,7 @@ public class InitialConsiderationService {
         }
 
         return respondentCollection.stream().map(
-                respondent -> String.format(
+            respondent -> String.format(
                     RESPONDENT_NAME, nullCheck(respondent.getValue().getRespondentName()),
                     nullCheck(respondent.getValue().getResponseRespondentName()))).findFirst()
             .orElse(RESPONDENT_MISSING);

@@ -41,7 +41,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.VenueService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -49,16 +48,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_ABERDEEN_VENUE_FIELD_NAME;
-import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_VENUE_FIELD_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_COMPLETED_REPORT;
@@ -87,6 +85,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CA
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.BRISTOL;
+import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.DUNDEE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper.CAUSE_LIST_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
@@ -149,6 +149,7 @@ public class ListingServiceTest {
         dateListedType.setHearingRoom(new DynamicFixedListType("Tribunal 4"));
         dateListedType.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue"));
         dateListedType.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
+        dateListedType.setHearingVenueDayScotland("Aberdeen");
         dateListedType.setListedDate("2019-12-12T12:11:00.000");
         dateListedType.setHearingTimingStart("2019-12-12T12:11:00.000");
         dateListedType.setHearingTimingBreak("2019-12-12T12:11:00.000");
@@ -164,6 +165,7 @@ public class ListingServiceTest {
         dateListedType1.setHearingRoom(new DynamicFixedListType("Tribunal 4"));
         dateListedType1.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue"));
         dateListedType1.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
+        dateListedType1.setHearingVenueDayScotland("Aberdeen");
         dateListedType1.setListedDate("2019-12-10T12:11:00.000");
         dateListedType1.setHearingTimingStart("2019-12-10T11:00:00.000");
         dateListedType1.setHearingTimingBreak("2019-12-10T12:00:00.000");
@@ -180,6 +182,7 @@ public class ListingServiceTest {
         dateListedType2.setHearingRoom(new DynamicFixedListType("Tribunal 5"));
         dateListedType2.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue2"));
         dateListedType2.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
+        dateListedType2.setHearingVenueDayScotland("Aberdeen");
         dateListedType2.setListedDate("2019-12-12T12:11:30.000");
         DateListedTypeItem dateListedTypeItem2 = new DateListedTypeItem();
         dateListedTypeItem2.setId("124");
@@ -192,6 +195,7 @@ public class ListingServiceTest {
         dateListedType3.setHearingRoom(new DynamicFixedListType("Tribunal 5"));
         dateListedType3.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue2"));
         dateListedType3.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
+        dateListedType3.setHearingVenueDayScotland("Aberdeen");
         dateListedType3.setListedDate("2019-12-12T12:11:55.000");
         dateListedType3.setHearingTimingStart("2019-12-12T14:11:55.000");
         dateListedType3.setHearingTimingBreak("2019-12-12T15:11:55.000");
@@ -443,12 +447,22 @@ public class ListingServiceTest {
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());
         submitEvents.get(0).getCaseData().setClaimantCompany("RYAN AIR LTD");
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(
-                anyString(), anyString(), anyString(), anyString(),
-                anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService
                 .processListingHearingsRequest(listingDetails, "authToken");
         assertEquals(result, listingDataResult.toString());
+    }
+
+    @Test
+    public void testVenueNotFound() {
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate("2019-12-12T12:11:00.000");
+        dateListedType.setHearingVenueDayScotland("Glasgow");
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setId("123");
+        dateListedTypeItem.setValue(dateListedType);
+        assertFalse(listingService.isListingVenueValid(listingDetails.getCaseData(),
+                dateListedTypeItem, ENGLANDWALES_CASE_TYPE_ID, "123"));
     }
 
     @Test
@@ -618,8 +632,7 @@ public class ListingServiceTest {
         listingDetails.getCaseData().setHearingDocETCL(HEARING_ETCL_PUBLIC);
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(),
-                anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.processListingHearingsRequest(listingDetails,
                 "authToken");
         assertEquals(result, listingDataResult.toString());
@@ -739,8 +752,7 @@ public class ListingServiceTest {
         listingDetails.getCaseData().setVenueAberdeen(new DynamicFixedListType(ALL_VENUES));
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(),
-                anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.processListingHearingsRequest(listingDetails,
                 "authToken");
         assertEquals(result, listingDataResult.toString());
@@ -804,10 +816,7 @@ public class ListingServiceTest {
         listingDetailsRange.getCaseData().setVenueAberdeen(new DynamicFixedListType(
                 TribunalOffice.ABERDEEN.getOfficeName()));
         submitEvents.get(0).getCaseData().setClaimantCompany("RYAN AIR LTD");
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch("authToken",
-                ENGLANDWALES_CASE_TYPE_ID, listingDetailsRange.getCaseData().getListingDateFrom(),
-                listingDetailsRange.getCaseData().getListingDateTo(), TribunalOffice.ABERDEEN.getOfficeName(),
-                LISTING_ABERDEEN_VENUE_FIELD_NAME, TribunalOffice.ABERDEEN.getOfficeName())).thenReturn(submitEvents);
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.processListingHearingsRequest(listingDetailsRange,
                 "authToken");
         assertEquals(result, listingDataResult.toString());
@@ -861,10 +870,7 @@ public class ListingServiceTest {
         submitEvents.get(0).getCaseData().setClaimantCompany("RYAN AIR LTD");
         listingDetails.getCaseData().setVenueAberdeen(new DynamicFixedListType(ALL_VENUES));
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch("authToken", ENGLANDWALES_CASE_TYPE_ID,
-                listingDetails.getCaseData().getListingDate(), listingDetails.getCaseData().getListingDate(),
-                TribunalOffice.ABERDEEN.getOfficeName(), LISTING_VENUE_FIELD_NAME,
-                TribunalOffice.ABERDEEN.getOfficeName())).thenReturn(submitEvents);
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.processListingHearingsRequest(listingDetails, "authToken");
         assertEquals(result, listingDataResult.toString());
     }
@@ -930,8 +936,7 @@ public class ListingServiceTest {
         submitEvents.get(0).getCaseData().setClaimantCompany("RYAN AIR LTD");
         listingDetailsRange.getCaseData().setListingVenue(new DynamicFixedListType(ALL_VENUES));
         listingDetailsRange.getCaseData().setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(),
-                anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.processListingHearingsRequest(listingDetailsRange, "authToken");
         assertEquals(result, listingDataResult.toString());
     }
@@ -942,8 +947,7 @@ public class ListingServiceTest {
                 .get(1).getValue().setListedDate(null);
         submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue().getHearingDateCollection()
                 .get(1).getValue().setListedDate("");
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(),
-                anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString())).thenReturn(submitEvents);
         listingService.processListingHearingsRequest(listingDetailsRange, "authToken");
     }
 
@@ -995,8 +999,7 @@ public class ListingServiceTest {
         listingDetailsRange.getCaseData().setListingDateFrom("2021-01-01");
         listingDetailsRange.getCaseData().setListingDateTo("2021-12-01");
         listingDetailsRange.getCaseData().setVenueAberdeen(new DynamicFixedListType("Aberdeen"));
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(),
-                anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString())).thenReturn(submitEvents);
         var listingDataResult = listingService
                 .processListingHearingsRequest(listingDetailsRange, "authToken");
         assertEquals(result, listingDataResult.toString());
@@ -1111,8 +1114,7 @@ public class ListingServiceTest {
         representedTypeRItem.setValue(representedTypeR);
         submitEvents.get(0).getCaseData()
                 .setRepCollection(new ArrayList<>(Collections.singleton(representedTypeRItem)));
-        when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(),
-                anyString(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString())).thenReturn(submitEvents);
         listingDetails.getCaseData().setVenueAberdeen(new DynamicFixedListType("Aberdeen"));
         ListingData listingDataResult = listingService
                 .processListingHearingsRequest(listingDetails, "authToken");
@@ -1146,7 +1148,7 @@ public class ListingServiceTest {
                 + "hearingNotes= , judicialMediation= , "
                 + "hearingFormat= , hearingReadingDeliberationMembersChambers= ))], "
                 + "listingVenueOfficeGlas=null, listingVenueOfficeAber=null, venueGlasgow=null, "
-                + "venueAberdeen=null, venueDundee=null, venueEdinburgh=null, "
+                + "venueAberdeen=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), venueDundee=null, venueEdinburgh=null, "
                 + "hearingDocType=null, hearingDocETCL=null, roomOrNoRoom=null, docMarkUp=null, "
                 + "bfDateCollection=null, clerkResponsible=null, "
                 + "reportType=Brought Forward Report, documentName=null, showAll=null, localReportsSummaryHdr=null, "
@@ -1202,7 +1204,7 @@ public class ListingServiceTest {
                 + "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat= , "
                 + "hearingReadingDeliberationMembersChambers= ))], "
                 + "listingVenueOfficeGlas=null, listingVenueOfficeAber=null, "
-                + "venueGlasgow=null, venueAberdeen=null, venueDundee=null, venueEdinburgh=null, "
+                + "venueGlasgow=null, venueAberdeen=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, label=Aberdeen), listItems=null), venueDundee=null, venueEdinburgh=null, "
                 + "hearingDocType=ETCL - Cause List, hearingDocETCL=Staff, roomOrNoRoom=null, docMarkUp=null, "
                 + "bfDateCollection=null, clerkResponsible=null, reportType=Brought "
                 + "Forward Report, documentName=null, "
@@ -1236,8 +1238,35 @@ public class ListingServiceTest {
                 + "localReportsSummaryHdr=null, localReportsSummary=null, localReportsSummaryHdr2=null, "
                 + "localReportsSummary2=null, localReportsDetailHdr=null, "
                 + "localReportsDetail=null, managingOffice=Leeds)";
-        ListingData listingData = listingService.setManagingOfficeAndCourtAddressFromCaseData(caseDetails.getCaseData());
+        ListingData listingData = listingService.setManagingOfficeAndCourtAddressFromCaseData(
+                caseDetails.getCaseData());
         assertEquals(result, listingData.toString());
+    }
+
+    @Test
+    public void getSelectedOfficeFromPrintingDetailsEWTest() {
+        CaseData caseData = new CaseData();
+        ListingData listingData = new ListingData();
+        listingData.setListingVenue(new DynamicFixedListType("blah blah"));
+        caseData.setManagingOffice(BRISTOL.getOfficeName());
+        caseData.setPrintHearingDetails(listingData);
+        assertEquals(BRISTOL.getOfficeName(), listingService.getSelectedOfficeForPrintLists(caseData));
+    }
+
+    @Test
+    public void getSelectedOfficeFromPrintingDetailsScotlandTest() {
+        CaseData caseData = new CaseData();
+        ListingData listingData = new ListingData();
+        listingData.setListingVenueScotland(DUNDEE.getOfficeName());
+        caseData.setPrintHearingDetails(listingData);
+        assertEquals(DUNDEE.getOfficeName(), listingService.getSelectedOfficeForPrintLists(caseData));
+    }
+
+    @Test
+    public void getSelectedOfficeFromPrintingDetailsExceptionTest() {
+        CaseData caseData = new CaseData();
+        caseData.setPrintHearingDetails(new ListingData());
+        assertThrows(IllegalStateException.class, () -> listingService.getSelectedOfficeForPrintLists(caseData));
     }
 
     @Test

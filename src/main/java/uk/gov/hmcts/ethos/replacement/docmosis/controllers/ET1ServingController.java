@@ -22,7 +22,6 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
-
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -47,12 +46,13 @@ public class ET1ServingController {
     @PostMapping(value = "/midServingDocumentOtherTypeNames", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "return serving document other type names")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> midServingDocumentOtherTypeNames(
             @RequestBody CCDRequest ccdRequest,
@@ -64,45 +64,12 @@ public class ET1ServingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setOtherTypeDocumentName(ET1ServingService.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
+        caseData.setOtherTypeDocumentName(
+                ET1ServingService.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
+        caseData.setClaimantAndRespondentAddresses(ET1ServingService.generateClaimantAndRespondentAddress(caseData));
+        caseData.setEmailLinkToAcas(ET1ServingService.generateEmailLinkToAcas(caseData));
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
-    /**
-     * This service Gets userToken as a parameter for security validation
-     * and ccdRequest data which has caseData as an object.
-     * @param  userToken        Used for authorisation
-     *
-     * @param ccdRequest        CaseData which is a generic data type for most of the
-     *                          methods which holds ET1 case data
-     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse that
-     *                          includes caseData which contains the claimant and respondent
-     *                          addresses in html string format, and an email link that will
-     *                          be used
-     */
-    @PostMapping(value = "/midServingDocumentRecipient", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "return serving document other type recipient's addresses")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> midServingDocumentRecipient(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setClaimantAndRespondentAddresses(ET1ServingService.generateClaimantAndRespondentAddress(caseData));
-        caseData.setEmailLinkToAcas(ET1ServingService.generateEmailLinkToAcas(caseData));
-
-        return getCallbackRespEntityNoErrors(caseData);
-    }
 }

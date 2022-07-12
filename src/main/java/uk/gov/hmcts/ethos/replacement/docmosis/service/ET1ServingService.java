@@ -35,22 +35,19 @@ public class ET1ServingService {
     }
 
     public String generateClaimantAndRespondentAddress(CaseData caseData) {
-        List<String> recipients = caseData.getServingDocumentRecipient();
         StringBuilder addressStr = new StringBuilder();
-        if (recipients.contains(SERVING_RECIPIENT_CLAIMANT)) {
-            ClaimantIndType claimant = caseData.getClaimantIndType();
-            addressStr.append(String.format(CLAIMANT_ADDRESS, claimant.getClaimantFirstNames(),
-                            claimant.getClaimantLastName(),
-                            caseData.getClaimantType().getClaimantAddressUK().toAddressHtml()));
-        }
-        if (recipients.contains(SERVING_RECIPIENT_RESPONDENT)) {
-            int index = 1;
-            for (RespondentSumTypeItem respondentItem : caseData.getRespondentCollection()) {
-                addressStr.append(String.format(RESPONDENT_ADDRESS, index,
-                        respondentItem.getValue().getRespondentName(),
-                        respondentItem.getValue().getRespondentAddress().toAddressHtml()));
-                index++;
-            }
+
+        ClaimantIndType claimant = caseData.getClaimantIndType();
+        addressStr.append(String.format(CLAIMANT_ADDRESS, claimant.getClaimantFirstNames(),
+            claimant.getClaimantLastName(),
+            caseData.getClaimantType().getClaimantAddressUK().toAddressHtml()));
+
+        int index = 1;
+        for (RespondentSumTypeItem respondentItem : caseData.getRespondentCollection()) {
+            addressStr.append(String.format(RESPONDENT_ADDRESS, index,
+                respondentItem.getValue().getRespondentName(),
+                respondentItem.getValue().getRespondentAddress().toAddressHtml()));
+            index++;
         }
 
         return addressStr.toString();

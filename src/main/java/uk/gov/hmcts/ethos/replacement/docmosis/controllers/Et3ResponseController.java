@@ -16,20 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 
@@ -75,6 +67,7 @@ public class Et3ResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setEt3ResponseShowInset(YES);
+        caseData.setEt3ResponseNameShowInset(YES);
         caseData.setEt3ResponseClaimantName(Et3ResponseHelper.formatClaimantNameForHtml(caseData));
         
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());

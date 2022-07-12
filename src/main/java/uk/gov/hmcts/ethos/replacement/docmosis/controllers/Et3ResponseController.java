@@ -38,8 +38,7 @@ public class Et3ResponseController {
     private final VerifyTokenService verifyTokenService;
 
     /**
-     * Called for the ET3 "Select Respondent" page. Creates a DynamicList containing a list of all the respondents
-     * which the user will be able to select as part of the ET3 Vetting Process.
+     * Called for the start of the ET3 Response Form event
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization

@@ -4,8 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
 /**
- * ET3 vetting helper provides methods to assist with the ET3 vetting pages
- * this includes formatting markdown and querying the state of the ET3 response.
+ * ET3 Response Helper provides methods to assist with the ET3 Response Form event
  */
 @Slf4j
 public class Et3ResponseHelper {
@@ -16,6 +15,11 @@ public class Et3ResponseHelper {
         // Access through static methods
     }
 
+    /**
+     * Formats the name of the claimant for display on the Claimant name correct page
+     * @param caseData data for the current case
+     * @return Name ready for presentation on web
+     */
     public static String formatClaimantNameForHtml(CaseData caseData) {
         return String.format(CLAIMANT_NAME_TABLE, caseData.getClaimant());
     }

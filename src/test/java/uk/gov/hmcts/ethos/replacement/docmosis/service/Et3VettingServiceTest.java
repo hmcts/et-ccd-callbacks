@@ -6,6 +6,7 @@ import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.util.List;
@@ -43,7 +44,7 @@ class Et3VettingServiceTest {
     @Test
     void whenGivenASubmittedEt3Response_shouldSetEt3VettingCompleted() {
         et3VettingService.saveEt3VettingToRespondent(caseData);
-        var result = caseData.getRespondentCollection().get(0).getValue();
+        RespondentSumType result = caseData.getRespondentCollection().get(0).getValue();
 
         assertThat(result.getEt3VettingCompleted(),
             equalTo(YES));

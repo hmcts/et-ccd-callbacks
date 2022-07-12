@@ -59,23 +59,23 @@ public class ExcelDocManagementServiceTest {
         bytes = "Bytes to return".getBytes();
     }
 
-        @Test
-        public void uploadExcelDocument() {
-            URI uri = URI.create("http://google.com");
-            when(documentManagementService.uploadDocument(userToken,
-                    bytes,
-                    MultiplesHelper.generateExcelDocumentName(multipleDetails.getCaseData()), APPLICATION_EXCEL_VALUE,
-                    multipleDetails.getCaseTypeId()))
-                    .thenReturn(uri);
-            excelDocManagementService.uploadExcelDocument(userToken,
-                    multipleDetails,
-                    bytes);
-            verify(documentManagementService, times(1)).uploadDocument(userToken,
-                    bytes,
-                    MultiplesHelper.generateExcelDocumentName(multipleDetails.getCaseData()), APPLICATION_EXCEL_VALUE,
-                    multipleDetails.getCaseTypeId());
-            verifyNoMoreInteractions(documentManagementService);
-        }
+    @Test
+    public void uploadExcelDocument() {
+        URI uri = URI.create("http://google.com");
+        when(documentManagementService.uploadDocument(userToken,
+                bytes,
+                MultiplesHelper.generateExcelDocumentName(multipleDetails.getCaseData()), APPLICATION_EXCEL_VALUE,
+                multipleDetails.getCaseTypeId()))
+                .thenReturn(uri);
+        excelDocManagementService.uploadExcelDocument(userToken,
+                multipleDetails,
+                bytes);
+        verify(documentManagementService, times(1)).uploadDocument(userToken,
+                bytes,
+                MultiplesHelper.generateExcelDocumentName(multipleDetails.getCaseData()), APPLICATION_EXCEL_VALUE,
+                multipleDetails.getCaseTypeId());
+        verifyNoMoreInteractions(documentManagementService);
+    }
 
     @Test
     public void downloadExcelDocument() throws IOException {

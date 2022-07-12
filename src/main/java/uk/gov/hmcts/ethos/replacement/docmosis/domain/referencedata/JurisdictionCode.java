@@ -7,7 +7,8 @@ import lombok.Getter;
 public enum JurisdictionCode {
     ADG("Suffer a detriment and/or dismissal resulting from a failure to allow an employee to be accompanied"
         + " or to accompany a fellow employee at a disciplinary/grievance hearing"),
-    ADT("Application for a declaration that the inclusion of discriminatory terms/rules within certain "
+    ADT("Discriminatory terms or rules"),
+    ADTST("Application for a declaration that the inclusion of discriminatory terms/rules within certain "
         + "agreements or rules causes the aforesaid to be invalid"),
     APA("Application by an employee, their representative or trade union for a protective award as a "
         + "result of an employer's failure to consult over a redundancy situation"),

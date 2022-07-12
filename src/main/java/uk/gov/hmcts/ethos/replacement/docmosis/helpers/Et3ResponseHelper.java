@@ -10,13 +10,13 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 @Slf4j
 public class Et3ResponseHelper {
 
-  private static final String CLAIMANT_NAME_TABLE = "<pre> ET1 claimant name&#09&#09&#09&#09 %s</pre><hr>";
+    private static final String CLAIMANT_NAME_TABLE = "<pre> ET1 claimant name&#09&#09&#09&#09 %s</pre><hr>";
 
-  private Et3ResponseHelper() {
-    // Access through static methods
-  }
+    private Et3ResponseHelper() {
+        // Access through static methods
+    }
 
-  public static String formatClaimantNameForHtml(CaseData caseData) {
-    return String.format(CLAIMANT_NAME_TABLE, caseData.getClaimant());
-  }
+    public static String formatClaimantNameForHtml(CaseData caseData) {
+        return String.format(CLAIMANT_NAME_TABLE, caseData.getClaimant());
+    }
 }

@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
 /**
- * ET3 Response Helper provides methods to assist with the ET3 Response Form event
+ * ET3 Response Helper provides methods to assist with the ET3 Response Form event.
  */
 @Slf4j
 public class Et3ResponseHelper {
@@ -16,7 +16,7 @@ public class Et3ResponseHelper {
     }
 
     /**
-     * Formats the name of the claimant for display on the Claimant name correct page
+     * Formats the name of the claimant for display on the Claimant name correct page.
      * @param caseData data for the current case
      * @return Name ready for presentation on web
      */

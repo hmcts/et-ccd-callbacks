@@ -176,6 +176,7 @@ public class BulkActionsControllerTest {
         when(bulkCreationService.bulkCreationLogic(
                 isA(BulkDetails.class), isA(BulkCasesPayload.class), eq(AUTH_TOKEN), isA(String.class)))
                 .thenReturn(bulkRequestPayload);
+
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATION_BULK_ES_URL)
                 .content(requestContent.toString())

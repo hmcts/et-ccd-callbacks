@@ -94,8 +94,8 @@ public class BulkSearchServiceTest {
                 + "leadClaimantS=null, clerkRespS=null, " + "claimantSurnameS=null, respondentSurnameS=null, "
                 + "claimantRepS=null, respondentRepS=JuanPedro, fileLocS=null, receiptDateS=null, "
                 + "positionTypeS=null, feeGroupReferenceS=null, jurCodesCollectionS=null, stateS=null, "
-                + "currentPositionS=null, claimantAddressLine1S=null, " +
-                "claimantPostCodeS=null, respondentAddressLine1S=null, respondentPostCodeS=null,"
+                + "currentPositionS=null, claimantAddressLine1S=null, "
+                + "claimantPostCodeS=null, respondentAddressLine1S=null, respondentPostCodeS=null,"
                 + " flag1S=null, flag2S=null, EQPS=null, "
                 + "respondentRepOrgS=null, claimantRepOrgS=null))]";
         BulkRequestPayload bulkRequestPayload = bulkSearchService.bulkSearchLogic(bulkDetails);
@@ -113,13 +113,16 @@ public class BulkSearchServiceTest {
     @Test
     public void bulkMidSearchLogic() {
         String result = "BulkDetails(super=GenericCaseDetails(caseId=null, jurisdiction=TRIBUNALS, state=null,"
-                + " caseTypeId=Manchester_Multiple, createdDate=null, " + "lastModified=null, dataClassification=null), "
+                + " caseTypeId=Manchester_Multiple, createdDate=null, " + "lastModified=null, "
+                + "dataClassification=null), "
                 + "caseData=BulkData(bulkCaseTitle=null, multipleReference=1111, multipleReferenceLinkMarkUp=null,"
                 + " feeGroupReference=null, claimantSurname=, " + "respondentSurname=null, claimantRep=null, "
                 + "respondentRep=JuanPedro, ethosCaseReference=222, clerkResponsible=null, fileLocation=null, "
                 + "jurCodesCollection=null, fileLocationV2=null, feeGroupReferenceV2=null, claimantSurnameV2=null, "
-                + "respondentSurnameV2=null, multipleReferenceV2=null, " + "clerkResponsibleV2=null, positionTypeV2=null,"
-                + " claimantRepV2=null, respondentRepV2=null, fileLocationGlasgow=null, fileLocationAberdeen=null, "
+                + "respondentSurnameV2=null, multipleReferenceV2=null, " + "clerkResponsibleV2=null, "
+                + "positionTypeV2=null,"
+                + " claimantRepV2=null, respondentRepV2=null, fileLocationGlasgow=null, "
+                + "fileLocationAberdeen=null, "
                 + "fileLocationDundee=null, fileLocationEdinburgh=null, managingOffice=null, subMultipleName=null,"
                 + " subMultipleRef=null, caseIdCollection=null, " + "searchCollection=null, "
                 + "midSearchCollection=[MidSearchTypeItem" + "(id=2222, value=2222)], "
@@ -150,23 +153,32 @@ public class BulkSearchServiceTest {
         String result = "BulkDetails(super=GenericCaseDetails(caseId=null, jurisdiction=TRIBUNALS, state=null, "
                 + "caseTypeId=Manchester_Multiple, createdDate=null, "
                 + "lastModified=null, dataClassification=null), caseData=BulkData(bulkCaseTitle=null, "
-                + "multipleReference=1111, multipleReferenceLinkMarkUp=null, feeGroupReference=null, claimantSurname=, "
+                + "multipleReference=1111, multipleReferenceLinkMarkUp=null, feeGroupReference=null,"
+                + " claimantSurname=, "
                 + "respondentSurname=null, claimantRep=null, respondentRep=JuanPedro, ethosCaseReference=222, "
                 + "clerkResponsible=null, fileLocation=null, " + "jurCodesCollection=null, fileLocationV2=null,"
-                + " feeGroupReferenceV2=null, claimantSurnameV2=null," + " respondentSurnameV2=null, multipleReferenceV2=null, "
+                + " feeGroupReferenceV2=null, claimantSurnameV2=null," + " respondentSurnameV2=null, "
+                + "multipleReferenceV2=null, "
                 + "clerkResponsibleV2=null, positionTypeV2=null, claimantRepV2=null, respondentRepV2=null,"
-                + " fileLocationGlasgow=null, fileLocationAberdeen=null, " + "fileLocationDundee=null, fileLocationEdinburgh=null,"
+                + " fileLocationGlasgow=null, fileLocationAberdeen=null, " + "fileLocationDundee=null,"
+                + " fileLocationEdinburgh=null,"
                 + " managingOffice=null, subMultipleName=null, subMultipleRef=null, caseIdCollection=null, "
                 + "searchCollection=null, midSearchCollection=[MidSearchTypeItem(id=2222, value=2222)], "
                 + "multipleCollection=[MultipleTypeItem(id=2222, value=MultipleType" + "(caseIDM=null,"
                 + " ethosCaseReferenceM=2222, leadClaimantM=null, multipleReferenceM=null, clerkRespM=null, "
-                + "claimantSurnameM=null, respondentSurnameM=null," + " claimantRepM=null, respondentRepM=JuanPedro,"
-                + " fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null,"
-                + " stateM=null, subMultipleM= , subMultipleTitleM=null, currentPositionM=null, claimantAddressLine1M=null,"
+                + "claimantSurnameM=null, respondentSurnameM=null," + " claimantRepM=null, "
+                + "respondentRepM=JuanPedro,"
+                + " fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, "
+                + "jurCodesCollectionM=null,"
+                + " stateM=null, subMultipleM= , subMultipleTitleM=null, currentPositionM=null, "
+                + "claimantAddressLine1M=null,"
                 + " claimantPostCodeM=null, " + "respondentAddressLine1M=null, respondentPostCodeM=null, flag1M=null,"
-                + " flag2M=null, EQPM=null, respondentRepOrgM=null, claimantRepOrgM=null))], " + "subMultipleCollection=null,"
-                + " subMultipleDynamicList=null, searchCollectionCount=null, multipleCollectionCount=null, correspondenceType=null, "
-                + "correspondenceScotType=null, selectAll=Yes, scheduleDocName=null, positionType=null, flag1=null, "
+                + " flag2M=null, EQPM=null, respondentRepOrgM=null, claimantRepOrgM=null))], "
+                + "subMultipleCollection=null,"
+                + " subMultipleDynamicList=null, searchCollectionCount=null, multipleCollectionCount=null, "
+                + "correspondenceType=null, "
+                + "correspondenceScotType=null, selectAll=Yes, scheduleDocName=null, positionType=null,"
+                + " flag1=null, "
                 + "flag2=null, EQP=null, submissionRef=null, " + "claimantOrg=null, respondentOrg=null, state=null, "
                 + "flag1Update=null, flag2Update=null, EQPUpdate=null, jurCodesDynamicList=null, outcomeUpdate=null, "
                 + "filterCases=null, docMarkUp=null, multipleSource=Manually Created))";
@@ -183,6 +195,16 @@ public class BulkSearchServiceTest {
 
     @Test
     public void bulkMidSearchSubMultipleLogic() {
+        bulkDetails.getCaseData().setRespondentRep("JuanPedro");
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel("11111");
+        dynamicValueType.setCode("11111");
+        dynamicFixedListType.setValue(dynamicValueType);
+        List<DynamicValueType> listItems = new ArrayList<>(Collections.singleton(dynamicValueType));
+        dynamicFixedListType.setListItems(listItems);
+        bulkDetails.getCaseData().setSubMultipleDynamicList(dynamicFixedListType);
+        BulkRequestPayload bulkRequestPayload = bulkSearchService.bulkMidSearchLogic(bulkDetails, false);
         String result = "BulkDetails(super=GenericCaseDetails(caseId=null, jurisdiction=TRIBUNALS, state=null, "
                 + "caseTypeId=Manchester_Multiple, createdDate=null, "
                 + "lastModified=null, dataClassification=null), caseData=BulkData(bulkCaseTitle=null, multipleReference=1111, "
@@ -208,16 +230,6 @@ public class BulkSearchServiceTest {
                 + "flag2=null, EQP=null, submissionRef=null, " + "claimantOrg=null, respondentOrg=null, state=null, "
                 + "flag1Update=null, flag2Update=null, EQPUpdate=null, jurCodesDynamicList=null, outcomeUpdate=null, "
                 + "filterCases=null, docMarkUp=null, multipleSource=Manually Created))";
-        bulkDetails.getCaseData().setRespondentRep("JuanPedro");
-        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
-        DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setLabel("11111");
-        dynamicValueType.setCode("11111");
-        dynamicFixedListType.setValue(dynamicValueType);
-        List<DynamicValueType> listItems = new ArrayList<>(Collections.singleton(dynamicValueType));
-        dynamicFixedListType.setListItems(listItems);
-        bulkDetails.getCaseData().setSubMultipleDynamicList(dynamicFixedListType);
-        BulkRequestPayload bulkRequestPayload = bulkSearchService.bulkMidSearchLogic(bulkDetails, false);
         assertEquals(result, bulkRequestPayload.getBulkDetails().toString());
     }
 
@@ -225,7 +237,8 @@ public class BulkSearchServiceTest {
     public void midCreateSubMultiple() {
         String result = "BulkDetails(super=GenericCaseDetails(caseId=null, jurisdiction=TRIBUNALS, state=null, "
                 + "caseTypeId=Manchester_Multiple, createdDate=null, "
-                + "lastModified=null, dataClassification=null), caseData=BulkData(bulkCaseTitle=null, multipleReference=1111,"
+                + "lastModified=null, dataClassification=null), caseData=BulkData(bulkCaseTitle=null, "
+                + "multipleReference=1111,"
                 + " multipleReferenceLinkMarkUp=null, feeGroupReference=null, claimantSurname=, "
                 + "respondentSurname=null, claimantRep=null, respondentRep=JuanPedro, ethosCaseReference=222, "
                 + "clerkResponsible=null, fileLocation=null, " + "jurCodesCollection=null, fileLocationV2=null,"
@@ -233,18 +246,26 @@ public class BulkSearchServiceTest {
                 + " multipleReferenceV2=null, " + "clerkResponsibleV2=null, positionTypeV2=null, claimantRepV2=null,"
                 + " respondentRepV2=null, fileLocationGlasgow=null, fileLocationAberdeen=null, "
                 + "fileLocationDundee=null, fileLocationEdinburgh=null, managingOffice=null, subMultipleName=null, "
-                + "subMultipleRef=null, caseIdCollection=null, " + "searchCollection=null, midSearchCollection=[MidSearchTypeItem("
+                + "subMultipleRef=null, caseIdCollection=null, " + "searchCollection=null, "
+                + "midSearchCollection=[MidSearchTypeItem("
                 + "id=2222, value=2222)], multipleCollection=[MultipleTypeItem(id=2222, value=MultipleType"
                 + "(caseIDM=null, ethosCaseReferenceM=2222, leadClaimantM=null, multipleReferenceM=null, clerkRespM=null,"
-                + " claimantSurnameM=null, respondentSurnameM=null," + " claimantRepM=null, respondentRepM=JuanPedro,"
-                + " fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null,"
-                + " stateM=null, subMultipleM= , subMultipleTitleM=null, currentPositionM=null, claimantAddressLine1M=null,"
-                + " claimantPostCodeM=null, " + "respondentAddressLine1M=null, respondentPostCodeM=null, flag1M=null,"
+                + " claimantSurnameM=null, respondentSurnameM=null," + " claimantRepM=null, "
+                + "respondentRepM=JuanPedro,"
+                + " fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, "
+                + "jurCodesCollectionM=null,"
+                + " stateM=null, subMultipleM= , subMultipleTitleM=null, currentPositionM=null,"
+                + " claimantAddressLine1M=null,"
+                + " claimantPostCodeM=null, " + "respondentAddressLine1M=null, respondentPostCodeM=null,"
+                + " flag1M=null,"
                 + " flag2M=null, EQPM=null, respondentRepOrgM=null, claimantRepOrgM=null))], "
                 + "subMultipleCollection=null, subMultipleDynamicList=null, searchCollectionCount=null, "
-                + "multipleCollectionCount=null, correspondenceType=null, " + "correspondenceScotType=null, selectAll=null,"
-                + " scheduleDocName=null, positionType=null, flag1=null, flag2=null, EQP=null, submissionRef=null, "
-                + "claimantOrg=null, respondentOrg=null, state=null, flag1Update=null, flag2Update=null, EQPUpdate=null,"
+                + "multipleCollectionCount=null, correspondenceType=null, " + "correspondenceScotType=null, "
+                + "selectAll=null,"
+                + " scheduleDocName=null, positionType=null, flag1=null, flag2=null, EQP=null, "
+                + "submissionRef=null, "
+                + "claimantOrg=null, respondentOrg=null, state=null, flag1Update=null, flag2Update=null, "
+                + "EQPUpdate=null,"
                 + " jurCodesDynamicList=null, outcomeUpdate=null, "
                 + "filterCases=null, docMarkUp=null, multipleSource=Manually Created))";
         bulkDetails.getCaseData().setRespondentRep("JuanPedro");
@@ -257,10 +278,12 @@ public class BulkSearchServiceTest {
         String result = "BulkDetails(super=GenericCaseDetails(caseId=null, jurisdiction=TRIBUNALS, state=null, "
                 + "caseTypeId=Manchester_Multiple, createdDate=null, "
                 + "lastModified=null, dataClassification=null), caseData=BulkData(bulkCaseTitle=null, "
-                + "multipleReference=1111, multipleReferenceLinkMarkUp=null, feeGroupReference=null, claimantSurname=, "
+                + "multipleReference=1111, multipleReferenceLinkMarkUp=null, feeGroupReference=null, "
+                + "claimantSurname=, "
                 + "respondentSurname=null, claimantRep=null, respondentRep=JuanPedro, ethosCaseReference=222, "
                 + "clerkResponsible=null, fileLocation=null, " + "jurCodesCollection=null, fileLocationV2=null,"
-                + " feeGroupReferenceV2=null, claimantSurnameV2=null," + " respondentSurnameV2=null, multipleReferenceV2=null, "
+                + " feeGroupReferenceV2=null, claimantSurnameV2=null," + " respondentSurnameV2=null, "
+                + "multipleReferenceV2=null, "
                 + "clerkResponsibleV2=null, positionTypeV2=null, claimantRepV2=null, respondentRepV2=null, "
                 + "fileLocationGlasgow=null, fileLocationAberdeen=null, " + "fileLocationDundee=null, "
                 + "fileLocationEdinburgh=null, managingOffice=null, subMultipleName=null, "
@@ -268,12 +291,16 @@ public class BulkSearchServiceTest {
                 + "multipleCollection=[MultipleTypeItem(id=2222, " + "value=MultipleType(caseIDM=null, "
                 + "ethosCaseReferenceM=2222, leadClaimantM=null, multipleReferenceM=null, clerkRespM=null, "
                 + "claimantSurnameM=null, respondentSurnameM=null, " + "claimantRepM=null, respondentRepM=JuanPedro,"
-                + " fileLocM=null, receiptDateM=null, positionTypeM=null, " + "feeGroupReferenceM=null, jurCodesCollectionM=null, "
-                + "stateM=null, subMultipleM=4200001/1, subMultipleTitleM=null, currentPositionM=null, claimantAddressLine1M=null,"
+                + " fileLocM=null, receiptDateM=null, positionTypeM=null, " + "feeGroupReferenceM=null,"
+                + " jurCodesCollectionM=null, "
+                + "stateM=null, subMultipleM=4200001/1, subMultipleTitleM=null, currentPositionM=null,"
+                + " claimantAddressLine1M=null,"
                 + " claimantPostCodeM=null, " + "respondentAddressLine1M=null, respondentPostCodeM=null, flag1M=null,"
                 + " flag2M=null, EQPM=null, " + "respondentRepOrgM=null, claimantRepOrgM=null))], "
-                + "subMultipleCollection=null, subMultipleDynamicList=null, searchCollectionCount=null, multipleCollectionCount=null,"
-                + " correspondenceType=null, " + "correspondenceScotType=null, selectAll=null, scheduleDocName=null, "
+                + "subMultipleCollection=null, subMultipleDynamicList=null, searchCollectionCount=null, "
+                + "multipleCollectionCount=null,"
+                + " correspondenceType=null, " + "correspondenceScotType=null, selectAll=null, "
+                + "scheduleDocName=null, "
                 + "positionType=null, flag1=null, flag2=null, EQP=null, submissionRef=null, "
                 + "claimantOrg=null, respondentOrg=null, state=null, flag1Update=null, flag2Update=null,"
                 + " EQPUpdate=null, jurCodesDynamicList=null, outcomeUpdate=null, "

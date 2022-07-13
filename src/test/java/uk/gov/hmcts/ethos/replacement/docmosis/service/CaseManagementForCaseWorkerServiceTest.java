@@ -131,7 +131,6 @@ public class CaseManagementForCaseWorkerServiceTest {
         ccdRequest15.setCaseDetails(caseDetails15);
 
         manchesterCcdRequest = new CCDRequest();
-        CaseDetails manchesterCaseDetails = new CaseDetails();
         CaseData caseData = new CaseData();
         CasePreAcceptType casePreAcceptType = new CasePreAcceptType();
         casePreAcceptType.setCaseAccepted(YES);
@@ -143,8 +142,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         counterClaimType.setCounterClaim("72632632");
         eccCounterClaimTypeItem.setId(UUID.randomUUID().toString());
         eccCounterClaimTypeItem.setValue(counterClaimType);
-
-
+        CaseDetails manchesterCaseDetails = new CaseDetails();
         caseData.setEccCases(Arrays.asList(eccCounterClaimTypeItem));
         caseData.setRespondentECC(createRespondentECC());
         manchesterCaseDetails.setCaseData(caseData);
@@ -160,7 +158,6 @@ public class CaseManagementForCaseWorkerServiceTest {
         submitCaseData.setRepresentativeClaimantType(createRepresentedTypeC());
         submitCaseData.setRepCollection(createRepCollection(false));
         submitCaseData.setClaimantRepresentedQuestion(YES);
-        ClaimantType claimantType = new ClaimantType();
         Address address = new Address();
         address.setAddressLine1("AddressLine1");
         address.setAddressLine2("AddressLine2");
@@ -168,6 +165,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         address.setPostTown("Manchester");
         address.setCountry("UK");
         address.setPostCode("L1 122");
+        ClaimantType claimantType = new ClaimantType();
         claimantType.setClaimantAddressUK(address);
         submitCaseData.setClaimantType(claimantType);
         submitEvent.setState("Accepted");
@@ -228,8 +226,9 @@ public class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
         assertEquals(YES, caseData.getRespondentCollection().get(0).getValue().getResponseReceived());
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-            if (respondentSumTypeItem != caseData.getRespondentCollection().get(0))
+            if (respondentSumTypeItem != caseData.getRespondentCollection().get(0)) {
                 assertEquals(NO, respondentSumTypeItem.getValue().getResponseReceived());
+            }
         }
     }
 
@@ -286,10 +285,10 @@ public class CaseManagementForCaseWorkerServiceTest {
 
         assertEquals(1, caseData.getRespondentCollection().size());
 
-        assertEquals("Antonio Vazquez", caseData.
-                getRespondentCollection().get(0).getValue().getRespondentName());
-        assertEquals(NO, caseData.getRespondentCollection().
-                get(0).getValue().getResponseStruckOut());
+        assertEquals("Antonio Vazquez", caseData
+                .getRespondentCollection().get(0).getValue().getRespondentName());
+        assertEquals(NO, caseData.getRespondentCollection()
+                .get(0).getValue().getResponseStruckOut());
     }
 
     @Test
@@ -347,19 +346,19 @@ public class CaseManagementForCaseWorkerServiceTest {
 
         assertEquals(3, caseData.getRespondentCollection().size());
 
-        assertEquals("Antonio Vazquez", caseData.
-                getRespondentCollection().get(0).getValue().getRespondentName());
-        assertEquals(NO, caseData.getRespondentCollection().
-                get(0).getValue().getResponseStruckOut());
-        assertEquals("Roberto Dondini", caseData.
-                getRespondentCollection().
-                get(1).getValue().getRespondentName());
-        assertEquals(NO, caseData.getRespondentCollection().
-                get(1).getValue().getResponseStruckOut());
+        assertEquals("Antonio Vazquez", caseData
+                .getRespondentCollection().get(0).getValue().getRespondentName());
+        assertEquals(NO, caseData.getRespondentCollection()
+                .get(0).getValue().getResponseStruckOut());
+        assertEquals("Roberto Dondini", caseData
+                .getRespondentCollection()
+                .get(1).getValue().getRespondentName());
+        assertEquals(NO, caseData.getRespondentCollection()
+                .get(1).getValue().getResponseStruckOut());
         assertEquals("Juan Garcia", caseData.getRespondentCollection().
                 get(2).getValue().getRespondentName());
-        assertEquals(YES, caseData.getRespondentCollection().
-                get(2).getValue().getResponseStruckOut());
+        assertEquals(YES, caseData.getRespondentCollection()
+                .get(2).getValue().getResponseStruckOut());
     }
 
     @Test
@@ -432,8 +431,8 @@ public class CaseManagementForCaseWorkerServiceTest {
     public void buildFlagsImageFileNameForTrueFlagsFields() {
         CaseDetails caseDetails = ccdRequest15.getCaseDetails();
         FlagsImageHelper.buildFlagsImageFileName(caseDetails);
-        String expected = "" +
-                "<font color='DarkRed' size='5'> DO NOT POSTPONE </font>"
+        String expected = ""
+                + "<font color='DarkRed' size='5'> DO NOT POSTPONE </font>"
                 + "<font size='5'> - </font>"
                 + "<font color='Green' size='5'> LIVE APPEAL </font>"
                 + "<font size='5'> - </font>"
@@ -520,19 +519,19 @@ public class CaseManagementForCaseWorkerServiceTest {
     }
 
     private CaseData createCaseWithHearingDate(String date) {
-        var caseData = new CaseData();
-        List<HearingTypeItem> hearings = new ArrayList<>();
         HearingTypeItem hearing = new HearingTypeItem();
         hearing.setId(UUID.randomUUID().toString());
-        HearingType hearingType = new HearingType();
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         DateListedType dateListedType = new DateListedType();
         dateListedType.setListedDate(date);
         dateListedTypeItem.setId(UUID.randomUUID().toString());
         dateListedTypeItem.setValue(dateListedType);
+        HearingType hearingType = new HearingType();
         hearingType.setHearingDateCollection(Collections.singletonList(dateListedTypeItem));
         hearing.setValue(hearingType);
+        List<HearingTypeItem> hearings = new ArrayList<>();
         hearings.add(hearing);
+        var caseData = new CaseData();
         caseData.setHearingCollection(hearings);
         return caseData;
     }
@@ -644,12 +643,12 @@ public class CaseManagementForCaseWorkerServiceTest {
                 manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                 new ArrayList<>(), SUBMITTED_CALLBACK).getEccCases().get(0).getValue().getCounterClaim());
         EccCounterClaimTypeItem c1 = new EccCounterClaimTypeItem();
-        EccCounterClaimTypeItem c2 = new EccCounterClaimTypeItem();
         EccCounterClaimType counterClaimType1 = new EccCounterClaimType();
         EccCounterClaimType counterClaimType2 = new EccCounterClaimType();
         counterClaimType1.setCounterClaim("72632632");
         counterClaimType2.setCounterClaim("63467343");
         c1.setId(UUID.randomUUID().toString());
+        EccCounterClaimTypeItem c2 = new EccCounterClaimTypeItem();
         c2.setId(UUID.randomUUID().toString());
         c1.setValue(counterClaimType1);
         c2.setValue(counterClaimType2);

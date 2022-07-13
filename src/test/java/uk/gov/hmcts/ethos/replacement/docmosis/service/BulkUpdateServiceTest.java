@@ -188,8 +188,6 @@ public class BulkUpdateServiceTest {
         BulkData bulkData = new BulkData();
         bulkData.setMultipleReference("1111");
         submitBulkEvent.setCaseData(bulkData);
-        List<SubmitBulkEvent> submitBulkEventList = new ArrayList<>(Collections.singletonList(submitBulkEvent));
-        BulkCasesPayload bulkCasesPayload = new BulkCasesPayload();
         BulkDetails bulkDetails = getBulkDetailsCompleteWithValues(getBulkDetailsWithValues());
         bulkDetails.getCaseData().setMultipleReferenceV2(null);
         MultipleType multipleTypeLead = new MultipleType();
@@ -200,6 +198,8 @@ public class BulkUpdateServiceTest {
         multipleTypeItem.setId("1112");
         multipleTypeItem.setValue(multipleTypeLead);
         bulkDetails.getCaseData().getMultipleCollection().add(0, multipleTypeItem);
+        List<SubmitBulkEvent> submitBulkEventList = new ArrayList<>(Collections.singletonList(submitBulkEvent));
+        BulkCasesPayload bulkCasesPayload = new BulkCasesPayload();
         bulkCasesPayload.setSubmitEvents(new ArrayList<>(Collections.singleton(submitEvent)));
         when(ccdClient.retrieveBulkCases("authToken", ENGLANDWALES_BULK_CASE_TYPE_ID,
                 bulkDetails.getJurisdiction())).thenReturn(submitBulkEventList);
@@ -262,8 +262,8 @@ public class BulkUpdateServiceTest {
                 bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
         when(ccdClient.retrieveCase("authToken", ENGLANDWALES_CASE_TYPE_ID,
                 bulkDetails.getJurisdiction(), null)).thenReturn(submitEvent);
-        assertEquals("[Multiple reference does not exist or" +
-                " it is the same as the current multiple case]",
+        assertEquals("[Multiple reference does not exist or"
+                + " it is the same as the current multiple case]",
                 bulkUpdateService.bulkUpdateLogic(getBulkDetailsCompleteWithValues(getBulkDetailsWithValues()),
                 "authToken").getErrors().toString());
     }
@@ -356,7 +356,8 @@ public class BulkUpdateServiceTest {
 
     @Test
     public void bulkPreAcceptLogicEmptyCases() {
-        List<String> errors = bulkUpdateService.bulkPreAcceptLogic(bulkRequest.getCaseDetails(), new ArrayList<>(), "authToken", false).getErrors();
+        List<String> errors = bulkUpdateService.bulkPreAcceptLogic(
+                bulkRequest.getCaseDetails(), new ArrayList<>(), "authToken", false).getErrors();
         assertEquals("[No cases on the multiple case: 2300001/2019]", errors.toString());
     }
 
@@ -371,10 +372,13 @@ public class BulkUpdateServiceTest {
                 + "multipleReferenceM=null, clerkRespM=null, claimantSurnameM=null, respondentSurnameM=null, "
                 + "claimantRepM=null, respondentRepM=null, " + "fileLocM=null, receiptDateM=null, positionTypeM=null,"
                 + " feeGroupReferenceM=null, jurCodesCollectionM=null, stateM=Accepted, " + "subMultipleM=12, "
-                + "subMultipleTitleM=null, currentPositionM=null, claimantAddressLine1M=null, claimantPostCodeM=null, "
-                + "respondentAddressLine1M=null, respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null,"
+                + "subMultipleTitleM=null, currentPositionM=null, claimantAddressLine1M=null, "
+                + "claimantPostCodeM=null, "
+                + "respondentAddressLine1M=null, respondentPostCodeM=null, "
+                + "flag1M=null, flag2M=null, EQPM=null,"
                 + " respondentRepOrgM=null, claimantRepOrgM=null))]";
-        assertEquals(multipleCollection, bulkRequestPayload.getBulkDetails().getCaseData().getMultipleCollection().toString());
+        assertEquals(multipleCollection,
+                bulkRequestPayload.getBulkDetails().getCaseData().getMultipleCollection().toString());
     }
 
     @Test
@@ -387,10 +391,12 @@ public class BulkUpdateServiceTest {
         String multipleCollection = "[MultipleTypeItem(id=1111, value=MultipleType(caseIDM=null, "
                 + "ethosCaseReferenceM=11111, leadClaimantM=null, " + "multipleReferenceM=null, clerkRespM=null,"
                 + " claimantSurnameM=null, respondentSurnameM=null, claimantRepM=null, respondentRepM=null, "
-                + "fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null,"
+                + "fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, "
+                + "jurCodesCollectionM=null,"
                 + " stateM=Accepted, " + "subMultipleM=12, subMultipleTitleM=null, currentPositionM=null, "
                 + "claimantAddressLine1M=null, claimantPostCodeM=null, " + "respondentAddressLine1M=null, "
-                + "respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, respondentRepOrgM=null, claimantRepOrgM=null))]";
+                + "respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, respondentRepOrgM=null, "
+                + "claimantRepOrgM=null))]";
         assertEquals(multipleCollection, bulkRequestPayload.getBulkDetails().getCaseData().getMultipleCollection().toString());
     }
 
@@ -403,13 +409,17 @@ public class BulkUpdateServiceTest {
         BulkRequestPayload bulkRequestPayload = bulkUpdateService.bulkPreAcceptLogic(
                 bulkRequest.getCaseDetails(), submitEvents, "authToken", true);
         String multipleCollection = "[MultipleTypeItem(id=1111, value=MultipleType(caseIDM=null, "
-                + "ethosCaseReferenceM=11111, leadClaimantM=null, " + "multipleReferenceM=null, clerkRespM=null, "
+                + "ethosCaseReferenceM=11111, leadClaimantM=null, " + "multipleReferenceM=null,"
+                + " clerkRespM=null, "
                 + "claimantSurnameM=null, respondentSurnameM=null, claimantRepM=null, respondentRepM=null, "
-                + "fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null,"
+                + "fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, "
+                + "jurCodesCollectionM=null,"
                 + " stateM=Accepted, " + "subMultipleM=12, subMultipleTitleM=null, currentPositionM=null, "
                 + "claimantAddressLine1M=null, claimantPostCodeM=null, " + "respondentAddressLine1M=null, "
-                + "respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, respondentRepOrgM=null, claimantRepOrgM=null))]";
-        assertEquals(multipleCollection, bulkRequestPayload.getBulkDetails().getCaseData().getMultipleCollection().toString());
+                + "respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, "
+                + "respondentRepOrgM=null, claimantRepOrgM=null))]";
+        assertEquals(multipleCollection,
+                bulkRequestPayload.getBulkDetails().getCaseData().getMultipleCollection().toString());
     }
 
 }

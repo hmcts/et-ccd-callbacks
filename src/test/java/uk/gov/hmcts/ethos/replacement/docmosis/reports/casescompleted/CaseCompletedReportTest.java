@@ -203,8 +203,6 @@ public class CaseCompletedReportTest {
         // then no data returned
 
         String searchDate = "1970-01-01";
-        String listingDate = "1970-01-02T00:00:00";
-
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
@@ -212,7 +210,7 @@ public class CaseCompletedReportTest {
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
-
+        String listingDate = "1970-01-02T00:00:00";
         List<SubmitEvent> submitEvents = new ArrayList<>();
         DateListedTypeItem dateListedTypeItem = createHearingDateListed(listingDate, HEARING_STATUS_HEARD, YES);
         List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_PERLIMINARY_HEARING,
@@ -236,8 +234,6 @@ public class CaseCompletedReportTest {
         // then no data returned
 
         String searchDate = "1970-01-01";
-        String listingDate = "1970-01-01T00:00:00";
-
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
@@ -245,7 +241,7 @@ public class CaseCompletedReportTest {
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
-
+        String listingDate = "1970-01-01T00:00:00";
         List<SubmitEvent> submitEvents = new ArrayList<>();
         DateListedTypeItem dateListedTypeItem = createHearingDateListed(listingDate, HEARING_STATUS_HEARD, NO);
         List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_PERLIMINARY_HEARING,
@@ -271,8 +267,6 @@ public class CaseCompletedReportTest {
         // then we have some data
 
         String searchDate = "1970-01-01";
-        String listingDate = "1970-01-01T00:00:00";
-
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
@@ -280,7 +274,7 @@ public class CaseCompletedReportTest {
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
-
+        String listingDate = "1970-01-01T00:00:00";
         List<SubmitEvent> submitEvents = new ArrayList<>();
         DateListedTypeItem dateListedTypeItem = createHearingDateListed(listingDate, HEARING_STATUS_HEARD, YES);
         List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_PERLIMINARY_HEARING,
@@ -313,8 +307,6 @@ public class CaseCompletedReportTest {
         // then we have some data
 
         String searchDate = "1970-01-01";
-        String listingDate = "1970-01-01T00:00:00";
-
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
@@ -322,7 +314,7 @@ public class CaseCompletedReportTest {
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
-
+        String listingDate = "1970-01-01T00:00:00";
         List<SubmitEvent> submitEvents = new ArrayList<>();
         DateListedTypeItem dateListedTypeItem = createHearingDateListed(listingDate, HEARING_STATUS_HEARD, YES);
         List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_PERLIMINARY_HEARING,
@@ -356,8 +348,6 @@ public class CaseCompletedReportTest {
         // then we have some data
 
         String searchDate = "1970-01-01";
-        String listingDate = "1970-01-01T00:00:00";
-
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
@@ -365,7 +355,7 @@ public class CaseCompletedReportTest {
         listingData.setListingDate(searchDate);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingDetails.setCaseData(listingData);
-
+        String listingDate = "1970-01-01T00:00:00";
         List<SubmitEvent> submitEvents = new ArrayList<>();
         DateListedTypeItem dateListedTypeItem = createHearingDateListed(listingDate, HEARING_STATUS_HEARD, YES);
         List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_PERLIMINARY_HEARING,
@@ -399,8 +389,6 @@ public class CaseCompletedReportTest {
         // then we have some data
 
         String searchDate = "1970-01-01";
-        String listingDate = "1970-01-01T00:00:00";
-
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
@@ -408,7 +396,7 @@ public class CaseCompletedReportTest {
         listingData.setListingDate(searchDate);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingDetails.setCaseData(listingData);
-
+        String listingDate = "1970-01-01T00:00:00";
         List<SubmitEvent> submitEvents = new ArrayList<>();
         DateListedTypeItem dateListedTypeItem = createHearingDateListed(listingDate, HEARING_STATUS_HEARD, YES);
         List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_PERLIMINARY_HEARING,
@@ -442,8 +430,6 @@ public class CaseCompletedReportTest {
         // then we have some data
 
         String searchDate = "1970-01-01";
-        String listingDate = "1970-01-01T00:00:00";
-
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
@@ -451,7 +437,7 @@ public class CaseCompletedReportTest {
         listingData.setListingDate(searchDate);
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingDetails.setCaseData(listingData);
-
+        String listingDate = "1970-01-01T00:00:00";
         List<SubmitEvent> submitEvents = new ArrayList<>();
         DateListedTypeItem dateListedTypeItem = createHearingDateListed(listingDate, HEARING_STATUS_HEARD, YES);
         List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_PERLIMINARY_HEARING,
@@ -479,8 +465,6 @@ public class CaseCompletedReportTest {
         // then we have data for all cases
 
         String searchDate = "1970-01-01";
-        String listingDate = "1970-01-01T00:00:00";
-
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
@@ -488,7 +472,7 @@ public class CaseCompletedReportTest {
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
-
+        String listingDate = "1970-01-01T00:00:00";
         List<SubmitEvent> submitEvents = new ArrayList<>();
         DateListedTypeItem dateListedTypeItem = createHearingDateListed(listingDate, HEARING_STATUS_HEARD, YES);
         List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_PERLIMINARY_HEARING,
@@ -523,8 +507,6 @@ public class CaseCompletedReportTest {
         // then we have data for only valid cases
 
         String searchDate = "1970-01-01";
-        String listingDate = "1970-01-01T00:00:00";
-
         ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         ListingData listingData = new ListingData();
@@ -532,7 +514,7 @@ public class CaseCompletedReportTest {
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(listingData);
-
+        String listingDate = "1970-01-01T00:00:00";
         List<SubmitEvent> submitEvents = new ArrayList<>();
         DateListedTypeItem dateListedTypeItem = createHearingDateListed(listingDate, HEARING_STATUS_HEARD, YES);
         List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_PERLIMINARY_HEARING,

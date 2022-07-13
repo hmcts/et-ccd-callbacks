@@ -787,25 +787,23 @@ public class CaseCompletedReportTest {
     }
 
     private DateListedTypeItem createHearingDateListed(String listedDate, String status, String disposed) {
-        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         DateListedType dateListedType = new DateListedType();
         dateListedType.setListedDate(listedDate);
         dateListedType.setHearingStatus(status);
         dateListedType.setHearingCaseDisposed(disposed);
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setValue(dateListedType);
 
         return dateListedTypeItem;
     }
 
     private HearingTypeItem createHearing(String type, DateListedTypeItem... dateListedTypeItems) {
-        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         HearingType hearingType = new HearingType();
         hearingType.setHearingType(type);
-
         List<DateListedTypeItem> hearingDateCollection = new ArrayList<>();
         Collections.addAll(hearingDateCollection, dateListedTypeItems);
-
         hearingType.setHearingDateCollection(hearingDateCollection);
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(hearingType);
         return hearingTypeItem;
     }
@@ -817,12 +815,11 @@ public class CaseCompletedReportTest {
     }
 
     private void verifyReportHeaderIsZero(ListingData listingData) {
-        ReportHeaderValues reportHeaderValues = new ReportHeaderValues(
-                0,0,0,"Leeds",
-                0,0,0,
-                0,0,0,
-                0,0,0,
-                0,0,0);
+        ReportHeaderValues reportHeaderValues = new ReportHeaderValues(0, 0, 0, "Leeds",
+                0, 0, 0,
+                0, 0, 0,
+                0, 0, 0,
+                0, 0, 0);
         verifyReportHeader(listingData, reportHeaderValues);
         verifyReportDetails(listingData, 0);
     }
@@ -834,7 +831,8 @@ public class CaseCompletedReportTest {
         assertEquals(String.valueOf(reportHeaderValues.casesCompletedHearingTotal),
                 adhocReportType.getCasesCompletedHearingTotal());
         assertEquals(String.valueOf(reportHeaderValues.sessionDaysTotal), adhocReportType.getSessionDaysTotal());
-        assertEquals(String.format(Locale.ROOT, COMPLETED_PER_SESSION_FORMAT, reportHeaderValues.completedPerSessionTotal),
+        assertEquals(String.format(
+                Locale.ROOT, COMPLETED_PER_SESSION_FORMAT, reportHeaderValues.completedPerSessionTotal),
                 adhocReportType.getCompletedPerSessionTotal());
         assertEquals(reportHeaderValues.reportOffice, adhocReportType.getReportOffice());
 
@@ -842,28 +840,36 @@ public class CaseCompletedReportTest {
         assertEquals(String.valueOf(reportHeaderValues.conNoneCasesCompletedHearing),
                 adhocReportType.getConNoneCasesCompletedHearing());
         assertEquals(String.valueOf(reportHeaderValues.conNoneSessionDays), adhocReportType.getConNoneSessionDays());
-        assertEquals(String.format(Locale.ROOT, COMPLETED_PER_SESSION_FORMAT, reportHeaderValues.conNoneCompletedPerSession),
+        assertEquals(String.format(
+                Locale.ROOT, COMPLETED_PER_SESSION_FORMAT, reportHeaderValues.conNoneCompletedPerSession),
                 adhocReportType.getConNoneCompletedPerSession());
 
         // Conciliation - Fast Track
         assertEquals(String.valueOf(reportHeaderValues.conFastCasesCompletedHearing),
                 adhocReportType.getConFastCasesCompletedHearing());
-        assertEquals(String.valueOf(reportHeaderValues.conFastSessionDays), adhocReportType.getConFastSessionDays());
-        assertEquals(String.format(Locale.ROOT, COMPLETED_PER_SESSION_FORMAT, reportHeaderValues.conFastCompletedPerSession),
+        assertEquals(String.valueOf(
+                reportHeaderValues.conFastSessionDays), adhocReportType.getConFastSessionDays());
+        assertEquals(String.format(
+                Locale.ROOT, COMPLETED_PER_SESSION_FORMAT, reportHeaderValues.conFastCompletedPerSession),
                 adhocReportType.getConFastCompletedPerSession());
 
         // Conciliation - Standard Track
-        assertEquals(String.valueOf(reportHeaderValues.conStdCasesCompletedHearing),
+        assertEquals(String.valueOf(
+                reportHeaderValues.conStdCasesCompletedHearing),
                 adhocReportType.getConStdCasesCompletedHearing());
-        assertEquals(String.valueOf(reportHeaderValues.conStdSessionDays), adhocReportType.getConStdSessionDays());
-        assertEquals(String.format(Locale.ROOT, COMPLETED_PER_SESSION_FORMAT, reportHeaderValues.conStdCompletedPerSession),
+        assertEquals(String.valueOf(
+                reportHeaderValues.conStdSessionDays), adhocReportType.getConStdSessionDays());
+        assertEquals(String.format(
+                Locale.ROOT, COMPLETED_PER_SESSION_FORMAT, reportHeaderValues.conStdCompletedPerSession),
                 adhocReportType.getConStdCompletedPerSession());
 
         // Conciliation - Open Track
         assertEquals(String.valueOf(reportHeaderValues.conOpenCasesCompletedHearing),
                 adhocReportType.getConOpenCasesCompletedHearing());
-        assertEquals(String.valueOf(reportHeaderValues.conOpenSessionDays), adhocReportType.getConOpenSessionDays());
-        assertEquals(String.format(Locale.ROOT, COMPLETED_PER_SESSION_FORMAT, reportHeaderValues.conOpenCompletedPerSession),
+        assertEquals(String.valueOf(
+                reportHeaderValues.conOpenSessionDays), adhocReportType.getConOpenSessionDays());
+        assertEquals(String.format(
+                Locale.ROOT, COMPLETED_PER_SESSION_FORMAT, reportHeaderValues.conOpenCompletedPerSession),
                 adhocReportType.getConOpenCompletedPerSession());
     }
 

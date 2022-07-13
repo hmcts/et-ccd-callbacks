@@ -71,13 +71,16 @@ public class SubMultipleServiceTest {
                 + " claimantSurnameV2=null, "
                 + "respondentSurnameV2=null, multipleReferenceV2=null, " + "clerkResponsibleV2=null, "
                 + "positionTypeV2=null,"
-                + " claimantRepV2=null, respondentRepV2=null," + " fileLocationGlasgow=null, fileLocationAberdeen=null, "
+                + " claimantRepV2=null, respondentRepV2=null," + " fileLocationGlasgow=null,"
+                + " fileLocationAberdeen=null, "
                 + "fileLocationDundee=null, fileLocationEdinburgh=null, managingOffice=null, subMultipleName=null, "
                 + "subMultipleRef=null, caseIdCollection=null, " + "searchCollection=null, midSearchCollection=null, "
-                + "multipleCollection=[MultipleTypeItem(id=2222, value=MultipleType(caseIDM=null, ethosCaseReferenceM=2222,"
+                + "multipleCollection=[MultipleTypeItem(id=2222, value=MultipleType(caseIDM=null,"
+                + " ethosCaseReferenceM=2222,"
                 + " leadClaimantM=null, " + "multipleReferenceM=null, clerkRespM=null, claimantSurnameM=null, "
                 + "respondentSurnameM=null," + " claimantRepM=null, respondentRepM=null, "
-                + "fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null,"
+                + "fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, "
+                + "jurCodesCollectionM=null,"
                 + " stateM=null, subMultipleM=null, " + "subMultipleTitleM=SubMultipleNew, currentPositionM=null, "
                 + "claimantAddressLine1M=null, claimantPostCodeM=null, respondentAddressLine1M=null, "
                 + "respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, respondentRepOrgM=null, "
@@ -138,7 +141,8 @@ public class SubMultipleServiceTest {
     @Test
     public void populateFilterDefaultedAllDynamicListLogic() {
         String result = "DynamicFixedListType(value=DynamicValueType(code=999999, label=Select All), "
-                + "listItems=[DynamicValueType(code=999999, label=Select All), DynamicValueType(code=1234567, label=SubMultiple1)])";
+                + "listItems=[DynamicValueType(code=999999, label=Select All), DynamicValueType("
+                + "code=1234567, label=SubMultiple1)])";
         bulkDetails.getCaseData().setSubMultipleCollection(createSubMultiples());
         BulkRequestPayload bulkRequestPayload = subMultipleService.populateFilterDefaultedDynamicListLogic(
                 bulkDetails, SELECT_ALL_VALUE);
@@ -148,7 +152,8 @@ public class SubMultipleServiceTest {
     @Test
     public void populateFilterDefaultedNoneDynamicListLogic() {
         String result = "DynamicFixedListType(value=DynamicValueType(code=999999, label=None), "
-                + "listItems=[DynamicValueType(code=999999, label=None), DynamicValueType(code=1234567, label=SubMultiple1)])";
+                + "listItems=[DynamicValueType(code=999999, label=None), DynamicValueType("
+                + "code=1234567, label=SubMultiple1)])";
         bulkDetails.getCaseData().setSubMultipleCollection(createSubMultiples());
         BulkRequestPayload bulkRequestPayload = subMultipleService.populateFilterDefaultedDynamicListLogic(
                 bulkDetails, SELECT_NONE_VALUE);
@@ -157,36 +162,6 @@ public class SubMultipleServiceTest {
 
     @Test
     public void deleteSubMultipleLogic() {
-        String result = "BulkData(bulkCaseTitle=null, multipleReference=null, multipleReferenceLinkMarkUp=null,"
-                + " feeGroupReference=null, claimantSurname=null, respondentSurname=null, "
-                + "claimantRep=null, respondentRep=null, ethosCaseReference=null, clerkResponsible=null, "
-                + "fileLocation=null, jurCodesCollection=null, "
-                + "fileLocationV2=null, feeGroupReferenceV2=null, claimantSurnameV2=null, respondentSurnameV2=null,"
-                + " multipleReferenceV2=null, " + "clerkResponsibleV2=null, positionTypeV2=null, claimantRepV2=null,"
-                + " respondentRepV2=null, fileLocationGlasgow=null, fileLocationAberdeen=null, "
-                + "fileLocationDundee=null, fileLocationEdinburgh=null, managingOffice=null, subMultipleName=SubMultipleNew, "
-                + "subMultipleRef=null, " + "caseIdCollection=null, searchCollection=null, " + "midSearchCollection="
-                + "[MidSearchTypeItem(id=1111, " + "value=1111), MidSearchTypeItem(id=2222, value=2222)], "
-                + "multipleCollection=[MultipleTypeItem(id=2222, value=MultipleType(caseIDM=null, ethosCaseReferenceM=2222, "
-                + "leadClaimantM=null, " + "multipleReferenceM=null, clerkRespM=null, claimantSurnameM=null, "
-                + "respondentSurnameM=null, claimantRepM=null, respondentRepM=null, " + "fileLocM=null, receiptDateM=null,"
-                + " positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null, stateM=null, subMultipleM= , "
-                + "subMultipleTitleM=null, currentPositionM=null, claimantAddressLine1M=null, claimantPostCodeM=null, "
-                + "respondentAddressLine1M=null, " + "respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, "
-                + "respondentRepOrgM=null, claimantRepOrgM=null)), " + "MultipleTypeItem(id=3333, value=MultipleType(caseIDM=null, "
-                + "ethosCaseReferenceM=3333, leadClaimantM=null, multipleReferenceM=null, " + "clerkRespM=null, claimantSurnameM=null,"
-                + " respondentSurnameM=null, claimantRepM=null, respondentRepM=null, fileLocM=null, receiptDateM=null, "
-                + "positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null, stateM=null, subMultipleM= ,"
-                + " subMultipleTitleM= , " + "currentPositionM=null, claimantAddressLine1M=null, claimantPostCodeM=null, "
-                + "respondentAddressLine1M=null, " + "respondentPostCodeM=null, "
-                + "flag1M=null, flag2M=null, EQPM=null, respondentRepOrgM=null, claimantRepOrgM=null))], "
-                + "subMultipleCollection=[SubMultipleTypeItem(id=1234567, value=SubMultipleType(subMultipleNameT=SubMultiple1,"
-                + " subMultipleRefT=1234567))], " + "subMultipleDynamicList=null, searchCollectionCount=null, "
-                + "multipleCollectionCount=null, correspondenceType=null, correspondenceScotType=null, "
-                + "selectAll=null, scheduleDocName=null, positionType=null, flag1=null, flag2=null, EQP=null,"
-                + " submissionRef=null, claimantOrg=null, " + "respondentOrg=null, state=null, flag1Update=null, "
-                + "flag2Update=null, EQPUpdate=null, jurCodesDynamicList=null, outcomeUpdate=null, "
-                + "filterCases=null, docMarkUp=null, multipleSource=null)";
         MultipleType multipleType = new MultipleType();
         multipleType.setEthosCaseReferenceM("3333");
         multipleType.setSubMultipleM("1111");
@@ -197,6 +172,53 @@ public class SubMultipleServiceTest {
         bulkDetails.getCaseData().setSubMultipleDynamicList(createDynamicFixedListType());
         bulkDetails.getCaseData().setSubMultipleCollection(createTwoSubMultiples());
         BulkRequestPayload bulkRequestPayload = subMultipleService.deleteSubMultipleLogic(bulkDetails);
+        String result = "BulkData(bulkCaseTitle=null, multipleReference=null,"
+                + " multipleReferenceLinkMarkUp=null,"
+                + " feeGroupReference=null, claimantSurname=null, respondentSurname=null, "
+                + "claimantRep=null, respondentRep=null, ethosCaseReference=null, clerkResponsible=null, "
+                + "fileLocation=null, jurCodesCollection=null, "
+                + "fileLocationV2=null, feeGroupReferenceV2=null, claimantSurnameV2=null, "
+                + "respondentSurnameV2=null,"
+                + " multipleReferenceV2=null, " + "clerkResponsibleV2=null, positionTypeV2=null, "
+                + "claimantRepV2=null,"
+                + " respondentRepV2=null, fileLocationGlasgow=null, fileLocationAberdeen=null, "
+                + "fileLocationDundee=null, fileLocationEdinburgh=null, managingOffice=null,"
+                + " subMultipleName=SubMultipleNew, "
+                + "subMultipleRef=null, " + "caseIdCollection=null, searchCollection=null, "
+                + "midSearchCollection="
+                + "[MidSearchTypeItem(id=1111, " + "value=1111), MidSearchTypeItem(id=2222, value=2222)], "
+                + "multipleCollection=[MultipleTypeItem(id=2222, value=MultipleType(caseIDM=null, "
+                + "ethosCaseReferenceM=2222, "
+                + "leadClaimantM=null, " + "multipleReferenceM=null, clerkRespM=null, claimantSurnameM=null, "
+                + "respondentSurnameM=null, claimantRepM=null, respondentRepM=null, "
+                + "fileLocM=null, receiptDateM=null,"
+                + " positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null,"
+                + " stateM=null, subMultipleM= , "
+                + "subMultipleTitleM=null, currentPositionM=null, claimantAddressLine1M=null, "
+                + "claimantPostCodeM=null, "
+                + "respondentAddressLine1M=null, " + "respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, "
+                + "respondentRepOrgM=null, claimantRepOrgM=null)), " + "MultipleTypeItem(id=3333, "
+                + "value=MultipleType(caseIDM=null, "
+                + "ethosCaseReferenceM=3333, leadClaimantM=null, multipleReferenceM=null, "
+                + "clerkRespM=null, claimantSurnameM=null,"
+                + " respondentSurnameM=null, claimantRepM=null, respondentRepM=null,"
+                + " fileLocM=null, receiptDateM=null, "
+                + "positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null, stateM=null, subMultipleM= ,"
+                + " subMultipleTitleM= , " + "currentPositionM=null,"
+                + " claimantAddressLine1M=null, claimantPostCodeM=null, "
+                + "respondentAddressLine1M=null, " + "respondentPostCodeM=null, "
+                + "flag1M=null, flag2M=null, EQPM=null, respondentRepOrgM=null, claimantRepOrgM=null))], "
+                + "subMultipleCollection=[SubMultipleTypeItem(id=1234567,"
+                + " value=SubMultipleType(subMultipleNameT=SubMultiple1,"
+                + " subMultipleRefT=1234567))], " + "subMultipleDynamicList=null,"
+                + " searchCollectionCount=null, "
+                + "multipleCollectionCount=null, correspondenceType=null,"
+                + " correspondenceScotType=null, "
+                + "selectAll=null, scheduleDocName=null, positionType=null, flag1=null, flag2=null, EQP=null,"
+                + " submissionRef=null, claimantOrg=null, " + "respondentOrg=null, state=null, flag1Update=null, "
+                + "flag2Update=null, EQPUpdate=null, jurCodesDynamicList=null,"
+                + " outcomeUpdate=null, "
+                + "filterCases=null, docMarkUp=null, multipleSource=null)";
         assertEquals(result, bulkRequestPayload.getBulkDetails().getCaseData().toString());
     }
 
@@ -209,7 +231,6 @@ public class SubMultipleServiceTest {
 
     @Test
     public void bulkMidUpdateLogic() {
-        String result = "[MidSearchTypeItem(id=123456, value=3333)]";
         MultipleType multipleType = new MultipleType();
         multipleType.setEthosCaseReferenceM("3333");
         multipleType.setSubMultipleM("1111");
@@ -220,6 +241,7 @@ public class SubMultipleServiceTest {
         bulkDetails.getCaseData().setSubMultipleDynamicList(createDynamicFixedListType());
         bulkDetails.getCaseData().setSubMultipleCollection(createTwoSubMultiples());
         BulkRequestPayload bulkRequestPayload = subMultipleService.bulkMidUpdateLogic(bulkDetails);
+        String result = "[MidSearchTypeItem(id=123456, value=3333)]";
         assertEquals(result, bulkRequestPayload.getBulkDetails().getCaseData().getMidSearchCollection().toString());
         assertEquals("SubMultiple2", bulkRequestPayload.getBulkDetails().getCaseData().getSubMultipleName());
         assertEquals("1111", bulkRequestPayload.getBulkDetails().getCaseData().getSubMultipleRef());

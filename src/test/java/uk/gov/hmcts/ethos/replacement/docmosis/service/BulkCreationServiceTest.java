@@ -224,7 +224,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         assertThrows(CaseCreationException.class,
                 () -> bulkSearchService.bulkCasesRetrievalRequest(
-                getBulkDetails(YES, "Single"), "authToken", true));
+                        getBulkDetails(YES, "Single"), "authToken", true));
     }
 
     @Test
@@ -321,21 +321,31 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
                 + "value=MultipleType(caseIDM=0, ethosCaseReferenceM=1111, "
                 + "leadClaimantM=Yes, multipleReferenceM=null, " + "clerkRespM= , claimantSurnameM=Fernandez,"
                 + " respondentSurnameM=Mr Respondent, claimantRepM= , respondentRepM= , fileLocM= , receiptDateM= , "
-                + "positionTypeM= , feeGroupReferenceM=111122211, jurCodesCollectionM= , stateM=Accepted, subMultipleM= ,"
+                + "positionTypeM= , feeGroupReferenceM=111122211, jurCodesCollectionM= , "
+                + "stateM=Accepted, subMultipleM= ,"
                 + " subMultipleTitleM= , currentPositionM= , " + "claimantAddressLine1M= , claimantPostCodeM= , "
-                + "respondentAddressLine1M= , respondentPostCodeM= , flag1M= , flag2M= , EQPM= , respondentRepOrgM= , "
-                + "claimantRepOrgM= )), MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, ethosCaseReferenceM=111111,"
+                + "respondentAddressLine1M= , respondentPostCodeM= , flag1M= , flag2M= , "
+                + "EQPM= , respondentRepOrgM= , "
+                + "claimantRepOrgM= )), MultipleTypeItem(id=0, value=MultipleType(caseIDM=0,"
+                + " ethosCaseReferenceM=111111,"
                 + " leadClaimantM=No, multipleReferenceM=null, " + "clerkRespM= , claimantSurnameM=Fernandez, "
-                + "respondentSurnameM=Mr Respondent, claimantRepM= ," + " respondentRepM= , fileLocM= , receiptDateM= , "
-                + "positionTypeM= , feeGroupReferenceM=111122211, jurCodesCollectionM= , stateM=Accepted, subMultipleM= "
+                + "respondentSurnameM=Mr Respondent, claimantRepM= ," + " respondentRepM= , "
+                + "fileLocM= , receiptDateM= , "
+                + "positionTypeM= , feeGroupReferenceM=111122211, jurCodesCollectionM= , "
+                + "stateM=Accepted, subMultipleM= "
                 + ", subMultipleTitleM= , currentPositionM= , " + "claimantAddressLine1M= , claimantPostCodeM= , "
                 + "respondentAddressLine1M= , respondentPostCodeM= , flag1M= , flag2M= , EQPM= , respondentRepOrgM= , "
-                + "claimantRepOrgM= )), MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, ethosCaseReferenceM=1122,"
+                + "claimantRepOrgM= )), MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, "
+                + "ethosCaseReferenceM=1122,"
                 + " leadClaimantM=No, multipleReferenceM=null, " + "clerkRespM= , claimantSurnameM=Fernandez, "
-                + "respondentSurnameM=Mr Respondent, claimantRepM= , " + "respondentRepM= , fileLocM= , receiptDateM= , "
-                + "positionTypeM= , feeGroupReferenceM=111122211, jurCodesCollectionM= , stateM=Accepted, subMultipleM= , "
-                + "subMultipleTitleM= , currentPositionM= , " + "claimantAddressLine1M= , claimantPostCodeM= , "
-                + "respondentAddressLine1M= , respondentPostCodeM= , flag1M= , flag2M= , EQPM= , respondentRepOrgM= , "
+                + "respondentSurnameM=Mr Respondent, claimantRepM= , " + "respondentRepM= , "
+                + "fileLocM= , receiptDateM= , "
+                + "positionTypeM= , feeGroupReferenceM=111122211, jurCodesCollectionM= , "
+                + "stateM=Accepted, subMultipleM= , "
+                + "subMultipleTitleM= , currentPositionM= , " + "claimantAddressLine1M= , "
+                + "claimantPostCodeM= , "
+                + "respondentAddressLine1M= , respondentPostCodeM= , flag1M= , flag2M= , "
+                + "EQPM= , respondentRepOrgM= , "
                 + "claimantRepOrgM= ))]";
         when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), anyList())).thenReturn(submitEventList);
         BulkCasesPayload bulkCasesPayload = bulkCreationService.updateBulkRequest(
@@ -389,8 +399,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
         String expectedResult = "[MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, "
                 + "ethosCaseReferenceM=1111, leadClaimantM=Yes, " + "multipleReferenceM=null, clerkRespM= ,"
                 + " claimantSurnameM=Fernandez, respondentSurnameM=Mr Respondent, claimantRepM= , "
-                + "respondentRepM= , fileLocM= , receiptDateM= , positionTypeM= , feeGroupReferenceM=111122211,"
-                + " jurCodesCollectionM= , " + "stateM=Accepted, subMultipleM= , subMultipleTitleM= , currentPositionM= ,"
+                + "respondentRepM= , fileLocM= , receiptDateM= , positionTypeM= , "
+                + "feeGroupReferenceM=111122211,"
+                + " jurCodesCollectionM= , " + "stateM=Accepted, subMultipleM= , "
+                + "subMultipleTitleM= , currentPositionM= ,"
                 + " claimantAddressLine1M= , claimantPostCodeM= , " + "respondentAddressLine1M= , respondentPostCodeM= ,"
                 + " flag1M= , flag2M= , EQPM= , respondentRepOrgM= , claimantRepOrgM= ))]";
         when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), anyList())).thenReturn(submitEventList);
@@ -465,8 +477,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
                 + "dateNotified=null, disposalDate=null,"
                 + " juridictionCodesSubList1=null))], fileLocationV2=null, feeGroupReferenceV2=null, "
                 + "claimantSurnameV2=null, "
-                + "respondentSurnameV2=null, multipleReferenceV2=null, clerkResponsibleV2=null, positionTypeV2=null,"
-                + " claimantRepV2=null, respondentRepV2=null, " + "fileLocationGlasgow=null, fileLocationAberdeen=null, "
+                + "respondentSurnameV2=null, multipleReferenceV2=null, "
+                + "clerkResponsibleV2=null, positionTypeV2=null,"
+                + " claimantRepV2=null, respondentRepV2=null, "
+                + "fileLocationGlasgow=null, fileLocationAberdeen=null, "
                 + "fileLocationDundee=null, fileLocationEdinburgh=null, managingOffice=null, "
                 + "subMultipleName=null, subMultipleRef=null, caseIdCollection=[], searchCollection=[], "
                 + "midSearchCollection=null, " + "multipleCollection=[MultipleTypeItem(id=22222,"
@@ -523,9 +537,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         assertThrows(CaseCreationException.class,
                 () -> {
-                    bulkSearchService.retrievalCasesForPreAcceptRequest(
-                            getBulkDetails(YES, "Single"), "authToken");
-                });
+            bulkSearchService.retrievalCasesForPreAcceptRequest(
+                    getBulkDetails(YES, "Single"), "authToken");
+        });
     }
 
     @Test

@@ -130,6 +130,7 @@ public class BulkHelperTest {
                 + "respondentPostCodeM=PostCode, flag1M= , flag2M= , EQPM= , respondentRepOrgM= , claimantRepOrgM= ))]";
         assertEquals(result, BulkHelper.getMultipleTypeListBySubmitEventList(
                 submitEvents, "1234").toString());
+
     }
 
     @Test
@@ -269,6 +270,7 @@ public class BulkHelperTest {
                 null, BulkHelper.getJurCodesListFromString(jurCodes)));
         assertFalse(BulkHelper.containsAllJurCodes(
                 new ArrayList<>(), BulkHelper.getJurCodesListFromString(jurCodes)));
+
 
         assertFalse(BulkHelper.containsAllJurCodes(
                 new ArrayList<>(), BulkHelper.getJurCodesListFromString(null)));
@@ -431,6 +433,7 @@ public class BulkHelperTest {
         List<SubmitEvent> submitEventListResult = BulkHelper.calculateLeadCase(submitEventList, caseIds);
         assertEquals("[2, 1, 3, 4]", submitEventListResult.stream()
                 .map(submitEvent1 -> submitEvent1.getCaseData().getEthosCaseReference())
+
                 .collect(Collectors.toList()).toString());
     }
 
@@ -444,6 +447,7 @@ public class BulkHelperTest {
         List<SubmitEvent> submitEventListResult = BulkHelper.calculateLeadCase(submitEventList, caseIds);
         assertEquals("[5, 1, 2, 3]", submitEventListResult.stream()
                 .map(submitEvent1 -> submitEvent1.getCaseData().getEthosCaseReference())
+
                 .collect(Collectors.toList()).toString());
     }
 

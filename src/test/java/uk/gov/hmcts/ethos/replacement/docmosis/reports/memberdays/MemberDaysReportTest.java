@@ -174,7 +174,8 @@ class MemberDaysReportTest {
 
         CaseData caseData3 = new CaseData();
         caseData3.setEthosCaseReference("1800522/2020");
-        caseData3.setReceiptDate("2018-08-12");DateListedType dateListedType5 = new DateListedType();
+        caseData3.setReceiptDate("2018-08-12");
+        DateListedType dateListedType5 = new DateListedType();
         dateListedType5.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType5.setHearingClerk(new DynamicFixedListType("Clerk3"));
         dateListedType5.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue2"));

@@ -37,8 +37,8 @@ public class SubMultipleReferenceServiceTest {
     @Test
     public void createScotlandReference() {
         var multipleRef = "8000001";
-        when(subMultipleRefScotlandRepository.ethosSubMultipleCaseRefGen(Integer.parseInt(multipleRef), 1)).
-                thenReturn(multipleRef + "/1");
+        when(subMultipleRefScotlandRepository.ethosSubMultipleCaseRefGen(Integer.parseInt(multipleRef), 1))
+                .thenReturn(multipleRef + "/1");
         var expectedRef = multipleRef + "/1";
 
         assertEquals(expectedRef, subMultipleReferenceService.createReference(SCOTLAND_BULK_CASE_TYPE_ID,

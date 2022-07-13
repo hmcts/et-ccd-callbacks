@@ -65,13 +65,13 @@ class CaseSourceLocalReportTest {
                         adhocReportType.getManuallyCreatedTotalCasesPercent()), .00);
         assertEquals(0.00, Strings.isNullOrEmpty(
                 adhocReportType.getEt1OnlineTotalCasesPercent()) ? 0.00 : Float.parseFloat(
-                        adhocReportType.getEt1OnlineTotalCasesPercent()),.00);
+                        adhocReportType.getEt1OnlineTotalCasesPercent()), .00);
         assertEquals(0.00, Strings.isNullOrEmpty(
                 adhocReportType.getMigratedTotalCasesPercent()) ? 0.00 : Float.parseFloat(
-                        adhocReportType.getMigratedTotalCasesPercent()),.00);
+                        adhocReportType.getMigratedTotalCasesPercent()), .00);
         assertEquals(0.00, Strings.isNullOrEmpty(
                 adhocReportType.getEccTotalCasesPercent()) ? 0.00 : Float.parseFloat(
-                        adhocReportType.getEccTotalCasesPercent()),.00);
+                        adhocReportType.getEccTotalCasesPercent()), .00);
     }
 
     @Test
@@ -79,10 +79,10 @@ class CaseSourceLocalReportTest {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.setCaseData(listingData);
 
-        submitEvents.add(createSubmitEvent( "1970-04-01", MANUALLY_CREATED_POSITION));
-        submitEvents.add(createSubmitEvent( "1970-04-02", MIGRATION_CASE_SOURCE));
-        submitEvents.add(createSubmitEvent( "1970-04-03", ET1_ONLINE_CASE_SOURCE));
-        submitEvents.add(createSubmitEvent( "1970-04-04", FLAG_ECC));
+        submitEvents.add(createSubmitEvent("1970-04-01", MANUALLY_CREATED_POSITION));
+        submitEvents.add(createSubmitEvent("1970-04-02", MIGRATION_CASE_SOURCE));
+        submitEvents.add(createSubmitEvent("1970-04-03", ET1_ONLINE_CASE_SOURCE));
+        submitEvents.add(createSubmitEvent("1970-04-04", FLAG_ECC));
 
         ListingData reportListingData = caseSourceLocalReport.generateReportData(listingDetails, submitEvents);
 

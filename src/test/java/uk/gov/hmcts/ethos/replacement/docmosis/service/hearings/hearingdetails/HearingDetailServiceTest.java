@@ -32,12 +32,12 @@ public class HearingDetailServiceTest {
 
         hearingDetailsService.initialiseHearingDetails(caseData);
 
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(caseData.getHearingDetailsHearing(), "hearing", "Hearing ");
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
+                caseData.getHearingDetailsHearing(), "hearing", "Hearing ");
     }
 
     @Test
     public void testHandleListingSelected() {
-        var caseData = createCaseData();
         var hearingStatus = Constants.HEARING_STATUS_HEARD;
         selectedListing.setHearingStatus(hearingStatus);
         var postponedBy = "Arthur";
@@ -70,9 +70,8 @@ public class HearingDetailServiceTest {
         selectedListing.setHearingTimingDuration(duration);
         var notes = "Some notes";
         selectedListing.setHearingNotes2(notes);
-
+        var caseData = createCaseData();
         hearingDetailsService.handleListingSelected(caseData);
-
         assertEquals(hearingStatus, caseData.getHearingDetailsStatus());
         assertEquals(postponedBy, caseData.getHearingDetailsPostponedBy());
         assertEquals(caseDisposed, caseData.getHearingDetailsCaseDisposed());
@@ -93,7 +92,6 @@ public class HearingDetailServiceTest {
 
     @Test
     public void testHandleListingSelectedNullValue() {
-        CaseData caseData = createCaseData();
         selectedListing.setHearingStatus(null);
         selectedListing.setPostponedBy(null);
         selectedListing.setHearingCaseDisposed(null);
@@ -108,6 +106,7 @@ public class HearingDetailServiceTest {
         selectedListing.setHearingTimingFinish(null);
         selectedListing.setHearingTimingDuration(null);
         selectedListing.setHearingNotes2(null);
+        CaseData caseData = createCaseData();
         hearingDetailsService.handleListingSelected(caseData);
 
         assertEquals(" ", caseData.getHearingDetailsStatus());

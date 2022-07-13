@@ -67,13 +67,16 @@ import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_4;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.SHEET_NAME;
 
- public class MultipleUtil {
+public final class MultipleUtil {
 
     public static final String TESTING_FILE_NAME = "MyFirstExcel.xlsx";
     public static final String TESTING_FILE_NAME_ERROR = "MyFirstExcelError.xlsx";
     public static final String TESTING_FILE_NAME_WITH_TWO = "MyFirstExcel2.xlsx";
     public static final String TESTING_FILE_NAME_WRONG_COLUMN_ROW = "MyFirstExcelWrongColumnRow.xlsx";
     public static final String TESTING_FILE_NAME_EMPTY = "MyFirstExcelEmpty.xlsx";
+
+    private MultipleUtil() {
+    }
 
     public static TreeMap<String, Object> getMultipleObjectsAll() {
         TreeMap<String, Object> multipleObjectTreeMap = new TreeMap<>();

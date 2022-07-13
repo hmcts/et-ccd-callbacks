@@ -267,12 +267,16 @@ public class VenueAddressReaderServiceTest {
         switch (tribunalOffice) {
             case GLASGOW:
                 hearing.setHearingGlasgow(hearingVenue);
+                break;
             case ABERDEEN:
                 hearing.setHearingAberdeen(hearingVenue);
+                break;
             case DUNDEE:
                 hearing.setHearingDundee(hearingVenue);
+                break;
             case EDINBURGH:
                 hearing.setHearingEdinburgh(hearingVenue);
+                break;
             default:
         }
 

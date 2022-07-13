@@ -405,7 +405,7 @@ class EventValidationServiceTest {
     void shouldValidateDisposalDateInFuture() {
         List<String> errors = new ArrayList<>();
         eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(
-                FUTURE_RECEIPT_DATE.toString()), errors);
+                "2777-05-15"), errors);
         assertThat(errors.get(0))
                 .isEqualTo(String.format(EventValidationService.DISPOSAL_DATE_IN_FUTURE, "blah blah"));
 

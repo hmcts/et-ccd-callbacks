@@ -222,7 +222,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
      void caseCreationRequestException() throws IOException {
         when(ccdClient.retrieveCases(anyString(), anyString(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-        assertThrows(CaseCreationException.class, () -> bulkSearchService.bulkCasesRetrievalRequest(
+        assertThrows(CaseCreationException.class,
+                () -> bulkSearchService.bulkCasesRetrievalRequest(
                 getBulkDetails(YES, "Single"), "authToken", true));
     }
 

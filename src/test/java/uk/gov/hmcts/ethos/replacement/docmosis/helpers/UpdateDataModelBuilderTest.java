@@ -25,14 +25,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 public class UpdateDataModelBuilderTest {
     CaseData caseData;
 
-    private final String CLAIMANT_REPRESENTATIVE_NAME = "Ruth Powers";
-    private final String JURISDICTION = "DSO";
-    private final String RESPONDENT_NAME = "Mindy Simmons";
-    private final String JUDGEMENT_ID = "1234-5678-9012";
-    private final String JUDGEMENT_TYPE = "Case Management";
-    private final String RESPONDENT_REPRESENTATIVE_ID = "5555-6666-7777-8888";
-    private final String RESPONDENT_REPRESENTATIVE_NAME = "Lionel Hutz";
-    private final String UNKNOWN_VALUE = "Unknown";
+    private static final String CLAIMANT_REPRESENTATIVE_NAME = "Ruth Powers";
+    private static final String JURISDICTION = "DSO";
+    private static final String RESPONDENT_NAME = "Mindy Simmons";
+    private static final String JUDGEMENT_ID = "1234-5678-9012";
+    private static final String JUDGEMENT_TYPE = "Case Management";
+    private static final String RESPONDENT_REPRESENTATIVE_ID = "5555-6666-7777-8888";
+    private static final String RESPONDENT_REPRESENTATIVE_NAME = "Lionel Hutz";
+    private static final String UNKNOWN_VALUE = "Unknown";
 
     @Before
     public void setup() {

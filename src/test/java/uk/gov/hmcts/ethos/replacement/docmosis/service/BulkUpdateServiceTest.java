@@ -262,8 +262,7 @@ public class BulkUpdateServiceTest {
                 bulkDetails.getJurisdiction(), searchTypeItem.getId())).thenReturn(submitEvent);
         when(ccdClient.retrieveCase("authToken", ENGLANDWALES_CASE_TYPE_ID,
                 bulkDetails.getJurisdiction(), null)).thenReturn(submitEvent);
-        assertEquals("[Multiple reference does not exist or"
-                + " it is the same as the current multiple case]",
+        assertEquals("[Multiple reference does not exist or it is the same as the current multiple case]",
                 bulkUpdateService.bulkUpdateLogic(getBulkDetailsCompleteWithValues(getBulkDetailsWithValues()),
                 "authToken").getErrors().toString());
     }

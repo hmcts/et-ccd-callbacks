@@ -718,10 +718,9 @@ public class CaseManagementForCaseWorkerServiceTest {
                 "RespondentName3", true);
         if (single) {
             return new ArrayList<>(Collections.singletonList(respondentSumTypeItem1));
-        } else {
+        }
             return new ArrayList<>(Arrays.asList(
                     respondentSumTypeItem1, respondentSumTypeItem2, respondentSumTypeItem3));
-        }
     }
 
     private RespondentSumTypeItem createRespondentSumType(String respondentName, boolean struckOut) {

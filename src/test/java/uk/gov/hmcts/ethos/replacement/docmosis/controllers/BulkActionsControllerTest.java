@@ -203,8 +203,10 @@ public class BulkActionsControllerTest {
     @Test
     public void midSearchBulkCase() throws Exception {
         when(bulkSearchService.bulkMidSearchLogic(
-                isA(BulkDetails.class), isA(Boolean.class))).thenReturn(bulkRequestPayload);
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+                isA(BulkDetails.class), isA(Boolean.class)))
+                .thenReturn(bulkRequestPayload);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN))
+                .thenReturn(true);
         mvc.perform(post(MID_SEARCH_BULK_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)

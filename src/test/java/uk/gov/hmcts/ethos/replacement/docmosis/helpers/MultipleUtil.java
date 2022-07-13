@@ -67,7 +67,7 @@ import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_4;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.SHEET_NAME;
 
- class MultipleUtil {
+ public class MultipleUtil {
 
     public static final String TESTING_FILE_NAME = "MyFirstExcel.xlsx";
     public static final String TESTING_FILE_NAME_ERROR = "MyFirstExcelError.xlsx";

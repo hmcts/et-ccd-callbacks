@@ -89,9 +89,11 @@ public class UpdateDataModelBuilderTest {
     @Test
     public void testClaimantRepresentativeSelected() {
         MultipleData multipleData = createMultipleData(
-                CLAIMANT_REPRESENTATIVE_NAME, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
+                CLAIMANT_REPRESENTATIVE_NAME, SELECT_NONE_VALUE,
+                SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
-        assertEquals(CLAIMANT_REPRESENTATIVE_NAME, updateDataModel.getRepresentativeClaimantType().getNameOfRepresentative());
+        assertEquals(CLAIMANT_REPRESENTATIVE_NAME,
+                updateDataModel.getRepresentativeClaimantType().getNameOfRepresentative());
     }
 
     @Test
@@ -145,7 +147,7 @@ public class UpdateDataModelBuilderTest {
     @Test
     public void testUnknownSelectedRespondentIsIgnored() {
         MultipleData multipleData = createMultipleData(
-                SELECT_NONE_VALUE, SELECT_NONE_VALUE,UNKNOWN_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
+                SELECT_NONE_VALUE, SELECT_NONE_VALUE, UNKNOWN_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
         assertNull(updateDataModel.getRespondentSumType());
     }
@@ -169,7 +171,7 @@ public class UpdateDataModelBuilderTest {
     @Test
     public void testUnknownSelectedJudgementIsIgnored() {
         MultipleData multipleData = createMultipleData(
-                SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE,UNKNOWN_VALUE, SELECT_NONE_VALUE);
+                SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, UNKNOWN_VALUE, SELECT_NONE_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
         assertNull(updateDataModel.getJudgementType());
     }
@@ -185,7 +187,8 @@ public class UpdateDataModelBuilderTest {
     @Test
     public void testRespondentRepresentativeSelected() {
         MultipleData multipleData = createMultipleData(
-                SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, RESPONDENT_REPRESENTATIVE_ID);
+                SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE,
+                SELECT_NONE_VALUE, RESPONDENT_REPRESENTATIVE_ID);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
         assertEquals(RESPONDENT_REPRESENTATIVE_NAME, updateDataModel.getRepresentedType().getNameOfRepresentative());
     }
@@ -193,7 +196,8 @@ public class UpdateDataModelBuilderTest {
     @Test
     public void testUnknownSelectedRespondentRepresentativeIsIgnored() {
         MultipleData multipleData = createMultipleData(
-                SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE, UNKNOWN_VALUE);
+                SELECT_NONE_VALUE, SELECT_NONE_VALUE, SELECT_NONE_VALUE,
+                SELECT_NONE_VALUE, UNKNOWN_VALUE);
         UpdateDataModel updateDataModel = UpdateDataModelBuilder.build(multipleData, caseData);
         assertNull(updateDataModel.getRepresentedType());
     }

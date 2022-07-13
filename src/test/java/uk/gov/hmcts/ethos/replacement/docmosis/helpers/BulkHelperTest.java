@@ -94,14 +94,16 @@ public class BulkHelperTest {
         String result = "[MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, ethosCaseReferenceM=222,"
                 + " leadClaimantM=No, multipleReferenceM=1234, " + "clerkRespM=JuanFran, claimantSurnameM=Mike, "
                 + "respondentSurnameM=Andrew Smith, claimantRepM= , respondentRepM= , fileLocM=Manchester, "
-                + "receiptDateM= , positionTypeM= , feeGroupReferenceM= , jurCodesCollectionM=AA, stateM= , subMultipleM= , "
-                + "subMultipleTitleM= , currentPositionM= , " + "claimantAddressLine1M=Line1, claimantPostCodeM=PostCode,"
+                + "receiptDateM= , positionTypeM= , feeGroupReferenceM= , jurCodesCollectionM=AA, stateM= "
+                + ", subMultipleM= , " + "subMultipleTitleM= , currentPositionM= , "
+                + "claimantAddressLine1M=Line1, claimantPostCodeM=PostCode,"
                 + " respondentAddressLine1M=Line1, respondentPostCodeM=PostCode, flag1M= , flag2M= , EQPM= , "
                 + "respondentRepOrgM= , claimantRepOrgM= )), MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, "
                 + "ethosCaseReferenceM=222, leadClaimantM=No, " + "multipleReferenceM=1234, clerkRespM=JuanFran,"
                 + " claimantSurnameM=Mike, respondentSurnameM=Andrew Smith, claimantRepM= , respondentRepM= , "
-                + "fileLocM=Manchester, receiptDateM= , positionTypeM= , feeGroupReferenceM= , jurCodesCollectionM=AA,"
-                + " stateM= , subMultipleM= , subMultipleTitleM= , " + "currentPositionM= , claimantAddressLine1M=Line1, "
+                + "fileLocM=Manchester, receiptDateM= , positionTypeM= , feeGroupReferenceM= , "
+                + "jurCodesCollectionM=AA," + " stateM= , subMultipleM= , subMultipleTitleM= , "
+                + "currentPositionM= , claimantAddressLine1M=Line1, "
                 + "claimantPostCodeM=PostCode, respondentAddressLine1M=Line1, respondentPostCodeM=PostCode, flag1M= , "
                 + "flag2M= , EQPM= , respondentRepOrgM= , claimantRepOrgM= ))]";
         assertEquals(result, BulkHelper.getMultipleTypeListBySubmitEventList(submitEvents, "1234").toString());
@@ -156,16 +158,17 @@ public class BulkHelperTest {
 
     @Test
     public void getMultipleTypeFromSubmitEvent() {
-        String result = "MultipleType(caseIDM=0, ethosCaseReferenceM= , leadClaimantM=No, multipleReferenceM= , clerkRespM= , "
-                + "claimantSurnameM=Mike, respondentSurnameM=Juan Pedro, claimantRepM= , respondentRepM= , fileLocM=Manchester, "
-                + "receiptDateM= , positionTypeM= , feeGroupReferenceM=11111, jurCodesCollectionM= , stateM= , subMultipleM= , "
-                + "subMultipleTitleM= , currentPositionM= , claimantAddressLine1M= , claimantPostCodeM= , respondentAddressLine1M= , "
+        String result = "MultipleType(caseIDM=0, ethosCaseReferenceM= , leadClaimantM=No, "
+                + "multipleReferenceM= , clerkRespM= , claimantSurnameM=Mike,"
+                + " respondentSurnameM=Juan Pedro, claimantRepM= , respondentRepM= , fileLocM=Manchester, "
+                + "receiptDateM= , positionTypeM= , feeGroupReferenceM=11111, jurCodesCollectionM= ,"
+                + " stateM= , subMultipleM= , subMultipleTitleM= , currentPositionM= , "
+                + "claimantAddressLine1M= , claimantPostCodeM= , respondentAddressLine1M= , "
                 + "respondentPostCodeM= , flag1M= , flag2M= , EQPM= , respondentRepOrgM= , claimantRepOrgM= )";
         assertEquals(result, BulkHelper.getMultipleTypeFromSubmitEvent(submitEventComplete).toString());
     }
 
     private SubmitEvent getSubmitEvent() {
-        SubmitEvent submitEvent = new SubmitEvent();
         ClaimantIndType claimantIndType = new ClaimantIndType();
         claimantIndType.setClaimantLastName("Mike");
         RespondentSumType respondentSumType = new RespondentSumType();
@@ -177,11 +180,12 @@ public class BulkHelperTest {
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(respondentSumTypeItem)));
         caseData.setFileLocation(new DynamicFixedListType("Manchester"));
         caseData.setFeeGroupReference("11111");
+        SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         return submitEvent;
     }
 
-    private List<JurCodesTypeItem> getJurCodesTypeItems(String ... codes) {
+    private List<JurCodesTypeItem> getJurCodesTypeItems(String... codes) {
         JurCodesType jurCodesType = new JurCodesType();
         jurCodesType.setJuridictionCodesList(codes[0]);
         JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
@@ -278,27 +282,27 @@ public class BulkHelperTest {
 
     @Test
     public void getJurCodesCollectionWithHide_NoJurCodeFiltered_ReturnsAllOutputs() {
-        JurCodesTypeItem JurCodesTypeItem1 = getJurCodesWithOutcome(
+        JurCodesTypeItem jurCodesTypeItem1 = getJurCodesWithOutcome(
                 "A", "Successful at hearing");
-        JurCodesTypeItem JurCodesTypeItem2 = getJurCodesWithOutcome(
+        JurCodesTypeItem jurCodesTypeItem2 = getJurCodesWithOutcome(
                 "B", "Unsuccessful at hearing");
-        JurCodesTypeItem JurCodesTypeItem3 = getJurCodesWithOutcome(
+        JurCodesTypeItem jurCodesTypeItem3 = getJurCodesWithOutcome(
                 "C", "Dismissed at hearing - out of scope");
         List<JurCodesTypeItem> jurCodesTypeItems = new ArrayList<>(
-                Arrays.asList(JurCodesTypeItem1, JurCodesTypeItem2, JurCodesTypeItem3));
+                Arrays.asList(jurCodesTypeItem1, jurCodesTypeItem2, jurCodesTypeItem3));
         assertEquals("A, B, C", BulkHelper.getJurCodesCollectionWithHide(jurCodesTypeItems));
     }
 
     @Test
     public void getJurCodesCollectionWithHide_PartJurCodesFiltered_ReturnsSomeOutputs() {
-        JurCodesTypeItem JurCodesTypeItem1 = getJurCodesWithOutcome(
+        JurCodesTypeItem jurCodesTypeItem1 = getJurCodesWithOutcome(
                 "A", "Acas conciliated settlement");
-        JurCodesTypeItem JurCodesTypeItem2 = getJurCodesWithOutcome(
+        JurCodesTypeItem jurCodesTypeItem2 = getJurCodesWithOutcome(
                 "B", "Successful at hearing");
-        JurCodesTypeItem JurCodesTypeItem3 = getJurCodesWithOutcome(
+        JurCodesTypeItem jurCodesTypeItem3 = getJurCodesWithOutcome(
                 "C", "Withdrawn or private settlement");
         List<JurCodesTypeItem> jurCodesTypeItems = new ArrayList<>(
-                Arrays.asList(JurCodesTypeItem1, JurCodesTypeItem2, JurCodesTypeItem3));
+                Arrays.asList(jurCodesTypeItem1, jurCodesTypeItem2, jurCodesTypeItem3));
         assertEquals("B", BulkHelper.getJurCodesCollectionWithHide(jurCodesTypeItems));
     }
 
@@ -415,7 +419,9 @@ public class BulkHelperTest {
         List<String> caseIds = new ArrayList<>(Arrays.asList("5", "2", "3"));
         List<SubmitEvent> submitEventListResult = BulkHelper.calculateLeadCase(submitEventList, caseIds);
         assertEquals("[2, 1, 3, 4]", submitEventListResult.stream()
-                .map(submitEvent1 -> submitEvent1.getCaseData().getEthosCaseReference()).collect(Collectors.toList()).toString());
+                .map(submitEvent1
+                        -> submitEvent1.getCaseData().getEthosCaseReference())
+                .collect(Collectors.toList()).toString());
     }
 
     @Test
@@ -427,7 +433,9 @@ public class BulkHelperTest {
         List<String> caseIds = new ArrayList<>(Arrays.asList("5", "2", "3"));
         List<SubmitEvent> submitEventListResult = BulkHelper.calculateLeadCase(submitEventList, caseIds);
         assertEquals("[5, 1, 2, 3]", submitEventListResult.stream()
-                .map(submitEvent1 -> submitEvent1.getCaseData().getEthosCaseReference()).collect(Collectors.toList()).toString());
+                .map(submitEvent1
+                        -> submitEvent1.getCaseData().getEthosCaseReference())
+                .collect(Collectors.toList()).toString());
     }
 
 }

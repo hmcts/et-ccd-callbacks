@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -265,7 +266,7 @@ public class EventValidationService {
         // Azure has always UTC time but user's times change in summer and winters, we need to use ZonedDateTime.
         ZonedDateTime disposalDateTime = LocalDate.parse(disposalDate).atStartOfDay()
                 .atZone(ZoneId.of("Europe/London"));
-        ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.of("UTC"));
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
         if (disposalDateTime.isAfter(now)) {
             errors.add(String.format(DISPOSAL_DATE_IN_FUTURE, jurCode));
 

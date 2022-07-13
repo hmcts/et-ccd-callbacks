@@ -42,7 +42,7 @@ public class InitialConsiderationService {
         + "href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">View all "
         + "jurisdiction codes and descriptors (opens in new tab)</a><br><br>";
     static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
-    static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, 1, "", "");
+    static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "");
 
     /**
      * Creates the respondent detail section for Initial Consideration.

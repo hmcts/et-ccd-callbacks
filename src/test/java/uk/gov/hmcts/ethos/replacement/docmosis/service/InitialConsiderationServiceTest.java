@@ -24,7 +24,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 class InitialConsiderationServiceTest {
     static final String EXPECTED_RESPONDENT_NAME =
-        "| Respondent 1 name given | |\r\n"
+        "| Respondent  name given | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | Test Corp|\r\n"
             + "|In ET3 by respondent | |\r\n"
@@ -43,7 +43,7 @@ class InitialConsiderationServiceTest {
             + "\r\n";
 
     static final String EXPECTED_RESPONDENT_NAME_BLANK =
-        "| Respondent 1 name given | |\r\n"
+        "| Respondent  name given | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | |\r\n"
             + "|In ET3 by respondent | |\r\n"

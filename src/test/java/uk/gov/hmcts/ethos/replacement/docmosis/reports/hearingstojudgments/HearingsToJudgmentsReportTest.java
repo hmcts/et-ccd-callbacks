@@ -43,6 +43,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype.HearingsByHearingTypeReportDetail;
 
 class HearingsToJudgmentsReportTest {
 
@@ -51,7 +52,7 @@ class HearingsToJudgmentsReportTest {
     HearingsToJudgmentsCaseDataBuilder caseDataBuilder;
     List<HearingsToJudgmentsSubmitEvent> submitEvents = new ArrayList<>();
 
-    static final LocalDateTime BASE_DATE = LocalDateTime.of(2021, 7, 1, 0, 0,0);
+    static final LocalDateTime BASE_DATE = LocalDateTime.of(2021, 7, 1, 0, 0, 0);
     static final String HEARING_LISTING_DATE = BASE_DATE.format(OLD_DATE_TIME_PATTERN);
     static final String DATE_WITHIN_4WKS = BASE_DATE.plusWeeks(1).format(OLD_DATE_TIME_PATTERN2);
     static final String DATE_NOT_WITHIN_4WKS = BASE_DATE.plusWeeks(5).format(OLD_DATE_TIME_PATTERN2);
@@ -74,7 +75,7 @@ class HearingsToJudgmentsReportTest {
         when(hearingsToJudgmentsReportDataSource.getData(ENGLANDWALES_CASE_TYPE_ID,
                 TribunalOffice.NEWCASTLE.getOfficeName(), DATE_FROM, DATE_TO)).thenReturn(submitEvents);
 
-        var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName(),
+        ReportParams params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName(),
                 DATE_FROM, DATE_TO);
         hearingsToJudgmentsReport = new HearingsToJudgmentsReport(hearingsToJudgmentsReportDataSource, params);
     }
@@ -85,9 +86,11 @@ class HearingsToJudgmentsReportTest {
         // When I request report data
         // Then the case should not be in the report data
 
-        submitEvents.add(caseDataBuilder.withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName()).buildAsSubmitEvent(SUBMITTED_STATE));
+        submitEvents.add(caseDataBuilder.withManagingOffice(
+                TribunalOffice.NEWCASTLE.getOfficeName()).buildAsSubmitEvent(SUBMITTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -99,9 +102,11 @@ class HearingsToJudgmentsReportTest {
         // When I request report data
         // Then the case should not be in the report data
 
-        submitEvents.add(caseDataBuilder.withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName()).buildAsSubmitEvent(ACCEPTED_STATE));
+        submitEvents.add(caseDataBuilder.withManagingOffice(
+                TribunalOffice.NEWCASTLE.getOfficeName()).buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -115,10 +120,12 @@ class HearingsToJudgmentsReportTest {
 
         submitEvents.add(caseDataBuilder
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
-                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_LISTED, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER,
+                        HEARING_STATUS_LISTED, HEARING_TYPE_JUDICIAL_HEARING, YES)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -133,10 +140,12 @@ class HearingsToJudgmentsReportTest {
 
         submitEvents.add(caseDataBuilder
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
-                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER,
+                        HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -149,17 +158,19 @@ class HearingsToJudgmentsReportTest {
         // When I request report data
         // Then the case should not be in the report data
 
-        var judgmentTypeItem = new JudgementTypeItem();
+        JudgementTypeItem judgmentTypeItem = new JudgementTypeItem();
         judgmentTypeItem.setValue(null);
-        var submitEvent = caseDataBuilder
+        HearingsToJudgmentsSubmitEvent submitEvent = caseDataBuilder
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
-                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER,
+                        HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
                 .withJudgment("2021-07-16", DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvent.getCaseData().getJudgementCollection().add(judgmentTypeItem);
         submitEvents.add(submitEvent);
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -172,15 +183,17 @@ class HearingsToJudgmentsReportTest {
         // When I request report data
         // Then the case should not be in the report data
 
-        var submitEvent = caseDataBuilder
+        HearingsToJudgmentsSubmitEvent submitEvent = caseDataBuilder
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
-                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD,
+                        HEARING_TYPE_JUDICIAL_HEARING, YES)
                 .withJudgment("2021-07-16", DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .withJudgment(null, null, null)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvents.add(submitEvent);
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -291,7 +304,8 @@ class HearingsToJudgmentsReportTest {
                 .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertEquals(0, reportData.getReportDetails().size());
     }
@@ -305,11 +319,13 @@ class HearingsToJudgmentsReportTest {
 
         submitEvents.add(caseDataBuilder
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
-                .withHearing(INVALID_HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withHearing(INVALID_HEARING_LISTING_DATE, HEARING_NUMBER,
+                        HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
                 .withJudgment(INVALID_JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertEquals(0, reportData.getReportDetails().size());
     }
@@ -324,11 +340,13 @@ class HearingsToJudgmentsReportTest {
 
         submitEvents.add(caseDataBuilder
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
-                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD,
+                        HEARING_TYPE_JUDICIAL_HEARING, YES)
                 .withJudgment(INVALID_JUDGMENT_HEARING_DATE, DATE_WITHIN_4WKS, DATE_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertEquals(0, reportData.getReportDetails().size());
     }
@@ -347,7 +365,8 @@ class HearingsToJudgmentsReportTest {
                 .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
     }
@@ -359,8 +378,9 @@ class HearingsToJudgmentsReportTest {
         // And has a judgment made
         // When I request report data
         // Then the case is in the report data
-        var managingOffice = TribunalOffice.GLASGOW.getOfficeName();
-        when(hearingsToJudgmentsReportDataSource.getData(SCOTLAND_CASE_TYPE_ID, managingOffice, DATE_FROM, DATE_TO)).thenReturn(submitEvents);
+        String managingOffice = TribunalOffice.GLASGOW.getOfficeName();
+        when(hearingsToJudgmentsReportDataSource.getData(SCOTLAND_CASE_TYPE_ID, managingOffice, DATE_FROM, DATE_TO))
+                .thenReturn(submitEvents);
 
         submitEvents.add(caseDataBuilder
                 .withManagingOffice(managingOffice)
@@ -368,12 +388,13 @@ class HearingsToJudgmentsReportTest {
                 .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(SCOTLAND_LISTING_CASE_TYPE_ID, managingOffice);
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
+                SCOTLAND_LISTING_CASE_TYPE_ID, managingOffice);
         assertNotNull(reportData);
         assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportData.getReportSummary().getOffice());
         assertEquals(1, reportData.getReportDetails().size());
 
-        var reportDetail = reportData.getReportDetails().get(0);
+        HearingsToJudgmentsReportDetail reportDetail = reportData.getReportDetails().get(0);
         assertEquals(TribunalOffice.GLASGOW.getOfficeName(), reportDetail.getReportOffice());
     }
 
@@ -391,7 +412,8 @@ class HearingsToJudgmentsReportTest {
         submitEvents.add(createValidSubmitEventWithin4Wks());
         submitEvents.add(createValidSubmitEventWithin4Wks());
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertEquals("4", reportData.getReportSummary().getTotalCases());
         assertEquals(1, reportData.getReportDetails().size());
@@ -412,7 +434,8 @@ class HearingsToJudgmentsReportTest {
         // Will set the first cases total days to a number larger than the second cases
         submitEvents.get(0).getCaseData().getJudgementCollection().get(0).getValue().setDateJudgmentSent("2021-12-31");
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertEquals(2, reportData.getReportDetails().size());
@@ -449,11 +472,12 @@ class HearingsToJudgmentsReportTest {
                 .withJudgment(judgmentHearingDate, dateJudgmentMade, dateJudgmentSent)
                 .buildAsSubmitEvent(caseState));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
 
-        var reportDetail = reportData.getReportDetails().get(0);
+        HearingsToJudgmentsReportDetail reportDetail = reportData.getReportDetails().get(0);
         assertEquals(hearingJudge, reportDetail.getHearingJudge());
         assertEquals(TribunalOffice.NEWCASTLE.getOfficeName(), reportDetail.getReportOffice());
         assertEquals(caseReference, reportDetail.getCaseReference());
@@ -472,11 +496,11 @@ class HearingsToJudgmentsReportTest {
         // | 2021-07-05 | 2 | 2021-08-03 | 2021-08-04
         // When I request report data
         // Then I have correct hearing values for hearing #2
-        var expectedTotalDays = "31";
-        var caseReference = "2500123/2021";
-        var judge = "3756_Hugh Garfield"; // Amended to mimic Judge's ITCO reference
-        var judgmentHearingDate = "2021-07-05";
-        var dateJudgmentSent = "2021-08-04";
+        String expectedTotalDays = "31";
+        String caseReference = "2500123/2021";
+        String judge = "3756_Hugh Garfield"; // Amended to mimic Judge's ITCO reference
+        String judgmentHearingDate = "2021-07-05";
+        String dateJudgmentSent = "2021-08-04";
 
         submitEvents.add(caseDataBuilder
                 .withEthosCaseReference(caseReference)
@@ -489,11 +513,12 @@ class HearingsToJudgmentsReportTest {
                 .withJudgment(judgmentHearingDate, "2021-08-03", dateJudgmentSent)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
-        var reportData = hearingsToJudgmentsReport.runReport(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName());
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
 
-        var reportDetail = reportData.getReportDetails().get(0);
+        HearingsToJudgmentsReportDetail reportDetail = reportData.getReportDetails().get(0);
         assertEquals(judge, reportDetail.getHearingJudge());
         assertEquals(TribunalOffice.NEWCASTLE.getOfficeName(), reportDetail.getReportOffice());
         assertEquals(caseReference, reportDetail.getCaseReference());

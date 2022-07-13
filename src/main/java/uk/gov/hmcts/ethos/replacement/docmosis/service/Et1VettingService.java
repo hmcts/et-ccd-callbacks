@@ -191,21 +191,28 @@ public class Et1VettingService {
             case 6:
                 caseData.setEt1VettingRespondentAcasDetails6(
                     generateRespondentAndAcasDetails(respondentList.get(5).getValue(), 6));
+                break;
             case 5:
                 caseData.setEt1VettingRespondentAcasDetails5(
                     generateRespondentAndAcasDetails(respondentList.get(4).getValue(), 5));
+                break;
             case 4:
                 caseData.setEt1VettingRespondentAcasDetails4(
                     generateRespondentAndAcasDetails(respondentList.get(3).getValue(), 4));
+                break;
             case 3:
                 caseData.setEt1VettingRespondentAcasDetails3(
                     generateRespondentAndAcasDetails(respondentList.get(2).getValue(), 3));
+                break;
             case 2:
                 caseData.setEt1VettingRespondentAcasDetails2(
                     generateRespondentAndAcasDetails(respondentList.get(1).getValue(), 2));
+                break;
             case 1:
                 caseData.setEt1VettingRespondentAcasDetails1(
                     generateRespondentAndAcasDetails(respondentList.get(0).getValue(), 1));
+                break;
+            default:
                 break;
         }
     }

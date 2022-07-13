@@ -91,15 +91,19 @@ public class BulkHelperTest {
 
     @Test
     public void getMultipleTypeListBySubmitEventList() {
-        String result = "[MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, ethosCaseReferenceM=222, leadClaimantM=No, multipleReferenceM=1234, " +
-                "clerkRespM=JuanFran, claimantSurnameM=Mike, respondentSurnameM=Andrew Smith, claimantRepM= , respondentRepM= , fileLocM=Manchester, " +
-                "receiptDateM= , positionTypeM= , feeGroupReferenceM= , jurCodesCollectionM=AA, stateM= , subMultipleM= , subMultipleTitleM= , currentPositionM= , " +
-                "claimantAddressLine1M=Line1, claimantPostCodeM=PostCode, respondentAddressLine1M=Line1, respondentPostCodeM=PostCode, flag1M= , flag2M= , EQPM= , " +
-                "respondentRepOrgM= , claimantRepOrgM= )), MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, ethosCaseReferenceM=222, leadClaimantM=No, " +
-                "multipleReferenceM=1234, clerkRespM=JuanFran, claimantSurnameM=Mike, respondentSurnameM=Andrew Smith, claimantRepM= , respondentRepM= , " +
-                "fileLocM=Manchester, receiptDateM= , positionTypeM= , feeGroupReferenceM= , jurCodesCollectionM=AA, stateM= , subMultipleM= , subMultipleTitleM= , " +
-                "currentPositionM= , claimantAddressLine1M=Line1, claimantPostCodeM=PostCode, respondentAddressLine1M=Line1, respondentPostCodeM=PostCode, flag1M= , " +
-                "flag2M= , EQPM= , respondentRepOrgM= , claimantRepOrgM= ))]";
+        String result = "[MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, ethosCaseReferenceM=222,"
+                + " leadClaimantM=No, multipleReferenceM=1234, " + "clerkRespM=JuanFran, claimantSurnameM=Mike, "
+                + "respondentSurnameM=Andrew Smith, claimantRepM= , respondentRepM= , fileLocM=Manchester, "
+                + "receiptDateM= , positionTypeM= , feeGroupReferenceM= , jurCodesCollectionM=AA, stateM= , subMultipleM= , "
+                + "subMultipleTitleM= , currentPositionM= , " + "claimantAddressLine1M=Line1, claimantPostCodeM=PostCode,"
+                + " respondentAddressLine1M=Line1, respondentPostCodeM=PostCode, flag1M= , flag2M= , EQPM= , "
+                + "respondentRepOrgM= , claimantRepOrgM= )), MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, "
+                + "ethosCaseReferenceM=222, leadClaimantM=No, " + "multipleReferenceM=1234, clerkRespM=JuanFran,"
+                + " claimantSurnameM=Mike, respondentSurnameM=Andrew Smith, claimantRepM= , respondentRepM= , "
+                + "fileLocM=Manchester, receiptDateM= , positionTypeM= , feeGroupReferenceM= , jurCodesCollectionM=AA,"
+                + " stateM= , subMultipleM= , subMultipleTitleM= , " + "currentPositionM= , claimantAddressLine1M=Line1, "
+                + "claimantPostCodeM=PostCode, respondentAddressLine1M=Line1, respondentPostCodeM=PostCode, flag1M= , "
+                + "flag2M= , EQPM= , respondentRepOrgM= , claimantRepOrgM= ))]";
         assertEquals(result, BulkHelper.getMultipleTypeListBySubmitEventList(submitEvents, "1234").toString());
     }
 
@@ -107,15 +111,19 @@ public class BulkHelperTest {
     public void getMultipleTypeListBySubmitEventListWithStates() {
         submitEvents.get(0).setState(SUBMITTED_STATE);
         submitEvents.get(1).setState(PENDING_STATE);
-        String result = "[MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, ethosCaseReferenceM=222, leadClaimantM=No, multipleReferenceM=1234, " +
-                "clerkRespM=JuanFran, claimantSurnameM=Mike, respondentSurnameM=Andrew Smith, claimantRepM= , respondentRepM= , fileLocM=Manchester, " +
-                "receiptDateM= , positionTypeM= , feeGroupReferenceM= , jurCodesCollectionM=AA, stateM=Submitted, subMultipleM= , subMultipleTitleM= , " +
-                "currentPositionM= , claimantAddressLine1M=Line1, claimantPostCodeM=PostCode, respondentAddressLine1M=Line1, respondentPostCodeM=PostCode, " +
-                "flag1M= , flag2M= , EQPM= , respondentRepOrgM= , claimantRepOrgM= )), MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, ethosCaseReferenceM=222, " +
-                "leadClaimantM=No, multipleReferenceM=1234, clerkRespM=JuanFran, claimantSurnameM=Mike, respondentSurnameM=Andrew Smith, claimantRepM= , " +
-                "respondentRepM= , fileLocM=Manchester, receiptDateM= , positionTypeM= , feeGroupReferenceM= , jurCodesCollectionM=AA, stateM=Submitted, " +
-                "subMultipleM= , subMultipleTitleM= , currentPositionM= , claimantAddressLine1M=Line1, claimantPostCodeM=PostCode, respondentAddressLine1M=Line1, " +
-                "respondentPostCodeM=PostCode, flag1M= , flag2M= , EQPM= , respondentRepOrgM= , claimantRepOrgM= ))]";
+        String result = "[MultipleTypeItem(id=0, value=MultipleType(caseIDM=0, ethosCaseReferenceM=222, "
+                + "leadClaimantM=No, multipleReferenceM=1234, " + "clerkRespM=JuanFran, claimantSurnameM=Mike, "
+                + "respondentSurnameM=Andrew Smith, claimantRepM= , " + "respondentRepM= , fileLocM=Manchester, "
+                + "receiptDateM= , positionTypeM= , feeGroupReferenceM= , jurCodesCollectionM=AA, stateM=Submitted, "
+                + "subMultipleM= , subMultipleTitleM= , " + "currentPositionM= , claimantAddressLine1M=Line1,"
+                + " claimantPostCodeM=PostCode, respondentAddressLine1M=Line1, respondentPostCodeM=PostCode, "
+                + "flag1M= , flag2M= , EQPM= , respondentRepOrgM= , claimantRepOrgM= )), MultipleTypeItem(id=0, "
+                + "value=MultipleType(caseIDM=0, ethosCaseReferenceM=222, " + "leadClaimantM=No, multipleReferenceM=1234,"
+                + " clerkRespM=JuanFran, claimantSurnameM=Mike, respondentSurnameM=Andrew Smith, claimantRepM= , "
+                + "respondentRepM= , fileLocM=Manchester, receiptDateM= , positionTypeM= , feeGroupReferenceM= , "
+                + "jurCodesCollectionM=AA, stateM=Submitted, " + "subMultipleM= , subMultipleTitleM= , currentPositionM= , "
+                + "claimantAddressLine1M=Line1, claimantPostCodeM=PostCode, respondentAddressLine1M=Line1, "
+                + "respondentPostCodeM=PostCode, flag1M= , flag2M= , EQPM= , respondentRepOrgM= , claimantRepOrgM= ))]";
         assertEquals(result, BulkHelper.getMultipleTypeListBySubmitEventList(submitEvents, "1234").toString());
     }
 
@@ -148,11 +156,11 @@ public class BulkHelperTest {
 
     @Test
     public void getMultipleTypeFromSubmitEvent() {
-        String result = "MultipleType(caseIDM=0, ethosCaseReferenceM= , leadClaimantM=No, multipleReferenceM= , clerkRespM= , " +
-                "claimantSurnameM=Mike, respondentSurnameM=Juan Pedro, claimantRepM= , respondentRepM= , fileLocM=Manchester, " +
-                "receiptDateM= , positionTypeM= , feeGroupReferenceM=11111, jurCodesCollectionM= , stateM= , subMultipleM= , " +
-                "subMultipleTitleM= , currentPositionM= , claimantAddressLine1M= , claimantPostCodeM= , respondentAddressLine1M= , " +
-                "respondentPostCodeM= , flag1M= , flag2M= , EQPM= , respondentRepOrgM= , claimantRepOrgM= )";
+        String result = "MultipleType(caseIDM=0, ethosCaseReferenceM= , leadClaimantM=No, multipleReferenceM= , clerkRespM= , "
+                + "claimantSurnameM=Mike, respondentSurnameM=Juan Pedro, claimantRepM= , respondentRepM= , fileLocM=Manchester, "
+                + "receiptDateM= , positionTypeM= , feeGroupReferenceM=11111, jurCodesCollectionM= , stateM= , subMultipleM= , "
+                + "subMultipleTitleM= , currentPositionM= , claimantAddressLine1M= , claimantPostCodeM= , respondentAddressLine1M= , "
+                + "respondentPostCodeM= , flag1M= , flag2M= , EQPM= , respondentRepOrgM= , claimantRepOrgM= )";
         assertEquals(result, BulkHelper.getMultipleTypeFromSubmitEvent(submitEventComplete).toString());
     }
 
@@ -247,130 +255,147 @@ public class BulkHelperTest {
         assertFalse(BulkHelper.containsAllJurCodes(null, BulkHelper.getJurCodesListFromString(jurCodes)));
         assertFalse(BulkHelper.containsAllJurCodes(new ArrayList<>(), BulkHelper.getJurCodesListFromString(jurCodes)));
 
-        assertFalse(BulkHelper.containsAllJurCodes(new ArrayList<>(), BulkHelper.getJurCodesListFromString(null)));
-        assertFalse(BulkHelper.containsAllJurCodes(new ArrayList<>(), BulkHelper.getJurCodesListFromString("")));
-        assertFalse(BulkHelper.containsAllJurCodes(new ArrayList<>(), BulkHelper.getJurCodesListFromString(" ")));
+        assertFalse(BulkHelper.containsAllJurCodes(
+                new ArrayList<>(), BulkHelper.getJurCodesListFromString(null)));
+        assertFalse(BulkHelper.containsAllJurCodes(
+                new ArrayList<>(), BulkHelper.getJurCodesListFromString("")));
+        assertFalse(BulkHelper.containsAllJurCodes(
+                new ArrayList<>(), BulkHelper.getJurCodesListFromString(" ")));
     }
 
     @Test
     public void getJurCodesCollectionWithHide_AllJurCodesAreFiltered_ReturnsEmptyString() {
-        JurCodesTypeItem JurCodesTypeItem1 = getJurCodesWithOutcome("A", "Acas conciliated settlement");
-        JurCodesTypeItem JurCodesTypeItem2 = getJurCodesWithOutcome("B", "Withdrawn or private settlement");
-        JurCodesTypeItem JurCodesTypeItem3 = getJurCodesWithOutcome("C", "Input in error");
-        List<JurCodesTypeItem> jurCodesTypeItems = new ArrayList<>(Arrays.asList(JurCodesTypeItem1, JurCodesTypeItem2, JurCodesTypeItem3));
+        JurCodesTypeItem JurCodesTypeItem1 = getJurCodesWithOutcome(
+                "A", "Acas conciliated settlement");
+        JurCodesTypeItem JurCodesTypeItem2 = getJurCodesWithOutcome(
+                "B", "Withdrawn or private settlement");
+        JurCodesTypeItem JurCodesTypeItem3 = getJurCodesWithOutcome(
+                "C", "Input in error");
+        List<JurCodesTypeItem> jurCodesTypeItems = new ArrayList<>(
+                Arrays.asList(JurCodesTypeItem1, JurCodesTypeItem2, JurCodesTypeItem3));
         assertEquals(" ", BulkHelper.getJurCodesCollectionWithHide(jurCodesTypeItems));
     }
 
     @Test
     public void getJurCodesCollectionWithHide_NoJurCodeFiltered_ReturnsAllOutputs() {
-        JurCodesTypeItem JurCodesTypeItem1 = getJurCodesWithOutcome("A", "Successful at hearing");
-        JurCodesTypeItem JurCodesTypeItem2 = getJurCodesWithOutcome("B", "Unsuccessful at hearing");
-        JurCodesTypeItem JurCodesTypeItem3 = getJurCodesWithOutcome("C", "Dismissed at hearing - out of scope");
-        List<JurCodesTypeItem> jurCodesTypeItems = new ArrayList<>(Arrays.asList(JurCodesTypeItem1, JurCodesTypeItem2, JurCodesTypeItem3));
+        JurCodesTypeItem JurCodesTypeItem1 = getJurCodesWithOutcome(
+                "A", "Successful at hearing");
+        JurCodesTypeItem JurCodesTypeItem2 = getJurCodesWithOutcome(
+                "B", "Unsuccessful at hearing");
+        JurCodesTypeItem JurCodesTypeItem3 = getJurCodesWithOutcome(
+                "C", "Dismissed at hearing - out of scope");
+        List<JurCodesTypeItem> jurCodesTypeItems = new ArrayList<>(
+                Arrays.asList(JurCodesTypeItem1, JurCodesTypeItem2, JurCodesTypeItem3));
         assertEquals("A, B, C", BulkHelper.getJurCodesCollectionWithHide(jurCodesTypeItems));
     }
 
     @Test
     public void getJurCodesCollectionWithHide_PartJurCodesFiltered_ReturnsSomeOutputs() {
-        JurCodesTypeItem JurCodesTypeItem1 = getJurCodesWithOutcome("A", "Acas conciliated settlement");
-        JurCodesTypeItem JurCodesTypeItem2 = getJurCodesWithOutcome("B", "Successful at hearing");
-        JurCodesTypeItem JurCodesTypeItem3 = getJurCodesWithOutcome("C", "Withdrawn or private settlement");
-        List<JurCodesTypeItem> jurCodesTypeItems = new ArrayList<>(Arrays.asList(JurCodesTypeItem1, JurCodesTypeItem2, JurCodesTypeItem3));
+        JurCodesTypeItem JurCodesTypeItem1 = getJurCodesWithOutcome(
+                "A", "Acas conciliated settlement");
+        JurCodesTypeItem JurCodesTypeItem2 = getJurCodesWithOutcome(
+                "B", "Successful at hearing");
+        JurCodesTypeItem JurCodesTypeItem3 = getJurCodesWithOutcome(
+                "C", "Withdrawn or private settlement");
+        List<JurCodesTypeItem> jurCodesTypeItems = new ArrayList<>(
+                Arrays.asList(JurCodesTypeItem1, JurCodesTypeItem2, JurCodesTypeItem3));
         assertEquals("B", BulkHelper.getJurCodesCollectionWithHide(jurCodesTypeItems));
     }
 
     @Test
     public void buildScheduleDocumentContentListCases() {
-        String expected = "{\n" +
-                "\"accessKey\":\"\",\n" +
-                "\"templateName\":\"EM-TRB-SUM-ENG-00220.docx\",\n" +
-                "\"outputName\":\"document.docx\",\n" +
-                "\"data\":{\n" +
-                "\"Multiple_No\":\"210001\",\n" +
-                "\"Multiple_title\":\"Title1\",\n" +
-                "\"subMultiple\":[\n" +
-                "{\"SubMultiple_No\":\"211000\",\n" +
-                "\"SubMultiple_title\":\"SubMultiple1\",\n" +
-                "\"multiple\":[\n" +
-                "{\"Claimant\":\"Lady C Collins\",\n" +
-                "\"Current_position\":\"With judge\",\n" +
-                "\"Case_No\":\"2120000/2019\",\n" +
-                "\"claimant_full_name\":\"Lady C Collins\",\n" +
-                "\"claimant_addressLine1\":\"\",\n" +
-                "\"claimant_postCode\":\"\",\n" +
-                "\"respondent_full_name\":\"Emma Watson\",\n" +
-                "\"respondent_addressLine1\":\"Sillavan Way\",\n" +
-                "\"respondent_postCode\":\"M12 122\"},\n" +
-                "{\"Claimant\":\"Mrs F Watson\",\n" +
-                "\"Current_position\":\"Nowhere\",\n" +
-                "\"Case_No\":\"2120001/2019\",\n" +
-                "\"claimant_full_name\":\"Mrs F Watson\",\n" +
-                "\"claimant_addressLine1\":\"Avenue\",\n" +
-                "\"claimant_postCode\":\"L232323\",\n" +
-                "\"respondent_full_name\":\"Mr Steve Martin\",\n" +
-                "\"respondent_addressLine1\":\"Sillavan Street\",\n" +
-                "\"respondent_postCode\":\"M12 222\"}]\n" +
-                "},\n" +
-                "{\"SubMultiple_No\":\"211001\",\n" +
-                "\"SubMultiple_title\":\"SubMultiple2\",\n" +
-                "\"multiple\":[\n" +
-                "{\"Claimant\":\"Juan Pedro Martin\",\n" +
-                "\"Current_position\":\"\",\n" +
-                "\"Case_No\":\"2120002/2019\",\n" +
-                "\"claimant_full_name\":\"Juan Pedro Martin\",\n" +
-                "\"claimant_addressLine1\":\"\",\n" +
-                "\"claimant_postCode\":\"\",\n" +
-                "\"respondent_full_name\":\"Emma Watson\",\n" +
-                "\"respondent_addressLine1\":\"\",\n" +
-                "\"respondent_postCode\":\"\"}]\n" +
-                "}],\n" +
-                "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n" +
-                "}\n" +
-                "}\n";
-        assertEquals(expected, BulkHelper.buildScheduleDocumentContent(bulkDetailsListCases.getCaseData(), "").toString());
+        String expected = "{\n"
+                + "\"accessKey\":\"\",\n"
+                + "\"templateName\":\"EM-TRB-SUM-ENG-00220.docx\",\n"
+                + "\"outputName\":\"document.docx\",\n"
+                + "\"data\":{\n"
+                + "\"Multiple_No\":\"210001\",\n"
+                + "\"Multiple_title\":\"Title1\",\n"
+                + "\"subMultiple\":[\n"
+                + "{\"SubMultiple_No\":\"211000\",\n"
+                + "\"SubMultiple_title\":\"SubMultiple1\",\n"
+                + "\"multiple\":[\n"
+                + "{\"Claimant\":\"Lady C Collins\",\n"
+                + "\"Current_position\":\"With judge\",\n"
+                + "\"Case_No\":\"2120000/2019\",\n"
+                + "\"claimant_full_name\":\"Lady C Collins\",\n"
+                + "\"claimant_addressLine1\":\"\",\n"
+                + "\"claimant_postCode\":\"\",\n"
+                + "\"respondent_full_name\":\"Emma Watson\",\n"
+                + "\"respondent_addressLine1\":\"Sillavan Way\",\n"
+                + "\"respondent_postCode\":\"M12 122\"},\n"
+                + "{\"Claimant\":\"Mrs F Watson\",\n"
+                + "\"Current_position\":\"Nowhere\",\n"
+                + "\"Case_No\":\"2120001/2019\",\n"
+                + "\"claimant_full_name\":\"Mrs F Watson\",\n"
+                + "\"claimant_addressLine1\":\"Avenue\",\n"
+                + "\"claimant_postCode\":\"L232323\",\n"
+                + "\"respondent_full_name\":\"Mr Steve Martin\",\n"
+                + "\"respondent_addressLine1\":\"Sillavan Street\",\n"
+                + "\"respondent_postCode\":\"M12 222\"}]\n"
+                + "},\n"
+                + "{\"SubMultiple_No\":\"211001\",\n"
+                + "\"SubMultiple_title\":\"SubMultiple2\",\n"
+                + "\"multiple\":[\n"
+                + "{\"Claimant\":\"Juan Pedro Martin\",\n"
+                + "\"Current_position\":\"\",\n"
+                + "\"Case_No\":\"2120002/2019\",\n"
+                + "\"claimant_full_name\":\"Juan Pedro Martin\",\n"
+                + "\"claimant_addressLine1\":\"\",\n"
+                + "\"claimant_postCode\":\"\",\n"
+                + "\"respondent_full_name\":\"Emma Watson\",\n"
+                + "\"respondent_addressLine1\":\"\",\n"
+                + "\"respondent_postCode\":\"\"}]\n"
+                + "}],\n"
+                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
+                + "}\n"
+                + "}\n";
+        assertEquals(expected, BulkHelper.buildScheduleDocumentContent(
+                bulkDetailsListCases.getCaseData(), "").toString());
     }
 
     @Test
     public void buildScheduleDocumentContentMultipleScheduleDetailed() {
-        String expected = "{\n" +
-                "\"accessKey\":\"\",\n" +
-                "\"templateName\":\"EM-TRB-SUM-ENG-00222.docx\",\n" +
-                "\"outputName\":\"document.docx\",\n" +
-                "\"data\":{\n" +
-                "\"Multiple_No\":\"210001\",\n" +
-                "\"Multiple_title\":\"Title1\",\n" +
-                "\"multiple\":[\n" +
-                "{\"Claimant\":\"Lady C Collins\",\n" +
-                "\"Current_position\":\"With judge\",\n" +
-                "\"Case_No\":\"2120000/2019\",\n" +
-                "\"claimant_full_name\":\"Lady C Collins\",\n" +
-                "\"claimant_addressLine1\":\"\",\n" +
-                "\"claimant_postCode\":\"\",\n" +
-                "\"respondent_full_name\":\"Emma Watson\",\n" +
-                "\"respondent_addressLine1\":\"Sillavan Way\",\n" +
-                "\"respondent_postCode\":\"M12 122\"},\n" +
-                "{\"Claimant\":\"Mrs F Watson\",\n" +
-                "\"Current_position\":\"Nowhere\",\n" +
-                "\"Case_No\":\"2120001/2019\",\n" +
-                "\"claimant_full_name\":\"Mrs F Watson\",\n" +
-                "\"claimant_addressLine1\":\"Avenue\",\n" +
-                "\"claimant_postCode\":\"L232323\",\n" +
-                "\"respondent_full_name\":\"Mr Steve Martin\",\n" +
-                "\"respondent_addressLine1\":\"Sillavan Street\",\n" +
-                "\"respondent_postCode\":\"M12 222\"},\n" +
-                "{\"Claimant\":\"Juan Pedro Martin\",\n" +
-                "\"Current_position\":\"\",\n" +
-                "\"Case_No\":\"2120002/2019\",\n" +
-                "\"claimant_full_name\":\"Juan Pedro Martin\",\n" +
-                "\"claimant_addressLine1\":\"\",\n" +
-                "\"claimant_postCode\":\"\",\n" +
-                "\"respondent_full_name\":\"Emma Watson\",\n" +
-                "\"respondent_addressLine1\":\"\",\n" +
-                "\"respondent_postCode\":\"\"}],\n" +
-                "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n" +
-                "}\n" +
-                "}\n";
-        assertEquals(expected, BulkHelper.buildScheduleDocumentContent(bulkDetailsScheduleDetailed.getCaseData(), "").toString());
+        String expected = "{\n"
+                + "\"accessKey\":\"\",\n"
+                + "\"templateName\":\"EM-TRB-SUM-ENG-00222.docx\",\n"
+                + "\"outputName\":\"document.docx\",\n"
+                + "\"data\":{\n"
+                + "\"Multiple_No\":\"210001\",\n"
+                + "\"Multiple_title\":\"Title1\",\n"
+                + "\"multiple\":[\n"
+                + "{\"Claimant\":\"Lady C Collins\",\n"
+                + "\"Current_position\":\"With judge\",\n"
+                + "\"Case_No\":\"2120000/2019\",\n"
+                + "\"claimant_full_name\":\"Lady C Collins\",\n"
+                + "\"claimant_addressLine1\":\"\",\n"
+                + "\"claimant_postCode\":\"\",\n"
+                + "\"respondent_full_name\":\"Emma Watson\",\n"
+                + "\"respondent_addressLine1\":\"Sillavan Way\",\n"
+                + "\"respondent_postCode\":\"M12 122\"},\n"
+                + "{\"Claimant\":\"Mrs F Watson\",\n"
+                + "\"Current_position\":\"Nowhere\",\n"
+                + "\"Case_No\":\"2120001/2019\",\n"
+                + "\"claimant_full_name\":\"Mrs F Watson\",\n"
+                + "\"claimant_addressLine1\":\"Avenue\",\n"
+                + "\"claimant_postCode\":\"L232323\",\n"
+                + "\"respondent_full_name\":\"Mr Steve Martin\",\n"
+                + "\"respondent_addressLine1\":\"Sillavan Street\",\n"
+                + "\"respondent_postCode\":\"M12 222\"},\n"
+                + "{\"Claimant\":\"Juan Pedro Martin\",\n"
+                + "\"Current_position\":\"\",\n"
+                + "\"Case_No\":\"2120002/2019\",\n"
+                + "\"claimant_full_name\":\"Juan Pedro Martin\",\n"
+                + "\"claimant_addressLine1\":\"\",\n"
+                + "\"claimant_postCode\":\"\",\n"
+                + "\"respondent_full_name\":\"Emma Watson\",\n"
+                + "\"respondent_addressLine1\":\"\",\n"
+                + "\"respondent_postCode\":\"\"}],\n"
+                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"\n"
+                + "}\n"
+                + "}\n";
+        assertEquals(expected, BulkHelper.buildScheduleDocumentContent(
+                bulkDetailsScheduleDetailed.getCaseData(), "").toString());
     }
 
     private SubmitEvent createSubmitEvent(String ethosCaseReference) {
@@ -383,8 +408,10 @@ public class BulkHelperTest {
 
     @Test
     public void calculateLeadCase() {
-        List<SubmitEvent> submitEventList = new ArrayList<>(Arrays.asList(createSubmitEvent("1"), createSubmitEvent("2"),
-                createSubmitEvent("3"), createSubmitEvent("4")));
+        List<SubmitEvent> submitEventList = new ArrayList<>(Arrays.asList(createSubmitEvent("1"),
+                createSubmitEvent("2"),
+                createSubmitEvent("3"),
+                createSubmitEvent("4")));
         List<String> caseIds = new ArrayList<>(Arrays.asList("5", "2", "3"));
         List<SubmitEvent> submitEventListResult = BulkHelper.calculateLeadCase(submitEventList, caseIds);
         assertEquals("[2, 1, 3, 4]", submitEventListResult.stream()
@@ -393,8 +420,10 @@ public class BulkHelperTest {
 
     @Test
     public void calculateLeadCase2() {
-        List<SubmitEvent> submitEventList = new ArrayList<>(Arrays.asList(createSubmitEvent("1"), createSubmitEvent("2"),
-                createSubmitEvent("3"), createSubmitEvent("5")));
+        List<SubmitEvent> submitEventList = new ArrayList<>(Arrays.asList(createSubmitEvent("1"),
+                createSubmitEvent("2"),
+                createSubmitEvent("3"),
+                createSubmitEvent("5")));
         List<String> caseIds = new ArrayList<>(Arrays.asList("5", "2", "3"));
         List<SubmitEvent> submitEventListResult = BulkHelper.calculateLeadCase(submitEventList, caseIds);
         assertEquals("[5, 1, 2, 3]", submitEventListResult.stream()

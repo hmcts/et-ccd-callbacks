@@ -54,11 +54,21 @@ class TimeToFirstHearingReportTest {
 
     private void verifyReportHeaderIsZero(ListingData listingData) {
         AdhocReportType adhocReportType = listingData.getLocalReportsDetailHdr();
-        assertEquals(0, Strings.isNullOrEmpty(adhocReportType.getTotal())?0:Integer.parseInt(adhocReportType.getTotal()));
-        assertEquals(0, Strings.isNullOrEmpty(adhocReportType.getTotal26wk())?0:Integer.parseInt(adhocReportType.getTotal26wk()));
-        assertEquals(0, Strings.isNullOrEmpty(adhocReportType.getTotalx26wk())?0:Integer.parseInt(adhocReportType.getTotalx26wk()));
-        assertEquals(0.00, Strings.isNullOrEmpty(adhocReportType.getTotal26wkPerCent())?0.00:Float.parseFloat(adhocReportType.getTotal26wkPerCent()), .00);
-        assertEquals(0.00, Strings.isNullOrEmpty(adhocReportType.getTotalx26wkPerCent())?0.00:Float.parseFloat(adhocReportType.getTotalx26wkPerCent()),.00);
+        assertEquals(0, Strings.isNullOrEmpty(
+                adhocReportType.getTotal()) ? 0 : Integer.parseInt(
+                        adhocReportType.getTotal()));
+        assertEquals(0, Strings.isNullOrEmpty(
+                adhocReportType.getTotal26wk()) ? 0 : Integer.parseInt(
+                        adhocReportType.getTotal26wk()));
+        assertEquals(0, Strings.isNullOrEmpty(
+                adhocReportType.getTotalx26wk()) ? 0 : Integer.parseInt(
+                        adhocReportType.getTotalx26wk()));
+        assertEquals(0.00, Strings.isNullOrEmpty(
+                adhocReportType.getTotal26wkPerCent()) ? 0.00 : Float.parseFloat(
+                        adhocReportType.getTotal26wkPerCent()), .00);
+        assertEquals(0.00, Strings.isNullOrEmpty(
+                adhocReportType.getTotalx26wkPerCent()) ? 0.00 : Float.parseFloat(
+                        adhocReportType.getTotalx26wkPerCent()),.00);
     }
 
     @Test
@@ -94,11 +104,21 @@ class TimeToFirstHearingReportTest {
         ListingData reportListingData = timeToFirstHearingReport.generateReportData(listingDetails, submitEvents);
 
         AdhocReportType adhocReportType = reportListingData.getLocalReportsDetailHdr();
-        assertEquals(1, Strings.isNullOrEmpty(adhocReportType.getTotalCases())?0:Integer.parseInt(adhocReportType.getTotalCases()));
-        assertEquals(1, Strings.isNullOrEmpty(adhocReportType.getTotal26wk())?0:Integer.parseInt(adhocReportType.getTotal26wk()));
-        assertEquals(0, Strings.isNullOrEmpty(adhocReportType.getTotalx26wk())?0:Integer.parseInt(adhocReportType.getTotalx26wk()));
-        assertEquals(100, Strings.isNullOrEmpty(adhocReportType.getTotal26wkPerCent())?0:Float.parseFloat(adhocReportType.getTotal26wkPerCent()), .00);
-        assertEquals(0, Strings.isNullOrEmpty(adhocReportType.getTotalx26wkPerCent())?0:Float.parseFloat(adhocReportType.getTotalx26wkPerCent()), .00);
+        assertEquals(1, Strings.isNullOrEmpty(
+                adhocReportType.getTotalCases()) ? 0 : Integer.parseInt(
+                        adhocReportType.getTotalCases()));
+        assertEquals(1, Strings.isNullOrEmpty(
+                adhocReportType.getTotal26wk()) ? 0 : Integer.parseInt(
+                        adhocReportType.getTotal26wk()));
+        assertEquals(0, Strings.isNullOrEmpty(
+                adhocReportType.getTotalx26wk()) ? 0 : Integer.parseInt(
+                        adhocReportType.getTotalx26wk()));
+        assertEquals(100, Strings.isNullOrEmpty(
+                adhocReportType.getTotal26wkPerCent()) ? 0 : Float.parseFloat(
+                        adhocReportType.getTotal26wkPerCent()), .00);
+        assertEquals(0, Strings.isNullOrEmpty(
+                adhocReportType.getTotalx26wkPerCent()) ? 0 : Float.parseFloat(
+                        adhocReportType.getTotalx26wkPerCent()), .00);
     }
 
     @Test

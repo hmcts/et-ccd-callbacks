@@ -412,8 +412,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
         BulkRequestPayload bulkRequestPayload = bulkCreationService.bulkCreationLogic(
                 getBulkDetails(YES, "Single"),
                 bulkCasesPayload, "authToken", BULK_CREATION_STEP);
-        assertThat(bulkRequestPayload.getBulkDetails().toString())
-        .hasToString(RESULT);
+        assertThat(bulkRequestPayload.getBulkDetails().toString()).hasToString(RESULT);
     }
 
     @Test
@@ -522,7 +521,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
         when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), any()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         assertThrows(CaseCreationException.class,
-                ()->{
+                () -> {
                     bulkSearchService.retrievalCasesForPreAcceptRequest(
                             getBulkDetails(YES, "Single"), "authToken");
                 });

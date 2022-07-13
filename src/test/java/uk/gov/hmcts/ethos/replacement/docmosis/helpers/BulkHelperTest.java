@@ -265,14 +265,14 @@ public class BulkHelperTest {
 
     @Test
     public void getJurCodesCollectionWithHide_AllJurCodesAreFiltered_ReturnsEmptyString() {
-        JurCodesTypeItem JurCodesTypeItem1 = getJurCodesWithOutcome(
+        JurCodesTypeItem jurCodesTypeItem1 = getJurCodesWithOutcome(
                 "A", "Acas conciliated settlement");
-        JurCodesTypeItem JurCodesTypeItem2 = getJurCodesWithOutcome(
+        JurCodesTypeItem jurCodesTypeItem2 = getJurCodesWithOutcome(
                 "B", "Withdrawn or private settlement");
-        JurCodesTypeItem JurCodesTypeItem3 = getJurCodesWithOutcome(
+        JurCodesTypeItem jurCodesTypeItem3 = getJurCodesWithOutcome(
                 "C", "Input in error");
         List<JurCodesTypeItem> jurCodesTypeItems = new ArrayList<>(
-                Arrays.asList(JurCodesTypeItem1, JurCodesTypeItem2, JurCodesTypeItem3));
+                Arrays.asList(jurCodesTypeItem1, jurCodesTypeItem2, jurCodesTypeItem3));
         assertEquals(" ", BulkHelper.getJurCodesCollectionWithHide(jurCodesTypeItems));
     }
 

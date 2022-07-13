@@ -72,7 +72,6 @@ class CaseSourceLocalReportTest {
         assertEquals(0.00, Strings.isNullOrEmpty(
                 adhocReportType.getEccTotalCasesPercent()) ? 0.00 : Float.parseFloat(
                         adhocReportType.getEccTotalCasesPercent()),.00);
-
     }
 
     @Test

@@ -108,8 +108,8 @@ public class SubMultipleServiceTest {
 
     @Test
     public void populateSubMultipleDynamicListLogic() {
-        String result = "DynamicFixedListType(value=DynamicValueType(code=1234567, label=SubMultiple1), " +
-                "listItems=[DynamicValueType(code=1234567, label=SubMultiple1)])";
+        String result = "DynamicFixedListType(value=DynamicValueType(code=1234567, label=SubMultiple1), "
+                + "listItems=[DynamicValueType(code=1234567, label=SubMultiple1)])";
         bulkDetails.getCaseData().setSubMultipleCollection(createSubMultiples());
         BulkRequestPayload bulkRequestPayload = subMultipleService.populateSubMultipleDynamicListLogic(bulkDetails);
         assertEquals(result, bulkRequestPayload.getBulkDetails().getCaseData().getSubMultipleDynamicList().toString());
@@ -117,8 +117,8 @@ public class SubMultipleServiceTest {
 
     @Test
     public void populateSubMultipleDynamicListLogicWithPreviousDynamicList() {
-        String result = "DynamicFixedListType(value=DynamicValueType(code=1234567, label=SubMultiple1), " +
-                "listItems=[DynamicValueType(code=1234567, label=SubMultiple1)])";
+        String result = "DynamicFixedListType(value=DynamicValueType(code=1234567, label=SubMultiple1), "
+                + "listItems=[DynamicValueType(code=1234567, label=SubMultiple1)])";
         bulkDetails.getCaseData().setSubMultipleDynamicList(createDynamicFixedListType());
         bulkDetails.getCaseData().setSubMultipleCollection(createSubMultiples());
         BulkRequestPayload bulkRequestPayload = subMultipleService.populateSubMultipleDynamicListLogic(bulkDetails);
@@ -134,8 +134,8 @@ public class SubMultipleServiceTest {
 
     @Test
     public void populateFilterDefaultedAllDynamicListLogic() {
-        String result = "DynamicFixedListType(value=DynamicValueType(code=999999, label=Select All), " +
-                "listItems=[DynamicValueType(code=999999, label=Select All), DynamicValueType(code=1234567, label=SubMultiple1)])";
+        String result = "DynamicFixedListType(value=DynamicValueType(code=999999, label=Select All), "
+                + "listItems=[DynamicValueType(code=999999, label=Select All), DynamicValueType(code=1234567, label=SubMultiple1)])";
         bulkDetails.getCaseData().setSubMultipleCollection(createSubMultiples());
         BulkRequestPayload bulkRequestPayload = subMultipleService.populateFilterDefaultedDynamicListLogic(
                 bulkDetails, SELECT_ALL_VALUE);
@@ -144,8 +144,8 @@ public class SubMultipleServiceTest {
 
     @Test
     public void populateFilterDefaultedNoneDynamicListLogic() {
-        String result = "DynamicFixedListType(value=DynamicValueType(code=999999, label=None), " +
-                "listItems=[DynamicValueType(code=999999, label=None), DynamicValueType(code=1234567, label=SubMultiple1)])";
+        String result = "DynamicFixedListType(value=DynamicValueType(code=999999, label=None), "
+                + "listItems=[DynamicValueType(code=999999, label=None), DynamicValueType(code=1234567, label=SubMultiple1)])";
         bulkDetails.getCaseData().setSubMultipleCollection(createSubMultiples());
         BulkRequestPayload bulkRequestPayload = subMultipleService.populateFilterDefaultedDynamicListLogic(
                 bulkDetails, SELECT_NONE_VALUE);

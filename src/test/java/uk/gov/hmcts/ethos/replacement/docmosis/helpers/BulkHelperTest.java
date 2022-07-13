@@ -270,8 +270,6 @@ public class BulkHelperTest {
                 null, BulkHelper.getJurCodesListFromString(jurCodes)));
         assertFalse(BulkHelper.containsAllJurCodes(
                 new ArrayList<>(), BulkHelper.getJurCodesListFromString(jurCodes)));
-
-
         assertFalse(BulkHelper.containsAllJurCodes(
                 new ArrayList<>(), BulkHelper.getJurCodesListFromString(null)));
         assertFalse(BulkHelper.containsAllJurCodes(

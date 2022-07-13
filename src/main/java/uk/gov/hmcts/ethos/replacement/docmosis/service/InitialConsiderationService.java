@@ -59,7 +59,8 @@ public class InitialConsiderationService {
         IntWrapper respondentCount = new IntWrapper(0);
         return respondentCollection.stream()
                 .map(respondent -> String.format(
-                        RESPONDENT_NAME, respondentCount.incrementAndReturnValue(),
+                        RESPONDENT_NAME,
+                        respondentCollection.size() > 1 ? respondentCount.incrementAndReturnValue() : "",
                         nullCheck(respondent.getValue().getRespondentName()),
                         nullCheck(respondent.getValue().getResponseRespondentName())))
                 .collect(Collectors.joining());

@@ -209,7 +209,6 @@ public class Et1VettingService {
                         generateRespondentAndAcasDetails(respondentList.get(0).getValue(), 1));
                 break;
             default:
-                throw new IllegalStateException("Unexpected value: " + respondentList.size());
         }
     }
 

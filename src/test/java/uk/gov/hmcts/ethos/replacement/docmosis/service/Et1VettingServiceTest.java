@@ -285,7 +285,7 @@ class Et1VettingServiceTest {
     }
 
     @Test
-    void initialBeforeYouStart_returnRespondentAcasDetailsMarkUp() {
+    void initialBeforeYouStart_returnRespondentSixAcasDetailsMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
             .isEqualTo(EXPECTED_RESPONDENT1_ACAS_DETAILS);
@@ -299,6 +299,74 @@ class Et1VettingServiceTest {
             .isEqualTo(EXPECTED_RESPONDENT5_ACAS_DETAILS);
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails6())
             .isEqualTo(EXPECTED_RESPONDENT6_ACAS_DETAILS);
+    }
+
+    @Test
+    void initialBeforeYouStart_returnFiveRespondentAcasDetailsMarkUp() {
+        removeRespondents(5);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
+                .isEqualTo(EXPECTED_RESPONDENT1_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails2())
+                .isEqualTo(EXPECTED_RESPONDENT2_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails3())
+                .isEqualTo(EXPECTED_RESPONDENT3_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails4())
+                .isEqualTo(EXPECTED_RESPONDENT4_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails5())
+                .isEqualTo(EXPECTED_RESPONDENT5_ACAS_DETAILS);
+    }
+
+    @Test
+    void initialBeforeYouStart_returnFourRespondentAcasDetailsMarkUp() {
+        removeRespondents(4);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
+                .isEqualTo(EXPECTED_RESPONDENT1_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails2())
+                .isEqualTo(EXPECTED_RESPONDENT2_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails3())
+                .isEqualTo(EXPECTED_RESPONDENT3_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails4())
+                .isEqualTo(EXPECTED_RESPONDENT4_ACAS_DETAILS);
+    }
+
+    @Test
+    void initialBeforeYouStart_returnThreeRespondentAcasDetailsMarkUp() {
+        removeRespondents(3);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
+                .isEqualTo(EXPECTED_RESPONDENT1_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails2())
+                .isEqualTo(EXPECTED_RESPONDENT2_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails3())
+                .isEqualTo(EXPECTED_RESPONDENT3_ACAS_DETAILS);
+    }
+
+    @Test
+    void initialBeforeYouStart_returnTwoRespondentAcasDetailsMarkUp() {
+        removeRespondents(2);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
+                .isEqualTo(EXPECTED_RESPONDENT1_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails2())
+                .isEqualTo(EXPECTED_RESPONDENT2_ACAS_DETAILS);
+    }
+
+    @Test
+    void initialBeforeYouStart_returnOneRespondentAcasDetailsMarkUp() {
+        removeRespondents(1);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
+                .isEqualTo(EXPECTED_RESPONDENT1_ACAS_DETAILS);
+    }
+
+    void removeRespondents(int respondents) {
+        int i = respondents;
+        while (i <= 5) {
+            caseDetails.getCaseData().getRespondentCollection().remove(6 - respondents);
+            i++;
+        }
     }
 
     @Test

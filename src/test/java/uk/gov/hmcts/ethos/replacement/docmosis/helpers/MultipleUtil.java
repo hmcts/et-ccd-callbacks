@@ -76,6 +76,7 @@ public final class MultipleUtil {
     public static final String TESTING_FILE_NAME_EMPTY = "MyFirstExcelEmpty.xlsx";
 
     private MultipleUtil() {
+        //Utility class can't have a public or default constructor
     }
 
     public static TreeMap<String, Object> getMultipleObjectsAll() {

@@ -185,71 +185,31 @@ public class Et1VettingService {
         }
     }
 
+    @SuppressWarnings("checkstyle:FallThrough")
     private void populateRespondentAcasDetailsMarkUp(CaseData caseData) {
         List<RespondentSumTypeItem> respondentList = caseData.getRespondentCollection();
-        if (respondentList.size() == 6) {
-            caseData.setEt1VettingRespondentAcasDetails6(
-                    generateRespondentAndAcasDetails(respondentList.get(5).getValue(), 6));
-
-            caseData.setEt1VettingRespondentAcasDetails5(
-                    generateRespondentAndAcasDetails(respondentList.get(4).getValue(), 5));
-
-            caseData.setEt1VettingRespondentAcasDetails4(
-                    generateRespondentAndAcasDetails(respondentList.get(3).getValue(), 4));
-
-            caseData.setEt1VettingRespondentAcasDetails3(
-                    generateRespondentAndAcasDetails(respondentList.get(2).getValue(), 3));
-
-            caseData.setEt1VettingRespondentAcasDetails2(
-                    generateRespondentAndAcasDetails(respondentList.get(1).getValue(), 2));
-
-            caseData.setEt1VettingRespondentAcasDetails1(
-                    generateRespondentAndAcasDetails(respondentList.get(0).getValue(), 1));
-        } else if (respondentList.size() == 5) {
-            caseData.setEt1VettingRespondentAcasDetails5(
-                    generateRespondentAndAcasDetails(respondentList.get(4).getValue(), 5));
-
-            caseData.setEt1VettingRespondentAcasDetails4(
-                    generateRespondentAndAcasDetails(respondentList.get(3).getValue(), 4));
-
-            caseData.setEt1VettingRespondentAcasDetails3(
-                    generateRespondentAndAcasDetails(respondentList.get(2).getValue(), 3));
-
-            caseData.setEt1VettingRespondentAcasDetails2(
-                    generateRespondentAndAcasDetails(respondentList.get(1).getValue(), 2));
-
-            caseData.setEt1VettingRespondentAcasDetails1(
-                    generateRespondentAndAcasDetails(respondentList.get(0).getValue(), 1));
-        } else if (respondentList.size() == 4) {
-            caseData.setEt1VettingRespondentAcasDetails4(
-                    generateRespondentAndAcasDetails(respondentList.get(3).getValue(), 4));
-
-            caseData.setEt1VettingRespondentAcasDetails3(
-                    generateRespondentAndAcasDetails(respondentList.get(2).getValue(), 3));
-
-            caseData.setEt1VettingRespondentAcasDetails2(
-                    generateRespondentAndAcasDetails(respondentList.get(1).getValue(), 2));
-
-            caseData.setEt1VettingRespondentAcasDetails1(
-                    generateRespondentAndAcasDetails(respondentList.get(0).getValue(), 1));
-        } else if (respondentList.size() == 3) {
-            caseData.setEt1VettingRespondentAcasDetails3(
-                    generateRespondentAndAcasDetails(respondentList.get(2).getValue(), 3));
-
-            caseData.setEt1VettingRespondentAcasDetails2(
-                    generateRespondentAndAcasDetails(respondentList.get(1).getValue(), 2));
-
-            caseData.setEt1VettingRespondentAcasDetails1(
-                    generateRespondentAndAcasDetails(respondentList.get(0).getValue(), 1));
-        } else if (respondentList.size() == 2) {
-            caseData.setEt1VettingRespondentAcasDetails2(
-                    generateRespondentAndAcasDetails(respondentList.get(1).getValue(), 2));
-
-            caseData.setEt1VettingRespondentAcasDetails1(
-                    generateRespondentAndAcasDetails(respondentList.get(0).getValue(), 1));
-        } else if (respondentList.size() == 1) {
-            caseData.setEt1VettingRespondentAcasDetails1(
-                    generateRespondentAndAcasDetails(respondentList.get(0).getValue(), 1));
+        switch (respondentList.size()) {
+            case 6:
+                caseData.setEt1VettingRespondentAcasDetails6(
+                        generateRespondentAndAcasDetails(respondentList.get(5).getValue(), 6));
+            case 5:
+                caseData.setEt1VettingRespondentAcasDetails5(
+                        generateRespondentAndAcasDetails(respondentList.get(4).getValue(), 5));
+            case 4:
+                caseData.setEt1VettingRespondentAcasDetails4(
+                        generateRespondentAndAcasDetails(respondentList.get(3).getValue(), 4));
+            case 3:
+                caseData.setEt1VettingRespondentAcasDetails3(
+                        generateRespondentAndAcasDetails(respondentList.get(2).getValue(), 3));
+            case 2:
+                caseData.setEt1VettingRespondentAcasDetails2(
+                        generateRespondentAndAcasDetails(respondentList.get(1).getValue(), 2));
+            case 1:
+                caseData.setEt1VettingRespondentAcasDetails1(
+                        generateRespondentAndAcasDetails(respondentList.get(0).getValue(), 1));
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + respondentList.size());
         }
     }
 

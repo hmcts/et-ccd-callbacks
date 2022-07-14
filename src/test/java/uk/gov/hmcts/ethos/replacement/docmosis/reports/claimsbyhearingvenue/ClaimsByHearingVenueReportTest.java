@@ -116,7 +116,8 @@ class ClaimsByHearingVenueReportTest {
 
         String expectedReportTitle = getReportTitle(SINGLE_HEARING_DATE_TYPE);
         int expectedNumberOfSubmitEventEntries = 1;
-        ClaimsByHearingVenueReportParams singleHearingDateTypeReportParams = new ClaimsByHearingVenueReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        ClaimsByHearingVenueReportParams singleHearingDateTypeReportParams =
+                new ClaimsByHearingVenueReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 OFFICE_NAME, SINGLE_START_DATE, SINGLE_END_DATE, SINGLE_HEARING_DATE_TYPE, TEST_USERNAME);
         ClaimsByHearingVenueReportData reportData = claimsByHearingVenueReport
                 .generateReport(singleHearingDateTypeReportParams);

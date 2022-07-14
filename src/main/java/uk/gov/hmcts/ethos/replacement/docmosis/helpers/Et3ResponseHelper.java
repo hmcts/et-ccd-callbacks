@@ -3,6 +3,12 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 /**
  * ET3 Response Helper provides methods to assist with the ET3 Response Form event.
  */
@@ -22,5 +28,39 @@ public class Et3ResponseHelper {
      */
     public static String formatClaimantNameForHtml(CaseData caseData) {
         return String.format(CLAIMANT_NAME_TABLE, caseData.getClaimant());
+    }
+
+    /**
+     * Validates that the employment start date is in the past and not after 
+     * the employment end date if both dates are provided.
+     * @param caseData data for the current case
+     * @return List of validation errors encountered
+     */
+    public static List<String> validateEmploymentDates(CaseData caseData) {
+        ArrayList<String> errors = new ArrayList<>();
+        String startDateStr = caseData.getEt3ResponseEmploymentStartDate();
+        String endDateStr = caseData.getEt3ResponseEmploymentEndDate();
+
+        if (isNullOrEmpty(startDateStr)) {
+            return errors;
+        }
+
+        LocalDate startDate = LocalDate.parse(startDateStr);
+
+        if (startDate.isAfter(LocalDate.now())) {
+            errors.add("Start date must be in the past");
+        }
+
+        if (isNullOrEmpty(endDateStr)) {
+            return errors;
+        }
+
+        LocalDate endDate = LocalDate.parse(endDateStr);
+
+        if (startDate.isAfter(endDate)) {
+            errors.add("End date must be after the start date");
+        }
+
+        return errors;
     }
 }

@@ -64,12 +64,12 @@ public class ET3NotificationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setOtherTypeDocumentName(
-            ServingHelper.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
-        caseData.setClaimantAndRespondentAddresses(ServingHelper.generateClaimantAndRespondentAddress(caseData));
-        caseData.setEmailLinkToAcas(ServingHelper.generateEmailLinkToAcas(caseData));
+        caseData.setEt3OtherTypeDocumentName(
+            ServingHelper.generateOtherTypeDocumentName(caseData.getEt3NotificationDocCollection()));
+        caseData.setEt3ClaimantAndRespondentAddresses(ServingHelper.generateClaimantAndRespondentAddress(caseData));
+        caseData.setEt3EmailLinkToAcas(ServingHelper.generateEmailLinkToAcas(caseData));
 
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
 }

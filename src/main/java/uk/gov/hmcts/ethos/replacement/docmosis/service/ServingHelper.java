@@ -10,7 +10,7 @@ import java.text.MessageFormat;
 import java.util.List;
 
 @Service
-public class ET1ServingService {
+public class ServingHelper {
     public static final String SERVING_DOCUMENT_OTHER_TYPE = "Another type of document";
     private static final String SERVING_RECIPIENT_CLAIMANT = "Claimant";
     private static final String SERVING_RECIPIENT_RESPONDENT = "Respondent";

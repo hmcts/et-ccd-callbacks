@@ -37,15 +37,13 @@ class HearingsToJudgmentsReportDataTest {
     }
 
     private HearingsToJudgmentsReportData setupValidReportData() {
-        var reportSummary = new HearingsToJudgmentsReportSummary("Office");
+        HearingsToJudgmentsReportSummary reportSummary = new HearingsToJudgmentsReportSummary("Office");
         reportSummary.setTotalCases("2");
         reportSummary.setTotal4Wk("1");
         reportSummary.setTotal4WkPercent("50.00");
         reportSummary.setTotalX4Wk("1");
         reportSummary.setTotalX4WkPercent("50.00");
-        var reportData = new HearingsToJudgmentsReportData(reportSummary);
-
-        var reportDetail1 = new HearingsToJudgmentsReportDetail();
+        HearingsToJudgmentsReportDetail reportDetail1 = new HearingsToJudgmentsReportDetail();
         reportDetail1.setCaseReference("caseRef1");
         reportDetail1.setHearingDate("2021-02-03");
         reportDetail1.setReportOffice("Office");
@@ -53,6 +51,7 @@ class HearingsToJudgmentsReportDataTest {
         reportDetail1.setHearingJudge("Test1 Judge");
         reportDetail1.setJudgementDateSent("2021-04-03");
         reportDetail1.setTotalDays("25");
+        HearingsToJudgmentsReportData reportData = new HearingsToJudgmentsReportData(reportSummary);
         reportData.addReportDetail(reportDetail1);
 
         var reportDetail2 = new HearingsToJudgmentsReportDetail();
@@ -76,7 +75,7 @@ class HearingsToJudgmentsReportDataTest {
                 reportSummary.getTotal4WkPercent(), reportSummary.getTotalX4Wk(), reportSummary.getTotalX4WkPercent()));
 
         sb.append("\"" + REPORT_DETAILS + "\":[\n");
-        if(CollectionUtils.isNotEmpty(reportData.getReportDetails())
+        if (CollectionUtils.isNotEmpty(reportData.getReportDetails())
                 && reportData.getReportDetails().get(0) != null) {
             var reportDetail1 = reportData.getReportDetails().get(0);
             sb.append(buildDetailJsonString(
@@ -85,7 +84,7 @@ class HearingsToJudgmentsReportDataTest {
                     reportDetail1.getJudgementDateSent(), reportDetail1.getTotalDays()
             ));
         }
-        if(CollectionUtils.isNotEmpty(reportData.getReportDetails())
+        if (CollectionUtils.isNotEmpty(reportData.getReportDetails())
                 && reportData.getReportDetails().get(1) != null) {
             var reportDetail2 = reportData.getReportDetails().get(1);
             sb.append(",\n");
@@ -106,9 +105,12 @@ class HearingsToJudgmentsReportDataTest {
         sb.append(REPORT_OFFICE).append(office).append(NEW_LINE);
         sb.append(TOTAL_CASES).append(StringUtils.defaultString(totalCases, "0")).append(NEW_LINE);
         sb.append(TOTAL_WITHIN_4WEEKS).append(StringUtils.defaultString(total4Wk, "0")).append(NEW_LINE);
-        sb.append(TOTAL_PERCENT_WITHIN_4WEEKS).append(StringUtils.defaultString(total4WkPercent, "0.00")).append(NEW_LINE);
-        sb.append(TOTAL_NOT_WITHIN_4WEEKS).append(StringUtils.defaultString(totalX4Wk, "0")).append(NEW_LINE);
-        sb.append(TOTAL_PERCENT_NOT_WITHIN_4WEEKS).append(StringUtils.defaultString(totalX4WkPercent, "0.00")).append(NEW_LINE);
+        sb.append(TOTAL_PERCENT_WITHIN_4WEEKS).append(StringUtils.defaultString(
+                total4WkPercent, "0.00")).append(NEW_LINE);
+        sb.append(TOTAL_NOT_WITHIN_4WEEKS).append(StringUtils.defaultString(
+                totalX4Wk, "0")).append(NEW_LINE);
+        sb.append(TOTAL_PERCENT_NOT_WITHIN_4WEEKS).append(StringUtils.defaultString(
+                totalX4WkPercent, "0.00")).append(NEW_LINE);
         return sb;
     }
 

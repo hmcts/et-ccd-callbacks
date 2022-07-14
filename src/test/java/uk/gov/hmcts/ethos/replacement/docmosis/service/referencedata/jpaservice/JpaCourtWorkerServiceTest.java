@@ -23,10 +23,12 @@ public class JpaCourtWorkerServiceTest {
                 createCourtWorker("worker2", "Worker 2"),
                 createCourtWorker("worker3", "Worker 3"));
         var courtWorkerRepository = mock(CourtWorkerRepository.class);
-        when(courtWorkerRepository.findByTribunalOfficeAndType(tribunalOffice, courtWorkerType)).thenReturn(courtWorkers);
+        when(courtWorkerRepository.findByTribunalOfficeAndType(
+                tribunalOffice, courtWorkerType)).thenReturn(courtWorkers);
 
         var courtWorkerService = new JpaCourtWorkerService(courtWorkerRepository);
-        var values = courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice, courtWorkerType);
+        var values = courtWorkerService.getCourtWorkerByTribunalOffice(
+                tribunalOffice, courtWorkerType);
 
         assertEquals(3, values.size());
         verifyValue(values.get(0), "worker1", "Worker 1");

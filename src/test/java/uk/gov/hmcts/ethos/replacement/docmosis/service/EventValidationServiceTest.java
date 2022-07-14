@@ -380,7 +380,8 @@ class EventValidationServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({SUBMITTED_STATE + ",false", ACCEPTED_STATE + ",false", REJECTED_STATE + ",false", CLOSED_STATE + ",true"})
+    @CsvSource({SUBMITTED_STATE + ",false", ACCEPTED_STATE + ",false", REJECTED_STATE
+            + ",false", CLOSED_STATE + ",true"})
     void validateCurrentPositionCaseClosed(String state, boolean expected) {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setState(state);
@@ -403,7 +404,8 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateDisposalDateInFuture() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(FUTURE_RECEIPT_DATE.toString()), errors);
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(
+                "2777-05-15"), errors);
         assertThat(errors.get(0))
                 .isEqualTo(String.format(EventValidationService.DISPOSAL_DATE_IN_FUTURE, "blah blah"));
 
@@ -412,12 +414,12 @@ class EventValidationServiceTest {
     private HearingTypeItem setHearing(String hearingDate) {
         HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setId(UUID.randomUUID().toString());
-        HearingType hearingType = new HearingType();
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         DateListedType dateListedType = new DateListedType();
         dateListedType.setListedDate(hearingDate);
         dateListedTypeItem.setId(UUID.randomUUID().toString());
         dateListedTypeItem.setValue(dateListedType);
+        HearingType hearingType = new HearingType();
         hearingType.setHearingDateCollection(Collections.singletonList(dateListedTypeItem));
         hearingTypeItem.setValue(hearingType);
         return hearingTypeItem;

@@ -107,6 +107,7 @@ public class CaseDataBuilder {
                 break;
             case EDINBURGH:
                 hearing.setHearingEdinburgh(dynamicFixedListType);
+                break;
             case GLASGOW:
                 hearing.setHearingGlasgow(dynamicFixedListType);
                 break;

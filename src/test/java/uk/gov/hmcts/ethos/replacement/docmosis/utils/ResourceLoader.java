@@ -18,33 +18,41 @@ public class ResourceLoader {
     private ResourceLoader() {
     }
 
-    public static UploadResponse successfulDocumentManagementUploadResponse() throws URISyntaxException, IOException {
-        String response = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(ResourceLoader.class.getClassLoader()
+    public static UploadResponse successfulDocumentManagementUploadResponse()
+            throws URISyntaxException, IOException {
+        String response = new String(Files.readAllBytes(
+                Paths.get(Objects.requireNonNull(ResourceLoader.class.getClassLoader()
                 .getResource("response.success.json")).toURI())));
         return jsonMapper.fromJson(response, UploadResponse.class);
     }
 
-    public static UploadResponse unsuccessfulDocumentManagementUploadResponse() throws URISyntaxException, IOException {
-        String response = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(ResourceLoader.class.getClassLoader()
+    public static UploadResponse unsuccessfulDocumentManagementUploadResponse()
+            throws URISyntaxException, IOException {
+        String response = new String(Files.readAllBytes(
+                Paths.get(Objects.requireNonNull(ResourceLoader.class.getClassLoader()
                 .getResource("response.failure.json")).toURI())));
         return jsonMapper.fromJson(response, UploadResponse.class);
     }
 
-    public static uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse successfulDocStoreUpload() throws URISyntaxException, IOException {
-        String response = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(ResourceLoader.class.getClassLoader()
+    public static uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse successfulDocStoreUpload()
+            throws URISyntaxException, IOException {
+        String response = new String(Files.readAllBytes(
+                Paths.get(Objects.requireNonNull(ResourceLoader.class.getClassLoader()
                 .getResource("responseDocStore.success.json")).toURI())));
         return jsonMapper.fromJson(response, uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse.class);
     }
 
     public static ListingDetails generateListingDetails(String jsonFileName) throws Exception {
-        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(ListingDetails.class.getClassLoader()
+        String json = new String(Files.readAllBytes(
+                Paths.get(Objects.requireNonNull(ListingDetails.class.getClassLoader()
                 .getResource(jsonFileName)).toURI())));
         return jsonMapper.fromJson(json, ListingDetails.class);
     }
 
     public static List<SubmitEvent> generateSubmitEventList(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(
-                new TypeReference<List<SubmitEvent>>(){}.getClass().getClassLoader().getResource(jsonFileName)).toURI())
+                new TypeReference<List<SubmitEvent>>(){}.getClass()
+                        .getClassLoader().getResource(jsonFileName)).toURI())
         ));
         return jsonMapper.fromJson(json, new TypeReference<>() {});
     }

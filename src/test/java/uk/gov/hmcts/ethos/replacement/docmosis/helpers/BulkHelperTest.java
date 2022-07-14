@@ -120,19 +120,24 @@ public class BulkHelperTest {
                 + "subMultipleM= , subMultipleTitleM= , " + "currentPositionM= , claimantAddressLine1M=Line1,"
                 + " claimantPostCodeM=PostCode, respondentAddressLine1M=Line1, respondentPostCodeM=PostCode, "
                 + "flag1M= , flag2M= , EQPM= , respondentRepOrgM= , claimantRepOrgM= )), MultipleTypeItem(id=0, "
-                + "value=MultipleType(caseIDM=0, ethosCaseReferenceM=222, " + "leadClaimantM=No, multipleReferenceM=1234,"
+                + "value=MultipleType(caseIDM=0, ethosCaseReferenceM=222, "
+                + "leadClaimantM=No, multipleReferenceM=1234,"
                 + " clerkRespM=JuanFran, claimantSurnameM=Mike, respondentSurnameM=Andrew Smith, claimantRepM= , "
                 + "respondentRepM= , fileLocM=Manchester, receiptDateM= , positionTypeM= , feeGroupReferenceM= , "
-                + "jurCodesCollectionM=AA, stateM=Submitted, " + "subMultipleM= , subMultipleTitleM= , currentPositionM= , "
+                + "jurCodesCollectionM=AA, stateM=Submitted, "
+                + "subMultipleM= , subMultipleTitleM= , currentPositionM= , "
                 + "claimantAddressLine1M=Line1, claimantPostCodeM=PostCode, respondentAddressLine1M=Line1, "
                 + "respondentPostCodeM=PostCode, flag1M= , flag2M= , EQPM= , respondentRepOrgM= , claimantRepOrgM= ))]";
-        assertEquals(result, BulkHelper.getMultipleTypeListBySubmitEventList(submitEvents, "1234").toString());
+        assertEquals(result, BulkHelper.getMultipleTypeListBySubmitEventList(
+                submitEvents, "1234").toString());
+
     }
 
     @Test
     public void getMultipleTypeListEmptyBySubmitEventList() {
         String result = "[]";
-        assertEquals(result, BulkHelper.getMultipleTypeListBySubmitEventList(new ArrayList<>(), "1234").toString());
+        assertEquals(result, BulkHelper.getMultipleTypeListBySubmitEventList(
+                new ArrayList<>(), "1234").toString());
     }
 
     @Test
@@ -239,9 +244,12 @@ public class BulkHelperTest {
         assertFalse(BulkHelper.containsAllJurCodes(null, BulkHelper.getJurCodesListFromString(jurCodes)));
         assertFalse(BulkHelper.containsAllJurCodes(new ArrayList<>(), BulkHelper.getJurCodesListFromString(jurCodes)));
 
-        assertFalse(BulkHelper.containsAllJurCodes(new ArrayList<>(), BulkHelper.getJurCodesListFromString(null)));
-        assertFalse(BulkHelper.containsAllJurCodes(new ArrayList<>(), BulkHelper.getJurCodesListFromString("")));
-        assertFalse(BulkHelper.containsAllJurCodes(new ArrayList<>(), BulkHelper.getJurCodesListFromString(" ")));
+        assertFalse(BulkHelper.containsAllJurCodes(
+                new ArrayList<>(), BulkHelper.getJurCodesListFromString(null)));
+        assertFalse(BulkHelper.containsAllJurCodes(
+                new ArrayList<>(), BulkHelper.getJurCodesListFromString("")));
+        assertFalse(BulkHelper.containsAllJurCodes(
+                new ArrayList<>(), BulkHelper.getJurCodesListFromString(" ")));
     }
 
     @Test
@@ -249,16 +257,19 @@ public class BulkHelperTest {
         List<JurCodesTypeItem> jurCodesTypeItems1 = getJurCodesTypeItems("A", "B", "C");
         List<JurCodesTypeItem> jurCodesTypeItems2 = getJurCodesTypeItems("A", "B", "C");
         String jurCodes = BulkHelper.getJurCodesCollectionWithHide(jurCodesTypeItems2);
-        assertTrue(BulkHelper.containsAllJurCodes(jurCodesTypeItems1, BulkHelper.getJurCodesListFromString(jurCodes)));
+        assertTrue(BulkHelper.containsAllJurCodes(
+                jurCodesTypeItems1, BulkHelper.getJurCodesListFromString(jurCodes)));
 
         jurCodesTypeItems1 = getJurCodesTypeItems("A", "B", "D");
         jurCodesTypeItems2 = getJurCodesTypeItems("A", "C", "B");
         jurCodes = BulkHelper.getJurCodesCollectionWithHide(jurCodesTypeItems2);
-        assertFalse(BulkHelper.containsAllJurCodes(jurCodesTypeItems1, BulkHelper.getJurCodesListFromString(jurCodes)));
+        assertFalse(BulkHelper.containsAllJurCodes(
+                jurCodesTypeItems1, BulkHelper.getJurCodesListFromString(jurCodes)));
 
-        assertFalse(BulkHelper.containsAllJurCodes(null, BulkHelper.getJurCodesListFromString(jurCodes)));
-        assertFalse(BulkHelper.containsAllJurCodes(new ArrayList<>(), BulkHelper.getJurCodesListFromString(jurCodes)));
-
+        assertFalse(BulkHelper.containsAllJurCodes(
+                null, BulkHelper.getJurCodesListFromString(jurCodes)));
+        assertFalse(BulkHelper.containsAllJurCodes(
+                new ArrayList<>(), BulkHelper.getJurCodesListFromString(jurCodes)));
         assertFalse(BulkHelper.containsAllJurCodes(
                 new ArrayList<>(), BulkHelper.getJurCodesListFromString(null)));
         assertFalse(BulkHelper.containsAllJurCodes(
@@ -419,8 +430,7 @@ public class BulkHelperTest {
         List<String> caseIds = new ArrayList<>(Arrays.asList("5", "2", "3"));
         List<SubmitEvent> submitEventListResult = BulkHelper.calculateLeadCase(submitEventList, caseIds);
         assertEquals("[2, 1, 3, 4]", submitEventListResult.stream()
-                .map(submitEvent1
-                        -> submitEvent1.getCaseData().getEthosCaseReference())
+                .map(submitEvent1 -> submitEvent1.getCaseData().getEthosCaseReference())
                 .collect(Collectors.toList()).toString());
     }
 
@@ -433,8 +443,7 @@ public class BulkHelperTest {
         List<String> caseIds = new ArrayList<>(Arrays.asList("5", "2", "3"));
         List<SubmitEvent> submitEventListResult = BulkHelper.calculateLeadCase(submitEventList, caseIds);
         assertEquals("[5, 1, 2, 3]", submitEventListResult.stream()
-                .map(submitEvent1
-                        -> submitEvent1.getCaseData().getEthosCaseReference())
+                .map(submitEvent1 -> submitEvent1.getCaseData().getEthosCaseReference())
                 .collect(Collectors.toList()).toString());
     }
 

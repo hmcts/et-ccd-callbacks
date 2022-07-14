@@ -256,6 +256,18 @@ public class SubMultipleServiceTest {
 
     @Test
     public void updateSubMultipleLogic() {
+        bulkDetails.getCaseData().setSubMultipleRef("1111");
+        bulkDetails.getCaseData().setSubMultipleName("NewSubMultipleName");
+        MultipleType multipleType = new MultipleType();
+        multipleType.setEthosCaseReferenceM("3333");
+        multipleType.setSubMultipleM("1111");
+        MultipleTypeItem multipleTypeItem = new MultipleTypeItem();
+        multipleTypeItem.setId("123456");
+        multipleTypeItem.setValue(multipleType);
+        bulkDetails.getCaseData().getMultipleCollection().add(multipleTypeItem);
+        bulkDetails.getCaseData().setSubMultipleDynamicList(createDynamicFixedListType());
+        bulkDetails.getCaseData().setSubMultipleCollection(createTwoSubMultiples());
+        BulkRequestPayload bulkRequestPayload = subMultipleService.updateSubMultipleLogic(bulkDetails);
         String result = "BulkData(bulkCaseTitle=null, multipleReference=null, multipleReferenceLinkMarkUp=null,"
                 + " feeGroupReference=null, claimantSurname=null, respondentSurname=null, "
                 + "claimantRep=null, respondentRep=null, ethosCaseReference=null, clerkResponsible=null, "
@@ -293,18 +305,6 @@ public class SubMultipleServiceTest {
                 + "state=null, flag1Update=null, flag2Update=null, EQPUpdate=null, jurCodesDynamicList=null,"
                 + " outcomeUpdate=null, filterCases=null, docMarkUp=null, "
                 + "multipleSource=null)";
-        bulkDetails.getCaseData().setSubMultipleRef("1111");
-        bulkDetails.getCaseData().setSubMultipleName("NewSubMultipleName");
-        MultipleType multipleType = new MultipleType();
-        multipleType.setEthosCaseReferenceM("3333");
-        multipleType.setSubMultipleM("1111");
-        MultipleTypeItem multipleTypeItem = new MultipleTypeItem();
-        multipleTypeItem.setId("123456");
-        multipleTypeItem.setValue(multipleType);
-        bulkDetails.getCaseData().getMultipleCollection().add(multipleTypeItem);
-        bulkDetails.getCaseData().setSubMultipleDynamicList(createDynamicFixedListType());
-        bulkDetails.getCaseData().setSubMultipleCollection(createTwoSubMultiples());
-        BulkRequestPayload bulkRequestPayload = subMultipleService.updateSubMultipleLogic(bulkDetails);
         assertEquals(result, bulkRequestPayload.getBulkDetails().getCaseData().toString());
     }
 

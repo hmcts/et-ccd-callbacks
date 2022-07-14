@@ -8,11 +8,9 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,7 +41,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype.HearingsByHearingTypeReportDetail;
 
 class HearingsToJudgmentsReportTest {
 
@@ -75,9 +72,12 @@ class HearingsToJudgmentsReportTest {
         when(hearingsToJudgmentsReportDataSource.getData(ENGLANDWALES_CASE_TYPE_ID,
                 TribunalOffice.NEWCASTLE.getOfficeName(), DATE_FROM, DATE_TO)).thenReturn(submitEvents);
 
-        ReportParams params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.NEWCASTLE.getOfficeName(),
+        ReportParams params = new ReportParams(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID,
+                TribunalOffice.NEWCASTLE.getOfficeName(),
                 DATE_FROM, DATE_TO);
-        hearingsToJudgmentsReport = new HearingsToJudgmentsReport(hearingsToJudgmentsReportDataSource, params);
+        hearingsToJudgmentsReport = new HearingsToJudgmentsReport(
+                hearingsToJudgmentsReportDataSource, params);
     }
 
     @Test
@@ -291,7 +291,7 @@ class HearingsToJudgmentsReportTest {
             HEARING_STATUS_POSTPONED + "," + HEARING_TYPE_JUDICIAL_REMEDY + "," + YES,
             HEARING_STATUS_POSTPONED + "," + HEARING_TYPE_JUDICIAL_REMEDY + "," + NO,
     })
-    void shouldNotShowInvalidHearings(String hearingStatus, String HearingType, String disposed) {
+    void shouldNotShowInvalidHearings(String hearingStatus, String hearingType, String disposed) {
         // Given a case is accepted
         // And has been heard
         // And has a judgment made
@@ -300,7 +300,7 @@ class HearingsToJudgmentsReportTest {
 
         submitEvents.add(caseDataBuilder
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
-                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, hearingStatus, HearingType, disposed)
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, hearingStatus, hearingType, disposed)
                 .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
@@ -361,7 +361,8 @@ class HearingsToJudgmentsReportTest {
 
         submitEvents.add(caseDataBuilder
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
-                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER,
+                        HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
                 .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
@@ -379,12 +380,14 @@ class HearingsToJudgmentsReportTest {
         // When I request report data
         // Then the case is in the report data
         String managingOffice = TribunalOffice.GLASGOW.getOfficeName();
-        when(hearingsToJudgmentsReportDataSource.getData(SCOTLAND_CASE_TYPE_ID, managingOffice, DATE_FROM, DATE_TO))
+        when(hearingsToJudgmentsReportDataSource.getData(
+                SCOTLAND_CASE_TYPE_ID, managingOffice, DATE_FROM, DATE_TO))
                 .thenReturn(submitEvents);
 
         submitEvents.add(caseDataBuilder
                 .withManagingOffice(managingOffice)
-                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER,
+                        HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
                 .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
 
@@ -432,7 +435,8 @@ class HearingsToJudgmentsReportTest {
         submitEvents.add(createValidSubmitEventNotWithin4Wks());
 
         // Will set the first cases total days to a number larger than the second cases
-        submitEvents.get(0).getCaseData().getJudgementCollection().get(0).getValue().setDateJudgmentSent("2021-12-31");
+        submitEvents.get(0).getCaseData().getJudgementCollection()
+                .get(0).getValue().setDateJudgmentSent("2021-12-31");
 
         HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
                 ENGLANDWALES_LISTING_CASE_TYPE_ID,
@@ -453,11 +457,16 @@ class HearingsToJudgmentsReportTest {
                     + HEARING_TYPE_PERLIMINARY_HEARING_CM + ",," + CLOSED_STATE,
             "2021-07-19T10:00:00.000,2021-07-19,2021-08-26,2021-08-26,39,2500124/2021,4,Four Test,"
                     + HEARING_TYPE_PERLIMINARY_HEARING_CM_TCC + "," + YES + "," + CLOSED_STATE})
-    void shouldContainCorrectDetailValuesForHearingsWithValidJudgment(String hearingListedDate, String judgmentHearingDate,
-                                                                      String dateJudgmentMade, String dateJudgmentSent,
-                                                                      String expectedTotalDays, String caseReference,
-                                                                      String hearingNumber, String hearingJudge,
-                                                                      String hearingType, String hearingReserved,
+    void shouldContainCorrectDetailValuesForHearingsWithValidJudgment(String hearingListedDate,
+                                                                      String judgmentHearingDate,
+                                                                      String dateJudgmentMade,
+                                                                      String dateJudgmentSent,
+                                                                      String expectedTotalDays,
+                                                                      String caseReference,
+                                                                      String hearingNumber,
+                                                                      String hearingJudge,
+                                                                      String hearingType,
+                                                                      String hearingReserved,
                                                                       String caseState) {
         // Given I have a case in a valid state
         // And the case has a valid hearing and judgment
@@ -496,7 +505,6 @@ class HearingsToJudgmentsReportTest {
         // | 2021-07-05 | 2 | 2021-08-03 | 2021-08-04
         // When I request report data
         // Then I have correct hearing values for hearing #2
-        String expectedTotalDays = "31";
         String caseReference = "2500123/2021";
         String judge = "3756_Hugh Garfield"; // Amended to mimic Judge's ITCO reference
         String judgmentHearingDate = "2021-07-05";
@@ -505,10 +513,12 @@ class HearingsToJudgmentsReportTest {
         submitEvents.add(caseDataBuilder
                 .withEthosCaseReference(caseReference)
                 .withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
-                .withHearing("2021-07-06T10:00:00.000", HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING,
+                .withHearing("2021-07-06T10:00:00.000", HEARING_STATUS_HEARD,
+                        HEARING_TYPE_JUDICIAL_HEARING,
                         YES, HEARING_NUMBER, "A.N. Other", YES)
                 .withJudgment("2021-07-06", "2021-08-03", "2021-08-04")
-                .withHearing("2021-07-05T10:00:00.000", HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING,
+                .withHearing("2021-07-05T10:00:00.000", HEARING_STATUS_HEARD,
+                        HEARING_TYPE_JUDICIAL_HEARING,
                         YES, "2", judge, NO)
                 .withJudgment(judgmentHearingDate, "2021-08-03", dateJudgmentSent)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
@@ -523,7 +533,7 @@ class HearingsToJudgmentsReportTest {
         assertEquals(TribunalOffice.NEWCASTLE.getOfficeName(), reportDetail.getReportOffice());
         assertEquals(caseReference, reportDetail.getCaseReference());
         assertEquals(NO, reportDetail.getReservedHearing());
-        assertEquals(expectedTotalDays, reportDetail.getTotalDays());
+        assertEquals("31", reportDetail.getTotalDays());
         assertEquals(judgmentHearingDate, reportDetail.getHearingDate());
         assertEquals(dateJudgmentSent, reportDetail.getJudgementDateSent());
     }
@@ -531,7 +541,8 @@ class HearingsToJudgmentsReportTest {
     private HearingsToJudgmentsSubmitEvent createValidSubmitEventWithin4Wks() {
         caseDataBuilder = new HearingsToJudgmentsCaseDataBuilder();
         return caseDataBuilder.withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
-                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD,
+                        HEARING_TYPE_JUDICIAL_HEARING, YES)
                 .withJudgment(JUDGMENT_HEARING_DATE, DATE_WITHIN_4WKS, DATE_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
     }
@@ -539,7 +550,8 @@ class HearingsToJudgmentsReportTest {
     private HearingsToJudgmentsSubmitEvent createValidSubmitEventNotWithin4Wks() {
         caseDataBuilder = new HearingsToJudgmentsCaseDataBuilder();
         return caseDataBuilder.withManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName())
-                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD, HEARING_TYPE_JUDICIAL_HEARING, YES)
+                .withHearing(HEARING_LISTING_DATE, HEARING_NUMBER, HEARING_STATUS_HEARD,
+                        HEARING_TYPE_JUDICIAL_HEARING, YES)
                 .withJudgment(JUDGMENT_HEARING_DATE, DATE_NOT_WITHIN_4WKS, DATE_NOT_WITHIN_4WKS)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
     }

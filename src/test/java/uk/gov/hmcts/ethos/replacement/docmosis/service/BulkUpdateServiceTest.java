@@ -396,7 +396,8 @@ public class BulkUpdateServiceTest {
                 + "claimantAddressLine1M=null, claimantPostCodeM=null, " + "respondentAddressLine1M=null, "
                 + "respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, respondentRepOrgM=null, "
                 + "claimantRepOrgM=null))]";
-        assertEquals(multipleCollection, bulkRequestPayload.getBulkDetails().getCaseData().getMultipleCollection().toString());
+        assertEquals(multipleCollection, bulkRequestPayload.getBulkDetails().getCaseData()
+                .getMultipleCollection().toString());
     }
 
     @Test

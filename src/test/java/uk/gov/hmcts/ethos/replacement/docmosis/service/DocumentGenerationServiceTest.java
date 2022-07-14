@@ -413,8 +413,8 @@ public class DocumentGenerationServiceTest {
 
         BulkDocumentInfo bulkDocumentInfo1 = documentGenerationService.processBulkDocumentRequest(
                 bulkRequest, "authToken");
-        assertEquals("BulkDocumentInfo(markUps=, errors=[There are not cases searched to " +
-                "generate letters], documentInfo=null)", bulkDocumentInfo1.toString());
+        assertEquals("BulkDocumentInfo(markUps=, errors=[There are not cases searched to "
+                + "generate letters], documentInfo=null)", bulkDocumentInfo1.toString());
     }
 
     @Test(expected = Exception.class)
@@ -436,9 +436,9 @@ public class DocumentGenerationServiceTest {
         when(tornadoService.scheduleGeneration(anyString(), any(), anyString())).thenReturn(documentInfo);
         BulkDocumentInfo bulkDocumentInfo1 = documentGenerationService.processBulkScheduleRequest(
                 bulkRequest, "authToken");
-        assertEquals("BulkDocumentInfo(markUps=Markup, errors=[], documentInfo=DocumentInfo(type=Document, " +
-                "description=resources/exampleV1.json, url=http://google.com, markUp=Markup))"
-                , bulkDocumentInfo1.toString());
+        assertEquals("BulkDocumentInfo(markUps=Markup, errors=[], documentInfo=DocumentInfo(type=Document, "
+                + "description=resources/exampleV1.json, url=http://google.com, markUp=Markup))",
+                bulkDocumentInfo1.toString());
     }
 
     @Test

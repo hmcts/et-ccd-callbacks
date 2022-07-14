@@ -128,10 +128,10 @@ public class BulkActionsControllerTest {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
         List<SubmitEvent> submitEvents;
-        List<MultipleTypeItem> multipleTypeItems = new ArrayList<>();
         bulkCasesPayload = new BulkCasesPayload();
         submitEvents = getSubmitEvents();
         bulkCasesPayload.setSubmitEvents(submitEvents);
+        List<MultipleTypeItem> multipleTypeItems = new ArrayList<>();
         bulkCasesPayload.setMultipleTypeItems(multipleTypeItems);
         BulkData bulkData = new BulkData();
         BulkDetails bulkDetails = new BulkDetails();
@@ -154,9 +154,10 @@ public class BulkActionsControllerTest {
         when(bulkSearchService.bulkCasesRetrievalRequest(isA(
                 BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class))).thenReturn(bulkCasesPayload);
         when(bulkCreationService.bulkCreationLogic(isA(
-                BulkDetails.class), isA(BulkCasesPayload.class), eq(AUTH_TOKEN), isA(String.class))).
-                thenReturn(bulkRequestPayload);
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+                BulkDetails.class), isA(BulkCasesPayload.class), eq(AUTH_TOKEN), isA(String.class)))
+                .thenReturn(bulkRequestPayload);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN))
+                .thenReturn(true);
         mvc.perform(post(CREATION_BULK_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -173,8 +174,9 @@ public class BulkActionsControllerTest {
                 isA(BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class), isA(Boolean.class)))
                 .thenReturn(bulkCasesPayload);
         when(bulkCreationService.bulkCreationLogic(
-                isA(BulkDetails.class), isA(BulkCasesPayload.class), eq(AUTH_TOKEN), isA(String.class))).
-                thenReturn(bulkRequestPayload);
+                isA(BulkDetails.class), isA(BulkCasesPayload.class), eq(AUTH_TOKEN), isA(String.class)))
+                .thenReturn(bulkRequestPayload);
+
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATION_BULK_ES_URL)
                 .content(requestContent.toString())

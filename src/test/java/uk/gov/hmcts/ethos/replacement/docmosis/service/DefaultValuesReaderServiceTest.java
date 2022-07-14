@@ -136,12 +136,11 @@ public class DefaultValuesReaderServiceTest {
 
     @Test
     public void testGetCaseDataWithClaimantWorkAddress() {
-        var defaultValues = createDefaultValues();
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setClaimantWorkAddressQuestion(YES);
         caseData.setClaimantWorkAddressQRespondent(new DynamicFixedListType("Respondent 2"));
         caseData.setRespondentCollection(createRespondents());
-
+        DefaultValues defaultValues = createDefaultValues();
         defaultValuesReaderService.getCaseData(caseData, defaultValues);
 
         assertEquals(POSITION_TYPE_CASE_CLOSED, caseData.getPositionType());
@@ -153,8 +152,7 @@ public class DefaultValuesReaderServiceTest {
         assertEquals("TestFax", caseData.getTribunalCorrespondenceFax());
         assertEquals("TestDX", caseData.getTribunalCorrespondenceDX());
         assertEquals("TestEmail", caseData.getTribunalCorrespondenceEmail());
-
-        var address = caseData.getClaimantWorkAddress().getClaimantWorkAddress();
+        Address address = caseData.getClaimantWorkAddress().getClaimantWorkAddress();
         assertEquals("Respondent 2 AddressLine1", address.getAddressLine1());
     }
 

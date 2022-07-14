@@ -222,8 +222,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
      void caseCreationRequestException() throws IOException {
         when(ccdClient.retrieveCases(anyString(), anyString(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-        assertThrows(CaseCreationException.class,
-                () -> bulkSearchService.bulkCasesRetrievalRequest(
+        assertThrows(CaseCreationException.class, () -> bulkSearchService.bulkCasesRetrievalRequest(
                         getBulkDetails(YES, "Single"), "authToken", true));
     }
 
@@ -403,7 +402,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
                 + "feeGroupReferenceM=111122211,"
                 + " jurCodesCollectionM= , " + "stateM=Accepted, subMultipleM= , "
                 + "subMultipleTitleM= , currentPositionM= ,"
-                + " claimantAddressLine1M= , claimantPostCodeM= , " + "respondentAddressLine1M= , respondentPostCodeM= ,"
+                + " claimantAddressLine1M= , claimantPostCodeM= , "
+                + "respondentAddressLine1M= , respondentPostCodeM= ,"
                 + " flag1M= , flag2M= , EQPM= , respondentRepOrgM= , claimantRepOrgM= ))]";
         when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), anyList())).thenReturn(submitEventList);
         BulkCasesPayload bulkCasesPayload = bulkCreationService.updateBulkRequest(
@@ -535,11 +535,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
      void retrievalCasesForPreAcceptRequestException() throws IOException {
         when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), any()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-        assertThrows(CaseCreationException.class,
-                () -> {
-            bulkSearchService.retrievalCasesForPreAcceptRequest(
-                    getBulkDetails(YES, "Single"), "authToken");
-        });
+        assertThrows(CaseCreationException.class, () -> bulkSearchService.retrievalCasesForPreAcceptRequest(
+                        getBulkDetails(YES, "Single"), "authToken"));
     }
 
     @Test

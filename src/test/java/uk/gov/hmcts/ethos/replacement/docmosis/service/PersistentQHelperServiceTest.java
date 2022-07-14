@@ -43,7 +43,6 @@ public class PersistentQHelperServiceTest {
     @Before
     public void setUp() {
         ccdRequest = new CCDRequest();
-        CaseDetails caseDetails = new CaseDetails();
         CaseData caseData = MultipleUtil.getCaseData("2123456/2020");
         caseData.setCaseRefNumberCount("2");
         caseData.setPositionTypeCT("PositionTypeCT");
@@ -52,6 +51,7 @@ public class PersistentQHelperServiceTest {
         valueType.setCode(ENGLANDWALES_CASE_TYPE_ID);
         officeCT.setValue(valueType);
         caseData.setOfficeCT(officeCT);
+        CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseTypeId("ENGLANDWALES");
         caseDetails.setJurisdiction("Employment");
@@ -64,17 +64,17 @@ public class PersistentQHelperServiceTest {
     public void sendCreationEventToSinglesWithoutConfirmation() {
 
         when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
-
         persistentQHelperService.sendCreationEventToSingles(userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getJurisdiction(),
-                new ArrayList<>(), new ArrayList<>(Collections.singletonList("ethosCaseReference")), ENGLANDWALES_CASE_TYPE_ID,
+                new ArrayList<>(), new ArrayList<>(
+                        Collections.singletonList("ethosCaseReference")), ENGLANDWALES_CASE_TYPE_ID,
                 "positionTypeCT", "ccdGatewayBaseUrl", "",
                 SINGLE_CASE_TYPE, NO,
                 MultiplesHelper.generateMarkUp("ccdGatewayBaseUrl",
                         ccdRequest.getCaseDetails().getCaseId(),
                         ccdRequest.getCaseDetails().getCaseData().getMultipleRefNumber()),
-                true,null
-                );
+                true, null
+        );
 
         verify(userService).getUserDetails(userToken);
         verifyNoMoreInteractions(userService);
@@ -85,10 +85,10 @@ public class PersistentQHelperServiceTest {
     public void sendTransferToEcmEvent() {
 
         when(userService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
-
         persistentQHelperService.sendTransferToEcmEvent(userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId(), ccdRequest.getCaseDetails().getJurisdiction(),
-                new ArrayList<>(), new ArrayList<>(Collections.singletonList("ethosCaseReference")), ENGLANDWALES_CASE_TYPE_ID,
+                new ArrayList<>(), new ArrayList<>(
+                        Collections.singletonList("ethosCaseReference")), ENGLANDWALES_CASE_TYPE_ID,
                 "positionTypeCT", "ccdGatewayBaseUrl", "",
                 NO, null
         );

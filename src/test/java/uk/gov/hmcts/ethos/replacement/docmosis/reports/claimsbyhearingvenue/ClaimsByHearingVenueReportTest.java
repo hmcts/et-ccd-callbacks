@@ -303,7 +303,7 @@ class ClaimsByHearingVenueReportTest {
         assertEquals(expectedNumberOfSubmitEventEntries, reportData.getReportDetails().size());
         assertEquals(expectedFirstCaseReference, reportData.getReportDetails().get(0).getCaseReference());
         assertEquals(expectedSecondCaseReference, reportData.getReportDetails().get(1).getCaseReference());
-        var expectedThirdFirstCaseReference = submitEvents.get(0).getCaseData().getEthosCaseReference();
+        String expectedThirdFirstCaseReference = submitEvents.get(0).getCaseData().getEthosCaseReference();
         assertEquals(expectedThirdFirstCaseReference, reportData.getReportDetails().get(2).getCaseReference());
     }
 

@@ -431,7 +431,6 @@ public class BulkHelperTest {
         List<SubmitEvent> submitEventListResult = BulkHelper.calculateLeadCase(submitEventList, caseIds);
         assertEquals("[2, 1, 3, 4]", submitEventListResult.stream()
                 .map(submitEvent1 -> submitEvent1.getCaseData().getEthosCaseReference())
-
                 .collect(Collectors.toList()).toString());
     }
 
@@ -445,7 +444,6 @@ public class BulkHelperTest {
         List<SubmitEvent> submitEventListResult = BulkHelper.calculateLeadCase(submitEventList, caseIds);
         assertEquals("[5, 1, 2, 3]", submitEventListResult.stream()
                 .map(submitEvent1 -> submitEvent1.getCaseData().getEthosCaseReference())
-
                 .collect(Collectors.toList()).toString());
     }
 

@@ -40,7 +40,6 @@ public class MultipleMidEventValidationServiceTest {
 
     @Test
     public void multipleValidationLogicCurrentMultiple() {
-
         MoveCasesType moveCasesType = new MoveCasesType();
         moveCasesType.setUpdatedMultipleRef("246000");
         moveCasesType.setUpdatedSubMultipleRef("SubMultiple");
@@ -50,7 +49,6 @@ public class MultipleMidEventValidationServiceTest {
         multipleMidEventValidationService.multipleValidationLogic(userToken,
                 multipleDetails,
                 errors);
-
         verify(multipleHelperService, times(1)).validateSubMultiple(
                 "SubMultiple",
                 multipleDetails.getCaseData().getSubMultipleCollection(),
@@ -62,7 +60,6 @@ public class MultipleMidEventValidationServiceTest {
 
     @Test
     public void multipleValidationLogicExternalMultiple() {
-
         MoveCasesType moveCasesType = new MoveCasesType();
         moveCasesType.setUpdatedMultipleRef("246001");
         moveCasesType.setUpdatedSubMultipleRef("SubMultiple");
@@ -72,7 +69,6 @@ public class MultipleMidEventValidationServiceTest {
         multipleMidEventValidationService.multipleValidationLogic(userToken,
                 multipleDetails,
                 errors);
-
         verify(multipleHelperService, times(1)).validateExternalMultipleAndSubMultiple(
                 userToken,
                 multipleDetails.getCaseTypeId(),
@@ -94,7 +90,6 @@ public class MultipleMidEventValidationServiceTest {
         multipleMidEventValidationService.multipleValidationLogic(userToken,
                 multipleDetails,
                 errors);
-
         assertEquals(0, errors.size());
 
     }

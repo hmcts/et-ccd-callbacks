@@ -72,5 +72,6 @@ class ServingHelperTest {
             + "%20sent%20are%20attached%20to%20this%20email.%0D%0A%0D%0A";
         CaseData caseData = caseDetails.getCaseData();
         assertThat(ServingHelper.generateEmailLinkToAcas(caseData, false), is(expectedEt1EmailLinkToAcas));
+        assertThat(ServingHelper.generateEmailLinkToAcas(caseData, true), is(expectedEt3EmailLinkToAcas));
     }
 }

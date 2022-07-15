@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest({ET3NotificationController.class, JsonMapper.class})
 class ET3NotificationControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String ET3_NOTIFICATION_ENGPOINT = "/et3Notification";
+    private static final String ET3_NOTIFICATION_ENDPOINT = "/et3Notification";
     private CCDRequest ccdRequest;
 
     @MockBean
@@ -59,7 +59,7 @@ class ET3NotificationControllerTest {
         when(servingHelper.generateOtherTypeDocumentLink(anyList())).thenReturn("expectedDocumentName");
         when(servingHelper.generateEmailLinkToAcas(any(), anyBoolean())).thenReturn("expectedLink");
         when(servingHelper.generateClaimantAndRespondentAddress(any())).thenReturn("expectedAddresses");
-        mvc.perform(post(ET3_NOTIFICATION_ENGPOINT)
+        mvc.perform(post(ET3_NOTIFICATION_ENDPOINT)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -77,7 +77,7 @@ class ET3NotificationControllerTest {
     @Test
     void et3NotificationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(ET3_NOTIFICATION_ENGPOINT)
+        mvc.perform(post(ET3_NOTIFICATION_ENDPOINT)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))

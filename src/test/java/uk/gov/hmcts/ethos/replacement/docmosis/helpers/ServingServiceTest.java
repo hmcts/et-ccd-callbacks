@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -16,20 +16,20 @@ import java.util.Objects;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-class ServingHelperTest {
+class ServingServiceTest {
     private static CaseDetails caseDetails;
 
-    private static ServingHelper ServingHelper;
+    private static ServingService ServingService;
 
     @BeforeAll
     static void setUp() throws Exception {
         caseDetails = generateCaseDetails("midServingCaseDetailsTest.json");
-        ServingHelper = new ServingHelper();
+        ServingService = new ServingService();
     }
 
     private static CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(
-                ServingHelperTest.class.getClassLoader()
+                ServingServiceTest.class.getClassLoader()
                 .getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
@@ -40,7 +40,7 @@ class ServingHelperTest {
         String expectedDocumentName = "**<big>test-filename.xlsx</big>**<br/><small><a target=\"_blank\" "
             + "href=\"/documents/test-document/binary\">test-filename.xlsx</a></small><br/>";
         List<DocumentTypeItem> documentTypeItems = caseDetails.getCaseData().getServingDocumentCollection();
-        assertThat(ServingHelper
+        assertThat(ServingService
             .generateOtherTypeDocumentLink(documentTypeItems), is(expectedDocumentName));
     }
 
@@ -54,7 +54,7 @@ class ServingHelperTest {
                 + "<br/>Manchester<br/>M12 4ED<br/><br/>";
 
         CaseData caseData = caseDetails.getCaseData();
-        assertThat(ServingHelper.generateClaimantAndRespondentAddress(caseData),
+        assertThat(ServingService.generateClaimantAndRespondentAddress(caseData),
                 is(expectedClaimantAndRespondentAddress));
     }
 
@@ -71,7 +71,7 @@ class ServingHelperTest {
             + "has%20completed%20ET3%20notifications%20to%20the%20relevant%20parties.%0D%0A%0D%0AThe%20documents%20we"
             + "%20sent%20are%20attached%20to%20this%20email.%0D%0A%0D%0A";
         CaseData caseData = caseDetails.getCaseData();
-        assertThat(ServingHelper.generateEmailLinkToAcas(caseData, false), is(expectedEt1EmailLinkToAcas));
-        assertThat(ServingHelper.generateEmailLinkToAcas(caseData, true), is(expectedEt3EmailLinkToAcas));
+        assertThat(ServingService.generateEmailLinkToAcas(caseData, false), is(expectedEt1EmailLinkToAcas));
+        assertThat(ServingService.generateEmailLinkToAcas(caseData, true), is(expectedEt3EmailLinkToAcas));
     }
 }

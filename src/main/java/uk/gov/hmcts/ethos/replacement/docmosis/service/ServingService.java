@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class ServingHelper {
+public class ServingService {
     public static final String SERVING_DOCUMENT_OTHER_TYPE = "Another type of document";
     private static final String SERVING_RECIPIENT_CLAIMANT = "Claimant";
     private static final String SERVING_RECIPIENT_RESPONDENT = "Respondent";
@@ -30,12 +31,12 @@ public class ServingHelper {
 
     public String generateOtherTypeDocumentLink(List<DocumentTypeItem> docList) {
         String documentLinks = "";
-        if (docList != null) {
-            documentLinks = docList
+        if (CollectionUtils.isNotEmpty(docList)) {
+            documentLinks = (docList
                 .stream()
                 .filter(d -> d.getValue().getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE))
                 .map(d -> createDocLinkBinary(d))
-                .collect(Collectors.joining());
+                .collect(Collectors.joining()));
         }
 
         return documentLinks;

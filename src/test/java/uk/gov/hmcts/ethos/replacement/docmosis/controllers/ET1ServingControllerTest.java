@@ -11,7 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -41,7 +41,7 @@ class ET1ServingControllerTest {
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
-    private ServingHelper servingHelper;
+    private ServingService servingService;
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -57,9 +57,9 @@ class ET1ServingControllerTest {
     @Test
     void midServingDocumentOtherTypeNames() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(servingHelper.generateOtherTypeDocumentLink(anyList())).thenReturn("expectedDocumentName");
-        when(servingHelper.generateEmailLinkToAcas(any(), anyBoolean())).thenReturn("expectedLink");
-        when(servingHelper.generateClaimantAndRespondentAddress(any())).thenReturn("expectedAddresses");
+        when(servingService.generateOtherTypeDocumentLink(anyList())).thenReturn("expectedDocumentName");
+        when(servingService.generateEmailLinkToAcas(any(), anyBoolean())).thenReturn("expectedLink");
+        when(servingService.generateClaimantAndRespondentAddress(any())).thenReturn("expectedAddresses");
         mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
@@ -70,9 +70,9 @@ class ET1ServingControllerTest {
                 .andExpect(jsonPath("$.data.emailLinkToAcas", notNullValue()))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(servingHelper, times(1)).generateOtherTypeDocumentLink(anyList());
-        verify(servingHelper, times(1)).generateEmailLinkToAcas(any(), anyBoolean());
-        verify(servingHelper, times(1)).generateClaimantAndRespondentAddress(any());
+        verify(servingService, times(1)).generateOtherTypeDocumentLink(anyList());
+        verify(servingService, times(1)).generateEmailLinkToAcas(any(), anyBoolean());
+        verify(servingService, times(1)).generateClaimantAndRespondentAddress(any());
     }
 
     @Test

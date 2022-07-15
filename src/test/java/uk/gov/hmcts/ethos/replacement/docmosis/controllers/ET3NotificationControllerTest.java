@@ -31,11 +31,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest({ET1ServingController.class, JsonMapper.class})
-class ET1ServingControllerTest {
+@WebMvcTest({ET3NotificationController.class, JsonMapper.class})
+class ET3NotificationControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL = "/midServingDocumentOtherTypeNames";
-    private static final String SERVING_DOCUMENT_RECIPIENT_URL = "/midServingDocumentRecipient";
+    private static final String ET3_NOTIFICATION_ENGPOINT = "/et3Notification";
     private CCDRequest ccdRequest;
 
     @MockBean
@@ -50,38 +49,38 @@ class ET1ServingControllerTest {
     @BeforeEach
     void setUp() {
         var caseData = new CaseData();
-        caseData.setServingDocumentCollection(new ArrayList<>());
+        caseData.setEt3NotificationDocCollection(new ArrayList<>());
         ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
     }
 
     @Test
-    void midServingDocumentOtherTypeNames() throws Exception {
+    void et3Notification() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(servingHelper.generateOtherTypeDocumentLink(anyList())).thenReturn("expectedDocumentName");
         when(servingHelper.generateEmailLinkToAcas(any(), anyBoolean())).thenReturn("expectedLink");
         when(servingHelper.generateClaimantAndRespondentAddress(any())).thenReturn("expectedAddresses");
-        mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.otherTypeDocumentName", notNullValue()))
-                .andExpect(jsonPath("$.data.claimantAndRespondentAddresses", notNullValue()))
-                .andExpect(jsonPath("$.data.emailLinkToAcas", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+        mvc.perform(post(ET3_NOTIFICATION_ENGPOINT)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.et3OtherTypeDocumentName", notNullValue()))
+            .andExpect(jsonPath("$.data.et3ClaimantAndRespondentAddresses", notNullValue()))
+            .andExpect(jsonPath("$.data.et3EmailLinkToAcas", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
         verify(servingHelper, times(1)).generateOtherTypeDocumentLink(anyList());
         verify(servingHelper, times(1)).generateEmailLinkToAcas(any(), anyBoolean());
         verify(servingHelper, times(1)).generateClaimantAndRespondentAddress(any());
     }
 
     @Test
-    void midServingDocumentOtherTypeNamesForbidden() throws Exception {
+    void et3NotificationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
-                        .content(jsonMapper.toJson(ccdRequest))
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
+        mvc.perform(post(ET3_NOTIFICATION_ENGPOINT)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
     }
 }

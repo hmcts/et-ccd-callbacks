@@ -65,9 +65,9 @@ public class ET1ServingController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setOtherTypeDocumentName(
-                ServingHelper.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
+                ServingHelper.generateOtherTypeDocumentLink(caseData.getServingDocumentCollection()));
         caseData.setClaimantAndRespondentAddresses(ServingHelper.generateClaimantAndRespondentAddress(caseData));
-        caseData.setEmailLinkToAcas(ServingHelper.generateEmailLinkToAcas(caseData));
+        caseData.setEmailLinkToAcas(ServingHelper.generateEmailLinkToAcas(caseData, false));
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }

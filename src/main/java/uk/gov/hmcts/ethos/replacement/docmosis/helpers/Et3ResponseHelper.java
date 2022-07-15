@@ -16,6 +16,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class Et3ResponseHelper {
 
     private static final String CLAIMANT_NAME_TABLE = "<pre> ET1 claimant name&#09&#09&#09&#09 %s</pre><hr>";
+    public static final String START_DATE_MUST_BE_IN_THE_PAST = "Start date must be in the past";
+    public static final String END_DATE_MUST_BE_AFTER_THE_START_DATE = "End date must be after the start date";
 
     private Et3ResponseHelper() {
         // Access through static methods
@@ -48,7 +50,7 @@ public class Et3ResponseHelper {
         LocalDate startDate = LocalDate.parse(startDateStr);
 
         if (startDate.isAfter(LocalDate.now())) {
-            errors.add("Start date must be in the past");
+            errors.add(START_DATE_MUST_BE_IN_THE_PAST);
         }
 
         if (isNullOrEmpty(endDateStr)) {
@@ -58,7 +60,7 @@ public class Et3ResponseHelper {
         LocalDate endDate = LocalDate.parse(endDateStr);
 
         if (startDate.isAfter(endDate)) {
-            errors.add("End date must be after the start date");
+            errors.add(END_DATE_MUST_BE_AFTER_THE_START_DATE);
         }
 
         return errors;

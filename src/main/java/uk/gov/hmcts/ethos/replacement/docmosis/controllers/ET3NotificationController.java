@@ -30,7 +30,7 @@ public class ET3NotificationController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
     private final VerifyTokenService verifyTokenService;
-    private final ServingHelper ServingHelper;
+    private final ServingHelper servingHelper;
 
     /**
      * This service Gets userToken as a parameter for security validation
@@ -65,9 +65,9 @@ public class ET3NotificationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setEt3OtherTypeDocumentName(
-            ServingHelper.generateOtherTypeDocumentName(caseData.getEt3NotificationDocCollection()));
-        caseData.setEt3ClaimantAndRespondentAddresses(ServingHelper.generateClaimantAndRespondentAddress(caseData));
-        caseData.setEt3EmailLinkToAcas(ServingHelper.generateEmailLinkToAcas(caseData));
+            servingHelper.generateOtherTypeDocumentLink(caseData.getEt3NotificationDocCollection()));
+        caseData.setEt3ClaimantAndRespondentAddresses(servingHelper.generateClaimantAndRespondentAddress(caseData));
+        caseData.setEt3EmailLinkToAcas(servingHelper.generateEmailLinkToAcas(caseData, true));
 
         return getCallbackRespEntityNoErrors(caseData);
     }

@@ -48,7 +48,6 @@ class CaseSourceLocalReportTest {
 
     private void verifyReportHeaderIsZero(ListingData listingData) {
         var adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
-
         assertEquals(0, Strings.isNullOrEmpty(
                 adhocReportType.getEt1OnlineTotalCases()) ? 0 : Integer.parseInt(
                         adhocReportType.getEt1OnlineTotalCases()));
@@ -79,6 +78,7 @@ class CaseSourceLocalReportTest {
     void mainTest() {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.setCaseData(listingData);
+
         submitEvents.add(createSubmitEvent("1970-04-01", MANUALLY_CREATED_POSITION));
         submitEvents.add(createSubmitEvent("1970-04-02", MIGRATION_CASE_SOURCE));
         submitEvents.add(createSubmitEvent("1970-04-03", ET1_ONLINE_CASE_SOURCE));

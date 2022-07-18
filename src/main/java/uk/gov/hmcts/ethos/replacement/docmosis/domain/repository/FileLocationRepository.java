@@ -22,7 +22,6 @@ public interface FileLocationRepository extends JpaRepository<FileLocation, Inte
      */
     List<FileLocation> findByTribunalOffice(TribunalOffice tribunalOffice);
 
-    long deleteByTribunalOffice(TribunalOffice tribunalOffice);
     /**
      * Returns a list of file locations by tribunal office in ascending
      * order of file location names from table et_cos.file_location

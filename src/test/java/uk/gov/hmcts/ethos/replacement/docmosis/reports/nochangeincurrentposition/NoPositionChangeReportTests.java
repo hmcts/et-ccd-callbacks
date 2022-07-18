@@ -63,6 +63,7 @@ class NoPositionChangeReportTests {
                 TribunalOffice.MANCHESTER.getOfficeName())).thenReturn(submitEvents);
         when(noPositionChangeDataSource.getMultiplesData(
                 eq(ENGLANDWALES_BULK_CASE_TYPE_ID), anyList())).thenReturn(submitMultipleEvents);
+
         noPositionChangeReport = new NoPositionChangeReport(noPositionChangeDataSource, REPORT_CREATE_DATE);
     }
 

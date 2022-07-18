@@ -24,7 +24,6 @@ allprojects {
 
 checkstyle {
     maxWarnings = 0
-    sourceSets = [project.sourceSets.main]
     toolVersion = '8.29'
 }
 

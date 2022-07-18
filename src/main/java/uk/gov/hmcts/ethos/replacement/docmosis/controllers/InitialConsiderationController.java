@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -60,9 +61,15 @@ public class InitialConsiderationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        DocumentInfo documentInfo = initialConsiderationService.processSummaryDocument(
+                caseData, ccdRequest.getCaseDetails().getCaseTypeId(), userToken);
+        initialConsiderationService.addIcEwDocumentLink(caseData, documentInfo);
+
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .confirmation_header(COMPLETE_IC_HDR)
             .confirmation_body(String.format(COMPLETE_IC_BODY, ccdRequest.getCaseDetails().getCaseId()))
+            .data(caseData)
             .build());
     }
 

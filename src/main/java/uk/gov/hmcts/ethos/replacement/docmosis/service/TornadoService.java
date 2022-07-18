@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
@@ -44,9 +45,12 @@ public class TornadoService {
     private final UserService userService;
     private final DefaultValuesReaderService defaultValuesReaderService;
     private final VenueAddressReaderService venueAddressReaderService;
+    private final InitialConsiderationHelper initialConsiderationHelper;
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
+
+    private static final String IC_SUMMARY_FILENAME = "InitialConsideration.pdf";
 
     public DocumentInfo documentGeneration(String authToken, CaseData caseData, String caseTypeId,
                                            CorrespondenceType correspondenceType,
@@ -129,6 +133,28 @@ public class TornadoService {
         }
         try (var outputStreamWriter = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
             writeOutputStream(outputStreamWriter, sb);
+        }
+    }
+
+    public DocumentInfo summaryGeneration(String authToken, CaseData caseData, String caseType) throws IOException {
+        HttpURLConnection conn = null;
+        try {
+            conn = createConnection();
+            buildSummaryInstruction(conn, caseData, authToken);
+            return checkResponseStatus(authToken, conn, IC_SUMMARY_FILENAME, caseType);
+        } catch (IOException e) {
+            log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, e);
+            throw e;
+        } finally {
+            closeConnection(conn);
+        }
+    }
+
+    private void buildSummaryInstruction(HttpURLConnection conn, CaseData caseData, String authToken)
+            throws IOException {
+        try (var outputStreamWriter = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
+            outputStreamWriter.write(initialConsiderationHelper.getDocumentRequestEW(caseData, authToken));
+            outputStreamWriter.flush();
         }
     }
 

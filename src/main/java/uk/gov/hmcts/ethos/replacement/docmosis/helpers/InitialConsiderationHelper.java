@@ -2,12 +2,17 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.InitialConsiderationData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.InitialConsiderationDocument;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
+@Service
 public class InitialConsiderationHelper {
+
+    private static final String IC_SUMMARY_FILENAME = "InitialConsideration.pdf";
+    private static final String IC_SUMMARY_EW_TEMPLATE_NAME = "TEST-RET-2017.docx";
 
     public String getDocumentRequest(CaseData caseData) throws JsonProcessingException {
         InitialConsiderationData data = InitialConsiderationData.builder()
@@ -31,7 +36,7 @@ public class InitialConsiderationHelper {
         return mapper.writeValueAsString(document);
     }
 
-    public String getDocumentRequestEW(CaseData caseData) throws JsonProcessingException {
+    public String getDocumentRequestEW(CaseData caseData, String accessKey) throws JsonProcessingException {
         InitialConsiderationData data = InitialConsiderationData.builder()
                 .caseNumber(nullCheck(caseData.getEthosCaseReference()))
                 .icReceiptET3FormIssues(nullCheck(caseData.getIcReceiptET3FormIssues()))
@@ -47,9 +52,9 @@ public class InitialConsiderationHelper {
                 .build();
 
         InitialConsiderationDocument document = InitialConsiderationDocument.builder()
-                .accessKey("")
-                .outputName("")
-                .templateName("")
+                .accessKey(accessKey)
+                .outputName(IC_SUMMARY_FILENAME)
+                .templateName(IC_SUMMARY_EW_TEMPLATE_NAME)
                 .data(data).build();
 
         ObjectMapper mapper = new ObjectMapper();

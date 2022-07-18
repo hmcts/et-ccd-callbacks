@@ -1,17 +1,25 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.apache.commons.lang3.EnumUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
+
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +30,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Service
 public class InitialConsiderationService {
+
+    @Value("${document_management.ccdCaseDocument.url}")
+    private String ccdCaseDocumentUrl;
+
     static final String RESPONDENT_NAME =
         "| Respondent name given | |\r\n"
             + "|-------------|:------------|\r\n"
@@ -40,6 +52,9 @@ public class InitialConsiderationService {
         + "jurisdiction codes and descriptors (opens in new tab)</a><br><br>";
     static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
     static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "");
+
+    private static final String IC_TYPE_OF_DOC = "Initial Consideration";
+    private static final String IC_DOC_FILENAME = "InitialConsideration.pdf";
 
     /**
      * Creates the respondent detail section for Initial Consideration.
@@ -132,5 +147,35 @@ public class InitialConsiderationService {
                 .append("<br><br>"));
 
         return sb.append("<hr>").toString();
+    }
+
+    public void addIcEwDocumentLink(CaseData caseData, URI documentSelfPath) {
+        if (caseData.getDocumentCollection() == null) {
+            List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
+            caseData.setDocumentCollection(documentTypeItemList);
+        }
+        caseData.getDocumentCollection().add(createDocumentTypeItem(documentSelfPath));
+    }
+
+    private DocumentTypeItem createDocumentTypeItem(URI documentSelfPath) {
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        documentTypeItem.setValue(createDocumentType(documentSelfPath));
+        return documentTypeItem;
+    }
+
+    private DocumentType createDocumentType(URI documentSelfPath) {
+        DocumentType documentType = new DocumentType();
+        documentType.setTypeOfDocument(IC_TYPE_OF_DOC);
+        documentType.setShortDescription(null);
+        documentType.setUploadedDocument(createUploadedDocumentType(documentSelfPath));
+        return documentType;
+    }
+
+    private UploadedDocumentType createUploadedDocumentType(URI documentSelfPath) {
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentBinaryUrl(ccdCaseDocumentUrl + documentSelfPath.getRawPath() + "/binary");
+        uploadedDocumentType.setDocumentFilename(IC_DOC_FILENAME);
+        uploadedDocumentType.setDocumentUrl(ccdCaseDocumentUrl + documentSelfPath.getRawPath());
+        return uploadedDocumentType;
     }
 }

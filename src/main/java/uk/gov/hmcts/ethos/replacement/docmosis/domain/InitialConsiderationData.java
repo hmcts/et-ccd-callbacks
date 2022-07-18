@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain;
 
-import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
+import java.util.List;
 
 @SuperBuilder
 @Data
@@ -41,4 +41,37 @@ public class InitialConsiderationData {
 
     @JsonProperty("other_directions")
     private String otherDirections;
+
+    // Eng Wales
+
+    @JsonProperty("icReceiptET3FormIssues")
+    private String icReceiptET3FormIssues;
+
+    @JsonProperty("icRespondentsNameIdentityIssues")
+    private String icRespondentsNameIdentityIssues;
+
+    @JsonProperty("icJurisdictionCodeIssues")
+    private String icJurisdictionCodeIssues;
+
+    @JsonProperty("icApplicationIssues")
+    private String icApplicationIssues;
+
+    @JsonProperty("icEmployersContractClaimIssues")
+    private String icEmployersContractClaimIssues;
+
+    @JsonProperty("icClaimProspectIssues")
+    private String icClaimProspectIssues;
+
+    @JsonProperty("icListingIssues")
+    private String icListingIssues;
+
+    @JsonProperty("icDdaDisabilityIssues")
+    private String icDdaDisabilityIssues;
+
+    @JsonProperty("icOrderForFurtherInformation")
+    private String icOrderForFurtherInformation;
+
+    @JsonProperty("icOtherIssuesOrFinalOrders")
+    private String icOtherIssuesOrFinalOrders;
+
 }

@@ -1,13 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import java.util.HashMap;
-import java.util.Map;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.InitialConsiderationData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.InitialConsiderationDocument;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 public class InitialConsiderationHelper {
 
@@ -30,8 +28,35 @@ public class InitialConsiderationHelper {
 
         ObjectMapper mapper = new ObjectMapper();
 
-       return  mapper.writeValueAsString(document);
+        return mapper.writeValueAsString(document);
     }
+
+    public String getDocumentRequestEW(CaseData caseData) throws JsonProcessingException {
+        InitialConsiderationData data = InitialConsiderationData.builder()
+                .caseNumber(nullCheck(caseData.getEthosCaseReference()))
+                .icReceiptET3FormIssues(nullCheck(caseData.getIcReceiptET3FormIssues()))
+                .icRespondentsNameIdentityIssues(nullCheck(caseData.getIcRespondentsNameIdentityIssues()))
+                .icJurisdictionCodeIssues(nullCheck(caseData.getIcJurisdictionCodeIssues()))
+                .icApplicationIssues(nullCheck(caseData.getIcApplicationIssues()))
+                .icEmployersContractClaimIssues(nullCheck(caseData.getIcEmployersContractClaimIssues()))
+                .icClaimProspectIssues(nullCheck(caseData.getIcClaimProspectIssues()))
+                .icListingIssues(nullCheck(caseData.getIcListingIssues()))
+                .icDdaDisabilityIssues(nullCheck(caseData.getIcDdaDisabilityIssues()))
+                .icOrderForFurtherInformation(nullCheck(caseData.getIcOrderForFurtherInformation()))
+                .icOtherIssuesOrFinalOrders(nullCheck(caseData.getIcOtherIssuesOrFinalOrders()))
+                .build();
+
+        InitialConsiderationDocument document = InitialConsiderationDocument.builder()
+                .accessKey("")
+                .outputName("")
+                .templateName("")
+                .data(data).build();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        return mapper.writeValueAsString(document);
+    }
+
 }
 
 

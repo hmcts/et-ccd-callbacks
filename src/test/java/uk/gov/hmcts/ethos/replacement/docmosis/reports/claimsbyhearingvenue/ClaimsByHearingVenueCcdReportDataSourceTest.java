@@ -1,16 +1,18 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue;
 
+import org.junit.Test;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.model.reports.claimsbyhearingvenue.ClaimsByHearingVenueSubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
+
 import java.io.IOException;
 import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.junit.Test;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.model.reports.claimsbyhearingvenue.ClaimsByHearingVenueSubmitEvent;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 
 public class ClaimsByHearingVenueCcdReportDataSourceTest {
     @Test
@@ -26,7 +28,7 @@ public class ClaimsByHearingVenueCcdReportDataSourceTest {
         var submitEvents = List.of(submitEventOne, submitEventTwo);
         when(ccdClient.claimsByHearingVenueSearch(anyString(), anyString(), anyString())).thenReturn(submitEvents);
         var ccdReportDataSource = new ClaimsByHearingVenueCcdReportDataSource(authToken, ccdClient);
-        var results = ccdReportDataSource.getData(caseTypeId,fromDate, toDate);
+        var results = ccdReportDataSource.getData(caseTypeId, fromDate, toDate);
         assertEquals(2, results.size());
         assertEquals(submitEventOne, results.get(0));
         assertEquals(submitEventTwo, results.get(1));
@@ -47,7 +49,7 @@ public class ClaimsByHearingVenueCcdReportDataSourceTest {
         });
 
         String expectedMessage = "Failed to get claims by hearing venue search results "
-        + "for case type id Test_caseTypeId";
+            + "for case type id Test_caseTypeId";
         String actualMessage = exception.getMessage();
         assertEquals(expectedMessage, actualMessage);
     }

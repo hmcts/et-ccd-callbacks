@@ -92,6 +92,41 @@ public class HearingDetailServiceTest {
     }
 
     @Test
+    public void testHandleListingSelectedNullValue() {
+        CaseData caseData = createCaseData();
+        selectedListing.setHearingStatus(null);
+        selectedListing.setPostponedBy(null);
+        selectedListing.setHearingCaseDisposed(null);
+        selectedListing.setHearingPartHeard(null);
+        selectedListing.setHearingReservedJudgement(null);
+        selectedListing.setAttendeeClaimant(null);
+        selectedListing.setAttendeeNonAttendees(null);
+        selectedListing.setAttendeeRespNoRep(null);
+        selectedListing.setAttendeeRespAndRep(null);
+        selectedListing.setAttendeeRepOnly(null);
+        selectedListing.setHearingTimingStart(null);
+        selectedListing.setHearingTimingFinish(null);
+        selectedListing.setHearingTimingDuration(null);
+        selectedListing.setHearingNotes2(null);
+        hearingDetailsService.handleListingSelected(caseData);
+
+        assertEquals(" ", caseData.getHearingDetailsStatus());
+        assertEquals(" ", caseData.getHearingDetailsPostponedBy());
+        assertEquals(" ", caseData.getHearingDetailsCaseDisposed());
+        assertEquals(" ", caseData.getHearingDetailsPartHeard());
+        assertEquals(" ", caseData.getHearingDetailsReservedJudgment());
+        assertEquals(" ", caseData.getHearingDetailsAttendeeClaimant());
+        assertEquals(" ", caseData.getHearingDetailsAttendeeNonAttendees());
+        assertEquals(" ", caseData.getHearingDetailsAttendeeRespNoRep());
+        assertEquals(" ", caseData.getHearingDetailsAttendeeRespAndRep());
+        assertEquals(" ", caseData.getHearingDetailsAttendeeRepOnly());
+        assertEquals(" ", caseData.getHearingDetailsTimingStart());
+        assertEquals(" ", caseData.getHearingDetailsTimingFinish());
+        assertEquals(" ", caseData.getHearingDetailsTimingDuration());
+        assertEquals(" ", caseData.getHearingDetailsHearingNotes2());
+    }
+
+    @Test
     public void testUpdateCase() {
         var caseData = createCaseData();
         var hearingStatus = Constants.HEARING_STATUS_HEARD;

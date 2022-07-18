@@ -8,6 +8,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Service
 public class HearingDetailsService {
@@ -25,24 +26,28 @@ public class HearingDetailsService {
     }
 
     public void handleListingSelected(CaseData caseData) {
-        var selectedListing = getSelectedListing(caseData);
+        DateListedType selectedListing = getSelectedListing(caseData);
 
-        caseData.setHearingDetailsStatus(selectedListing.getHearingStatus());
-        caseData.setHearingDetailsPostponedBy(selectedListing.getPostponedBy());
-        caseData.setHearingDetailsCaseDisposed(selectedListing.getHearingCaseDisposed());
-        caseData.setHearingDetailsPartHeard(selectedListing.getHearingPartHeard());
-        caseData.setHearingDetailsReservedJudgment(selectedListing.getHearingReservedJudgement());
-        caseData.setHearingDetailsAttendeeClaimant(selectedListing.getAttendeeClaimant());
-        caseData.setHearingDetailsAttendeeNonAttendees(selectedListing.getAttendeeNonAttendees());
-        caseData.setHearingDetailsAttendeeRespNoRep(selectedListing.getAttendeeRespNoRep());
-        caseData.setHearingDetailsAttendeeRespAndRep(selectedListing.getAttendeeRespAndRep());
-        caseData.setHearingDetailsAttendeeRepOnly(selectedListing.getAttendeeRepOnly());
-        caseData.setHearingDetailsTimingStart(selectedListing.getHearingTimingStart());
+        caseData.setHearingDetailsStatus(nonNull(selectedListing.getHearingStatus()));
+        caseData.setHearingDetailsPostponedBy(nonNull(selectedListing.getPostponedBy()));
+        caseData.setHearingDetailsCaseDisposed(nonNull(selectedListing.getHearingCaseDisposed()));
+        caseData.setHearingDetailsPartHeard(nonNull(selectedListing.getHearingPartHeard()));
+        caseData.setHearingDetailsReservedJudgment(nonNull(selectedListing.getHearingReservedJudgement()));
+        caseData.setHearingDetailsAttendeeClaimant(nonNull(selectedListing.getAttendeeClaimant()));
+        caseData.setHearingDetailsAttendeeNonAttendees(nonNull(selectedListing.getAttendeeNonAttendees()));
+        caseData.setHearingDetailsAttendeeRespNoRep(nonNull(selectedListing.getAttendeeRespNoRep()));
+        caseData.setHearingDetailsAttendeeRespAndRep(nonNull(selectedListing.getAttendeeRespAndRep()));
+        caseData.setHearingDetailsAttendeeRepOnly(nonNull(selectedListing.getAttendeeRepOnly()));
+        caseData.setHearingDetailsTimingStart(nonNull(selectedListing.getHearingTimingStart()));
         caseData.setHearingDetailsTimingBreak(selectedListing.getHearingTimingBreak());
         caseData.setHearingDetailsTimingResume(selectedListing.getHearingTimingResume());
-        caseData.setHearingDetailsTimingFinish(selectedListing.getHearingTimingFinish());
-        caseData.setHearingDetailsTimingDuration(selectedListing.getHearingTimingDuration());
-        caseData.setHearingDetailsHearingNotes2(selectedListing.getHearingNotes2());
+        caseData.setHearingDetailsTimingFinish(nonNull(selectedListing.getHearingTimingFinish()));
+        caseData.setHearingDetailsTimingDuration(nonNull(selectedListing.getHearingTimingDuration()));
+        caseData.setHearingDetailsHearingNotes2(nonNull(selectedListing.getHearingNotes2()));
+    }
+
+    private String nonNull(String value) {
+        return isNullOrEmpty(value) ? " " : value;
     }
 
     public void updateCase(CaseDetails caseDetails) {

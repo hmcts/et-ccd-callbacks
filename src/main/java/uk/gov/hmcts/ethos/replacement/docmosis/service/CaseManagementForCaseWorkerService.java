@@ -100,19 +100,38 @@ public class CaseManagementForCaseWorkerService {
             var respondentSumType = caseData.getRespondentCollection().get(0).getValue();
             caseData.setRespondent(nullCheck(respondentSumType.getRespondentName()));
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-                if (respondentSumTypeItem.getValue().getResponseReceived() == null) {
-                    respondentSumTypeItem.getValue().setResponseReceived(NO);
-                }
-                if (respondentSumTypeItem.getValue().getResponseReceived().equals(NO)
-                        && respondentSumTypeItem.getValue().getResponseRespondentAddress() != null) {
-                    resetResponseRespondentAddress(respondentSumTypeItem);
-                }
-                if (Strings.isNullOrEmpty(respondentSumTypeItem.getValue().getResponseContinue())) {
-                    respondentSumTypeItem.getValue().setResponseContinue(YES);
-                }
+                checkExtensionRequired(respondentSumTypeItem);
+                checkResponseReceived(respondentSumTypeItem);
+                checkResponseAddress(respondentSumTypeItem);
+                checkResponseContinue(respondentSumTypeItem);
             }
         } else {
             caseData.setRespondent(MISSING_RESPONDENT);
+        }
+    }
+
+    private void checkResponseAddress(RespondentSumTypeItem respondentSumTypeItem) {
+        if (respondentSumTypeItem.getValue().getResponseReceived().equals(NO)
+                && respondentSumTypeItem.getValue().getResponseRespondentAddress() != null) {
+            resetResponseRespondentAddress(respondentSumTypeItem);
+        }
+    }
+
+    private void checkResponseContinue(RespondentSumTypeItem respondentSumTypeItem) {
+        if (Strings.isNullOrEmpty(respondentSumTypeItem.getValue().getResponseContinue())) {
+            respondentSumTypeItem.getValue().setResponseContinue(YES);
+        }
+    }
+
+    private void checkResponseReceived(RespondentSumTypeItem respondentSumTypeItem) {
+        if (respondentSumTypeItem.getValue().getResponseReceived() == null) {
+            respondentSumTypeItem.getValue().setResponseReceived(NO);
+        }
+    }
+
+    private void checkExtensionRequired(RespondentSumTypeItem respondentSumTypeItem) {
+        if (isNullOrEmpty(respondentSumTypeItem.getValue().getExtensionRequested())) {
+            respondentSumTypeItem.getValue().setExtensionRequested(NO);
         }
     }
 

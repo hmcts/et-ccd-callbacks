@@ -113,7 +113,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String DYNAMIC_JUDGMENT_URL = "/dynamicJudgments";
     private static final String JUDGEMENT_SUBMITTED_URL = "/judgementSubmitted";
     private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL = "/reinstateClosedCaseMidEventValidation";
-    private static final String SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL = "/midServingDocumentOtherTypeNames";
+
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -176,7 +176,6 @@ public class CaseActionsForCaseWorkerControllerTest {
     private JsonNode requestContent;
     private JsonNode requestContent2;
     private JsonNode requestContent3;
-    private JsonNode requestContent4;
     private SubmitEvent submitEvent;
     private DefaultValues defaultValues;
 
@@ -188,8 +187,6 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .getResource("/exampleV2.json")).toURI()));
         requestContent3 = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
                 .getResource("/exampleV3.json")).toURI()));
-        requestContent4 = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
-                .getResource("/exampleV4.json")).toURI()));
 
         objectMapper.readTree(new File(Objects.requireNonNull(getClass()
                 .getResource("/CaseCloseEvent_ValidHearingStatusCaseDetails.json")).toURI()));
@@ -800,21 +797,6 @@ public class CaseActionsForCaseWorkerControllerTest {
     }
 
     @Test
-    public void midServingDocumentOtherTypeNames() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-
-        String expectedDocumentName = "**<big>test-filename.xlsx</big>**<br/><small>Test description</small><br/>";
-        mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
-                        .content(requestContent4.toString())
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.otherTypeDocumentName").value(expectedDocumentName))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
-    }
-
-    @Test
     public void createCaseError400() throws Exception {
         mvc.perform(post(CREATION_CASE_URL)
                 .content("error")
@@ -1208,7 +1190,8 @@ public class CaseActionsForCaseWorkerControllerTest {
     @Test
     public void amendCaseDetailsError500() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(eventValidationService.validateCaseState(isA(CaseDetails.class)))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
         when(eventValidationService.validateCurrentPosition(isA(CaseDetails.class))).thenReturn(true);
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent.toString())
@@ -1632,15 +1615,4 @@ public class CaseActionsForCaseWorkerControllerTest {
         verify(clerkService, never()).initialiseClerkResponsible(isA(CaseData.class));
         verify(fileLocationSelectionService, never()).initialiseFileLocation(isA(CaseData.class));
     }
-
-    @Test
-    public void midServingDocumentOtherTypeNamesForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
-                        .content(requestContent4.toString())
-                        .header("Authorization", AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
 }

@@ -74,7 +74,8 @@ public class CourtWorkerService {
         var selectedCode = adminData.getUpdateCourtWorkerSelectList().getSelectedCode();
 
         CourtWorker selectedCourtWorker = courtWorkerRepository.findByCodeAndTribunalOfficeAndType(selectedCode,
-                TribunalOffice.valueOfOfficeName(adminData.getUpdateCourtWorkerOffice()), CourtWorkerType.valueOf(adminData.getUpdateCourtWorkerType()));
+                TribunalOffice.valueOfOfficeName(adminData.getUpdateCourtWorkerOffice()),
+                CourtWorkerType.valueOf(adminData.getUpdateCourtWorkerType()));
         if (selectedCourtWorker != null) {
 
             adminData.setUpdateCourtWorkerCode(selectedCourtWorker.getCode());
@@ -91,11 +92,10 @@ public class CourtWorkerService {
         var selectedCode = adminData.getUpdateCourtWorkerSelectList().getSelectedCode();
 
         var selectedCourtWorker = courtWorkerRepository.findByCodeAndTribunalOfficeAndType(selectedCode,
-                TribunalOffice.valueOfOfficeName(adminData.getUpdateCourtWorkerOffice()), CourtWorkerType.valueOf(adminData.getUpdateCourtWorkerType()));
-
+                TribunalOffice.valueOfOfficeName(adminData.getUpdateCourtWorkerOffice()),
+                CourtWorkerType.valueOf(adminData.getUpdateCourtWorkerType()));
 
         if (selectedCourtWorker != null) {
-
             selectedCourtWorker.setName(adminData.getUpdateCourtWorkerName());
             checkIfCourtWorkerNameExists(selectedCourtWorker, errors);
             if (errors.isEmpty()) {

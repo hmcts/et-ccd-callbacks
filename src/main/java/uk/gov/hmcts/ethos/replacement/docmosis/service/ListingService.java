@@ -1,7 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
@@ -39,11 +44,13 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_COMPLETED_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_SOURCE_LOCAL_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_STAFF;
@@ -57,15 +64,18 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIM
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING_CM_TCC;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PRIVATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIVE_CASELOAD_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SERVING_CLAIMS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TIME_TO_FIRST_HEARING_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper.CAUSE_LIST_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper.CASES_SEARCHED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_HEARING_LISTED_DATE;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -81,6 +91,8 @@ public class ListingService {
     private final VenueService venueService;
     private static final String MISSING_DOCUMENT_NAME = "Missing document name";
     private static final String MESSAGE = "Failed to generate document for case id : ";
+    public static final String ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND =
+            "data.hearingCollection.value.Hearing_venue_Scotland";
 
     public ListingData listingCaseCreation(ListingDetails listingDetails) {
 
@@ -105,24 +117,24 @@ public class ListingService {
                 if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
                     log.info("Processing listing single cases");
                     listingTypeItems.addAll(getListingTypeItems(hearingTypeItem,
-                            caseData.getPrintHearingDetails(), caseData));
+                            caseData.getPrintHearingDetails(), caseData, true));
                 }
             }
         }
         caseData.setPrintHearingCollection(caseData.getPrintHearingDetails());
         caseData.getPrintHearingCollection().setListingCollection(listingTypeItems);
-        caseData.getPrintHearingCollection().clearReportFields();
 
         return caseData;
     }
 
-    public ListingData setCourtAddressFromCaseData(CaseData caseData) {
+    public ListingData setManagingOfficeAndCourtAddressFromCaseData(CaseData caseData) {
         var listingData = caseData.getPrintHearingCollection();
         listingData.setTribunalCorrespondenceAddress(caseData.getTribunalCorrespondenceAddress());
         listingData.setTribunalCorrespondenceTelephone(caseData.getTribunalCorrespondenceTelephone());
         listingData.setTribunalCorrespondenceFax(caseData.getTribunalCorrespondenceFax());
         listingData.setTribunalCorrespondenceEmail(caseData.getTribunalCorrespondenceEmail());
         listingData.setTribunalCorrespondenceDX(caseData.getTribunalCorrespondenceDX());
+        listingData.setManagingOffice(caseData.getManagingOffice());
         return listingData;
     }
 
@@ -172,7 +184,7 @@ public class ListingService {
         for (HearingTypeItem hearingTypeItem : submitEvent.getCaseData().getHearingCollection()) {
             if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
                 listingTypeItems.addAll(getListingTypeItems(hearingTypeItem,
-                        listingDetails.getCaseData(), submitEvent.getCaseData()));
+                        listingDetails.getCaseData(), submitEvent.getCaseData(), false));
             }
         }
     }
@@ -194,14 +206,46 @@ public class ListingService {
             dateFrom = listingData.getListingDate();
             dateTo = listingData.getListingDate();
         }
+        if (ALL_VENUES.equals(venueToSearch)
+                && UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()).equals(SCOTLAND_CASE_TYPE_ID)) {
+            venueToSearch = listingData.getManagingOffice();
+            venueToSearchMapping = ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND;
+        }
+        return ccdClient.buildAndGetElasticSearchRequest(authToken,
+                UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()),
+                getESQuery(dateFrom, dateTo, venueToSearchMapping, venueToSearch));
+    }
 
-        return ccdClient.retrieveCasesVenueAndDateElasticSearch(
-                authToken, UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()),
-                dateFrom, dateTo, venueToSearch, venueToSearchMapping, listingData.getManagingOffice());
+    private String getESQuery(String dateFrom, String dateTo, String key, String venue) {
+        BoolQueryBuilder boolQueryBuilder = boolQuery()
+                .filter(new RangeQueryBuilder(
+                        ELASTICSEARCH_FIELD_HEARING_LISTED_DATE)
+                        .gte(dateFrom).lte(dateTo))
+                .must(new MatchQueryBuilder(key, venue));
+        return new SearchSourceBuilder()
+                .size(MAX_ES_SIZE)
+                .query(boolQueryBuilder).toString();
+    }
+
+    public String getSelectedOfficeForPrintLists(CaseData caseData) {
+        if (caseData.getPrintHearingDetails().getListingVenue() != null) {
+            return caseData.getManagingOffice();
+        } else if (!Strings.isNullOrEmpty(caseData.getPrintHearingDetails().getListingVenueScotland())) {
+            return caseData.getPrintHearingDetails().getListingVenueScotland();
+        } else {
+            throw new IllegalStateException("Unable to get selected office from "
+                   + "printing details for case reference " + caseData.getEthosCaseReference());
+        }
     }
 
     private List<ListingTypeItem> getListingTypeItems(HearingTypeItem hearingTypeItem,
-                                                      ListingData listingData, CaseData caseData) {
+                                                      ListingData listingData, CaseData caseData, boolean singleCase) {
+        String caseTypeId = "";
+        if (singleCase) {
+            caseTypeId = TribunalOffice.getCaseTypeId(getSelectedOfficeForPrintLists(caseData));
+        } else {
+            caseTypeId = TribunalOffice.getCaseTypeId(listingData.getManagingOffice());
+        }
         List<ListingTypeItem> listingTypeItems = new ArrayList<>();
         if (isHearingTypeValid(listingData, hearingTypeItem)) {
             int hearingDateCollectionSize = hearingTypeItem.getValue().getHearingDateCollection().size();
@@ -210,7 +254,8 @@ public class ListingService {
                 hearingTypeItem.getValue().getHearingNumber();
                 log.info("Hearing number: " + hearingTypeItem.getValue().getHearingNumber());
                 var dateListedTypeItem = hearingTypeItem.getValue().getHearingDateCollection().get(i);
-                boolean isListingVenueValid = isListingVenueValid(listingData, dateListedTypeItem);
+                boolean isListingVenueValid = isListingVenueValid(listingData, dateListedTypeItem,
+                        caseTypeId, caseData.getEthosCaseReference());
                 boolean isListingDateValid = isListingDateValid(listingData, dateListedTypeItem);
                 log.info("isListingVenueValid: " + isListingVenueValid);
                 log.info("isListingDateValid: " + isListingDateValid);
@@ -290,8 +335,24 @@ public class ListingService {
                 dateSearchTo, listingData.getReportType());
     }
 
-    private boolean isListingVenueValid(ListingData listingData, DateListedTypeItem dateListedTypeItem) {
-        if (listingData.hasListingVenue() && ALL_VENUES.equals(listingData.getListingVenue().getSelectedCode())) {
+    private boolean areAllVenuesSelected(ListingData listingData,
+                                         DateListedTypeItem dateListedTypeItem,
+                                         String caseTypeId) {
+        if (listingData.hasListingVenue()
+                && ALL_VENUES.equals(listingData.getListingVenue().getSelectedCode())) {
+            return caseTypeId.equals(ENGLANDWALES_CASE_TYPE_ID)
+                    || (caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)
+                    && listingData.getManagingOffice()
+                    .equals(dateListedTypeItem.getValue().getHearingVenueDayScotland()));
+        }
+        return false;
+    }
+
+    public boolean isListingVenueValid(ListingData listingData,
+                                        DateListedTypeItem dateListedTypeItem,
+                                        String caseTypeId,
+                                        String caseReference) {
+        if (areAllVenuesSelected(listingData, dateListedTypeItem, caseTypeId)) {
             return true;
         } else {
             String venueSearched;
@@ -300,12 +361,17 @@ public class ListingService {
 
             if (ListingVenueHelper.isAllScottishVenues(listingData)) {
                 venueSearched = dateListedTypeItem.getValue().hasHearingVenue()
-                        ? dateListedTypeItem.getValue().getHearingVenueDay().getValue().getLabel()
+                        ? dateListedTypeItem.getValue().getHearingVenueDayScotland()
                         : " ";
                 log.info("Checking venue for all scottish level (HearingVenueDay): " + venueSearched);
             } else {
-                venueSearched = ListingHelper.getVenueFromDateListedType(dateListedTypeItem.getValue());
-                log.info("Checking venue low level: " + venueSearched);
+                try {
+                    venueSearched = ListingHelper.getVenueCodeFromDateListedType(dateListedTypeItem.getValue());
+                } catch (IllegalStateException ex) {
+                    log.error("Unable to get venue code for case reference " + caseReference, ex);
+                    return false;
+                }
+
             }
             return venueSearched.trim().equals(venueToSearch.trim());
         }

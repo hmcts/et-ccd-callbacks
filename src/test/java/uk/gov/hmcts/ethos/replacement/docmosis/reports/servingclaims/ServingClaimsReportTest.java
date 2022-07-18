@@ -14,7 +14,6 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -10,22 +10,28 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
+import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.listing.ListingRequest;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
-
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -72,7 +78,10 @@ class EventValidationServiceTest {
     private static final LocalDate PAST_RESPONSE_RECEIVED_DATE = LocalDate.now().minusDays(1);
     private static final LocalDate CURRENT_RESPONSE_RECEIVED_DATE = LocalDate.now();
     private static final LocalDate FUTURE_RESPONSE_RECEIVED_DATE = LocalDate.now().plusDays(1);
-
+    private static final String DISPOSAL_DATE = "2022-05-01";
+    private static final String DISPOSAL_DATE_NO_MATCH = "2022-05-15";
+    private static final String HEARING_DATE = "2022-05-01T10:10:00.000";
+    private static final String HEARING_DATE2 = "2022-06-30T10:10:00.000";
     private EventValidationService eventValidationService;
 
     private CaseDetails caseDetails1;
@@ -160,10 +169,10 @@ class EventValidationServiceTest {
 
     @ParameterizedTest
     @CsvSource({
-        MULTIPLE_CASE_TYPE + "," + SUBMITTED_STATE,
-        MULTIPLE_CASE_TYPE + "," + ACCEPTED_STATE,
-        SINGLE_CASE_TYPE + "," + SUBMITTED_STATE,
-        SINGLE_CASE_TYPE + "," + ACCEPTED_STATE
+            MULTIPLE_CASE_TYPE + "," + SUBMITTED_STATE,
+            MULTIPLE_CASE_TYPE + "," + ACCEPTED_STATE,
+            SINGLE_CASE_TYPE + "," + SUBMITTED_STATE,
+            SINGLE_CASE_TYPE + "," + ACCEPTED_STATE
     })
     void shouldValidateCaseState(String caseType, String caseState) {
         caseDetails1.getCaseData().setEcmCaseType(caseType);
@@ -354,7 +363,7 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateJurisdictionCodesWithDuplicatesCodesAndExistenceJudgement() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdictionCodes(caseDetails1.getCaseData(), errors);
+        eventValidationService.validateJurisdiction(caseDetails1.getCaseData(), errors);
 
         assertEquals(2, errors.size());
         assertEquals(DUPLICATE_JURISDICTION_CODE_ERROR_MESSAGE + " \"COM\" in Jurisdiction 3 "
@@ -365,7 +374,7 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateJurisdictionCodesWithUniqueCodes() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdictionCodes(caseDetails2.getCaseData(), errors);
+        eventValidationService.validateJurisdiction(caseDetails2.getCaseData(), errors);
 
         assertEquals(0, errors.size());
     }
@@ -386,9 +395,63 @@ class EventValidationServiceTest {
     void shouldValidateJurisdictionCodesWithEmptyCodes() {
         List<String> errors = new ArrayList<>();
         caseDetails3.getCaseData().setJudgementCollection(new ArrayList<>());
-        eventValidationService.validateJurisdictionCodes(caseDetails3.getCaseData(), errors);
+        eventValidationService.validateJurisdiction(caseDetails3.getCaseData(), errors);
 
         assertEquals(0, errors.size());
+    }
+
+    @Test
+    void shouldValidateDisposalDateInFuture() {
+        List<String> errors = new ArrayList<>();
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(FUTURE_RECEIPT_DATE.toString()), errors);
+        assertThat(errors.get(0))
+                .isEqualTo(String.format(EventValidationService.DISPOSAL_DATE_IN_FUTURE, "blah blah"));
+
+    }
+
+    private HearingTypeItem setHearing(String hearingDate) {
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        hearingTypeItem.setId(UUID.randomUUID().toString());
+        HearingType hearingType = new HearingType();
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate(hearingDate);
+        dateListedTypeItem.setId(UUID.randomUUID().toString());
+        dateListedTypeItem.setValue(dateListedType);
+        hearingType.setHearingDateCollection(Collections.singletonList(dateListedTypeItem));
+        hearingTypeItem.setValue(hearingType);
+        return hearingTypeItem;
+    }
+
+    private CaseData setCaseDataForDisposalDateTest(String disposalDate) {
+        CaseData caseData = new CaseData();
+        HearingTypeItem hearingTypeItem1 = setHearing(HEARING_DATE2);
+        HearingTypeItem hearingTypeItem2 = setHearing(HEARING_DATE);
+        caseData.setHearingCollection(Arrays.asList(hearingTypeItem1, hearingTypeItem2));
+        JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
+        jurCodesTypeItem.setId(UUID.randomUUID().toString());
+        JurCodesType jurCodesType = new JurCodesType();
+        jurCodesType.setJuridictionCodesList("blah blah");
+        jurCodesType.setDisposalDate(disposalDate);
+        jurCodesTypeItem.setValue(jurCodesType);
+        caseData.setJurCodesCollection(Collections.singletonList(jurCodesTypeItem));
+        return caseData;
+    }
+
+    @Test
+    void disposalDateNoMatchWithHearingDate() {
+        List<String> errors = new ArrayList<>();
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(DISPOSAL_DATE_NO_MATCH), errors);
+        assertThat(errors.get(0))
+                .isEqualTo(String.format(EventValidationService.DISPOSAL_DATE_HEARING_DATE_MATCH, "blah blah"));
+
+    }
+
+    @Test
+    void disposalDateMatchWithHearingDate() {
+        List<String> errors = new ArrayList<>();
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(DISPOSAL_DATE), errors);
+        assertThat(errors).isEmpty();
     }
 
     @ParameterizedTest
@@ -687,8 +750,10 @@ class EventValidationServiceTest {
         List<String> errors = new ArrayList<>();
         var invalidCase = invalidJudgeAllocationCaseDetails.getCaseData();
         eventValidationService.validateHearingJudgeAllocationForCaseCloseEvent(invalidCase, errors);
-        assertEquals(1, errors.size());
-        assertEquals(CLOSING_HEARD_CASE_WITH_NO_JUDGE_ERROR, errors.get(0));
+        assertThat(errors.size())
+                .isEqualTo(1);
+        assertThat(errors.get(0))
+                .isEqualTo(CLOSING_HEARD_CASE_WITH_NO_JUDGE_ERROR);
     }
 
     @Test
@@ -697,7 +762,7 @@ class EventValidationServiceTest {
         var caseWithNoHearings = invalidJudgeAllocationCaseDetails.getCaseData();
         caseWithNoHearings.getHearingCollection().clear();
         eventValidationService.validateHearingJudgeAllocationForCaseCloseEvent(caseWithNoHearings, errors);
-        assertEquals(0, errors.size());
+        assertThat(errors)
+                .isEmpty();
     }
-
 }

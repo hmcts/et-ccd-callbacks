@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData;
@@ -142,7 +143,6 @@ public class ListingGenerationController {
         var listingData = listingRequest.getCaseDetails().getCaseData();
 
         if (ListingHelper.isListingRangeValid(listingData, errors)) {
-
             listingData = listingService.processListingHearingsRequest(
                     listingRequest.getCaseDetails(), userToken);
 
@@ -178,7 +178,8 @@ public class ListingGenerationController {
         List<String> errors = new ArrayList<>();
         var listingData = ccdRequest.getCaseDetails().getCaseData().getPrintHearingCollection();
         if (listingData.getListingCollection() != null && !listingData.getListingCollection().isEmpty()) {
-            listingData = listingService.setCourtAddressFromCaseData(ccdRequest.getCaseDetails().getCaseData());
+            listingData = listingService.setManagingOfficeAndCourtAddressFromCaseData(
+                    ccdRequest.getCaseDetails().getCaseData());
             var documentInfo = listingService.processHearingDocument(
                     listingData, ccdRequest.getCaseDetails().getCaseTypeId(), userToken);
             ccdRequest.getCaseDetails().getCaseData().setDocMarkUp(documentInfo.getMarkUp());
@@ -349,7 +350,25 @@ public class ListingGenerationController {
         var listingData = listingRequest.getCaseDetails().getCaseData();
         var caseTypeId = listingRequest.getCaseDetails().getCaseTypeId();
 
-        return getResponseEntity(listingData, caseTypeId, userToken);
+        List<String> errorsList = new ArrayList<>();
+        boolean invalidCharsExist = InvalidCharacterCheck.invalidCharactersExistAllListingTypes(
+                listingRequest.getCaseDetails(), errorsList);
+        if (!invalidCharsExist && !hasListings(listingData)) {
+            errorsList.add("No cases with hearings have been found for your search criteria");
+        }
+        if (errorsList.isEmpty()) {
+            var documentInfo = getDocumentInfo(listingData, caseTypeId, userToken);
+            updateListingDocMarkUp(listingData, documentInfo);
+            return ResponseEntity.ok(ListingCallbackResponse.builder()
+                    .data(listingData)
+                    .significant_item(Helper.generateSignificantItem(documentInfo, errorsList))
+                    .build());
+        } else {
+            return ResponseEntity.ok(ListingCallbackResponse.builder()
+                    .errors(errorsList)
+                    .data(listingData)
+                    .build());
+        }
     }
 
     @PostMapping(value = "/generateHearingDocumentConfirmation", consumes = APPLICATION_JSON_VALUE)

@@ -4,6 +4,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.reports.eccreport.EccReportSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 
 import java.util.ArrayList;
@@ -20,7 +21,8 @@ public class EccReport {
 
     public EccReportData generateReport(ReportParams params) {
         var submitEvents = getCases(params);
-        var reportData = initReport(params.getManagingOffice());
+        var office = ReportHelper.getReportOffice(params.getCaseTypeId(), params.getManagingOffice());
+        var reportData = initReport(office);
 
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             executeReport(reportData, submitEvents);
@@ -28,13 +30,14 @@ public class EccReport {
         return reportData;
     }
 
-    private EccReportData initReport(String managingOffice) {
-        return new EccReportData(managingOffice);
+    private EccReportData initReport(String office) {
+        return new EccReportData(office);
     }
 
     private List<EccReportSubmitEvent> getCases(ReportParams params) {
-        return reportDataSource.getData(new ReportParams(UtilHelper.getListingCaseTypeId(
-                params.getCaseTypeId()), params.getManagingOffice(), params.getDateFrom(), params.getDateTo()));
+        var caseTypeId = UtilHelper.getListingCaseTypeId(params.getCaseTypeId());
+        return reportDataSource.getData(new ReportParams(caseTypeId, params.getManagingOffice(), params.getDateFrom(),
+                params.getDateTo()));
     }
 
     private void executeReport(EccReportData eccReportData,

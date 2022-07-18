@@ -1,1 +1,0 @@
-ALTER TYPE emp_status ADD VALUE 'UNKNOWN';

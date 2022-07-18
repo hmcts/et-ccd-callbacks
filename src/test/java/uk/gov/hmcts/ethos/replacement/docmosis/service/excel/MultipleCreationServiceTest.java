@@ -145,9 +145,7 @@ public class MultipleCreationServiceTest {
                 userToken,
                 multipleDetails);
         verifyNoMoreInteractions(excelDocManagementService);
-        verify(multipleReferenceService, times(1)).createReference(
-                multipleDetails.getCaseTypeId(),
-                1);
+        verify(multipleReferenceService, times(1)).createReference(multipleDetails.getCaseTypeId());
         verifyNoMoreInteractions(multipleReferenceService);
     }
 

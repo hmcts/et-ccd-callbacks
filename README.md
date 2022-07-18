@@ -45,7 +45,7 @@ There is a dependency on a postgres database to be running locally.
 
 To install the database schema required for et-ccd-callbacks execute the following command:
 ```bash
-    ./gradlew installlocaldb
+    ./bin/init-db.sh
 ```
 
 There is also a dependency on Azure Service Bus.
@@ -80,6 +80,9 @@ To run all unit tests please execute following command:
 ```bash
     ./gradlew test
 ```
+
+### Integration tests
+Integration tests require docker to be running. They are executed as part of the `gradle check` task.
 
 ### Coding style tests
 

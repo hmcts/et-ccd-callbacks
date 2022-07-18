@@ -1,22 +1,24 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport;
 
-import java.io.IOException;
-import java.util.List;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import org.junit.Test;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReportSubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 
-public class RespondentsReportCcdReportDataSourceTest {
+import java.io.IOException;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+class RespondentsReportCcdReportDataSourceTest {
 
     @Test
-    public void shouldReturnSearchResults() throws IOException {
+    void shouldReturnSearchResults() throws IOException {
         var authToken = "token";
         var caseTypeId = "caseTypeId";
         var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
@@ -34,8 +36,8 @@ public class RespondentsReportCcdReportDataSourceTest {
         assertEquals(submitEvent, results.get(0));
     }
 
-    @Test(expected = ReportException.class)
-    public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
+    @Test
+    void shouldThrowReportExceptionWhenSearchFails() throws IOException {
         var authToken = "token";
         var caseTypeId = "caseTypeId";
         var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
@@ -45,8 +47,8 @@ public class RespondentsReportCcdReportDataSourceTest {
         when(ccdClient.respondentsReportSearch(anyString(), anyString(), anyString())).thenThrow(new IOException());
 
         var ccdReportDataSource = new RespondentsReportCcdDataSource(authToken, ccdClient);
-        ccdReportDataSource.getData(caseTypeId, managingOffice, fromDate, toDate);
-        fail("Should throw exception instead");
+        assertThrows(ReportException.class, () -> ccdReportDataSource.getData(
+                caseTypeId, managingOffice, fromDate, toDate));
     }
 
 }

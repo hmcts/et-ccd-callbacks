@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.AdhocReportTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.AdhocReportType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,9 +92,7 @@ public class CasesCompletedReport {
         adhocReportType.setConOpenCompletedPerSession(ZERO_DECIMAL);
 
         var managingOffice = listingDetails.getCaseData().getManagingOffice();
-        var reportOffice = StringUtils.isNotBlank(managingOffice) && TribunalOffice.isEnglandWalesOffice(managingOffice)
-                ? managingOffice
-                : TribunalOffice.SCOTLAND.getOfficeName();
+        var reportOffice = ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), managingOffice);
         adhocReportType.setReportOffice(reportOffice);
 
         var listingData = listingDetails.getCaseData();

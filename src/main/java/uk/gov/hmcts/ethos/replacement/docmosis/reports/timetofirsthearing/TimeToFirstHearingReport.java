@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.AdhocReportTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.AdhocReportType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -27,6 +28,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_STANDARD_TRACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Service
 @Slf4j
@@ -36,18 +38,20 @@ public class TimeToFirstHearingReport {
     static final String ZERO_DECIMAL = "0.00";
 
     public ListingData generateReportData(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
+        var managingOffice = listingDetails.getCaseData().getManagingOffice();
+        var reportOffice = ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), managingOffice);
 
-        initReport(listingDetails);
+        initReport(listingDetails, reportOffice);
 
         if (CollectionUtils.isNotEmpty(submitEvents)) {
-            executeReport(listingDetails, submitEvents);
+            executeReport(listingDetails, submitEvents, reportOffice);
         }
 
         listingDetails.getCaseData().clearReportFields();
         return listingDetails.getCaseData();
     }
 
-    private void initReport(ListingDetails listingDetails) {
+    private void initReport(ListingDetails listingDetails, String reportOffice) {
 
         var adhocReportType = new AdhocReportType();
 
@@ -81,7 +85,7 @@ public class TimeToFirstHearingReport {
         adhocReportType.setTotalx26wkPerCent(ZERO_DECIMAL);
 
         //localReportsDetail fields
-        adhocReportType.setReportOffice("");
+        adhocReportType.setReportOffice(reportOffice);
         adhocReportType.setCaseReference("");
         adhocReportType.setConciliationTrack("");
         adhocReportType.setReceiptDate("");
@@ -100,20 +104,21 @@ public class TimeToFirstHearingReport {
         listingData.setLocalReportsDetail(new ArrayList<>());
     }
 
-    private void executeReport(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
+    private void executeReport(ListingDetails listingDetails, List<SubmitEvent> submitEvents, String reportOffice) {
         log.info(String.format("Time to first hearing report case type id %s for office %s with search results: %d",
                 listingDetails.getCaseTypeId(), listingDetails.getCaseData().getManagingOffice(), submitEvents.size()));
         populateLocalReportSummary(listingDetails.getCaseData(), submitEvents);
-        populateLocalReportSummaryHdr(listingDetails);
-        populateLocalReportSummaryDetail(listingDetails, submitEvents);
+        populateLocalReportSummaryHdr(listingDetails, reportOffice);
+        populateLocalReportSummaryDetail(listingDetails, submitEvents, reportOffice);
 
     }
 
-    private void populateLocalReportSummaryDetail(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
+    private void populateLocalReportSummaryDetail(ListingDetails listingDetails, List<SubmitEvent> submitEvents,
+                                                  String reportOffice) {
         var localReportsDetailList = listingDetails.getCaseData().getLocalReportsDetail();
         for (var submitEvent : submitEvents) {
             var localReportsDetailItem =
-                    getLocalReportsDetail(listingDetails, submitEvent.getCaseData());
+                    getLocalReportsDetail(listingDetails, submitEvent.getCaseData(), reportOffice);
             if (localReportsDetailItem != null) {
                 localReportsDetailList.add(localReportsDetailItem);
             }
@@ -121,7 +126,8 @@ public class TimeToFirstHearingReport {
         listingDetails.getCaseData().setLocalReportsDetail(localReportsDetailList);
     }
 
-    private AdhocReportTypeItem getLocalReportsDetail(ListingDetails listingDetails, CaseData caseData) {
+    private AdhocReportTypeItem getLocalReportsDetail(ListingDetails listingDetails, CaseData caseData,
+                                                      String reportOffice) {
 
         var firstHearingDate = getFirstHearingDate(caseData);
         if (firstHearingDate == null || isFirstHearingWithin26Weeks(caseData, firstHearingDate)) {
@@ -129,7 +135,7 @@ public class TimeToFirstHearingReport {
         }
         var adhocReportType = new AdhocReportType();
         adhocReportType.setHearingDate(firstHearingDate.toString());
-        adhocReportType.setReportOffice(listingDetails.getCaseData().getManagingOffice());
+        adhocReportType.setReportOffice(reportOffice);
         adhocReportType.setCaseReference(caseData.getEthosCaseReference());
         adhocReportType.setConciliationTrack(getConciliationTrack(caseData));
         if (!Strings.isNullOrEmpty(caseData.getReceiptDate())) {
@@ -145,11 +151,11 @@ public class TimeToFirstHearingReport {
 
     }
 
-    private void populateLocalReportSummaryHdr(ListingDetails listingDetails) {
+    private void populateLocalReportSummaryHdr(ListingDetails listingDetails, String reportOffice) {
 
         var listingData = listingDetails.getCaseData();
         var adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
-        adhocReportType.setReportOffice(listingDetails.getCaseData().getManagingOffice());
+        adhocReportType.setReportOffice(reportOffice);
         int totalCases = Integer.parseInt(adhocReportType.getConOpenTotal())
                 + Integer.parseInt(adhocReportType.getConStdTotal())
                 + Integer.parseInt(adhocReportType.getConFastTotal())
@@ -355,7 +361,8 @@ public class TimeToFirstHearingReport {
         if (Constants.HEARING_TYPE_JUDICIAL_HEARING.equals(hearingType.getHearingType())
                 || HEARING_TYPE_PERLIMINARY_HEARING.equals(hearingType.getHearingType())) {
             for (var dateListedItemType : hearingType.getHearingDateCollection()) {
-                if (Constants.HEARING_STATUS_HEARD.equals(dateListedItemType.getValue().getHearingStatus())) {
+                if (Constants.HEARING_STATUS_HEARD.equals(dateListedItemType.getValue().getHearingStatus())
+                        && YES.equals(dateListedItemType.getValue().getHearingCaseDisposed())) {
                     var date = LocalDate.parse(dateListedItemType.getValue().getListedDate(),  OLD_DATE_TIME_PATTERN);
                     datesList.add(date);
                 }

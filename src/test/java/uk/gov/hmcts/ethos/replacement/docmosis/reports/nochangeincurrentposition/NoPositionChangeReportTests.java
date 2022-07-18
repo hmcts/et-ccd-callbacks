@@ -39,7 +39,7 @@ class NoPositionChangeReportTests {
     List<NoPositionChangeSubmitEvent> submitEvents = new ArrayList<>();
     List<SubmitMultipleEvent> submitMultipleEvents = new ArrayList<>();
 
-    static final LocalDateTime BASE_DATE = LocalDateTime.of(2021, 7, 1, 0, 0,0);
+    static final LocalDateTime BASE_DATE = LocalDateTime.of(2021, 7, 1, 0, 0, 0);
     static final String REPORT_CREATE_DATE = BASE_DATE.plusMonths(3).format(OLD_DATE_TIME_PATTERN2);
     static final String DATE_WITHIN_3MONTHS = BASE_DATE.plusDays(2).format(OLD_DATE_TIME_PATTERN2);
     static final String DATE_BEFORE_3MONTHS = BASE_DATE.minusDays(2).format(OLD_DATE_TIME_PATTERN2);
@@ -61,8 +61,8 @@ class NoPositionChangeReportTests {
         noPositionChangeDataSource = mock(NoPositionChangeDataSource.class);
         when(noPositionChangeDataSource.getData(ENGLANDWALES_CASE_TYPE_ID, REPORT_CREATE_DATE,
                 TribunalOffice.MANCHESTER.getOfficeName())).thenReturn(submitEvents);
-        when(noPositionChangeDataSource.getMultiplesData(eq(ENGLANDWALES_BULK_CASE_TYPE_ID), anyList())).thenReturn(submitMultipleEvents);
-
+        when(noPositionChangeDataSource.getMultiplesData(
+                eq(ENGLANDWALES_BULK_CASE_TYPE_ID), anyList())).thenReturn(submitMultipleEvents);
         noPositionChangeReport = new NoPositionChangeReport(noPositionChangeDataSource, REPORT_CREATE_DATE);
     }
 
@@ -109,9 +109,9 @@ class NoPositionChangeReportTests {
 
         var reportData = noPositionChangeReport.runReport(listingDetails);
         assertCommonValues(reportData);
-        assertEquals("1" , reportData.getReportSummary().getTotalCases());
-        assertEquals("1" , reportData.getReportSummary().getTotalSingleCases());
-        assertEquals("0" , reportData.getReportSummary().getTotalMultipleCases());
+        assertEquals("1", reportData.getReportSummary().getTotalCases());
+        assertEquals("1", reportData.getReportSummary().getTotalSingleCases());
+        assertEquals("0", reportData.getReportSummary().getTotalMultipleCases());
         assertEquals(1, reportData.getReportDetailsSingle().size());
         assertTrue(reportData.getReportDetailsMultiple().isEmpty());
         var reportDetail = reportData.getReportDetailsSingle().get(0);
@@ -137,9 +137,9 @@ class NoPositionChangeReportTests {
 
         var reportData = noPositionChangeReport.runReport(listingDetails);
         assertCommonValues(reportData);
-        assertEquals("1" , reportData.getReportSummary().getTotalCases());
-        assertEquals("1" , reportData.getReportSummary().getTotalSingleCases());
-        assertEquals("0" , reportData.getReportSummary().getTotalMultipleCases());
+        assertEquals("1", reportData.getReportSummary().getTotalCases());
+        assertEquals("1", reportData.getReportSummary().getTotalSingleCases());
+        assertEquals("0", reportData.getReportSummary().getTotalMultipleCases());
         assertEquals(1, reportData.getReportDetailsSingle().size());
         assertTrue(reportData.getReportDetailsMultiple().isEmpty());
         var reportDetail = reportData.getReportDetailsSingle().get(0);
@@ -175,9 +175,9 @@ class NoPositionChangeReportTests {
 
         var reportData = noPositionChangeReport.runReport(listingDetails);
         assertCommonValues(reportData);
-        assertEquals("1" , reportData.getReportSummary().getTotalCases());
-        assertEquals("0" , reportData.getReportSummary().getTotalSingleCases());
-        assertEquals("1" , reportData.getReportSummary().getTotalMultipleCases());
+        assertEquals("1", reportData.getReportSummary().getTotalCases());
+        assertEquals("0", reportData.getReportSummary().getTotalSingleCases());
+        assertEquals("1", reportData.getReportSummary().getTotalMultipleCases());
         assertTrue(reportData.getReportDetailsSingle().isEmpty());
         assertEquals(1, reportData.getReportDetailsMultiple().size());
         var reportDetail = reportData.getReportDetailsMultiple().get(0);
@@ -206,9 +206,9 @@ class NoPositionChangeReportTests {
 
         var reportData = noPositionChangeReport.runReport(listingDetails);
         assertCommonValues(reportData);
-        assertEquals("1" , reportData.getReportSummary().getTotalCases());
-        assertEquals("1" , reportData.getReportSummary().getTotalSingleCases());
-        assertEquals("0" , reportData.getReportSummary().getTotalMultipleCases());
+        assertEquals("1", reportData.getReportSummary().getTotalCases());
+        assertEquals("1", reportData.getReportSummary().getTotalSingleCases());
+        assertEquals("0", reportData.getReportSummary().getTotalMultipleCases());
         assertEquals(1, reportData.getReportDetailsSingle().size());
         assertTrue(reportData.getReportDetailsMultiple().isEmpty());
         var reportDetail = reportData.getReportDetailsSingle().get(0);
@@ -232,9 +232,9 @@ class NoPositionChangeReportTests {
 
         var reportData = noPositionChangeReport.runReport(listingDetails);
         assertCommonValues(reportData);
-        assertEquals("2" , reportData.getReportSummary().getTotalCases());
-        assertEquals("1" , reportData.getReportSummary().getTotalSingleCases());
-        assertEquals("1" , reportData.getReportSummary().getTotalMultipleCases());
+        assertEquals("2", reportData.getReportSummary().getTotalCases());
+        assertEquals("1", reportData.getReportSummary().getTotalSingleCases());
+        assertEquals("1", reportData.getReportSummary().getTotalMultipleCases());
         assertEquals(1, reportData.getReportDetailsSingle().size());
         assertEquals(1, reportData.getReportDetailsMultiple().size());
     }

@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +80,8 @@ public class ListingGenerationControllerTest {
     private static final String GENERATE_HEARING_DOCUMENT_CONFIRMATION_URL = "/generateHearingDocumentConfirmation";
     private static final String LISTING_SINGLE_CASES_URL = "/listingSingleCases";
     private static final String GENERATE_LISTINGS_DOC_SINGLE_CASES_URL = "/generateListingsDocSingleCases";
-    private static final String GENERATE_LISTINGS_DOC_SINGLE_CASES_CONFIRMATION_URL = "/generateListingsDocSingleCasesConfirmation";
+    private static final String GENERATE_LISTINGS_DOC_SINGLE_CASES_CONFIRMATION_URL =
+            "/generateListingsDocSingleCasesConfirmation";
     private static final String GENERATE_REPORT_URL = "/generateReport";
     private static final String INIT_PRINT_HEARING_LISTS_URL = "/initPrintHearingLists";
     private static final String INIT_GENERATE_REPORT_URL = "/initGenerateReport";
@@ -144,16 +144,14 @@ public class ListingGenerationControllerTest {
 
     private ListingRequest getListingData() {
 
-        singleListingRequest = new ListingRequest();
-        var listingDetails = new ListingDetails();
         var listingData = new ListingData();
-
         listingData.setDocMarkUp("Test doc markup");
         listingData.setDocumentName("test listing doc name");
         listingData.setListingDate("2021-10-20");
         listingData.setListingDateFrom("2020-11-12");
         listingData.setHearingDateType("Range");
         listingData.setListingDateTo("2021-10-18");
+        listingData.setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());
 
         var listingTypeItem1 = new ListingTypeItem();
         listingTypeItem1.setId("97087d19-795a-4886-8cdb-06489b8b2ef5");
@@ -204,9 +202,10 @@ public class ListingGenerationControllerTest {
 
         var listingTypeItems = new ArrayList<ListingTypeItem>();
         listingTypeItems.add(new ListingTypeItem());
-
+        var listingDetails = new ListingDetails();
         listingData.setListingCollection(listingTypeItems);
         listingDetails.setCaseData(listingData);
+        singleListingRequest = new ListingRequest();
         singleListingRequest.setCaseDetails(listingDetails);
 
         return singleListingRequest;
@@ -257,7 +256,6 @@ public class ListingGenerationControllerTest {
                 .andExpect(jsonPath("$.warnings", nullValue()));
     }
 
-    @Ignore("It needs to be fixed once owningOffice/managingOffice issue with Scotland is resolved")
     @Test
     public void listingHearings() throws Exception {
         when(listingService.processListingHearingsRequest(isA(ListingDetails.class), eq(AUTH_TOKEN)))
@@ -349,7 +347,7 @@ public class ListingGenerationControllerTest {
 
     @Test
     public void generateListingsDocSingleCases() throws Exception {
-        when(listingService.setCourtAddressFromCaseData(isA(CaseData.class)))
+        when(listingService.setManagingOfficeAndCourtAddressFromCaseData(isA(CaseData.class)))
                 .thenReturn(singleListingRequest.getCaseDetails().getCaseData());
         when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
                 .thenReturn(documentInfo);
@@ -618,7 +616,7 @@ public class ListingGenerationControllerTest {
                 .thenThrow(new InternalException(ERROR_MESSAGE));
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(listingService.setCourtAddressFromCaseData(isA(CaseData.class)))
+        when(listingService.setManagingOfficeAndCourtAddressFromCaseData(isA(CaseData.class)))
                 .thenReturn(singleListingRequest.getCaseDetails().getCaseData());
 
         mvc.perform(post(GENERATE_LISTINGS_DOC_SINGLE_CASES_URL)

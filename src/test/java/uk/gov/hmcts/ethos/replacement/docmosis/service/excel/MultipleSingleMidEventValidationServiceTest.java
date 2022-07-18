@@ -72,9 +72,11 @@ public class MultipleSingleMidEventValidationServiceTest {
 
         assertEquals(0, errors.size());
         assertEquals(SELECT_NONE_VALUE, multipleDetails.getCaseData().getBatchUpdateClaimantRep().getValue().getCode());
-        assertEquals(SELECT_NONE_VALUE, multipleDetails.getCaseData().getBatchUpdateJurisdiction().getValue().getLabel());
+        assertEquals(SELECT_NONE_VALUE, multipleDetails.getCaseData()
+                .getBatchUpdateJurisdiction().getValue().getLabel());
         assertEquals(2, multipleDetails.getCaseData().getBatchUpdateRespondent().getListItems().size());
-        assertEquals(SELECT_NONE_VALUE, multipleDetails.getCaseData().getBatchUpdateRespondentRep().getValue().getLabel());
+        assertEquals(SELECT_NONE_VALUE, multipleDetails
+                .getCaseData().getBatchUpdateRespondentRep().getValue().getLabel());
 
     }
 
@@ -141,7 +143,8 @@ public class MultipleSingleMidEventValidationServiceTest {
         JurCodesType jurCodesType = new JurCodesType();
         jurCodesType.setJuridictionCodesList("AA");
         jurCodesTypeItem.setValue(jurCodesType);
-        submitEventList.get(0).getCaseData().setJurCodesCollection(new ArrayList<>(Collections.singletonList(jurCodesTypeItem)));
+        submitEventList.get(0).getCaseData().setJurCodesCollection(
+                new ArrayList<>(Collections.singletonList(jurCodesTypeItem)));
 
         when(singleCasesReadingService.retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(),
@@ -169,7 +172,7 @@ public class MultipleSingleMidEventValidationServiceTest {
 
     /**
      * This test is for the scenario where CCD returns the case data with a
-     * representativeClaimantType as a RepresentedTypeC object with no values set
+     * representativeClaimantType as a RepresentedTypeC object with no values set.
      */
     @Test
     public void shouldHandleRepresentativeClaimantWithNoValues() {
@@ -182,7 +185,8 @@ public class MultipleSingleMidEventValidationServiceTest {
         JurCodesType jurCodesType = new JurCodesType();
         jurCodesType.setJuridictionCodesList("AA");
         jurCodesTypeItem.setValue(jurCodesType);
-        submitEventList.get(0).getCaseData().setJurCodesCollection(new ArrayList<>(Collections.singletonList(jurCodesTypeItem)));
+        submitEventList.get(0).getCaseData().setJurCodesCollection(
+                new ArrayList<>(Collections.singletonList(jurCodesTypeItem)));
 
         when(singleCasesReadingService.retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(),

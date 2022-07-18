@@ -35,7 +35,9 @@ public class BfActionReport {
         bfActionReportData.clearReportFields();
         bfActionReportData.setReportType(BROUGHT_FORWARD_REPORT);
         bfActionReportData.setDocumentName(BROUGHT_FORWARD_REPORT);
-        bfActionReportData.setOffice(caseData.getManagingOffice());
+
+        var managingOffice = caseData.getManagingOffice();
+        bfActionReportData.setOffice(ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), managingOffice));
         bfActionReportData.setListingDate(caseData.getListingDate());
         bfActionReportData.setListingDateFrom(caseData.getListingDateFrom());
         bfActionReportData.setListingDateTo(caseData.getListingDateTo());

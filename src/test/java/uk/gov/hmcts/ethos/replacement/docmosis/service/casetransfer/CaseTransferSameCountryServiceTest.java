@@ -176,7 +176,7 @@ class CaseTransferSameCountryServiceTest {
 
         verify(caseTransferEventService, times(1)).transfer(caseTransferEventParamsArgumentCaptor.capture());
         var params = caseTransferEventParamsArgumentCaptor.getValue();
-        verifyCaseTransferEventParams(eccCaseReference,claimantEthosCaseReference, officeCT, params);
+        verifyCaseTransferEventParams(eccCaseReference, claimantEthosCaseReference, officeCT, params);
     }
 
     @Test
@@ -277,8 +277,8 @@ class CaseTransferSameCountryServiceTest {
                 .buildAsCaseDetails(caseTypeId, jurisdiction);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken)).thenReturn(Collections.emptyList());
 
-        assertThrows(IllegalStateException.class,
-                () -> caseTransferSameCountryService.transferCase(caseDetails, userToken));
+        assertThrows(IllegalStateException.class, () -> caseTransferSameCountryService.transferCase(
+                caseDetails, userToken));
     }
 
     private void verifyCaseTransferEventParams(String expectedEthosCaseReference,

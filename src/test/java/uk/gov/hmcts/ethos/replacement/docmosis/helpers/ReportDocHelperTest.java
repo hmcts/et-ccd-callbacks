@@ -6,6 +6,7 @@ import org.junit.Test;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.AdhocReportTypeItem;
@@ -55,6 +56,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_BY_HEARING_TYPE_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
@@ -183,7 +185,7 @@ public class ReportDocHelperTest {
 
     @Test
     public void buildCasesCompletedReport() {
-        var expected = "{\n"
+        String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-SCO-ENG-00221.docx\",\n"
                 + "\"outputName\":\"document.docx\",\n"
@@ -235,19 +237,19 @@ public class ReportDocHelperTest {
 
     @Test
     public void buildCasesAwaitingJudgmentReport() throws URISyntaxException, IOException {
-        var expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("casesAwaitingJudgmentExpected.json")).toURI())));
-        var today = UtilHelper.formatCurrentDate(LocalDate.now());
+        String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("replace-with-current-date", today);
-        var reportData = getCasesAwaitingJudgementReportData();
-        var actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
+        CasesAwaitingJudgmentReportData reportData = getCasesAwaitingJudgementReportData();
+        String actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
                 "EM-TRB-SCO-ENG-00749", userDetails).toString();
         assertEquals(expectedJson, actualJson);
     }
 
     @Test(expected = IllegalStateException.class)
     public void testCasesAwaitingJudgementInvalidListingData() {
-        var listingData = new ListingData();
+        ListingData listingData = new ListingData();
         listingData.setReportType(CASES_AWAITING_JUDGMENT_REPORT);
 
         ReportDocHelper.buildReportDocumentContent(listingData, "access-key", "template-name", userDetails);
@@ -312,12 +314,12 @@ public class ReportDocHelperTest {
 
     @Test
     public void buildMembersDayLocalReport() {
-        var todaysDate = UtilHelper.formatCurrentDate(LocalDate.now());
-        var  listingData = new MemberDaysReportData();
+        String todaysDate = UtilHelper.formatCurrentDate(LocalDate.now());
+        MemberDaysReportData  listingData = new MemberDaysReportData();
         listingData.setReportDate(todaysDate);
         listingData.setReportType(MEMBER_DAYS_REPORT);
 
-        var detailItem = new MemberDaysReportDetail();
+        MemberDaysReportDetail detailItem = new MemberDaysReportDetail();
         detailItem.setHearingDate("15 September 2021");
         detailItem.setEmployeeMember("EE Member");
         detailItem.setEmployerMember("ER Member");
@@ -333,14 +335,14 @@ public class ReportDocHelperTest {
         listingData.setFullDaysTotal("2");
         listingData.setTotalDays("2.0");
 
-        var memberDaySummaryItem = new MemberDaySummaryItem();
+        MemberDaySummaryItem memberDaySummaryItem = new MemberDaySummaryItem();
         memberDaySummaryItem.setHearingDate("15 September 2021");
         memberDaySummaryItem.setFullDays("2");
         memberDaySummaryItem.setHalfDays("0");
         memberDaySummaryItem.setTotalDays("2");
 
         listingData.getMemberDaySummaryItems().add(memberDaySummaryItem);
-        var userName = nullCheck(userDetails.getFirstName() + " " + userDetails.getLastName());
+        String userName = nullCheck(userDetails.getFirstName() + " " + userDetails.getLastName());
         String expected = "{\n"
             + "\"accessKey\":\"\",\n"
             + "\"templateName\":\"EM-TRB-SCO-ENG-00800.docx\",\n"
@@ -418,48 +420,46 @@ public class ReportDocHelperTest {
         listingData.setListingDateFrom("2021-10-02");
         listingData.setListingDateTo("2021-10-28");
 
-        var adHocReportType = new AdhocReportType();
+        AdhocReportType adHocReportType = new AdhocReportType();
         adHocReportType.setReportOffice("Leeds");
         listingData.setLocalReportsDetailHdr(adHocReportType);
 
         listingData.setLocalReportsDetail(new ArrayList<>());
-        var adhocReportTypeItem = new AdhocReportTypeItem();
-        var adhocReportType = new AdhocReportType();
-
+        AdhocReportType adhocReportType = new AdhocReportType();
         adhocReportType.setClaimServed6PlusDaysTotal("3");
         adhocReportType.setClaimServed6PlusDaysPercent("100");
         adhocReportType.setTotalCases("3");
         adhocReportType.setClaimServedTotal("3");
         adhocReportType.setClaimServedItems(new ArrayList<>());
 
-        var claimServedType3 = new ClaimServedType();
+        ClaimServedType claimServedType3 = new ClaimServedType();
         claimServedType3.setReportedNumberOfDays(String.valueOf(5));
         claimServedType3.setActualNumberOfDays(String.valueOf(365));
         claimServedType3.setCaseReceiptDate("2020-10-12");
         claimServedType3.setClaimServedDate("2021-10-12");
-        var claimServedTypeItem3 = new ClaimServedTypeItem();
+        ClaimServedTypeItem claimServedTypeItem3 = new ClaimServedTypeItem();
         claimServedTypeItem3.setId(String.valueOf(UUID.randomUUID()));
         claimServedTypeItem3.setValue(claimServedType3);
 
-        var claimServedType = new ClaimServedType();
+        ClaimServedType claimServedType = new ClaimServedType();
         claimServedType.setReportedNumberOfDays(String.valueOf(5));
         claimServedType.setActualNumberOfDays(String.valueOf(46));
         claimServedType.setCaseReceiptDate("2021-09-02");
         claimServedType.setClaimServedDate("2021-10-16");
         claimServedType.setClaimServedCaseNumber("0098");
 
-        var claimServedTypeItem = new ClaimServedTypeItem();
+        ClaimServedTypeItem claimServedTypeItem = new ClaimServedTypeItem();
         claimServedTypeItem.setId(String.valueOf(UUID.randomUUID()));
         claimServedTypeItem.setValue(claimServedType);
 
-        var claimServedType2 = new ClaimServedType();
+        ClaimServedType claimServedType2 = new ClaimServedType();
         claimServedType2.setReportedNumberOfDays(String.valueOf(5));
         claimServedType2.setActualNumberOfDays(String.valueOf(189));
         claimServedType2.setCaseReceiptDate("2021-08-12");
         claimServedType2.setClaimServedDate("2021-02-17");
         claimServedType2.setClaimServedCaseNumber("185");
 
-        var claimServedTypeItem2 = new ClaimServedTypeItem();
+        ClaimServedTypeItem claimServedTypeItem2 = new ClaimServedTypeItem();
         claimServedTypeItem2.setId(String.valueOf(UUID.randomUUID()));
         claimServedTypeItem2.setValue(claimServedType2);
 
@@ -467,79 +467,93 @@ public class ReportDocHelperTest {
         adhocReportType.getClaimServedItems().add(claimServedTypeItem2);
         adhocReportType.getClaimServedItems().add(claimServedTypeItem3);
         adhocReportType.setTotal("3");
-
+        AdhocReportTypeItem adhocReportTypeItem = new AdhocReportTypeItem();
         adhocReportTypeItem.setId(String.valueOf(UUID.randomUUID()));
         adhocReportTypeItem.setValue(adhocReportType);
 
         listingData.setLocalReportsDetail(new ArrayList<>());
         listingData.getLocalReportsDetail().add(adhocReportTypeItem);
-        var expectedJson = getExpectedResult("servingClaimsDay6EntriesSorted.json");
-        var today = UtilHelper.formatCurrentDate(LocalDate.now());
+        String expectedJson = getExpectedResult("servingClaimsDay6EntriesSorted.json");
+        String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("current-date-placeholder", today);
-        var actualJson = ReportDocHelper.buildReportDocumentContent(listingData,
+        String actualJson = ReportDocHelper.buildReportDocumentContent(listingData,
             "", "EM-TRB-SCO-ENG-00781", userDetails).toString();
         assertEquals(expectedJson, actualJson);
     }
 
     @Test
     public void buildCorrectServingClaimsReportDocForProvidedAllDaysEntries() throws URISyntaxException, IOException  {
-        var expectedJson = getExpectedResult("servingClaimsAllDaysEntries.json");
-        var today = UtilHelper.formatCurrentDate(LocalDate.now());
-        var expected = expectedJson.replace("current-date-placeholder", today);
+        String expectedJson = getExpectedResult("servingClaimsAllDaysEntries.json");
+        String today = UtilHelper.formatCurrentDate(LocalDate.now());
+        String expected = expectedJson.replace("current-date-placeholder", today);
         assertEquals(expected, ReportDocHelper.buildReportDocumentContent(reportDetailsClaimsServed.getCaseData(),
                 "", "EM-TRB-SCO-ENG-00781", userDetails).toString());
     }
 
     @Test
     public void buildHearingsToJudgmentsReport() throws URISyntaxException, IOException {
-        var expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("hearingsToJudgmentsExpected.json")).toURI())));
-        var today = UtilHelper.formatCurrentDate(LocalDate.now());
+        String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("replace-with-current-date", today);
-        var reportData = getHearingsToJudgmentsReportData();
-        var actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
+        HearingsToJudgmentsReportData reportData = getHearingsToJudgmentsReportData();
+        String actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
                 "EM-TRB-SCO-ENG-00786", userDetails).toString();
         assertEquals(expectedJson, actualJson);
     }
 
     @Test
     public void buildRespondentsReport() throws URISyntaxException, IOException {
-        var expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("respondentsReportExpected.json")).toURI())));
-        var today = UtilHelper.formatCurrentDate(LocalDate.now());
+        String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("current-date", today);
-        var reportData = getRespondentsReportData();
-        var actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
+        RespondentsReportData reportData = getRespondentsReportData();
+        String actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
                 "EM-TRB-SCO-ENG-00815", userDetails).toString();
         assertEquals(expectedJson, actualJson);
     }
 
     @Test
     public void buildSessionDaysReport() throws URISyntaxException, IOException {
-        var expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("sessionDaysExpected.json")).toURI())));
-        var today = UtilHelper.formatCurrentDate(LocalDate.now());
+        String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("current-date", today);
-        var reportData = getSessionDaysReportData();
-        var actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
+        SessionDaysReportData reportData = getSessionDaysReportData();
+        String actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
                 "EM-TRB-SCO-ENG-00817", userDetails).toString();
         assertEquals(expectedJson, actualJson);
     }
 
     @Test
     public void buildEccReport() throws URISyntaxException, IOException {
-        var expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("eccExpected.json")).toURI())));
-        var today = UtilHelper.formatCurrentDate(LocalDate.now());
+        String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("current-date", today);
-        var reportData = getEccReportData();
-        var actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
+        EccReportData reportData = getEccReportData();
+        String actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
                 "EM-TRB-SCO-ENG-00818", userDetails).toString();
         assertEquals(expectedJson, actualJson);
     }
 
+    @Test
+    public void testEccReportContainsOfficeWhenNoCasesFound() {
+        EccReportData reportData = new EccReportData(TribunalOffice.MANCHESTER.getOfficeName());
+        reportData.setReportType(ECC_REPORT);
+        reportData.setDocumentName("TestDocument");
+        reportData.setHearingDateType(Constants.RANGE_HEARING_DATE_TYPE);
+        reportData.setListingDateFrom("2022-01-01");
+        reportData.setListingDateTo("2022-01-10");
+
+        String actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
+                "EM-TRB-SCO-ENG-00818", userDetails).toString();
+        assertTrue(actualJson.contains("\"Report_Office\":\"Manchester\""));
+    }
+
     private CasesAwaitingJudgmentReportData getCasesAwaitingJudgementReportData() {
-        var reportSummary = new ReportSummary("Newcastle");
+        ReportSummary reportSummary = new ReportSummary("Newcastle");
         reportSummary.getPositionTypes()
                 .add(new PositionTypeSummary("Signed fair copy received", 1));
         reportSummary.getPositionTypes()
@@ -548,11 +562,11 @@ public class ReportDocHelperTest {
         reportSummary.getPositionTypes()
                 .add(new PositionTypeSummary("Draft with members", 10));
 
-        var reportData = new CasesAwaitingJudgmentReportData(reportSummary);
+        CasesAwaitingJudgmentReportData reportData = new CasesAwaitingJudgmentReportData(reportSummary);
         reportData.setReportType(CASES_AWAITING_JUDGMENT_REPORT);
         reportData.setDocumentName("TestDocument");
 
-        var reportDetail = new ReportDetail();
+        ReportDetail reportDetail = new ReportDetail();
         reportDetail.setWeeksSinceHearing(2);
         reportDetail.setDaysSinceHearing(16);
         reportDetail.setCaseNumber("250003/2021");
@@ -598,7 +612,6 @@ public class ReportDocHelperTest {
     }
 
     private HearingsByHearingTypeReportData getHearingsByHearingTypeReportData() {
-        var reportSummaryHdr = new HearingsByHearingTypeReportSummaryHdr();
         ReportFields fields = new ReportFields();
         fields.setTotal("6");
         fields.setHearingCount("1");
@@ -607,24 +620,25 @@ public class ReportDocHelperTest {
         fields.setCostsCount("1");
         fields.setCmCount("1");
         fields.setHearingPrelimCount("1");
+        HearingsByHearingTypeReportSummaryHdr reportSummaryHdr = new HearingsByHearingTypeReportSummaryHdr();
         reportSummaryHdr.setFields(fields);
         reportSummaryHdr.setOffice("Manchester");
-        var reportData = new HearingsByHearingTypeReportData(reportSummaryHdr);
+        HearingsByHearingTypeReportData reportData = new HearingsByHearingTypeReportData(reportSummaryHdr);
         reportData.setReportType(HEARINGS_BY_HEARING_TYPE_REPORT);
-        var reportSummary = new HearingsByHearingTypeReportSummary();
+        HearingsByHearingTypeReportSummary reportSummary = new HearingsByHearingTypeReportSummary();
         reportSummary.setFields(fields);
         reportSummary.getFields().setDate("12/02/2022");
         reportData.addReportSummaryList(Collections.singletonList(reportSummary));
-        var reportSummary2Hdr = new HearingsByHearingTypeReportSummary2Hdr();
+        HearingsByHearingTypeReportSummary2Hdr reportSummary2Hdr = new HearingsByHearingTypeReportSummary2Hdr();
         reportSummary2Hdr.setFields(fields);
         reportSummary2Hdr.getFields().setSubSplit("Stage 1");
         reportData.addReportSummary2HdrList(Collections.singletonList(reportSummary2Hdr));
-        var reportSummary2 = new HearingsByHearingTypeReportSummary2();
+        HearingsByHearingTypeReportSummary2 reportSummary2 = new HearingsByHearingTypeReportSummary2();
         reportSummary2.setFields(fields);
         reportSummary2.getFields().setSubSplit("Stage 1");
         reportSummary2.getFields().setDate("12/02/2022");
         reportData.addReportSummary2List(Collections.singletonList(reportSummary2));
-        var reportDetail = new HearingsByHearingTypeReportDetail();
+        HearingsByHearingTypeReportDetail reportDetail = new HearingsByHearingTypeReportDetail();
         reportDetail.setTel("Y");
         reportDetail.setDuration("20");
         reportDetail.setCaseReference("1111");
@@ -640,21 +654,21 @@ public class ReportDocHelperTest {
     }
 
     private HearingsToJudgmentsReportData getHearingsToJudgmentsReportData() {
-        var reportSummary = new HearingsToJudgmentsReportSummary("Newcastle");
+        HearingsToJudgmentsReportSummary reportSummary = new HearingsToJudgmentsReportSummary("Newcastle");
         reportSummary.setTotalCases("5");
         reportSummary.setTotal4Wk("2");
         reportSummary.setTotal4WkPercent("40.00");
         reportSummary.setTotalX4Wk("3");
         reportSummary.setTotalX4WkPercent("60.00");
 
-        var reportData = new HearingsToJudgmentsReportData(reportSummary);
+        HearingsToJudgmentsReportData reportData = new HearingsToJudgmentsReportData(reportSummary);
         reportData.setReportType(HEARINGS_TO_JUDGEMENTS_REPORT);
         reportData.setDocumentName("TestDocument");
         reportData.setHearingDateType(Constants.RANGE_HEARING_DATE_TYPE);
         reportData.setListingDateFrom("2021-06-20");
         reportData.setListingDateTo("2021-09-20");
 
-        var reportDetail = new HearingsToJudgmentsReportDetail();
+        HearingsToJudgmentsReportDetail reportDetail = new HearingsToJudgmentsReportDetail();
         reportDetail.setReportOffice("Newcastle");
         reportDetail.setCaseReference("250003/2021");
         reportDetail.setHearingDate("2021-07-03");
@@ -688,23 +702,23 @@ public class ReportDocHelperTest {
     }
 
     private RespondentsReportData getRespondentsReportData() {
-        var reportSummary = new RespondentsReportSummary();
+        RespondentsReportSummary reportSummary = new RespondentsReportSummary();
         reportSummary.setTotalCasesWithMoreThanOneRespondent("2");
         reportSummary.setOffice("Manchester");
 
-        var reportData = new RespondentsReportData(reportSummary);
+        RespondentsReportData reportData = new RespondentsReportData(reportSummary);
         reportData.setReportType(RESPONDENTS_REPORT);
         reportData.setDocumentName("TestDocument");
         reportData.setHearingDateType(Constants.RANGE_HEARING_DATE_TYPE);
         reportData.setListingDateFrom("2022-01-01");
         reportData.setListingDateTo("2022-01-10");
 
-        var reportDetail1 = new RespondentsReportDetail();
+        RespondentsReportDetail reportDetail1 = new RespondentsReportDetail();
         reportDetail1.setCaseNumber("110001/2022");
         reportDetail1.setRespondentName("Resp1");
         reportDetail1.setRepresentativeHasMoreThanOneRespondent("Y");
         reportDetail1.setRepresentativeName("Rep1");
-        var reportDetail2 = new RespondentsReportDetail();
+        RespondentsReportDetail reportDetail2 = new RespondentsReportDetail();
         reportDetail2.setCaseNumber("110002/2022");
         reportDetail2.setRespondentName("Resp2");
         reportDetail2.setRepresentativeHasMoreThanOneRespondent("N");
@@ -714,21 +728,21 @@ public class ReportDocHelperTest {
     }
 
     private SessionDaysReportData getSessionDaysReportData() {
-        var reportSummary = new SessionDaysReportSummary("Manchester");
+        SessionDaysReportSummary reportSummary = new SessionDaysReportSummary("Manchester");
         reportSummary.setFtSessionDaysTotal("1");
         reportSummary.setPtSessionDaysTotal("1");
         reportSummary.setOtherSessionDaysTotal("1");
         reportSummary.setSessionDaysTotal("3");
         reportSummary.setPtSessionDaysPerCent("33");
 
-        var reportData = new SessionDaysReportData(reportSummary);
+        SessionDaysReportData reportData = new SessionDaysReportData(reportSummary);
         reportData.setReportType(SESSION_DAYS_REPORT);
         reportData.setDocumentName("TestDocument");
         reportData.setHearingDateType(Constants.RANGE_HEARING_DATE_TYPE);
         reportData.setListingDateFrom("2022-01-01");
         reportData.setListingDateTo("2022-01-10");
 
-        var summary2 = new SessionDaysReportSummary2();
+        SessionDaysReportSummary2 summary2 = new SessionDaysReportSummary2();
 
         summary2.setDate("20-1-2022");
         summary2.setFtSessionDays("1");
@@ -737,7 +751,7 @@ public class ReportDocHelperTest {
         summary2.setSessionDaysTotalDetail("3");
         reportData.addReportSummary2List(Collections.singletonList(summary2));
 
-        var reportDetail1 = new SessionDaysReportDetail();
+        SessionDaysReportDetail reportDetail1 = new SessionDaysReportDetail();
         reportDetail1.setSessionType("Full Day");
         reportDetail1.setHearingTelConf("Y");
         reportDetail1.setHearingSitAlone("Y");
@@ -754,14 +768,14 @@ public class ReportDocHelperTest {
     }
 
     private EccReportData getEccReportData() {
-        var reportData = new EccReportData("Manchester");
+        EccReportData reportData = new EccReportData("Manchester");
         reportData.setReportType(ECC_REPORT);
         reportData.setDocumentName("TestDocument");
         reportData.setHearingDateType(Constants.RANGE_HEARING_DATE_TYPE);
         reportData.setListingDateFrom("2022-01-01");
         reportData.setListingDateTo("2022-01-10");
 
-        var reportDetail1 = new EccReportDetail();
+        EccReportDetail reportDetail1 = new EccReportDetail();
         reportDetail1.setRespondentsCount("2");
         reportDetail1.setEccCaseList("ecc1\necc2");
         reportDetail1.setEccCasesCount("2");
@@ -774,39 +788,39 @@ public class ReportDocHelperTest {
 
     @Test
     public void buildHearingsByHearingTypeReport() throws URISyntaxException, IOException {
-        var expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("hearingsByHearingTypeExpected.json")).toURI())));
-        var today = UtilHelper.formatCurrentDate(LocalDate.now());
+        String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("replace-with-current-date", today);
-        var reportData = getHearingsByHearingTypeReportData();
-        var actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
+        HearingsByHearingTypeReportData reportData = getHearingsByHearingTypeReportData();
+        String actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
                 "EM-TRB-SCO-ENG-00785", userDetails).toString();
         assertEquals(expectedJson, actualJson);
     }
 
     @Test
     public void buildNoPositionChangeReport() throws URISyntaxException, IOException {
-        var expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("noChangeInCurrentPositionExpected.json")).toURI())));
-        var today = UtilHelper.formatCurrentDate(LocalDate.now());
+        String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("replace-with-current-date", today);
-        var reportData = getNoPositionChangeReportData();
-        var actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
+        NoPositionChangeReportData reportData = getNoPositionChangeReportData();
+        String actualJson = ReportDocHelper.buildReportDocumentContent(reportData, "",
                 "EM-TRB-SCO-ENG-00794", userDetails).toString();
         assertEquals(expectedJson, actualJson);
     }
 
     private NoPositionChangeReportData getNoPositionChangeReportData() {
-        var reportSummary = new NoPositionChangeReportSummary("Newcastle");
+        NoPositionChangeReportSummary reportSummary = new NoPositionChangeReportSummary("Newcastle");
         reportSummary.setTotalCases("3");
         reportSummary.setTotalSingleCases("2");
         reportSummary.setTotalMultipleCases("1");
 
-        var reportData = new NoPositionChangeReportData(reportSummary, "2021-06-20");
+        NoPositionChangeReportData reportData = new NoPositionChangeReportData(reportSummary, "2021-06-20");
         reportData.setReportType(NO_CHANGE_IN_CURRENT_POSITION_REPORT);
         reportData.setDocumentName("TestDocument");
 
-        var reportDetailSingle = new NoPositionChangeReportDetailSingle();
+        NoPositionChangeReportDetailSingle reportDetailSingle = new NoPositionChangeReportDetailSingle();
         reportDetailSingle.setCaseReference("250003/2021");
         reportDetailSingle.setYear("2021");
         reportDetailSingle.setCurrentPosition("Test1");
@@ -822,7 +836,7 @@ public class ReportDocHelperTest {
         reportDetailSingle.setRespondent("Resp2 & Others");
         reportData.getReportDetailsSingle().add(reportDetailSingle);
 
-        var reportDetailMultiple = new NoPositionChangeReportDetailMultiple();
+        NoPositionChangeReportDetailMultiple reportDetailMultiple = new NoPositionChangeReportDetailMultiple();
         reportDetailMultiple.setCaseReference("250005/2021");
         reportDetailMultiple.setYear("2023");
         reportDetailMultiple.setCurrentPosition("Test3");
@@ -834,9 +848,9 @@ public class ReportDocHelperTest {
     }
 
     private String getExpectedResult(String resourceFileName) throws URISyntaxException, IOException {
-        var expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
             .getResource(resourceFileName)).toURI())));
-        var today = UtilHelper.formatCurrentDate(LocalDate.now());
+        String today = UtilHelper.formatCurrentDate(LocalDate.now());
         expectedJson = expectedJson.replace("current-date-placeholder", today);
         return expectedJson;
     }

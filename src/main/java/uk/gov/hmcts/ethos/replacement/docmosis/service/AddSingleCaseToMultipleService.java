@@ -58,29 +58,36 @@ public class AddSingleCaseToMultipleService {
             SubmitMultipleEvent multipleEvent = multipleEvents.get(0);
             var multipleData = multipleEvent.getCaseData();
 
-            List<String> ethosCaseRefCollection = multipleHelperService.getEthosCaseRefCollection(userToken,
-                    multipleData, errors);
-
-            String newEthosCaseReferenceToAdd = caseData.getEthosCaseReference();
-
-            if (ethosCaseRefCollection.isEmpty()) {
-                leadClaimant = YES;
+            if (!multipleData.getManagingOffice().equals(caseData.getManagingOffice())) {
+                errors.add((String.format("Multiple %s is managed by %s", multipleData.getMultipleReference(),
+                        multipleData.getManagingOffice())));
             }
 
-            var parentMultipleCaseId = String.valueOf(multipleEvent.getCaseId());
-            addNewLeadToMultiple(userToken, multipleCaseTypeId, jurisdiction,
-                    multipleData, leadClaimant, newEthosCaseReferenceToAdd, caseId, errors, parentMultipleCaseId);
+            if (errors.isEmpty()) {
+                List<String> ethosCaseRefCollection = multipleHelperService.getEthosCaseRefCollection(userToken,
+                        multipleData, errors);
 
-            multipleHelperService.moveCasesAndSendUpdateToMultiple(userToken, caseData.getSubMultipleName(),
-                    jurisdiction, multipleCaseTypeId, String.valueOf(multipleEvent.getCaseId()),
-                    multipleData, new ArrayList<>(Collections.singletonList(newEthosCaseReferenceToAdd)), errors);
+                String newEthosCaseReferenceToAdd = caseData.getEthosCaseReference();
 
-            var multipleCaseId = String.valueOf(multipleEvent.getCaseId());
-            updateCaseDataForMultiple(caseData, updatedMultipleReference, leadClaimant, multipleCaseId);
+                if (ethosCaseRefCollection.isEmpty()) {
+                    leadClaimant = YES;
+                }
 
-            caseData.setSubMultipleName(subMultipleName);
+                var parentMultipleCaseId = String.valueOf(multipleEvent.getCaseId());
+                addNewLeadToMultiple(userToken, multipleCaseTypeId, jurisdiction,
+                        multipleData, leadClaimant, newEthosCaseReferenceToAdd, caseId, errors, parentMultipleCaseId);
 
-            caseData.setMultipleFlag(YES);
+                multipleHelperService.moveCasesAndSendUpdateToMultiple(userToken, caseData.getSubMultipleName(),
+                        jurisdiction, multipleCaseTypeId, String.valueOf(multipleEvent.getCaseId()),
+                        multipleData, new ArrayList<>(Collections.singletonList(newEthosCaseReferenceToAdd)), errors);
+
+                var multipleCaseId = String.valueOf(multipleEvent.getCaseId());
+                updateCaseDataForMultiple(caseData, updatedMultipleReference, leadClaimant, multipleCaseId);
+
+                caseData.setSubMultipleName(subMultipleName);
+
+                caseData.setMultipleFlag(YES);
+            }
         }
     }
 

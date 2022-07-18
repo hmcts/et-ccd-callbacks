@@ -12,11 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_OFFICE_NUMBER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_OFFICE_NUMBER;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleReferenceServiceTest {
@@ -32,37 +28,30 @@ public class MultipleReferenceServiceTest {
 
     @Test
     public void createEnglandWalesReference() {
-        when(multipleRefEnglandWalesRepository.ethosMultipleCaseRefGen(1, ENGLANDWALES_CASE_TYPE_ID))
-                .thenReturn("00015");
-        var expectedReference = ENGLANDWALES_OFFICE_NUMBER + "00015";
+        var expectedReference = "6000001";
+        when(multipleRefEnglandWalesRepository.ethosMultipleCaseRefGen()).thenReturn(expectedReference);
 
-        assertEquals(expectedReference, multipleReferenceService.createReference(ENGLANDWALES_BULK_CASE_TYPE_ID, 1));
+        assertEquals(expectedReference, multipleReferenceService.createReference(ENGLANDWALES_BULK_CASE_TYPE_ID));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void createEnglandWalesReferenceCaseTypeNotFound() {
-        when(multipleRefEnglandWalesRepository.ethosMultipleCaseRefGen(1, ENGLANDWALES_CASE_TYPE_ID))
-                .thenReturn("00015");
-
-        multipleReferenceService.createReference("invalid-case-type-id", 1);
+        multipleReferenceService.createReference("invalid-case-type-id");
 
         fail("Should throw IllegalArgumentException");
     }
 
     @Test
     public void createScotlandReference() {
-        when(multipleRefScotlandRepository.ethosMultipleCaseRefGen(1, SCOTLAND_CASE_TYPE_ID)).thenReturn("00015");
-        var expectedReference = SCOTLAND_OFFICE_NUMBER + "00015";
+        var expectedReference = "8000001";
+        when(multipleRefScotlandRepository.ethosMultipleCaseRefGen()).thenReturn(expectedReference);
 
-        assertEquals(expectedReference, multipleReferenceService.createReference(SCOTLAND_BULK_CASE_TYPE_ID, 1));
+        assertEquals(expectedReference, multipleReferenceService.createReference(SCOTLAND_BULK_CASE_TYPE_ID));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void createScotlandReferenceCaseTypeNotFound() {
-        when(multipleRefScotlandRepository.ethosMultipleCaseRefGen(1, SCOTLAND_CASE_TYPE_ID))
-                .thenReturn("00015");
-
-        multipleReferenceService.createReference("invalid-case-type-id", 1);
+        multipleReferenceService.createReference("invalid-case-type-id");
 
         fail("Should throw IllegalArgumentException");
     }

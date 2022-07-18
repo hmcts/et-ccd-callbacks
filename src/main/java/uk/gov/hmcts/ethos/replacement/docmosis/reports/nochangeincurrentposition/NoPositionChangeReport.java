@@ -4,9 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -35,14 +35,11 @@ public class NoPositionChangeReport {
 
     public NoPositionChangeReportData runReport(ListingDetails listingDetails) {
         var caseTypeId = listingDetails.getCaseTypeId();
-        var managingOffice = isNullOrEmpty(listingDetails.getCaseData().getManagingOffice())
-                ? TribunalOffice.GLASGOW.getOfficeName()
-                : listingDetails.getCaseData().getManagingOffice();
+        var managingOffice = listingDetails.getCaseData().getManagingOffice();
+        var reportOffice = ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), managingOffice);
 
         var submitEvents = getCases(caseTypeId, managingOffice);
-        var reportData = initReport(SCOTLAND_LISTING_CASE_TYPE_ID.equals(caseTypeId)
-            ? TribunalOffice.SCOTLAND.getOfficeName()
-            : managingOffice);
+        var reportData = initReport(reportOffice);
 
         log.info("Retrieved No Change In Current Position report case data");
         if (CollectionUtils.isEmpty(submitEvents)) {

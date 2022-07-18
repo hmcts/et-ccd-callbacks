@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -693,7 +694,7 @@ public class CaseActionsForCaseWorkerController {
 
         List<String> errors = new ArrayList<>();
         var caseData =  ccdRequest.getCaseDetails().getCaseData();
-        eventValidationService.validateJurisdictionCodes(caseData, errors);
+        eventValidationService.validateJurisdiction(caseData, errors);
         log.info(EVENT_FIELDS_VALIDATION + errors);
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -721,31 +722,6 @@ public class CaseActionsForCaseWorkerController {
 
         var caseData = ccdRequest.getCaseDetails().getCaseData();
         conciliationTrackService.populateConciliationTrackForJurisdiction(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
-    }
-
-    @PostMapping(value = "/generateCaseRefNumbers", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "generates ethos case numbers according to caseRefNumberCount field.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> generateCaseRefNumbers(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
-        log.info("GENERATE CASE REF NUMBERS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        var caseData = caseCreationForCaseWorkerService.generateCaseRefNumbers(ccdRequest);
-
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -881,10 +857,6 @@ public class CaseActionsForCaseWorkerController {
 
         var caseDetails = ccdRequest.getCaseDetails();
         List<String> errors = HearingsHelper.hearingMidEventValidation(caseDetails.getCaseData());
-        if ("updateHearing".equals(ccdRequest.getEventId())) {
-            errors.addAll(HearingsHelper.hearingTimeValidation(caseDetails.getCaseData()));
-        }
-
         return getCallbackRespEntity(errors, caseDetails);
     }
 
@@ -1167,11 +1139,10 @@ public class CaseActionsForCaseWorkerController {
     }
 
     private void generateEthosCaseReference(CaseData caseData, CCDRequest ccdRequest) {
-        if (caseData.getEthosCaseReference() == null || caseData.getEthosCaseReference().trim().equals("")) {
-            log.info("Case Type Id: " + ccdRequest.getCaseDetails().getCaseTypeId());
-            String reference = singleReferenceService.createReference(
-                    ccdRequest.getCaseDetails().getCaseTypeId(), 1);
-            log.info("Reference generated: " + reference);
+        if (StringUtils.isBlank(caseData.getEthosCaseReference())) {
+            var reference = singleReferenceService.createReference(ccdRequest.getCaseDetails().getCaseTypeId());
+            log.info(String.format("Created reference %s for CCD case %s", reference,
+                    ccdRequest.getCaseDetails().getCaseId()));
             caseData.setEthosCaseReference(reference);
         }
     }

@@ -1,16 +1,19 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays;
 
+import org.junit.Test;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysSubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
+
 import java.io.IOException;
 import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import org.junit.Test;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysSubmitEvent;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 
 public class SessionDaysCcdReportDataSourceTest {
 
@@ -18,6 +21,7 @@ public class SessionDaysCcdReportDataSourceTest {
     public void shouldReturnSearchResults() throws IOException {
         var authToken = "token";
         var caseTypeId = "caseTypeId";
+        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var fromDate = "1-1-2022";
         var toDate = "10-1-2022";
         var ccdClient = mock(CcdClient.class);
@@ -27,7 +31,8 @@ public class SessionDaysCcdReportDataSourceTest {
 
         var ccdReportDataSource = new SessionDaysCcdReportDataSource(authToken, ccdClient);
 
-        var results = ccdReportDataSource.getData(caseTypeId,fromDate, toDate);
+        var results = ccdReportDataSource.getData(caseTypeId, managingOffice,
+                fromDate, toDate);
         assertEquals(1, results.size());
         assertEquals(submitEvent, results.get(0));
     }
@@ -36,13 +41,14 @@ public class SessionDaysCcdReportDataSourceTest {
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
         var authToken = "token";
         var caseTypeId = "caseTypeId";
+        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         var fromDate = "1-1-2022";
         var toDate = "10-1-2022";
         var ccdClient = mock(CcdClient.class);
         when(ccdClient.sessionDaysSearch(anyString(), anyString(), anyString())).thenThrow(new IOException());
 
         var ccdReportDataSource = new SessionDaysCcdReportDataSource(authToken, ccdClient);
-        ccdReportDataSource.getData(caseTypeId, fromDate, toDate);
+        ccdReportDataSource.getData(caseTypeId, managingOffice, fromDate, toDate);
         fail("Should throw exception instead");
     }
 

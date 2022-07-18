@@ -9,6 +9,7 @@ import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CaseData;
 import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 
 import java.time.Clock;
 import java.time.DateTimeException;
@@ -68,8 +69,11 @@ public class CasesAwaitingJudgmentReport {
 
     public CasesAwaitingJudgmentReportData runReport(ListingDetails listingDetails) {
         var managingOffice = listingDetails.getCaseData().getManagingOffice();
-        var submitEvents = getCases(listingDetails.getCaseTypeId(), managingOffice);
-        var reportData = initReport(managingOffice);
+        var caseTypeId = listingDetails.getCaseTypeId();
+        var submitEvents = getCases(caseTypeId, managingOffice);
+
+        var reportOffice = ReportHelper.getReportOffice(caseTypeId, managingOffice);
+        var reportData = initReport(reportOffice);
 
         populateData(reportData, submitEvents);
 

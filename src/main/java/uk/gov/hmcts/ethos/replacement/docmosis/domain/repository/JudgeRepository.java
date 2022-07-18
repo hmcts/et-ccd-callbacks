@@ -9,5 +9,17 @@ import java.util.List;
 
 @Repository
 public interface JudgeRepository extends JpaRepository<Judge, Integer> {
+
+    List<Judge> findById(int id);
+
     List<Judge> findByTribunalOffice(TribunalOffice tribunalOffice);
+
+    List<Judge> findByTribunalOfficeOrderById(TribunalOffice tribunalOffice);
+
+    boolean existsByCodeAndTribunalOffice(String code, TribunalOffice tribunalOffice);
+
+    boolean existsByNameAndTribunalOffice(String name, TribunalOffice tribunalOffice);
+
+    boolean existsByTribunalOfficeAndNameAndIdIsNot(TribunalOffice tribunalOffice, String name, int id);
+
 }

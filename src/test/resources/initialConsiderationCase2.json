@@ -1,0 +1,62 @@
+{
+  "caseType": "Single",
+  "claimant": "Tom Franks",
+  "stateAPI": "Accepted",
+  "caseSource": "Manually Created",
+  "respondent": "Test Corp",
+  "receiptDate": "2022-06-06",
+  "claimantType": {
+    "claimant_addressUK": {
+      "Country": "United Kingdom",
+      "PostCode": "EX1 3UD",
+      "PostTown": "Exeter",
+      "AddressLine1": "13 Vaughan Rise"
+    }
+  },
+  "multipleFlag": "No",
+  "positionType": "Manually Created",
+  "preAcceptCase": {
+    "caseAccepted": "Yes",
+    "dateAccepted": "2022-06-12"
+  },
+  "dateToPosition": "2022-06-27",
+  "managingOffice": "Glasgow",
+  "claimantIndType": {
+    "claimant_title1": "Mr",
+    "claimant_last_name": "Franks",
+    "claimant_first_names": "Tom"
+  },
+  "currentPosition": "Manually Created",
+  "claimantRequests": {},
+  "claimantOtherType": {},
+  "conciliationTrack": "Open Track",
+  "feeGroupReference": "123343333333",
+  "newEmploymentType": {},
+  "targetHearingDate": "2022-12-03",
+  "ethosCaseReference": "8000001/2022",
+  "flagsImageFileName": "EMP-TRIB-0000000000.jpg",
+  "claimantWorkAddress": {
+    "claimant_work_address": {
+      "Country": "United Kingdom",
+      "PostCode": "BR1 4AG",
+      "PostTown": "Bromley",
+      "AddressLine1": "Flat 22",
+      "AddressLine2": "Cameron House",
+      "AddressLine3": "Highland Road"
+    }
+  },
+  "claimant_TypeOfClaimant": "Individual",
+  "tribunalCorrespondenceDX": "DX 580003",
+  "tribunalCorrespondenceFax": "01264 785 177",
+  "representativeClaimantType": {},
+  "claimantRepresentedQuestion": "No",
+  "claimantWorkAddressQuestion": "Yes",
+  "tribunalCorrespondenceEmail": "glasgowet@justice.gov.uk",
+  "tribunalCorrespondenceAddress": {
+    "PostCode": "G2 8GT",
+    "PostTown": "Glasgow",
+    "AddressLine1": "Glasgow Tribunals Centre",
+    "AddressLine2": "3 Atlantic Quay, 20 York Street"
+  },
+  "tribunalCorrespondenceTelephone": "0141 204 0730"
+}

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -21,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
@@ -28,6 +28,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POST
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_SETTLED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_WITHDRAWN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JudgeEmploymentStatus.FEE_PAID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JudgeEmploymentStatus.SALARIED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JudgeEmploymentStatus.UNKNOWN;
@@ -50,7 +52,8 @@ class SessionDaysReportTest {
         caseDataBuilder = new SessionDaysCaseDataBuilder();
         reportDataSource = mock(SessionDaysReportDataSource.class);
         judgeService = mock(JpaJudgeService.class);
-        when(reportDataSource.getData(ENGLANDWALES_LISTING_CASE_TYPE_ID, DATE_FROM, DATE_TO)).thenReturn(submitEvents);
+        when(reportDataSource.getData(ENGLANDWALES_CASE_TYPE_ID, TribunalOffice.MANCHESTER.getOfficeName(),
+                DATE_FROM, DATE_TO)).thenReturn(submitEvents);
         List<Judge> judges = getJudges();
         when(judgeService.getJudges(TribunalOffice.MANCHESTER)).thenReturn(judges);
         sessionDaysReport = new SessionDaysReport(reportDataSource, judgeService);
@@ -114,7 +117,6 @@ class SessionDaysReportTest {
         assertEquals(0, reportData.getReportDetails().size());
     }
 
-    @Disabled("todo")
     @Test
     void shouldShowCaseWithValidHearingStatus() {
         // Given a case has valid hearing status i.e "Heard"
@@ -130,9 +132,9 @@ class SessionDaysReportTest {
         assertCommonValues(reportData);
         assertEquals("1", reportData.getReportSummary().getFtSessionDaysTotal());
         assertEquals("1", reportData.getReportSummary().getPtSessionDaysTotal());
-        assertEquals("2", reportData.getReportSummary().getOtherSessionDaysTotal());
-        assertEquals("4", reportData.getReportSummary().getSessionDaysTotal());
-        assertEquals("25", reportData.getReportSummary().getPtSessionDaysPerCent());
+        assertEquals("1", reportData.getReportSummary().getOtherSessionDaysTotal());
+        assertEquals("3", reportData.getReportSummary().getSessionDaysTotal());
+        assertEquals("33", reportData.getReportSummary().getPtSessionDaysPerCent());
         assertEquals(1, reportData.getReportSummary2List().size());
         assertEquals(4, reportData.getReportDetails().size());
         assertReportSummary2Values(reportData);
@@ -142,8 +144,8 @@ class SessionDaysReportTest {
         var reportSummary2 = reportData.getReportSummary2List().get(0);
         assertEquals("1", reportSummary2.getFtSessionDays());
         assertEquals("1", reportSummary2.getPtSessionDays());
-        assertEquals("2", reportSummary2.getOtherSessionDays());
-        assertEquals("4", reportSummary2.getSessionDaysTotalDetail());
+        assertEquals("1", reportSummary2.getOtherSessionDays());
+        assertEquals("3", reportSummary2.getSessionDaysTotalDetail());
         assertEquals("2022-01-20", reportSummary2.getDate());
     }
 
@@ -170,6 +172,20 @@ class SessionDaysReportTest {
 
     private void assertCommonValues(SessionDaysReportData reportData) {
         assertNotNull(reportData);
-        assertEquals("Manchester", reportData.getReportSummary().getOffice());
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), reportData.getReportSummary().getOffice());
+    }
+
+    @Test
+    void checkReportOffice_Scotland() {
+        when(reportDataSource.getData(SCOTLAND_CASE_TYPE_ID, null,
+                DATE_FROM, DATE_TO)).thenReturn(submitEvents);
+        when(judgeService.getJudges(TribunalOffice.GLASGOW)).thenReturn(getJudges());
+
+        caseDataBuilder.withHearingData(HEARING_STATUS_HEARD);
+        submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
+        var params = new ReportParams(SCOTLAND_LISTING_CASE_TYPE_ID, null,
+                DATE_FROM, DATE_TO);
+        var reportData = sessionDaysReport.generateReport(params);
+        assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportData.getReportSummary().getOffice());
     }
 }

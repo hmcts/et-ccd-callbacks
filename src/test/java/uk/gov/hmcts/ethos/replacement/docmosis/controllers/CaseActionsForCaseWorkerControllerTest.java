@@ -98,7 +98,6 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String JURISDICTION_VALIDATION_URL = "/jurisdictionValidation";
     private static final String JUDGEMENT_VALIDATION_URL = "/judgmentValidation";
     private static final String DEPOSIT_VALIDATION_URL = "/depositValidation";
-    private static final String GENERATE_CASE_REF_NUMBERS_URL = "/generateCaseRefNumbers";
     private static final String MID_RESPONDENT_ECC_URL = "/midRespondentECC";
     private static final String CREATE_ECC_URL = "/createECC";
     private static final String LINK_ORIGINAL_CASE_ECC_URL = "/linkOriginalCaseECC";
@@ -113,7 +112,8 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String DYNAMIC_DEPOSIT_ORDER_URL = "/dynamicDepositOrder";
     private static final String DYNAMIC_JUDGMENT_URL = "/dynamicJudgments";
     private static final String JUDGEMENT_SUBMITTED_URL = "/judgementSubmitted";
-    private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL = "/reinstateClosedCaseMidEventValidation";
+    private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL =
+            "/reinstateClosedCaseMidEventValidation";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -294,7 +294,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     @Test
     public void postDefaultValuesFromET1WithPositionTypeDefined() throws Exception {
         when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
-        when(singleReferenceService.createReference(isA(String.class), isA(Integer.class))).thenReturn("5100001/2019");
+        when(singleReferenceService.createReference(isA(String.class))).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent.toString())
@@ -309,7 +309,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     @Test
     public void postDefaultValues() throws Exception {
         when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
-        when(singleReferenceService.createReference(isA(String.class), isA(Integer.class))).thenReturn("5100001/2019");
+        when(singleReferenceService.createReference(isA(String.class))).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent2.toString())
@@ -569,21 +569,6 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void midRespondentAddressPopulated() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
-    }
-
-    @Test
-    public void generateCaseRefNumbers() throws Exception {
-        when(caseCreationForCaseWorkerService.generateCaseRefNumbers(isA(CCDRequest.class)))
-                .thenReturn(submitEvent.getCaseData());
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(GENERATE_CASE_REF_NUMBERS_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -1205,7 +1190,8 @@ public class CaseActionsForCaseWorkerControllerTest {
     @Test
     public void amendCaseDetailsError500() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(eventValidationService.validateCaseState(isA(CaseDetails.class)))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
         when(eventValidationService.validateCurrentPosition(isA(CaseDetails.class))).thenReturn(true);
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent.toString())
@@ -1232,18 +1218,6 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError());
-    }
-
-    @Test
-    public void generateCaseRefNumbersError500() throws Exception {
-        when(caseCreationForCaseWorkerService.generateCaseRefNumbers(isA(CCDRequest.class)))
-                .thenThrow(new InternalException(ERROR_MESSAGE));
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(GENERATE_CASE_REF_NUMBERS_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -1467,16 +1441,6 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void midRespondentAddressPopulatedForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
-                .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    public void generateCaseRefNumbersForbidden() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(GENERATE_CASE_REF_NUMBERS_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))

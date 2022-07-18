@@ -265,7 +265,9 @@
           "respondent_phone2": "07577136570",
           "response_referred_to_judge": "2019-12-22",
           "response_returned_from_judge": "2019-12-21",
-          "responseStruckOut": "No"
+          "responseStruckOut": "No",
+          "responseReceived" : "Yes",
+          "responseReceivedDate" : "2022-03-01"
         }
       },
       {
@@ -495,5 +497,6 @@
   },
   "id": "123456789",
   "jurisdiction": "English",
-  "state": "UK"
+  "state": "UK",
+  "case_type_id" : "ET_EnglandWales"
 }

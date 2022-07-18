@@ -3,12 +3,12 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.casesourcelocalreport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.AdhocReportTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.AdhocReportType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,11 +49,8 @@ public class CaseSourceLocalReport {
             listingData.setLocalReportsSummary(newSummary);
         }
         var adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
-        var reportOffice = isNullOrEmpty(listingData.getManagingOffice())
-                || SCOTLAND_LISTING_CASE_TYPE_ID.equals(listingDetails.getCaseTypeId())
-                ? TribunalOffice.SCOTLAND.getOfficeName()
-                : listingData.getManagingOffice();
-        adhocReportType.setReportOffice(reportOffice);
+        adhocReportType.setReportOffice(ReportHelper.getReportOffice(listingDetails.getCaseTypeId(),
+                listingData.getManagingOffice()));
         var manuallyCreatedCases = 0;
         var et1OnlineCases = 0;
         var eccCases = 0;

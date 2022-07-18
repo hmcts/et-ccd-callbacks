@@ -1,37 +1,41 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReportSubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
-import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReportSubmitEvent;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
-public class RespondentsReportTest {
+class RespondentsReportTest {
 
     ReportParams params;
     RespondentsReportDataSource reportDataSource;
     RespondentsReport respondentsReport;
     RespondentsReportCaseDataBuilder caseDataBuilder = new RespondentsReportCaseDataBuilder();
     List<RespondentsReportSubmitEvent> submitEvents = new ArrayList<>();
-    static final LocalDateTime BASE_DATE = LocalDateTime.of(2022, 1, 1, 0, 0,0);
+    static final LocalDateTime BASE_DATE = LocalDateTime.of(2022, 1, 1, 0, 0, 0);
     static final String DATE_FROM = BASE_DATE.minusDays(1).format(OLD_DATE_TIME_PATTERN);
     static final String DATE_TO = BASE_DATE.plusDays(15).format(OLD_DATE_TIME_PATTERN);
     static final String MANAGING_OFFICE = TribunalOffice.MANCHESTER.getOfficeName();
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         submitEvents.clear();
         caseDataBuilder = new RespondentsReportCaseDataBuilder();
         reportDataSource = mock(RespondentsReportDataSource.class);
@@ -42,7 +46,7 @@ public class RespondentsReportTest {
     }
 
     @Test
-    public void shouldNotShowCaseWithNoRespondent() {
+    void shouldNotShowCaseWithNoRespondent() {
         // Given a case has no respondent
         // and report data is requested
         // the case should not be in the report data
@@ -58,7 +62,7 @@ public class RespondentsReportTest {
     }
 
     @Test
-    public void shouldNotShowCaseWithOneRespondent() {
+    void shouldNotShowCaseWithOneRespondent() {
         // Given a case has 1 respondent
         // and report data is requested
         // the case should not be in the report data
@@ -74,7 +78,7 @@ public class RespondentsReportTest {
     }
 
     @Test
-    public void shouldShowCaseWithMoreThanOneRespondent() {
+    void shouldShowCaseWithMoreThanOneRespondent() {
         // Given a case has more than 1 respondents
         // and report data is requested
         // the cases should be in the report data
@@ -89,7 +93,7 @@ public class RespondentsReportTest {
     }
 
     @Test
-    public void shouldShowCaseDetailsWithMoreThanOneRespondentRepresented() {
+    void shouldShowCaseDetailsWithMoreThanOneRespondentRepresented() {
         // Given a case has more than 1 respondents and represented
         // and report data is requested
         // the cases should be in the report data details
@@ -104,6 +108,19 @@ public class RespondentsReportTest {
         assertEquals("Rep1", reportData.getReportDetails().get(0).getRepresentativeName());
         assertEquals("Y", reportData.getReportDetails()
                 .get(0).getRepresentativeHasMoreThanOneRespondent());
+    }
+
+    @Test
+    void checkScotlandOfficeName() {
+        when(reportDataSource.getData(SCOTLAND_CASE_TYPE_ID, null, DATE_FROM, DATE_TO))
+                .thenReturn(submitEvents);
+        params = new ReportParams(SCOTLAND_LISTING_CASE_TYPE_ID, null, DATE_FROM, DATE_TO);
+
+        caseDataBuilder.withMoreThanOneRespondents();
+        submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
+
+        var reportData = respondentsReport.generateReport(params);
+        assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportData.getReportSummary().getOffice());
     }
 
     private void assertCommonValues(RespondentsReportData reportData) {

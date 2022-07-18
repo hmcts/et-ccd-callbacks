@@ -152,7 +152,7 @@ public class BulkSearchService {
         if (bulkDetails.getCaseData().getMultipleReference() == null
                 || bulkDetails.getCaseData().getMultipleReference().trim().equals("")) {
             log.info("Case Type:" + bulkDetails.getCaseTypeId());
-            return multipleReferenceService.createReference(bulkDetails.getCaseTypeId(), 1);
+            return multipleReferenceService.createReference(bulkDetails.getCaseTypeId());
         } else {
             return bulkDetails.getCaseData().getMultipleReference();
         }

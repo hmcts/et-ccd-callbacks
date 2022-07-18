@@ -1,13 +1,13 @@
 CREATE TABLE single_reference_englandwales
 (
-    counter int,
-    cyear varchar(10)
+    cyear smallint PRIMARY KEY,
+    counter int
 );
 
 CREATE TABLE single_reference_scotland
 (
-    counter int,
-    cyear varchar(10)
+    cyear smallint PRIMARY KEY,
+    counter int
 );
 
 CREATE TABLE multiple_reference_englandwales

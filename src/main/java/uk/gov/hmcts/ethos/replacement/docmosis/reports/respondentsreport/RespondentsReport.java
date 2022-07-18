@@ -6,6 +6,7 @@ import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReport
 import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReportSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 
 import java.util.ArrayList;
@@ -22,8 +23,8 @@ public class RespondentsReport {
 
     public RespondentsReportData generateReport(ReportParams params) {
         var submitEvents = getCases(params);
-        var reportData = initReport(params.getManagingOffice());
-
+        var reportOffice = ReportHelper.getReportOffice(params.getCaseTypeId(), params.getManagingOffice());
+        var reportData = initReport(reportOffice);
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             executeReport(reportData, submitEvents);
         }

@@ -129,6 +129,7 @@
         }
       ],
       "listingVenue": "Manchester",
+      "managingOffice": "Manchester",
       "docMarkUp": "test doc markup -example listing version 3",
       "documentName":"test doc name",
       "hearingDocType":"test hearing doc type"

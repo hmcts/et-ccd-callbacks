@@ -14,6 +14,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.Ccd
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueCcdReportDataSource;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportParams;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport.EccReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport.EccReportCcdDataSource;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport.EccReportData;
@@ -129,19 +130,21 @@ public class ReportDataService {
     private ClaimsByHearingVenueReportData getClaimsByHearingVenueReport(ListingDetails listingDetails,
                                                                          String authToken) {
         log.info("Claims By Hearing Venue Report for {}", listingDetails.getCaseTypeId());
-        var params = setListingDateRangeForSearch(listingDetails);
-        var reportDataSource = new ClaimsByHearingVenueCcdReportDataSource(authToken, ccdClient);
+        var genericReportParams = setListingDateRangeForSearch(listingDetails);
         var listingData = listingDetails.getCaseData();
-        var hearingDateType = listingData.getHearingDateType();
-        var claimsByHearingVenueReport = new ClaimsByHearingVenueReport(reportDataSource, params);
-        return claimsByHearingVenueReport.generateReport(hearingDateType,
+        var claimsByHearingVenueReportParams = new ClaimsByHearingVenueReportParams(
+                genericReportParams.getCaseTypeId(), genericReportParams.getManagingOffice(),
+                genericReportParams.getDateFrom(), genericReportParams.getDateTo(), listingData.getHearingDateType(),
                 getUserFullName(authToken));
+        var reportDataSource = new ClaimsByHearingVenueCcdReportDataSource(authToken, ccdClient);
+        var claimsByHearingVenueReport = new ClaimsByHearingVenueReport(reportDataSource);
+        return claimsByHearingVenueReport.generateReport(claimsByHearingVenueReportParams);
     }
 
     private String getUserFullName(String userToken) {
         var userDetails = userService.getUserDetails(userToken);
         var firstName = userDetails.getFirstName() != null ? userDetails.getFirstName() : "";
-        var lastName = userDetails.getFirstName() != null ? userDetails.getFirstName() : "";
+        var lastName = userDetails.getLastName() != null ? userDetails.getLastName() : "";
         return firstName + " " + lastName;
     }
 
@@ -177,7 +180,7 @@ public class ReportDataService {
     }
 
     private SessionDaysReportData getSessionDaysReport(ListingDetails listingDetails, String authToken) {
-        log.info("Session Days Report for {}", listingDetails.getCaseData().getManagingOffice());
+        log.info("Session Days Report for {}", listingDetails.getCaseTypeId());
         var reportDataSource = new SessionDaysCcdReportDataSource(authToken, ccdClient);
         setListingDateRangeForSearch(listingDetails);
 

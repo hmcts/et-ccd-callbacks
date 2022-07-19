@@ -237,7 +237,7 @@ repositories {
 }
 
 ext {
-    feignVersion = '11.9'
+    feignVersion = '11.8'
     junitJupiterVersion = '5.8.2'
     log4JVersion = '2.18.0'
     logbackVersion = '1.2.11'

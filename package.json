@@ -60,9 +60,9 @@
     "merge": "^2.1.1",
     "minimist": "^1.2.6",
     "yargs-parser": "^21.0.1",
-    "got": "^12.1.0",
     "moment": "^2.29.2",
     "ftp":  "^0.3.10",
-    "opener": "^1.5.2"
+    "opener": "^1.5.2",
+    "glob-parent": "^6.0.2"
   }
 }

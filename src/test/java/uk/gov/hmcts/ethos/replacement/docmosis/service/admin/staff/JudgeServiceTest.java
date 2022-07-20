@@ -309,5 +309,4 @@ class JudgeServiceTest {
         listJudge.add(judge);
         return listJudge;
     }
-
 }

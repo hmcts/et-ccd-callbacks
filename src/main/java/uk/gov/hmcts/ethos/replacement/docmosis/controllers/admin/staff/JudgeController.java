@@ -152,4 +152,72 @@ public class JudgeController {
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }
 
+    @PostMapping(value = "/deleteJudgeMidEventSelectOffice", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Populates the dynamicList for judges when an office is selected")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> deleteJudgeMidEventSelectOffice(
+        @RequestHeader("Authorization") String userToken,
+        @RequestBody CCDRequest ccdRequest) {
+
+        log.info("/deleteJudgeMidEventSelectOffice");
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
+        }
+
+        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        List<String> errors = judgeService.deleteJudgeMidEventSelectOffice(adminData);
+
+        return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
+    }
+
+    @PostMapping(value = "/deleteJudgeMidEventSelectJudge", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Populates the judge name when an item is selected from the judges dynamicList")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> deleteJudgeMidEventSelectJudge(
+        @RequestHeader("Authorization") String userToken,
+        @RequestBody CCDRequest ccdRequest) {
+
+        log.info("/deleteJudgeMidEventSelectJudge");
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
+        }
+
+        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        List<String> errors = judgeService.deleteJudgeMidEventSelectJudge(adminData);
+
+        return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
+    }
+
+    @PostMapping(value = "/deleteJudge", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Deletes a judge")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> deleteJudge(
+        @RequestHeader("Authorization") String userToken,
+        @RequestBody CCDRequest ccdRequest) {
+
+        log.info("/deleteJudge");
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
+        }
+
+        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        List<String> errors = judgeService.deleteJudge(adminData);
+
+        return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
+    }
 }

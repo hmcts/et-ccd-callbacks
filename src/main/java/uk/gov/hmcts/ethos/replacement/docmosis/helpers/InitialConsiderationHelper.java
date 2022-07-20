@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.InitialConsiderationData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.InitialConsiderationDocument;
@@ -13,6 +12,9 @@ public class InitialConsiderationHelper {
     private static final String IC_SUMMARY_FILENAME = "InitialConsideration.pdf";
     private static final String IC_SUMMARY_EW_TEMPLATE_NAME = "TEST-RET-2017.docx";
     private static final String IC_SUMMARY_SC_TEMPLATE_NAME = "InitialConsideration.docx";
+
+    private InitialConsiderationHelper() {
+    }
 
     public static String getDocumentRequestSC(CaseData caseData, String accessKey) throws JsonProcessingException {
         InitialConsiderationData data = InitialConsiderationData.builder()
@@ -62,9 +64,7 @@ public class InitialConsiderationHelper {
 
         return mapper.writeValueAsString(document);
     }
-
 }
-
 
 
 

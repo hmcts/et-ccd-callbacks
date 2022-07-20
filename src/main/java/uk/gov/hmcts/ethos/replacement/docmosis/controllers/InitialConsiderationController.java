@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -58,6 +56,11 @@ public class InitialConsiderationController {
         log.info("Initial consideration complete requested for case reference ---> {}",
             ccdRequest.getCaseDetails().getCaseId());
 
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .confirmation_header(COMPLETE_IC_HDR)
             .confirmation_body(String.format(COMPLETE_IC_BODY, ccdRequest.getCaseDetails().getCaseId()))
@@ -75,6 +78,11 @@ public class InitialConsiderationController {
                                                                                 String userToken) {
         log.info("Submitting Initial consideration request for case reference ---> {}",
             ccdRequest.getCaseDetails().getCaseId());
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 

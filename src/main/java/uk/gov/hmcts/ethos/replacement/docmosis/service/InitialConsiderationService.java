@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -200,5 +199,4 @@ public class InitialConsiderationService {
         uploadedDocumentType.setDocumentUrl(ccdCaseDocumentUrl + documentPath);
         return uploadedDocumentType;
     }
-
 }

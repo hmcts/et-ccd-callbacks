@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -160,9 +159,6 @@ public class TornadoService {
             documentRequest = InitialConsiderationHelper.getDocumentRequestEW(caseData, authToken);
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        log.info(mapper.writeValueAsString(documentRequest));
-
         try (var outputStreamWriter = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
             outputStreamWriter.write(documentRequest);
             outputStreamWriter.flush();
@@ -219,7 +215,6 @@ public class TornadoService {
 
     private DocumentInfo createDocument(String authToken, HttpURLConnection conn, String documentName,
                                         ByteArrayOutputStream os, String caseTypeId) throws IOException {
-
         byte[] bytes;
         try (var is = conn.getInputStream()) {
             bytes = getBytesFromInputStream(os, is);
@@ -227,8 +222,7 @@ public class TornadoService {
 
         var documentSelfPath = documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME,
                 APPLICATION_DOCX_VALUE, caseTypeId);
-        log.info("Case type is: " + caseTypeId);
-        log.info("Document Name is: " + documentName);
+
         log.info("URI documentSelfPath uploaded and created: " + documentSelfPath.toString());
         var downloadUrl = documentManagementService.generateDownloadableURL(documentSelfPath);
         var markup = documentManagementService.generateMarkupDocument(downloadUrl);

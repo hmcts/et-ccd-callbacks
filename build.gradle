@@ -22,7 +22,8 @@ allprojects {
 
 checkstyle {
     maxWarnings = 0
-    toolVersion = '8.29'
+    toolVersion = '10.3.1'
+    getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
 }
 
 def sonarExclusions = ['**/uk/gov/hmcts/ethos/replacement/docmosis/config/**',

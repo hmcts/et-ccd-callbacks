@@ -92,14 +92,14 @@ class AddSingleCaseToMultipleServiceTest {
 
         verify(multipleHelperService, times(1))
                 .sendCreationUpdatesToSinglesWithoutConfirmation(
-                userToken,
-                multipleDetails.getCaseTypeId(),
-                multipleDetails.getJurisdiction(),
-                submitMultipleEvents.get(0).getCaseData(),
-                errors,
-                new ArrayList<>(Collections.singletonList("21006/2020")),
-                "",
-                multipleDetails.getCaseId());
+                    userToken,
+                    multipleDetails.getCaseTypeId(),
+                    multipleDetails.getJurisdiction(),
+                    submitMultipleEvents.get(0).getCaseData(),
+                    errors,
+                    new ArrayList<>(Collections.singletonList("21006/2020")),
+                    "",
+                    multipleDetails.getCaseId());
 
         verify(multipleHelperService, times(1)).addLeadMarkUp(
                 userToken,

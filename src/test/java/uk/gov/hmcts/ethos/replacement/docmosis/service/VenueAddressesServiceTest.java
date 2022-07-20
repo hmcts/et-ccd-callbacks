@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 @SpringBootTest(classes = {
-        VenueAddressesService.class,
+    VenueAddressesService.class,
 })
 @EnableConfigurationProperties({VenueAddressesConfiguration.class})
 public class VenueAddressesServiceTest {

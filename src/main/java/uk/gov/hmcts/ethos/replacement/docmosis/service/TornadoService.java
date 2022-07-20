@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,7 +46,6 @@ public class TornadoService {
     private final UserService userService;
     private final DefaultValuesReaderService defaultValuesReaderService;
     private final VenueAddressReaderService venueAddressReaderService;
-    private final InitialConsiderationHelper initialConsiderationHelper;
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
@@ -140,7 +140,7 @@ public class TornadoService {
         HttpURLConnection conn = null;
         try {
             conn = createConnection();
-            buildSummaryInstruction(conn, caseData, authToken);
+            buildSummaryInstruction(conn, caseData, authToken, caseType);
             return checkResponseStatus(authToken, conn, IC_SUMMARY_FILENAME, caseType);
         } catch (IOException e) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, e);
@@ -150,10 +150,21 @@ public class TornadoService {
         }
     }
 
-    private void buildSummaryInstruction(HttpURLConnection conn, CaseData caseData, String authToken)
-            throws IOException {
+    private void buildSummaryInstruction(HttpURLConnection conn, CaseData caseData, String authToken, String caseType)
+        throws IOException {
+        String documentRequest;
+
+        if (caseType.equals(SCOTLAND_CASE_TYPE_ID)) {
+            documentRequest = InitialConsiderationHelper.getDocumentRequestSC(caseData, authToken);
+        } else {
+            documentRequest = InitialConsiderationHelper.getDocumentRequestEW(caseData, authToken);
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        log.info(mapper.writeValueAsString(documentRequest));
+
         try (var outputStreamWriter = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
-            outputStreamWriter.write(initialConsiderationHelper.getDocumentRequestEW(caseData, authToken));
+            outputStreamWriter.write(documentRequest);
             outputStreamWriter.flush();
         }
     }
@@ -216,6 +227,8 @@ public class TornadoService {
 
         var documentSelfPath = documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME,
                 APPLICATION_DOCX_VALUE, caseTypeId);
+        log.info("Case type is: " + caseTypeId);
+        log.info("Document Name is: " + documentName);
         log.info("URI documentSelfPath uploaded and created: " + documentSelfPath.toString());
         var downloadUrl = documentManagementService.generateDownloadableURL(documentSelfPath);
         var markup = documentManagementService.generateMarkupDocument(downloadUrl);

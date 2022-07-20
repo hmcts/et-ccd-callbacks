@@ -38,7 +38,6 @@ public class InitialConsiderationService {
     @Value("${document_management.ccdCaseDocument.url}")
     private String ccdCaseDocumentUrl;
 
-    private final InitialConsiderationHelper initialConsiderationHelper;
     private final TornadoService tornadoService;
 
     static final String RESPONDENT_NAME =
@@ -60,7 +59,7 @@ public class InitialConsiderationService {
     static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
     static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "");
 
-    private static final String IC_TYPE_OF_DOC = "Initial Consideration";
+    private static final String ET1_DOC_TYPE = "ET1";
     private static final String IC_SUMMARY_FILENAME = "InitialConsideration.pdf";
     private static final String MESSAGE = "Failed to generate document for case id : ";
 
@@ -188,7 +187,7 @@ public class InitialConsiderationService {
 
     private DocumentType createDocumentType(String documentPath) {
         DocumentType documentType = new DocumentType();
-        documentType.setTypeOfDocument(IC_TYPE_OF_DOC);
+        documentType.setTypeOfDocument(ET1_DOC_TYPE);
         documentType.setShortDescription(null);
         documentType.setUploadedDocument(createUploadedDocumentType(documentPath));
         return documentType;

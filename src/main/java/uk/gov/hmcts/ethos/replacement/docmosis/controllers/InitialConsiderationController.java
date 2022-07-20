@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -56,19 +58,31 @@ public class InitialConsiderationController {
         log.info("Initial consideration complete requested for case reference ---> {}",
             ccdRequest.getCaseDetails().getCaseId());
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        DocumentInfo documentInfo = initialConsiderationService.processSummaryDocument(
-                caseData, ccdRequest.getCaseDetails().getCaseTypeId(), userToken);
-        initialConsiderationService.addIcEwDocumentLink(caseData, documentInfo);
-
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .confirmation_header(COMPLETE_IC_HDR)
             .confirmation_body(String.format(COMPLETE_IC_BODY, ccdRequest.getCaseDetails().getCaseId()))
+            .build());
+    }
+
+    @PostMapping(value = "/submitInitialConsideration", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Handles Initial Consideration Submission")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
+        @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")})
+    public ResponseEntity<CCDCallbackResponse> submitInitialConsideration(@RequestBody CCDRequest ccdRequest,
+                                                                            @RequestHeader(value = "Authorization")
+                                                                                String userToken) {
+        log.info("Submitting Initial consideration request for case reference ---> {}",
+            ccdRequest.getCaseDetails().getCaseId());
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        DocumentInfo documentInfo = initialConsiderationService.processSummaryDocument(
+            caseData, ccdRequest.getCaseDetails().getCaseTypeId(), userToken);
+        initialConsiderationService.addIcEwDocumentLink(caseData, documentInfo);
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(caseData)
             .build());
     }

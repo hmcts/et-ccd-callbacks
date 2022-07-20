@@ -240,7 +240,6 @@ ext {
     junitJupiterVersion = '5.8.2'
     log4JVersion = '2.18.0'
     logbackVersion = '1.2.11'
-    pact_version = '4.1.7'
     reformLoggingVersion = '5.1.9'
     serenity = '2.3.31'
     tomcatEmbedVersion = '9.0.58'

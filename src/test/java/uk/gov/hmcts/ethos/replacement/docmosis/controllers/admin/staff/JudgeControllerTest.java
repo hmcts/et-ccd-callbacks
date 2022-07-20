@@ -97,7 +97,6 @@ class JudgeControllerTest {
     @Test
     void testAddJudgeSuccess() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-
         mockMvc.perform(post(ADD_JUDGE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", AUTH_TOKEN)
@@ -212,7 +211,7 @@ class JudgeControllerTest {
     }
 
     @Test
-    void updateCourtWorker_InvalidToken() throws Exception {
+    void updateCourtWorker_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(UPDATE_JUDGE_URL)
                         .contentType(APPLICATION_JSON)

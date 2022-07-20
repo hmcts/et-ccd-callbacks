@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
@@ -55,13 +56,18 @@ public class InitialConsiderationServiceTest {
 
     CaseData caseDetailsEmpty;
     CaseData caseDetails;
+
+    @Mock
+    TornadoService tornadoService;
+
     InitialConsiderationService initialConsiderationService;
+
 
     @BeforeEach
     void setUp() throws Exception {
         caseDetails = generateCaseData("initialConsiderationCase1.json");
         caseDetailsEmpty = generateCaseData("initialConsiderationCase2.json");
-        initialConsiderationService = new InitialConsiderationService();
+        initialConsiderationService = new InitialConsiderationService(tornadoService);
     }
 
     @Test

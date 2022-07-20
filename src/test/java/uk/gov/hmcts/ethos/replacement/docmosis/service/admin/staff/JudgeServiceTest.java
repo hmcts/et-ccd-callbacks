@@ -24,7 +24,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeService.NO_FOUND_ERROR_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeService.NO_JUDGE_FOUND_ERROR_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeService.NO_JUDGE_FOUND_WITH_NAME_SPECIFIED_ERROR_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeService.SAVE_ERROR_MESSAGE;
 
 class JudgeServiceTest {
@@ -104,7 +105,7 @@ class JudgeServiceTest {
 
         List<String> errors = judgeService.updateJudgeMidEventSelectOffice(adminData);
         assertEquals(1, errors.size());
-        assertEquals(String.format(NO_FOUND_ERROR_MESSAGE, tribunalOffice), errors.get(0));
+        assertEquals(String.format(NO_JUDGE_FOUND_ERROR_MESSAGE, tribunalOffice), errors.get(0));
     }
 
     @Test
@@ -165,6 +166,87 @@ class JudgeServiceTest {
         assertEquals(SAVE_ERROR_MESSAGE, errors.get(0));
     }
 
+    @Test
+    void deleteJudge_shouldDeleteJudge() {
+        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(),
+            judgeCode, judgeName, employmentStatus);
+        var listJudge = createListJudge(1, TribunalOffice.LEEDS, judgeCode, judgeName,
+            employmentStatus);
+        when(judgeRepository.findById(anyInt())).thenReturn(listJudge);
+        List<String> errors = judgeService.deleteJudge(adminData);
+
+        assertEquals(0, errors.size());
+        verify(judgeRepository, times(1)).deleteAll(listJudge);
+        verify(judgeRepository, times(1)).flush();
+    }
+
+    @Test
+    void deleteJudge_shouldReturnNoJudgeFoundError() {
+        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), judgeCode, judgeName,
+            employmentStatus);
+        List<Judge> emptyJudgeList = new ArrayList<>();
+        when(judgeRepository.findById(anyInt())).thenReturn(emptyJudgeList);
+        var expectedErrorMsg = String.format(NO_JUDGE_FOUND_WITH_NAME_SPECIFIED_ERROR_MESSAGE,
+            adminData.getJudgeName());
+        List<String> errors = judgeService.deleteJudge(adminData);
+
+        assertEquals(1, errors.size());
+        assertEquals(expectedErrorMsg, errors.get(0));
+    }
+
+    @Test
+    void deleteJudgeMidEventSelectOffice_shouldReturnJudgesListBySelectedOffice() {
+        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), judgeCode, judgeName,
+            employmentStatus);
+        var judges = createListJudge(1, TribunalOffice.LEEDS, judgeCode, judgeName, employmentStatus);
+        when(judgeRepository.findByTribunalOfficeOrderById(TribunalOffice.valueOfOfficeName(tribunalOffice)))
+            .thenReturn(judges);
+        List<String> errors = judgeService.deleteJudgeMidEventSelectOffice(adminData);
+
+        assertEquals(0, errors.size());
+        verify(judgeRepository, times(1)).findByTribunalOfficeOrderById(any());
+    }
+
+    @Test
+    void deleteJudgeMidEventSelectOffice_shouldReturnNoJudgeFoundError() {
+        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), judgeCode, judgeName,
+            employmentStatus);
+        List<Judge> emptyJudgeList = new ArrayList<>();
+        when(judgeRepository.findByTribunalOfficeOrderById(TribunalOffice.valueOfOfficeName(tribunalOffice)))
+            .thenReturn(emptyJudgeList);
+        var expectedErrorMsg = String.format(NO_JUDGE_FOUND_ERROR_MESSAGE, adminData.getTribunalOffice());
+        List<String> errors = judgeService.deleteJudgeMidEventSelectOffice(adminData);
+
+        assertEquals(1, errors.size());
+        assertEquals(expectedErrorMsg, errors.get(0));
+    }
+
+    @Test
+    void deleteJudgeMidEventSelectJudge_shouldSetJudgeForSelectedCode() {
+        adminData = createAdminDataWithDynamicList("22", TribunalOffice.LEEDS.getOfficeName(), judgeCode, judgeName,
+            employmentStatus);
+        var judges = createListJudge(22, TribunalOffice.LEEDS, judgeCode, judgeName, employmentStatus);
+        when(judgeRepository.findById(anyInt())).thenReturn(judges);
+        List<String> errors = judgeService.deleteJudgeMidEventSelectJudge(adminData);
+
+        assertEquals(0, errors.size());
+        verify(judgeRepository, times(1)).findById(anyInt());
+    }
+
+    @Test
+    void deleteJudgeMidEventSelectJudge_shouldReturnNoJudgeFoundError() {
+        adminData = createAdminDataWithDynamicList("22", TribunalOffice.LEEDS.getOfficeName(), judgeCode, judgeName,
+            employmentStatus);
+        List<Judge> emptyJudgeList = new ArrayList<>();
+        when(judgeRepository.findById(anyInt())).thenReturn(emptyJudgeList);
+        var expectedErrorMsg = String.format(NO_JUDGE_FOUND_WITH_NAME_SPECIFIED_ERROR_MESSAGE,
+            adminData.getJudgeName());
+        List<String> errors = judgeService.deleteJudgeMidEventSelectJudge(adminData);
+
+        assertEquals(1, errors.size());
+        assertEquals(expectedErrorMsg, errors.get(0));
+    }
+
     private AdminData createAdminData(String judgeCode, String judgeName, String tribunalOffice,
                                       String employmentStatus) {
         AdminData adminData = new AdminData();
@@ -178,18 +260,21 @@ class JudgeServiceTest {
     private AdminData createAdminDataWithDynamicList(String id, String tribunalOffice, String code, String name,
                                                      String employmentStatus) {
         var adminData = createAdminData(code, name, tribunalOffice, employmentStatus);
-        adminData.setTribunalOffice(tribunalOffice);
+        adminData.setJudgeSelectList(getDynamicFixedListType(id, name));
+        adminData.getJudgeSelectList().setValue(getDynamicValueType(id, name));
+        return adminData;
+    }
 
+    private DynamicValueType getDynamicValueType(String id, String name) {
+        return DynamicValueType.create(id, name);
+    }
+
+    private DynamicFixedListType getDynamicFixedListType(String id, String name) {
         List<DynamicValueType> dynamicJudge = new ArrayList<>();
         dynamicJudge.add(DynamicValueType.create(id, name));
-
         var judgeDynamicList = new DynamicFixedListType();
         judgeDynamicList.setListItems(dynamicJudge);
-        adminData.setJudgeSelectList(judgeDynamicList);
-
-        var dynamicValueType = DynamicValueType.create(id, name);
-        adminData.getJudgeSelectList().setValue(dynamicValueType);
-        return adminData;
+        return judgeDynamicList;
     }
 
     private Judge createJudge(AdminData adminData) {

@@ -173,13 +173,12 @@ public class InitialConsiderationService {
 
     private String createDocumentPath(DocumentInfo documentInfo) {
         return documentInfo.getUrl()
-                .substring(documentInfo.getUrl().indexOf("/documents/"))
-                .replace("/binary", "");
+                .substring(documentInfo.getUrl().indexOf("/documents/"));
     }
 
     private DocumentTypeItem createDocumentTypeItem(String documentPath) {
         DocumentTypeItem documentTypeItem = new DocumentTypeItem();
-        documentTypeItem.setId(documentPath);
+        documentTypeItem.setId(documentPath.replace("/documents/", "").replace("/binary", ""));
         documentTypeItem.setValue(createDocumentType(documentPath));
         return documentTypeItem;
     }
@@ -194,9 +193,9 @@ public class InitialConsiderationService {
 
     private UploadedDocumentType createUploadedDocumentType(String documentPath) {
         UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
-        uploadedDocumentType.setDocumentBinaryUrl(ccdCaseDocumentUrl + documentPath + "/binary");
+        uploadedDocumentType.setDocumentBinaryUrl(ccdCaseDocumentUrl + documentPath);
         uploadedDocumentType.setDocumentFilename(IC_SUMMARY_FILENAME);
-        uploadedDocumentType.setDocumentUrl(ccdCaseDocumentUrl + documentPath);
+        uploadedDocumentType.setDocumentUrl(ccdCaseDocumentUrl + documentPath.replace("/binary", ""));
         return uploadedDocumentType;
     }
 }

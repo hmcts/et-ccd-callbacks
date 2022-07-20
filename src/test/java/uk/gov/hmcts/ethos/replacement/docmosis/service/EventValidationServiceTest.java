@@ -79,6 +79,7 @@ class EventValidationServiceTest {
     private static final LocalDate CURRENT_RESPONSE_RECEIVED_DATE = LocalDate.now();
     private static final LocalDate FUTURE_RESPONSE_RECEIVED_DATE = LocalDate.now().plusDays(1);
     private static final String DISPOSAL_DATE = "2022-05-01";
+    private static final String FUTURE_DATE = "2777-12-31";
     private static final String DISPOSAL_DATE_NO_MATCH = "2022-05-15";
     private static final String HEARING_DATE = "2022-05-01T10:10:00.000";
     private static final String HEARING_DATE2 = "2022-06-30T10:10:00.000";
@@ -403,7 +404,7 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateDisposalDateInFuture() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(FUTURE_RECEIPT_DATE.toString()), errors);
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(FUTURE_DATE), errors);
         assertThat(errors.get(0))
                 .isEqualTo(String.format(EventValidationService.DISPOSAL_DATE_IN_FUTURE, "blah blah"));
 

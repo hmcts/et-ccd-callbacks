@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 @SpringBootTest(classes = {
-        TribunalOfficesService.class,
+    TribunalOfficesService.class,
 })
 @EnableConfigurationProperties({CaseDefaultValuesConfiguration.class, TribunalOfficesConfiguration.class})
 public class TribunalOfficeServiceTest {

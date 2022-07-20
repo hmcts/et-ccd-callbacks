@@ -122,7 +122,7 @@ public class Et3VettingHelper {
     private static void setRespondentNameAddress(CaseData caseData, RespondentSumTypeItem respondentSumTypeItem) {
         String respondentName = isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentName())
             ? NONE_GIVEN
-            : respondentSumTypeItem.getValue().getRespondentName();
+            : respondentSumTypeItem.getValue().getResponseRespondentName();
 
         Address address = respondentSumTypeItem.getValue().getResponseRespondentAddress();
 

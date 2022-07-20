@@ -134,8 +134,8 @@ class CaseTransferUtilsTest {
                 .withCounterClaim(counterClaim)
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
-        assertThrows(CaseCreationException.class,
-                () -> caseTransferUtils.getAllCasesToBeTransferred(eccCase, userToken));
+        assertThrows(CaseCreationException.class, () -> caseTransferUtils.getAllCasesToBeTransferred(
+                eccCase, userToken));
     }
 
     @Test
@@ -157,8 +157,8 @@ class CaseTransferUtilsTest {
                 .withCounterClaim(counterClaim)
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
-        assertThrows(CaseCreationException.class,
-                () -> caseTransferUtils.getAllCasesToBeTransferred(eccCase, userToken));
+        assertThrows(CaseCreationException.class, () -> caseTransferUtils.getAllCasesToBeTransferred(
+                eccCase, userToken));
     }
 
     @Test

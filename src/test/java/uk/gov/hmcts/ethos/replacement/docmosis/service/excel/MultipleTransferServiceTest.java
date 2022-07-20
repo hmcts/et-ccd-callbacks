@@ -115,9 +115,8 @@ public class MultipleTransferServiceTest {
                 MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl,
                         multipleDetails.getCaseId(),
                         multipleDetails.getCaseData().getMultipleReference()),
-                true,null
-                );
-
+                true, null
+        );
         verifyNoMoreInteractions(persistentQHelperService);
 
     }

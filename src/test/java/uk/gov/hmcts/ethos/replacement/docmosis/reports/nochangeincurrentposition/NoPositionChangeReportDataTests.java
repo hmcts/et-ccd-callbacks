@@ -38,29 +38,26 @@ class NoPositionChangeReportDataTests {
     }
 
     private NoPositionChangeReportData setupValidReportData() {
-        var reportSummary = new NoPositionChangeReportSummary("Office");
+        NoPositionChangeReportSummary reportSummary = new NoPositionChangeReportSummary("Office");
         reportSummary.setTotalCases("0");
         reportSummary.setTotalSingleCases("2");
         reportSummary.setTotalMultipleCases("1");
-        var reportData = new NoPositionChangeReportData(reportSummary, "2021-06-07");
-
-        var reportDetailSingle1 = new NoPositionChangeReportDetailSingle();
+        NoPositionChangeReportDetailSingle reportDetailSingle1 = new NoPositionChangeReportDetailSingle();
         reportDetailSingle1.setCaseReference("caseRef1");
         reportDetailSingle1.setDateToPosition("2021-02-03");
         reportDetailSingle1.setCurrentPosition("Test position1");
         reportDetailSingle1.setYear("2021");
         reportDetailSingle1.setRespondent("R1");
+        NoPositionChangeReportData reportData = new NoPositionChangeReportData(reportSummary, "2021-06-07");
         reportData.addReportDetailsSingle(reportDetailSingle1);
-
-        var reportDetailSingle2 = new NoPositionChangeReportDetailSingle();
+        NoPositionChangeReportDetailSingle reportDetailSingle2 = new NoPositionChangeReportDetailSingle();
         reportDetailSingle2.setCaseReference("caseRef2");
         reportDetailSingle2.setDateToPosition("2021-02-04");
         reportDetailSingle2.setCurrentPosition("Test position2");
         reportDetailSingle2.setYear("2022");
         reportDetailSingle2.setRespondent("R2 & Others");
         reportData.addReportDetailsSingle(reportDetailSingle2);
-
-        var reportDetailMultiple = new NoPositionChangeReportDetailMultiple();
+        NoPositionChangeReportDetailMultiple reportDetailMultiple = new NoPositionChangeReportDetailMultiple();
         reportDetailMultiple.setCaseReference("caseRef3");
         reportDetailMultiple.setDateToPosition("2021-02-05");
         reportDetailMultiple.setCurrentPosition("Test position3");
@@ -78,14 +75,14 @@ class NoPositionChangeReportDataTests {
                 reportSummary.getTotalSingleCases(), reportSummary.getTotalMultipleCases()));
 
         sb.append("\"" + REPORT_DETAILS_SINGLE + "\":[\n");
-        if(CollectionUtils.isNotEmpty(reportData.getReportDetailsSingle())
+        if (CollectionUtils.isNotEmpty(reportData.getReportDetailsSingle())
                 && reportData.getReportDetailsSingle().get(0) != null) {
             var rdSingle1 = reportData.getReportDetailsSingle().get(0);
             sb.append(buildDetailSingleJsonString(
                     rdSingle1.getCaseReference(), rdSingle1.getYear(), rdSingle1.getCurrentPosition(),
                     rdSingle1.getDateToPosition(), rdSingle1.getRespondent()));
         }
-        if(CollectionUtils.isNotEmpty(reportData.getReportDetailsSingle())
+        if (CollectionUtils.isNotEmpty(reportData.getReportDetailsSingle())
                 && reportData.getReportDetailsSingle().get(1) != null) {
             var rdSingle2 = reportData.getReportDetailsSingle().get(1);
             sb.append(",\n");
@@ -98,8 +95,8 @@ class NoPositionChangeReportDataTests {
         sb.append("],\n");
 
         sb.append("\"" + REPORT_DETAILS_MULTIPLE + "\":[\n");
-        if(CollectionUtils.isNotEmpty(reportData.getReportDetailsSingle())) {
-            var rdMultiple = reportData.getReportDetailsMultiple().get(0);
+        if (CollectionUtils.isNotEmpty(reportData.getReportDetailsSingle())) {
+            NoPositionChangeReportDetailMultiple rdMultiple = reportData.getReportDetailsMultiple().get(0);
             sb.append(buildDetailMultipleJsonString(
                     rdMultiple.getCaseReference(), rdMultiple.getYear(), rdMultiple.getCurrentPosition(),
                     rdMultiple.getDateToPosition(), rdMultiple.getMultipleName()
@@ -112,7 +109,7 @@ class NoPositionChangeReportDataTests {
 
     private StringBuilder buildSummaryJsonString(String office, String reportDate, String totalCases,
                                                   String totalSingle, String totalMultiple) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(REPORT_OFFICE).append(StringUtils.defaultString(office, "")).append(NEW_LINE);
         sb.append(REPORT_DATE).append(UtilHelper.listingFormatLocalDate(reportDate)).append(NEW_LINE);
         sb.append(TOTAL_CASES).append(StringUtils.defaultString(totalCases, "0")).append(NEW_LINE);
@@ -123,7 +120,7 @@ class NoPositionChangeReportDataTests {
 
     private StringBuilder buildDetailSingleJsonString(String caseReference, String year, String currentPosition,
                                                       String dateToPosition, String respondent) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append("{");
         sb.append("\"caseReference\":\"").append(caseReference).append("\",");
         sb.append("\"year\":\"").append(year).append("\",");
@@ -136,7 +133,7 @@ class NoPositionChangeReportDataTests {
 
     private StringBuilder buildDetailMultipleJsonString(String caseReference, String year, String currentPosition,
                                                         String dateToPosition, String multipleName) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append("{");
         sb.append("\"caseReference\":\"").append(caseReference).append("\",");
         sb.append("\"year\":\"").append(year).append("\",");

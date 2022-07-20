@@ -242,7 +242,7 @@ ext {
     logbackVersion = '1.2.11'
     reformLoggingVersion = '5.1.9'
     serenity = '2.3.31'
-    tomcatEmbedVersion = '10.0.22'
+    tomcatEmbedVersion = '9.0.58'
 }
 
 dependencyManagement {

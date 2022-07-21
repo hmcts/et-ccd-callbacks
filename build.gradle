@@ -22,6 +22,7 @@ allprojects {
 
 checkstyle {
     maxWarnings = 0
+    ignoreFailures = false
     toolVersion = '10.3.1'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
 }

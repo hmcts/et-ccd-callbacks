@@ -40,25 +40,25 @@ public class InitialConsiderationService {
 
     private final TornadoService tornadoService;
 
-    static final String RESPONDENT_NAME =
+    private static final String RESPONDENT_NAME =
         "| Respondent %s name given | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | %s|\r\n"
             + "|In ET3 by respondent | %s|\r\n"
             + "\r\n";
 
-    static final String HEARING_DETAILS =
+    private static final String HEARING_DETAILS =
         "|Hearing details | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|Date | %s|\r\n"
             + "|Type | %s|\r\n"
             + "|Duration | %s|";
 
-    static final String JURISDICTION_HEADER = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
+    private static final String JURISDICTION_HEADER = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
         + "href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">View all "
         + "jurisdiction codes and descriptors (opens in new tab)</a><br><br>";
-    static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
-    static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "");
+    private static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
+    private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "");
 
     private static final String IC_SUMMARY_FILENAME = "InitialConsideration.pdf";
     private static final String MESSAGE = "Failed to generate document for case id : ";

@@ -244,7 +244,7 @@ ext {
     logbackVersion = '1.2.11'
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
-    serenity = '3.2.5'
+    serenity = '2.3.31'
     tomcatEmbedVersion = '10.0.22'
 }
 
@@ -342,8 +342,8 @@ dependencies {
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.23.1'
 
     // Contract Tests
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: pact_version
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: pact_version
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.11'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.38'
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.1'
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
     contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion

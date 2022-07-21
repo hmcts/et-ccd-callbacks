@@ -101,7 +101,7 @@ class Et3ResponseHelperTest {
     }
 
     @Test
-    void something() throws URISyntaxException, IOException {
+    void buildEt3FormDocument_createsDocumentWithRelevantData() throws URISyntaxException, IOException {
         CaseData caseData = new CaseData();
         Address address = new Address();
         address.setAddressLine1("111 Road");

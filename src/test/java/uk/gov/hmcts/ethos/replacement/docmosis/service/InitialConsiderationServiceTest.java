@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.IOException;
@@ -32,21 +33,37 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
 class InitialConsiderationServiceTest {
     static final String EXPECTED_RESPONDENT_NAME =
-        "| Respondent name given | |\r\n"
+        "| Respondent  name given | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | Test Corp|\r\n"
-            + "|In ET3 by respondent | |";
+            + "|In ET3 by respondent | |\r\n"
+            + "\r\n";
+
+    static final String EXPECTED_RESPONDENT_NAME_2 =
+        "| Respondent 1 name given | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|In ET1 by claimant | Test Corp|\r\n"
+            + "|In ET3 by respondent | |\r\n"
+            + "\r\n"
+            + "| Respondent 2 name given | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|In ET1 by claimant | Test Name Two|\r\n"
+            + "|In ET3 by respondent | |\r\n"
+            + "\r\n";
 
     static final String EXPECTED_RESPONDENT_NAME_BLANK =
-        "| Respondent name given | |\r\n"
+        "| Respondent  name given | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | |\r\n"
-            + "|In ET3 by respondent | |";
+            + "|In ET3 by respondent | |\r\n"
+            + "\r\n";
 
     static final String EXPECTED_HEARING_STRING =
         "|Hearing details | |\r\n"
@@ -72,8 +89,8 @@ class InitialConsiderationServiceTest {
 
     private static final String IC_SUMMARY_FILENAME = "InitialConsideration.pdf";
 
-    CaseData caseDetailsEmpty;
-    CaseData caseDetails;
+    CaseData caseDataEmpty;
+    CaseData caseData;
 
     @Mock
     TornadoService tornadoService;
@@ -82,8 +99,8 @@ class InitialConsiderationServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        caseDetails = generateCaseData("initialConsiderationCase1.json");
-        caseDetailsEmpty = generateCaseData("initialConsiderationCase2.json");
+        caseData = generateCaseData("initialConsiderationCase1.json");
+        caseDataEmpty = generateCaseData("initialConsiderationCase2.json");
         initialConsiderationService = new InitialConsiderationService(tornadoService);
     }
 
@@ -99,16 +116,27 @@ class InitialConsiderationServiceTest {
 
     @Test
     void getHearingDetailsTest() {
-        String hearingDetails = initialConsiderationService.getHearingDetails(caseDetails.getHearingCollection());
+        String hearingDetails = initialConsiderationService.getHearingDetails(caseData.getHearingCollection());
         assertThat(hearingDetails)
             .isEqualTo(EXPECTED_HEARING_STRING);
     }
 
     @Test
     void getRespondentNameTest() {
-        String respondentName = initialConsiderationService.getRespondentName(caseDetails.getRespondentCollection());
+        String respondentName = initialConsiderationService.getRespondentName(caseData.getRespondentCollection());
         assertThat(respondentName)
             .isEqualTo(EXPECTED_RESPONDENT_NAME);
+    }
+
+    @Test
+    void getRespondentTwoNameTest() {
+        caseData = CaseDataBuilder.builder()
+                .withRespondent("Test Corp", YES, "2022-03-01", false)
+                .withRespondent("Test Name Two", YES, "2022-03-01", false)
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID).getCaseData();
+        String respondentName = initialConsiderationService.getRespondentName(caseData.getRespondentCollection());
+        assertThat(respondentName)
+                .isEqualTo(EXPECTED_RESPONDENT_NAME_2);
     }
 
     @Test
@@ -121,7 +149,7 @@ class InitialConsiderationServiceTest {
 
     @Test
     void missingHearingCollectionTest() {
-        String hearingDetails = initialConsiderationService.getHearingDetails(caseDetailsEmpty.getHearingCollection());
+        String hearingDetails = initialConsiderationService.getHearingDetails(caseDataEmpty.getHearingCollection());
         assertThat(hearingDetails)
             .isEqualTo(EXPECTED_HEARING_BLANK);
     }
@@ -129,7 +157,7 @@ class InitialConsiderationServiceTest {
     @Test
     void missingJurisdictionCollectionTest() {
         String jurisdictionCodesHtml =
-            initialConsiderationService.generateJurisdictionCodesHtml(caseDetailsEmpty.getJurCodesCollection());
+            initialConsiderationService.generateJurisdictionCodesHtml(caseDataEmpty.getJurCodesCollection());
         assertThat(jurisdictionCodesHtml)
             .isEmpty();
     }
@@ -153,7 +181,7 @@ class InitialConsiderationServiceTest {
     @Test
     void missingRespondentCollectionTest() {
         String respondentName =
-            initialConsiderationService.getRespondentName(caseDetailsEmpty.getRespondentCollection());
+            initialConsiderationService.getRespondentName(caseDataEmpty.getRespondentCollection());
         assertThat(respondentName)
             .isEqualTo(EXPECTED_RESPONDENT_NAME_BLANK);
     }

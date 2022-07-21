@@ -22,6 +22,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.listing.ListingRequest;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -31,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -169,10 +171,10 @@ class EventValidationServiceTest {
 
     @ParameterizedTest
     @CsvSource({
-            MULTIPLE_CASE_TYPE + "," + SUBMITTED_STATE,
-            MULTIPLE_CASE_TYPE + "," + ACCEPTED_STATE,
-            SINGLE_CASE_TYPE + "," + SUBMITTED_STATE,
-            SINGLE_CASE_TYPE + "," + ACCEPTED_STATE
+        MULTIPLE_CASE_TYPE + "," + SUBMITTED_STATE,
+        MULTIPLE_CASE_TYPE + "," + ACCEPTED_STATE,
+        SINGLE_CASE_TYPE + "," + SUBMITTED_STATE,
+        SINGLE_CASE_TYPE + "," + ACCEPTED_STATE
     })
     void shouldValidateCaseState(String caseType, String caseState) {
         caseDetails1.getCaseData().setEcmCaseType(caseType);
@@ -752,8 +754,8 @@ class EventValidationServiceTest {
         List<String> errors = new ArrayList<>();
         var invalidCase = invalidJudgeAllocationCaseDetails.getCaseData();
         eventValidationService.validateHearingJudgeAllocationForCaseCloseEvent(invalidCase, errors);
-        assertThat(errors.size())
-                .isEqualTo(1);
+        assertThat(errors)
+                .hasSize(1);
         assertThat(errors.get(0))
                 .isEqualTo(CLOSING_HEARD_CASE_WITH_NO_JUDGE_ERROR);
     }

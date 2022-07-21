@@ -1,10 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
-
 
 @SuperBuilder
 @Data

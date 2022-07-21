@@ -42,6 +42,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_STAFF;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LETTER_ADDRESS_ALLOCATED_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIST_CASES_CONFIG;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
 public class TornadoServiceTest {
@@ -81,6 +82,12 @@ public class TornadoServiceTest {
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
         tornadoService.listingGeneration(authToken, createListingData(), ENGLANDWALES_LISTING_CASE_TYPE_ID);
+    }
+
+    @Test(expected = IOException.class)
+    public void summaryGeneration_NoTornadoConnection_ShouldThrowException() throws IOException {
+        when(tornadoConnection.createConnection()).thenThrow(IOException.class);
+        tornadoService.summaryGeneration(authToken, new CaseData(), ENGLANDWALES_LISTING_CASE_TYPE_ID);
     }
 
     @Test(expected = IOException.class)
@@ -156,6 +163,22 @@ public class TornadoServiceTest {
         DocumentInfo documentInfo = tornadoService.listingGeneration(
                 authToken, listingData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
 
+        verifyDocumentInfo(documentInfo);
+    }
+
+    @Test
+    public void summaryGeneration_EW_shouldCreateDocumentInfo() throws IOException {
+        mockConnectionSuccess();
+        DocumentInfo documentInfo = tornadoService.summaryGeneration(
+                authToken, new CaseData(), ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        verifyDocumentInfo(documentInfo);
+    }
+
+    @Test
+    public void summaryGeneration_SC_shouldCreateDocumentInfo() throws IOException {
+        mockConnectionSuccess();
+        DocumentInfo documentInfo = tornadoService.summaryGeneration(
+                authToken, new CaseData(), SCOTLAND_LISTING_CASE_TYPE_ID);
         verifyDocumentInfo(documentInfo);
     }
 

@@ -3,12 +3,23 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -18,35 +29,57 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-public class InitialConsiderationServiceTest {
-    static final String EXPECTED_RESPONDENT_NAME =
-        "| Respondent name given | |\r\n"
+@ExtendWith(SpringExtension.class)
+class InitialConsiderationServiceTest {
+    private static final String EXPECTED_RESPONDENT_NAME =
+        "| Respondent  name given | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | Test Corp|\r\n"
-            + "|In ET3 by respondent | |";
+            + "|In ET3 by respondent | |\r\n"
+            + "\r\n";
 
-    static final String EXPECTED_RESPONDENT_NAME_BLANK =
-        "| Respondent name given | |\r\n"
+    private static final String EXPECTED_RESPONDENT_NAME_2 =
+        "| Respondent 1 name given | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|In ET1 by claimant | Test Corp|\r\n"
+            + "|In ET3 by respondent | |\r\n"
+            + "\r\n"
+            + "| Respondent 2 name given | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|In ET1 by claimant | Test Name Two|\r\n"
+            + "|In ET3 by respondent | |\r\n"
+            + "\r\n";
+
+    private static final String EXPECTED_RESPONDENT_NAME_BLANK =
+        "| Respondent  name given | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | |\r\n"
-            + "|In ET3 by respondent | |";
+            + "|In ET3 by respondent | |\r\n"
+            + "\r\n";
 
-    static final String EXPECTED_HEARING_STRING =
+    private static final String EXPECTED_HEARING_STRING =
         "|Hearing details | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|Date | 01 Jul 2022|\r\n"
             + "|Type | Preliminary Hearing(CM)|\r\n"
             + "|Duration | 1.5 Hours|";
 
-    static final String EXPECTED_HEARING_BLANK =
+    private static final String EXPECTED_HEARING_BLANK =
         "|Hearing details | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|Date | -|\r\n"
             + "|Type | -|\r\n"
             + "|Duration | -|";
 
-    static final String EXPECTED_JURISDICTION_HTML = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
+    private static final String EXPECTED_JURISDICTION_HTML = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
         + "href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">View all "
         + "jurisdiction codes and descriptors (opens in new tab)</a><br><br><strong>DAG</strong> - "
         + "Discrimination, including indirect discrimination, harassment or victimisation or discrimination "
@@ -54,19 +87,20 @@ public class InitialConsiderationServiceTest {
         + "including indirect discrimination, discrimination based on association or perception, harassment "
         + "or victimisation on grounds of sex, marriage and civil partnership or gender reassignment<br><br><hr>";
 
-    CaseData caseDetailsEmpty;
-    CaseData caseDetails;
+    private static final String IC_SUMMARY_FILENAME = "InitialConsideration.pdf";
+
+    CaseData caseDataEmpty;
+    CaseData caseData;
 
     @Mock
     TornadoService tornadoService;
 
     InitialConsiderationService initialConsiderationService;
 
-
     @BeforeEach
     void setUp() throws Exception {
-        caseDetails = generateCaseData("initialConsiderationCase1.json");
-        caseDetailsEmpty = generateCaseData("initialConsiderationCase2.json");
+        caseData = generateCaseData("initialConsiderationCase1.json");
+        caseDataEmpty = generateCaseData("initialConsiderationCase2.json");
         initialConsiderationService = new InitialConsiderationService(tornadoService);
     }
 
@@ -82,16 +116,27 @@ public class InitialConsiderationServiceTest {
 
     @Test
     void getHearingDetailsTest() {
-        String hearingDetails = initialConsiderationService.getHearingDetails(caseDetails.getHearingCollection());
+        String hearingDetails = initialConsiderationService.getHearingDetails(caseData.getHearingCollection());
         assertThat(hearingDetails)
             .isEqualTo(EXPECTED_HEARING_STRING);
     }
 
     @Test
     void getRespondentNameTest() {
-        String respondentName = initialConsiderationService.getRespondentName(caseDetails.getRespondentCollection());
+        String respondentName = initialConsiderationService.getRespondentName(caseData.getRespondentCollection());
         assertThat(respondentName)
             .isEqualTo(EXPECTED_RESPONDENT_NAME);
+    }
+
+    @Test
+    void getRespondentTwoNameTest() {
+        caseData = CaseDataBuilder.builder()
+                .withRespondent("Test Corp", YES, "2022-03-01", false)
+                .withRespondent("Test Name Two", YES, "2022-03-01", false)
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID).getCaseData();
+        String respondentName = initialConsiderationService.getRespondentName(caseData.getRespondentCollection());
+        assertThat(respondentName)
+                .isEqualTo(EXPECTED_RESPONDENT_NAME_2);
     }
 
     @Test
@@ -104,7 +149,7 @@ public class InitialConsiderationServiceTest {
 
     @Test
     void missingHearingCollectionTest() {
-        String hearingDetails = initialConsiderationService.getHearingDetails(caseDetailsEmpty.getHearingCollection());
+        String hearingDetails = initialConsiderationService.getHearingDetails(caseDataEmpty.getHearingCollection());
         assertThat(hearingDetails)
             .isEqualTo(EXPECTED_HEARING_BLANK);
     }
@@ -112,9 +157,9 @@ public class InitialConsiderationServiceTest {
     @Test
     void missingJurisdictionCollectionTest() {
         String jurisdictionCodesHtml =
-            initialConsiderationService.generateJurisdictionCodesHtml(caseDetailsEmpty.getJurCodesCollection());
+            initialConsiderationService.generateJurisdictionCodesHtml(caseDataEmpty.getJurCodesCollection());
         assertThat(jurisdictionCodesHtml)
-            .isEqualTo("");
+            .isEmpty();
     }
 
     @Test
@@ -122,7 +167,7 @@ public class InitialConsiderationServiceTest {
         String jurisdictionCodesHtml =
             initialConsiderationService.generateJurisdictionCodesHtml(generateInvalidJurisdictionCodes());
         assertThat(jurisdictionCodesHtml)
-            .isEqualTo("");
+            .isEmpty();
     }
 
     @Test
@@ -136,7 +181,7 @@ public class InitialConsiderationServiceTest {
     @Test
     void missingRespondentCollectionTest() {
         String respondentName =
-            initialConsiderationService.getRespondentName(caseDetailsEmpty.getRespondentCollection());
+            initialConsiderationService.getRespondentName(caseDataEmpty.getRespondentCollection());
         assertThat(respondentName)
             .isEqualTo(EXPECTED_RESPONDENT_NAME_BLANK);
     }
@@ -197,5 +242,72 @@ public class InitialConsiderationServiceTest {
         hearingDate.setValue(dateListedType);
 
         return hearingDate;
+    }
+
+    @Test
+    void processSummaryDocument_Normal() throws IOException {
+        DocumentInfo documentInfo = new DocumentInfo();
+        when(tornadoService.summaryGeneration(anyString(), any(), anyString()))
+                .thenReturn(documentInfo);
+        CaseData caseData = new CaseData();
+        assertThat(initialConsiderationService.processSummaryDocument(caseData, "caseTypeId", "authToken"))
+                .isEqualTo(documentInfo);
+    }
+
+    @Test
+    void processSummaryDocument_Exception() throws IOException {
+        when(tornadoService.summaryGeneration(anyString(), any(), anyString()))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
+        CaseData caseData = new CaseData();
+        assertThrows(DocumentManagementException.class, () ->
+                initialConsiderationService.processSummaryDocument(caseData, "caseTypeId", "authToken"));
+    }
+
+    @Test
+    void addIcEwDocumentLink_NoDocumentCollection() {
+        CaseData caseData = new CaseData();
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setUrl("http://dm-store:8080/documents/9c6cc92e-1eea-430b-8583-a1e71508b2a1/binary");
+
+        List<DocumentTypeItem> expectDocumentCollection = new ArrayList<>();
+        expectDocumentCollection.add(createDocumentTypeItem("9c6cc92e-1eea-430b-8583-a1e71508b2a1"));
+
+        initialConsiderationService.addIcEwDocumentLink(caseData, documentInfo);
+        assertThat(caseData.getDocumentCollection())
+                .isEqualTo(expectDocumentCollection);
+    }
+
+    @Test
+    void addIcEwDocumentLink_HaveDocumentCollection() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        documentCollection.add(createDocumentTypeItem("9c6cc92e-1eea-430b-8583-a1e71508b2a1"));
+        CaseData caseData = new CaseData();
+        caseData.setDocumentCollection(documentCollection);
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setUrl("http://dm-store:8080/documents/1c67f047-72ee-48a5-a39c-441b5080b264/binary");
+
+        List<DocumentTypeItem> expectDocumentCollection = new ArrayList<>();
+        expectDocumentCollection.add(createDocumentTypeItem("9c6cc92e-1eea-430b-8583-a1e71508b2a1"));
+        expectDocumentCollection.add(createDocumentTypeItem("1c67f047-72ee-48a5-a39c-441b5080b264"));
+
+        initialConsiderationService.addIcEwDocumentLink(caseData, documentInfo);
+        assertThat(caseData.getDocumentCollection())
+                .isEqualTo(expectDocumentCollection);
+    }
+
+    private DocumentTypeItem createDocumentTypeItem(String docUrl) {
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentBinaryUrl("null/documents/" + docUrl + "/binary");
+        uploadedDocumentType.setDocumentFilename(IC_SUMMARY_FILENAME);
+        uploadedDocumentType.setDocumentUrl("null/documents/" + docUrl);
+
+        DocumentType documentType = new DocumentType();
+        documentType.setUploadedDocument(uploadedDocumentType);
+
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        documentTypeItem.setId(docUrl);
+        documentTypeItem.setValue(documentType);
+
+        return documentTypeItem;
     }
 }

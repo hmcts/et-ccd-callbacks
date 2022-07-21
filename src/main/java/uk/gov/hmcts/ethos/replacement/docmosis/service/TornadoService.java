@@ -39,6 +39,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 @Service("tornadoService")
 public class TornadoService {
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
+    private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
+    private static final String APPLICATION_PDF_VALUE = "application/pdf";
 
     private final TornadoConnection tornadoConnection;
     private final DocumentManagementService documentManagementService;
@@ -220,13 +222,22 @@ public class TornadoService {
             bytes = getBytesFromInputStream(os, is);
         }
 
-        var documentSelfPath = documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME,
-                APPLICATION_DOCX_VALUE, caseTypeId);
+        var documentSelfPath = uploadDocument(documentName, authToken, bytes, caseTypeId);
 
         log.info("URI documentSelfPath uploaded and created: " + documentSelfPath.toString());
         var downloadUrl = documentManagementService.generateDownloadableURL(documentSelfPath);
         var markup = documentManagementService.generateMarkupDocument(downloadUrl);
         return generateDocumentInfo(documentName, documentSelfPath, markup);
+    }
+
+    private URI uploadDocument(String documentName, String authToken, byte[] bytes, String caseTypeId) {
+        if (documentName.contains(".pdf")) {
+            return documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME_PDF,
+                    APPLICATION_PDF_VALUE, caseTypeId);
+        } else {
+            return documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME,
+                    APPLICATION_DOCX_VALUE, caseTypeId);
+        }
     }
 
     private byte[] getBytesFromInputStream(ByteArrayOutputStream os, InputStream is) throws IOException {

@@ -27,7 +27,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CA
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-        BroughtForwardInitialiser.class, ClerkService.class
+    BroughtForwardInitialiser.class, ClerkService.class
 })
 class BroughtForwardInitialiserTest {
 

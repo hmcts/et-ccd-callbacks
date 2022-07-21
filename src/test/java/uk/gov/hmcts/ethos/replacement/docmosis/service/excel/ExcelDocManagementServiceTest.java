@@ -169,8 +169,8 @@ public class ExcelDocManagementServiceTest {
                 multipleDetails.getCaseTypeId());
         verify(scheduleCreationService, times(1))
                 .writeSchedule(multipleDetails.getCaseData(),
-                new ArrayList<>(),
-                new TreeMap<>());
+                    new ArrayList<>(),
+                    new TreeMap<>());
         verifyNoMoreInteractions(excelCreationService);
     }
 

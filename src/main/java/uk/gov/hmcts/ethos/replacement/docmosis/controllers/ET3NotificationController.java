@@ -25,7 +25,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-public class ET1ServingController {
+public class ET3NotificationController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
@@ -43,20 +43,20 @@ public class ET1ServingController {
      *                          includes caseData which contains the upload document names of
      *                          type "Another type of document" in a html string format.
      */
-    @PostMapping(value = "/midServingDocumentOtherTypeNames", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/et3Notification", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "return serving document other type names")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                        schema = @Schema(implementation = CCDCallbackResponse.class))
-                }),
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> midServingDocumentOtherTypeNames(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+    public ResponseEntity<CCDCallbackResponse> et3Notification(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -64,12 +64,12 @@ public class ET1ServingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setOtherTypeDocumentName(
-                servingService.generateOtherTypeDocumentLink(caseData.getServingDocumentCollection()));
-        caseData.setClaimantAndRespondentAddresses(servingService.generateClaimantAndRespondentAddress(caseData));
-        caseData.setEmailLinkToAcas(servingService.generateEmailLinkToAcas(caseData, false));
+        caseData.setEt3OtherTypeDocumentName(
+            servingService.generateOtherTypeDocumentLink(caseData.getEt3NotificationDocCollection()));
+        caseData.setEt3ClaimantAndRespondentAddresses(servingService.generateClaimantAndRespondentAddress(caseData));
+        caseData.setEt3EmailLinkToAcas(servingService.generateEmailLinkToAcas(caseData, true));
 
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
 }

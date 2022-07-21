@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,26 +40,26 @@ public class InitialConsiderationService {
 
     private final TornadoService tornadoService;
 
-    static final String RESPONDENT_NAME =
-        "| Respondent name given | |\r\n"
+    private static final String RESPONDENT_NAME =
+        "| Respondent %s name given | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | %s|\r\n"
-            + "|In ET3 by respondent | %s|";
+            + "|In ET3 by respondent | %s|\r\n"
+            + "\r\n";
 
-    static final String HEARING_DETAILS =
+    private static final String HEARING_DETAILS =
         "|Hearing details | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|Date | %s|\r\n"
             + "|Type | %s|\r\n"
             + "|Duration | %s|";
 
-    static final String JURISDICTION_HEADER = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
+    private static final String JURISDICTION_HEADER = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
         + "href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">View all "
         + "jurisdiction codes and descriptors (opens in new tab)</a><br><br>";
-    static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
-    static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "");
+    private static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
+    private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "");
 
-    private static final String ET1_DOC_TYPE = "ET1";
     private static final String IC_SUMMARY_FILENAME = "InitialConsideration.pdf";
     private static final String MESSAGE = "Failed to generate document for case id : ";
 
@@ -74,11 +75,14 @@ public class InitialConsiderationService {
             return RESPONDENT_MISSING;
         }
 
-        return respondentCollection.stream().map(
-            respondent -> String.format(
-                    RESPONDENT_NAME, nullCheck(respondent.getValue().getRespondentName()),
-                    nullCheck(respondent.getValue().getResponseRespondentName()))).findFirst()
-            .orElse(RESPONDENT_MISSING);
+        IntWrapper respondentCount = new IntWrapper(0);
+        return respondentCollection.stream()
+                .map(respondent -> String.format(
+                        RESPONDENT_NAME,
+                        respondentCollection.size() > 1 ? respondentCount.incrementAndReturnValue() : "",
+                        nullCheck(respondent.getValue().getRespondentName()),
+                        nullCheck(respondent.getValue().getResponseRespondentName())))
+                .collect(Collectors.joining());
     }
 
     /**
@@ -173,20 +177,19 @@ public class InitialConsiderationService {
 
     private String createDocumentPath(DocumentInfo documentInfo) {
         return documentInfo.getUrl()
-                .substring(documentInfo.getUrl().indexOf("/documents/"))
-                .replace("/binary", "");
+                .substring(documentInfo.getUrl().indexOf("/documents/"));
     }
 
     private DocumentTypeItem createDocumentTypeItem(String documentPath) {
         DocumentTypeItem documentTypeItem = new DocumentTypeItem();
-        documentTypeItem.setId(documentPath);
+        documentTypeItem.setId(documentPath.replace("/documents/", "").replace("/binary", ""));
         documentTypeItem.setValue(createDocumentType(documentPath));
         return documentTypeItem;
     }
 
     private DocumentType createDocumentType(String documentPath) {
         DocumentType documentType = new DocumentType();
-        documentType.setTypeOfDocument(ET1_DOC_TYPE);
+        documentType.setTypeOfDocument(null);
         documentType.setShortDescription(null);
         documentType.setUploadedDocument(createUploadedDocumentType(documentPath));
         return documentType;
@@ -194,9 +197,9 @@ public class InitialConsiderationService {
 
     private UploadedDocumentType createUploadedDocumentType(String documentPath) {
         UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
-        uploadedDocumentType.setDocumentBinaryUrl(ccdCaseDocumentUrl + documentPath + "/binary");
+        uploadedDocumentType.setDocumentBinaryUrl(ccdCaseDocumentUrl + documentPath);
         uploadedDocumentType.setDocumentFilename(IC_SUMMARY_FILENAME);
-        uploadedDocumentType.setDocumentUrl(ccdCaseDocumentUrl + documentPath);
+        uploadedDocumentType.setDocumentUrl(ccdCaseDocumentUrl + documentPath.replace("/binary", ""));
         return uploadedDocumentType;
     }
 }

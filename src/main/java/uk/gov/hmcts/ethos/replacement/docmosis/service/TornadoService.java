@@ -39,8 +39,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 @Service("tornadoService")
 public class TornadoService {
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
-    public static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
-    public static final String APPLICATION_PDF_VALUE = "application/pdf";
+    private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
+    private static final String APPLICATION_PDF_VALUE = "application/pdf";
 
     private final TornadoConnection tornadoConnection;
     private final DocumentManagementService documentManagementService;

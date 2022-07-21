@@ -13,8 +13,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.TornadoConfiguration;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoConnection;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
@@ -29,11 +36,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest({Et3ResponseController.class, JsonMapper.class})
+@WebMvcTest({Et3ResponseController.class, Et3ResponseService.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
 class Et3ResponseControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_START_URL = "/et3Response/aboutToStart";
+    private static final String ABOUT_TO_SUBMIT_URL = "/et3Response/aboutToSubmit";
     private static final String PROCESSING_COMPLETE_URL = "/et3Response/processingComplete";
     private static final String MID_EMPLOYMENT_DATES_URL = "/et3Response/midEmploymentDates";
 
@@ -41,6 +49,10 @@ class Et3ResponseControllerTest {
     private WebApplicationContext applicationContext;
     @MockBean
     private VerifyTokenService verifyTokenService;
+
+    @MockBean
+    private TornadoService tornadoService;
+
     private MockMvc mvc;
     private CCDRequest ccdRequest;
 
@@ -117,6 +129,42 @@ class Et3ResponseControllerTest {
     @Test
     void midEmploymentDates_badRequest() throws Exception {
         mvc.perform(post(MID_EMPLOYMENT_DATES_URL)
+                .content("garbage content")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void aboutToSubmit_tokenOk() throws Exception {
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setMarkUp("<a href=\"\">Document</a>");
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(tornadoService.createEt3ResponseForm(AUTH_TOKEN, caseData, null)).thenReturn(documentInfo);
+        mvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void aboutToSubmit_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void aboutToSubmit_badRequest() throws Exception {
+        mvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))

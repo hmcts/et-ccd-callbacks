@@ -3,44 +3,54 @@ package uk.gov.hmcts.ethos.replacement.docmosis.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import java.util.List;
 
 @SuperBuilder
 @Data
 public class InitialConsiderationData {
 
-    @JsonProperty("case_number")
+    @JsonProperty("caseNumber")
     private String caseNumber;
 
-    @JsonProperty("issues_jurisdiction")
+    @JsonProperty("issuesJurisdiction")
     private String issuesJurisdiction;
 
-    @JsonProperty("can_proceed")
+    @JsonProperty("canProceed")
     private String canProceed;
 
-    @JsonProperty("hearing_already_listed")
+    @JsonProperty("hearingAlreadyListed")
     private String hearingAlreadyListed;
 
-    @JsonProperty("hearing_listed")
+    @JsonProperty("hearingListed")
     private List<String> hearingListed;
 
-    @JsonProperty("hearing_postpone")
+    @JsonProperty("hearingPostpone")
     private String hearingPostpone;
 
-    @JsonProperty("hearing_extend")
+    @JsonProperty("hearingExtend")
     private String hearingExtend;
 
-    @JsonProperty("hearing_convert_final")
+    @JsonProperty("hearingConvertFinal")
     private String hearingConvertFinal;
 
-    @JsonProperty("hearing_convert_f2f")
+    @JsonProperty("hearingConvertF2f")
     private String hearingConvertF2f;
 
-    @JsonProperty("hearing_other")
+    @JsonProperty("hearingOther")
     private String hearingOther;
 
-    @JsonProperty("other_directions")
+    @JsonProperty("otherDirections")
     private String otherDirections;
+
+    @JsonProperty("hearingNotListed")
+    private List<String> hearingNotListed;
+
+
+    void testCCD(CaseData caseData){
+        caseData.getEtICHearingNotListedList();
+
+    }
 
     // Eng Wales
 

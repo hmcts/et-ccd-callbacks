@@ -1,12 +1,15 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.InitialConsiderationData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.InitialConsiderationDocument;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
+@Slf4j
 public class InitialConsiderationHelper {
 
     private static final String IC_SUMMARY_FILENAME = "InitialConsideration.pdf";
@@ -25,7 +28,10 @@ public class InitialConsiderationHelper {
             .hearingListed(caseData.getEtICHearingListed())
             .hearingPostpone(caseData.getEtICPostponeGiveDetails())
             .hearingConvertF2f(caseData.getEtICConvertF2fGiveDetails())
-            //.hearingListed(caseData.getEtICHearingAlreadyListed())
+            .hearingConvertFinal(caseData.getEtICConvertPreliminaryGiveDetails())
+            .hearingExtend(caseData.getEtICExtendDurationGiveDetails())
+            .hearingOther(caseData.getEtICExtendDurationGiveDetails())
+            .otherDirections(caseData.getEtICHearingAnyOtherDirections())
             .build();
 
         InitialConsiderationDocument document = InitialConsiderationDocument.builder()
@@ -35,6 +41,9 @@ public class InitialConsiderationHelper {
             .data(data).build();
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        log.info(mapper.writeValueAsString(data));
 
         return mapper.writeValueAsString(document);
     }

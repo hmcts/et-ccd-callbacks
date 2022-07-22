@@ -112,8 +112,8 @@ public class ECCHelper {
                                                             ClaimantType originalClaimantType) {
         var respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName(originalClaimantIndType.claimantFullName());
-        respondentSumType.setRespondentACASNo(EMPLOYER_CONTRACT_CLAIM_CODE);
-        respondentSumType.setRespondentACASQuestion(NO);
+        respondentSumType.setRespondentAcasNo(EMPLOYER_CONTRACT_CLAIM_CODE);
+        respondentSumType.setRespondentAcasQuestion(NO);
         respondentSumType.setRespondentAddress(originalClaimantType.getClaimantAddressUK());
 
         var respondentSumTypeItem = new RespondentSumTypeItem();

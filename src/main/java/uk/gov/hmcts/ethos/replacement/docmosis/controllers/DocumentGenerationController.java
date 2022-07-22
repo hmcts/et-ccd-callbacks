@@ -173,7 +173,7 @@ public class DocumentGenerationController {
                 return ResponseEntity.ok(CCDCallbackResponse.builder()
                         .data(caseDetails.getCaseData())
                         .errors(errors)
-                        .significant_item(significantItem)
+                        .significantItem(significantItem)
                         .build());
             } else {
                 return getCallbackRespEntityErrors(errors, caseDetails.getCaseData());
@@ -205,7 +205,7 @@ public class DocumentGenerationController {
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
-                .confirmation_header(GENERATED_DOCUMENT_URL + ccdRequest.getCaseDetails().getCaseData().getDocMarkUp())
+                .confirmationHeader(GENERATED_DOCUMENT_URL + ccdRequest.getCaseDetails().getCaseData().getDocMarkUp())
                 .build());
     }
 

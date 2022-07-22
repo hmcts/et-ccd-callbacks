@@ -338,7 +338,7 @@ public class BulkSearchServiceTest {
         bulkData.setPositionType("PositionType");
         bulkData.setFlag1("Flag1");
         bulkData.setFlag2("Flag2");
-        bulkData.setEQP("EQP");
+        bulkData.setEqp("EQP");
         bulkData.setClaimantOrg("ClaimantOrg");
         bulkData.setRespondentOrg("RespondentOrg");
         bulkData.setSubmissionRef("11111111111");

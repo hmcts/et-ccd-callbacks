@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class DocumentCollectionService {
 
     @Value("${document_management.ccdCaseDocument.url}")

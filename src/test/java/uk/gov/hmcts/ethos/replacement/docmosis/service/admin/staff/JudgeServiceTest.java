@@ -263,17 +263,9 @@ class JudgeServiceTest {
     private AdminData createAdminDataWithDynamicList(String id, String tribunalOffice, String code, String name,
                                                      String employmentStatus) {
         AdminData adminData = createAdminData(code, name, tribunalOffice, employmentStatus);
-        adminData.setJudgeSelectList(getDynamicFixedListType(id, name));
+        adminData.setJudgeSelectList(DynamicFixedListType.of(DynamicValueType.create(code, name)));
         adminData.getJudgeSelectList().setValue(DynamicValueType.create(id, name));
         return adminData;
-    }
-
-    private DynamicFixedListType getDynamicFixedListType(String id, String name) {
-        List<DynamicValueType> dynamicJudge = new ArrayList<>();
-        dynamicJudge.add(DynamicValueType.create(id, name));
-        DynamicFixedListType judgeDynamicList = new DynamicFixedListType();
-        judgeDynamicList.setListItems(dynamicJudge);
-        return judgeDynamicList;
     }
 
     private Judge createJudge(AdminData adminData) {

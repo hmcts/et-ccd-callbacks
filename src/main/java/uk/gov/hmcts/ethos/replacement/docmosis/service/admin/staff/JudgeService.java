@@ -31,6 +31,10 @@ public class JudgeService {
         this.judgeRepository = judgeRepository;
     }
 
+    /**
+     * Resets/Clears the judge details fields.
+     * @param adminData The object containing admin data
+     */
     public void initAddJudge(AdminData adminData) {
         adminData.setTribunalOffice(null);
         adminData.setJudgeCode(null);
@@ -38,10 +42,14 @@ public class JudgeService {
         adminData.setEmploymentStatus(null);
     }
 
+    /**
+     * Saves the newly added Judge details to the ethos database.
+     * @param adminData The object containing admin data
+     */
     public void saveJudge(AdminData adminData) {
         TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice());
 
-        var judge =  new Judge();
+        Judge judge =  new Judge();
         judge.setCode(adminData.getJudgeCode());
         judge.setName(adminData.getJudgeName());
         judge.setEmploymentStatus(JudgeEmploymentStatus.valueOf(adminData.getEmploymentStatus()));
@@ -58,9 +66,13 @@ public class JudgeService {
         }
     }
 
+    /**
+     * Populates the list of judges for the selected tribunal office.
+     * @param adminData The object containing admin data
+     */
     public List<String> updateJudgeMidEventSelectOffice(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        var tribunalOffice = adminData.getTribunalOffice();
+        String tribunalOffice = adminData.getTribunalOffice();
         List<Judge> judgeList = getJudgesListByOffice(tribunalOffice);
 
         if (judgeList.isEmpty()) {
@@ -69,21 +81,25 @@ public class JudgeService {
         }
 
         List<DynamicValueType> dynamicJudge = new ArrayList<>();
-        for (var judge : judgeList) {
+        for (Judge judge : judgeList) {
             dynamicJudge.add(DynamicValueType.create(judge.getId().toString(), judge.getName()));
         }
 
-        var judgeDynamicList = new DynamicFixedListType();
+        DynamicFixedListType judgeDynamicList = new DynamicFixedListType();
         judgeDynamicList.setListItems(dynamicJudge);
 
         adminData.setJudgeSelectList(judgeDynamicList);
         return errors;
     }
 
+    /**
+     * Populates the details of judge for the selected judge name.
+     * @param adminData The object containing admin data
+     */
     public List<String> updateJudgeMidEventSelectJudge(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        var selectedId = Integer.parseInt(adminData.getJudgeSelectList().getSelectedCode());
-        var findJudge = judgeRepository.findById(selectedId);
+        int selectedId = Integer.parseInt(adminData.getJudgeSelectList().getSelectedCode());
+        List<Judge> findJudge = judgeRepository.findById(selectedId);
         if (findJudge.isEmpty()) {
             errors.add(SAVE_ERROR_MESSAGE);
             return errors;
@@ -92,6 +108,10 @@ public class JudgeService {
         return errors;
     }
 
+    /**
+     * Updates the details of the selected Judge.
+     * @param adminData The object containing admin data
+     */
     public List<String> updateJudge(AdminData adminData) {
         List<String> errors = new ArrayList<>();
         var selectedId = Integer.parseInt(adminData.getJudgeSelectList().getSelectedCode());
@@ -115,10 +135,14 @@ public class JudgeService {
         return errors;
     }
 
+    /**
+     * Deletes the selected Judge from the ethos database.
+     * @param adminData The object containing admin data
+     */
     public List<String> deleteJudge(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        var selectedId = Integer.parseInt(adminData.getJudgeSelectList().getSelectedCode());
-        var matchingJudgesList = judgeRepository.findById(selectedId);
+        int selectedId = Integer.parseInt(adminData.getJudgeSelectList().getSelectedCode());
+        List<Judge> matchingJudgesList = judgeRepository.findById(selectedId);
         if (matchingJudgesList.isEmpty()) {
             errors.add(String.format(NO_JUDGE_FOUND_WITH_NAME_SPECIFIED_ERROR_MESSAGE, adminData.getJudgeName()));
             return errors;
@@ -128,9 +152,13 @@ public class JudgeService {
         return errors;
     }
 
+    /**
+     * Populates the list of judges for the selected tribunal office.
+     * @param adminData The object containing admin data
+     */
     public List<String> deleteJudgeMidEventSelectOffice(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        var tribunalOffice = adminData.getTribunalOffice();
+        String tribunalOffice = adminData.getTribunalOffice();
         List<Judge> judgeList = getJudgesListByOffice(adminData.getTribunalOffice());
         if (judgeList.isEmpty()) {
             errors.add(String.format(NO_JUDGE_FOUND_ERROR_MESSAGE, tribunalOffice));
@@ -140,10 +168,14 @@ public class JudgeService {
         return errors;
     }
 
+    /**
+     * Populates the details of judge for the selected judge name.
+     * @param adminData The object containing admin data
+     */
     public List<String> deleteJudgeMidEventSelectJudge(AdminData adminData) {
-        var errors = new ArrayList<String>();
-        var selectedId = Integer.parseInt(adminData.getJudgeSelectList().getSelectedCode());
-        var findJudge = judgeRepository.findById(selectedId);
+        List<String> errors = new ArrayList<>();
+        int selectedId = Integer.parseInt(adminData.getJudgeSelectList().getSelectedCode());
+        List<Judge> findJudge = judgeRepository.findById(selectedId);
         if (findJudge.isEmpty()) {
             errors.add(String.format(NO_JUDGE_FOUND_WITH_NAME_SPECIFIED_ERROR_MESSAGE, adminData.getJudgeName()));
             return errors;
@@ -160,7 +192,7 @@ public class JudgeService {
         List<DynamicValueType> dynamicJudge = new ArrayList<>();
         judgeList.forEach(judge -> dynamicJudge.add(DynamicValueType.create(judge.getId().toString(),
             judge.getName())));
-        var judgeDynamicList = new DynamicFixedListType();
+        DynamicFixedListType judgeDynamicList = new DynamicFixedListType();
         judgeDynamicList.setListItems(dynamicJudge);
         return judgeDynamicList;
     }

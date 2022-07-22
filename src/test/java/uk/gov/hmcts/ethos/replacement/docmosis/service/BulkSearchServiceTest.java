@@ -96,7 +96,7 @@ public class BulkSearchServiceTest {
                 + "positionTypeS=null, feeGroupReferenceS=null, jurCodesCollectionS=null, stateS=null, "
                 + "currentPositionS=null, claimantAddressLine1S=null, "
                 + "claimantPostCodeS=null, respondentAddressLine1S=null, respondentPostCodeS=null,"
-                + " flag1S=null, flag2S=null, EQPS=null, "
+                + " flag1S=null, flag2S=null, eqps=null, "
                 + "respondentRepOrgS=null, claimantRepOrgS=null))]";
         BulkRequestPayload bulkRequestPayload = bulkSearchService.bulkSearchLogic(bulkDetails);
         assertEquals(result, bulkRequestPayload.getBulkDetails().getCaseData().getSearchCollection().toString());

@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -26,6 +27,8 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.addDocument;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.addDocuments;
 
 
 /**
@@ -113,6 +116,41 @@ public class Et3ResponseController {
         List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
 
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    /**
+     * Called at the end of the journey before data is submitted, saves the uploaded documents into the document tab
+     * for the case
+     * @param ccdRequest generic request from CCD
+     * @param userToken authentication token to verify the user
+     * @return Callback response entity with case data and errors attached.
+     */
+    @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "display the next steps after ET3 response")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setEt3ResponseDocumentCollection(new ArrayList<>());
+        addDocument(caseData, caseData.getEt3ResponseEmployerClaimDocument());
+        addDocument(caseData, caseData.getEt3ResponseRespondentSupportDocument());
+        addDocuments(caseData, caseData.getEt3ResponseContestClaimDocument());
+
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
     /**

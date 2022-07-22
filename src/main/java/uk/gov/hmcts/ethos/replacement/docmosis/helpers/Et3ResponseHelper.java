@@ -1,11 +1,16 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -64,5 +69,92 @@ public class Et3ResponseHelper {
         }
 
         return errors;
+    }
+
+    /**
+     * Adds a group of documents to the ET3 response collection so that it can be displayed on the document tab
+     * @param caseData data for the current case
+     * @param documentTypeItemList the documents to be added to the document tab
+     */
+    public static void addDocuments(CaseData caseData, List<DocumentTypeItem> documentTypeItemList) {
+        if (CollectionUtils.isEmpty(documentTypeItemList)) {
+            return;
+        }
+
+        if (caseData.getEt3ResponseDocumentCollection() == null) {
+            caseData.setEt3ResponseDocumentCollection(new ArrayList<>());
+        }
+
+        for (DocumentTypeItem documentTypeItem : documentTypeItemList) {
+            if (documentExistsOnCollection(
+                caseData.getEt3ResponseDocumentCollection(),
+                documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl())
+            ) {
+                continue;
+            }
+
+            DocumentType documentType = documentTypeItem.getValue();
+
+            DocumentTypeItem documentItem = new DocumentTypeItem();
+            documentItem.setId(UUID.randomUUID().toString());
+            documentItem.setValue(documentType);
+
+            caseData.getEt3ResponseDocumentCollection().add(documentTypeItem);
+        }
+    }
+
+    /**
+     * Adds a document to the ET3 response collection so that it can be displayed on the document tab
+     * @param caseData data for the current case
+     * @param documentToAdd the document to be added to the document tab
+     */
+    public static void addDocument(CaseData caseData, UploadedDocumentType documentToAdd) {
+        if (documentToAdd == null) {
+            return;
+        }
+
+        if (caseData.getEt3ResponseDocumentCollection() == null) {
+            caseData.setEt3ResponseDocumentCollection(new ArrayList<>());
+        } else if (
+            documentExistsOnCollection(caseData.getEt3ResponseDocumentCollection(),
+                documentToAdd.getDocumentBinaryUrl())
+        ) {
+            return;
+        }
+
+        DocumentType documentType = new DocumentType();
+
+        documentType.setTypeOfDocument("Other");
+        documentType.setUploadedDocument(documentToAdd);
+        documentType.setShortDescription("Uploaded with ET3 response");
+
+        DocumentTypeItem documentItem = new DocumentTypeItem();
+
+        documentItem.setId(UUID.randomUUID().toString());
+        documentItem.setValue(documentType);
+
+        caseData.getEt3ResponseDocumentCollection().add(documentItem);
+    }
+
+    /**
+     * Checks if a document collection contains a document based on the URL of the document
+     * @param collectionToCheck a document collection to check
+     * @param documentUrlToFind the url of the document to be found
+     * @return true if found, false if not found or the collection passed is null
+     */
+    private static boolean documentExistsOnCollection(List<DocumentTypeItem> collectionToCheck,
+                                                      String documentUrlToFind) {
+        if (collectionToCheck == null) {
+            return false;
+        }
+
+        return collectionToCheck
+            .stream()
+            .anyMatch(
+                d -> d.getValue()
+                    .getUploadedDocument()
+                    .getDocumentBinaryUrl()
+                    .equals(documentUrlToFind)
+            );
     }
 }

@@ -374,7 +374,7 @@ public class BulkUpdateServiceTest {
                 + "subMultipleTitleM=null, currentPositionM=null, claimantAddressLine1M=null, "
                 + "claimantPostCodeM=null, "
                 + "respondentAddressLine1M=null, respondentPostCodeM=null, "
-                + "flag1M=null, flag2M=null, EQPM=null,"
+                + "flag1M=null, flag2M=null, eqpm=null,"
                 + " respondentRepOrgM=null, claimantRepOrgM=null))]";
         assertEquals(multipleCollection,
                 bulkRequestPayload.getBulkDetails().getCaseData().getMultipleCollection().toString());
@@ -394,7 +394,7 @@ public class BulkUpdateServiceTest {
                 + "jurCodesCollectionM=null,"
                 + " stateM=Accepted, " + "subMultipleM=12, subMultipleTitleM=null, currentPositionM=null, "
                 + "claimantAddressLine1M=null, claimantPostCodeM=null, " + "respondentAddressLine1M=null, "
-                + "respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, respondentRepOrgM=null, "
+                + "respondentPostCodeM=null, flag1M=null, flag2M=null, eqpm=null, respondentRepOrgM=null, "
                 + "claimantRepOrgM=null))]";
         assertEquals(multipleCollection, bulkRequestPayload.getBulkDetails().getCaseData()
                 .getMultipleCollection().toString());
@@ -416,7 +416,7 @@ public class BulkUpdateServiceTest {
                 + "jurCodesCollectionM=null,"
                 + " stateM=Accepted, " + "subMultipleM=12, subMultipleTitleM=null, currentPositionM=null, "
                 + "claimantAddressLine1M=null, claimantPostCodeM=null, " + "respondentAddressLine1M=null, "
-                + "respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, "
+                + "respondentPostCodeM=null, flag1M=null, flag2M=null, eqpm=null, "
                 + "respondentRepOrgM=null, claimantRepOrgM=null))]";
         assertEquals(multipleCollection,
                 bulkRequestPayload.getBulkDetails().getCaseData().getMultipleCollection().toString());

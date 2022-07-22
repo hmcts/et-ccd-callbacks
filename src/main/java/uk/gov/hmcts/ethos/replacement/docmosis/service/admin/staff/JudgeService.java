@@ -118,7 +118,7 @@ public class JudgeService {
 
         var findJudge = judgeRepository.findById(selectedId);
         if (!findJudge.isEmpty()) {
-            var thisJudge = findJudge.get(0);
+            Judge thisJudge = findJudge.get(0);
             thisJudge.setName(adminData.getJudgeName());
             thisJudge.setEmploymentStatus(JudgeEmploymentStatus.valueOf(adminData.getEmploymentStatus()));
             if (judgeRepository.existsByTribunalOfficeAndNameAndIdIsNot(

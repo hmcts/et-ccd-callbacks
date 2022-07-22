@@ -30,8 +30,8 @@ public class Et3ResponseHelper {
 
     /**
      * Formats the name of the claimant for display on the Claimant name correct page.
-     * @param caseData data for the current case
-     * @return Name ready for presentation on web
+     * @param caseData data for the current case.
+     * @return Name ready for presentation on web.
      */
     public static String formatClaimantNameForHtml(CaseData caseData) {
         return String.format(CLAIMANT_NAME_TABLE, caseData.getClaimant());
@@ -40,8 +40,8 @@ public class Et3ResponseHelper {
     /**
      * Validates that the employment start date is in the past and not after 
      * the employment end date if both dates are provided.
-     * @param caseData data for the current case
-     * @return List of validation errors encountered
+     * @param caseData data for the current case.
+     * @return List of validation errors encountered.
      */
     public static List<String> validateEmploymentDates(CaseData caseData) {
         ArrayList<String> errors = new ArrayList<>();
@@ -72,9 +72,9 @@ public class Et3ResponseHelper {
     }
 
     /**
-     * Adds a group of documents to the ET3 response collection so that it can be displayed on the document tab
-     * @param caseData data for the current case
-     * @param documentTypeItemList the documents to be added to the document tab
+     * Adds a group of documents to the ET3 response collection so that it can be displayed on the document tab.
+     * @param caseData data for the current case.
+     * @param documentTypeItemList the documents to be added to the document tab.
      */
     public static void addDocuments(CaseData caseData, List<DocumentTypeItem> documentTypeItemList) {
         if (CollectionUtils.isEmpty(documentTypeItemList)) {
@@ -104,9 +104,9 @@ public class Et3ResponseHelper {
     }
 
     /**
-     * Adds a document to the ET3 response collection so that it can be displayed on the document tab
-     * @param caseData data for the current case
-     * @param documentToAdd the document to be added to the document tab
+     * Adds a document to the ET3 response collection so that it can be displayed on the document tab.
+     * @param caseData data for the current case.
+     * @param documentToAdd the document to be added to the document tab.
      */
     public static void addDocument(CaseData caseData, UploadedDocumentType documentToAdd) {
         if (documentToAdd == null) {
@@ -137,10 +137,10 @@ public class Et3ResponseHelper {
     }
 
     /**
-     * Checks if a document collection contains a document based on the URL of the document
-     * @param collectionToCheck a document collection to check
-     * @param documentUrlToFind the url of the document to be found
-     * @return true if found, false if not found or the collection passed is null
+     * Checks if a document collection contains a document based on the URL of the document.
+     * @param collectionToCheck a document collection to check.
+     * @param documentUrlToFind the url of the document to be found.
+     * @return true if found, false if not found or the collection passed is null.
      */
     private static boolean documentExistsOnCollection(List<DocumentTypeItem> collectionToCheck,
                                                       String documentUrlToFind) {

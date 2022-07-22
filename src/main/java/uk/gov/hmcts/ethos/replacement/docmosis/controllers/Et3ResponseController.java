@@ -120,9 +120,9 @@ public class Et3ResponseController {
 
     /**
      * Called at the end of the journey before data is submitted, saves the uploaded documents into the document tab
-     * for the case
-     * @param ccdRequest generic request from CCD
-     * @param userToken authentication token to verify the user
+     * for the case.
+     * @param ccdRequest generic request from CCD.
+     * @param userToken authentication token to verify the user.
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
@@ -155,8 +155,8 @@ public class Et3ResponseController {
 
     /**
      * Generates the confirmation page for the ET3 response journey, with instructions on what to do next.
-     * @param ccdRequest generic request from CCD
-     * @param userToken authentication token to verify the user
+     * @param ccdRequest generic request from CCD.
+     * @param userToken authentication token to verify the user.
      * @return this will return and display a message to the user on the next steps.
      */
     @PostMapping(value = "/processingComplete", consumes = APPLICATION_JSON_VALUE)

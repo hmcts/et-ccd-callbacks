@@ -9,7 +9,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

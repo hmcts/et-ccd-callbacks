@@ -61,6 +61,6 @@
     "minimist": "^1.2.6",
     "moment": "^2.29.2",
     "yargs-parser": "^21.0.1",
-    "file-type": "^6.2.0"
+    "file-type": "^17.1.3"
   }
 }

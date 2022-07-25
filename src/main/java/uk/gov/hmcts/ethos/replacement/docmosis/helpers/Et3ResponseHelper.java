@@ -123,13 +123,9 @@ public class Et3ResponseHelper {
         }
 
         DocumentType documentType = new DocumentType();
-
-        documentType.setTypeOfDocument("Other");
         documentType.setUploadedDocument(documentToAdd);
-        documentType.setShortDescription("Uploaded with ET3 response");
 
         DocumentTypeItem documentItem = new DocumentTypeItem();
-
         documentItem.setId(UUID.randomUUID().toString());
         documentItem.setValue(documentType);
 

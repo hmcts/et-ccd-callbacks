@@ -61,8 +61,8 @@ public class InitialConsiderationController {
         }
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
-            .confirmation_header(COMPLETE_IC_HDR)
-            .confirmation_body(String.format(COMPLETE_IC_BODY, ccdRequest.getCaseDetails().getCaseId()))
+            .confirmationHeader(COMPLETE_IC_HDR)
+            .confirmationBody(String.format(COMPLETE_IC_BODY, ccdRequest.getCaseDetails().getCaseId()))
             .build());
     }
 

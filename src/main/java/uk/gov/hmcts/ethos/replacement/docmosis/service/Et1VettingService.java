@@ -215,8 +215,8 @@ public class Et1VettingService {
     private String generateRespondentAndAcasDetails(RespondentSumType respondent, int respondentNumber) {
         return String.format(RESPONDENT_ACAS_DETAILS, respondentNumber, respondent.getRespondentName(),
             toAddressWithTab(respondent.getRespondentAddress()))
-            + (respondent.getRespondentACAS() == null
-            ? NO_ACAS_CERT_DISPLAY : String.format(ACAS_CERT_LIST_DISPLAY, respondent.getRespondentACAS()));
+            + (respondent.getRespondentAcas() == null
+            ? NO_ACAS_CERT_DISPLAY : String.format(ACAS_CERT_LIST_DISPLAY, respondent.getRespondentAcas()));
     }
 
     /**

@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentCollectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -34,6 +35,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class InitialConsiderationController {
 
     private final VerifyTokenService verifyTokenService;
+    private final DocumentCollectionService documentCollectionService;
     private final InitialConsiderationService initialConsiderationService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String COMPLETE_IC_HDR = "<h1>Initial consideration complete</h1>";
@@ -43,6 +45,7 @@ public class InitialConsiderationController {
         + "the case. "
         + "You can <a href=\"/cases/case-details/%s#Documents\" target=\"_blank\">view the initial "
         + "consideration document in the Documents tab (opens in new tab).</a></p>";
+    private static final String IC_SUMMARY_FILENAME = "InitialConsideration.pdf";
 
     @PostMapping(value = "/completeInitialConsideration", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "completes the Initial Consideration flow")
@@ -88,7 +91,7 @@ public class InitialConsiderationController {
 
         DocumentInfo documentInfo = initialConsiderationService.processSummaryDocument(
             caseData, ccdRequest.getCaseDetails().getCaseTypeId(), userToken);
-        initialConsiderationService.addIcEwDocumentLink(caseData, documentInfo);
+        documentCollectionService.addDocumentCollection(caseData, documentInfo, IC_SUMMARY_FILENAME);
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(caseData)

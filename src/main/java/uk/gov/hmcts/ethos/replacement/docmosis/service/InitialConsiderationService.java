@@ -2,27 +2,22 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
-import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -34,9 +29,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 @Service
 @RequiredArgsConstructor
 public class InitialConsiderationService {
-
-    @Value("${document_management.ccdCaseDocument.url}")
-    private String ccdCaseDocumentUrl;
 
     private final TornadoService tornadoService;
 
@@ -60,7 +52,6 @@ public class InitialConsiderationService {
     private static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
     private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "");
 
-    private static final String IC_SUMMARY_FILENAME = "InitialConsideration.pdf";
     private static final String MESSAGE = "Failed to generate document for case id : ";
 
     /**
@@ -167,39 +158,4 @@ public class InitialConsiderationService {
         }
     }
 
-    public void addIcEwDocumentLink(CaseData caseData, DocumentInfo documentInfo) {
-        if (caseData.getDocumentCollection() == null) {
-            List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
-            caseData.setDocumentCollection(documentTypeItemList);
-        }
-        caseData.getDocumentCollection().add(createDocumentTypeItem(createDocumentPath(documentInfo)));
-    }
-
-    private String createDocumentPath(DocumentInfo documentInfo) {
-        return documentInfo.getUrl()
-                .substring(documentInfo.getUrl().indexOf("/documents/"));
-    }
-
-    private DocumentTypeItem createDocumentTypeItem(String documentPath) {
-        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
-        documentTypeItem.setId(documentPath.replace("/documents/", "").replace("/binary", ""));
-        documentTypeItem.setValue(createDocumentType(documentPath));
-        return documentTypeItem;
-    }
-
-    private DocumentType createDocumentType(String documentPath) {
-        DocumentType documentType = new DocumentType();
-        documentType.setTypeOfDocument(null);
-        documentType.setShortDescription(null);
-        documentType.setUploadedDocument(createUploadedDocumentType(documentPath));
-        return documentType;
-    }
-
-    private UploadedDocumentType createUploadedDocumentType(String documentPath) {
-        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
-        uploadedDocumentType.setDocumentBinaryUrl(ccdCaseDocumentUrl + documentPath);
-        uploadedDocumentType.setDocumentFilename(IC_SUMMARY_FILENAME);
-        uploadedDocumentType.setDocumentUrl(ccdCaseDocumentUrl + documentPath.replace("/binary", ""));
-        return uploadedDocumentType;
-    }
 }

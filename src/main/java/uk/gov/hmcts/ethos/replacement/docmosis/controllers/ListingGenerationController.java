@@ -185,7 +185,7 @@ public class ListingGenerationController {
             ccdRequest.getCaseDetails().getCaseData().setDocMarkUp(documentInfo.getMarkUp());
             return ResponseEntity.ok(CCDCallbackResponse.builder()
                     .data(ccdRequest.getCaseDetails().getCaseData())
-                    .significant_item(Helper.generateSignificantItem(documentInfo, errors))
+                    .significantItem(Helper.generateSignificantItem(documentInfo, errors))
                     .build());
         } else {
             errors.add("No hearings have been found for your search criteria");
@@ -219,7 +219,7 @@ public class ListingGenerationController {
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
-                .confirmation_header(GENERATED_DOCUMENT_URL + ccdRequest.getCaseDetails().getCaseData().getDocMarkUp())
+                .confirmationHeader(GENERATED_DOCUMENT_URL + ccdRequest.getCaseDetails().getCaseData().getDocMarkUp())
                 .build());
     }
 
@@ -285,7 +285,7 @@ public class ListingGenerationController {
             updateListingDocMarkUp(listingData, documentInfo);
             return ResponseEntity.ok(ListingCallbackResponse.builder()
                     .data(listingData)
-                    .significant_item(Helper.generateSignificantItem(documentInfo, errorsList))
+                    .significantItem(Helper.generateSignificantItem(documentInfo, errorsList))
                     .build());
         } else {
             errorsList.add("No cases (with hearings / claims served) have been found for your search criteria");
@@ -361,7 +361,7 @@ public class ListingGenerationController {
             updateListingDocMarkUp(listingData, documentInfo);
             return ResponseEntity.ok(ListingCallbackResponse.builder()
                     .data(listingData)
-                    .significant_item(Helper.generateSignificantItem(documentInfo, errorsList))
+                    .significantItem(Helper.generateSignificantItem(documentInfo, errorsList))
                     .build());
         } else {
             return ResponseEntity.ok(ListingCallbackResponse.builder()
@@ -394,7 +394,7 @@ public class ListingGenerationController {
 
         return ResponseEntity.ok(ListingCallbackResponse.builder()
                 .data(listingRequest.getCaseDetails().getCaseData())
-                .confirmation_header(GENERATED_DOCUMENT_URL
+                .confirmationHeader(GENERATED_DOCUMENT_URL
                         + listingRequest.getCaseDetails().getCaseData().getDocMarkUp())
                 .build());
     }

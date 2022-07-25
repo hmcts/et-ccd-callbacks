@@ -152,7 +152,7 @@ public class BulkActionsController {
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
                 .data(bulkRequest.getCaseDetails().getCaseData())
-                .confirmation_header("Updates are being processed...")
+                .confirmationHeader("Updates are being processed...")
                 .build());
     }
 
@@ -269,7 +269,7 @@ public class BulkActionsController {
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
                 .data(bulkRequest.getCaseDetails().getCaseData())
-                .confirmation_header(GENERATED_DOCUMENTS_URL
+                .confirmationHeader(GENERATED_DOCUMENTS_URL
                         + bulkRequest.getCaseDetails().getCaseData().getDocMarkUp())
                 .build());
     }
@@ -588,7 +588,7 @@ public class BulkActionsController {
             bulkRequest.getCaseDetails().getCaseData().setDocMarkUp(bulkDocumentInfo.getMarkUps());
             return ResponseEntity.ok(BulkCallbackResponse.builder()
                     .data(bulkRequest.getCaseDetails().getCaseData())
-                    .significant_item(Helper.generateSignificantItem(bulkDocumentInfo.getDocumentInfo() != null
+                    .significantItem(Helper.generateSignificantItem(bulkDocumentInfo.getDocumentInfo() != null
                             ? bulkDocumentInfo.getDocumentInfo() : new DocumentInfo(), new ArrayList<>()))
                     .build());
         } else {
@@ -621,7 +621,7 @@ public class BulkActionsController {
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
                 .data(bulkRequest.getCaseDetails().getCaseData())
-                .confirmation_header(
+                .confirmationHeader(
                         GENERATED_DOCUMENTS_URL + bulkRequest.getCaseDetails().getCaseData().getDocMarkUp())
                 .build());
     }

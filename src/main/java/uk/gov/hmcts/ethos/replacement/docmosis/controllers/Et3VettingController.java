@@ -318,8 +318,8 @@ public class Et3VettingController {
         //  hyperlink as part of the text. See RET-2020 for what the links should be once they have been added
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
-                .confirmation_header(PROCESSING_COMPLETE_HEADER)
-                .confirmation_body(PROCESSING_COMPLETE_BODY)
+                .confirmationHeader(PROCESSING_COMPLETE_HEADER)
+                .confirmationBody(PROCESSING_COMPLETE_BODY)
                 .build());
     }
 }

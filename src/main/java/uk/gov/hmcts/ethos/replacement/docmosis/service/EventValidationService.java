@@ -347,9 +347,9 @@ public class EventValidationService {
 
     private void validateResponseReturnedFromJudgeDate(RespondentSumType respondentSumType, List<String> errors,
                                                        int index) {
-        if (respondentSumType.getResponse_ReferredToJudge() != null
+        if (respondentSumType.getResponseReferredToJudge() != null
                 && respondentSumType.getResponseReturnedFromJudge() != null) {
-            var responseReferredToJudge = LocalDate.parse(respondentSumType.getResponse_ReferredToJudge());
+            var responseReferredToJudge = LocalDate.parse(respondentSumType.getResponseReferredToJudge());
             var responseReturnedFromJudge = LocalDate.parse(respondentSumType.getResponseReturnedFromJudge());
             if (responseReturnedFromJudge.isBefore(responseReferredToJudge)) {
                 String respondentName = respondentSumType.getRespondentName() != null

@@ -128,7 +128,7 @@ public class MultipleDocGenerationController {
 
         return ResponseEntity.ok(MultipleCallbackResponse.builder()
                 .data(multipleData)
-                .confirmation_header(GENERATED_DOCUMENT_URL + multipleData.getDocMarkUp())
+                .confirmationHeader(GENERATED_DOCUMENT_URL + multipleData.getDocMarkUp())
                 .build());
     }
 

@@ -81,26 +81,14 @@ public class Et3ResponseHelper {
             return;
         }
 
-        if (caseData.getEt3ResponseDocumentCollection() == null) {
+        if (CollectionUtils.isEmpty(caseData.getEt3ResponseDocumentCollection())) {
             caseData.setEt3ResponseDocumentCollection(new ArrayList<>());
         }
 
-        for (DocumentTypeItem documentTypeItem : documentTypeItemList) {
-            if (documentExistsOnCollection(
-                caseData.getEt3ResponseDocumentCollection(),
-                documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl())
-            ) {
-                continue;
-            }
-
-            DocumentType documentType = documentTypeItem.getValue();
-
-            DocumentTypeItem documentItem = new DocumentTypeItem();
-            documentItem.setId(UUID.randomUUID().toString());
-            documentItem.setValue(documentType);
-
-            caseData.getEt3ResponseDocumentCollection().add(documentTypeItem);
-        }
+        documentTypeItemList.stream()
+            .filter(d -> !documentExistsOnCollection(caseData.getEt3ResponseDocumentCollection(),
+                d.getValue().getUploadedDocument().getDocumentBinaryUrl()))
+            .forEach(documentToAdd -> saveFileToCollection(caseData, documentToAdd.getValue()));
     }
 
     /**
@@ -125,11 +113,20 @@ public class Et3ResponseHelper {
         DocumentType documentType = new DocumentType();
         documentType.setUploadedDocument(documentToAdd);
 
-        DocumentTypeItem documentItem = new DocumentTypeItem();
-        documentItem.setId(UUID.randomUUID().toString());
-        documentItem.setValue(documentType);
+        saveFileToCollection(caseData, documentType);
+    }
 
-        caseData.getEt3ResponseDocumentCollection().add(documentItem);
+    /**
+     * Saves a document of DocumentType to the ET3Response document collection.
+     * @param caseData data for the current case.
+     * @param documentType the document to save
+     */
+    private static void saveFileToCollection(CaseData caseData, DocumentType documentType) {
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        documentTypeItem.setId(UUID.randomUUID().toString());
+        documentTypeItem.setValue(documentType);
+
+        caseData.getEt3ResponseDocumentCollection().add(documentTypeItem);
     }
 
     /**

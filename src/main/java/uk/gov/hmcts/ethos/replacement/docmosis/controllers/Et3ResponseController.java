@@ -180,8 +180,8 @@ public class Et3ResponseController {
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())
-            .confirmation_header(PROCESSING_COMPLETE_HEADER)
-            .confirmation_body(PROCESSING_COMPLETE_BODY)
+            .confirmationHeader(PROCESSING_COMPLETE_HEADER)
+            .confirmationBody(PROCESSING_COMPLETE_BODY)
             .build());
     }
 }

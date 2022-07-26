@@ -60,6 +60,7 @@
     "merge": "^2.1.1",
     "minimist": "^1.2.6",
     "moment": "^2.29.2",
-    "yargs-parser": "^21.0.1"
+    "yargs-parser": "^21.0.1",
+    "file-type": "^17.1.3"
   }
 }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -28,6 +27,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_OP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_SH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_ST;
@@ -102,6 +102,23 @@ public class Et1VettingService {
         caseDetails.getCaseData().setEt1VettingRespondentDetailsMarkUp(
             initialRespondentDetailsMarkUp(caseDetails.getCaseData()));
         populateRespondentAcasDetailsMarkUp(caseDetails.getCaseData());
+    }
+
+    /**
+     * This method populates the hearing venue. The office is determined from the previous screen where the user
+     * picks the tribunal office the case should be listed in. If they choose a different office to the current one,
+     * they should see the venues for that office
+     * @param caseData holds all the casedata
+     */
+    public void populateHearingVenue(CaseData caseData) {
+        if (caseData.getRegionalOfficeList() != null
+                && !isNullOrEmpty(caseData.getRegionalOfficeList().getSelectedCode())) {
+            caseData.setEt1TribunalRegion(caseData.getRegionalOfficeList().getSelectedCode());
+        } else {
+            caseData.setEt1TribunalRegion(caseData.getManagingOffice());
+        }
+        caseData.setEt1HearingVenues(getHearingVenuesList(caseData.getEt1TribunalRegion()));
+
     }
 
     /**
@@ -309,10 +326,10 @@ public class Et1VettingService {
     public String toAddressWithTab(Address address) {
         StringBuilder claimantAddressStr = new StringBuilder();
         claimantAddressStr.append(address.getAddressLine1());
-        if (!Strings.isNullOrEmpty(address.getAddressLine2())) {
+        if (!isNullOrEmpty(address.getAddressLine2())) {
             claimantAddressStr.append(BR_WITH_TAB).append(address.getAddressLine2());
         }
-        if (!Strings.isNullOrEmpty(address.getAddressLine3())) {
+        if (!isNullOrEmpty(address.getAddressLine3())) {
             claimantAddressStr.append(BR_WITH_TAB).append(address.getAddressLine3());
         }
         claimantAddressStr.append(BR_WITH_TAB).append(address.getPostTown())
@@ -341,13 +358,9 @@ public class Et1VettingService {
         caseData.getJurCodesCollection().add(codesTypeItem);
     }
 
-    public DynamicFixedListType getHearingVenuesList(CaseData caseData) {
+    public DynamicFixedListType getHearingVenuesList(String office) {
         DynamicFixedListType dynamicListingVenues = new DynamicFixedListType();
-
-        dynamicListingVenues.setListItems(
-            jpaVenueService.getVenues(TribunalOffice.valueOfOfficeName(caseData.getManagingOffice()))
-        );
-
+        dynamicListingVenues.setListItems(jpaVenueService.getVenues(TribunalOffice.valueOfOfficeName(office)));
         return dynamicListingVenues;
     }
 

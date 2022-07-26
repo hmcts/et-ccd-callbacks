@@ -94,7 +94,7 @@ public class InitialConsiderationData {
     private String furtherInfoTimeToComply;
 
     @JsonProperty("r27ClaimToBe")
-    private List<String> r27ClaimToBe;
+    private String r27ClaimToBe;
     @JsonProperty("r27WhichPart")
     private String r27WhichPart;
     @JsonProperty("r27Direction")
@@ -105,7 +105,7 @@ public class InitialConsiderationData {
     private String r27NumberOfDays;
 
     @JsonProperty("r28ClaimToBe")
-    private List<String> r28ClaimToBe;
+    private String r28ClaimToBe;
     @JsonProperty("r28WhichPart")
     private String r28WhichPart;
     @JsonProperty("r28DirectionReason")

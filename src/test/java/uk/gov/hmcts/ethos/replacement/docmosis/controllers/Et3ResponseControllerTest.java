@@ -36,6 +36,7 @@ class Et3ResponseControllerTest {
     private static final String ABOUT_TO_START_URL = "/et3Response/aboutToStart";
     private static final String PROCESSING_COMPLETE_URL = "/et3Response/processingComplete";
     private static final String MID_EMPLOYMENT_DATES_URL = "/et3Response/midEmploymentDates";
+    private static final String ABOUT_TO_SUBMIT_URL = "/et3Response/aboutToSubmit";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -151,6 +152,37 @@ class Et3ResponseControllerTest {
     @Test
     void et3ProcessingComplete_badRequest() throws Exception {
         mvc.perform(post(PROCESSING_COMPLETE_URL)
+                .content("garbage content")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void aboutToSubmit_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void aboutToSubmit_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void aboutToSubmit_badRequest() throws Exception {
+        mvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))

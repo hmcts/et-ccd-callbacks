@@ -22,8 +22,8 @@ class Et3ResponseHelperTest {
     public static final String START_DATE_MUST_BE_IN_THE_PAST = "Start date must be in the past";
     public static final String END_DATE_MUST_BE_AFTER_THE_START_DATE = "End date must be after the start date";
     private CaseData caseData;
-    private UploadedDocumentType document1ToSave;
-    private UploadedDocumentType document2ToSave;
+    private UploadedDocumentType document1;
+    private UploadedDocumentType document2;
 
     @BeforeEach
     void setUp() {
@@ -31,15 +31,15 @@ class Et3ResponseHelperTest {
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseData = caseDetails.getCaseData();
-        document1ToSave = new UploadedDocumentType();
-        document1ToSave.setDocumentFilename("Document 1");
-        document1ToSave.setDocumentUrl("documentstore.com/document1");
-        document1ToSave.setDocumentBinaryUrl("binary.documentstore.com/document1");
+        document1 = new UploadedDocumentType();
+        document1.setDocumentFilename("Document 1");
+        document1.setDocumentUrl("documentstore.com/document1");
+        document1.setDocumentBinaryUrl("binary.documentstore.com/document1");
 
-        document2ToSave = new UploadedDocumentType();
-        document2ToSave.setDocumentFilename("Document 2");
-        document2ToSave.setDocumentUrl("documentstore.com/document2");
-        document2ToSave.setDocumentBinaryUrl("binary.documentstore.com/document2");
+        document2 = new UploadedDocumentType();
+        document2.setDocumentFilename("Document 2");
+        document2.setDocumentUrl("documentstore.com/document2");
+        document2.setDocumentBinaryUrl("binary.documentstore.com/document2");
     }
 
     @Test
@@ -114,7 +114,7 @@ class Et3ResponseHelperTest {
     void givenADocument_saveItToTheET3Collection() {
         assertNull(caseData.getEt3ResponseDocumentCollection());
 
-        Et3ResponseHelper.addDocument(caseData, document1ToSave);
+        Et3ResponseHelper.addDocument(caseData, document1);
 
         assertThat(caseData.getEt3ResponseDocumentCollection().size(), is(1));
     }
@@ -134,12 +134,12 @@ class Et3ResponseHelperTest {
 
         DocumentTypeItem documentTypeItem1 = new DocumentTypeItem();
         DocumentType documentType1 = new DocumentType();
-        documentType1.setUploadedDocument(document1ToSave);
+        documentType1.setUploadedDocument(document1);
         documentTypeItem1.setValue(documentType1);
 
         DocumentTypeItem documentTypeItem2 = new DocumentTypeItem();
         DocumentType documentType2 = new DocumentType();
-        documentType2.setUploadedDocument(document2ToSave);
+        documentType2.setUploadedDocument(document2);
         documentTypeItem2.setValue(documentType2);
 
         List<DocumentTypeItem> documents = Arrays.asList(documentTypeItem1, documentTypeItem2);
@@ -162,8 +162,8 @@ class Et3ResponseHelperTest {
     void givenADuplicateDocument_saveOnceToTheET3Collection() {
         assertNull(caseData.getEt3ResponseDocumentCollection());
 
-        Et3ResponseHelper.addDocument(caseData, document1ToSave);
-        Et3ResponseHelper.addDocument(caseData, document1ToSave);
+        Et3ResponseHelper.addDocument(caseData, document1);
+        Et3ResponseHelper.addDocument(caseData, document1);
 
         assertThat(caseData.getEt3ResponseDocumentCollection().size(), is(1));
     }

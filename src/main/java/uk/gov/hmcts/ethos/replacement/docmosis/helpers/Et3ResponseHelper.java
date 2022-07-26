@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.documentExistsOnCollection;
 
 /**
  * ET3 Response Helper provides methods to assist with the ET3 Response Form event.
@@ -101,12 +102,11 @@ public class Et3ResponseHelper {
             return;
         }
 
-        if (caseData.getEt3ResponseDocumentCollection() == null) {
+        List<DocumentTypeItem> et3Documents = caseData.getEt3ResponseDocumentCollection();
+
+        if (CollectionUtils.isEmpty(et3Documents)) {
             caseData.setEt3ResponseDocumentCollection(new ArrayList<>());
-        } else if (
-            documentExistsOnCollection(caseData.getEt3ResponseDocumentCollection(),
-                documentToAdd.getDocumentBinaryUrl())
-        ) {
+        } else if (documentExistsOnCollection(et3Documents, documentToAdd.getDocumentBinaryUrl())) {
             return;
         }
 
@@ -117,7 +117,7 @@ public class Et3ResponseHelper {
     }
 
     /**
-     * Saves a document of DocumentType to the ET3Response document collection.
+     * Saves a document to the ET3Response document collection.
      * @param caseData data for the current case.
      * @param documentType the document to save
      */
@@ -127,27 +127,5 @@ public class Et3ResponseHelper {
         documentTypeItem.setValue(documentType);
 
         caseData.getEt3ResponseDocumentCollection().add(documentTypeItem);
-    }
-
-    /**
-     * Checks if a document collection contains a document based on the URL of the document.
-     * @param collectionToCheck a document collection to check.
-     * @param documentUrlToFind the url of the document to be found.
-     * @return true if found, false if not found or the collection passed is null.
-     */
-    private static boolean documentExistsOnCollection(List<DocumentTypeItem> collectionToCheck,
-                                                      String documentUrlToFind) {
-        if (collectionToCheck == null) {
-            return false;
-        }
-
-        return collectionToCheck
-            .stream()
-            .anyMatch(
-                d -> d.getValue()
-                    .getUploadedDocument()
-                    .getDocumentBinaryUrl()
-                    .equals(documentUrlToFind)
-            );
     }
 }

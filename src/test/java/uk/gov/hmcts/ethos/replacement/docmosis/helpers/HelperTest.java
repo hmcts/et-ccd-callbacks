@@ -5,14 +5,20 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 
 public class HelperTest {
@@ -45,6 +51,30 @@ public class HelperTest {
                 .getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
+    }
+
+    private List<DocumentTypeItem> getDocumentCollection() {
+        UploadedDocumentType document1 = new UploadedDocumentType();
+        document1.setDocumentFilename("Document 1");
+        document1.setDocumentUrl("documentstore.com/document1");
+        document1.setDocumentBinaryUrl("binary.documentstore.com/document1");
+
+        UploadedDocumentType document2 = new UploadedDocumentType();
+        document2.setDocumentFilename("Document 2");
+        document2.setDocumentUrl("documentstore.com/document2");
+        document2.setDocumentBinaryUrl("binary.documentstore.com/document2");
+
+        DocumentTypeItem documentTypeItem1 = new DocumentTypeItem();
+        DocumentType documentType1 = new DocumentType();
+        documentType1.setUploadedDocument(document1);
+        documentTypeItem1.setValue(documentType1);
+
+        DocumentTypeItem documentTypeItem2 = new DocumentTypeItem();
+        DocumentType documentType2 = new DocumentType();
+        documentType2.setUploadedDocument(document2);
+        documentTypeItem2.setValue(documentType2);
+
+        return Arrays.asList(documentTypeItem1, documentTypeItem2);
     }
 
     @Test
@@ -87,5 +117,29 @@ public class HelperTest {
         List<RespondentSumTypeItem> activeRespondents = Helper.getActiveRespondents(caseDetailsScot2.getCaseData());
 
         assertEquals(activeRespondentsFound, activeRespondents.size());
+    }
+
+    @Test
+    public void ifDocumentExistsOnCollection_ReturnTrue() {
+        assertThat(Helper.documentExistsOnCollection(getDocumentCollection(), "binary.documentstore.com/document1"),
+            is(true));
+    }
+
+    @Test
+    public void ifDocumentDoesntExistsOnCollection_ReturnFalse() {
+        assertThat(Helper.documentExistsOnCollection(getDocumentCollection(), "binary.documentstore.com/document3"),
+            is(false));
+    }
+
+    @Test
+    public void ifCollectionIsNull_ReturnFalse() {
+        assertThat(Helper.documentExistsOnCollection(null, "binary.documentstore.com/document3"),
+            is(false));
+    }
+
+    @Test
+    public void ifDocumentIsNull_ReturnFalse() {
+        assertThat(Helper.documentExistsOnCollection(getDocumentCollection(), null),
+            is(false));
     }
 }

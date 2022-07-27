@@ -115,6 +115,7 @@ public class ScotlandFileLocationSelectionServiceTest {
     }
 
     private DynamicValueType createSelectedListItemAtIndex(TribunalOffice tribunalOffice, int index) {
-        return DynamicValueType.create(tribunalOffice.getOfficeNumber() + index, tribunalOffice.getOfficeName() + index);
+        return DynamicValueType.create(tribunalOffice.getOfficeNumber() + index,
+                tribunalOffice.getOfficeName() + index);
     }
 }

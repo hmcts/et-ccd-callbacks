@@ -108,9 +108,10 @@ public class SingleCasesReadingServiceTest {
                 anyString(),
                 anyList()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-        HashSet<SchedulePayloadEvent> schedulePayloadEventList = singleCasesReadingService.retrieveScheduleCases(userToken,
-                multipleDetails.getCaseTypeId(),
-                new ArrayList<>(Collections.singletonList("240001/2020")));
+        HashSet<SchedulePayloadEvent> schedulePayloadEventList = singleCasesReadingService
+                .retrieveScheduleCases(userToken,
+                    multipleDetails.getCaseTypeId(),
+                    new ArrayList<>(Collections.singletonList("240001/2020")));
         assertEquals(schedulePayloadEventList, new HashSet<>());
     }
 

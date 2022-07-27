@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.SignificantItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -258,5 +260,27 @@ public class Helper {
      */
     public static Object intersectProperties(Object sourceObject, Class<?> targetClassType) {
         return mapper.convertValue(sourceObject, targetClassType);
+    }
+
+    /**
+     * Checks if a document collection contains a document based on the URL of the document.
+     * @param collection a document collection to check.
+     * @param documentBinaryUrl the binary url of the document to be found.
+     * @return true if found, false if not found or the collection passed is null.
+     */
+    public static boolean documentExistsOnCollection(List<DocumentTypeItem> collection,
+                                                      String documentBinaryUrl) {
+        if (CollectionUtils.isEmpty(collection)) {
+            return false;
+        }
+
+        return collection
+            .stream()
+            .anyMatch(
+                d -> d.getValue()
+                    .getUploadedDocument()
+                    .getDocumentBinaryUrl()
+                    .equals(documentBinaryUrl)
+            );
     }
 }

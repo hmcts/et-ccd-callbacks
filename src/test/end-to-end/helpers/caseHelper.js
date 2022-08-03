@@ -114,6 +114,14 @@ async function generateReport(I, jurisdiction, caseType, eventName) {
     await I.executeCreateReport(jurisdiction, caseType, eventName);
 }
 
+async function initialConsideration(I, eventName) {
+    await I.chooseNextStep(eventName, 3);
+    await I.wait(3);
+    await I.startInitialConsideration();
+    await I.initialConsiderationRule26();
+    //await I.initialConsiderationCheckYourAnswers();
+}
+
 module.exports = {
     acceptCaseEvent,
     caseDetails,
@@ -131,8 +139,8 @@ module.exports = {
     // printHearingLists,
     allocateHearing,
     hearingDetails,
-    hearingDetails,
     caseTransfer,
     judgment,
-    generateReport
+    generateReport,
+    initialConsideration
 };

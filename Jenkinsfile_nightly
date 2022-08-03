@@ -53,8 +53,8 @@ withNightlyPipeline(type, product, component) {
                 alwaysLinkToLastBuild: true,
                 keepAll : true,
                 reportDir : "functional-output",
-                reportFiles : "ecm-e2e-result.html",
-                reportName : "ECM E2E functional tests result"
+                reportFiles : "et-e2e-result.html",
+                reportName : "ET E2E functional tests result"
         ]
     }
 

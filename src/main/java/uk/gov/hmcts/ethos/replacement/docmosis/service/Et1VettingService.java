@@ -355,9 +355,8 @@ public class Et1VettingService {
     }
 
     public DynamicFixedListType getHearingVenuesList(String office) {
-        DynamicFixedListType dynamicListingVenues = new DynamicFixedListType();
-        dynamicListingVenues.setListItems(jpaVenueService.getVenues(TribunalOffice.valueOfOfficeName(office)));
-        return dynamicListingVenues;
+        List<DynamicValueType> venueList = jpaVenueService.getVenues(TribunalOffice.valueOfOfficeName(office));
+        return DynamicFixedListType.from(venueList);
     }
 
     public String getAddressesHtml(CaseData caseData) {

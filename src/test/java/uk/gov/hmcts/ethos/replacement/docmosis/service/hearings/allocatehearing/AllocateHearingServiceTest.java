@@ -81,9 +81,11 @@ public class AllocateHearingServiceTest {
         var clerks = caseData.getAllocateHearingClerk();
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(clerks, "clerk", "Clerk ");
         var employerMembers = caseData.getAllocateHearingEmployerMember();
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(employerMembers, "employerMember", "Employer Member ");
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
+                employerMembers, "employerMember", "Employer Member ");
         var employeeMembers = caseData.getAllocateHearingEmployeeMember();
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(employeeMembers, "employeeMember", "Employee Member ");
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
+                employeeMembers, "employeeMember", "Employee Member ");
 
         assertEquals(hearingSitAlone, caseData.getAllocateHearingSitAlone());
         assertEquals(postponedBy, caseData.getAllocateHearingPostponedBy());

@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 @SpringBootTest(classes = {
-        TribunalOfficesService.class,
+    TribunalOfficesService.class,
 })
 @EnableConfigurationProperties({CaseDefaultValuesConfiguration.class, TribunalOfficesConfiguration.class})
 public class TribunalOfficeServiceTest {
@@ -33,7 +33,7 @@ public class TribunalOfficeServiceTest {
     @Autowired
     TribunalOfficesService tribunalOfficesService;
 
-    private final static Object[][] TEST_CASES = new Object[][] {
+    private static final Object[][] TEST_CASES = new Object[][] {
             { TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA" },
             { TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA" },
             { TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA" },

@@ -1420,11 +1420,14 @@ public class DocumentHelperTest {
                 + "\"respondent_postCode\":\"M12 42R\",\n"
                 + "\"Respondent\":\"1. Antonio Vazquez\",\n"
                 + "\"resp_others\":\"2. Juan Garcia\\n3. Mike Jordan\",\n"
-                + "\"resp_address\":\"1. 11 Small Street, 22 House, Manchester, North West, M12 42R, UK\\n2. 12 Small Street, 24 House, Manchester, North West, M12 4ED, UK\\n3. 11 Small Street, 22 House, Manchester, North West, M12 42R, UK\",\n"
+                + "\"resp_address\":\"1. 11 Small Street, 22 House, Manchester, North West, M12 42R, "
+                + "UK\\n2. 12 Small Street, 24 House, Manchester, North West, M12 4ED, UK\\n3. 11 Small Street, "
+                + "22 House, Manchester, North West, M12 42R, UK\",\n"
                 + "\"Hearing_date\":\"\",\n"
                 + "\"Hearing_date_time\":\"\",\n"
                 + "\"Hearing_time\":\"\",\n"
-                + "\"Hearing_venue\":\"Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, Manchester, M3 2JA\",\n"
+                + "\"Hearing_venue\":\"Manchester Employment Tribunals, "
+                + "Alexandra House, 14-22 The Parsonage, Manchester, M3 2JA\",\n"
                 + "\"Hearing_duration\":\"3 days\",\n"
                 + "\"t1_2\":\"true\",\n"
                 + "\"Court_addressLine1\":\"Manchester Employment Tribunal,\",\n"
@@ -1842,11 +1845,11 @@ public class DocumentHelperTest {
     public void buildDocumentContentScot4() throws URISyntaxException, IOException {
         when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(ABERDEEN_VENUE_ADDRESS);
 
-        var expectedResult = getExpectedResult("expectedDocumentContentScot4.json");
+        String expectedResult = getExpectedResult("expectedDocumentContentScot4.json");
         expectedResult = expectedResult.replace("current-date", UtilHelper.formatCurrentDate(LocalDate.now()));
         expectedResult = expectedResult.replace("plus28",
                 UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28));
-        var actualResult = DocumentHelper.buildDocumentContent(caseDetailsScot4.getCaseData(), "",
+        String actualResult = DocumentHelper.buildDocumentContent(caseDetailsScot4.getCaseData(), "",
                 userDetails, SCOTLAND_CASE_TYPE_ID,
                 caseDetailsScot4.getCaseData().getCorrespondenceType(),
                 caseDetailsScot4.getCaseData().getCorrespondenceScotType(),
@@ -1856,7 +1859,6 @@ public class DocumentHelperTest {
 
     @Test
     public void buildScotDocumentTemplates() {
-        CaseDetails caseDetailsTemplates = new CaseDetails();
         CaseData caseData = new CaseData();
         CorrespondenceScotType correspondenceScotType = new CorrespondenceScotType();
         String topLevel = "Part_3_Scot";
@@ -1864,6 +1866,7 @@ public class DocumentHelperTest {
         correspondenceScotType.setTopLevelScotDocuments(topLevel);
         correspondenceScotType.setPart3ScotDocuments(part);
         caseData.setCorrespondenceScotType(correspondenceScotType);
+        CaseDetails caseDetailsTemplates = new CaseDetails();
         caseDetailsTemplates.setCaseData(caseData);
         assertEquals(getJson(topLevel, part), DocumentHelper.buildDocumentContent(caseDetailsTemplates.getCaseData(),
                 "", userDetails, SCOTLAND_CASE_TYPE_ID,
@@ -1946,7 +1949,6 @@ public class DocumentHelperTest {
 
     @Test
     public void buildDocumentTemplates() {
-        CaseDetails caseDetailsTemplates = new CaseDetails();
         CaseData caseData = new CaseData();
         CorrespondenceType correspondenceType = new CorrespondenceType();
         String topLevel = "Part_18";
@@ -1954,6 +1956,7 @@ public class DocumentHelperTest {
         correspondenceType.setTopLevelDocuments(topLevel);
         correspondenceType.setPart18Documents(part);
         caseData.setCorrespondenceType(correspondenceType);
+        CaseDetails caseDetailsTemplates = new CaseDetails();
         caseDetailsTemplates.setCaseData(caseData);
         String result = "{\n"
                 + "\"accessKey\":\"\",\n"
@@ -2089,6 +2092,16 @@ public class DocumentHelperTest {
 
     @Test
     public void buildDocumentContentMultiples() {
+        AddressLabelsAttributesType addressLabelsAttributesType = new AddressLabelsAttributesType();
+        addressLabelsAttributesType.setNumberOfCopies("1");
+        addressLabelsAttributesType.setStartingLabel("2");
+        addressLabelsAttributesType.setShowTelFax("1232312");
+        MultipleData multipleData = new MultipleData();
+        CorrespondenceType correspondenceType = new CorrespondenceType();
+        correspondenceType.setTopLevelDocuments(ADDRESS_LABELS_TEMPLATE);
+        multipleData.setCorrespondenceType(correspondenceType);
+        multipleData.setAddressLabelsAttributesType(addressLabelsAttributesType);
+        multipleData.setAddressLabelCollection(MultipleUtil.getAddressLabelTypeItemList());
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx\",\n"
@@ -2118,16 +2131,6 @@ public class DocumentHelperTest {
                 + "\"Case_No\":\"123456\",\n"
                 + "}\n"
                 + "}\n";
-        AddressLabelsAttributesType addressLabelsAttributesType = new AddressLabelsAttributesType();
-        addressLabelsAttributesType.setNumberOfCopies("1");
-        addressLabelsAttributesType.setStartingLabel("2");
-        addressLabelsAttributesType.setShowTelFax("1232312");
-        MultipleData multipleData = new MultipleData();
-        CorrespondenceType correspondenceType = new CorrespondenceType();
-        correspondenceType.setTopLevelDocuments(ADDRESS_LABELS_TEMPLATE);
-        multipleData.setCorrespondenceType(correspondenceType);
-        multipleData.setAddressLabelsAttributesType(addressLabelsAttributesType);
-        multipleData.setAddressLabelCollection(MultipleUtil.getAddressLabelTypeItemList());
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails2.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 multipleData.getCorrespondenceType(), multipleData.getCorrespondenceScotType(),
@@ -2146,7 +2149,7 @@ public class DocumentHelperTest {
     @Test
     public void getHearingByNumber() {
         String expectedHearingNumber = "2";
-        String expectedHearing_type = "Single";
+        String expectedHearingType = "Single";
         String expectedHearingVenue = "Manchester";
 
         String correspondenceHearingNumber = "2";
@@ -2154,7 +2157,7 @@ public class DocumentHelperTest {
         assertEquals(expectedHearingNumber,
                 DocumentHelper.getHearingByNumber(caseDetails1.getCaseData().getHearingCollection(),
                         correspondenceHearingNumber).getHearingNumber());
-        assertEquals(expectedHearing_type,
+        assertEquals(expectedHearingType,
                 DocumentHelper.getHearingByNumber(caseDetails1.getCaseData().getHearingCollection(),
                         correspondenceHearingNumber).getHearingType());
         assertEquals(expectedHearingVenue,
@@ -2163,10 +2166,10 @@ public class DocumentHelperTest {
     }
 
     private String getExpectedResult(String resourceFileName) throws URISyntaxException, IOException {
-        var expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource(resourceFileName)).toURI())));
-        var currentLocalDate = LocalDate.now();
-        var currentLocalDatePlus28Days = currentLocalDate.plusDays(28);
+        LocalDate currentLocalDate = LocalDate.now();
+        LocalDate currentLocalDatePlus28Days = currentLocalDate.plusDays(28);
         return expectedJson.replace("current-date-placeholder",
                         UtilHelper.formatCurrentDate(currentLocalDate))
                 .replace("current-date-plus28-placeholder",

@@ -52,7 +52,9 @@ public class CasesAwaitingJudgmentReportTest {
         submitEvents.clear();
 
         reportDataSource = mock(ReportDataSource.class);
-        when(reportDataSource.getData(ENGLANDWALES_CASE_TYPE_ID, TribunalOffice.LEEDS.getOfficeName())).thenReturn(submitEvents);
+        when(reportDataSource.getData(ENGLANDWALES_CASE_TYPE_ID,
+                TribunalOffice.LEEDS.getOfficeName()))
+                .thenReturn(submitEvents);
 
         var now = "2021-07-31T10:00:00.Z";
         var clock = Clock.fixed(Instant.parse(now), ZoneId.of("UTC"));
@@ -254,24 +256,19 @@ public class CasesAwaitingJudgmentReportTest {
         assertEquals(3, reportData.getReportSummary().getPositionTypes().get(2).getPositionTypeCount());
     }
 
-
     @Test
     public void shouldContainCorrectDetailValuesForCaseWithOneHearing() {
         // Given I have a valid case
         // When I request report data
         // Then I have correct report detail values for the case
-        var listedDate = "2021-07-16T10:00:00.000";
-        var expectedWeeksSinceHearing = 2;
-        var expectedDaysSinceHearing = 15;
-        var caseReference = "2500123/2021";
-        var currentPosition = MANUALLY_CREATED_POSITION;
-        var dateToPosition = "2021-07-10";
-        var expectedDateToPosition = "10/07/2021";
-        var expectedLastHeardHearingDate = "16/07/2021";
-        var conciliationTrack = CONCILIATION_TRACK_FAST_TRACK;
-        var hearingNumber = "1";
-        var hearingType = HEARING_TYPE_JUDICIAL_COSTS_HEARING;
-        var judge = "Hugh Parkfield";
+        String listedDate = "2021-07-16T10:00:00.000";
+        String caseReference = "2500123/2021";
+        String currentPosition = MANUALLY_CREATED_POSITION;
+        String dateToPosition = "2021-07-10";
+        String conciliationTrack = CONCILIATION_TRACK_FAST_TRACK;
+        String hearingNumber = "1";
+        String hearingType = HEARING_TYPE_JUDICIAL_COSTS_HEARING;
+        String judge = "Hugh Parkfield";
 
         submitEvents.add(caseDataBuilder
                 .withEthosCaseReference(caseReference)
@@ -282,28 +279,26 @@ public class CasesAwaitingJudgmentReportTest {
                 .withConciliationTrack(conciliationTrack)
                 .withHearing(listedDate, HEARING_STATUS_HEARD, hearingNumber, hearingType, judge)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
-        var listingDetails = new ListingDetails();
-        var caseData = new ListingData();
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
-
-        var reportDetail = reportData.getReportDetails().get(0);
+        ReportDetail reportDetail = reportData.getReportDetails().get(0);
         assertEquals(validPositionType, reportDetail.getPositionType());
-
-        assertEquals(expectedWeeksSinceHearing, reportDetail.getWeeksSinceHearing());
-        assertEquals(expectedDaysSinceHearing, reportDetail.getDaysSinceHearing());
+        assertEquals(2, reportDetail.getWeeksSinceHearing());
+        assertEquals(15, reportDetail.getDaysSinceHearing());
         assertEquals(caseReference, reportDetail.getCaseNumber());
         assertEquals(ReportDetail.NO_MULTIPLE_REFERENCE, reportDetail.getMultipleReference());
-        assertEquals(expectedLastHeardHearingDate, reportDetail.getLastHeardHearingDate());
+        assertEquals("16/07/2021", reportDetail.getLastHeardHearingDate());
         assertEquals(hearingNumber, reportDetail.getHearingNumber());
         assertEquals(hearingType, reportDetail.getHearingType());
         assertEquals(judge, reportDetail.getJudge());
         assertEquals(currentPosition, reportDetail.getCurrentPosition());
-        assertEquals(expectedDateToPosition, reportDetail.getDateToPosition());
+        assertEquals("10/07/2021", reportDetail.getDateToPosition());
         assertEquals(conciliationTrack, reportDetail.getConciliationTrack());
     }
 
@@ -347,9 +342,6 @@ public class CasesAwaitingJudgmentReportTest {
         // | 2021-07-06 | 4 | Withdrawn |
         // When I request report data
         // Then I have correct hearing values for hearing #3
-        var expectedWeeksSinceHearing = 3;
-        var expectedDaysSinceHearing = 26;
-        var expectedLastHeardHearingDate = "05/07/2021";
         var caseReference = "2500123/2021";
         var judge = "Hugh Parkfield";
 
@@ -357,10 +349,14 @@ public class CasesAwaitingJudgmentReportTest {
                 .withEthosCaseReference(caseReference)
                 .withPositionType(validPositionType)
                 .withSingleCaseType()
-                .withHearing("2021-07-01T10:00:00.000", HEARING_STATUS_HEARD, "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
-                .withHearing("2021-07-02T10:00:00.000", HEARING_STATUS_POSTPONED, "2", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
-                .withHearing("2021-07-05T10:00:00.000", HEARING_STATUS_HEARD, "3", HEARING_TYPE_JUDICIAL_MEDIATION, judge)
-                .withHearing("2021-07-06T10:00:00.000", HEARING_STATUS_WITHDRAWN, "4", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
+                .withHearing("2021-07-01T10:00:00.000", HEARING_STATUS_HEARD,
+                        "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
+                .withHearing("2021-07-02T10:00:00.000", HEARING_STATUS_POSTPONED,
+                        "2", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
+                .withHearing("2021-07-05T10:00:00.000", HEARING_STATUS_HEARD,
+                        "3", HEARING_TYPE_JUDICIAL_MEDIATION, judge)
+                .withHearing("2021-07-06T10:00:00.000", HEARING_STATUS_WITHDRAWN,
+                        "4", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         var listingDetails = new ListingDetails();
         var caseData = new ListingData();
@@ -374,10 +370,10 @@ public class CasesAwaitingJudgmentReportTest {
         var reportDetail = reportData.getReportDetails().get(0);
         assertEquals(validPositionType, reportDetail.getPositionType());
 
-        assertEquals(expectedWeeksSinceHearing, reportDetail.getWeeksSinceHearing());
-        assertEquals(expectedDaysSinceHearing, reportDetail.getDaysSinceHearing());
+        assertEquals(3, reportDetail.getWeeksSinceHearing());
+        assertEquals(26, reportDetail.getDaysSinceHearing());
         assertEquals(caseReference, reportDetail.getCaseNumber());
-        assertEquals(expectedLastHeardHearingDate, reportDetail.getLastHeardHearingDate());
+        assertEquals("05/07/2021", reportDetail.getLastHeardHearingDate());
         assertEquals("3", reportDetail.getHearingNumber());
         assertEquals(HEARING_TYPE_JUDICIAL_MEDIATION, reportDetail.getHearingType());
         assertEquals(judge, reportDetail.getJudge());
@@ -404,28 +400,32 @@ public class CasesAwaitingJudgmentReportTest {
                 .withPositionType(validPositionType)
                 .withEthosCaseReference("Case 1")
                 .withSingleCaseType()
-                .withHearing("2021-07-10T10:00:00.000", HEARING_STATUS_HEARD, "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
+                .withHearing("2021-07-10T10:00:00.000", HEARING_STATUS_HEARD,
+                        "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         caseDataBuilder = new CaseDataBuilder();
         submitEvents.add(caseDataBuilder
                 .withPositionType(validPositionType)
                 .withEthosCaseReference("Case 2")
                 .withSingleCaseType()
-                .withHearing("2021-07-02T10:00:00.000", HEARING_STATUS_HEARD, "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
+                .withHearing("2021-07-02T10:00:00.000", HEARING_STATUS_HEARD,
+                        "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         caseDataBuilder = new CaseDataBuilder();
         submitEvents.add(caseDataBuilder
                 .withPositionType(validPositionType)
                 .withEthosCaseReference("Case 3")
                 .withSingleCaseType()
-                .withHearing("2021-07-05T10:00:00.000", HEARING_STATUS_HEARD, "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
+                .withHearing("2021-07-05T10:00:00.000", HEARING_STATUS_HEARD,
+                        "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         caseDataBuilder = new CaseDataBuilder();
         submitEvents.add(caseDataBuilder
                 .withPositionType(validPositionType)
                 .withEthosCaseReference("Case 4")
                 .withSingleCaseType()
-                .withHearing("2021-07-01T10:00:00.000", HEARING_STATUS_HEARD, "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
+                .withHearing("2021-07-01T10:00:00.000", HEARING_STATUS_HEARD,
+                        "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         caseDataBuilder = new CaseDataBuilder();
         var listingDetails = new ListingDetails();

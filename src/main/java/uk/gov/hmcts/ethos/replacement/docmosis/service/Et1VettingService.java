@@ -105,6 +105,21 @@ public class Et1VettingService {
     }
 
     /**
+     * This method populates the hearing venue. The office is determined from the previous screen where the user
+     * picks the tribunal office the case should be listed in. If they choose a different office to the current one,
+     * they should see the venues for that office
+     * @param caseData holds all the casedata
+     */
+    public void populateHearingVenue(CaseData caseData) {
+        if (DynamicFixedListType.getSelectedLabel(caseData.getRegionalOfficeList()).isPresent()) {
+            caseData.setEt1TribunalRegion(caseData.getRegionalOfficeList().getSelectedLabel());
+        } else {
+            caseData.setEt1TribunalRegion(caseData.getManagingOffice());
+        }
+        caseData.setEt1HearingVenues(getHearingVenuesList(caseData.getEt1TribunalRegion()));
+    }
+
+    /**
      * Prepare wordings to be displayed in et1VettingBeforeYouStart.
      * Check uploaded document in documentCollection
      *  For ET1 form
@@ -341,14 +356,9 @@ public class Et1VettingService {
         caseData.getJurCodesCollection().add(codesTypeItem);
     }
 
-    public DynamicFixedListType getHearingVenuesList(CaseData caseData) {
-        DynamicFixedListType dynamicListingVenues = new DynamicFixedListType();
-
-        dynamicListingVenues.setListItems(
-            jpaVenueService.getVenues(TribunalOffice.valueOfOfficeName(caseData.getManagingOffice()))
-        );
-
-        return dynamicListingVenues;
+    public DynamicFixedListType getHearingVenuesList(String office) {
+        List<DynamicValueType> venueList = jpaVenueService.getVenues(TribunalOffice.valueOfOfficeName(office));
+        return DynamicFixedListType.from(venueList);
     }
 
     public String getAddressesHtml(CaseData caseData) {

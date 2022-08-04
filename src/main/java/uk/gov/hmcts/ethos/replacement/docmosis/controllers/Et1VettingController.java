@@ -136,9 +136,7 @@ public class Et1VettingController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         caseData.setEt1AddressDetails(et1VettingService.getAddressesHtml(caseData));
-        caseData.setEt1TribunalRegion(caseData.getManagingOffice());
-        caseData.setEt1HearingVenues(et1VettingService.getHearingVenuesList(caseData));
-
+        et1VettingService.populateHearingVenue(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

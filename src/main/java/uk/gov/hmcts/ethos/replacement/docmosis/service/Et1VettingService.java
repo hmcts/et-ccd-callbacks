@@ -112,7 +112,7 @@ public class Et1VettingService {
      */
     public void populateHearingVenue(CaseData caseData) {
         if (DynamicFixedListType.getSelectedLabel(caseData.getRegionalOfficeList()).isPresent()) {
-            caseData.setEt1TribunalRegion(caseData.getRegionalOfficeList().getSelectedCode());
+            caseData.setEt1TribunalRegion(caseData.getRegionalOfficeList().getSelectedLabel());
         } else {
             caseData.setEt1TribunalRegion(caseData.getManagingOffice());
         }

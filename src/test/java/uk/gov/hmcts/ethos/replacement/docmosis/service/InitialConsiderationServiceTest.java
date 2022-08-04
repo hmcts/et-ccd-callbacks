@@ -8,6 +8,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -17,19 +19,35 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-public class InitialConsiderationServiceTest {
+class InitialConsiderationServiceTest {
     static final String EXPECTED_RESPONDENT_NAME =
-        "| Respondent name given | |\r\n"
+        "| Respondent  name given | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | Test Corp|\r\n"
-            + "|In ET3 by respondent | |";
+            + "|In ET3 by respondent | |\r\n"
+            + "\r\n";
+
+    static final String EXPECTED_RESPONDENT_NAME_2 =
+        "| Respondent 1 name given | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|In ET1 by claimant | Test Corp|\r\n"
+            + "|In ET3 by respondent | |\r\n"
+            + "\r\n"
+            + "| Respondent 2 name given | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|In ET1 by claimant | Test Name Two|\r\n"
+            + "|In ET3 by respondent | |\r\n"
+            + "\r\n";
 
     static final String EXPECTED_RESPONDENT_NAME_BLANK =
-        "| Respondent name given | |\r\n"
+        "| Respondent  name given | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | |\r\n"
-            + "|In ET3 by respondent | |";
+            + "|In ET3 by respondent | |\r\n"
+            + "\r\n";
 
     static final String EXPECTED_HEARING_STRING =
         "|Hearing details | |\r\n"
@@ -53,14 +71,14 @@ public class InitialConsiderationServiceTest {
         + "including indirect discrimination, discrimination based on association or perception, harassment "
         + "or victimisation on grounds of sex, marriage and civil partnership or gender reassignment<br><br><hr>";
 
-    CaseData caseDetailsEmpty;
-    CaseData caseDetails;
+    CaseData caseDataEmpty;
+    CaseData caseData;
     InitialConsiderationService initialConsiderationService;
 
     @BeforeEach
     void setUp() throws Exception {
-        caseDetails = generateCaseData("initialConsiderationCase1.json");
-        caseDetailsEmpty = generateCaseData("initialConsiderationCase2.json");
+        caseData = generateCaseData("initialConsiderationCase1.json");
+        caseDataEmpty = generateCaseData("initialConsiderationCase2.json");
         initialConsiderationService = new InitialConsiderationService();
     }
 
@@ -76,16 +94,27 @@ public class InitialConsiderationServiceTest {
 
     @Test
     void getHearingDetailsTest() {
-        String hearingDetails = initialConsiderationService.getHearingDetails(caseDetails.getHearingCollection());
+        String hearingDetails = initialConsiderationService.getHearingDetails(caseData.getHearingCollection());
         assertThat(hearingDetails)
             .isEqualTo(EXPECTED_HEARING_STRING);
     }
 
     @Test
     void getRespondentNameTest() {
-        String respondentName = initialConsiderationService.getRespondentName(caseDetails.getRespondentCollection());
+        String respondentName = initialConsiderationService.getRespondentName(caseData.getRespondentCollection());
         assertThat(respondentName)
             .isEqualTo(EXPECTED_RESPONDENT_NAME);
+    }
+
+    @Test
+    void getRespondentTwoNameTest() {
+        caseData = CaseDataBuilder.builder()
+                .withRespondent("Test Corp", YES, "2022-03-01", false)
+                .withRespondent("Test Name Two", YES, "2022-03-01", false)
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID).getCaseData();
+        String respondentName = initialConsiderationService.getRespondentName(caseData.getRespondentCollection());
+        assertThat(respondentName)
+                .isEqualTo(EXPECTED_RESPONDENT_NAME_2);
     }
 
     @Test
@@ -98,7 +127,7 @@ public class InitialConsiderationServiceTest {
 
     @Test
     void missingHearingCollectionTest() {
-        String hearingDetails = initialConsiderationService.getHearingDetails(caseDetailsEmpty.getHearingCollection());
+        String hearingDetails = initialConsiderationService.getHearingDetails(caseDataEmpty.getHearingCollection());
         assertThat(hearingDetails)
             .isEqualTo(EXPECTED_HEARING_BLANK);
     }
@@ -106,9 +135,9 @@ public class InitialConsiderationServiceTest {
     @Test
     void missingJurisdictionCollectionTest() {
         String jurisdictionCodesHtml =
-            initialConsiderationService.generateJurisdictionCodesHtml(caseDetailsEmpty.getJurCodesCollection());
+            initialConsiderationService.generateJurisdictionCodesHtml(caseDataEmpty.getJurCodesCollection());
         assertThat(jurisdictionCodesHtml)
-            .isEqualTo("");
+            .isEmpty();
     }
 
     @Test
@@ -116,7 +145,7 @@ public class InitialConsiderationServiceTest {
         String jurisdictionCodesHtml =
             initialConsiderationService.generateJurisdictionCodesHtml(generateInvalidJurisdictionCodes());
         assertThat(jurisdictionCodesHtml)
-            .isEqualTo("");
+            .isEmpty();
     }
 
     @Test
@@ -130,7 +159,7 @@ public class InitialConsiderationServiceTest {
     @Test
     void missingRespondentCollectionTest() {
         String respondentName =
-            initialConsiderationService.getRespondentName(caseDetailsEmpty.getRespondentCollection());
+            initialConsiderationService.getRespondentName(caseDataEmpty.getRespondentCollection());
         assertThat(respondentName)
             .isEqualTo(EXPECTED_RESPONDENT_NAME_BLANK);
     }

@@ -168,7 +168,7 @@ public class Et1VettingController {
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())
-            .confirmation_body(String.format(PROCESSING_COMPLETE_TEXT, caseNumber))
+            .confirmationBody(String.format(PROCESSING_COMPLETE_TEXT, caseNumber))
             .build());
     }
 }

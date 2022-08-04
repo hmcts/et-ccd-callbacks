@@ -28,33 +28,8 @@ public class CaseDataBuilder {
         return withHearing(listedDate, hearingStatus, null, null, null);
     }
 
-    public CaseDataBuilder withSingleCaseType() {
-        caseData.setEcmCaseType(SINGLE_CASE_TYPE);
-        return this;
-    }
-
-    public CaseDataBuilder withMultipleCaseType(String multipleReference) {
-        caseData.setEcmCaseType(MULTIPLE_CASE_TYPE);
-        caseData.setMultipleReference(multipleReference);
-        return this;
-    }
-
-    public CaseDataBuilder withCurrentPosition(String currentPosition) {
-        caseData.setCurrentPosition(currentPosition);
-        return this;
-    }
-
-    public CaseDataBuilder withDateToPosition(String dateToPosition) {
-        caseData.setDateToPosition(dateToPosition);
-        return this;
-    }
-
-    public CaseDataBuilder withConciliationTrack(String conciliationTrack) {
-        caseData.setConciliationTrack(conciliationTrack);
-        return this;
-    }
-
-    public CaseDataBuilder withHearing(String listedDate, String hearingStatus, String hearingNumber, String hearingType, String judge) {
+    public CaseDataBuilder withHearing(String listedDate, String hearingStatus,
+                                       String hearingNumber, String hearingType, String judge) {
         var dateListedType = new DateListedType();
         dateListedType.setListedDate(listedDate);
         dateListedType.setHearingStatus(hearingStatus);
@@ -78,6 +53,32 @@ public class CaseDataBuilder {
         }
         caseData.getHearingCollection().add(hearingTypeItem);
 
+        return this;
+    }
+
+    public CaseDataBuilder withSingleCaseType() {
+        caseData.setEcmCaseType(SINGLE_CASE_TYPE);
+        return this;
+    }
+
+    public CaseDataBuilder withMultipleCaseType(String multipleReference) {
+        caseData.setEcmCaseType(MULTIPLE_CASE_TYPE);
+        caseData.setMultipleReference(multipleReference);
+        return this;
+    }
+
+    public CaseDataBuilder withCurrentPosition(String currentPosition) {
+        caseData.setCurrentPosition(currentPosition);
+        return this;
+    }
+
+    public CaseDataBuilder withDateToPosition(String dateToPosition) {
+        caseData.setDateToPosition(dateToPosition);
+        return this;
+    }
+
+    public CaseDataBuilder withConciliationTrack(String conciliationTrack) {
+        caseData.setConciliationTrack(conciliationTrack);
         return this;
     }
 

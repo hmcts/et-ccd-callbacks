@@ -149,8 +149,8 @@ public class MultipleBatchUpdate3ServiceTest {
         var representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId("Respondent Rep");
         representedTypeRItem.setValue(representedTypeR);
-        submitEvents.get(0).getCaseData().setRepCollection
-                (new ArrayList<>(Collections.singletonList(representedTypeRItem)));
+        submitEvents.get(0).getCaseData().setRepCollection(
+                new ArrayList<>(Collections.singletonList(representedTypeRItem)));
         assertEquals(3, multipleObjectsFlags.size());
 
         when(singleCasesReadingService.retrieveSingleCase(userToken,
@@ -167,7 +167,7 @@ public class MultipleBatchUpdate3ServiceTest {
                 multipleObjectsFlags);
 
         assertEquals(2, multipleObjectsFlags.size());
-        assertNull( submitEvents.get(0).getCaseData().getRepCollection().get(0).getValue());
+        assertNull(submitEvents.get(0).getCaseData().getRepCollection().get(0).getValue());
     }
 
     @Test

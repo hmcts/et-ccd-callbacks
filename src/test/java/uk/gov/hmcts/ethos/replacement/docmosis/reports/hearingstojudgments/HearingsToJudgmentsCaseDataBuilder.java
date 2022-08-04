@@ -27,7 +27,10 @@ public class HearingsToJudgmentsCaseDataBuilder {
         return this;
     }
 
-    public HearingsToJudgmentsCaseDataBuilder withHearing(String listedDate, String hearingNumber, String hearingStatus, String hearingType,
+    public HearingsToJudgmentsCaseDataBuilder withHearing(String listedDate,
+                                                          String hearingNumber,
+                                                          String hearingStatus,
+                                                          String hearingType,
                                                           String disposed) {
         return withHearing(listedDate, hearingStatus, hearingType, disposed, hearingNumber, null, null);
     }

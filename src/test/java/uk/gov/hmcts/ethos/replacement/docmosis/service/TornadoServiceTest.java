@@ -153,7 +153,8 @@ public class TornadoServiceTest {
         mockConnectionSuccess();
         ListingData listingData = createListingData();
 
-        DocumentInfo documentInfo = tornadoService.listingGeneration(authToken, listingData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        DocumentInfo documentInfo = tornadoService.listingGeneration(
+                authToken, listingData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
 
         verifyDocumentInfo(documentInfo);
     }
@@ -165,7 +166,8 @@ public class TornadoServiceTest {
         bulkData.setScheduleDocName(LIST_CASES_CONFIG);
         bulkData.setSearchCollection(new ArrayList<>());
 
-        DocumentInfo documentInfo = tornadoService.scheduleGeneration(authToken, bulkData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        DocumentInfo documentInfo = tornadoService.scheduleGeneration(
+                authToken, bulkData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
 
         verifyDocumentInfo(documentInfo);
     }

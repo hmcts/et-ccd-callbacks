@@ -54,5 +54,4 @@ public class AdminData {
     private String updateCourtWorkerName;
     @JsonProperty("updateCourtWorkerSelectList")
     private DynamicFixedListType updateCourtWorkerSelectList;
-
 }

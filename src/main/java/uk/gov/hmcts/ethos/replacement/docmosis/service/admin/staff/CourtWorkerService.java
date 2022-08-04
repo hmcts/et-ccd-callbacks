@@ -108,6 +108,24 @@ public class CourtWorkerService {
         return errors;
     }
 
+    public List<String> deleteCourtWorker(AdminData adminData) {
+        List<String> errors = new ArrayList<>();
+        var selectedCode = adminData.getAdminCourtWorker().getCourtWorkerCode();
+
+        var selectedCourtWorker = courtWorkerRepository.findByCodeAndTribunalOfficeAndType(selectedCode,
+                TribunalOffice.valueOfOfficeName(adminData.getAdminCourtWorker().getTribunalOffice()),
+                CourtWorkerType.valueOf(adminData.getAdminCourtWorker().getCourtWorkerType()));
+
+        if (selectedCourtWorker != null) {
+            courtWorkerRepository.delete(selectedCourtWorker);
+            courtWorkerRepository.flush();
+        } else {
+            errors.add(String.format("There is not any court worker found with the %s worker code", selectedCode));
+        }
+
+        return errors;
+    }
+
     private void checkIfCourtWorkerCodeExists(CourtWorker courtWorker, List<String> errors) {
         if (courtWorkerRepository.existsByTribunalOfficeAndTypeAndCode(courtWorker.getTribunalOffice(),
                 courtWorker.getType(), courtWorker.getCode())) {

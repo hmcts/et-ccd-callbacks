@@ -187,4 +187,33 @@ public class FileLocationService {
         return errors;
     }
 
+    /**
+     * This method is used to delete file location name for the selected file location code
+     * Returns a list of errors. For this method there may be one of two errors which are
+     * ERROR_FILE_LOCATION_NOT_FOUND_BY_TRIBUNAL_OFFICE defined as
+     * "There is not any file location found in the %s office"
+     * ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE defined as
+     * "There is not any file location found with the %s location code"
+     * Gets adminData as a parameter.
+     *
+     * @param  adminData  AdminData which is a generic data type for most of the
+     *                    methods which holds file location code, file location name
+     *                    and tribunal office and file location list.
+     * @return errors     A list of string values that contains error definitions.
+     */
+    public List<String> deleteFileLocation(AdminData adminData) {
+
+        List<String> errors = new ArrayList<>();
+        String selectedFileLocationCode = adminData.getFileLocationList().getSelectedCode();
+        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice());
+        FileLocation selectedFileLocation = fileLocationRepository
+                .findByCodeAndTribunalOffice(selectedFileLocationCode, tribunalOffice);
+        if (selectedFileLocation != null) {
+            fileLocationRepository.delete(selectedFileLocation);
+            fileLocationRepository.flush();
+        } else {
+            errors.add(ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE);
+        }
+        return errors;
+    }
 }

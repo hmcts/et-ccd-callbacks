@@ -425,6 +425,8 @@ class Et1VettingServiceTest {
         String expected = String.format(TRACK_ALLOCATION_HTML, TRACK_OPEN);
         assertThat(et1VettingService.populateEt1TrackAllocationHtml(caseData))
             .isEqualTo(expected);
+        assertThat(caseData.getTrackType())
+            .isEqualTo(TRACK_OPEN);
     }
 
     @Test

@@ -42,6 +42,22 @@ module.exports = () => {
         submitPage9: steps.createCasePages.page9SubmitPage,
         startInitialConsideration: steps.initialConsideration.initialConsiderationStartPage,
         initialConsiderationRule26: steps.initialConsideration.initialConsiderationRule26Page,
-        initialConsiderationCheckYourAnswers: steps.initialConsideration.initialConsiderationCheckYourAnswersPage
+        initialConsiderationCheckYourAnswers: steps.initialConsideration.initialConsiderationCheckYourAnswersPage,
+        startet1Vetting: steps.et1Vetting.et1VettingBeforeYouStart,
+        minReqInfoET1Vetting: steps.et1Vetting.minReqInfoET1Vetting,
+        minReqInfo2ET1Vetting: steps.et1Vetting.minReqInfo2ET1Vetting,
+        et1CaseVettingOptions1: steps.et1Vetting.et1CaseVettingOptions1,
+        caseDetails1ET1Vetting: steps.et1Vetting.caseDetails1ET1Vetting,
+        caseDetails2ET1Vetting: steps.et1Vetting.caseDetails2ET1Vetting,
+        caseDetails3ET1Vetting: steps.et1Vetting.caseDetails3ET1Vetting,
+        caseDetails4ET1Vetting: steps.et1Vetting.caseDetails4ET1Vetting,
+        furtherQET1Vetting: steps.et1Vetting.furtherQET1Vetting,
+        possibleReferal1ET1Vetting: steps.et1Vetting.possibleReferal1ET1Vetting,
+        possibleReferal2ET1Vetting: steps.et1Vetting.possibleReferal2ET1Vetting,
+        otherFactorsET1Vetting: steps.et1Vetting.otherFactorsET1Vetting,
+        finalNotesET1Vetting: steps.et1Vetting.finalNotesET1Vetting,
+        checkYourAnswersET1Vetting: steps.et1Vetting.checkYourAnswersET1Vetting
+
+
     });
 };

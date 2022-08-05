@@ -27,7 +27,9 @@ const eventNames = {
     JUDGMENT: 'Judgment',
     CREATE_REPORT: 'Create Report',
     GENERATE_REPORT: 'Generate Report',
-    INITIAL_CONSIDERATION: 'Initial Consideration'
+    INITIAL_CONSIDERATION: 'Initial Consideration',
+    ET1_VETTING: 'ET1 case vetting'
+
 };
 
 const states = {

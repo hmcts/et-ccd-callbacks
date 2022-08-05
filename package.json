@@ -17,7 +17,7 @@
         "require-directory": "2.1.1"
     },
     "scripts": {
-        "test:functional": "codeceptjs run --steps -c ./src/test/end-to-end/codecept.conf.js --steps —-reporter mocha-multi",
+        "test:functional": "codeceptjs run --config ./src/test/end-to-end/codecept.conf.js --steps —-reporter mocha-multi",
         "codeceptjs": "codeceptjs run --steps",
         "codeceptjs:headless": "HEADLESS=true codeceptjs run --steps"
     },
@@ -25,7 +25,7 @@
         "chai": "4.3.6",
         "chai-as-promised": "7.1.1",
         "chai-http": "4.3.0",
-        "codeceptjs": "3.3.0",
+        "codeceptjs": "3.3.3",
         "eslint": "8.13.0",
         "eslint-plugin-mocha": "10.0.4",
         "istanbul": "1.1.0-alpha.1",

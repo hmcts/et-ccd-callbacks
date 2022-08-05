@@ -5,8 +5,11 @@ const fs = require('fs');
 const testConfig = require('../../config.js');
 const idamApi = require('./idamApi');
 const s2sService = require('./s2sHelper');
+const { expect } = require('chai');
 const logger = Logger.getLogger('helpers/ccdDataStoreApi.js');
 const env = testConfig.TestEnv;
+
+const { I } = inject()
 
 async function createCaseInCcd(dataLocation = 'ccd-case-basic-data.json', jurisdiction = 'Leeds') {
     console.log(`create case for ${jurisdiction} jurisdiction`);
@@ -18,27 +21,38 @@ async function createCaseInCcd(dataLocation = 'ccd-case-basic-data.json', jurisd
     return caseId;
 }
 
-async function createECMCase(dataLocation = 'ccd-case-basic-data.json', jurisdiction = 'Leeds') {
+async function createECMCase(dataLocation = 'et-ccd-basic-data.json', jurisdiction = 'Leeds',location = 'ET_EnglandWales') {
     const authToken = await idamApi.getUserToken();
     const userId = await idamApi.getUserId(authToken);
     const serviceToken = await s2sService.getServiceToken();
+    logger.debug('authToken ='+authToken)
+    logger.debug('userId ='+userId)
+    logger.debug('serviceToken ='+serviceToken)
 
     const ccdApiUrl = `http://ccd-data-store-api-${env}.service.core-compute-${env}.internal`;
-    const ccdStartCasePath = `/caseworkers/${userId}/jurisdictions/EMPLOYMENT/case-types/${jurisdiction}/event-triggers/initiateCase/token`;
-    const ccdSaveCasePath = `/caseworkers/${userId}/jurisdictions/EMPLOYMENT/case-types/${jurisdiction}/cases`;
+    const ccdStartCasePath = `/caseworkers/${userId}/jurisdictions/EMPLOYMENT/case-types/${location}/event-triggers/initiateCase/token`;
+    const ccdSaveCasePath = `/caseworkers/${userId}/jurisdictions/EMPLOYMENT/case-types/${location}/cases`;
 
     const startCaseOptions = {
         method: 'GET',
         uri: ccdApiUrl + ccdStartCasePath,
         headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'ServiceAuthorization': `Bearer ${serviceToken}`,
-            'Content-Type': 'application/json'
+
         }
     };
 
-    const startCaseResponse = await request(startCaseOptions);
-    const eventToken = JSON.parse(startCaseResponse).token;
+    let url = ccdApiUrl + ccdStartCasePath;
+    let headers = {
+        'Authorization': `Bearer ${authToken}`,
+        'ServiceAuthorization': `Bearer ${serviceToken}`,
+        'Content-Type': 'application/json'
+    };
+
+
+    const startCaseResponse = await I.sendGetRequest(url,headers);
+    expect(startCaseResponse.status).to.eql(200)
+    logger.info('... status code is =>' + startCaseResponse.status)
+    const eventToken =startCaseResponse.data.token;
 
     const data = fs.readFileSync(dataLocation);
     const saveBody = {

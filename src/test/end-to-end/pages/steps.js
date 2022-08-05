@@ -58,6 +58,8 @@ module.exports = () => {
         finalNotesET1Vetting: steps.et1Vetting.finalNotesET1Vetting,
         checkYourAnswersET1Vetting: steps.et1Vetting.checkYourAnswersET1Vetting,
         et3Processing: steps.et3Processing.et3ProcessingPage,
-        et3ProcessingWithNoResponse: steps.et3Processing.et3ProcessingPageNoET3Response
+        et3ProcessingWithNoResponse: steps.et3Processing.et3ProcessingPageNoET3Response,
+        et1ServingProcess:steps.et1Serving.processEt1Serving,
+        et3NotificationProcess:steps.et3Notification.processEt3Notification
     });
 };

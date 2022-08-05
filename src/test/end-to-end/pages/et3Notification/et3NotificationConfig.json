@@ -1,0 +1,10 @@
+{
+  "addNew_et3_document": "#et3NotificationDocCollection > div > button:nth-child(2)",
+  "select_et3_document_type_dropdown": "#et3NotificationDocCollection_0_typeOfDocument",
+  "attach_et3_document": "et3NotificationDocCollection_0_uploadedDocument",
+  "remove_attached_document": "[aria-label='Remove Upload document PDF']",
+  "et3_short_description_of_document": "#et3NotificationDocCollection_0_shortDescription",
+  "select_acas_option": "#et3NotificationDocRecipient-Acas",
+  "select_claimant_option": "#et3NotificationDocRecipient-Claimant",
+  "select_respondent_option": "#et3NotificationDocRecipient-Respondent"
+}

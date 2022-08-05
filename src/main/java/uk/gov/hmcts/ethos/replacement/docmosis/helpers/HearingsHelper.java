@@ -170,7 +170,8 @@ public class HearingsHelper {
     }
 
     /**
-     * This finds the hearing by using the listed date and comparing it to the date provided. I
+     * This finds the hearing by using the listed date and comparing it to the date provided. It streams through each
+     * hearing and then checks whether the date listed is equal to the date provided.
      * @param caseData used to query the hearing collection
      * @param hearingDate date given to find in the collection
      * @return hearingItem which contains the hearing data

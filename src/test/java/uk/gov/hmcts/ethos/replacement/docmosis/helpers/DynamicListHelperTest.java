@@ -260,7 +260,7 @@ class DynamicListHelperTest {
         String hearingNumber = "123";
         String venue = "Bristol Mags";
         CaseData caseData = CaseDataBuilder.builder()
-                .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge1", venue)
+                .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge1", venue, null, null, null, null)
                 .withHearingSession(0, hearingNumber, "2019-11-25T12:11:00.000", Constants.HEARING_STATUS_HEARD, true)
                 .build();
 
@@ -305,7 +305,7 @@ class DynamicListHelperTest {
         String hearingNumber = "123";
         String venue = "Some venue";
         CaseData caseData = CaseDataBuilder.builder()
-                .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge", venue)
+                .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge", venue, null, null, null, null)
                 .withHearingSession(0, hearingNumber, "2019-11-25T12:11:00.000", Constants.HEARING_STATUS_HEARD, true)
                 .build();
         caseData.getHearingCollection().get(0).getValue().setHearingVenueScotland(TribunalOffice.LEEDS.getOfficeName());
@@ -317,7 +317,7 @@ class DynamicListHelperTest {
     void testCreateDynamicHearingListNoVenue() {
         String hearingNumber = "123";
         CaseData caseData = CaseDataBuilder.builder()
-                .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge1")
+                .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge1", null, null, null, null)
                 .withHearingSession(0, hearingNumber, "2019-11-25T12:11:00.000", Constants.HEARING_STATUS_HEARD, true)
                 .build();
 

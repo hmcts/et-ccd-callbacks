@@ -77,7 +77,7 @@ public class Et1VettingService {
 
     private static final String TRACK_ALLOCATION_HTML = "|||\r\n|--|--|\r\n|Track allocation|%s|\r\n";
     private static final String JUR_CODE_HTML = "<hr><h3>Jurisdiction Codes</h3>"
-        + "<a href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
+        + "<a target=\"_blank\" href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
         + "View all jurisdiction codes and descriptors (opens in new tab)</a><hr>"
         + "<h3>Codes already added</h3>%s<hr>";
     private static final String CASE_NAME_AND_DESCRIPTION_HTML = "<h4>%s</h4>%s";

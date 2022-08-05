@@ -27,6 +27,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import java.util.ArrayList;
 import java.util.List;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MSL_HEARING_FORMAT_VIDEO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
@@ -71,16 +72,21 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withHearing(String hearingNumber, String hearingType, String judge) {
-        return withHearing(hearingNumber, hearingType, judge, null);
+    public CaseDataBuilder withHearing(String hearingNumber, String hearingType, String judge, List<String> hearingFormat,
+            String hearingLengthNum, String hearingLengthType, String hearingSitAlone) {
+        return withHearing(hearingNumber, hearingType, judge, null, hearingFormat, hearingLengthNum,
+                hearingLengthType, hearingSitAlone);
     }
 
-    public CaseDataBuilder withHearing(String hearingNumber, String hearingType, String judge, String venue) {
+    public CaseDataBuilder withHearing(String hearingNumber, String hearingType, String judge, String venue,
+                                       List<String> hearingFormat, String hearingLengthNum, String hearingLengthType,
+                                       String hearingSitAlone) {
         if (caseData.getHearingCollection() == null) {
             caseData.setHearingCollection(new ArrayList<>());
         }
 
-        HearingTypeItem hearingTypeItem = createHearing(hearingNumber, hearingType, judge, venue);
+        HearingTypeItem hearingTypeItem = createHearing(hearingNumber, hearingType, judge, venue, hearingFormat,
+                hearingLengthNum, hearingLengthType, hearingSitAlone);
         caseData.getHearingCollection().add(hearingTypeItem);
 
         return this;
@@ -92,7 +98,8 @@ public class CaseDataBuilder {
             caseData.setHearingCollection(new ArrayList<>());
         }
 
-        HearingTypeItem hearingTypeItem = createHearing(hearingNumber, hearingType, judge, null);
+        HearingTypeItem hearingTypeItem = createHearing(hearingNumber, hearingType, judge, null, null, null,
+                null, null);
         HearingType hearing = hearingTypeItem.getValue();
         hearing.setHearingVenueScotland(tribunalOffice.getOfficeName());
 
@@ -119,16 +126,22 @@ public class CaseDataBuilder {
         return this;
     }
 
-    private HearingTypeItem createHearing(String hearingNumber, String hearingType, String judge, String venue) {
-        var type = new HearingType();
+    private HearingTypeItem createHearing(String hearingNumber, String hearingType, String judge, String venue,
+                                          List<String> hearingFormat, String hearingLengthNum, String hearingLengthType,
+                                          String hearingSitAlone) {
+        HearingType type = new HearingType();
         type.setHearingNumber(hearingNumber);
         type.setHearingType(hearingType);
         type.setJudge(new DynamicFixedListType(judge));
         if (venue != null) {
             type.setHearingVenue(DynamicFixedListType.of(DynamicValueType.create(venue, venue)));
         }
+        type.setHearingFormat(hearingFormat);
+        type.setHearingEstLengthNum(hearingLengthNum);
+        type.setHearingEstLengthNumType(hearingLengthType);
+        type.setHearingSitAlone(hearingSitAlone);
 
-        var hearingTypeItem = new HearingTypeItem();
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(type);
 
         return hearingTypeItem;

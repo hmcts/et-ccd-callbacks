@@ -75,7 +75,7 @@ public class PersistentQueueActionsController {
         return ResponseEntity.ok(BulkCallbackResponse.builder()
                 .errors(bulkRequestPayload.getErrors())
                 .data(bulkRequest.getCaseDetails().getCaseData())
-                .confirmationHeader("Updates are being processed. A notification will be sent once completed...")
+                .confirmation_header("Updates are being processed. A notification will be sent once completed...")
                 .build());
     }
 

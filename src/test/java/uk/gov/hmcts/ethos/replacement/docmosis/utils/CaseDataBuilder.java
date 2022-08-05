@@ -27,7 +27,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MSL_HEARING_FORMAT_VIDEO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
@@ -72,8 +71,9 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withHearing(String hearingNumber, String hearingType, String judge, List<String> hearingFormat,
-            String hearingLengthNum, String hearingLengthType, String hearingSitAlone) {
+    public CaseDataBuilder withHearing(String hearingNumber, String hearingType, String judge,
+                                       List<String> hearingFormat, String hearingLengthNum,
+                                       String hearingLengthType, String hearingSitAlone) {
         return withHearing(hearingNumber, hearingType, judge, null, hearingFormat, hearingLengthNum,
                 hearingLengthType, hearingSitAlone);
     }

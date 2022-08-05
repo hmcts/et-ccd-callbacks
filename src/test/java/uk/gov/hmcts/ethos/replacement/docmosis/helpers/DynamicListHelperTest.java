@@ -109,9 +109,12 @@ class DynamicListHelperTest {
         var dynamicValueRespondent = new DynamicValueType();
         dynamicValueRespondent.setCode("R: Antonio Vazquez");
         dynamicValueRespondent.setLabel("Antonio Vazquez");
-        List<DynamicValueType> listItems = DynamicListHelper.createDynamicRespondentName(caseDetails1.getCaseData().getRespondentCollection());
-        listItems.add(DynamicListHelper.getDynamicCodeLabel("C: " + caseDetails1.getCaseData().getClaimant(), caseDetails1.getCaseData().getClaimant()));
-        var dynamicValue = DynamicListHelper.getDynamicValueParty(caseDetails1.getCaseData(), listItems, "Respondent");
+        List<DynamicValueType> listItems = DynamicListHelper.createDynamicRespondentName(
+                caseDetails1.getCaseData().getRespondentCollection());
+        listItems.add(DynamicListHelper.getDynamicCodeLabel(
+                "C: " + caseDetails1.getCaseData().getClaimant(), caseDetails1.getCaseData().getClaimant()));
+        var dynamicValue = DynamicListHelper.getDynamicValueParty(
+                caseDetails1.getCaseData(), listItems, "Respondent");
         assertEquals(dynamicValue, dynamicValueRespondent);
     }
 
@@ -141,7 +144,8 @@ class DynamicListHelperTest {
 
     @Test
     void dynamicHearingList() {
-        List<DynamicValueType> dynamicHearingList = DynamicListHelper.createDynamicHearingList(caseDetails1.getCaseData());
+        List<DynamicValueType> dynamicHearingList = DynamicListHelper.createDynamicHearingList(
+                caseDetails1.getCaseData());
         dynamicValueType.setCode("1");
         dynamicValueType.setLabel("1 - Single - Manchester - 01 Nov 2019");
         assertEquals(dynamicValueType, dynamicHearingList.get(0));
@@ -155,7 +159,8 @@ class DynamicListHelperTest {
         DynamicLetters.dynamicLetters(caseDetails1.getCaseData(), ENGLANDWALES_CASE_TYPE_ID);
         dynamicValueType.setCode("1");
         dynamicValueType.setLabel("1 - Single - Manchester - 01 Nov 2019");
-        assertEquals(dynamicValueType, caseDetails1.getCaseData().getCorrespondenceType().getDynamicHearingNumber().getListItems().get(0));
+        assertEquals(dynamicValueType, caseDetails1.getCaseData().getCorrespondenceType()
+                .getDynamicHearingNumber().getListItems().get(0));
         assertNull(caseDetails1.getCaseData().getCorrespondenceScotType());
     }
 
@@ -164,15 +169,18 @@ class DynamicListHelperTest {
         DynamicLetters.dynamicLetters(caseDetailsScotTest1.getCaseData(), SCOTLAND_CASE_TYPE_ID);
         dynamicValueType.setCode("1");
         dynamicValueType.setLabel("1 - Single - Glasgow - 25 Nov 2019");
-        assertEquals(dynamicValueType, caseDetailsScotTest1.getCaseData().getCorrespondenceScotType().getDynamicHearingNumber().getListItems().get(0));
+        assertEquals(dynamicValueType, caseDetailsScotTest1.getCaseData()
+                .getCorrespondenceScotType().getDynamicHearingNumber().getListItems().get(0));
         assertNull(caseDetailsScotTest1.getCaseData().getCorrespondenceType());
     }
 
     @Test
     void createDynamicJurisdictionCodesTest() {
-        List<DynamicValueType> listItems = DynamicListHelper.createDynamicJurisdictionCodes(caseDetails1.getCaseData());
+        List<DynamicValueType> listItems = DynamicListHelper
+                .createDynamicJurisdictionCodes(caseDetails1.getCaseData());
         var totalJurisdictions = caseDetails1.getCaseData().getJurCodesCollection().size();
-        var dynamicValue = DynamicListHelper.getDynamicValue(caseDetails1.getCaseData().getJurCodesCollection()
+        var dynamicValue = DynamicListHelper
+                .getDynamicValue(caseDetails1.getCaseData().getJurCodesCollection()
                 .get(0).getValue().getJuridictionCodesList());
         assertEquals(dynamicValue, listItems.get(0));
         assertEquals(totalJurisdictions, listItems.size());
@@ -202,7 +210,8 @@ class DynamicListHelperTest {
         DynamicJudgements.dynamicJudgements(caseData);
         dynamicValueType.setCode("1");
         dynamicValueType.setLabel("1 : Manchester - Single - 2019-11-01");
-        assertEquals(dynamicValueType, caseData.getJudgementCollection().get(0).getValue().getDynamicJudgementHearing().getValue());
+        assertEquals(dynamicValueType, caseData.getJudgementCollection()
+                .get(0).getValue().getDynamicJudgementHearing().getValue());
     }
 
     @Test
@@ -216,7 +225,8 @@ class DynamicListHelperTest {
         dynamicValueType.setLabel("1 : Manchester - Single - 2019-11-01");
         caseData.getJudgementCollection().get(0).getValue().getDynamicJudgementHearing().setValue(dynamicValueType);
         DynamicJudgements.dynamicJudgements(caseData);
-        assertEquals(dynamicValueType, caseData.getJudgementCollection().get(0).getValue().getDynamicJudgementHearing().getValue());
+        assertEquals(dynamicValueType, caseData.getJudgementCollection()
+                .get(0).getValue().getDynamicJudgementHearing().getValue());
     }
 
     @Test
@@ -261,7 +271,12 @@ class DynamicListHelperTest {
         String venue = "Bristol Mags";
         CaseData caseData = CaseDataBuilder.builder()
                 .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge1", venue, null, null, null, null)
-                .withHearingSession(0, hearingNumber, "2019-11-25T12:11:00.000", Constants.HEARING_STATUS_HEARD, true)
+                .withHearingSession(
+                        0,
+                        hearingNumber,
+                        "2019-11-25T12:11:00.000",
+                        Constants.HEARING_STATUS_HEARD,
+                        true)
                 .build();
 
         var hearingList = DynamicListHelper.createDynamicHearingList(caseData);
@@ -280,7 +295,12 @@ class DynamicListHelperTest {
         String venue = "Some venue";
         CaseData caseData = CaseDataBuilder.builder()
                 .withHearingScotland(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge1", tribunalOffice, venue)
-                .withHearingSession(0, hearingNumber, "2019-11-25T12:11:00.000", Constants.HEARING_STATUS_HEARD, true)
+                .withHearingSession(
+                        0,
+                        hearingNumber,
+                        "2019-11-25T12:11:00.000",
+                        Constants.HEARING_STATUS_HEARD,
+                        true)
                 .build();
 
         var hearingList = DynamicListHelper.createDynamicHearingList(caseData);
@@ -306,7 +326,12 @@ class DynamicListHelperTest {
         String venue = "Some venue";
         CaseData caseData = CaseDataBuilder.builder()
                 .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge", venue, null, null, null, null)
-                .withHearingSession(0, hearingNumber, "2019-11-25T12:11:00.000", Constants.HEARING_STATUS_HEARD, true)
+                .withHearingSession(
+                        0,
+                        hearingNumber,
+                        "2019-11-25T12:11:00.000",
+                        Constants.HEARING_STATUS_HEARD,
+                        true)
                 .build();
         caseData.getHearingCollection().get(0).getValue().setHearingVenueScotland(TribunalOffice.LEEDS.getOfficeName());
 
@@ -318,7 +343,12 @@ class DynamicListHelperTest {
         String hearingNumber = "123";
         CaseData caseData = CaseDataBuilder.builder()
                 .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge1", null, null, null, null)
-                .withHearingSession(0, hearingNumber, "2019-11-25T12:11:00.000", Constants.HEARING_STATUS_HEARD, true)
+                .withHearingSession(
+                        0,
+                        hearingNumber,
+                        "2019-11-25T12:11:00.000",
+                        Constants.HEARING_STATUS_HEARD,
+                        true)
                 .build();
 
         var hearingList = DynamicListHelper.createDynamicHearingList(caseData);

@@ -43,6 +43,9 @@ class JudgeControllerTest {
     private static final String UPDATE_JUDGE_MID_OFFICE_URL = "/admin/staff/updateJudgeMidEventSelectOffice";
     private static final String UPDATE_JUDGE_MID_JUDGE_URL = "/admin/staff/updateJudgeMidEventSelectJudge";
     private static final String UPDATE_JUDGE_URL = "/admin/staff/updateJudge";
+    private static final String DELETE_JUDGE_MID_OFFICE_URL = "/admin/staff/deleteJudgeMidEventSelectOffice";
+    private static final String DELETE_JUDGE_MID_JUDGE_URL = "/admin/staff/deleteJudgeMidEventSelectJudge";
+    private static final String DELETE_JUDGE_URL = "/admin/staff/deleteJudge";
     private static final String AUTH_TOKEN = "some-token";
     private CCDRequest ccdRequest;
 
@@ -94,7 +97,6 @@ class JudgeControllerTest {
     @Test
     void testAddJudgeSuccess() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-
         mockMvc.perform(post(ADD_JUDGE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", AUTH_TOKEN)
@@ -219,4 +221,80 @@ class JudgeControllerTest {
         verify(judgeService, never()).updateJudge(ccdRequest.getCaseDetails().getAdminData());
     }
 
+    @Test
+    void testDeleteJudgeSuccess() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(DELETE_JUDGE_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()))
+            .andExpect(jsonPath("$.errors", hasSize(0)));
+        verify(judgeService, times(1)).deleteJudge(ccdRequest.getCaseDetails().getAdminData());
+    }
+
+    @Test
+    void testDeleteJudgeSuccess_InvalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(DELETE_JUDGE_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isForbidden());
+        verify(judgeService, never()).deleteJudge(ccdRequest.getCaseDetails().getAdminData());
+    }
+
+    @Test
+    void testDeleteJudgeMidEventSelectJudge() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(DELETE_JUDGE_MID_JUDGE_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", hasSize(0)))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(judgeService, times(1))
+            .deleteJudgeMidEventSelectJudge(ccdRequest.getCaseDetails().getAdminData());
+    }
+
+    @Test
+    void testDeleteJudgeMidEventSelectJudge_InvalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(DELETE_JUDGE_MID_JUDGE_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isForbidden());
+        verify(judgeService, never()).deleteJudgeMidEventSelectJudge(ccdRequest.getCaseDetails().getAdminData());
+    }
+
+    @Test
+    void testDeleteJudgeMidEventSelectOffice_Success() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(DELETE_JUDGE_MID_OFFICE_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", hasSize(0)))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(judgeService, times(1))
+            .deleteJudgeMidEventSelectOffice(ccdRequest.getCaseDetails().getAdminData());
+    }
+
+    @Test
+    void testDeleteJudgeMidEventSelectOffice_InvalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(DELETE_JUDGE_MID_OFFICE_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isForbidden());
+        verify(judgeService, never()).deleteJudgeMidEventSelectOffice(ccdRequest.getCaseDetails().getAdminData());
+    }
 }

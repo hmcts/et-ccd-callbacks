@@ -47,7 +47,8 @@ class RespondentsReportCcdReportDataSourceTest {
         when(ccdClient.respondentsReportSearch(anyString(), anyString(), anyString())).thenThrow(new IOException());
 
         var ccdReportDataSource = new RespondentsReportCcdDataSource(authToken, ccdClient);
-        assertThrows(ReportException.class, () -> ccdReportDataSource.getData(caseTypeId, managingOffice, fromDate, toDate));
+        assertThrows(ReportException.class, () -> ccdReportDataSource.getData(
+                caseTypeId, managingOffice, fromDate, toDate));
     }
 
 }

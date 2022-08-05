@@ -38,9 +38,12 @@ class JudgmentValidationServiceTest {
     @Test
     void populateJudgmentDateOfHearingTest() throws ParseException {
         DynamicJudgements.dynamicJudgements(caseDetails1.getCaseData());
-        caseDetails1.getCaseData().getJudgementCollection().get(0).getValue().getDynamicJudgementHearing().setValue(caseDetails1.getCaseData().getJudgementCollection().get(0).getValue().getDynamicJudgementHearing().getListItems().get(0));
+        caseDetails1.getCaseData().getJudgementCollection().get(0).getValue()
+                .getDynamicJudgementHearing().setValue(caseDetails1.getCaseData()
+                .getJudgementCollection().get(0).getValue().getDynamicJudgementHearing().getListItems().get(0));
         judgmentValidationService.validateJudgments(caseDetails1.getCaseData());
-        assertEquals("2019-11-01", caseDetails1.getCaseData().getJudgementCollection().get(0).getValue().getJudgmentHearingDate());
+        assertEquals("2019-11-01", caseDetails1.getCaseData()
+                .getJudgementCollection().get(0).getValue().getJudgmentHearingDate());
     }
 
     @Test
@@ -49,7 +52,8 @@ class JudgmentValidationServiceTest {
         caseData.setHearingCollection(null);
         DynamicJudgements.dynamicJudgements(caseData);
         var dynamicValue = DynamicListHelper.getDynamicValue(NO_HEARINGS);
-        assertEquals(dynamicValue, caseData.getJudgementCollection().get(0).getValue().getDynamicJudgementHearing().getListItems().get(0));
+        assertEquals(dynamicValue, caseData.getJudgementCollection()
+                .get(0).getValue().getDynamicJudgementHearing().getListItems().get(0));
 
         judgmentValidationService.validateJudgments(caseDetails1.getCaseData());
         assertNull(caseData.getJudgementCollection().get(0).getValue().getDynamicJudgementHearing());

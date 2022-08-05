@@ -64,7 +64,6 @@ class DepositOrderValidationServiceTest {
         assertEquals(DEPOSIT_REFUNDED_GREATER_DEPOSIT_ERROR, errors.get(0));
     }
 
-
     @Test
     void shouldReturnNoErrorsForDepositValidation() {
         var caseData = caseDetails1.getCaseData();
@@ -72,7 +71,8 @@ class DepositOrderValidationServiceTest {
         DynamicDepositOrder.dynamicDepositOrder(caseData);
         List<String> errors = depositOrderValidationService.validateDepositOrder(caseData);
         assertEquals(0, errors.size());
-        assertEquals("Tribunal", caseDetails1.getCaseData().getDepositCollection().get(0).getValue().getDepositRequestedBy());
+        assertEquals("Tribunal", caseDetails1.getCaseData()
+                .getDepositCollection().get(0).getValue().getDepositRequestedBy());
     }
 
     @Test

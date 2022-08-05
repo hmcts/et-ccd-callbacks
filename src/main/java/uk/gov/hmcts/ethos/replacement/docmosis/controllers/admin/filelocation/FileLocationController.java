@@ -19,8 +19,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.FileLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.SaveFileLocationException;
-import java.util.Arrays;
+
 import java.util.List;
+
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -104,9 +105,9 @@ public class FileLocationController {
     @Operation(summary = "Add File Location")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
-             content = {
+            content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-             }),
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -122,7 +123,7 @@ public class FileLocationController {
         try {
             fileLocationService.saveFileLocation(adminData);
         } catch (SaveFileLocationException e) {
-            return CCDCallbackResponse.getCallbackRespEntityErrors(Arrays.asList(e.getMessage()), adminData);
+            return CCDCallbackResponse.getCallbackRespEntityErrors(List.of(e.getMessage()), adminData);
         }
 
         return CCDCallbackResponse.getCallbackRespEntityNoErrors(adminData);

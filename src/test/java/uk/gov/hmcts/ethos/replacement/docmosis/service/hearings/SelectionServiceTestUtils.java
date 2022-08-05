@@ -12,9 +12,12 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class SelectionServiceTestUtils {
+public final class SelectionServiceTestUtils {
 
-    final static int DEFAULT_LIST_SIZE = 3;
+    private static final int DEFAULT_LIST_SIZE = 3;
+
+    private SelectionServiceTestUtils() {
+    }
 
     public static CaseData createCaseData(TribunalOffice tribunalOffice) {
         var caseData = new CaseData();
@@ -49,8 +52,8 @@ public class SelectionServiceTestUtils {
     public static void verifyDynamicFixedListNoneSelected(DynamicFixedListType dynamicFixedListType,
                                                    String codeBase, String labelBase) {
         assertEquals(DEFAULT_LIST_SIZE, dynamicFixedListType.getListItems().size());
-        for (var i = 1; i <= DEFAULT_LIST_SIZE; i++) {
-            var listItem = dynamicFixedListType.getListItems().get(i-1);
+        for (int i = 1; i <= DEFAULT_LIST_SIZE; i++) {
+            DynamicValueType listItem = dynamicFixedListType.getListItems().get(i - 1);
             assertEquals(codeBase + i, listItem.getCode());
             assertEquals(labelBase + i, listItem.getLabel());
         }
@@ -70,8 +73,8 @@ public class SelectionServiceTestUtils {
     }
 
     public static void verifyListItems(List<DynamicValueType> listItems, String codeBase, String labelBase) {
-        for (var i = 1; i <= DEFAULT_LIST_SIZE; i++) {
-            var listItem = listItems.get(i-1);
+        for (int i = 1; i <= DEFAULT_LIST_SIZE; i++) {
+            DynamicValueType listItem = listItems.get(i - 1);
             assertEquals(codeBase + i, listItem.getCode());
             assertEquals(labelBase + i, listItem.getLabel());
         }

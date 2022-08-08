@@ -28,7 +28,8 @@ const eventNames = {
     CREATE_REPORT: 'Create Report',
     GENERATE_REPORT: 'Generate Report',
     INITIAL_CONSIDERATION: 'Initial Consideration',
-    ET1_VETTING: 'ET1 case vetting'
+    ET1_VETTING: 'ET1 case vetting',
+    ET3_PROCESSING: 'ET3 Processing'
 
 };
 

@@ -56,8 +56,8 @@ module.exports = () => {
         possibleReferal2ET1Vetting: steps.et1Vetting.possibleReferal2ET1Vetting,
         otherFactorsET1Vetting: steps.et1Vetting.otherFactorsET1Vetting,
         finalNotesET1Vetting: steps.et1Vetting.finalNotesET1Vetting,
-        checkYourAnswersET1Vetting: steps.et1Vetting.checkYourAnswersET1Vetting
-
-
+        checkYourAnswersET1Vetting: steps.et1Vetting.checkYourAnswersET1Vetting,
+        et3Processing: steps.et3Processing.et3ProcessingPage,
+        et3ProcessingWithNoResponse: steps.et3Processing.et3ProcessingPageNoET3Response
     });
 };

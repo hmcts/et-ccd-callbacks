@@ -122,6 +122,12 @@ async function initialConsideration(I, eventName) {
     //await I.initialConsiderationCheckYourAnswers();
 }
 
+async function et3ProcessingPage(I, eventName) {
+    await I.chooseNextStep(eventName, 3);
+    await I.wait(3);
+    await I.et3Processing();
+}
+
 async function et1Vetting(I, eventName) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(3);

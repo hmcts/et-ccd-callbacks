@@ -4,7 +4,8 @@ const {et3Notification} = require("../helpers/caseHelper");
 
 Feature('ET3 Notification Process');
 
-const case_detail_url = '/cases/case-details/1659609053222055'
+//const case_detail_url = '/cases/case-details/1659609053222055'
+const case_detail_url = '/cases/case-details/1645038889612387';
 
 Scenario('progress application through et3 notification -  happy path England and Wales', async ({ I }) => {
     await I.authenticateWithIdam();

@@ -122,12 +122,23 @@ async function initialConsideration(I, eventName) {
     //await I.initialConsiderationCheckYourAnswers();
 }
 
+async function et1Serving(I, eventName) {
+    await I.chooseNextStep(eventName, 3);
+    await I.wait(3);
+    await I.et1ServingProcess();
+}
+
+async function et3Notification(I, eventName) {
+    await I.chooseNextStep(eventName, 3);
+    await I.wait(3);
+    await I.et3NotificationProcess
+}
+
 async function et3ProcessingPage(I, eventName) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(3);
     await I.et3Processing();
 }
-
 async function et1Vetting(I, eventName) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(3);
@@ -145,19 +156,6 @@ async function et1Vetting(I, eventName) {
     await I.otherFactorsET1Vetting();
     await I.finalNotesET1Vetting();
     //await I.checkYourAnswersET1Vetting();
-}
-
-
-async function et1Serving(I, eventName) {
-    await I.chooseNextStep(eventName, 3);
-    await I.wait(3);
-    await I.et1ServingProcess();
-}
-
-async function et3Notification(I, eventName) {
-    await I.chooseNextStep(eventName, 3);
-    await I.wait(3);
-    await I.et3NotificationProcess
 }
 
 module.exports = {
@@ -182,7 +180,7 @@ module.exports = {
     generateReport,
     initialConsideration,
     et1Vetting,
-    initialConsideration,
     et1Serving,
+    et3ProcessingPage,
     et3Notification
 };

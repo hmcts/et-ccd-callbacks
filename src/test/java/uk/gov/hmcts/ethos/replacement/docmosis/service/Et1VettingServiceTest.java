@@ -467,10 +467,12 @@ class Et1VettingServiceTest {
     @Test
     void generateEt1VettingDocumentExceptions() throws IOException {
         when(tornadoService.generateEt1VettingDocument(any(CaseData.class), anyString(),
-            anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
+                anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
         assertThrows(Exception.class, () -> et1VettingService.generateEt1VettingDocument(new CaseData(), "userToken",
                 ENGLANDWALES_CASE_TYPE_ID));
+    }
 
+    @Test
     void givenChangeOfRegion_shouldSetEt1TribunalRegionToNewOffice() {
         CaseData caseData = new CaseDataBuilder()
                 .withManagingOffice(TribunalOffice.LEEDS.getOfficeName())

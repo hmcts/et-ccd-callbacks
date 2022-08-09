@@ -9,10 +9,10 @@ Scenario('Verify ET3 Processing Journey', async ({I}) => {
     await I.authenticateWithIdam();
     await I.amOnPage(testUrl)
     await et3ProcessingPage(I,eventNames.ET3_PROCESSING);
-}).tag('@BAT');
+}).tag('@wip');
 
 Scenario('Verify ET3 Processing Journey With No ET3 response', async ({I}) => {
     await I.authenticateWithIdam();
     await I.amOnPage(testUrl)
     await et3ProcessingPage(I,eventNames.ET3_PROCESSING);
-}).tag('@BAT');
+}).tag('@wip');

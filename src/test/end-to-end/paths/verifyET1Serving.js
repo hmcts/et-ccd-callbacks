@@ -11,4 +11,4 @@ Scenario('progress application through et1 serving - happy path England and Wale
     await I.amOnPage(case_detail_url)
     await et1Serving(I,eventNames.ET1_SERVING);
 
-}).tag('@bat') .retry(testConfig.TestRetryScenarios)
+}).tag('@et_tests') .retry(testConfig.TestRetryScenarios)

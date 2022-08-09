@@ -11,5 +11,5 @@ Scenario('Verify Initial Consideration Journey', async ({I}) => {
     await I.amOnPage(testUrl)
     await et3Response(I,eventNames.ET3_RESPONSE);
 
-}).tag('@wip')
-    .retry(testConfig.TestRetryScenarios)
+}).tag('@wip');
+    //.retry(testConfig.TestRetryScenarios)

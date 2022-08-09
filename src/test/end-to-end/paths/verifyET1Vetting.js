@@ -17,7 +17,7 @@ Scenario('ET1 Case Vetting', async ({I}) => {
     //await pageOneEt1Vetting.et1VettingProcessingPageOne
     
   
-}).tag('@ET1VettingAuto');
+}).tag('@et_tests');
     //.retry(testConfig.TestRetryScenarios)   
   
   

@@ -12,4 +12,4 @@ Scenario('progress application through et3 notification -  happy path England an
     await I.amOnPage(case_detail_url)
     await et3Notification(I,eventNames.ET3_NOTIFICATION);
 
-}).tag('@new_test')
+}).tag('@wip');

@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.MSL_HEARING_FORMAT_VIDEO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.ET3_TABLE_DATA;
@@ -451,7 +452,7 @@ class Et3VettingHelperTest {
     @Test
     void givenHearingIsListed_SetCaseAsListed() {
         CaseData caseData = CaseDataBuilder.builder()
-            .withHearing("1", "test", "Judy")
+            .withHearing("1", "test", "Judy", List.of(MSL_HEARING_FORMAT_VIDEO), "2", "Days", "Sit Alone")
             .withHearingSession(0, "1", "2021-12-25T00:00:00.000", HEARING_STATUS_LISTED, false)
             .withConciliationTrack("Test track")
             .build();
@@ -461,7 +462,11 @@ class Et3VettingHelperTest {
                 "| <h2>Hearing details</h2>| | \r\n"
                     + "|--|--|\r\n"
                     + "|Date| Saturday 25 December 2021|\r\n"
-                    + "|Type| Test track|"
+                    + "|Hearing Type| test|\r\n"
+                    + "|Hearing Length| 2 Days|\r\n"
+                    + "|Hearing Format| Video|\r\n"
+                    + "|Sit Alone/Full Panel| Sit Alone|\r\n"
+                    + "|Track| Test track|"
             )
         );
         assertThat(caseData.getEt3IsCaseListedForHearing(), is(YES));
@@ -470,7 +475,7 @@ class Et3VettingHelperTest {
     @Test
     void givenHearingIsNotListed_SetCaseAsNotListed() {
         CaseData caseData = CaseDataBuilder.builder()
-            .withHearing("1", "test", "Judy")
+            .withHearing("1", "test", "Judy", List.of(MSL_HEARING_FORMAT_VIDEO), "2", "Days", "Sit Alone")
             .withHearingSession(0, "1", "2021-12-25T00:00:00.000", HEARING_STATUS_POSTPONED, false)
             .withConciliationTrack("Test track")
             .build();
@@ -483,7 +488,7 @@ class Et3VettingHelperTest {
     @Test
     void givenHearingIsListedButNoTrack_SetCaseAsListedNoTrackFound() {
         CaseData caseData = CaseDataBuilder.builder()
-            .withHearing("1", "test", "Judy")
+            .withHearing("1", "test", "Judy", List.of(MSL_HEARING_FORMAT_VIDEO), "2", "Days", "Sit Alone")
             .withHearingSession(0, "1", "2021-12-25T00:00:00.000", HEARING_STATUS_LISTED, false)
             .build();
         Et3VettingHelper.setHearingListedForExUi(caseData);
@@ -492,7 +497,11 @@ class Et3VettingHelperTest {
                 "| <h2>Hearing details</h2>| | \r\n"
                     + "|--|--|\r\n"
                     + "|Date| Saturday 25 December 2021|\r\n"
-                    + "|Type| Track could not be found|"
+                    + "|Hearing Type| test|\r\n"
+                    + "|Hearing Length| 2 Days|\r\n"
+                    + "|Hearing Format| Video|\r\n"
+                    + "|Sit Alone/Full Panel| Sit Alone|\r\n"
+                    + "|Track| Track could not be found|"
             )
         );
         assertThat(caseData.getEt3IsCaseListedForHearing(), is(YES));

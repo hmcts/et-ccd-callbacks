@@ -152,8 +152,6 @@ class Et1VettingControllerTest {
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data.et1AddressDetails", notNullValue()))
-            .andExpect(jsonPath("$.data.et1TribunalRegion", notNullValue()))
-            .andExpect(jsonPath("$.data.et1HearingVenues", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
     }

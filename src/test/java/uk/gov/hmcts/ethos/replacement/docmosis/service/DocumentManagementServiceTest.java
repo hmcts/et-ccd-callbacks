@@ -33,7 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -179,6 +179,6 @@ public class DocumentManagementServiceTest {
 
         CaseData caseData = new CaseData();
         documentManagementService.addDocumentToDocCollection(caseData, documentInfo);
-        assertThat(caseData.getDocumentCollection().size()).isEqualTo(1);
+        assertThat(caseData.getDocumentCollection()).hasSize(1);
     }
 }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
@@ -177,11 +178,7 @@ public class DocumentManagementService {
             caseData.setDocumentCollection(new ArrayList<>());
         }
 
-        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
-        uploadedDocumentType.setDocumentFilename(documentInfo.getDescription());
-        String documentID = documentInfo.getUrl().substring(documentInfo.getUrl().indexOf("/documents/"));
-        uploadedDocumentType.setDocumentBinaryUrl(ccdDMStoreBaseUrl + documentID);
-        uploadedDocumentType.setDocumentUrl(uploadedDocumentType.getDocumentBinaryUrl().replace("/binary", ""));
+        UploadedDocumentType uploadedDocumentType = getUploadedDocumentType(documentInfo);
 
         DocumentType documentType = new DocumentType();
         documentType.setUploadedDocument(uploadedDocumentType);
@@ -191,5 +188,15 @@ public class DocumentManagementService {
         documentTypeItem.setId(UUID.randomUUID().toString());
         documentTypeItem.setValue(documentType);
         caseData.getDocumentCollection().add(documentTypeItem);
+    }
+
+    @NotNull
+    private UploadedDocumentType getUploadedDocumentType(DocumentInfo documentInfo) {
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentFilename(documentInfo.getDescription());
+        String documentID = documentInfo.getUrl().substring(documentInfo.getUrl().indexOf("/documents/"));
+        uploadedDocumentType.setDocumentBinaryUrl(ccdDMStoreBaseUrl + documentID);
+        uploadedDocumentType.setDocumentUrl(uploadedDocumentType.getDocumentBinaryUrl().replace("/binary", ""));
+        return uploadedDocumentType;
     }
 }

@@ -151,7 +151,7 @@ public class Et1VettingController {
      * @return caseData in ccdRequest
      */
     @PostMapping(value = "/et1VettingAboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Return listing details and hearing venues.")
+    @Operation(summary = "Generates the PDF for ET1 Vetting.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully"),
         @ApiResponse(responseCode = "400", description = "Bad Request"),

@@ -67,7 +67,7 @@ class InitialConsiderationControllerTest {
             .withChooseEt3Respondent("Jack")
             .withRespondent("Jack", YES, "2022-03-01", false)
             .withClaimServedDate("2022-01-01")
-            .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge", venue)
+            .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge", venue, null, null, null, null)
             .withHearingSession(0, hearingNumber, "2019-11-25T12:11:00.000", Constants.HEARING_STATUS_LISTED, false)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 

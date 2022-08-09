@@ -82,7 +82,7 @@ public class Et1VettingService {
 
     private static final String TRACK_ALLOCATION_HTML = "|||\r\n|--|--|\r\n|Track allocation|%s|\r\n";
     private static final String JUR_CODE_HTML = "<hr><h3>Jurisdiction Codes</h3>"
-        + "<a href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
+        + "<a target=\"_blank\" href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
         + "View all jurisdiction codes and descriptors (opens in new tab)</a><hr>"
         + "<h3>Codes already added</h3>%s<hr>";
     private static final String CASE_NAME_AND_DESCRIPTION_HTML = "<h4>%s</h4>%s";
@@ -107,6 +107,21 @@ public class Et1VettingService {
         caseDetails.getCaseData().setEt1VettingRespondentDetailsMarkUp(
             initialRespondentDetailsMarkUp(caseDetails.getCaseData()));
         populateRespondentAcasDetailsMarkUp(caseDetails.getCaseData());
+    }
+
+    /**
+     * This method populates the hearing venue. The office is determined from the previous screen where the user
+     * picks the tribunal office the case should be listed in. If they choose a different office to the current one,
+     * they should see the venues for that office
+     * @param caseData holds all the casedata
+     */
+    public void populateHearingVenue(CaseData caseData) {
+        if (DynamicFixedListType.getSelectedLabel(caseData.getRegionalOfficeList()).isPresent()) {
+            caseData.setEt1TribunalRegion(caseData.getRegionalOfficeList().getSelectedLabel());
+        } else {
+            caseData.setEt1TribunalRegion(caseData.getManagingOffice());
+        }
+        caseData.setEt1HearingVenues(getHearingVenuesList(caseData.getEt1TribunalRegion()));
     }
 
     /**
@@ -346,14 +361,9 @@ public class Et1VettingService {
         caseData.getJurCodesCollection().add(codesTypeItem);
     }
 
-    public DynamicFixedListType getHearingVenuesList(CaseData caseData) {
-        DynamicFixedListType dynamicListingVenues = new DynamicFixedListType();
-
-        dynamicListingVenues.setListItems(
-            jpaVenueService.getVenues(TribunalOffice.valueOfOfficeName(caseData.getManagingOffice()))
-        );
-
-        return dynamicListingVenues;
+    public DynamicFixedListType getHearingVenuesList(String office) {
+        List<DynamicValueType> venueList = jpaVenueService.getVenues(TribunalOffice.valueOfOfficeName(office));
+        return DynamicFixedListType.from(venueList);
     }
 
     public String getAddressesHtml(CaseData caseData) {

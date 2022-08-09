@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
@@ -46,6 +47,7 @@ class Et1VettingControllerTest {
     private static final String JURISDICTION_CODE_ENDPOINT = "/jurisdictionCodes";
     private static final String HEARING_VENUE_ENDPOINT = "/et1HearingVenue";
     private static final String ET1_PROCESSING_COMPLETE_URL = "/finishEt1Vetting";
+    private static final String ET1_VETTING_ABOUT_TO_SUBMIT = "/et1VettingAboutToSubmit";
     private static final String AUTH_TOKEN = "some-token";
     private CCDRequest ccdRequest;
 
@@ -53,6 +55,9 @@ class Et1VettingControllerTest {
     private VerifyTokenService verifyTokenService;
     @MockBean
     private Et1VettingService et1VettingService;
+
+    @MockBean
+    private DocumentManagementService documentManagementService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -203,5 +208,37 @@ class Et1VettingControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void et1VettingAboutToSubmittokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(ET1_VETTING_ABOUT_TO_SUBMIT)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void et1VettingAboutToSubmit_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(ET1_VETTING_ABOUT_TO_SUBMIT)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void et1VettingAboutToSubmit_badRequest() throws Exception {
+        mockMvc.perform(post(ET1_VETTING_ABOUT_TO_SUBMIT)
+                        .content("garbage content")
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

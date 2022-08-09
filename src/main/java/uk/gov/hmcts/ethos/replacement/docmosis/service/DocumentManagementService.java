@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
@@ -13,7 +14,12 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClient;
 import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
@@ -24,6 +30,7 @@ import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.UUID;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
@@ -163,5 +170,26 @@ public class DocumentManagementService {
         var documentUUID = urlString.replace(ccdDMStoreBaseUrl + "/documents/", "");
         documentUUID = documentUUID.replace("/binary", "");
         return documentUUID;
+    }
+
+    public void addDocumentToDocCollection(CaseData caseData, DocumentInfo documentInfo) {
+        if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
+            caseData.setDocumentCollection(new ArrayList<>());
+        }
+
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentFilename(documentInfo.getDescription());
+        String documentID = documentInfo.getUrl().substring(documentInfo.getUrl().indexOf("/documents/"));
+        uploadedDocumentType.setDocumentBinaryUrl(ccdDMStoreBaseUrl + documentID);
+        uploadedDocumentType.setDocumentUrl(uploadedDocumentType.getDocumentBinaryUrl().replace("/binary", ""));
+
+        DocumentType documentType = new DocumentType();
+        documentType.setUploadedDocument(uploadedDocumentType);
+        documentType.setTypeOfDocument("Other");
+
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        documentTypeItem.setId(UUID.randomUUID().toString());
+        documentTypeItem.setValue(documentType);
+        caseData.getDocumentCollection().add(documentTypeItem);
     }
 }

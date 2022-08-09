@@ -20,8 +20,8 @@ import static uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType.getSe
  */
 public class Et1VettingHelper {
 
-    private static final String TEMPLATE_NAME = "Et1VettingHelper.docx";
-    private static final String OUTPUT_NAME = "Test.pdf";
+    private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-01140.docx";
+    private static final String OUTPUT_NAME = "ET1 Vetting PDF.pdf";
 
     private Et1VettingHelper() {
         // Access through static methods

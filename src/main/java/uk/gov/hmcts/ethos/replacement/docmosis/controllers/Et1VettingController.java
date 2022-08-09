@@ -32,7 +32,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequiredArgsConstructor
 public class Et1VettingController {
-    public static final String PROCESSING_COMPLETE_TEXT = "<hr><h2>Do this next</h2>:"
+    public static final String PROCESSING_COMPLETE_TEXT = "<hr><h2>Do this next</h2>"
         + "<p>You must <a href=\"/cases/case-details/%s/trigger/preAcceptanceCase/preAcceptanceCase1\">"
         + "accept or reject the case</a> or refer the case.</p>";
 

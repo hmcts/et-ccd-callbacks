@@ -28,7 +28,7 @@ public class SessionDaysTest {
     public void shouldGetSessionDaysForSingleHearingSingleSession() {
         var caseDataBuilder = new CaseDataBuilder();
         var caseData = caseDataBuilder
-                .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave")
+                .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
                 .withHearingSession(0, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                 .build();
         var listingData = createListingData("2021-07-02");
@@ -42,7 +42,7 @@ public class SessionDaysTest {
     public void shouldGetSessionDaysForSingleHearingMultipleSession() {
         var caseDataBuilder = new CaseDataBuilder();
         var caseData = caseDataBuilder
-                .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave")
+                .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
                 .withHearingSession(0, "1", "2021-07-01T09:00:00", HEARING_STATUS_HEARD, false)
                 .withHearingSession(0, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                 .build();
@@ -57,8 +57,8 @@ public class SessionDaysTest {
     public void shouldGetSessionDaysForMultipleHearings() {
         var caseDataBuilder = new CaseDataBuilder();
         var caseData = caseDataBuilder
-                .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave")
-                .withHearing("2", HEARING_TYPE_JUDICIAL_HEARING, "Judge Brenda")
+                .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
+                .withHearing("2", HEARING_TYPE_JUDICIAL_HEARING, "Judge Brenda", null, null, null, null)
                 .withHearingSession(0, "1", "2021-07-01T09:00:00", HEARING_STATUS_POSTPONED, false)
                 .withHearingSession(1, "1", "2021-07-03T09:00:00", HEARING_STATUS_HEARD, false)
                 .withHearingSession(1, "2", "2021-07-04T10:00:00", HEARING_STATUS_HEARD, true)
@@ -74,8 +74,8 @@ public class SessionDaysTest {
     public void shouldGetSessionDaysForMultipleHearingsScenario2() {
         var caseDataBuilder = new CaseDataBuilder();
         var caseData = caseDataBuilder
-                .withHearing("1", HEARING_TYPE_PERLIMINARY_HEARING, "Judge Dave")
-                .withHearing("2", HEARING_TYPE_JUDICIAL_HEARING, "Judge Brenda")
+                .withHearing("1", HEARING_TYPE_PERLIMINARY_HEARING, "Judge Dave", null, null, null, null)
+                .withHearing("2", HEARING_TYPE_JUDICIAL_HEARING, "Judge Brenda", null, null, null, null)
                 .withHearingSession(0, "1", "2021-07-01T09:00:00", HEARING_STATUS_POSTPONED, false)
                 .withHearingSession(0, "2", "2021-07-02T09:00:00", HEARING_STATUS_HEARD, true)
                 .withHearingSession(1, "1", "2021-07-03T10:00:00", HEARING_STATUS_HEARD, true)
@@ -92,8 +92,8 @@ public class SessionDaysTest {
     public void shouldGetSessionDaysIgnoreInvalidHearingType() {
         var caseDataBuilder = new CaseDataBuilder();
         var caseData = caseDataBuilder
-                .withHearing("1", HEARING_TYPE_PERLIMINARY_HEARING, "Judge Dave")
-                .withHearing("2", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "Judge Brenda")
+                .withHearing("1", HEARING_TYPE_PERLIMINARY_HEARING, "Judge Dave", null, null, null, null)
+                .withHearing("2", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "Judge Brenda", null, null, null, null)
                 .withHearingSession(0, "1", "2021-07-01T09:00:00", HEARING_STATUS_POSTPONED, false)
                 .withHearingSession(0, "2", "2021-07-02T09:00:00", HEARING_STATUS_HEARD, true)
                 .withHearingSession(1, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
@@ -110,7 +110,7 @@ public class SessionDaysTest {
         for (var hearingType : CasesCompletedReport.VALID_HEARING_TYPES) {
             var caseDataBuilder = new CaseDataBuilder();
             var caseData = caseDataBuilder
-                    .withHearing("1", hearingType, "Judge Dave")
+                    .withHearing("1", hearingType, "Judge Dave", null, null, null, null)
                     .withHearingSession(0, "1", "2021-07-01T09:00:00", HEARING_STATUS_HEARD, false)
                     .withHearingSession(0, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                     .build();
@@ -148,7 +148,7 @@ public class SessionDaysTest {
         for (var invalidHearingType : invalidHearingTypes) {
             var caseDataBuilder = new CaseDataBuilder();
             var caseData = caseDataBuilder
-                    .withHearing("1", invalidHearingType, "Judge Doris")
+                    .withHearing("1", invalidHearingType, "Judge Doris", null, null, null, null)
                     .withHearingSession(0, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                     .build();
 
@@ -164,7 +164,7 @@ public class SessionDaysTest {
     public void shouldGetNoSessionDaysIfNotEqualsListedDate() {
         var caseDataBuilder = new CaseDataBuilder();
         var caseData = caseDataBuilder
-                .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave")
+                .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
                 .withHearingSession(0, "1", "2021-07-01T10:00:00", HEARING_STATUS_HEARD, true)
                 .build();
 
@@ -179,7 +179,7 @@ public class SessionDaysTest {
     public void shouldGetNoSessionDaysIfHearingNotDisposed() {
         var caseDataBuilder = new CaseDataBuilder();
         var caseData = caseDataBuilder
-                .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave")
+                .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
                 .withHearingSession(0, "1", "2021-07-01T10:00:00", HEARING_STATUS_HEARD, false)
                 .build();
 

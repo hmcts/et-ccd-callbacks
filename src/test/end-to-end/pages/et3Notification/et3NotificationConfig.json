@@ -1,5 +1,5 @@
 {
-  "addNew_et3_document": "#et3NotificationDocCollection > div > button:nth-child(2)",
+  "addNew_et3_document_button": "#et3NotificationDocCollection",
   "select_et3_document_type_dropdown": "#et3NotificationDocCollection_0_typeOfDocument",
   "attach_et3_document": "et3NotificationDocCollection_0_uploadedDocument",
   "remove_attached_document": "[aria-label='Remove Upload document PDF']",

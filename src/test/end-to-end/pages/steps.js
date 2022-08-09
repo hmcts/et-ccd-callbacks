@@ -60,6 +60,7 @@ module.exports = () => {
         et3Processing: steps.et3Processing.et3ProcessingPage,
         et3ProcessingWithNoResponse: steps.et3Processing.et3ProcessingPageNoET3Response,
         et1ServingProcess:steps.et1Serving.processEt1Serving,
-        et3NotificationProcess:steps.et3Notification.processEt3Notification
+        et3NotificationProcess:steps.et3Notification.processEt3Notification,
+        et3ResponseProcess:steps.et3Response.processEt3Response
     });
 };

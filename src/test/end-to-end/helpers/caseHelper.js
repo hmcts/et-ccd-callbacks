@@ -139,6 +139,13 @@ async function et3ProcessingPage(I, eventName) {
     await I.wait(3);
     await I.et3Processing();
 }
+
+async function et3Response(I, eventName) {
+    await I.chooseNextStep(eventName, 3);
+    await I.wait(3);
+    await I.et3ResponseProcess();
+}
+
 async function et1Vetting(I, eventName) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(3);
@@ -182,5 +189,6 @@ module.exports = {
     et1Vetting,
     et1Serving,
     et3ProcessingPage,
-    et3Notification
+    et3Notification,
+    et3Response
 };

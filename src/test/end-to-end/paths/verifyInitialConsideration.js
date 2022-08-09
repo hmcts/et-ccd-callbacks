@@ -10,5 +10,5 @@ Scenario('Verify Initial Consideration Journey', async ({I}) => {
     await I.amOnPage(testUrl)
     await initialConsideration(I,eventNames.INITIAL_CONSIDERATION);
 
-}).tag('@e2e')
+}).tag('@bat')
     .retry(testConfig.TestRetryScenarios)

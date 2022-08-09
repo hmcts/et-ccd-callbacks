@@ -30,9 +30,9 @@ const eventNames = {
     INITIAL_CONSIDERATION: 'Initial Consideration',
     ET1_VETTING: 'ET1 case vetting',
     ET3_PROCESSING: 'ET3 Processing',
-    INITIAL_CONSIDERATION: 'Initial Consideration',
     ET1_SERVING: 'ET1 serving',
-    ET3_NOTIFICATION: 'ET3 notification'
+    ET3_NOTIFICATION: 'ET3 notification',
+    ET3_RESPONSE: 'ET3 response form'
 };
 
 const states = {

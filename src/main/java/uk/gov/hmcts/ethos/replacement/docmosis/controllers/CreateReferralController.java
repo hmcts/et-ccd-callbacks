@@ -35,7 +35,7 @@ public class CreateReferralController {
 
     /**
      * Called for the first page of the Create Referral event.
-     * Populates the Referral hearing details section on the page.
+     * Populates the Referral hearing detail's section on the page.
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
@@ -62,6 +62,31 @@ public class CreateReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         createReferralHelper.populateHearingDetails(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmitReferralDetails(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        createReferralHelper.createReferral(caseData, userToken);
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

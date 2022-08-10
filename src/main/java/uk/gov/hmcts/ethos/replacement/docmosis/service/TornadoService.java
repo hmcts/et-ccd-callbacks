@@ -198,7 +198,7 @@ public class TornadoService {
     }
 
     private URI uploadDocument(String documentName, String authToken, byte[] bytes, String caseTypeId) {
-        if (documentName.contains(".pdf")) {
+        if (documentName.endsWith(".pdf")) {
             return documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME_PDF,
                     APPLICATION_PDF_VALUE, caseTypeId);
         } else {

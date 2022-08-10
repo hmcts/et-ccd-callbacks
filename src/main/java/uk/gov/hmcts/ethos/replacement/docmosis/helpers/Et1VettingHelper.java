@@ -20,11 +20,13 @@ import static uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType.getSe
  */
 public class Et1VettingHelper {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-01140.docx";
     private static final String OUTPUT_NAME = "ET1 Vetting PDF.pdf";
 
     private Et1VettingHelper() {
         // Access through static methods
+        OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     /**
@@ -142,10 +144,7 @@ public class Et1VettingHelper {
                 .data(et1VettingData)
                 .build();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
-        return objectMapper.writeValueAsString(et1VettingDocument);
+        return OBJECT_MAPPER.writeValueAsString(et1VettingDocument);
     }
 
     private static String formatJurCodes(List<VettingJurCodesTypeItem> vettingJurisdictionCodeCollection) {

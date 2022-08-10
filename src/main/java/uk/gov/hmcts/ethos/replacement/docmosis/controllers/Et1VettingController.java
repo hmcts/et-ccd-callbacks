@@ -160,7 +160,7 @@ public class Et1VettingController {
     public ResponseEntity<CCDCallbackResponse> et1VettingAboutToSubmit(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
             @RequestBody CCDRequest ccdRequest) {
-        log.info("ET1 CASE VETTING ABOUT TO START ---> " + ccdRequest.getCaseDetails().getCaseId());
+        log.info("ET1 CASE VETTING ABOUT TO SUBMIT ---> {}", ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }

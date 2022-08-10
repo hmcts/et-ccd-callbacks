@@ -125,7 +125,8 @@ public class CourtWorkerController {
 
     @PostMapping(value = "/updateCourtWorker", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update a court worker")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully"),
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })

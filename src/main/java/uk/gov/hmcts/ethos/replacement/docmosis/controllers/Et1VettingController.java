@@ -32,7 +32,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequiredArgsConstructor
 public class Et1VettingController {
-    public static final String PROCESSING_COMPLETE_TEXT = "<hr><h2>Do this next</h2>:"
+    public static final String PROCESSING_COMPLETE_TEXT = "<hr><h2>Do this next</h2>"
         + "<p>You must <a href=\"/cases/case-details/%s/trigger/preAcceptanceCase/preAcceptanceCase1\">"
         + "accept or reject the case</a> or refer the case.</p>";
 
@@ -136,9 +136,7 @@ public class Et1VettingController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         caseData.setEt1AddressDetails(et1VettingService.getAddressesHtml(caseData));
-        caseData.setEt1TribunalRegion(caseData.getManagingOffice());
-        caseData.setEt1HearingVenues(et1VettingService.getHearingVenuesList(caseData));
-
+        et1VettingService.populateHearingVenue(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -170,7 +168,7 @@ public class Et1VettingController {
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())
-            .confirmationBody(String.format(PROCESSING_COMPLETE_TEXT, caseNumber))
+            .confirmation_body(String.format(PROCESSING_COMPLETE_TEXT, caseNumber))
             .build());
     }
 }

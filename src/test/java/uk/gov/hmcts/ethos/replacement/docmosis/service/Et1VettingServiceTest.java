@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -26,6 +28,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.LEEDS;
 import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.MANCHESTER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_OPEN;
 
@@ -136,7 +139,7 @@ class Et1VettingServiceTest {
     private static final String TRIBUNAL_LOCATION_LABEL = "**<big>%s regional office</big>**";
     private static final String TRACK_ALLOCATION_HTML = "|||\r\n|--|--|\r\n|Track allocation|%s|\r\n";
     private static final String JUR_CODE_HTML = "<hr><h3>Jurisdiction Codes</h3>"
-        + "<a href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
+        + "<a target=\"_blank\" href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
         + "View all jurisdiction codes and descriptors (opens in new tab)</a><hr>"
         + "<h3>Codes already added</h3>%s<hr>";
     private static final String RESPONDENT_ACAS_DETAILS = "<hr><h3>Respondent %o</h3>"
@@ -407,13 +410,13 @@ class Et1VettingServiceTest {
 
     @Test
     void testGeneratingHearingVenueList() {
-        caseDetails.getCaseData().setManagingOffice("Manchester");
+        caseDetails.getCaseData().setManagingOffice(MANCHESTER.getOfficeName());
         DynamicValueType expectedHearingVenue = DynamicValueType.create("code", "Manchester hearing venue");
 
         when(jpaVenueService.getVenues(MANCHESTER)).thenReturn(List.of(expectedHearingVenue));
 
-        assertThat(et1VettingService.getHearingVenuesList(caseDetails.getCaseData()).getListItems().get(0))
-            .isEqualTo(expectedHearingVenue);
+        assertThat(et1VettingService.getHearingVenuesList(caseDetails.getCaseData().getManagingOffice())
+                .getListItems().get(0)).isEqualTo(expectedHearingVenue);
     }
 
     @Test
@@ -439,6 +442,29 @@ class Et1VettingServiceTest {
             .isEqualTo(expectedOfficeLocation);
         assertThat(caseData.getRegionalOffice())
             .isEqualTo(expectedRegionalOffice);
+    }
+
+    @Test
+    void givenChangeOfRegion_shouldSetEt1TribunalRegionToNewOffice() {
+        CaseData caseData = new CaseDataBuilder()
+                .withManagingOffice(TribunalOffice.LEEDS.getOfficeName())
+                .build();
+        caseData.setRegionalOfficeList(DynamicFixedListType.of(
+                DynamicValueType.create(MANCHESTER.getOfficeName(), MANCHESTER.getOfficeName())));
+        caseData.getRegionalOfficeList().setValue(
+                DynamicValueType.create(MANCHESTER.getOfficeName(), MANCHESTER.getOfficeName()));
+        et1VettingService.populateHearingVenue(caseData);
+        assertThat(caseData.getEt1TribunalRegion()).isEqualTo(MANCHESTER.getOfficeName());
+    }
+
+    @Test
+    void givenNoChangeOfRegion_shouldSetEt1TribunalRegionToManagingOffice() {
+        CaseData caseData = new CaseDataBuilder()
+                .withManagingOffice(TribunalOffice.LEEDS.getOfficeName())
+                .build();
+        caseData.setRegionalOfficeList(null);
+        et1VettingService.populateHearingVenue(caseData);
+        assertThat(caseData.getEt1TribunalRegion()).isEqualTo(LEEDS.getOfficeName());
     }
 
     private DocumentTypeItem createDocumentTypeItem(String typeOfDocument, String binaryLink) {

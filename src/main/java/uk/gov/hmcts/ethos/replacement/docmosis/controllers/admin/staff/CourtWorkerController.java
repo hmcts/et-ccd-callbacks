@@ -125,10 +125,9 @@ public class CourtWorkerController {
 
     @PostMapping(value = "/updateCourtWorker", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update a court worker")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> updateCourtWorker(
             @RequestHeader("Authorization") String userToken,
@@ -167,9 +166,9 @@ public class CourtWorkerController {
     @PostMapping(value = "/deleteCourtWorker", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Delete a court worker")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> deleteCourtWorker(
             @RequestHeader("Authorization") String userToken,

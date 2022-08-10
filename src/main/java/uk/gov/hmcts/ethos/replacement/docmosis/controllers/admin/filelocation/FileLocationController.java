@@ -265,9 +265,9 @@ public class FileLocationController {
     @PostMapping(value = "/deleteFileLocation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Delete file location")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> deleteFileLocation(
             @RequestHeader("Authorization") String userToken,

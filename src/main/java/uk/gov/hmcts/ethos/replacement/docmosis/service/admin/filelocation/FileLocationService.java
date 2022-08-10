@@ -202,7 +202,6 @@ public class FileLocationService {
      * @return errors     A list of string values that contains error definitions.
      */
     public List<String> deleteFileLocation(AdminData adminData) {
-
         List<String> errors = new ArrayList<>();
         String selectedFileLocationCode = adminData.getFileLocationList().getSelectedCode();
         TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice());

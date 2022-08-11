@@ -145,8 +145,10 @@ public class CourtWorkerService {
     }
 
     private CourtWorker setCourtWorker(AdminData adminData) {
-        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(adminData.getAdminCourtWorker().getTribunalOffice());
-        CourtWorkerType courtWorkerType = CourtWorkerType.valueOf(adminData.getAdminCourtWorker().getCourtWorkerType());
+        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(
+                adminData.getAdminCourtWorker().getTribunalOffice());
+        CourtWorkerType courtWorkerType = CourtWorkerType.valueOf(
+                adminData.getAdminCourtWorker().getCourtWorkerType());
         String courtWorkerCode = adminData.getAdminCourtWorker().getCourtWorkerCode();
         String courtWorkerName = adminData.getAdminCourtWorker().getCourtWorkerName();
 

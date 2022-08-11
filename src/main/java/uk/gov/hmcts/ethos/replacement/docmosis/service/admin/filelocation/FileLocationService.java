@@ -29,10 +29,10 @@ public class FileLocationService {
             "A file location with the same Name (%s) and Tribunal Office (%s) already exists.";
 
     public static final String ERROR_FILE_LOCATION_NOT_FOUND_BY_TRIBUNAL_OFFICE =
-            "There is not any file location found in the %s office";
+            "No file location found in the %s office";
 
     public static final String ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE =
-            "There is not any file location found with the %s location code";
+            "No file location found with the %s location code";
 
     public FileLocationService(FileLocationRepository fileLocationRepository) {
         this.fileLocationRepository = fileLocationRepository;

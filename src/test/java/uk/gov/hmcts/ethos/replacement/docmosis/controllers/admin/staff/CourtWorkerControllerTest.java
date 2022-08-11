@@ -39,9 +39,9 @@ class CourtWorkerControllerTest {
     private static final String INIT_ADD_COURT_WORKER_URL = "/admin/staff/initAddCourtWorker";
     private static final String ADD_COURT_WORKER_URL = "/admin/staff/addCourtWorker";
     private static final String UPDATE_COURT_WORKER_MID_OFFICE_URL =
-            "/admin/staff/updateCourtWorkerMidEventSelectOffice";
+            "/admin/staff/midEventCourtWorkerSelectOffice";
     private static final String UPDATE_COURT_WORKER_MID_CLERK_URL =
-            "/admin/staff/updateCourtWorkerMidEventSelectCourtWorker";
+            "/admin/staff/midEventCourtWorkerSelectCourtWorker";
     private static final String UPDATE_COURT_WORKER_URL = "/admin/staff/updateCourtWorker";
     private static final String DELETE_COURT_WORKER_URL = "/admin/staff/deleteCourtWorker";
     private CCDRequest ccdRequest;

@@ -12,10 +12,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.AdminCourtWork
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorker;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepository;
-
 import java.util.ArrayList;
 import java.util.List;
-
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,7 +26,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.*;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.CODE_ERROR_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.NAME_ERROR_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.NO_FOUND_ERROR_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.NO_WORKER_CODE_FOUND_ERROR_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.SAVE_ERROR_MESSAGE;
 
 class CourtWorkerServiceTest {
 
@@ -192,34 +197,32 @@ class CourtWorkerServiceTest {
 
     @ParameterizedTest
     @EnumSource(CourtWorkerType.class)
-    void deleteCourtWorker_shouldSaveClerk(CourtWorkerType courtWorkerType) {
-        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(),
-                "Code1", "Name1");
-        adminData.setCourtWorkerName("Name2");
-
-        CourtWorker courtWorker = createCourtWorkerWithId(1, TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name1");
+    void deleteCourtWorker_shouldDelete(CourtWorkerType courtWorkerType) {
+        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(),
+                courtWorkerType.name(), "Code1", "Name1");
+        CourtWorker courtWorker = createCourtWorker(TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name1");
         when(courtWorkerRepository.findByCodeAndTribunalOfficeAndType(anyString(), any(), any()))
                 .thenReturn(courtWorker);
-
         List<String> errors = courtWorkerService.deleteCourtWorker(adminData);
         assertEquals(0, errors.size());
-        verify(courtWorkerRepository, times(1)).delete(
-                createCourtWorkerWithId(1, TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name2"));
+        verify(courtWorkerRepository, times(1)).delete(courtWorker);
+        verify(courtWorkerRepository, times(1)).flush();
     }
 
     @ParameterizedTest
     @EnumSource(CourtWorkerType.class)
-    void deleteCourtWorker_shouldReturnError(CourtWorkerType courtWorkerType) {
-        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(),
-                "Code1", "Name1");
-        adminData.setCourtWorkerName("Name2");
-
-        List<CourtWorker> listCourtWorker = new ArrayList<>();
-        when(courtWorkerRepository.findById(anyInt())).thenReturn(listCourtWorker);
-
+    void deleteCourtWorker_shouldReturnNoCourtWorkerFoundError(CourtWorkerType courtWorkerType) {
+        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(),
+                courtWorkerType.name(), "Code1", "Name1");
+        adminData.setCourtWorkerCode("Code1");
+        List<CourtWorker> courtWorkerList = new ArrayList<>();
+        when(courtWorkerRepository.findById(anyInt())).thenReturn(courtWorkerList);
+        String expectedErrorMsg = String.format(NO_WORKER_CODE_FOUND_ERROR_MESSAGE,
+                adminData.getCourtWorkerCode());
         List<String> errors = courtWorkerService.deleteCourtWorker(adminData);
+
         assertEquals(1, errors.size());
-        assertEquals(String.format(NO_WORKER_CODE_FOUND_ERROR_MESSAGE, "Code1"), errors.get(0));
+        assertThat(expectedErrorMsg, is(equalTo(errors.get(0))));
     }
 
     private AdminData createAdminData(String officeName, String courtWorkerType, String testCode, String testName) {

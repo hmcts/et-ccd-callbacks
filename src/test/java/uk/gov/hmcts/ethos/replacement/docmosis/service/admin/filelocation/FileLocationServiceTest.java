@@ -131,7 +131,7 @@ class FileLocationServiceTest {
 
         List<String> errors = fileLocationService.midEventSelectTribunalOffice(adminData);
         assertEquals(1, errors.size());
-        assertEquals("There is not any file location found in the Aberdeen office", errors.get(0));
+        assertEquals("No file location found in the Aberdeen office", errors.get(0));
     }
 
     @Test
@@ -157,7 +157,7 @@ class FileLocationServiceTest {
         List<String> errors = fileLocationService.midEventSelectFileLocation(adminData);
 
         assertEquals(1, errors.size());
-        assertEquals("There is not any file location found with the testCode location code", errors.get(0));
+        assertEquals("No file location found with the testCode location code", errors.get(0));
     }
 
     private AdminData createAdminData() {

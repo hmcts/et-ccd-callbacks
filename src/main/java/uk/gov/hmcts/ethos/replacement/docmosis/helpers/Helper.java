@@ -263,6 +263,6 @@ public class Helper {
     }
 
     public static String getCurrentDate() {
-        return new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        return new SimpleDateFormat("dd MMM yyyy").format(new Date());
     }
 }

@@ -66,6 +66,7 @@ public class CreateReferralHelper {
 
         ReferralType referralType = new ReferralType();
 
+        referralType.setReferralNumber(String.valueOf((caseData.getReferralCollection().size() + 1)));
         referralType.setReferCaseTo(caseData.getReferCaseTo());
         referralType.setIsUrgent(caseData.getIsUrgent());
         referralType.setReferralSubject(caseData.getReferralSubject());
@@ -79,6 +80,8 @@ public class CreateReferralHelper {
         UserDetails userDetails = userService.getUserDetails(userToken);
         referralType.setReferredBy(userDetails.getFirstName() + " " + userDetails.getLastName());
         referralType.setReferrerEmail(userDetails.getEmail());
+
+        referralType.setReferralStatus("Open");
 
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId(UUID.randomUUID().toString());

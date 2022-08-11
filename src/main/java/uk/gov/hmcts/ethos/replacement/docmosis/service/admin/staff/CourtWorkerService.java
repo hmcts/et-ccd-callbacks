@@ -34,7 +34,7 @@ public class CourtWorkerService {
 
     public List<String> addCourtWorker(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        var courtWorker = setCourtWorker(adminData);
+        CourtWorker courtWorker = setCourtWorker(adminData);
 
         checkIfCourtWorkerCodeExists(courtWorker, errors);
         checkIfCourtWorkerNameExists(courtWorker, errors);
@@ -47,8 +47,8 @@ public class CourtWorkerService {
 
     public List<String> getCourtWorkerMidEventSelectOffice(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        var tribunalOffice = adminData.getCourtWorkerOffice();
-        var courtWorkerType = adminData.getCourtWorkerType();
+        String tribunalOffice = adminData.getCourtWorkerOffice();
+        String courtWorkerType = adminData.getCourtWorkerType();
 
         List<CourtWorker> courtWorkerList = courtWorkerRepository.findByTribunalOfficeAndTypeOrderByNameAsc(
                 TribunalOffice.valueOfOfficeName(tribunalOffice), CourtWorkerType.valueOf(courtWorkerType));
@@ -59,11 +59,11 @@ public class CourtWorkerService {
         }
 
         List<DynamicValueType> dynamicCourtWorker = new ArrayList<>();
-        for (var courtWorker : courtWorkerList) {
+        for (CourtWorker courtWorker : courtWorkerList) {
             dynamicCourtWorker.add(DynamicValueType.create(courtWorker.getCode(), courtWorker.getName()));
         }
 
-        var courtWorkerDynamicList = new DynamicFixedListType();
+        DynamicFixedListType courtWorkerDynamicList = new DynamicFixedListType();
         courtWorkerDynamicList.setListItems(dynamicCourtWorker);
 
         adminData.setCourtWorkerSelectList(courtWorkerDynamicList);
@@ -73,7 +73,7 @@ public class CourtWorkerService {
 
     public List<String> getCourtWorkerMidEventSelectCourtWorker(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        var selectedCode = adminData.getCourtWorkerSelectList().getSelectedCode();
+        String selectedCode = adminData.getCourtWorkerSelectList().getSelectedCode();
 
         CourtWorker selectedCourtWorker = courtWorkerRepository.findByCodeAndTribunalOfficeAndType(selectedCode,
                 TribunalOffice.valueOfOfficeName(adminData.getCourtWorkerOffice()),
@@ -91,9 +91,9 @@ public class CourtWorkerService {
 
     public List<String> updateCourtWorker(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        var selectedCode = adminData.getCourtWorkerSelectList().getSelectedCode();
+        String selectedCode = adminData.getCourtWorkerSelectList().getSelectedCode();
 
-        var selectedCourtWorker = courtWorkerRepository.findByCodeAndTribunalOfficeAndType(selectedCode,
+        CourtWorker selectedCourtWorker = courtWorkerRepository.findByCodeAndTribunalOfficeAndType(selectedCode,
                 TribunalOffice.valueOfOfficeName(adminData.getCourtWorkerOffice()),
                 CourtWorkerType.valueOf(adminData.getCourtWorkerType()));
 
@@ -112,9 +112,9 @@ public class CourtWorkerService {
 
     public List<String> deleteCourtWorker(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        var selectedCode = adminData.getAdminCourtWorker().getCourtWorkerCode();
+        String selectedCode = adminData.getAdminCourtWorker().getCourtWorkerCode();
 
-        var selectedCourtWorker = courtWorkerRepository.findByCodeAndTribunalOfficeAndType(selectedCode,
+        CourtWorker selectedCourtWorker = courtWorkerRepository.findByCodeAndTribunalOfficeAndType(selectedCode,
                 TribunalOffice.valueOfOfficeName(adminData.getAdminCourtWorker().getTribunalOffice()),
                 CourtWorkerType.valueOf(adminData.getAdminCourtWorker().getCourtWorkerType()));
 
@@ -145,12 +145,12 @@ public class CourtWorkerService {
     }
 
     private CourtWorker setCourtWorker(AdminData adminData) {
-        var tribunalOffice = TribunalOffice.valueOfOfficeName(adminData.getAdminCourtWorker().getTribunalOffice());
-        var courtWorkerType = CourtWorkerType.valueOf(adminData.getAdminCourtWorker().getCourtWorkerType());
-        var courtWorkerCode = adminData.getAdminCourtWorker().getCourtWorkerCode();
-        var courtWorkerName = adminData.getAdminCourtWorker().getCourtWorkerName();
+        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(adminData.getAdminCourtWorker().getTribunalOffice());
+        CourtWorkerType courtWorkerType = CourtWorkerType.valueOf(adminData.getAdminCourtWorker().getCourtWorkerType());
+        String courtWorkerCode = adminData.getAdminCourtWorker().getCourtWorkerCode();
+        String courtWorkerName = adminData.getAdminCourtWorker().getCourtWorkerName();
 
-        var courtWorker = new CourtWorker();
+        CourtWorker courtWorker = new CourtWorker();
         courtWorker.setTribunalOffice(tribunalOffice);
         courtWorker.setType(courtWorkerType);
         courtWorker.setCode(courtWorkerCode);

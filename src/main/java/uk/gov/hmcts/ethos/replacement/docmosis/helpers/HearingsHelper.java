@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,6 +15,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
@@ -164,5 +167,28 @@ public class HearingsHelper {
             }
         }
 
+    }
+
+    /**
+     * This finds the hearing by using the listed date and comparing it to the date provided. It streams through each
+     * hearing and then checks whether the date listed is equal to the date provided.
+     * @param caseData used to query the hearing collection
+     * @param hearingDate date given to find in the collection
+     * @return hearingItem which contains the hearing data
+     */
+    public static HearingType findHearingByListedDate(CaseData caseData, String hearingDate) {
+        Optional<HearingTypeItem> hearingTypeItem =
+                caseData.getHearingCollection().stream()
+                        .filter(h -> hearingContainsDate(h.getValue().getHearingDateCollection(), hearingDate))
+                        .findFirst();
+        if (hearingTypeItem.isEmpty()) {
+            throw new NotFoundException("Failed to find hearing");
+        }
+        return hearingTypeItem.get().getValue();
+    }
+
+    private static boolean hearingContainsDate(List<DateListedTypeItem> hearingDateCollection, String hearingDate) {
+        return hearingDateCollection.stream()
+                .anyMatch(dateListedTypeItem -> hearingDate.equals(dateListedTypeItem.getValue().getListedDate()));
     }
 }

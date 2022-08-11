@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.filelocation;
 
+import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -213,6 +214,73 @@ class FileLocationControllerTest {
                 .andExpect(jsonPath("$.errors[0]", notNullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
         verify(fileLocationService, times(1)).updateFileLocation(ccdRequest.getCaseDetails().getAdminData());
+    }
+
+    @Test
+    void testDeleteFileLocationSuccess() throws Exception {
+        var ccdRequest = AdminDataBuilder
+                .builder()
+                .withFileLocationData("testCode", "testName", "ABERDEEN")
+                .buildAsCCDRequest();
+
+        var token = "some-token";
+        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
+
+        mockMvc.perform(post("/admin/filelocation/deleteFileLocation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", token)
+                .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(0)))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(fileLocationService, times(1)).deleteFileLocation(ccdRequest.getCaseDetails().getAdminData());
+    }
+
+    @Test
+    void testDeleteFileLocationInvalidToken() throws Exception {
+        var ccdRequest = AdminDataBuilder
+                .builder()
+                .withFileLocationData("testCode", "testName", "ABERDEEN")
+                .buildAsCCDRequest();
+
+        var token = "some-token";
+        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
+
+        mockMvc.perform(post("/admin/filelocation/deleteFileLocation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", token)
+                .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
+        verify(fileLocationService, never()).deleteFileLocation(ccdRequest.getCaseDetails().getAdminData());
+    }
+
+    @Test
+    void testDeleteFileLocationError() throws Exception {
+        var ccdRequest = AdminDataBuilder
+                .builder()
+                .withFileLocationData("testCode", "testName", "Aberdeen")
+                .buildAsCCDRequest();
+
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
+        String error = String.format(ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE,
+                adminData.getFileLocationCode());
+
+        var token = "some-token";
+        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
+
+        when(fileLocationService.deleteFileLocation(adminData)).thenReturn(Collections.singletonList(error));
+
+        mockMvc.perform(post("/admin/filelocation/deleteFileLocation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", token)
+                .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors[0]", notNullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(fileLocationService, times(1)).deleteFileLocation(ccdRequest.getCaseDetails().getAdminData());
     }
 
     @Test

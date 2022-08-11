@@ -25,10 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.CODE_ERROR_MESSAGE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.NAME_ERROR_MESSAGE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.NO_FOUND_ERROR_MESSAGE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.SAVE_ERROR_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.*;
 
 class CourtWorkerServiceTest {
 
@@ -98,16 +95,16 @@ class CourtWorkerServiceTest {
         var name = "Name1";
 
         adminData = createAdminData(tribunalOffice.getOfficeName(), courtWorkerType.name(), code, name);
-        adminData.setUpdateCourtWorkerOffice(tribunalOffice.getOfficeName());
-        adminData.setUpdateCourtWorkerType(courtWorkerType.name());
+        adminData.setCourtWorkerOffice(tribunalOffice.getOfficeName());
+        adminData.setCourtWorkerType(courtWorkerType.name());
 
         var listCourtWorker = createListCourtWorker(1, TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name1");
         when(courtWorkerRepository.findByTribunalOfficeAndTypeOrderByNameAsc(any(TribunalOffice.class),
                 any(CourtWorkerType.class))).thenReturn(listCourtWorker);
 
-        List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectOffice(adminData);
+        List<String> errors = courtWorkerService.getCourtWorkerMidEventSelectOffice(adminData);
         assertEquals(0, errors.size());
-        assertEquals(1, adminData.getUpdateCourtWorkerSelectList().getListItems().size());
+        assertEquals(1, adminData.getCourtWorkerSelectList().getListItems().size());
     }
 
     @ParameterizedTest
@@ -118,14 +115,14 @@ class CourtWorkerServiceTest {
         var name = "Name1";
 
         adminData = createAdminData(tribunalOffice.getOfficeName(), courtWorkerType.name(), code, name);
-        adminData.setUpdateCourtWorkerOffice(tribunalOffice.getOfficeName());
-        adminData.setUpdateCourtWorkerType(courtWorkerType.name());
+        adminData.setCourtWorkerOffice(tribunalOffice.getOfficeName());
+        adminData.setCourtWorkerType(courtWorkerType.name());
 
         List<CourtWorker> listCourtWorker = new ArrayList<>();
         when(courtWorkerRepository.findByTribunalOfficeAndTypeOrderByNameAsc(any(TribunalOffice.class),
                 any(CourtWorkerType.class))).thenReturn(listCourtWorker);
 
-        List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectOffice(adminData);
+        List<String> errors = courtWorkerService.getCourtWorkerMidEventSelectOffice(adminData);
         assertEquals(1, errors.size());
         assertEquals(String.format(NO_FOUND_ERROR_MESSAGE, courtWorkerType.name(), tribunalOffice.getOfficeName()),
                 errors.get(0));
@@ -141,10 +138,10 @@ class CourtWorkerServiceTest {
         when(courtWorkerRepository.findByCodeAndTribunalOfficeAndType(anyString(), any(), any()))
                 .thenReturn(courtWorker);
 
-        List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectCourtWorker(adminData);
+        List<String> errors = courtWorkerService.getCourtWorkerMidEventSelectCourtWorker(adminData);
         assertEquals(0, errors.size());
-        assertEquals("Code1", adminData.getUpdateCourtWorkerCode());
-        assertEquals("Name1", adminData.getUpdateCourtWorkerName());
+        assertEquals("Code1", adminData.getCourtWorkerCode());
+        assertEquals("Name1", adminData.getCourtWorkerName());
     }
 
     @ParameterizedTest
@@ -156,7 +153,7 @@ class CourtWorkerServiceTest {
         when(courtWorkerRepository.findByCodeAndTribunalOfficeAndType(anyString(), any(), any()))
                 .thenReturn(null);
 
-        List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectCourtWorker(adminData);
+        List<String> errors = courtWorkerService.getCourtWorkerMidEventSelectCourtWorker(adminData);
         assertEquals(1, errors.size());
         assertEquals(SAVE_ERROR_MESSAGE, errors.get(0));
     }
@@ -166,7 +163,7 @@ class CourtWorkerServiceTest {
     void updateCourtWorker_shouldSaveClerk(CourtWorkerType courtWorkerType) {
         adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(),
                 "Code1", "Name1");
-        adminData.setUpdateCourtWorkerName("Name2");
+        adminData.setCourtWorkerName("Name2");
 
         CourtWorker courtWorker = createCourtWorkerWithId(1, TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name1");
         when(courtWorkerRepository.findByCodeAndTribunalOfficeAndType(anyString(), any(), any()))
@@ -183,7 +180,7 @@ class CourtWorkerServiceTest {
     void updateCourtWorker_shouldReturnError(CourtWorkerType courtWorkerType) {
         adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(),
                 "Code1", "Name1");
-        adminData.setUpdateCourtWorkerName("Name2");
+        adminData.setCourtWorkerName("Name2");
 
         List<CourtWorker> listCourtWorker = new ArrayList<>();
         when(courtWorkerRepository.findById(anyInt())).thenReturn(listCourtWorker);
@@ -191,6 +188,38 @@ class CourtWorkerServiceTest {
         List<String> errors = courtWorkerService.updateCourtWorker(adminData);
         assertEquals(1, errors.size());
         assertEquals(SAVE_ERROR_MESSAGE, errors.get(0));
+    }
+
+    @ParameterizedTest
+    @EnumSource(CourtWorkerType.class)
+    void deleteCourtWorker_shouldSaveClerk(CourtWorkerType courtWorkerType) {
+        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(),
+                "Code1", "Name1");
+        adminData.setCourtWorkerName("Name2");
+
+        CourtWorker courtWorker = createCourtWorkerWithId(1, TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name1");
+        when(courtWorkerRepository.findByCodeAndTribunalOfficeAndType(anyString(), any(), any()))
+                .thenReturn(courtWorker);
+
+        List<String> errors = courtWorkerService.deleteCourtWorker(adminData);
+        assertEquals(0, errors.size());
+        verify(courtWorkerRepository, times(1)).delete(
+                createCourtWorkerWithId(1, TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name2"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(CourtWorkerType.class)
+    void deleteCourtWorker_shouldReturnError(CourtWorkerType courtWorkerType) {
+        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(),
+                "Code1", "Name1");
+        adminData.setCourtWorkerName("Name2");
+
+        List<CourtWorker> listCourtWorker = new ArrayList<>();
+        when(courtWorkerRepository.findById(anyInt())).thenReturn(listCourtWorker);
+
+        List<String> errors = courtWorkerService.deleteCourtWorker(adminData);
+        assertEquals(1, errors.size());
+        assertEquals(String.format(NO_WORKER_CODE_FOUND_ERROR_MESSAGE, "Code1"), errors.get(0));
     }
 
     private AdminData createAdminData(String officeName, String courtWorkerType, String testCode, String testName) {
@@ -209,18 +238,18 @@ class CourtWorkerServiceTest {
     private AdminData createAdminDataWithDynamicList(String id, String tribunalOffice, String courtWorkerType,
                                                      String code, String name) {
         var adminData = createAdminData(tribunalOffice, courtWorkerType, code, name);
-        adminData.setUpdateCourtWorkerOffice(tribunalOffice);
-        adminData.setUpdateCourtWorkerType(courtWorkerType);
+        adminData.setCourtWorkerOffice(tribunalOffice);
+        adminData.setCourtWorkerType(courtWorkerType);
 
         List<DynamicValueType> listDynamicValueType = new ArrayList<>();
         listDynamicValueType.add(DynamicValueType.create(id, name));
 
         var courtWorkerDynamicList = new DynamicFixedListType();
         courtWorkerDynamicList.setListItems(listDynamicValueType);
-        adminData.setUpdateCourtWorkerSelectList(courtWorkerDynamicList);
+        adminData.setCourtWorkerSelectList(courtWorkerDynamicList);
 
         var dynamicValueType = DynamicValueType.create(id, name);
-        adminData.getUpdateCourtWorkerSelectList().setValue(dynamicValueType);
+        adminData.getCourtWorkerSelectList().setValue(dynamicValueType);
 
         return adminData;
     }

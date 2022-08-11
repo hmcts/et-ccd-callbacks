@@ -84,6 +84,20 @@ class FileLocationServiceTest {
     }
 
     @Test
+    void shouldDeleteFileLocation() {
+        when(fileLocationRepository.existsByCodeAndTribunalOffice(fileLocationCode,
+                TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(false);
+        when(fileLocationRepository.existsByNameAndTribunalOffice(fileLocationName,
+                TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(false);
+        when(fileLocationRepository.findByCodeAndTribunalOffice(fileLocationCode,
+                TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(fileLocation);
+
+        List<String> errors = fileLocationService.deleteFileLocation(adminData);
+        verify(fileLocationRepository, times(1)).delete(fileLocation);
+        assertEquals(0, errors.size());
+    }
+
+    @Test
     void shouldUpdateFileLocation_ReturnFileLocationNameAndOfficeConflictError() {
         when(fileLocationRepository.existsByNameAndTribunalOffice(fileLocationName,
                 TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(true);

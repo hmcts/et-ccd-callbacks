@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -77,7 +78,7 @@ public class CourtWorkerController {
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }
 
-    @PostMapping(value = "/updateCourtWorkerMidEventSelectOffice", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/midEventCourtWorkerSelectOffice", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates the dynamicList for court worker when office and type selected")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully"),
@@ -88,19 +89,17 @@ public class CourtWorkerController {
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
-        log.info("/updateCourtWorkerMidEventSelectOffice");
-
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
-        var adminData = ccdRequest.getCaseDetails().getAdminData();
-        List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectOffice(adminData);
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
+        List<String> errors = courtWorkerService.getCourtWorkerMidEventSelectOffice(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }
 
-    @PostMapping(value = "/updateCourtWorkerMidEventSelectCourtWorker", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/midEventCourtWorkerSelectCourtWorker", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates the court worker code and name when dynamicList selected")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully"),
@@ -111,14 +110,12 @@ public class CourtWorkerController {
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
-        log.info("/updateCourtWorkerMidEventSelectCourtWorker");
-
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
         var adminData = ccdRequest.getCaseDetails().getAdminData();
-        List<String> errors = courtWorkerService.updateCourtWorkerMidEventSelectCourtWorker(adminData);
+        List<String> errors = courtWorkerService.getCourtWorkerMidEventSelectCourtWorker(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }

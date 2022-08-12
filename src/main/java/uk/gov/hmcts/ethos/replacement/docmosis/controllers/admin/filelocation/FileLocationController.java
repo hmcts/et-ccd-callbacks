@@ -79,7 +79,7 @@ public class FileLocationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         fileLocationService.initAdminData(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityNoErrors(adminData);
@@ -161,7 +161,7 @@ public class FileLocationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
-        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = fileLocationService.midEventSelectTribunalOffice(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
@@ -199,7 +199,7 @@ public class FileLocationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
-        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = fileLocationService.midEventSelectFileLocation(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
@@ -238,7 +238,7 @@ public class FileLocationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
-        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = fileLocationService.updateFileLocation(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
@@ -277,7 +277,7 @@ public class FileLocationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
-        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = fileLocationService.deleteFileLocation(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);

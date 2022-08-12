@@ -96,8 +96,8 @@ public class Et1VettingHelper {
                 .referralToJudgeOrLOList(CollectionUtils.isEmpty(caseData.getReferralToJudgeOrLOList())
                         ? null
                         : caseData.getReferralToJudgeOrLOList().toString())
-                .claimOfInterimReliefTextArea(nullChecker(caseData.getAClaimOfInterimReliefTextArea()))
-                .statutoryAppealTextArea(nullChecker(caseData.getAStatutoryAppealTextArea()))
+                .claimOfInterimReliefTextArea(nullChecker(caseData.getAclaimOfInterimReliefTextArea()))
+                .statutoryAppealTextArea(nullChecker(caseData.getAstatutoryAppealTextArea()))
                 .anAllegationOfCommissionOfSexualOffenceTextArea(nullChecker(
                         caseData.getAnAllegationOfCommissionOfSexualOffenceTextArea()))
                 .insolvencyTextArea(nullChecker(caseData.getInsolvencyTextArea()))
@@ -113,12 +113,12 @@ public class Et1VettingHelper {
                         ? null
                         : caseData.getReferralToREJOrVPList().toString())
                 .vexatiousLitigantOrderTextArea(nullChecker(caseData.getVexatiousLitigantOrderTextArea()))
-                .nationalSecurityIssueTextArea(nullChecker(caseData.getANationalSecurityIssueTextArea()))
+                .nationalSecurityIssueTextArea(nullChecker(caseData.getAnationalSecurityIssueTextArea()))
                 .nationalMultipleOrPresidentialOrderTextArea(nullChecker(
                         caseData.getNationalMultipleOrPresidentialOrderTextArea()))
                 .transferToOtherRegionTextArea(nullChecker(caseData.getTransferToOtherRegionTextArea()))
                 .serviceAbroadTextArea(nullChecker(caseData.getServiceAbroadTextArea()))
-                .sensitiveIssueTextArea(nullChecker(caseData.getASensitiveIssueTextArea()))
+                .sensitiveIssueTextArea(nullChecker(caseData.getAsensitiveIssueTextArea()))
                 .anyPotentialConflictTextArea(nullChecker(caseData.getAnyPotentialConflictTextArea()))
                 .anotherReasonREJOrVPTextArea(nullChecker(caseData.getAnotherReasonREJOrVPTextArea()))
                 .et1REJOrVPReferralGeneralNotes(nullChecker(caseData.getEt1REJOrVPReferralGeneralNotes()))

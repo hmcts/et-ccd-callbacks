@@ -55,12 +55,12 @@ class FileLocationControllerTest {
 
     @Test
     void testAddFileLocationSuccess() throws Exception {
-        var ccdRequest = AdminDataBuilder
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withFileLocationData("testCode", "testName", "ABERDEEN")
                 .buildAsCCDRequest();
 
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/admin/filelocation/addFileLocation")
@@ -76,7 +76,7 @@ class FileLocationControllerTest {
 
     @Test
     void testAddFileLocationError() throws Exception {
-        var ccdRequest = AdminDataBuilder
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withFileLocationData("testCode", "testName", "Aberdeen")
                 .buildAsCCDRequest();
@@ -85,7 +85,7 @@ class FileLocationControllerTest {
         String error = String.format(ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE,
                 adminData.getFileLocationCode());
 
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
         doThrow(new SaveFileLocationException(error)).when(fileLocationService).saveFileLocation(adminData);
 
@@ -99,12 +99,12 @@ class FileLocationControllerTest {
 
     @Test
     void testAddFileLocationInvalidToken() throws Exception {
-        var ccdRequest = AdminDataBuilder
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withFileLocationData("testCode", "testName", "ABERDEEN")
                 .buildAsCCDRequest();
 
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/admin/filelocation/addFileLocation")
@@ -118,11 +118,11 @@ class FileLocationControllerTest {
     @Test
     void testInitAdminDataSuccess() throws Exception {
 
-        var ccdRequest = AdminDataBuilder
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withFileLocationData("testCode", "testName", "ABERDEEN")
                 .buildAsCCDRequest();
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/admin/filelocation/initAdminData")
@@ -151,12 +151,12 @@ class FileLocationControllerTest {
   
     @Test
     void testUpdateFileLocationSuccess() throws Exception {
-        var ccdRequest = AdminDataBuilder
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withFileLocationData("testCode", "testName", "ABERDEEN")
                 .buildAsCCDRequest();
 
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/admin/filelocation/updateFileLocation")
@@ -172,12 +172,12 @@ class FileLocationControllerTest {
 
     @Test
     void testUpdateFileLocationInvalidToken() throws Exception {
-        var ccdRequest = AdminDataBuilder
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withFileLocationData("testCode", "testName", "ABERDEEN")
                 .buildAsCCDRequest();
 
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/admin/filelocation/updateFileLocation")
@@ -190,7 +190,7 @@ class FileLocationControllerTest {
 
     @Test
     void testUpdateFileLocationError() throws Exception {
-        var ccdRequest = AdminDataBuilder
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withFileLocationData("testCode", "testName", "Aberdeen")
                 .buildAsCCDRequest();
@@ -199,7 +199,7 @@ class FileLocationControllerTest {
         String error = String.format(ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE,
                 adminData.getFileLocationCode());
 
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         when(fileLocationService.updateFileLocation(adminData)).thenReturn(Arrays.asList(error));
@@ -218,12 +218,12 @@ class FileLocationControllerTest {
 
     @Test
     void testDeleteFileLocationSuccess() throws Exception {
-        var ccdRequest = AdminDataBuilder
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withFileLocationData("testCode", "testName", "ABERDEEN")
                 .buildAsCCDRequest();
 
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/admin/filelocation/deleteFileLocation")
@@ -239,12 +239,12 @@ class FileLocationControllerTest {
 
     @Test
     void testDeleteFileLocationInvalidToken() throws Exception {
-        var ccdRequest = AdminDataBuilder
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withFileLocationData("testCode", "testName", "ABERDEEN")
                 .buildAsCCDRequest();
 
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/admin/filelocation/deleteFileLocation")
@@ -257,7 +257,7 @@ class FileLocationControllerTest {
 
     @Test
     void testDeleteFileLocationError() throws Exception {
-        var ccdRequest = AdminDataBuilder
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withFileLocationData("testCode", "testName", "Aberdeen")
                 .buildAsCCDRequest();
@@ -266,7 +266,7 @@ class FileLocationControllerTest {
         String error = String.format(ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE,
                 adminData.getFileLocationCode());
 
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         when(fileLocationService.deleteFileLocation(adminData)).thenReturn(Collections.singletonList(error));

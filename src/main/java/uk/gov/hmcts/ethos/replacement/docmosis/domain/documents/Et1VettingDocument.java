@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Object which contains data needed by Tornado to generate a document.
+ */
 @Data
 @SuperBuilder
 public class Et1VettingDocument {

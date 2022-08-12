@@ -36,23 +36,22 @@ public class AdminData {
     @JsonProperty("fileLocationName")
     private String fileLocationName;
 
-    // For updating fileLocation
+    // For updating and deleting fileLocation
     @JsonProperty("fileLocationList")
     private DynamicFixedListType fileLocationList;
 
     @JsonProperty("adminCourtWorker")
     private AdminCourtWorker adminCourtWorker;
 
-    //updateCourtWorker
-    @JsonProperty("updateCourtWorkerOffice")
-    private String updateCourtWorkerOffice;
-    @JsonProperty("updateCourtWorkerType")
-    private String updateCourtWorkerType;
-    @JsonProperty("updateCourtWorkerCode")
-    private String updateCourtWorkerCode;
-    @JsonProperty("updateCourtWorkerName")
-    private String updateCourtWorkerName;
-    @JsonProperty("updateCourtWorkerSelectList")
-    private DynamicFixedListType updateCourtWorkerSelectList;
-
+    //updating and deleting court worker
+    @JsonProperty("courtWorkerOffice")
+    private String courtWorkerOffice;
+    @JsonProperty("courtWorkerType")
+    private String courtWorkerType;
+    @JsonProperty("courtWorkerCode")
+    private String courtWorkerCode;
+    @JsonProperty("courtWorkerName")
+    private String courtWorkerName;
+    @JsonProperty("courtWorkerSelectList")
+    private DynamicFixedListType courtWorkerSelectList;
 }

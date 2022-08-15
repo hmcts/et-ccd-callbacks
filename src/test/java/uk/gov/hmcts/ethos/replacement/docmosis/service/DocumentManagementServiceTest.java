@@ -14,7 +14,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -31,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -166,5 +169,16 @@ public class DocumentManagementServiceTest {
         assertEquals(documentManagementService.generateMarkupDocument(documentDownloadableURL), markup);
         assertNotNull(documentSelfPath);
         assertEquals("/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4", documentSelfPath.getPath());
+    }
+
+    @Test
+    public void addDocumentToDocumentField() {
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setDescription("Test description");
+        documentInfo.setUrl("http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
+
+        UploadedDocumentType uploadedDocumentType = documentManagementService.addDocumentToDocumentField(documentInfo);
+        assertThat(uploadedDocumentType.getDocumentFilename()).isEqualTo(documentInfo.getDescription());
+        assertThat(uploadedDocumentType.getDocumentBinaryUrl()).isEqualTo(documentInfo.getUrl());
     }
 }

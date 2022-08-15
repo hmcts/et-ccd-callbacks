@@ -5,12 +5,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -40,6 +42,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrac
 @Service
 @RequiredArgsConstructor
 public class Et1VettingService {
+
+    private final TornadoService tornadoService;
+
     private static final String ET1_DOC_TYPE = "ET1";
     private static final String ACAS_DOC_TYPE = "ACAS Certificate";
     private static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s"
@@ -88,7 +93,7 @@ public class Et1VettingService {
     private static final String TRIBUNAL_SCOTLAND = "Scotland";
     private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br><br><br>";
     private static final String NO_ACAS_CERT_DISPLAY = "No certificate has been provided.<br><br><br>";
-
+    private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
     private final JpaVenueService jpaVenueService;
 
     /**
@@ -367,5 +372,21 @@ public class Et1VettingService {
             toAddressWithTab(caseData.getClaimantWorkAddress().getClaimantWorkAddress()),
             toAddressWithTab(caseData.getRespondentCollection().get(0).getValue().getRespondentAddress())
         );
+    }
+
+    /**
+     * This calls the Tornado service to generate the pdf for the ET1 Vetting journey.
+     * @param caseData gets the casedata
+     * @param userToken user authentication token
+     * @param caseTypeId reference which casetype the document will be uploaded to
+     * @return DocumentInfo which contains the url and markup for the uploaded document
+     */
+    public DocumentInfo generateEt1VettingDocument(CaseData caseData, String userToken, String caseTypeId) {
+        try {
+            return tornadoService.generateEt1VettingDocument(caseData, userToken,
+                    caseTypeId, "ET1Vetting.pdf");
+        } catch (Exception e) {
+            throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
+        }
     }
 }

@@ -16,6 +16,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
@@ -30,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LETTER_ADDRESS_ALLOCATED_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
@@ -41,6 +43,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 public class TornadoService {
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
+    private static final String ET1_VETTING_OUTPUT_NAME = "ET1 Vetting.pdf";
+    private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
 
     private final TornadoConnection tornadoConnection;
     private final DocumentManagementService documentManagementService;
@@ -246,7 +250,13 @@ public class TornadoService {
         HttpURLConnection connection = null;
         try {
             connection = createConnection();
-            buildEt1VettingInstruction(connection, caseData, userToken);
+            if (documentName.equals(ET1_VETTING_OUTPUT_NAME)) {
+                buildEt1VettingInstruction(connection, caseData, userToken);
+            } else if (documentName.equals(IC_OUTPUT_NAME) && caseTypeId.equals(ENGLANDWALES_CASE_TYPE_ID)) {
+                buildInConEgwInstruction(connection, caseData, userToken);
+            } else if (documentName.equals(IC_OUTPUT_NAME) && caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
+                buildInConScoInstruction(connection, caseData, userToken);
+            }
             return checkResponseStatus(userToken, connection, documentName, caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
@@ -264,4 +274,23 @@ public class TornadoService {
             outputStreamWriter.flush();
         }
     }
+
+    private void buildInConEgwInstruction(HttpURLConnection connection, CaseData caseData, String userToken)
+            throws IOException {
+        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream(),
+                StandardCharsets.UTF_8)) {
+            outputStreamWriter.write(InitialConsiderationHelper.getDocumentRequestEW(caseData, userToken));
+            outputStreamWriter.flush();
+        }
+    }
+
+    private void buildInConScoInstruction(HttpURLConnection connection, CaseData caseData, String userToken)
+            throws IOException {
+        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream(),
+                StandardCharsets.UTF_8)) {
+            outputStreamWriter.write(InitialConsiderationHelper.getDocumentRequestSC(caseData, userToken));
+            outputStreamWriter.flush();
+        }
+    }
+
 }

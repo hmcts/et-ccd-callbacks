@@ -1,7 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
@@ -23,26 +27,32 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.get
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Service
+@RequiredArgsConstructor
 public class InitialConsiderationService {
-    static final String RESPONDENT_NAME =
+
+    private final TornadoService tornadoService;
+
+    private static final String RESPONDENT_NAME =
         "| Respondent %s name given | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|In ET1 by claimant | %s|\r\n"
             + "|In ET3 by respondent | %s|\r\n"
             + "\r\n";
 
-    static final String HEARING_DETAILS =
+    private static final String HEARING_DETAILS =
         "|Hearing details | |\r\n"
             + "|-------------|:------------|\r\n"
             + "|Date | %s|\r\n"
             + "|Type | %s|\r\n"
             + "|Duration | %s|";
 
-    static final String JURISDICTION_HEADER = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
+    private static final String JURISDICTION_HEADER = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
         + "href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">View all "
         + "jurisdiction codes and descriptors (opens in new tab)</a><br><br>";
-    static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
-    static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "");
+    private static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
+    private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "");
+    private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
+    private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
 
     /**
      * Creates the respondent detail section for Initial Consideration.
@@ -138,5 +148,20 @@ public class InitialConsiderationService {
                 .append("<br><br>"));
 
         return sb.append("<hr>").toString();
+    }
+
+    /**
+     * This calls the Tornado service to generate the pdf for the ET1 Vetting journey.
+     * @param caseData gets the casedata
+     * @param userToken user authentication token
+     * @param caseTypeId reference which casetype the document will be uploaded to
+     * @return DocumentInfo which contains the url and markup for the uploaded document
+     */
+    public DocumentInfo generateDocument(CaseData caseData, String userToken, String caseTypeId) {
+        try {
+            return tornadoService.generateEt1VettingDocument(caseData, userToken, caseTypeId, IC_OUTPUT_NAME);
+        } catch (Exception e) {
+            throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
+        }
     }
 }

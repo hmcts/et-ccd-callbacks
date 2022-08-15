@@ -98,13 +98,15 @@ class CreateReferralHelperTest {
 
         createReferralHelper.createReferral(caseData, "");
 
-        String expected = "ReferralType(referCaseTo=Judge Judy, referrerEmail=judge.judy@aol.com, isUrgent=Yes, "
+        String expected = "ReferralType(referralNumber=1, referCaseTo=Judge Judy, "
+            + "referrerEmail=judge.judy@aol.com, isUrgent=Yes, "
             + "referralSubject=Subject line here, referralSubjectSpecify=Custom subject line, referralDetails=This "
             + "is an explanation, referralDocument=[DocumentTypeItem(id=1, value=null), DocumentTypeItem(id=2, "
             + "value=null)], referralInstruction=Custom instructions for judge, referredBy=Judge Judy, "
-            + "referralDate=2022-08-10)";
+            + "referralDate="
+            + Helper.getCurrentDate()
+            + ", referralStatus=Open)";
         String actual = caseData.getReferralCollection().get(0).getValue().toString();
-
         assertEquals(expected, actual);
     }
 

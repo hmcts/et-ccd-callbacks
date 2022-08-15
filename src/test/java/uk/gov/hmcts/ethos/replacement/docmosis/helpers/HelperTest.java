@@ -94,7 +94,7 @@ public class HelperTest {
     @Test
     public void getCurrentDate() {
         String currentDate = Helper.getCurrentDate();
-        Pattern pattern = Pattern.compile("\\d\\d\\d\\d-\\d\\d-\\d\\d");
+        Pattern pattern = Pattern.compile("\\d{2} [A-Za-z]{3} \\d{4}");
         Matcher matcher = pattern.matcher(currentDate);
         assertTrue(matcher.matches());
     }

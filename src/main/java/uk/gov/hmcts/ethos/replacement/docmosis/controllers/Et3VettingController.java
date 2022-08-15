@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3VettingService;
@@ -283,8 +284,9 @@ public class Et3VettingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
-        et3VettingService.saveEt3VettingToRespondent(caseData);
+        DocumentInfo documentInfo = et3VettingService.generateEt1VettingDocument(caseData, userToken,
+                ccdRequest.getCaseDetails().getCaseTypeId());
+        et3VettingService.saveEt3VettingToRespondent(caseData, documentInfo);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

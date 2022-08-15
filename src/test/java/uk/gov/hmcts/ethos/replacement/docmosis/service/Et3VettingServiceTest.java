@@ -23,7 +23,7 @@ class Et3VettingServiceTest {
 
     @BeforeEach
     void setUp() {
-        et3VettingService = new Et3VettingService();
+        et3VettingService = new Et3VettingService(documentManagementService);
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("Doris", "Johnson")
             .withClaimantType("232 Petticoat Square", "3 House", null,

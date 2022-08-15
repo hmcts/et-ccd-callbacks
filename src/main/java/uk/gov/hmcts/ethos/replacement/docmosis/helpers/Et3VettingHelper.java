@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -15,6 +18,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et3VettingData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,6 +42,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
  */
 @Slf4j
 public class Et3VettingHelper {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    // Template need changing
+    private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-01140.docx";
+    private static final String OUTPUT_NAME = "ET3 Processing.pdf";
 
     static final String NO_RESPONDENTS_FOUND_ERROR = "No respondents found for case %s";
     static final String NO_CLAIM_SERVED_DATE = "Cannot proceed as there is no claim served date";
@@ -75,6 +85,7 @@ public class Et3VettingHelper {
 
     private Et3VettingHelper() {
         //Access through static methods
+        OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     /**
@@ -397,6 +408,21 @@ public class Et3VettingHelper {
             : TribunalOffice.SCOTLAND.getOfficeName();
 
         caseData.setEt3TribunalLocation(String.format(ET3_TRIBUNAL_TABLE, tribunalOffice, managingOffice));
+    }
+
+    public static String getDocumentRequest(CaseData caseData, String userToken) throws JsonProcessingException {
+        Et3VettingData et3VettingData = Et3VettingData.builder()
+                .build();
+
+        TornadoDocument et3VettingDocument = TornadoDocument.builder()
+                .accessKey(userToken)
+                .outputName(OUTPUT_NAME)
+                .templateName(TEMPLATE_NAME)
+                .et3VettingData(et3VettingData)
+                .build();
+
+        return OBJECT_MAPPER.writeValueAsString(et3VettingDocument);
+
     }
 
 }

@@ -187,7 +187,7 @@ public class TornadoServiceTest {
     @Test
     public void generateEt1VettingDocument() throws IOException {
         mockConnectionSuccess();
-        DocumentInfo documentInfo = tornadoService.generateEt1VettingDocument(
+        DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID, "random-string");
         verifyDocumentInfo(documentInfo);
     }
@@ -195,7 +195,7 @@ public class TornadoServiceTest {
     @Test(expected = IOException.class)
     public void generateEt1VettingDocument_exception() throws IOException {
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
-        tornadoService.generateEt1VettingDocument(new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID,
+        tornadoService.generateEventDocument(new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID,
                 "random-string");
     }
 

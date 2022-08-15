@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
  */
 @Data
 @SuperBuilder
-public class Et1VettingDocument {
+public class TornadoDocument {
 
     @JsonProperty("accessKey")
     private String accessKey;
@@ -17,6 +17,9 @@ public class Et1VettingDocument {
     private String templateName;
     @JsonProperty("outputName")
     private String outputName;
+
     @JsonProperty("data")
-    private Et1VettingData data;
+    private Et1VettingData et1VettingData;
+    @JsonProperty("data")
+    private Et3VettingData et3VettingData;
 }

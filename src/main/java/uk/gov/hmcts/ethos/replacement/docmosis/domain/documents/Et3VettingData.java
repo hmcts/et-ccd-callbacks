@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * This object contains references to the data captured during the ET3 Vetting/Processing event.
+ * Data is stored within this object to be used by Docmosis Tornado to generate a document.
+ */
 @Data
 @SuperBuilder
 public class Et3VettingData {

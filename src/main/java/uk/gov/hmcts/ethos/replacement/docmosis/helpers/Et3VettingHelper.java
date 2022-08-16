@@ -31,11 +31,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.nullChecker;
 
 /**
  * ET3 vetting helper provides methods to assist with the ET3 vetting pages
@@ -422,52 +422,58 @@ public class Et3VettingHelper {
     public static String getDocumentRequest(CaseData caseData, String userToken) throws JsonProcessingException {
         Et3VettingData et3VettingData = Et3VettingData.builder()
                 .ethosCaseReference(caseData.getEthosCaseReference())
-                .et3IsThereAnEt3Response(nullChecker(caseData.getEt3IsThereAnEt3Response()))
-                .et3NoEt3Response(nullChecker(caseData.getEt3NoEt3Response()))
-                .et3GeneralNotes(nullChecker(caseData.getEt3GeneralNotes()))
+                .et3IsThereAnEt3Response(defaultIfEmpty(caseData.getEt3IsThereAnEt3Response(), null))
+                .et3NoEt3Response(defaultIfEmpty(caseData.getEt3NoEt3Response(), null))
+                .et3GeneralNotes(defaultIfEmpty(caseData.getEt3GeneralNotes(), null))
                 .et3IsThereACompaniesHouseSearchDocument(
-                        nullChecker(caseData.getEt3IsThereACompaniesHouseSearchDocument()))
-                .et3GeneralNotesCompanyHouse(nullChecker(caseData.getEt3GeneralNotesCompanyHouse()))
-                .et3IsThereAnIndividualSearchDocument(nullChecker(caseData.getEt3IsThereAnIndividualSearchDocument()))
-                .et3GeneralNotesIndividualInsolvency(nullChecker(caseData.getEt3GeneralNotesIndividualInsolvency()))
-                .et3LegalIssue(nullChecker(caseData.getEt3LegalIssue()))
-                .et3LegalIssueGiveDetails(nullChecker(caseData.getEt3LegalIssueGiveDetails()))
-                .et3GeneralNotesLegalEntity(nullChecker(caseData.getEt3GeneralNotesLegalEntity()))
-                .et3ResponseInTime(nullChecker(caseData.getEt3ResponseInTime()))
-                .et3ResponseInTimeDetails(nullChecker(caseData.getEt3ResponseInTimeDetails()))
-                .et3DoWeHaveRespondentsName(nullChecker(caseData.getEt3DoWeHaveRespondentsName()))
-                .et3GeneralNotesRespondentName(nullChecker(caseData.getEt3GeneralNotesRespondentName()))
-                .et3DoesRespondentsNameMatch(nullChecker(caseData.getEt3DoesRespondentsNameMatch()))
-                .et3RespondentNameMismatchDetails(nullChecker(caseData.getEt3RespondentNameMismatchDetails()))
-                .et3GeneralNotesRespondentNameMatch(nullChecker(caseData.getEt3GeneralNotesRespondentNameMatch()))
-                .et3DoWeHaveRespondentsAddress(nullChecker(caseData.getEt3DoWeHaveRespondentsAddress()))
-                .et3DoesRespondentsAddressMatch(nullChecker(caseData.getEt3DoesRespondentsAddressMatch()))
-                .et3RespondentAddressMismatchDetails(nullChecker(caseData.getEt3RespondentAddressMismatchDetails()))
-                .et3GeneralNotesRespondentAddress(nullChecker(caseData.getEt3GeneralNotesRespondentAddress()))
-                .et3GeneralNotesAddressMatch(nullChecker(caseData.getEt3GeneralNotesAddressMatch()))
-                .et3IsCaseListedForHearing(nullChecker(caseData.getEt3IsCaseListedForHearing()))
-                .et3IsCaseListedForHearingDetails(nullChecker(caseData.getEt3IsCaseListedForHearingDetails()))
-                .et3GeneralNotesCaseListed(nullChecker(caseData.getEt3GeneralNotesCaseListed()))
-                .et3IsThisLocationCorrect(nullChecker(caseData.getEt3IsThisLocationCorrect()))
-                .et3GeneralNotesTransferApplication(nullChecker(caseData.getEt3GeneralNotesTransferApplication()))
-                .et3RegionalOffice(nullChecker(caseData.getEt3RegionalOffice()))
-                .et3WhyWeShouldChangeTheOffice(nullChecker(caseData.getEt3WhyWeShouldChangeTheOffice()))
-                .et3ContestClaim(nullChecker(caseData.getEt3ContestClaim()))
-                .et3ContestClaimGiveDetails(nullChecker(caseData.getEt3ContestClaimGiveDetails()))
-                .et3GeneralNotesContestClaim(nullChecker(caseData.getEt3GeneralNotesContestClaim()))
-                .et3ContractClaimSection7(nullChecker(caseData.getEt3ContractClaimSection7()))
-                .et3ContractClaimSection7Details(nullChecker(caseData.getEt3ContractClaimSection7Details()))
-                .et3GeneralNotesContractClaimSection7(nullChecker(caseData.getEt3GeneralNotesContractClaimSection7()))
-                .et3Rule26(nullChecker(caseData.getEt3Rule26()))
-                .et3Rule26Details(nullChecker(caseData.getEt3Rule26Details()))
-                .et3SuggestedIssuesStrikeOut(nullChecker(caseData.getEt3SuggestedIssuesStrikeOut()))
-                .et3SuggestedIssueInterpreters(nullChecker(caseData.getEt3SuggestedIssueInterpreters()))
-                .et3SuggestedIssueJurisdictional(nullChecker(caseData.getEt3SuggestedIssueJurisdictional()))
-                .et3SuggestedIssueAdjustments(nullChecker(caseData.getEt3SuggestedIssueAdjustments()))
-                .et3SuggestedIssueRule50(nullChecker(caseData.getEt3SuggestedIssueRule50()))
-                .et3SuggestedIssueTimePoints(nullChecker(caseData.getEt3SuggestedIssueTimePoints()))
-                .et3GeneralNotesRule26(nullChecker(caseData.getEt3GeneralNotesRule26()))
-                .et3AdditionalInformation(nullChecker(caseData.getEt3AdditionalInformation()))
+                        defaultIfEmpty(caseData.getEt3IsThereACompaniesHouseSearchDocument(), null))
+                .et3GeneralNotesCompanyHouse(defaultIfEmpty(caseData.getEt3GeneralNotesCompanyHouse(), null))
+                .et3IsThereAnIndividualSearchDocument(
+                        defaultIfEmpty(caseData.getEt3IsThereAnIndividualSearchDocument(), null))
+                .et3GeneralNotesIndividualInsolvency(
+                        defaultIfEmpty(caseData.getEt3GeneralNotesIndividualInsolvency(), null))
+                .et3LegalIssue(defaultIfEmpty(caseData.getEt3LegalIssue(), null))
+                .et3LegalIssueGiveDetails(defaultIfEmpty(caseData.getEt3LegalIssueGiveDetails(), null))
+                .et3GeneralNotesLegalEntity(defaultIfEmpty(caseData.getEt3GeneralNotesLegalEntity(), null))
+                .et3ResponseInTime(defaultIfEmpty(caseData.getEt3ResponseInTime(), null))
+                .et3ResponseInTimeDetails(defaultIfEmpty(caseData.getEt3ResponseInTimeDetails(), null))
+                .et3DoWeHaveRespondentsName(defaultIfEmpty(caseData.getEt3DoWeHaveRespondentsName(), null))
+                .et3GeneralNotesRespondentName(defaultIfEmpty(caseData.getEt3GeneralNotesRespondentName(), null))
+                .et3DoesRespondentsNameMatch(defaultIfEmpty(caseData.getEt3DoesRespondentsNameMatch(), null))
+                .et3RespondentNameMismatchDetails(defaultIfEmpty(caseData.getEt3RespondentNameMismatchDetails(), null))
+                .et3GeneralNotesRespondentNameMatch(
+                        defaultIfEmpty(caseData.getEt3GeneralNotesRespondentNameMatch(), null))
+                .et3DoWeHaveRespondentsAddress(defaultIfEmpty(caseData.getEt3DoWeHaveRespondentsAddress(), null))
+                .et3DoesRespondentsAddressMatch(defaultIfEmpty(caseData.getEt3DoesRespondentsAddressMatch(), null))
+                .et3RespondentAddressMismatchDetails(
+                        defaultIfEmpty(caseData.getEt3RespondentAddressMismatchDetails(), null))
+                .et3GeneralNotesRespondentAddress(defaultIfEmpty(caseData.getEt3GeneralNotesRespondentAddress(), null))
+                .et3GeneralNotesAddressMatch(defaultIfEmpty(caseData.getEt3GeneralNotesAddressMatch(), null))
+                .et3IsCaseListedForHearing(defaultIfEmpty(caseData.getEt3IsCaseListedForHearing(), null))
+                .et3IsCaseListedForHearingDetails(defaultIfEmpty(caseData.getEt3IsCaseListedForHearingDetails(), null))
+                .et3GeneralNotesCaseListed(defaultIfEmpty(caseData.getEt3GeneralNotesCaseListed(), null))
+                .et3IsThisLocationCorrect(defaultIfEmpty(caseData.getEt3IsThisLocationCorrect(), null))
+                .et3GeneralNotesTransferApplication(
+                        defaultIfEmpty(caseData.getEt3GeneralNotesTransferApplication(), null))
+                .et3RegionalOffice(defaultIfEmpty(caseData.getEt3RegionalOffice(), null))
+                .et3WhyWeShouldChangeTheOffice(defaultIfEmpty(caseData.getEt3WhyWeShouldChangeTheOffice(), null))
+                .et3ContestClaim(defaultIfEmpty(caseData.getEt3ContestClaim(), null))
+                .et3ContestClaimGiveDetails(defaultIfEmpty(caseData.getEt3ContestClaimGiveDetails(), null))
+                .et3GeneralNotesContestClaim(defaultIfEmpty(caseData.getEt3GeneralNotesContestClaim(), null))
+                .et3ContractClaimSection7(defaultIfEmpty(caseData.getEt3ContractClaimSection7(), null))
+                .et3ContractClaimSection7Details(defaultIfEmpty(caseData.getEt3ContractClaimSection7Details(), null))
+                .et3GeneralNotesContractClaimSection7(
+                        defaultIfEmpty(caseData.getEt3GeneralNotesContractClaimSection7(), null))
+                .et3Rule26(defaultIfEmpty(caseData.getEt3Rule26(), null))
+                .et3Rule26Details(defaultIfEmpty(caseData.getEt3Rule26Details(), null))
+                .et3SuggestedIssuesStrikeOut(defaultIfEmpty(caseData.getEt3SuggestedIssuesStrikeOut(), null))
+                .et3SuggestedIssueInterpreters(defaultIfEmpty(caseData.getEt3SuggestedIssueInterpreters(), null))
+                .et3SuggestedIssueJurisdictional(defaultIfEmpty(caseData.getEt3SuggestedIssueJurisdictional(), null))
+                .et3SuggestedIssueAdjustments(defaultIfEmpty(caseData.getEt3SuggestedIssueAdjustments(), null))
+                .et3SuggestedIssueRule50(defaultIfEmpty(caseData.getEt3SuggestedIssueRule50(), null))
+                .et3SuggestedIssueTimePoints(defaultIfEmpty(caseData.getEt3SuggestedIssueTimePoints(), null))
+                .et3GeneralNotesRule26(defaultIfEmpty(caseData.getEt3GeneralNotesRule26(), null))
+                .et3AdditionalInformation(defaultIfEmpty(caseData.getEt3AdditionalInformation(), null))
                 .build();
 
         Et3VettingDocument et3VettingDocument = Et3VettingDocument.builder()

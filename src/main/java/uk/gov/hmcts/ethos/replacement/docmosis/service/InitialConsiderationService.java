@@ -159,7 +159,7 @@ public class InitialConsiderationService {
      */
     public DocumentInfo generateDocument(CaseData caseData, String userToken, String caseTypeId) {
         try {
-            return tornadoService.generateEt1VettingDocument(caseData, userToken, caseTypeId, IC_OUTPUT_NAME);
+            return tornadoService.generateEventDocument(caseData, userToken, caseTypeId, IC_OUTPUT_NAME);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }

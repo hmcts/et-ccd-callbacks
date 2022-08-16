@@ -17,6 +17,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsidera
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @Slf4j
 public class InitialConsiderationHelper {
@@ -26,6 +27,15 @@ public class InitialConsiderationHelper {
     private static final String IC_SUMMARY_SC_TEMPLATE_NAME = "EM-TRB-SCO-ENG-02204.docx";
 
     private InitialConsiderationHelper() {
+    }
+
+    public static String getDocumentRequest(CaseData caseData, String accessKey, String caseTypeId)
+            throws JsonProcessingException {
+        if (caseTypeId.equals(ENGLANDWALES_CASE_TYPE_ID)) {
+            return getDocumentRequestEW(caseData, accessKey);
+        } else {
+            return getDocumentRequestSC(caseData, accessKey);
+        }
     }
 
     public static String getDocumentRequestSC(CaseData caseData, String accessKey) throws JsonProcessingException {

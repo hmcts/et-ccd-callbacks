@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.bulk.BulkData;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -30,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LETTER_ADDRESS_ALLOCATED_OFFICE;
@@ -260,6 +260,9 @@ public class TornadoService {
 
     private void buildDocumentInstruction(HttpURLConnection connection, CaseData caseData, String documentName)
             throws IOException {
+        if (isNullOrEmpty(documentName)) {
+            throw new IllegalArgumentException("Illegal document name " + documentName);
+        }
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream(),
                 StandardCharsets.UTF_8)) {
             switch (documentName) {
@@ -272,7 +275,7 @@ public class TornadoService {
                             tornadoConnection.getAccessKey()));
                     break;
                 default:
-                    throw new NotFoundException("Document not found");
+                    throw new IllegalArgumentException("Unexpected document name " + documentName);
             }
             outputStreamWriter.flush();
         }

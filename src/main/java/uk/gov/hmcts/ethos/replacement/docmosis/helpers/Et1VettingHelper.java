@@ -59,7 +59,7 @@ public class Et1VettingHelper {
                 .et1VettingAcasCertIsYesOrNo6(nullChecker(caseData.getEt1VettingAcasCertIsYesOrNo6()))
                 .et1VettingAcasCertExemptYesOrNo6(nullChecker(caseData.getEt1VettingAcasCertExemptYesOrNo6()))
                 .et1VettingAcasCertGeneralNote(nullChecker(caseData.getEt1VettingAcasCertGeneralNote()))
-                .substantiveDefectsList(DocumentHelper.listNullChecker(caseData.getSubstantiveDefectsList()))
+                .substantiveDefectsList(listNullChecker(caseData.getSubstantiveDefectsList()))
                 .rule121aTextArea(nullChecker(caseData.getRule121aTextArea()))
                 .rule121bTextArea(nullChecker(caseData.getRule121bTextArea()))
                 .rule121cTextArea(nullChecker(caseData.getRule121cTextArea()))

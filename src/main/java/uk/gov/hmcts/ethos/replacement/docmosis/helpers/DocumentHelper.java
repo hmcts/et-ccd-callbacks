@@ -961,4 +961,25 @@ public class DocumentHelper {
 
     }
 
+    /**
+     * Utility method to null check a string value.
+     * @param value to be checked if null or contains data
+     * @return null if the value is null or empty or will return the value itself
+     */
+    public static String nullChecker(String value) {
+        return isNullOrEmpty(value)
+                ? null
+                : value;
+    }
+
+    /**
+     * Utility method to null check a list.
+     * @param value list to be checked if null or contains data
+     * @return either null if the list is null or empty or will return the list in a string format
+     */
+    public static String listNullChecker(List<String> value) {
+        return CollectionUtils.isEmpty(value)
+                ? null
+                : value.toString();
+    }
 }

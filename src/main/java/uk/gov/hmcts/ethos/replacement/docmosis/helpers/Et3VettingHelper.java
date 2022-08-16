@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -15,6 +18,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et3VettingData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et3VettingDocument;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,13 +35,20 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LIST
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.nullChecker;
 
 /**
  * ET3 vetting helper provides methods to assist with the ET3 vetting pages
  * this includes formatting markdown and querying the state of the ET3 response.
+ * This also includes part of the document generation for the ET3 Vetting process. It creates the data needed by
+ * Docmosis in order to generate a document.
  */
 @Slf4j
 public class Et3VettingHelper {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-01145.docx";
+    private static final String OUTPUT_NAME = "ET3 Processing.pdf";
 
     static final String NO_RESPONDENTS_FOUND_ERROR = "No respondents found for case %s";
     static final String NO_CLAIM_SERVED_DATE = "Cannot proceed as there is no claim served date";
@@ -75,6 +87,7 @@ public class Et3VettingHelper {
 
     private Et3VettingHelper() {
         //Access through static methods
+        OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     /**
@@ -397,6 +410,75 @@ public class Et3VettingHelper {
             : TribunalOffice.SCOTLAND.getOfficeName();
 
         caseData.setEt3TribunalLocation(String.format(ET3_TRIBUNAL_TABLE, tribunalOffice, managingOffice));
+    }
+
+    /**
+     * This method generates the request which will be sent to Docmosis to generate the document.
+     * @param caseData where the data is stored
+     * @param userToken token to access tornado
+     * @return a string which contains a JSON payload which contains the data needed to generate the document
+     * @throws JsonProcessingException if the JSON cannot be correctly generated
+     */
+    public static String getDocumentRequest(CaseData caseData, String userToken) throws JsonProcessingException {
+        Et3VettingData et3VettingData = Et3VettingData.builder()
+                .ethosCaseReference(caseData.getEthosCaseReference())
+                .et3IsThereAnEt3Response(nullChecker(caseData.getEt3IsThereAnEt3Response()))
+                .et3NoEt3Response(nullChecker(caseData.getEt3NoEt3Response()))
+                .et3GeneralNotes(nullChecker(caseData.getEt3GeneralNotes()))
+                .et3IsThereACompaniesHouseSearchDocument(
+                        nullChecker(caseData.getEt3IsThereACompaniesHouseSearchDocument()))
+                .et3GeneralNotesCompanyHouse(nullChecker(caseData.getEt3GeneralNotesCompanyHouse()))
+                .et3IsThereAnIndividualSearchDocument(nullChecker(caseData.getEt3IsThereAnIndividualSearchDocument()))
+                .et3GeneralNotesIndividualInsolvency(nullChecker(caseData.getEt3GeneralNotesIndividualInsolvency()))
+                .et3LegalIssue(nullChecker(caseData.getEt3LegalIssue()))
+                .et3LegalIssueGiveDetails(nullChecker(caseData.getEt3LegalIssueGiveDetails()))
+                .et3GeneralNotesLegalEntity(nullChecker(caseData.getEt3GeneralNotesLegalEntity()))
+                .et3ResponseInTime(nullChecker(caseData.getEt3ResponseInTime()))
+                .et3ResponseInTimeDetails(nullChecker(caseData.getEt3ResponseInTimeDetails()))
+                .et3DoWeHaveRespondentsName(nullChecker(caseData.getEt3DoWeHaveRespondentsName()))
+                .et3GeneralNotesRespondentName(nullChecker(caseData.getEt3GeneralNotesRespondentName()))
+                .et3DoesRespondentsNameMatch(nullChecker(caseData.getEt3DoesRespondentsNameMatch()))
+                .et3RespondentNameMismatchDetails(nullChecker(caseData.getEt3RespondentNameMismatchDetails()))
+                .et3GeneralNotesRespondentNameMatch(nullChecker(caseData.getEt3GeneralNotesRespondentNameMatch()))
+                .et3DoWeHaveRespondentsAddress(nullChecker(caseData.getEt3DoWeHaveRespondentsAddress()))
+                .et3DoesRespondentsAddressMatch(nullChecker(caseData.getEt3DoesRespondentsAddressMatch()))
+                .et3RespondentAddressMismatchDetails(nullChecker(caseData.getEt3RespondentAddressMismatchDetails()))
+                .et3GeneralNotesRespondentAddress(nullChecker(caseData.getEt3GeneralNotesRespondentAddress()))
+                .et3GeneralNotesAddressMatch(nullChecker(caseData.getEt3GeneralNotesAddressMatch()))
+                .et3IsCaseListedForHearing(nullChecker(caseData.getEt3IsCaseListedForHearing()))
+                .et3IsCaseListedForHearingDetails(nullChecker(caseData.getEt3IsCaseListedForHearingDetails()))
+                .et3GeneralNotesCaseListed(nullChecker(caseData.getEt3GeneralNotesCaseListed()))
+                .et3IsThisLocationCorrect(nullChecker(caseData.getEt3IsThisLocationCorrect()))
+                .et3GeneralNotesTransferApplication(nullChecker(caseData.getEt3GeneralNotesTransferApplication()))
+                .et3RegionalOffice(nullChecker(caseData.getEt3RegionalOffice()))
+                .et3WhyWeShouldChangeTheOffice(nullChecker(caseData.getEt3WhyWeShouldChangeTheOffice()))
+                .et3ContestClaim(nullChecker(caseData.getEt3ContestClaim()))
+                .et3ContestClaimGiveDetails(nullChecker(caseData.getEt3ContestClaimGiveDetails()))
+                .et3GeneralNotesContestClaim(nullChecker(caseData.getEt3GeneralNotesContestClaim()))
+                .et3ContractClaimSection7(nullChecker(caseData.getEt3ContractClaimSection7()))
+                .et3ContractClaimSection7Details(nullChecker(caseData.getEt3ContractClaimSection7Details()))
+                .et3GeneralNotesContractClaimSection7(nullChecker(caseData.getEt3GeneralNotesContractClaimSection7()))
+                .et3Rule26(nullChecker(caseData.getEt3Rule26()))
+                .et3Rule26Details(nullChecker(caseData.getEt3Rule26Details()))
+                .et3SuggestedIssuesStrikeOut(nullChecker(caseData.getEt3SuggestedIssuesStrikeOut()))
+                .et3SuggestedIssueInterpreters(nullChecker(caseData.getEt3SuggestedIssueInterpreters()))
+                .et3SuggestedIssueJurisdictional(nullChecker(caseData.getEt3SuggestedIssueJurisdictional()))
+                .et3SuggestedIssueAdjustments(nullChecker(caseData.getEt3SuggestedIssueAdjustments()))
+                .et3SuggestedIssueRule50(nullChecker(caseData.getEt3SuggestedIssueRule50()))
+                .et3SuggestedIssueTimePoints(nullChecker(caseData.getEt3SuggestedIssueTimePoints()))
+                .et3GeneralNotesRule26(nullChecker(caseData.getEt3GeneralNotesRule26()))
+                .et3AdditionalInformation(nullChecker(caseData.getEt3AdditionalInformation()))
+                .build();
+
+        Et3VettingDocument et3VettingDocument = Et3VettingDocument.builder()
+                .accessKey(userToken)
+                .outputName(OUTPUT_NAME)
+                .templateName(TEMPLATE_NAME)
+                .et3VettingData(et3VettingData)
+                .build();
+
+        return OBJECT_MAPPER.writeValueAsString(et3VettingDocument);
+
     }
 
 }

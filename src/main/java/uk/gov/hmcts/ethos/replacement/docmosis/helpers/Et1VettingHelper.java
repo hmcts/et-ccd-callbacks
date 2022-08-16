@@ -12,8 +12,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et1VettingDocume
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType.getSelectedLabel;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.listNullChecker;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.nullChecker;
 
 /**
  * ET1 Vetting Helper provides methods to assist with the ET1 vetting event.
@@ -133,7 +134,7 @@ public class Et1VettingHelper {
                 .accessKey(userToken)
                 .outputName(OUTPUT_NAME)
                 .templateName(TEMPLATE_NAME)
-                .data(et1VettingData)
+                .et1VettingData(et1VettingData)
                 .build();
 
         return OBJECT_MAPPER.writeValueAsString(et1VettingDocument);
@@ -147,16 +148,5 @@ public class Et1VettingHelper {
                 .map(j -> j.getValue().getEt1VettingJurCodeList())
                 .collect(Collectors.joining(", "));
     }
-    
-    private static String nullChecker(String value) {
-        return isNullOrEmpty(value)
-                ? null
-                : value;
-    }
 
-    private static String listNullChecker(List<String> value) {
-        return CollectionUtils.isEmpty(value)
-                ? null
-                : value.toString();
-    }
 }

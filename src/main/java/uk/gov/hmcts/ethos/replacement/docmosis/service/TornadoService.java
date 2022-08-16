@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.bulk.BulkData;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper;
@@ -230,7 +232,7 @@ public class TornadoService {
     }
 
     /**
-     * This method calls the helper method to create the data to be passed through to Tornardo and then checks whether
+     * This method calls the helper method to create the data to be passed through to Tornado and then checks whether
      * it can reach the service.
      * @param caseData contains the data needed to generate the PDF
      * @param userToken contains the user authentication token
@@ -240,13 +242,13 @@ public class TornadoService {
      * @throws IOException if the call to Tornado has failed, an exception will be thrown. This could be due to
      timeout or maybe a bad gateway.
      */
-    public DocumentInfo generateEt1VettingDocument(CaseData caseData, String userToken, String caseTypeId,
-                                                   String documentName)
+    public DocumentInfo generateEventDocument(CaseData caseData, String userToken, String caseTypeId,
+                                              String documentName)
         throws IOException {
         HttpURLConnection connection = null;
         try {
             connection = createConnection();
-            buildEt1VettingInstruction(connection, caseData);
+            buildDocumentInstruction(connection, caseData, documentName);
             return checkResponseStatus(userToken, connection, documentName, caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
@@ -256,11 +258,22 @@ public class TornadoService {
         }
     }
 
-    private void buildEt1VettingInstruction(HttpURLConnection connection, CaseData caseData)
+    private void buildDocumentInstruction(HttpURLConnection connection, CaseData caseData, String documentName)
             throws IOException {
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream(),
                 StandardCharsets.UTF_8)) {
-            outputStreamWriter.write(Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey()));
+            switch (documentName) {
+                case "ET1 Vetting.pdf" :
+                    outputStreamWriter.write(Et1VettingHelper.getDocumentRequest(caseData,
+                            tornadoConnection.getAccessKey()));
+                    break;
+                case "ET3 Processing.pdf" :
+                    outputStreamWriter.write(Et3VettingHelper.getDocumentRequest(caseData,
+                            tornadoConnection.getAccessKey()));
+                    break;
+                default:
+                    throw new NotFoundException("Document not found");
+            }
             outputStreamWriter.flush();
         }
     }

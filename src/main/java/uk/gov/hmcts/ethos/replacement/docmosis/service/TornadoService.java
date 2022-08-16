@@ -246,7 +246,7 @@ public class TornadoService {
         HttpURLConnection connection = null;
         try {
             connection = createConnection();
-            buildEt1VettingInstruction(connection, caseData, userToken);
+            buildEt1VettingInstruction(connection, caseData);
             return checkResponseStatus(userToken, connection, documentName, caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
@@ -256,11 +256,11 @@ public class TornadoService {
         }
     }
 
-    private void buildEt1VettingInstruction(HttpURLConnection connection, CaseData caseData, String userToken)
+    private void buildEt1VettingInstruction(HttpURLConnection connection, CaseData caseData)
             throws IOException {
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream(),
                 StandardCharsets.UTF_8)) {
-            outputStreamWriter.write(Et1VettingHelper.getDocumentRequest(caseData, userToken));
+            outputStreamWriter.write(Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey()));
             outputStreamWriter.flush();
         }
     }

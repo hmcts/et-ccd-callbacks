@@ -19,7 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et3VettingData;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et3VettingDocument;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,7 +46,7 @@ public class Et3VettingHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     // Template need changing
-    private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-01140.docx";
+    private static final String TEMPLATE_NAME = "ET3 Processing.docx";
     private static final String OUTPUT_NAME = "ET3 Processing.pdf";
 
     static final String NO_RESPONDENTS_FOUND_ERROR = "No respondents found for case %s";
@@ -462,7 +462,7 @@ public class Et3VettingHelper {
                 .et3AdditionalInformation(nullChecker(caseData.getEt3AdditionalInformation()))
                 .build();
 
-        TornadoDocument et3VettingDocument = TornadoDocument.builder()
+        Et3VettingDocument et3VettingDocument = Et3VettingDocument.builder()
                 .accessKey(userToken)
                 .outputName(OUTPUT_NAME)
                 .templateName(TEMPLATE_NAME)

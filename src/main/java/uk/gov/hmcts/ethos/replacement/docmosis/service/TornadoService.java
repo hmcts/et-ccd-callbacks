@@ -248,7 +248,7 @@ public class TornadoService {
         HttpURLConnection connection = null;
         try {
             connection = createConnection();
-            buildDocumentInstruction(connection, caseData, userToken, documentName);
+            buildDocumentInstruction(connection, caseData, documentName);
             return checkResponseStatus(userToken, connection, documentName, caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
@@ -258,17 +258,18 @@ public class TornadoService {
         }
     }
 
-    private void buildDocumentInstruction(HttpURLConnection connection, CaseData caseData, String userToken,
-                                          String documentName)
+    private void buildDocumentInstruction(HttpURLConnection connection, CaseData caseData, String documentName)
             throws IOException {
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream(),
                 StandardCharsets.UTF_8)) {
             switch (documentName) {
                 case "ET1 Vetting.pdf" :
-                    outputStreamWriter.write(Et1VettingHelper.getDocumentRequest(caseData, userToken));
+                    outputStreamWriter.write(Et1VettingHelper.getDocumentRequest(caseData,
+                            tornadoConnection.getAccessKey()));
                     break;
                 case "ET3 Processing.pdf" :
-                    outputStreamWriter.write(Et3VettingHelper.getDocumentRequest(caseData, userToken));
+                    outputStreamWriter.write(Et3VettingHelper.getDocumentRequest(caseData,
+                            tornadoConnection.getAccessKey()));
                     break;
                 default:
                     throw new NotFoundException("Document not found");

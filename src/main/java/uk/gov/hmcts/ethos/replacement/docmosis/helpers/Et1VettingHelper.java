@@ -7,7 +7,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et1VettingData;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et1VettingDocument;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -130,7 +130,7 @@ public class Et1VettingHelper {
                         nullChecker(caseData.getEt1VettingAdditionalInformationTextArea()))
                 .build();
 
-        TornadoDocument et1VettingDocument = TornadoDocument.builder()
+        Et1VettingDocument et1VettingDocument = Et1VettingDocument.builder()
                 .accessKey(userToken)
                 .outputName(OUTPUT_NAME)
                 .templateName(TEMPLATE_NAME)

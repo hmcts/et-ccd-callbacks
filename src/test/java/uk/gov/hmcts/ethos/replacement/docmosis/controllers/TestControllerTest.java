@@ -50,4 +50,21 @@ class TestControllerTest {
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
     }
+
+    @Test
+    void testAboutToStartInvalidToken() throws Exception {
+        var ccdRequest = AdminDataBuilder
+                .builder()
+                .withFileLocationData("testCode", "testName", "ABERDEEN")
+                .buildAsCCDRequest();
+
+        var token = "some-token";
+        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
+
+        mockMvc.perform(post("/testEvent/aboutToStart")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", token)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
+    }
 }

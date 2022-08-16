@@ -107,19 +107,23 @@ public class CreateReferralHelper {
 
         Date nextHearingAfterReferral = null;
         for (HearingTypeItem hearing : hearingCollection) {
-            Date hearingStartDate;
-            try {
-                hearingStartDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
-                    .parse(
-                        hearing.getValue().getHearingDateCollection().get(0).getValue().getHearingTimingStart()
-                    );
-            } catch (ParseException e) {
-                log.info("Failed to parse hearing date when creating new referral");
-                continue;
-            }
+            String hearingDateString =
+                hearing.getValue().getHearingDateCollection().get(0).getValue().getHearingTimingStart();
 
-            if (hearingStartDate.after(new Date()) && (nextHearingAfterReferral == null || hearingStartDate.before(nextHearingAfterReferral))) {
-                nextHearingAfterReferral = hearingStartDate;
+            if (hearingDateString != null && !hearingDateString.isEmpty()) {
+                Date hearingStartDate;
+                try {
+                    hearingStartDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(hearingDateString);
+                } catch (ParseException e) {
+                    log.info("Failed to parse hearing date when creating new referral");
+                    continue;
+                }
+
+                if (hearingStartDate.after(new Date())
+                    && (nextHearingAfterReferral == null || hearingStartDate.before(nextHearingAfterReferral))
+                ) {
+                    nextHearingAfterReferral = hearingStartDate;
+                }
             }
         }
         return nextHearingAfterReferral == null ? "None" :

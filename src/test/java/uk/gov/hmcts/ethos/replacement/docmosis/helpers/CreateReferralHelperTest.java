@@ -90,6 +90,7 @@ class CreateReferralHelperTest {
         document2.setId("2");
         caseData.setReferCaseTo("Judge Judy");
         caseData.setIsUrgent("Yes");
+        caseData.setReferentEmail("judge.judy@aol.com");
         caseData.setReferralSubject("Subject line here");
         caseData.setReferralSubjectSpecify("Custom subject line");
         caseData.setReferralDetails("This is an explanation");
@@ -98,8 +99,8 @@ class CreateReferralHelperTest {
 
         createReferralHelper.createReferral(caseData, "");
 
-        String expected = "ReferralType(referralNumber=1, referCaseTo=Judge Judy, "
-            + "referrerEmail=judge.judy@aol.com, isUrgent=Yes, "
+        String expected = "ReferralType(referralNumber=1, referralHearingDate=None, referCaseTo=Judge Judy, "
+            + "referentEmail=judge.judy@aol.com, isUrgent=Yes, "
             + "referralSubject=Subject line here, referralSubjectSpecify=Custom subject line, referralDetails=This "
             + "is an explanation, referralDocument=[DocumentTypeItem(id=1, value=null), DocumentTypeItem(id=2, "
             + "value=null)], referralInstruction=Custom instructions for judge, referredBy=Judge Judy, "

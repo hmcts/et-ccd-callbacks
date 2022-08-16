@@ -285,7 +285,7 @@ public class Et3VettingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        DocumentInfo documentInfo = et3VettingService.generateEt1VettingDocument(caseData, userToken,
+        DocumentInfo documentInfo = et3VettingService.generateEt3ProcessingDocument(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
         et3VettingService.saveEt3VettingToRespondent(caseData, documentInfo);
 

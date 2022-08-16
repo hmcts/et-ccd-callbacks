@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
@@ -20,7 +21,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.intersectProperties;
 
 @Slf4j
-@Service()
+@Service("et3VettingService")
 @RequiredArgsConstructor
 public class Et3VettingService {
 
@@ -104,7 +105,7 @@ public class Et3VettingService {
         return (Et3VettingType) intersectProperties(caseData, Et3VettingType.class);
     }
 
-    public DocumentInfo generateEt1VettingDocument(CaseData caseData, String userToken, String caseTypeId) {
+    public DocumentInfo generateEt3ProcessingDocument(CaseData caseData, String userToken, String caseTypeId) {
         try {
             return tornadoService.generateEventDocument(caseData, userToken,
                     caseTypeId, "ET3 Processing.pdf");

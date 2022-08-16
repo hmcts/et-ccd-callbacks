@@ -2,25 +2,22 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 class Et3VettingServiceTest {
@@ -30,6 +27,7 @@ class Et3VettingServiceTest {
     @Autowired
     private TornadoService tornadoService;
     private CaseData caseData;
+    private DocumentInfo documentInfo;
 
     @BeforeEach
     void setUp() {
@@ -49,15 +47,14 @@ class Et3VettingServiceTest {
             .withChooseEt3Respondent("Antonio Vazquez")
             .build();
         caseData.setEt3NoEt3Response("Test data");
-        when(documentManagementService.addDocumentToDocumentField(DocumentInfo.builder().build()))
-                .thenReturn(new UploadedDocumentType());
+        documentInfo = DocumentInfo.builder()
+                .description("test-description")
+                .url("https://test.com/documents/random-uuid")
+                .build();
     }
 
     @Test
     void whenGivenASubmittedEt3Response_shouldSetEt3VettingCompleted() {
-        DocumentInfo documentInfo = new DocumentInfo();
-        documentInfo.setUrl("http://test.com/documents/random-uuid");
-        documentInfo.setDescription("test-description");
         et3VettingService.saveEt3VettingToRespondent(caseData, documentInfo);
         RespondentSumType result = caseData.getRespondentCollection().get(0).getValue();
 
@@ -67,9 +64,6 @@ class Et3VettingServiceTest {
 
     @Test
     void whenNoRespondentMatches_ShouldThrowFailedLookup() {
-        DocumentInfo documentInfo = new DocumentInfo();
-        documentInfo.setUrl("http://test.com/documents/random-uuid");
-        documentInfo.setDescription("test-description");
         caseData = CaseDataBuilder.builder()
             .withRespondentWithAddress("Juan Garcia",
                 "32 Sweet Street", "14 House", null,
@@ -84,9 +78,6 @@ class Et3VettingServiceTest {
 
     @Test
     void whenRestoreVettingFromRespondent_RecoverData() {
-        DocumentInfo documentInfo = new DocumentInfo();
-        documentInfo.setUrl("http://test.com/documents/random-uuid");
-        documentInfo.setDescription("test-description");
         et3VettingService.saveEt3VettingToRespondent(caseData, documentInfo);
         assertNull(caseData.getEt3NoEt3Response());
 

@@ -232,7 +232,7 @@ public class TornadoService {
     }
 
     /**
-     * This method calls the helper method to create the data to be passed through to Tornardo and then checks whether
+     * This method calls the helper method to create the data to be passed through to Tornado and then checks whether
      * it can reach the service.
      * @param caseData contains the data needed to generate the PDF
      * @param userToken contains the user authentication token

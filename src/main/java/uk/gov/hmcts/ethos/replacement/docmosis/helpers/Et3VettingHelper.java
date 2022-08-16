@@ -40,13 +40,14 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.nul
 /**
  * ET3 vetting helper provides methods to assist with the ET3 vetting pages
  * this includes formatting markdown and querying the state of the ET3 response.
+ * This also includes part of the document generation for the ET3 Vetting process. It creates the data needed by
+ * Docmosis in order to generate a document.
  */
 @Slf4j
 public class Et3VettingHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    // Template need changing
-    private static final String TEMPLATE_NAME = "ET3 Processing.docx";
+    private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-01145.docx";
     private static final String OUTPUT_NAME = "ET3 Processing.pdf";
 
     static final String NO_RESPONDENTS_FOUND_ERROR = "No respondents found for case %s";
@@ -411,6 +412,13 @@ public class Et3VettingHelper {
         caseData.setEt3TribunalLocation(String.format(ET3_TRIBUNAL_TABLE, tribunalOffice, managingOffice));
     }
 
+    /**
+     * This method generates the request which will be sent to Docmosis to generate the document.
+     * @param caseData where the data is stored
+     * @param userToken token to access tornado
+     * @return a string which contains a JSON payload which contains the data needed to generate the document
+     * @throws JsonProcessingException if the JSON cannot be correctly generated
+     */
     public static String getDocumentRequest(CaseData caseData, String userToken) throws JsonProcessingException {
         Et3VettingData et3VettingData = Et3VettingData.builder()
                 .ethosCaseReference(caseData.getEthosCaseReference())

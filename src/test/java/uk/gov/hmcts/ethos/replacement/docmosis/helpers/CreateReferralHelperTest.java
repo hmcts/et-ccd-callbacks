@@ -105,7 +105,7 @@ class CreateReferralHelperTest {
             + "value=null)], referralInstruction=Custom instructions for judge, referredBy=Judge Judy, "
             + "referralDate="
             + Helper.getCurrentDate()
-            + ", referralStatus=Open)";
+            + ", referralStatus=Awaiting instructions)";
         String actual = caseData.getReferralCollection().get(0).getValue().toString();
         assertEquals(expected, actual);
     }
@@ -122,10 +122,8 @@ class CreateReferralHelperTest {
     void saveTheUserDetailsOfTheReferrerWithTheReferral() {
         createReferralHelper.createReferral(caseData, "");
 
-        String email = caseData.getReferralCollection().get(0).getValue().getReferrerEmail();
         String referredBy = caseData.getReferralCollection().get(0).getValue().getReferredBy();
 
-        assertEquals("judge.judy@aol.com", email);
         assertEquals("Judge Judy", referredBy);
     }
 

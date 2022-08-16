@@ -84,7 +84,7 @@ public class CreateReferralHelper {
         UserDetails userDetails = userService.getUserDetails(userToken);
         referralType.setReferredBy(userDetails.getFirstName() + " " + userDetails.getLastName());
 
-        referralType.setReferralStatus("Open");
+        referralType.setReferralStatus(ReferralStatus.AWAITING_INSTRUCTION);
 
         referralType.setReferralHearingDate(getNearestHearingToReferral(caseData));
 

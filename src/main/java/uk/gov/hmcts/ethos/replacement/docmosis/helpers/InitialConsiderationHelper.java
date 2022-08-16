@@ -16,7 +16,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsidera
 
 import java.util.Optional;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @Slf4j
@@ -40,10 +40,10 @@ public class InitialConsiderationHelper {
 
     public static String getDocumentRequestSC(CaseData caseData, String accessKey) throws JsonProcessingException {
         InitialConsiderationData data = InitialConsiderationData.builder()
-                .caseNumber(nullChecker(caseData.getEthosCaseReference()))
-                .issuesJurisdiction(nullChecker(caseData.getEtICJuridictionCodesInvalid()))
-                .canProceed(nullChecker(caseData.getEtICCanProceed()))
-                .hearingAlreadyListed(nullChecker(caseData.getEtICHearingAlreadyListed()))
+                .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+                .issuesJurisdiction(defaultIfEmpty(caseData.getEtICJuridictionCodesInvalid(), null))
+                .canProceed(defaultIfEmpty(caseData.getEtICCanProceed(), null))
+                .hearingAlreadyListed(defaultIfEmpty(caseData.getEtICHearingAlreadyListed(), null))
                 .hearingListed(caseData.getEtICHearingListed())
                 .hearingPostpone(caseData.getEtICPostponeGiveDetails())
                 .hearingConvertF2f(caseData.getEtICConvertF2fGiveDetails())
@@ -140,17 +140,17 @@ public class InitialConsiderationHelper {
 
     public static String getDocumentRequestEW(CaseData caseData, String accessKey) throws JsonProcessingException {
         InitialConsiderationData data = InitialConsiderationData.builder()
-                .caseNumber(nullChecker(caseData.getEthosCaseReference()))
-                .icReceiptET3FormIssues(nullChecker(caseData.getIcReceiptET3FormIssues()))
-                .icRespondentsNameIdentityIssues(nullChecker(caseData.getIcRespondentsNameIdentityIssues()))
-                .icJurisdictionCodeIssues(nullChecker(caseData.getIcJurisdictionCodeIssues()))
-                .icApplicationIssues(nullChecker(caseData.getIcApplicationIssues()))
-                .icEmployersContractClaimIssues(nullChecker(caseData.getIcEmployersContractClaimIssues()))
-                .icClaimProspectIssues(nullChecker(caseData.getIcClaimProspectIssues()))
-                .icListingIssues(nullChecker(caseData.getIcListingIssues()))
-                .icDdaDisabilityIssues(nullChecker(caseData.getIcDdaDisabilityIssues()))
-                .icOrderForFurtherInformation(nullChecker(caseData.getIcOrderForFurtherInformation()))
-                .icOtherIssuesOrFinalOrders(nullChecker(caseData.getIcOtherIssuesOrFinalOrders()))
+                .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+                .icReceiptET3FormIssues(defaultIfEmpty(caseData.getIcReceiptET3FormIssues(), null))
+                .icRespondentsNameIdentityIssues(defaultIfEmpty(caseData.getIcRespondentsNameIdentityIssues(), null))
+                .icJurisdictionCodeIssues(defaultIfEmpty(caseData.getIcJurisdictionCodeIssues(), null))
+                .icApplicationIssues(defaultIfEmpty(caseData.getIcApplicationIssues(), null))
+                .icEmployersContractClaimIssues(defaultIfEmpty(caseData.getIcEmployersContractClaimIssues(), null))
+                .icClaimProspectIssues(defaultIfEmpty(caseData.getIcClaimProspectIssues(), null))
+                .icListingIssues(defaultIfEmpty(caseData.getIcListingIssues(), null))
+                .icDdaDisabilityIssues(defaultIfEmpty(caseData.getIcDdaDisabilityIssues(), null))
+                .icOrderForFurtherInformation(defaultIfEmpty(caseData.getIcOrderForFurtherInformation(), null))
+                .icOtherIssuesOrFinalOrders(defaultIfEmpty(caseData.getIcOtherIssuesOrFinalOrders(), null))
                 .build();
 
         InitialConsiderationDocument document = InitialConsiderationDocument.builder()
@@ -162,11 +162,5 @@ public class InitialConsiderationHelper {
         ObjectMapper mapper = new ObjectMapper();
 
         return mapper.writeValueAsString(document);
-    }
-
-    private static String nullChecker(String value) {
-        return isNullOrEmpty(value)
-                ? null
-                : value;
     }
 }

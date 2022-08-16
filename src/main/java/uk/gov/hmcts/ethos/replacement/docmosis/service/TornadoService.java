@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.bulk.BulkData;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -269,6 +270,8 @@ public class TornadoService {
                 case "ET3 Processing.pdf" :
                     outputStreamWriter.write(Et3VettingHelper.getDocumentRequest(caseData, userToken));
                     break;
+                default:
+                    throw new NotFoundException("Document not found");
             }
             outputStreamWriter.flush();
         }

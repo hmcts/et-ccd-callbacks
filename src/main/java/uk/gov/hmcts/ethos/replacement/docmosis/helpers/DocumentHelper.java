@@ -961,4 +961,15 @@ public class DocumentHelper {
 
     }
 
+    public static String nullChecker(String value) {
+        return isNullOrEmpty(value)
+                ? null
+                : value;
+    }
+
+    public static String listNullChecker(List<String> value) {
+        return CollectionUtils.isEmpty(value)
+                ? null
+                : value.toString();
+    }
 }

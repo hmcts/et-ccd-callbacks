@@ -12,8 +12,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType.getSelectedLabel;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.listNullChecker;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.nullChecker;
 
 /**
  * ET1 Vetting Helper provides methods to assist with the ET1 vetting event.
@@ -58,9 +59,7 @@ public class Et1VettingHelper {
                 .et1VettingAcasCertIsYesOrNo6(nullChecker(caseData.getEt1VettingAcasCertIsYesOrNo6()))
                 .et1VettingAcasCertExemptYesOrNo6(nullChecker(caseData.getEt1VettingAcasCertExemptYesOrNo6()))
                 .et1VettingAcasCertGeneralNote(nullChecker(caseData.getEt1VettingAcasCertGeneralNote()))
-                .substantiveDefectsList(CollectionUtils.isEmpty(caseData.getSubstantiveDefectsList())
-                        ? null
-                        : caseData.getSubstantiveDefectsList().toString())
+                .substantiveDefectsList(DocumentHelper.listNullChecker(caseData.getSubstantiveDefectsList()))
                 .rule121aTextArea(nullChecker(caseData.getRule121aTextArea()))
                 .rule121bTextArea(nullChecker(caseData.getRule121bTextArea()))
                 .rule121cTextArea(nullChecker(caseData.getRule121cTextArea()))
@@ -93,9 +92,7 @@ public class Et1VettingHelper {
                 .et1ReasonableAdjustmentsTextArea(nullChecker(caseData.getEt1ReasonableAdjustmentsTextArea()))
                 .et1VideoHearingQuestion(nullChecker(caseData.getEt1VideoHearingQuestion()))
                 .et1VideoHearingTextArea(nullChecker(caseData.getEt1VideoHearingTextArea()))
-                .referralToJudgeOrLOList(CollectionUtils.isEmpty(caseData.getReferralToJudgeOrLOList())
-                        ? null
-                        : caseData.getReferralToJudgeOrLOList().toString())
+                .referralToJudgeOrLOList(listNullChecker(caseData.getReferralToJudgeOrLOList()))
                 .claimOfInterimReliefTextArea(nullChecker(caseData.getAclaimOfInterimReliefTextArea()))
                 .statutoryAppealTextArea(nullChecker(caseData.getAstatutoryAppealTextArea()))
                 .anAllegationOfCommissionOfSexualOffenceTextArea(nullChecker(
@@ -109,9 +106,7 @@ public class Et1VettingHelper {
                 .anotherReasonForJudicialReferralTextArea(nullChecker(
                         caseData.getAnotherReasonForJudicialReferralTextArea()))
                 .et1JudgeReferralGeneralNotes(nullChecker(caseData.getEt1JudgeReferralGeneralNotes()))
-                .referralToREJOrVPList(CollectionUtils.isEmpty(caseData.getReferralToREJOrVPList())
-                        ? null
-                        : caseData.getReferralToREJOrVPList().toString())
+                .referralToREJOrVPList(listNullChecker(caseData.getReferralToREJOrVPList()))
                 .vexatiousLitigantOrderTextArea(nullChecker(caseData.getVexatiousLitigantOrderTextArea()))
                 .nationalSecurityIssueTextArea(nullChecker(caseData.getAnationalSecurityIssueTextArea()))
                 .nationalMultipleOrPresidentialOrderTextArea(nullChecker(
@@ -122,9 +117,7 @@ public class Et1VettingHelper {
                 .anyPotentialConflictTextArea(nullChecker(caseData.getAnyPotentialConflictTextArea()))
                 .anotherReasonREJOrVPTextArea(nullChecker(caseData.getAnotherReasonREJOrVPTextArea()))
                 .et1REJOrVPReferralGeneralNotes(nullChecker(caseData.getEt1REJOrVPReferralGeneralNotes()))
-                .otherReferralList(CollectionUtils.isEmpty(caseData.getOtherReferralList())
-                        ? null
-                        : caseData.getOtherReferralList().toString())
+                .otherReferralList(listNullChecker(caseData.getOtherReferralList()))
                 .claimOutOfTimeTextArea(nullChecker(caseData.getClaimOutOfTimeTextArea()))
                 .multipleClaimTextArea(nullChecker(caseData.getMultipleClaimTextArea()))
                 .employmentStatusIssuesTextArea(nullChecker(caseData.getEmploymentStatusIssuesTextArea()))
@@ -155,10 +148,5 @@ public class Et1VettingHelper {
                 .map(j -> j.getValue().getEt1VettingJurCodeList())
                 .collect(Collectors.joining(", "));
     }
-    
-    private static String nullChecker(String value) {
-        return isNullOrEmpty(value)
-                ? null
-                : value;
-    }
+
 }

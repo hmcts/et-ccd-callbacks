@@ -29,7 +29,6 @@ public class Et3VettingService {
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
-
     /**
      * Moves ET3 Vetting related fields off of CaseData and onto the relevant respondent.
      * @param caseData The object containing case data

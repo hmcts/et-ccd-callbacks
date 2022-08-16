@@ -973,7 +973,7 @@ public class DocumentHelper {
     }
 
     /**
-     * Utility method to null check a list
+     * Utility method to null check a list.
      * @param value list to be checked if null or contains data
      * @return either null if the list is null or empty or will return the list in a string format
      */

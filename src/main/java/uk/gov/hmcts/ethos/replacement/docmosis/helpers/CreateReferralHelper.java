@@ -13,7 +13,10 @@ import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -74,14 +77,16 @@ public class CreateReferralHelper {
         referralType.setReferralDetails(caseData.getReferralDetails());
         referralType.setReferralDocument(caseData.getReferralDocument());
         referralType.setReferralInstruction(caseData.getReferralInstruction());
+        referralType.setReferentEmail(caseData.getReferentEmail());
 
         referralType.setReferralDate(Helper.getCurrentDate());
 
         UserDetails userDetails = userService.getUserDetails(userToken);
         referralType.setReferredBy(userDetails.getFirstName() + " " + userDetails.getLastName());
-        referralType.setReferrerEmail(userDetails.getEmail());
 
         referralType.setReferralStatus("Open");
+
+        referralType.setReferralHearingDate(getNearestHearingToReferral(caseData));
 
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId(UUID.randomUUID().toString());
@@ -93,10 +98,38 @@ public class CreateReferralHelper {
         clearReferralDataFromCaseData(caseData);
     }
 
+    private String getNearestHearingToReferral(CaseData caseData) {
+        List<HearingTypeItem> hearingCollection = caseData.getHearingCollection();
+
+        if (CollectionUtils.isEmpty(hearingCollection)) {
+            return "None";
+        }
+
+        Date nextHearingAfterReferral = null;
+        for (HearingTypeItem hearing : hearingCollection) {
+            Date hearingStartDate;
+            try {
+                hearingStartDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
+                    .parse(
+                        hearing.getValue().getHearingDateCollection().get(0).getValue().getHearingTimingStart()
+                    );
+            } catch (ParseException e) {
+                log.info("Failed to parse hearing date when creating new referral");
+                continue;
+            }
+
+            if (hearingStartDate.after(new Date()) && (nextHearingAfterReferral == null || hearingStartDate.before(nextHearingAfterReferral))) {
+                nextHearingAfterReferral = hearingStartDate;
+            }
+        }
+        return nextHearingAfterReferral == null ? "None" :
+            new SimpleDateFormat("dd MMM yyyy").format(nextHearingAfterReferral);
+    }
+
     public void clearReferralDataFromCaseData(CaseData caseData) {
         caseData.setReferralHearingDetails(null);
         caseData.setReferCaseTo(null);
-        caseData.setReferrerEmail(null);
+        caseData.setReferentEmail(null);
         caseData.setIsUrgent(null);
         caseData.setReferralSubject(null);
         caseData.setReferralSubjectSpecify(null);

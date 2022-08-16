@@ -22,13 +22,26 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 @Slf4j
 public class InitialConsiderationHelper {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
     private static final String IC_SUMMARY_EW_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02203.docx";
     private static final String IC_SUMMARY_SC_TEMPLATE_NAME = "EM-TRB-SCO-ENG-02204.docx";
 
     private InitialConsiderationHelper() {
+        OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
+    /**
+     * This method generates the data in a JSON format stored in a String which allows Tornado to process the
+     * information.
+     * @param caseData contains all the case data
+     * @param accessKey contains the authentication token
+     * @param caseTypeId contains Case Type ID for England Wales or Scotland
+     * @return will either return a list which contains an error message if no respondents were found or will return an
+     *      empty list showing that there were no errors
+     * @throws JsonProcessingException if the JSON cannot be generated correctly, an error would be thrown. This could
+     *      be due to an illegal character potentially existing in the data
+     */
     public static String getDocumentRequest(CaseData caseData, String accessKey, String caseTypeId)
             throws JsonProcessingException {
         if (caseTypeId.equals(ENGLANDWALES_CASE_TYPE_ID)) {
@@ -38,7 +51,7 @@ public class InitialConsiderationHelper {
         }
     }
 
-    public static String getDocumentRequestSC(CaseData caseData, String accessKey) throws JsonProcessingException {
+    private static String getDocumentRequestSC(CaseData caseData, String accessKey) throws JsonProcessingException {
         InitialConsiderationData data = InitialConsiderationData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
                 .issuesJurisdiction(defaultIfEmpty(caseData.getEtICJuridictionCodesInvalid(), null))
@@ -138,7 +151,7 @@ public class InitialConsiderationHelper {
         return mapper.writeValueAsString(document);
     }
 
-    public static String getDocumentRequestEW(CaseData caseData, String accessKey) throws JsonProcessingException {
+    private static String getDocumentRequestEW(CaseData caseData, String accessKey) throws JsonProcessingException {
         InitialConsiderationData data = InitialConsiderationData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
                 .icReceiptET3FormIssues(defaultIfEmpty(caseData.getIcReceiptET3FormIssues(), null))

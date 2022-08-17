@@ -65,6 +65,13 @@ public class CreateReferralController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * Called at the end of creating a referral, takes the information saved in case data and stores it in the
+     * referral collection.
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data and errors attached.
+     */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "")
     @ApiResponses(value = {

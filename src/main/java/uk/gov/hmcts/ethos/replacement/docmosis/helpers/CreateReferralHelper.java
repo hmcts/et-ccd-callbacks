@@ -62,6 +62,11 @@ public class CreateReferralHelper {
         }
     }
 
+    /**
+     * Creates a referral and adds it to the referral collection.
+     * @param caseData contains all the case data
+     * @param userToken The user token of the logged-in user
+     */
     public void createReferral(CaseData caseData, String userToken) {
         if (CollectionUtils.isEmpty(caseData.getReferralCollection())) {
             caseData.setReferralCollection(new ArrayList<>());
@@ -84,7 +89,7 @@ public class CreateReferralHelper {
         UserDetails userDetails = userService.getUserDetails(userToken);
         referralType.setReferredBy(userDetails.getFirstName() + " " + userDetails.getLastName());
 
-        referralType.setReferralStatus(ReferralStatus.AWAITING_INSTRUCTION);
+        referralType.setReferralStatus(ReferralStatus.AWAITING_INSTRUCTIONS);
 
         referralType.setReferralHearingDate(getNearestHearingToReferral(caseData));
 
@@ -98,6 +103,11 @@ public class CreateReferralHelper {
         clearReferralDataFromCaseData(caseData);
     }
 
+    /**
+     * Gets the next hearing date from the referral, returns "None" if no suitable hearing date exists.
+     * @param caseData contains all the case data
+     * @return Returns next hearing date in "dd MMM yyyy" format or "None"
+     */
     private String getNearestHearingToReferral(CaseData caseData) {
         List<HearingTypeItem> hearingCollection = caseData.getHearingCollection();
 
@@ -130,6 +140,12 @@ public class CreateReferralHelper {
             new SimpleDateFormat("dd MMM yyyy").format(nextHearingAfterReferral);
     }
 
+    /**
+     * Resets the case data fields relating to creating a referral so that they won't be auto populated when
+     * creating
+     * a new referral.
+     * @param caseData contains all the case data
+     */
     public void clearReferralDataFromCaseData(CaseData caseData) {
         caseData.setReferralHearingDetails(null);
         caseData.setReferCaseTo(null);

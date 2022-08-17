@@ -16,6 +16,10 @@ public final class ReplyToReferralHelper {
         //Constructor
     }
 
+    /**
+     * Create fields for referral dropdown selector.
+     * @param caseData contains all the case data
+     */
     public static void populateSelectReferralDropdown(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getReferralCollection())) {
             return;

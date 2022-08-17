@@ -31,6 +31,13 @@ public class ReplyToReferralController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
 
+    /**
+     * Called for the first page of the Reply to Referral event.
+     * Populates the Referral select dropdown.
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data and errors attached.
+     */
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "initialize data for referral reply")
     @ApiResponses(value = {
@@ -52,7 +59,6 @@ public class ReplyToReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        //Placeholder for future tickets in the epic
         ReplyToReferralHelper.populateSelectReferralDropdown(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }

@@ -262,6 +262,10 @@ public class Helper {
         return mapper.convertValue(sourceObject, targetClassType);
     }
 
+    /**
+     * Gives current date in string format.
+     * @return current date in "dd MMM yyy" format
+     */
     public static String getCurrentDate() {
         return new SimpleDateFormat("dd MMM yyyy").format(new Date());
     }

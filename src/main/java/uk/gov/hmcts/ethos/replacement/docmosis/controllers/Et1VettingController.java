@@ -18,7 +18,9 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -32,12 +34,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequiredArgsConstructor
 public class Et1VettingController {
-    public static final String PROCESSING_COMPLETE_TEXT = "<hr><h2>Do this next</h2>:"
+    public static final String PROCESSING_COMPLETE_TEXT = "<hr><h2>Do this next</h2>"
         + "<p>You must <a href=\"/cases/case-details/%s/trigger/preAcceptanceCase/preAcceptanceCase1\">"
         + "accept or reject the case</a> or refer the case.</p>";
 
     private final VerifyTokenService verifyTokenService;
     private final Et1VettingService et1VettingService;
+    private final DocumentManagementService documentManagementService;
 
     /**
      * Initialise ET1 case vetting.
@@ -136,9 +139,36 @@ public class Et1VettingController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         caseData.setEt1AddressDetails(et1VettingService.getAddressesHtml(caseData));
-        caseData.setEt1TribunalRegion(caseData.getManagingOffice());
-        caseData.setEt1HearingVenues(et1VettingService.getHearingVenuesList(caseData));
+        et1VettingService.populateHearingVenue(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
 
+    /**
+     * About to Submit callback which handle the submission of data from the event into CCD and also generates a PDF
+     * of the ET1 Vetting data.
+     * @param userToken Used for authorisation
+     * @param ccdRequest CaseData which is a generic data type for most of the methods which holds ET1 case data
+     * @return caseData in ccdRequest
+     */
+    @PostMapping(value = "/et1VettingAboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Generates the PDF for ET1 Vetting.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> et1VettingAboutToSubmit(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
+            @RequestBody CCDRequest ccdRequest) {
+        log.info("ET1 CASE VETTING ABOUT TO SUBMIT ---> {}", ccdRequest.getCaseDetails().getCaseId());
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        DocumentInfo documentInfo = et1VettingService.generateEt1VettingDocument(caseData, userToken,
+                ccdRequest.getCaseDetails().getCaseTypeId());
+        caseData.setEt1VettingDocument(documentManagementService.addDocumentToDocumentField(documentInfo));
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -170,7 +200,7 @@ public class Et1VettingController {
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())
-            .confirmationBody(String.format(PROCESSING_COMPLETE_TEXT, caseNumber))
+            .confirmation_body(String.format(PROCESSING_COMPLETE_TEXT, caseNumber))
             .build());
     }
 }

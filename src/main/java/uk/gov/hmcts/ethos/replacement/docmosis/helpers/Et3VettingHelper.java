@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 import java.time.LocalDate;
@@ -52,7 +53,11 @@ public class Et3VettingHelper {
         "| <h2>Hearing details</h2>| | \r\n"
         + "|--|--|\r\n"
         + "|Date| %s|\r\n"
-        + "|Type| %s|";
+        + "|Hearing Type| %s|\r\n"
+        + "|Hearing Length| %s|\r\n"
+        + "|Hearing Format| %s|\r\n"
+        + "|Sit Alone/Full Panel| %s|\r\n"
+        + "|Track| %s|";
 
     private static final String ET3_TRIBUNAL_TABLE =
         "| <h2>Tribunal location</h2>| | \r\n"
@@ -351,29 +356,34 @@ public class Et3VettingHelper {
             ? "Track could not be found"
             : caseData.getConciliationTrack();
 
-        caseData.setEt3HearingDetails(String.format(ET3_HEARING_TABLE, hearingDate, track));
+        HearingType hearing = HearingsHelper.findHearingByListedDate(caseData, hearingDate);
+
+        caseData.setEt3HearingDetails(String.format(
+                ET3_HEARING_TABLE,
+                LocalDateTime.parse(hearingDate, OLD_DATE_TIME_PATTERN)
+                        .format(DateTimeFormatter.ofPattern("EEEE d MMMM y")),
+                hearing.getHearingType(),
+                hearing.getHearingEstLengthNum() + " " + hearing.getHearingEstLengthNumType(),
+                String.join(", ", hearing.getHearingFormat()),
+                hearing.getHearingSitAlone(),
+                track));
         caseData.setEt3IsCaseListedForHearing(YES);
     }
 
     private static String findHearingDate(List<HearingTypeItem> hearingCollection) {
         List<String> hearingDates = new ArrayList<>();
-
         hearingCollection.forEach(item -> addListedDates(hearingDates, item.getValue().getHearingDateCollection()));
-
         if (CollectionUtils.isEmpty(hearingDates)) {
             return CASE_NOT_LISTED;
         }
-
-        Collections.sort(hearingDates);
-        String date = hearingDates.get(0);
-
-        return LocalDateTime.parse(date, OLD_DATE_TIME_PATTERN).format(DateTimeFormatter.ofPattern("EEEE d MMMM y"));
+        return hearingDates.get(0);
     }
 
     private static void addListedDates(List<String> hearingDates, List<DateListedTypeItem> hearingCollection) {
         hearingCollection.stream()
             .filter(item -> HEARING_STATUS_LISTED.equals(item.getValue().getHearingStatus()))
             .forEach(item -> hearingDates.add(item.getValue().getListedDate()));
+        Collections.sort(hearingDates);
     }
 
     /**

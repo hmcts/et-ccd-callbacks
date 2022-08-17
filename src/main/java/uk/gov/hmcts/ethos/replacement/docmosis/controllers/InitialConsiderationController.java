@@ -70,6 +70,12 @@ public class InitialConsiderationController {
             .build());
     }
 
+    /**
+     * About to Submit callback which handle the submission of data from the event into CCD and generates a PDF.
+     * @param ccdRequest Holds the request and case data
+     * @param userToken Used for authorisation
+     * @return caseData in ccdRequest
+     */
     @PostMapping(value = "/submitInitialConsideration", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Handles Initial Consideration Submission")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {

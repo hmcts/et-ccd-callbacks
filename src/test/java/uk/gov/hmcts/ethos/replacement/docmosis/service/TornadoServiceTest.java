@@ -207,6 +207,13 @@ public class TornadoServiceTest {
                 "random-string");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void generateDocument_noDocumentName() throws IOException {
+        mockConnectionSuccess();
+        tornadoService.generateEventDocument(new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID,
+                null);
+    }
+
     private void createUserService() {
         UserDetails userDetails = HelperTest.getUserDetails();
         IdamApi idamApi = authorisation -> userDetails;

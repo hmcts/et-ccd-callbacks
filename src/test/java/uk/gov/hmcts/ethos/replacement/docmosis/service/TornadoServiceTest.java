@@ -207,7 +207,7 @@ public class TornadoServiceTest {
                 "random-string");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void generateDocument_noDocumentName() throws IOException {
         mockConnectionSuccess();
         tornadoService.generateEventDocument(new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID,

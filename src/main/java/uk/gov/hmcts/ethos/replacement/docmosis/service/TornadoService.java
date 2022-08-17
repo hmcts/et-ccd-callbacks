@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -260,24 +261,26 @@ public class TornadoService {
 
     private void buildDocumentInstruction(HttpURLConnection connection, CaseData caseData, String documentName)
             throws IOException {
-        if (isNullOrEmpty(documentName)) {
-            throw new IllegalArgumentException("Illegal document name " + documentName);
-        }
+        String documentContent = getDocumentContent(caseData, documentName);
+
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream(),
                 StandardCharsets.UTF_8)) {
-            switch (documentName) {
-                case "ET1 Vetting.pdf" :
-                    outputStreamWriter.write(Et1VettingHelper.getDocumentRequest(caseData,
-                            tornadoConnection.getAccessKey()));
-                    break;
-                case "ET3 Processing.pdf" :
-                    outputStreamWriter.write(Et3VettingHelper.getDocumentRequest(caseData,
-                            tornadoConnection.getAccessKey()));
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unexpected document name " + documentName);
-            }
+            outputStreamWriter.write(documentContent);
             outputStreamWriter.flush();
+        }
+    }
+
+    private String getDocumentContent(CaseData caseData, String documentName) throws JsonProcessingException {
+        if (isNullOrEmpty(documentName)) {
+            throw new NullPointerException("Document name cannot be null or empty");
+        }
+        switch (documentName) {
+            case "ET1 Vetting.pdf":
+                return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            case "ET3 Processing.pdf":
+                return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            default:
+                throw new IllegalArgumentException("Unexpected document name " + documentName);
         }
     }
 }

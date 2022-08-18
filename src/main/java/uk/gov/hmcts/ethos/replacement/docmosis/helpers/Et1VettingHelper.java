@@ -95,6 +95,7 @@ public class Et1VettingHelper {
                 .et1ReasonableAdjustmentsTextArea(defaultIfEmpty(caseData.getEt1ReasonableAdjustmentsTextArea(), null))
                 .et1VideoHearingQuestion(defaultIfEmpty(caseData.getEt1VideoHearingQuestion(), null))
                 .et1VideoHearingTextArea(defaultIfEmpty(caseData.getEt1VideoHearingTextArea(), null))
+                .et1FurtherQuestionsGeneralNotes(defaultIfEmpty(caseData.getEt1FurtherQuestionsGeneralNotes(), null))
                 .referralToJudgeOrLOList(CollectionUtils.isEmpty(caseData.getReferralToJudgeOrLOList())
                         ? null
                         : caseData.getReferralToJudgeOrLOList().toString())

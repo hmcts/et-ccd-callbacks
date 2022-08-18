@@ -62,7 +62,7 @@ public class InitialConsiderationHelper {
                 .hearingConvertF2f(caseData.getEtICConvertF2fGiveDetails())
                 .hearingConvertFinal(caseData.getEtICConvertPreliminaryGiveDetails())
                 .hearingExtend(caseData.getEtICExtendDurationGiveDetails())
-                .hearingOther(caseData.getEtICExtendDurationGiveDetails())
+                .hearingOther(caseData.getEtICOtherGiveDetails())
                 .otherDirections(caseData.getEtICHearingAnyOtherDirections())
                 .hearingNotListed(caseData.getEtICHearingNotListedList())
                 //cvp

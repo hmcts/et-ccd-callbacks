@@ -112,7 +112,7 @@ public class InitialConsiderationHelper {
                         .map(EtIcudlHearing::getEtIcudlCvpIssue).orElse(null))
                 .udlFinalF2FIssue(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
                         .map(EtIcudlHearing::getEtIcudlFinalF2FIssue).orElse(null))
-                .otherDirections(caseData.getEtICHearingNotListedAnyOtherDirections())
+                .hearingNotListedOtherDirections(caseData.getEtICHearingNotListedAnyOtherDirections())
                 //further information
                 .furtherInformation(caseData.getEtICFurtherInformation())
                 .furtherInfoGiveDetails(caseData.getEtICFurtherInformationGiveDetails())

@@ -155,9 +155,9 @@ public class InitialConsiderationService {
 
     /**
      * This calls the Tornado service to generate the pdf for the ET1 Vetting journey.
-     * @param caseData gets the casedata
+     * @param caseData gets the CaseData
      * @param userToken user authentication token
-     * @param caseTypeId reference which casetype the document will be uploaded to
+     * @param caseTypeId reference which CaseType the document will be uploaded to
      * @return DocumentInfo which contains the url and markup for the uploaded document
      */
     public DocumentInfo generateDocument(CaseData caseData, String userToken, String caseTypeId) {
@@ -168,6 +168,11 @@ public class InitialConsiderationService {
         }
     }
 
+    /**
+     * Clear value for hidden fields.
+     * @param caseData gets the CaseData
+     * @param caseTypeId reference which CaseType the document will be uploaded to
+     */
     public void clearHiddenValue(CaseData caseData, String caseTypeId) {
         if (caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
             if (YES.equals(caseData.getEtICCanProceed())) {

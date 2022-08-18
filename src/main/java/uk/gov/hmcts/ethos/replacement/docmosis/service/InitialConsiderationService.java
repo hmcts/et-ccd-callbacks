@@ -18,15 +18,16 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @Service
 @RequiredArgsConstructor
@@ -168,33 +169,44 @@ public class InitialConsiderationService {
     }
 
     public void clearHiddenValue(CaseData caseData, String caseTypeId) {
-        Collections.sort(caseData.getEtICHearingNotListedList());
-        if (caseTypeId.equals(ENGLANDWALES_CASE_TYPE_ID)) {
-            if (!caseData.getEtICCanProceed().equals("No")) {
-                caseData.setEtICFurtherInformation(null);
-                caseData.setEtICFurtherInformationHearingAnyOtherDirections(null);
-                caseData.setEtICFurtherInformationGiveDetails(null);
-                caseData.setEtICFurtherInformationTimeToComply(null);
-                caseData.setEtInitialConsiderationRule27(null);
-                caseData.setEtInitialConsiderationRule28(null);
+        if (caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
+            if (YES.equals(caseData.getEtICCanProceed())) {
+                removeEtIcCanProceedYesValue(caseData);
             }
-            if (!caseData.getEtICCanProceed().equals("Yes") || !caseData.getEtICHearingAlreadyListed().equals("No")) {
-                caseData.setEtICHearingNotListedList(null);
-                caseData.setEtICHearingNotListedSeekComments(null);
-                caseData.setEtICHearingNotListedListForPrelimHearing(null);
-                caseData.setEtICHearingNotListedListForFinalHearing(null);
-                caseData.setEtICHearingNotListedUDLHearing(null);
-                caseData.setEtICHearingNotListedAnyOtherDirections(null);
+            if (NO.equals(caseData.getEtICCanProceed()) || YES.equals(caseData.getEtICHearingAlreadyListed())) {
+                removeEtICHearingAlreadyListedYesValue(caseData);
             }
-            if (!caseData.getEtICCanProceed().equals("Yes") || !caseData.getEtICHearingAlreadyListed().equals("Yes")) {
-                caseData.setEtICHearingListed(null);
-                caseData.setEtICExtendDurationGiveDetails(null);
-                caseData.setEtICOtherGiveDetails(null);
-                caseData.setEtICHearingAnyOtherDirections(null);
-                caseData.setEtICPostponeGiveDetails(null);
-                caseData.setEtICConvertPreliminaryGiveDetails(null);
-                caseData.setEtICConvertF2fGiveDetails(null);
+            if (NO.equals(caseData.getEtICCanProceed()) || NO.equals(caseData.getEtICHearingAlreadyListed())) {
+                removeEtICHearingAlreadyListedNoValue(caseData);
             }
         }
+    }
+
+    private void removeEtIcCanProceedYesValue(CaseData caseData) {
+        caseData.setEtICFurtherInformation(null);
+        caseData.setEtICFurtherInformationHearingAnyOtherDirections(null);
+        caseData.setEtICFurtherInformationGiveDetails(null);
+        caseData.setEtICFurtherInformationTimeToComply(null);
+        caseData.setEtInitialConsiderationRule27(null);
+        caseData.setEtInitialConsiderationRule28(null);
+    }
+
+    private void removeEtICHearingAlreadyListedYesValue(CaseData caseData) {
+        caseData.setEtICHearingNotListedList(null);
+        caseData.setEtICHearingNotListedSeekComments(null);
+        caseData.setEtICHearingNotListedListForPrelimHearing(null);
+        caseData.setEtICHearingNotListedListForFinalHearing(null);
+        caseData.setEtICHearingNotListedUDLHearing(null);
+        caseData.setEtICHearingNotListedAnyOtherDirections(null);
+    }
+
+    private void removeEtICHearingAlreadyListedNoValue(CaseData caseData) {
+        caseData.setEtICHearingListed(null);
+        caseData.setEtICExtendDurationGiveDetails(null);
+        caseData.setEtICOtherGiveDetails(null);
+        caseData.setEtICHearingAnyOtherDirections(null);
+        caseData.setEtICPostponeGiveDetails(null);
+        caseData.setEtICConvertPreliminaryGiveDetails(null);
+        caseData.setEtICConvertF2fGiveDetails(null);
     }
 }

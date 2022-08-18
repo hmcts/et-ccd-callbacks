@@ -82,6 +82,7 @@ public class InitialConsiderationHelper {
                         .map(EtICListForPreliminaryHearing::getEtICGiveDetailsOfHearingNotice).orElse(null))
                 .preliminaryHearingLength(Optional.ofNullable(caseData.getEtICHearingNotListedListForPrelimHearing())
                         .map(EtICListForPreliminaryHearing::getEtICLengthOfPrelimHearing).orElse(null))
+                //final
                 .finalHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearing())
                         .map(EtICListForFinalHearing::getEtICTypeOfFinalHearing).orElse(null))
                 .finalHearingLength(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearing())

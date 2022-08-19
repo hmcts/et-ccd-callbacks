@@ -177,11 +177,13 @@ public class InitialConsiderationService {
         if (caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
             if (YES.equals(caseData.getEtICCanProceed())) {
                 removeEtIcCanProceedYesValue(caseData);
-            }
-            if (NO.equals(caseData.getEtICCanProceed()) || YES.equals(caseData.getEtICHearingAlreadyListed())) {
+                if (YES.equals(caseData.getEtICHearingAlreadyListed())) {
+                    removeEtICHearingAlreadyListedYesValue(caseData);
+                } else {
+                    removeEtICHearingAlreadyListedNoValue(caseData);
+                }
+            } else {
                 removeEtICHearingAlreadyListedYesValue(caseData);
-            }
-            if (NO.equals(caseData.getEtICCanProceed()) || NO.equals(caseData.getEtICHearingAlreadyListed())) {
                 removeEtICHearingAlreadyListedNoValue(caseData);
             }
         }

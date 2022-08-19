@@ -58,14 +58,14 @@ public class InitialConsiderationHelper {
                 .issuesJurCodesGiveDetails(defaultIfEmpty(caseData.getEtICInvalidDetails(), null))
                 .canProceed(defaultIfEmpty(caseData.getEtICCanProceed(), null))
                 .hearingAlreadyListed(defaultIfEmpty(caseData.getEtICHearingAlreadyListed(), null))
-                .hearingListed(caseData.getEtICHearingListed())
-                .hearingPostpone(caseData.getEtICPostponeGiveDetails())
-                .hearingConvertF2f(caseData.getEtICConvertF2fGiveDetails())
-                .hearingConvertFinal(caseData.getEtICConvertPreliminaryGiveDetails())
-                .hearingExtend(caseData.getEtICExtendDurationGiveDetails())
-                .hearingOther(caseData.getEtICOtherGiveDetails())
-                .otherDirections(caseData.getEtICHearingAnyOtherDirections())
-                .hearingNotListed(caseData.getEtICHearingNotListedList())
+                .hearingListed(Optional.ofNullable(caseData.getEtICHearingListed()).orElse(null))
+                .hearingPostpone(defaultIfEmpty(caseData.getEtICPostponeGiveDetails(), null))
+                .hearingConvertF2f(defaultIfEmpty(caseData.getEtICConvertF2fGiveDetails(), null))
+                .hearingConvertFinal(defaultIfEmpty(caseData.getEtICConvertPreliminaryGiveDetails(), null))
+                .hearingExtend(defaultIfEmpty(caseData.getEtICExtendDurationGiveDetails(), null))
+                .hearingOther(defaultIfEmpty(caseData.getEtICOtherGiveDetails(), null))
+                .otherDirections(defaultIfEmpty(caseData.getEtICHearingAnyOtherDirections(), null))
+                .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedList()).orElse(null))
                 //cvp
                 .cvpHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICTypeOfCvpHearing).orElse(null))
@@ -115,11 +115,12 @@ public class InitialConsiderationHelper {
                         .map(EtIcudlHearing::getEtIcudlFinalF2FIssue).orElse(null))
                 .udlCheckComplianceOrders(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
                         .map(EtIcudlHearing::getEtIcbuCheckComplianceOrders).orElse(null))
-                .hearingNotListedOtherDirections(caseData.getEtICHearingNotListedAnyOtherDirections())
+                .hearingNotListedOtherDirections(
+                        defaultIfEmpty(caseData.getEtICHearingNotListedAnyOtherDirections(), null))
                 //further information
-                .furtherInformation(caseData.getEtICFurtherInformation())
-                .furtherInfoGiveDetails(caseData.getEtICFurtherInformationGiveDetails())
-                .furtherInfoTimeToComply(caseData.getEtICFurtherInformationTimeToComply())
+                .furtherInformation(Optional.ofNullable(caseData.getEtICFurtherInformation()).orElse(null))
+                .furtherInfoGiveDetails(defaultIfEmpty(caseData.getEtICFurtherInformationGiveDetails(), null))
+                .furtherInfoTimeToComply(defaultIfEmpty(caseData.getEtICFurtherInformationTimeToComply(), null))
                 .r27ClaimToBe(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
                         .map(EtInitialConsiderationRule27::getEtICRule27ClaimToBe).orElse(null))
                 .r27WhichPart(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
@@ -140,7 +141,8 @@ public class InitialConsiderationHelper {
                         .map(EtInitialConsiderationRule28::getEtICRule28DirectionReason).orElse(null))
                 .r28NumberOfDays(Optional.ofNullable(caseData.getEtInitialConsiderationRule28())
                         .map(EtInitialConsiderationRule28::getEtICRule28NumberOfDays).orElse(null))
-                .furtherInfoAnyOtherDirections(caseData.getEtICFurtherInformationHearingAnyOtherDirections())
+                .furtherInfoAnyOtherDirections(
+                        defaultIfEmpty(caseData.getEtICFurtherInformationHearingAnyOtherDirections(), null))
                 .build();
 
         InitialConsiderationDocument document = InitialConsiderationDocument.builder()
@@ -148,10 +150,6 @@ public class InitialConsiderationHelper {
                 .outputName(IC_OUTPUT_NAME)
                 .templateName(IC_SUMMARY_SC_TEMPLATE_NAME)
                 .data(data).build();
-
-        OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
-        log.info(OBJECT_MAPPER.writeValueAsString(data));
 
         return OBJECT_MAPPER.writeValueAsString(document);
     }

@@ -26,6 +26,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping("/admin/staff")
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.LawOfDemeter"})
 public class CourtWorkerController {
 
     private final VerifyTokenService verifyTokenService;

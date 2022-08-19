@@ -36,6 +36,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
  * this includes formatting markdown and querying the state of the ET3 response.
  */
 @Slf4j
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
+    "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
+    "PMD.GodClass", "PMD.ConfusingTernary", "PDM.CyclomaticComplexity",
+    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.ClassNamingConventions",
+    "PMD.AvoidInstantiatingObjectsInLoops", "PMD.CognitiveComplexity", "PMD.PrematureDeclaration",
+    "PMD.LinguisticNaming", "PMD.InsufficientStringBufferDeclaration", "PMD.ConsecutiveLiteralAppends",
+    "PMD.LiteralsFirstInComparisons", "PMD.UnnecessaryFullyQualifiedName", "PMD.LawOfDemeter"})
 public class Et3VettingHelper {
 
     static final String NO_RESPONDENTS_FOUND_ERROR = "No respondents found for case %s";

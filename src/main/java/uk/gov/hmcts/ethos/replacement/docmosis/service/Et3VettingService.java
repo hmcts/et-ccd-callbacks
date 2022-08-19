@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
+import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
@@ -101,5 +102,21 @@ public class Et3VettingService {
 
     private Et3VettingType copyEt3FieldsFromCaseDataToRespondent(CaseData caseData) {
         return (Et3VettingType) intersectProperties(caseData, Et3VettingType.class);
+    }
+
+    /**
+     * This method calls the tornado service to generate the PDF for the ET3 Processing journey.
+     * @param caseData where the data is stored
+     * @param userToken user authentication token
+     * @param caseTypeId reference which caseType the document will be uploaded to
+     * @return DocumentInfo which contains the URL and description of the document uploaded to DM Store
+     */
+    public DocumentInfo generateEt3ProcessingDocument(CaseData caseData, String userToken, String caseTypeId) {
+        try {
+            return tornadoService.generateEventDocument(caseData, userToken,
+                    caseTypeId, "ET3 Processing.pdf");
+        } catch (Exception e) {
+            throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
+        }
     }
 }

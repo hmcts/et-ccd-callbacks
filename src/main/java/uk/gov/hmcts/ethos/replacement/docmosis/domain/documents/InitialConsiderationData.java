@@ -13,6 +13,8 @@ public class InitialConsiderationData {
     private String caseNumber;
     @JsonProperty("issuesJurisdiction")
     private String issuesJurisdiction;
+    @JsonProperty("issuesJurCodesGiveDetails")
+    private String issuesJurCodesGiveDetails;
     @JsonProperty("canProceed")
     private String canProceed;
     @JsonProperty("hearingAlreadyListed")
@@ -102,6 +104,8 @@ public class InitialConsiderationData {
     private List<String> r27Direction;
     @JsonProperty("r27DirectionReason")
     private String r27DirectionReason;
+    @JsonProperty("r27NoJurisdictionReason")
+    private String r27NoJurisdictionReason;
     @JsonProperty("r27NumberOfDays")
     private String r27NumberOfDays;
 

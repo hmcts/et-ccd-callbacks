@@ -223,27 +223,6 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void clearHiddenValue_EtICCanProceed_Yes() {
-        caseData.setEtICCanProceed(YES);
-
-        caseData.setEtICFurtherInformation(new ArrayList<>());
-        caseData.setEtICFurtherInformationHearingAnyOtherDirections("Test");
-        caseData.setEtICFurtherInformationGiveDetails("Test");
-        caseData.setEtICFurtherInformationTimeToComply("Test");
-        caseData.setEtInitialConsiderationRule27(new EtInitialConsiderationRule27());
-        caseData.setEtInitialConsiderationRule28(new EtInitialConsiderationRule28());
-
-        initialConsiderationService.clearHiddenValue(caseData, SCOTLAND_CASE_TYPE_ID);
-
-        assertThat(caseData.getEtICFurtherInformation()).isNull();
-        assertThat(caseData.getEtICFurtherInformationHearingAnyOtherDirections()).isNull();
-        assertThat(caseData.getEtICFurtherInformationGiveDetails()).isNull();
-        assertThat(caseData.getEtICFurtherInformationTimeToComply()).isNull();
-        assertThat(caseData.getEtInitialConsiderationRule27()).isNull();
-        assertThat(caseData.getEtInitialConsiderationRule28()).isNull();
-    }
-
-    @Test
     void clearHiddenValue_EtICCanProceed_No() {
         caseData.setEtICCanProceed(NO);
 
@@ -283,6 +262,12 @@ class InitialConsiderationServiceTest {
         caseData.setEtICCanProceed(YES);
         caseData.setEtICHearingAlreadyListed(YES);
 
+        caseData.setEtICFurtherInformation(new ArrayList<>());
+        caseData.setEtICFurtherInformationHearingAnyOtherDirections("Test");
+        caseData.setEtICFurtherInformationGiveDetails("Test");
+        caseData.setEtICFurtherInformationTimeToComply("Test");
+        caseData.setEtInitialConsiderationRule27(new EtInitialConsiderationRule27());
+        caseData.setEtInitialConsiderationRule28(new EtInitialConsiderationRule28());
         caseData.setEtICHearingNotListedList(new ArrayList<>());
         caseData.setEtICHearingNotListedSeekComments(new EtICSeekComments());
         caseData.setEtICHearingNotListedListForPrelimHearing(new EtICListForPreliminaryHearing());
@@ -292,6 +277,12 @@ class InitialConsiderationServiceTest {
 
         initialConsiderationService.clearHiddenValue(caseData, SCOTLAND_CASE_TYPE_ID);
 
+        assertThat(caseData.getEtICFurtherInformation()).isNull();
+        assertThat(caseData.getEtICFurtherInformationHearingAnyOtherDirections()).isNull();
+        assertThat(caseData.getEtICFurtherInformationGiveDetails()).isNull();
+        assertThat(caseData.getEtICFurtherInformationTimeToComply()).isNull();
+        assertThat(caseData.getEtInitialConsiderationRule27()).isNull();
+        assertThat(caseData.getEtInitialConsiderationRule28()).isNull();
         assertThat(caseData.getEtICHearingNotListedList()).isNull();
         assertThat(caseData.getEtICHearingNotListedSeekComments()).isNull();
         assertThat(caseData.getEtICHearingNotListedListForPrelimHearing()).isNull();
@@ -305,6 +296,12 @@ class InitialConsiderationServiceTest {
         caseData.setEtICCanProceed(YES);
         caseData.setEtICHearingAlreadyListed(NO);
 
+        caseData.setEtICFurtherInformation(new ArrayList<>());
+        caseData.setEtICFurtherInformationHearingAnyOtherDirections("Test");
+        caseData.setEtICFurtherInformationGiveDetails("Test");
+        caseData.setEtICFurtherInformationTimeToComply("Test");
+        caseData.setEtInitialConsiderationRule27(new EtInitialConsiderationRule27());
+        caseData.setEtInitialConsiderationRule28(new EtInitialConsiderationRule28());
         caseData.setEtICHearingListed(new ArrayList<>());
         caseData.setEtICExtendDurationGiveDetails("Test");
         caseData.setEtICOtherGiveDetails("Test");
@@ -315,6 +312,12 @@ class InitialConsiderationServiceTest {
 
         initialConsiderationService.clearHiddenValue(caseData, SCOTLAND_CASE_TYPE_ID);
 
+        assertThat(caseData.getEtICFurtherInformation()).isNull();
+        assertThat(caseData.getEtICFurtherInformationHearingAnyOtherDirections()).isNull();
+        assertThat(caseData.getEtICFurtherInformationGiveDetails()).isNull();
+        assertThat(caseData.getEtICFurtherInformationTimeToComply()).isNull();
+        assertThat(caseData.getEtInitialConsiderationRule27()).isNull();
+        assertThat(caseData.getEtInitialConsiderationRule28()).isNull();
         assertThat(caseData.getEtICHearingListed()).isNull();
         assertThat(caseData.getEtICExtendDurationGiveDetails()).isNull();
         assertThat(caseData.getEtICOtherGiveDetails()).isNull();

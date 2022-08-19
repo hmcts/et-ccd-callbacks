@@ -3,8 +3,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.domain.documents;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsiderationData;
 
+/**
+ * Object which contains data needed by Tornado to generate a document.
+ */
 @SuperBuilder
 @Data
 public class InitialConsiderationDocument {

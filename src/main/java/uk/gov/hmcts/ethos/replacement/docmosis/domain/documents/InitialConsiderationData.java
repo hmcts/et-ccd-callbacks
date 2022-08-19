@@ -5,6 +5,10 @@ import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import java.util.List;
 
+/**
+ * This object contains references to the data captured during the Initial Consideration event.
+ * Data is stored within this object to be used by Docmosis Tornado to generate a document
+ */
 @SuperBuilder
 @Data
 public class InitialConsiderationData {

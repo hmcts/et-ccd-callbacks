@@ -87,7 +87,7 @@ public class InitialConsiderationData {
     private List<String> udlCVPIssue;
     @JsonProperty("udlFinalF2FIssue")
     private List<String> udlFinalF2FIssue;
-    @JsonProperty("etICBUCheckComplianceOrders")
+    @JsonProperty("udlCheckComplianceOrders")
     private String udlCheckComplianceOrders;
     @JsonProperty("hearingNotListedOtherDirections")
     private String hearingNotListedOtherDirections;

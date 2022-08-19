@@ -21,7 +21,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +48,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
+    "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
+    "PMD.ExcessiveImports", "PMD.ConfusingTernary", "PDM.CyclomaticComplexity",
+    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.CognitiveComplexity", "PMD.NPathComplexity", "PMD.LinguisticNaming",
+    "PMD.InsufficientStringBufferDeclaration", "PMD.ConsecutiveLiteralAppends",
+    "PMD.ConsecutiveAppendsShouldReuse"})
 public class BulkHelper {
 
     private static final String JURISDICTION_OUTCOME_ACAS_CONCILIATED_SETTLEMENT = "Acas conciliated settlement";
@@ -462,14 +468,14 @@ public class BulkHelper {
     }
 
     private static Map<String, List<SearchType>> getSearchedCasesBySubMultipleRefMap(BulkData bulkData) {
-        Map<String, List<SearchType>> multipleMap = new HashMap<>();
+        Map<String, List<SearchType>> multipleMap = new ConcurrentHashMap<>();
         for (SearchTypeItem searchTypeItem : bulkData.getSearchCollection()) {
             if (bulkData.getMultipleCollection() != null) {
                 for (MultipleTypeItem multipleTypeItem : bulkData.getMultipleCollection()) {
                     if (searchTypeItem.getValue().getEthosCaseReferenceS()
                             .equals(multipleTypeItem.getValue().getEthosCaseReferenceM())
-                            && (multipleTypeItem.getValue().getSubMultipleM() != null
-                            && !multipleTypeItem.getValue().getSubMultipleM().equals(" "))) {
+                            && multipleTypeItem.getValue().getSubMultipleM() != null
+                            && !multipleTypeItem.getValue().getSubMultipleM().equals(" ")) {
                         multipleMap.computeIfAbsent(multipleTypeItem.getValue()
                                 .getSubMultipleM(), k -> new ArrayList<>()).add(searchTypeItem.getValue());
                     }

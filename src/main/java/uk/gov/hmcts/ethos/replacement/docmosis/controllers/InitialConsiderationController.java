@@ -93,6 +93,7 @@ public class InitialConsiderationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        initialConsiderationService.clearHiddenValue(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
         DocumentInfo documentInfo = initialConsiderationService.generateDocument(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setEtInitialConsiderationDocument(documentManagementService.addDocumentToDocumentField(documentInfo));

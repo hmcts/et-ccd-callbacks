@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
@@ -152,9 +155,9 @@ public class InitialConsiderationService {
 
     /**
      * This calls the Tornado service to generate the pdf for the ET1 Vetting journey.
-     * @param caseData gets the casedata
+     * @param caseData gets the CaseData
      * @param userToken user authentication token
-     * @param caseTypeId reference which casetype the document will be uploaded to
+     * @param caseTypeId reference which CaseType the document will be uploaded to
      * @return DocumentInfo which contains the url and markup for the uploaded document
      */
     public DocumentInfo generateDocument(CaseData caseData, String userToken, String caseTypeId) {
@@ -163,5 +166,52 @@ public class InitialConsiderationService {
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
+    }
+
+    /**
+     * Clear value for hidden fields.
+     * @param caseData gets the CaseData
+     * @param caseTypeId reference which CaseType the document will be uploaded to
+     */
+    public void clearHiddenValue(CaseData caseData, String caseTypeId) {
+        if (caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
+            if (YES.equals(caseData.getEtICCanProceed())) {
+                removeEtIcCanProceedYesValue(caseData);
+            }
+            if (NO.equals(caseData.getEtICCanProceed()) || YES.equals(caseData.getEtICHearingAlreadyListed())) {
+                removeEtICHearingAlreadyListedYesValue(caseData);
+            }
+            if (NO.equals(caseData.getEtICCanProceed()) || NO.equals(caseData.getEtICHearingAlreadyListed())) {
+                removeEtICHearingAlreadyListedNoValue(caseData);
+            }
+        }
+    }
+
+    private void removeEtIcCanProceedYesValue(CaseData caseData) {
+        caseData.setEtICFurtherInformation(null);
+        caseData.setEtICFurtherInformationHearingAnyOtherDirections(null);
+        caseData.setEtICFurtherInformationGiveDetails(null);
+        caseData.setEtICFurtherInformationTimeToComply(null);
+        caseData.setEtInitialConsiderationRule27(null);
+        caseData.setEtInitialConsiderationRule28(null);
+    }
+
+    private void removeEtICHearingAlreadyListedYesValue(CaseData caseData) {
+        caseData.setEtICHearingNotListedList(null);
+        caseData.setEtICHearingNotListedSeekComments(null);
+        caseData.setEtICHearingNotListedListForPrelimHearing(null);
+        caseData.setEtICHearingNotListedListForFinalHearing(null);
+        caseData.setEtICHearingNotListedUDLHearing(null);
+        caseData.setEtICHearingNotListedAnyOtherDirections(null);
+    }
+
+    private void removeEtICHearingAlreadyListedNoValue(CaseData caseData) {
+        caseData.setEtICHearingListed(null);
+        caseData.setEtICExtendDurationGiveDetails(null);
+        caseData.setEtICOtherGiveDetails(null);
+        caseData.setEtICHearingAnyOtherDirections(null);
+        caseData.setEtICPostponeGiveDetails(null);
+        caseData.setEtICConvertPreliminaryGiveDetails(null);
+        caseData.setEtICConvertF2fGiveDetails(null);
     }
 }

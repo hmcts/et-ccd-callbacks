@@ -113,6 +113,8 @@ public class InitialConsiderationHelper {
                         .map(EtIcudlHearing::getEtIcudlCvpIssue).orElse(null))
                 .udlFinalF2FIssue(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
                         .map(EtIcudlHearing::getEtIcudlFinalF2FIssue).orElse(null))
+                .udlCheckComplianceOrders(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
+                        .map(EtIcudlHearing::getEtIcbuCheckComplianceOrders).orElse(null))
                 .hearingNotListedOtherDirections(caseData.getEtICHearingNotListedAnyOtherDirections())
                 //further information
                 .furtherInformation(caseData.getEtICFurtherInformation())
@@ -147,12 +149,11 @@ public class InitialConsiderationHelper {
                 .templateName(IC_SUMMARY_SC_TEMPLATE_NAME)
                 .data(data).build();
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-        log.info(mapper.writeValueAsString(data));
+        log.info(OBJECT_MAPPER.writeValueAsString(data));
 
-        return mapper.writeValueAsString(document);
+        return OBJECT_MAPPER.writeValueAsString(document);
     }
 
     private static String getDocumentRequestEW(CaseData caseData, String accessKey) throws JsonProcessingException {
@@ -176,8 +177,6 @@ public class InitialConsiderationHelper {
                 .templateName(IC_SUMMARY_EW_TEMPLATE_NAME)
                 .data(data).build();
 
-        ObjectMapper mapper = new ObjectMapper();
-
-        return mapper.writeValueAsString(document);
+        return OBJECT_MAPPER.writeValueAsString(document);
     }
 }

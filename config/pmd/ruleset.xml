@@ -86,10 +86,22 @@
     <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
         <properties>
             <property name="separator" value="," />
-            <property name="maxDuplicateLiterals" value="10" />
+            <property name="maxDuplicateLiterals" value="40" />
             <property name="minimumLength" value="3" />
             <property name="skipAnnotations" value="false" />
             <property name="exceptionList" value="" />
+        </properties>
+    </rule>
+    <rule ref="category/java/codestyle.xml/ConfusingTernary">
+        <properties>
+            <property name="ignoreElseIf" value="true" />
+        </properties>
+    </rule>
+    <rule ref="category/java/design.xml/CyclomaticComplexity">
+        <properties>
+            <property name="classReportLevel" value="100" />
+            <property name="methodReportLevel" value="15" />
+            <property name="cycloOptions" value="" />
         </properties>
     </rule>
 </ruleset>

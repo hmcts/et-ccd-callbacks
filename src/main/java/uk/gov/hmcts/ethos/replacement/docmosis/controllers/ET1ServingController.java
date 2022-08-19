@@ -25,12 +25,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.LawOfDemeter", "PDM.FieldNamingConventions"})
 public class ET1ServingController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
     private final VerifyTokenService verifyTokenService;
-    private final ET1ServingService ET1ServingService;
+    private final ET1ServingService et1ServingService;
 
     /**
      * This service Gets userToken as a parameter for security validation
@@ -65,9 +66,9 @@ public class ET1ServingController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setOtherTypeDocumentName(
-                ET1ServingService.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
-        caseData.setClaimantAndRespondentAddresses(ET1ServingService.generateClaimantAndRespondentAddress(caseData));
-        caseData.setEmailLinkToAcas(ET1ServingService.generateEmailLinkToAcas(caseData));
+            et1ServingService.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
+        caseData.setClaimantAndRespondentAddresses(et1ServingService.generateClaimantAndRespondentAddress(caseData));
+        caseData.setEmailLinkToAcas(et1ServingService.generateEmailLinkToAcas(caseData));
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }

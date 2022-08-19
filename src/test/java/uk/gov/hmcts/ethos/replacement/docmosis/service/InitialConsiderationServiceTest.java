@@ -8,6 +8,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearing;
+import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearing;
+import uk.gov.hmcts.et.common.model.ccd.EtICSeekComments;
+import uk.gov.hmcts.et.common.model.ccd.EtIcudlHearing;
+import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule27;
+import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule28;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
@@ -31,6 +37,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
@@ -213,6 +220,108 @@ class InitialConsiderationServiceTest {
                 anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
         assertThrows(Exception.class, () -> initialConsiderationService.generateDocument(new CaseData(), "userToken",
                 ENGLANDWALES_CASE_TYPE_ID));
+    }
+
+    @Test
+    void clearHiddenValue_EtICCanProceed_Yes() {
+        caseData.setEtICCanProceed(YES);
+
+        caseData.setEtICFurtherInformation(new ArrayList<>());
+        caseData.setEtICFurtherInformationHearingAnyOtherDirections("Test");
+        caseData.setEtICFurtherInformationGiveDetails("Test");
+        caseData.setEtICFurtherInformationTimeToComply("Test");
+        caseData.setEtInitialConsiderationRule27(new EtInitialConsiderationRule27());
+        caseData.setEtInitialConsiderationRule28(new EtInitialConsiderationRule28());
+
+        initialConsiderationService.clearHiddenValue(caseData, SCOTLAND_CASE_TYPE_ID);
+
+        assertThat(caseData.getEtICFurtherInformation()).isNull();
+        assertThat(caseData.getEtICFurtherInformationHearingAnyOtherDirections()).isNull();
+        assertThat(caseData.getEtICFurtherInformationGiveDetails()).isNull();
+        assertThat(caseData.getEtICFurtherInformationTimeToComply()).isNull();
+        assertThat(caseData.getEtInitialConsiderationRule27()).isNull();
+        assertThat(caseData.getEtInitialConsiderationRule28()).isNull();
+    }
+
+    @Test
+    void clearHiddenValue_EtICCanProceed_No() {
+        caseData.setEtICCanProceed(NO);
+
+        caseData.setEtICHearingNotListedList(new ArrayList<>());
+        caseData.setEtICHearingNotListedSeekComments(new EtICSeekComments());
+        caseData.setEtICHearingNotListedListForPrelimHearing(new EtICListForPreliminaryHearing());
+        caseData.setEtICHearingNotListedListForFinalHearing(new EtICListForFinalHearing());
+        caseData.setEtICHearingNotListedUDLHearing(new EtIcudlHearing());
+        caseData.setEtICHearingNotListedAnyOtherDirections("Test");
+        caseData.setEtICHearingListed(new ArrayList<>());
+        caseData.setEtICExtendDurationGiveDetails("Test");
+        caseData.setEtICOtherGiveDetails("Test");
+        caseData.setEtICHearingAnyOtherDirections("Test");
+        caseData.setEtICPostponeGiveDetails("Test");
+        caseData.setEtICConvertPreliminaryGiveDetails("Test");
+        caseData.setEtICConvertF2fGiveDetails("Test");
+
+        initialConsiderationService.clearHiddenValue(caseData, SCOTLAND_CASE_TYPE_ID);
+
+        assertThat(caseData.getEtICHearingNotListedList()).isNull();
+        assertThat(caseData.getEtICHearingNotListedSeekComments()).isNull();
+        assertThat(caseData.getEtICHearingNotListedListForPrelimHearing()).isNull();
+        assertThat(caseData.getEtICHearingNotListedListForFinalHearing()).isNull();
+        assertThat(caseData.getEtICHearingNotListedUDLHearing()).isNull();
+        assertThat(caseData.getEtICHearingNotListedAnyOtherDirections()).isNull();
+        assertThat(caseData.getEtICHearingListed()).isNull();
+        assertThat(caseData.getEtICExtendDurationGiveDetails()).isNull();
+        assertThat(caseData.getEtICOtherGiveDetails()).isNull();
+        assertThat(caseData.getEtICHearingAnyOtherDirections()).isNull();
+        assertThat(caseData.getEtICPostponeGiveDetails()).isNull();
+        assertThat(caseData.getEtICConvertPreliminaryGiveDetails()).isNull();
+        assertThat(caseData.getEtICConvertF2fGiveDetails()).isNull();
+    }
+
+    @Test
+    void clearHiddenValue_EtICHearingAlreadyListed_Yes() {
+        caseData.setEtICCanProceed(YES);
+        caseData.setEtICHearingAlreadyListed(YES);
+
+        caseData.setEtICHearingNotListedList(new ArrayList<>());
+        caseData.setEtICHearingNotListedSeekComments(new EtICSeekComments());
+        caseData.setEtICHearingNotListedListForPrelimHearing(new EtICListForPreliminaryHearing());
+        caseData.setEtICHearingNotListedListForFinalHearing(new EtICListForFinalHearing());
+        caseData.setEtICHearingNotListedUDLHearing(new EtIcudlHearing());
+        caseData.setEtICHearingNotListedAnyOtherDirections("Test");
+
+        initialConsiderationService.clearHiddenValue(caseData, SCOTLAND_CASE_TYPE_ID);
+
+        assertThat(caseData.getEtICHearingNotListedList()).isNull();
+        assertThat(caseData.getEtICHearingNotListedSeekComments()).isNull();
+        assertThat(caseData.getEtICHearingNotListedListForPrelimHearing()).isNull();
+        assertThat(caseData.getEtICHearingNotListedListForFinalHearing()).isNull();
+        assertThat(caseData.getEtICHearingNotListedUDLHearing()).isNull();
+        assertThat(caseData.getEtICHearingNotListedAnyOtherDirections()).isNull();
+    }
+
+    @Test
+    void clearHiddenValue_EtICHearingAlreadyListed_No() {
+        caseData.setEtICCanProceed(YES);
+        caseData.setEtICHearingAlreadyListed(NO);
+
+        caseData.setEtICHearingListed(new ArrayList<>());
+        caseData.setEtICExtendDurationGiveDetails("Test");
+        caseData.setEtICOtherGiveDetails("Test");
+        caseData.setEtICHearingAnyOtherDirections("Test");
+        caseData.setEtICPostponeGiveDetails("Test");
+        caseData.setEtICConvertPreliminaryGiveDetails("Test");
+        caseData.setEtICConvertF2fGiveDetails("Test");
+
+        initialConsiderationService.clearHiddenValue(caseData, SCOTLAND_CASE_TYPE_ID);
+
+        assertThat(caseData.getEtICHearingListed()).isNull();
+        assertThat(caseData.getEtICExtendDurationGiveDetails()).isNull();
+        assertThat(caseData.getEtICOtherGiveDetails()).isNull();
+        assertThat(caseData.getEtICHearingAnyOtherDirections()).isNull();
+        assertThat(caseData.getEtICPostponeGiveDetails()).isNull();
+        assertThat(caseData.getEtICConvertPreliminaryGiveDetails()).isNull();
+        assertThat(caseData.getEtICConvertF2fGiveDetails()).isNull();
     }
 
     private List<JurCodesTypeItem> generateJurisdictionCodes() {

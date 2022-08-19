@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * Provides methods to validate claimant hearing preferences.
  */
+@SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal"})
 public class ClaimantHearingPreferencesValidator {
 
     static final String VIDEO_PREFERENCE = "Video";

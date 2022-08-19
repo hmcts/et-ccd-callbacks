@@ -83,5 +83,13 @@
     <rule ref="category/java/multithreading.xml"/>
     <rule ref="category/java/performance.xml"/>
     <rule ref="category/java/security.xml"/>
-
+    <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
+        <properties>
+            <property name="separator" value="," />
+            <property name="maxDuplicateLiterals" value="10" />
+            <property name="minimumLength" value="3" />
+            <property name="skipAnnotations" value="false" />
+            <property name="exceptionList" value="" />
+        </properties>
+    </rule>
 </ruleset>

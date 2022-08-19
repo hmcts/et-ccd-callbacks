@@ -3,11 +3,13 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
 
@@ -17,17 +19,27 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.intersectProperties;
 
 @Slf4j
-@Service()
+@Service("et3VettingService")
+@RequiredArgsConstructor
 public class Et3VettingService {
+
+    private final DocumentManagementService documentManagementService;
+    private final TornadoService tornadoService;
+
+    private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
+
     /**
-     * Moves ET3 Vetting related fields off of CaseData and onto the relevant respondent.
+     * Moves ET3 Vetting related fields off of CaseData and onto the relevant respondent. Also saves the document which
+     * has been generated onto the respondent
      * @param caseData The object containing case data
      */
-    public void saveEt3VettingToRespondent(CaseData caseData) {
+    public void saveEt3VettingToRespondent(CaseData caseData, DocumentInfo documentInfo) {
         String respondentName = caseData.getEt3ChooseRespondent().getSelectedLabel();
         RespondentSumTypeItem respondent = getRespondentForCase(respondentName, caseData);
 
         respondent.getValue().setEt3Vetting(copyEt3FieldsFromCaseDataToRespondent(caseData));
+        respondent.getValue().getEt3Vetting().setEt3VettingDocument(
+                documentManagementService.addDocumentToDocumentField(documentInfo));
         updateValuesOnObject(caseData, new Et3VettingType());
 
         respondent.getValue().setEt3VettingCompleted(YES);

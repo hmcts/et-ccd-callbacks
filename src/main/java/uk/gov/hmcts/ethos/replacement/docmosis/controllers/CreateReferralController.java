@@ -105,8 +105,7 @@ public class CreateReferralController {
     }
 
     /**
-     * Called after submitting a referral event
-     * Returns the confirmation header and body
+     * Called after submitting a referral event; returns the confirmation header and body.
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization

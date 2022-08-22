@@ -59,6 +59,7 @@ public class Helper {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     private Helper() {
+        super();
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 

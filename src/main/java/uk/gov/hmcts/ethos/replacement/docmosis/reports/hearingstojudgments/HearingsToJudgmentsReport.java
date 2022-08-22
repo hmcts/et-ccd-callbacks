@@ -31,6 +31,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.PrematureDeclaration",
+    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
+    "PMD.LawOfDemeter"})
 public class HearingsToJudgmentsReport {
     static final String PERCENTAGE_FORMAT = "%.2f";
 
@@ -44,6 +48,10 @@ public class HearingsToJudgmentsReport {
             HEARING_TYPE_PERLIMINARY_HEARING_CM,
             HEARING_TYPE_PERLIMINARY_HEARING_CM_TCC);
 
+    private final HearingsToJudgmentsReportDataSource hearingsToJudgmentsReportDataSource;
+    private final String listingDateFrom;
+    private final String listingDateTo;
+
     static class HearingWithJudgment {
         String hearingDate;
         String judgmentDateSent;
@@ -52,10 +60,6 @@ public class HearingsToJudgmentsReport {
         Boolean judgmentWithin4Weeks;
         String judge;
     }
-
-    private final HearingsToJudgmentsReportDataSource hearingsToJudgmentsReportDataSource;
-    private final String listingDateFrom;
-    private final String listingDateTo;
 
     public HearingsToJudgmentsReport(HearingsToJudgmentsReportDataSource hearingsToJudgmentsReportDataSource,
                                      ReportParams params) {
@@ -249,7 +253,7 @@ public class HearingsToJudgmentsReport {
     private boolean isWithinDateRange(LocalDate hearingListedDate) {
         var from = LocalDate.parse(listingDateFrom, OLD_DATE_TIME_PATTERN);
         var to = LocalDate.parse(listingDateTo, OLD_DATE_TIME_PATTERN);
-        return (!hearingListedDate.isBefore(from)) && (!hearingListedDate.isAfter(to));
+        return !hearingListedDate.isBefore(from) && !hearingListedDate.isAfter(to);
     }
 
     private boolean caseHasJudgments(HearingsToJudgmentsCaseData caseData) {

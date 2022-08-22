@@ -104,4 +104,9 @@
             <property name="cycloOptions" value="" />
         </properties>
     </rule>
+    <rule ref="category/java/design.xml/NPathComplexity">
+        <properties>
+            <property name="reportLevel" value="555" />
+        </properties>
+    </rule>
 </ruleset>

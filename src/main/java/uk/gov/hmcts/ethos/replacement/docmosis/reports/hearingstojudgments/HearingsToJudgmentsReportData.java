@@ -16,6 +16,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_O
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_CASES;
 
 @Getter
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.ConsecutiveAppendsShouldReuse",
+    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
+    "PMD.LawOfDemeter"})
 public class HearingsToJudgmentsReportData extends ListingData {
     // JsonIgnore is required on properties so that the report data is not
     // returned to CCD in any callback response.
@@ -33,6 +37,7 @@ public class HearingsToJudgmentsReportData extends ListingData {
     private final List<HearingsToJudgmentsReportDetail> reportDetails = new ArrayList<>();
 
     public HearingsToJudgmentsReportData(HearingsToJudgmentsReportSummary hearingsToJudgmentsReportSummary) {
+        super();
         this.reportSummary = hearingsToJudgmentsReportSummary;
     }
 

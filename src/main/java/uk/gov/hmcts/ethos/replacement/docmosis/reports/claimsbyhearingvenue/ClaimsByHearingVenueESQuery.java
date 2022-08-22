@@ -5,6 +5,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
 
+@SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.AvoidInstantiatingObjectsInLoops"})
 public class ClaimsByHearingVenueESQuery {
     private ClaimsByHearingVenueESQuery() {
         // Access through static methods

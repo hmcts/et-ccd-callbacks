@@ -11,6 +11,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_OFFICE;
 
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity",
+    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.CognitiveComplexity",
+    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons",
+    "PMD.ConsecutiveAppendsShouldReuse" })
 public class BfActionReportDoc {
 
     public StringBuilder getReportDocPart(ListingData data) {
@@ -19,7 +23,7 @@ public class BfActionReportDoc {
 
     private StringBuilder getBfActionReportDoc(ListingData listingData) {
         if (!(listingData instanceof BfActionReportData)) {
-            throw new IllegalStateException(("ListingData is not instance of BfActionReportData"));
+            throw new IllegalStateException("ListingData is not instance of BfActionReportData");
         }
 
         var reportData = (BfActionReportData) listingData;
@@ -39,9 +43,10 @@ public class BfActionReportDoc {
         }
 
         var itemsCount = bfDateTypeItems.size();
+        int one = 1;
         for (var i = 0; i < itemsCount; i++) {
             bfActionItemsListContent.append(getBfActionRow(bfDateTypeItems.get(i)));
-            if ((itemsCount - i) > 1) {
+            if ((itemsCount - i) > one) {
                 bfActionItemsListContent.append(",\n");
             }
         }

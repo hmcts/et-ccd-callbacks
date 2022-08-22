@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
@@ -41,7 +42,7 @@ public class CreateReferralHelper {
             boolean singleHearing = caseData.getHearingCollection().size() == 1;
 
             for (HearingTypeItem hearing : caseData.getHearingCollection()) {
-                for (var hearingDates : hearing.getValue().getHearingDateCollection()) {
+                for (DateListedTypeItem hearingDates : hearing.getValue().getHearingDateCollection()) {
                     hearingDetails.append(
                         String.format(
                             HEARING_DETAILS,

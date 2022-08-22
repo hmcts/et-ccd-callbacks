@@ -215,7 +215,7 @@ public class HearingsHelper {
     }
 
     private static DateListedTypeItem mapEarliest(HearingTypeItem o) {
-        var futureHearings = filterFutureHearings(o.getValue().getHearingDateCollection());
+        List<DateListedTypeItem> futureHearings = filterFutureHearings(o.getValue().getHearingDateCollection());
         if (futureHearings.isEmpty()) {
             return null;
         }

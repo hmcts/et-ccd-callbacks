@@ -99,7 +99,7 @@
     </rule>
     <rule ref="category/java/design.xml/CyclomaticComplexity">
         <properties>
-            <property name="classReportLevel" value="180" />
+            <property name="classReportLevel" value="190" />
             <property name="methodReportLevel" value="50" />
             <property name="cycloOptions" value="" />
         </properties>

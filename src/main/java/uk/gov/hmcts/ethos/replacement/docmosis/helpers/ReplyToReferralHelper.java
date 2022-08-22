@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -10,7 +9,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service
 public final class ReplyToReferralHelper {
     private ReplyToReferralHelper() {
         //Constructor

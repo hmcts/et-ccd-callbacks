@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -15,7 +14,6 @@ import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CreateReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
@@ -25,9 +23,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -46,9 +41,6 @@ class CreateReferralControllerTest {
     private VerifyTokenService verifyTokenService;
     @MockBean
     private UserService userService;
-    @SpyBean
-    @Autowired
-    private CreateReferralHelper createReferralHelper;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -82,7 +74,6 @@ class CreateReferralControllerTest {
             .andExpect(jsonPath("$.data.referralHearingDetails", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(createReferralHelper, times(1)).populateHearingDetails(any());
     }
 
     @Test
@@ -93,7 +84,6 @@ class CreateReferralControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isForbidden());
-        verify(createReferralHelper, never()).populateHearingDetails(any());
     }
 
     @Test

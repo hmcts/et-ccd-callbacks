@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CreateReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -31,7 +33,7 @@ public class CreateReferralController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
-    private final CreateReferralHelper createReferralHelper;
+    private final UserService userService;
 
     /**
      * Called for the first page of the Create Referral event.
@@ -61,7 +63,7 @@ public class CreateReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        createReferralHelper.populateHearingDetails(caseData);
+        CreateReferralHelper.populateHearingDetails(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -93,7 +95,11 @@ public class CreateReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        createReferralHelper.createReferral(caseData, userToken);
+        UserDetails userDetails = userService.getUserDetails(userToken);
+        CreateReferralHelper.createReferral(
+            caseData,
+            String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName())
+        );
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

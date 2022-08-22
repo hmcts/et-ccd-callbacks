@@ -10,7 +10,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
@@ -20,31 +19,16 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POST
 
 class CreateReferralHelperTest {
 
-    private UserService userService;
-    private CreateReferralHelper createReferralHelper;
     private CaseData caseData;
-
-    private final String expectedSingleHearingDetails = "<hr>To help you complete this form, open the <a href=\"url\">"
-        + "referral guidance documents</a><hr><h3>Hearing details </h3><pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp; 25 "
-        + "December 2021 00:00<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#09&#09&#09"
-        + " null</pre><hr>";
-
-    private final String expectedMultipleHearingDetails = "<hr>To help you complete this form, open the <a href="
-        + "\"url\">referral guidance documents</a><hr><h3>Hearing details 1</h3><pre>Date &nbsp;&#09&#09&#09&#09&#0"
-        + "9&nbsp; 25 December 2021 00:00<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#0"
-        + "9&#09&#09&#09 null</pre><hr><h3>Hearing details 2</h3><pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp; 26 December"
-        + " 2021 00:00<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#09&#09&#09 null<"
-        + "/pre><hr>";
 
     @BeforeEach
     void setUp() {
-        userService = mock(UserService.class);
         UserDetails userDetails = new UserDetails();
         userDetails.setFirstName("Judge");
         userDetails.setLastName("Judy");
         userDetails.setEmail("judge.judy@aol.com");
+        UserService userService = mock(UserService.class);
         when(userService.getUserDetails("")).thenReturn(userDetails);
-        createReferralHelper = new CreateReferralHelper(userService);
         caseData = CaseDataBuilder.builder().build();
     }
 
@@ -57,10 +41,13 @@ class CreateReferralHelperTest {
                 HEARING_STATUS_POSTPONED, false)
             .build();
 
-        createReferralHelper.populateHearingDetails(caseData);
+        CreateReferralHelper.populateHearingDetails(caseData);
 
-        assertThat(caseData.getReferralHearingDetails())
-            .isEqualTo(expectedSingleHearingDetails);
+        String expectedSingleHearingDetails = "<hr>To help you complete this form, open the <a href=\"url\">referral"
+            + " guidance documents</a><hr><h3>Hearing details </h3><pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp; 25 Dec"
+            + "ember 2021 00:00<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#09&#09&#0"
+            + "9 N/A</pre><hr>";
+        assertEquals(expectedSingleHearingDetails, caseData.getReferralHearingDetails());
     }
 
     @Test
@@ -76,10 +63,15 @@ class CreateReferralHelperTest {
                 HEARING_STATUS_HEARD, false)
             .build();
 
-        createReferralHelper.populateHearingDetails(caseData);
+        CreateReferralHelper.populateHearingDetails(caseData);
 
-        assertThat(caseData.getReferralHearingDetails())
-            .isEqualTo(expectedMultipleHearingDetails);
+        String expectedMultipleHearingDetails = "<hr>To help you complete this form, open the <a "
+            + "href=\"url\">referral guidance documents</a><hr><h3>Hearing details 1</h3><pre>Date &nbsp;&#09&#09&#09&#"
+            + "09&#09&nbsp; 25 December 2021 00:00<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;"
+            + "&#09&#09&#09&#09&#09 N/A</pre><hr><h3>Hearing details 2</h3><pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp;"
+            + " 26 December 2021 00:00<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#09&"
+            + "#09&#09 N/A</pre><hr>";
+        assertEquals(expectedMultipleHearingDetails, caseData.getReferralHearingDetails());
     }
 
     @Test
@@ -97,7 +89,7 @@ class CreateReferralHelperTest {
         caseData.setReferralDocument(List.of(document1, document2));
         caseData.setReferralInstruction("Custom instructions for judge");
 
-        createReferralHelper.createReferral(caseData, "");
+        CreateReferralHelper.createReferral(caseData, "Judge Judy");
 
         String expected = "ReferralType(referralNumber=1, referralHearingDate=None, referCaseTo=Judge Judy, "
             + "referentEmail=judge.judy@aol.com, isUrgent=Yes, "
@@ -113,15 +105,15 @@ class CreateReferralHelperTest {
 
     @Test
     void addNewReferralToReferralCollection() {
-        createReferralHelper.createReferral(caseData, "");
-        createReferralHelper.createReferral(caseData, "");
+        CreateReferralHelper.createReferral(caseData, "");
+        CreateReferralHelper.createReferral(caseData, "");
 
         assertEquals(2, caseData.getReferralCollection().size());
     }
 
     @Test
     void saveTheUserDetailsOfTheReferrerWithTheReferral() {
-        createReferralHelper.createReferral(caseData, "");
+        CreateReferralHelper.createReferral(caseData, "Judge Judy");
 
         String referredBy = caseData.getReferralCollection().get(0).getValue().getReferredBy();
 
@@ -142,7 +134,7 @@ class CreateReferralHelperTest {
         caseData.setReferralDocument(List.of(document1, document2));
         caseData.setReferralInstruction("Custom instructions for judge");
 
-        createReferralHelper.createReferral(caseData, "");
+        CreateReferralHelper.createReferral(caseData, "");
 
         assertNull(caseData.getReferCaseTo());
         assertNull(caseData.getIsUrgent());

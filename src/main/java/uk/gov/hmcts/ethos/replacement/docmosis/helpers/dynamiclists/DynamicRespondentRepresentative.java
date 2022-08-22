@@ -11,6 +11,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DynamicListHelper;
 import java.util.List;
 import java.util.ListIterator;
 
+@SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.ConfusingTernary",
+    "PMD.AvoidInstantiatingObjectsInLoops"})
 public class DynamicRespondentRepresentative {
 
     private DynamicRespondentRepresentative() {

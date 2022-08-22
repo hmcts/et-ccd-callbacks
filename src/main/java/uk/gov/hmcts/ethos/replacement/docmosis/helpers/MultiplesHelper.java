@@ -39,6 +39,8 @@ import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_5;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_6;
 
 @Slf4j
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass",
+    "PMD.TooManyMethods", "PMD.UseIndexOfChar"})
 public class MultiplesHelper {
 
     public static final List<String> HEADERS = new ArrayList<>(Arrays.asList(
@@ -297,7 +299,7 @@ public class MultiplesHelper {
     public static String getCurrentLead(String leadCaseLink) {
 
         return leadCaseLink != null && !leadCaseLink.isEmpty()
-                ? leadCaseLink.substring(leadCaseLink.indexOf(">") + 1).replace("</a>", "")
+                ? leadCaseLink.substring(leadCaseLink.indexOf('>') + 1).replace("</a>", "")
                 : "";
 
     }

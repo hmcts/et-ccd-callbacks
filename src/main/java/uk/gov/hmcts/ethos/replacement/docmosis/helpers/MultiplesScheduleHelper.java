@@ -22,6 +22,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_SCHEDULE_D
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass",
+    "PMD.TooManyMethods", "PMD.LiteralsFirstInComparisons", "PMD.LawOfDemeter", "PMD.AvoidInstantiatingObjectsInLoops"})
 public class MultiplesScheduleHelper {
 
     public static final String SUB_ZERO = "/0";
@@ -138,7 +140,7 @@ public class MultiplesScheduleHelper {
         TreeMap<String, SortedMap<String, SortedMap<String, Object>>> subMultipleTreeMap = new TreeMap<>();
 
         for (Map.Entry<String, Object> entry : multipleObjectsFiltered.entrySet()) {
-            List<String> caseIds = ((List<String>) entry.getValue());
+            List<String> caseIds = (List<String>) entry.getValue();
             SortedMap<String, SortedMap<String, Object>> scheduleEvents = new TreeMap<>();
 
             for (String caseId : caseIds) {

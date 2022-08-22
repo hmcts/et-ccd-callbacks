@@ -15,11 +15,12 @@ import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+@SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal"})
 public class DynamicJudgements {
+    public static final String NO_HEARINGS = "No Hearings";
+
     private DynamicJudgements() {
     }
-
-    public static final String NO_HEARINGS = "No Hearings";
 
     public static void dynamicJudgements(CaseData caseData) {
         var listHearings = DynamicListHelper.createDynamicHearingList(caseData);

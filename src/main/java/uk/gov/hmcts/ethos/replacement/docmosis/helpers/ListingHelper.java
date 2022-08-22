@@ -76,11 +76,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANG
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
 @Slf4j
-@SuppressWarnings({"PMD.ConfusingTernary", "PMD.LooseCoupling", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
-    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
-    "PMD.LawOfDemeter",  "PMD.ConsecutiveLiteralAppends", "PMD.ConsecutiveAppendsShouldReuse",
-    "PMD.LinguisticNaming", "PMD.NPathComplexity", "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.LooseCoupling", "PDM.CyclomaticComplexity",
+    "PMD.AvoidInstantiatingObjectsInLoops", "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass",
+    "PMD.CognitiveComplexity", "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons",
+    "PMD.FieldNamingConventions", "PMD.LawOfDemeter",  "PMD.ConsecutiveLiteralAppends",
+    "PMD.ConsecutiveAppendsShouldReuse", "PMD.LinguisticNaming", "PMD.NPathComplexity", "PMD.ExcessiveImports"})
 public class ListingHelper {
 
     private static final String ROOM_NOT_ALLOCATED = "* Not Allocated";

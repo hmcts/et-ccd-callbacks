@@ -13,6 +13,7 @@ import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+@SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal"})
 public class DynamicDepositOrder {
     private DynamicDepositOrder() {
     }

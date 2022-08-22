@@ -6,4 +6,4 @@ Scenario('login to the manage case application', async ({ I }) => {
     await I.authenticateWithIdam();
 
 }).retry(testConfig.TestRetryScenarios)
-    .tag('@bat')
+    .tag('@smoke')

@@ -8,6 +8,8 @@ module.exports = async function () {
        Could perform some assertion to check page title or open document on this page, for now keep simple.
     */
     const I = this;
-    await I.navByClick(commonConfig.continue);
-    await I.wait(2);
+    await I.click(commonConfig.submit);
+    await I.wait(5);
+    await I.click(commonConfig.closeAndReturnToCaseDetailsButton);
+    await I.wait(5);
 };

@@ -1,14 +1,13 @@
 const testConfig = require('./../../config');
 const {eventNames} = require('../pages/common/constants.js');
 const {initialConsideration} = require("../helpers/caseHelper");
-let testUrl = '/cases/case-details/1659525858049156';
+const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 
 Feature('Initial Consideration Happy Path - England and Wales');
 
 Scenario('Verify Initial Consideration Journey', async ({I}) => {
-    await I.authenticateWithIdam();
-    await I.amOnPage(testUrl)
+    await processCaseToAcceptedState();
     await initialConsideration(I,eventNames.INITIAL_CONSIDERATION);
 
-}).tag('@bat')
+}).tag('@RET-BAT')
     .retry(testConfig.TestRetryScenarios)

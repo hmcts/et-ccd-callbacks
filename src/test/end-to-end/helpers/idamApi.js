@@ -1,5 +1,6 @@
 const {Logger} = require('@hmcts/nodejs-logging');
 const requestModule = require('request-promise-native');
+
 const request = requestModule.defaults();
 const testConfig = require('../../config.js');
 const querystring = require('querystring');
@@ -41,22 +42,24 @@ async function getUserToken() {
     const authTokenResponse = await I.sendPostRequest(url,payload,headers);
 
     const  authToken = authTokenResponse.data.access_token ;
-    logger.debug('... The auth token is ...=>'+authToken);
+    console.log('... The auth token is ...=>'+authToken);
     return authToken;
 }
 
-async function getUserId(authToken) {
+async function getUserId() {
     const idamBaseUrl = 'https://idam-api.aat.platform.hmcts.net';
     const idamDetailsPath = '/details';
+    let token = await getUserToken();
+    console.log('checking token' +token)
       let url = idamBaseUrl + idamDetailsPath;
       let headers =
     {
-        'Authorization': `Bearer ${authToken}`
-    }
+        'Authorization': `Bearer ${token}`
+    };
     const userDetails = await I.sendGetRequest(url,headers);
     const userId =  userDetails.data.id
     logger.debug('... The user ID is ...=>'+userId);
-    return userId;
+    return { token, userId};
 }
 
 module.exports = {

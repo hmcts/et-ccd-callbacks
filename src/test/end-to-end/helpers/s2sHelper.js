@@ -6,12 +6,10 @@ const logger = Logger.getLogger('helpers/s2sHelper.js');
 const env = testConfig.TestEnv;
 
 async function getServiceToken() {
-    const serviceSecret = testConfig.TestS2SAuthSecret;
+    //const serviceSecret = testConfig.TestS2SAuthSecret;
     const s2sBaseUrl = `http://rpe-service-auth-provider-${env}.service.core-compute-${env}.internal`;
     const s2sAuthPath = '/testing-support/lease';
-    const oneTimePassword = require('otp')({
-        secret: serviceSecret
-    }).totp();
+    const oneTimePassword = testConfig.oneTimePassword
 
     const serviceToken = await request({
         method: 'POST',
@@ -19,7 +17,7 @@ async function getServiceToken() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({microservice: 'ethos_repl_service', oneTimePassword})
+        body: JSON.stringify({microservice: 'xui_webapp', oneTimePassword})
     });
 
     logger.debug(serviceToken);

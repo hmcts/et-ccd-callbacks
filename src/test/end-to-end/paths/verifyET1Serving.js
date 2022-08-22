@@ -1,14 +1,15 @@
 const testConfig = require('./../../config');
 const {eventNames} = require('../pages/common/constants.js');
 const {et1Serving} = require("../helpers/caseHelper");
-
+const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 Feature('ET1 Serving Process');
 
-const case_detail_url = '/cases/case-details/1659609053222055'
-
 Scenario('progress application through et1 serving - happy path England and Wales', async ({ I }) => {
-    await I.authenticateWithIdam();
-    await I.amOnPage(case_detail_url)
+
+   let caseId = await processCaseToAcceptedState();
+
+   console.log("... case id =>" +caseId);
+
     await et1Serving(I,eventNames.ET1_SERVING);
 
-}).tag('@et_tests') .retry(testConfig.TestRetryScenarios)
+}).tag('@RET-BAT') ;//.retry(testConfig.TestRetryScenarios)

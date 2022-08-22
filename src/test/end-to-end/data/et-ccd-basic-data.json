@@ -1,5 +1,6 @@
 {
-    "receiptDate": "2022-08-02",
+  "data": {
+    "receiptDate": "2022-08-17",
     "feeGroupReference": "946403697619",
     "managingOffice": "Leeds",
     "stateAPI": null,
@@ -37,7 +38,7 @@
     "respondentCollection": [
       {
         "value": {
-          "respondent_name": "Mrs Hellen Sharp",
+          "respondent_name": "Mrs Test Auto",
           "respondent_ACAS_question": "Yes",
           "respondent_ACAS": "15678",
           "respondent_ACAS_no": null,
@@ -93,13 +94,13 @@
     "claimantWorkAddressQuestion": "Yes",
     "claimantWorkAddressQRespondent": {
       "value": {
-        "code": "Mrs Hellen Sharp",
-        "label": "Mrs Hellen Sharp - 78 East Wonford Hill, Exeter, EX1 3DD, United Kingdom"
+        "code": "Mrs Test Auto",
+        "label": "Mrs Test Auto - 78 East Wonford Hill, Exeter, EX1 3DD, United Kingdom"
       },
       "list_items": [
         {
-          "code": "Mrs Hellen Sharp",
-          "label": "Mrs Hellen Sharp - 78 East Wonford Hill, Exeter, EX1 3DD, United Kingdom"
+          "code": "Mrs Test Auto",
+          "label": "Mrs Test Auto - 78 East Wonford Hill, Exeter, EX1 3DD, United Kingdom"
         }
       ]
     },
@@ -107,3 +108,4 @@
     "claimantRepresentedQuestion": "No",
     "representativeClaimantType": null
   }
+}

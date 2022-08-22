@@ -1,8 +1,5 @@
 async function acceptCaseEvent(I, caseId, eventName) {
     await I.wait(5);
-    await I.authenticateWithIdam();
-    await I.wait(5);
-    await I.amOnPage('/case-details/' + caseId);
     await I.chooseNextStep(eventName, 3);
     await I.acceptTheCase();
 }
@@ -162,7 +159,7 @@ async function et1Vetting(I, eventName) {
     await I.possibleReferal2ET1Vetting();
     await I.otherFactorsET1Vetting();
     await I.finalNotesET1Vetting();
-    //await I.checkYourAnswersET1Vetting();
+    await I.checkYourAnswersET1Vetting();
 }
 
 module.exports = {

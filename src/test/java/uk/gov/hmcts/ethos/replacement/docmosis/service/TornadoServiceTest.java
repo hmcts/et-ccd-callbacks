@@ -200,6 +200,22 @@ public class TornadoServiceTest {
         verifyDocumentInfo(documentInfo);
     }
 
+    @Test
+    public void generateInConEWDocument() throws IOException {
+        mockConnectionSuccess();
+        DocumentInfo documentInfo = tornadoService.generateEventDocument(
+                new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID, "Initial Consideration.pdf");
+        verifyDocumentInfo(documentInfo);
+    }
+
+    @Test
+    public void generateInConSCDocument() throws IOException {
+        mockConnectionSuccess();
+        DocumentInfo documentInfo = tornadoService.generateEventDocument(
+                new CaseData(), authToken, SCOTLAND_CASE_TYPE_ID, "Initial Consideration.pdf");
+        verifyDocumentInfo(documentInfo);
+    }
+
     @Test(expected = IOException.class)
     public void generateDocument_exception() throws IOException {
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);

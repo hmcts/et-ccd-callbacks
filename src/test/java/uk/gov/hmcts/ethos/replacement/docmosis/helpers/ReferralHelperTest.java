@@ -41,51 +41,16 @@ class ReferralHelperTest {
     private final String expectedSingleHearingDetails = "<hr>To help you complete this form, open the <a href=\"url\">"
         + "referral guidance documents</a><hr><h3>Hearing details </h3><pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp; 25 "
         + "December 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#09&#09&#09"
-        + " null</pre><hr>";
+        + " N/A</pre><hr>";
 
     private final String expectedMultipleHearingDetails = "<hr>To help you complete this form, open the <a href="
         + "\"url\">referral guidance documents</a><hr><h3>Hearing details 1</h3><pre>Date &nbsp;&#09&#09&#09&#09&#0"
         + "9&nbsp; 25 December 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#0"
-        + "9&#09&#09&#09 null</pre><hr><h3>Hearing details 2</h3><pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp; 26 December"
-        + " 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#09&#09&#09 null<"
+        + "9&#09&#09&#09 N/A</pre><hr><h3>Hearing details 2</h3><pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp; 26 December"
+        + " 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#09&#09&#09 N/A<"
         + "/pre><hr>";
 
-//    private final String expectedReferralDetails = "<h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09&#09&#0"
-//        + "9&#09&#09&#09&nbsp; null<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null"
-//        + "<br><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Urgent &nbsp;&#09&#09&#09&"
-//        + "#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referral date &#09&#09&#09&#09&#09&#09&#09&#09&#09 null"
-//        + "<br><br>Next hearing date &#09&#09&#09&#09&#09&#09&#09 None<br><br>Referral subject &#09&#09&#09&#09&#09&#"
-//        + "09&#09&#09 Other<br><br>Details of the referral &#09&#09&#09&#09&#09&#09 null<br><br>Documents &nbsp;&nbsp;"
-//        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; <br><br>Recommended instructions &nbsp;&#09&#09&#09&nbsp; null"
-//        + "</pre><hr>";
-//
-//    private final String expectedSingleReplyDetails = "<h3>Reply </h3><pre>Reply by &nbsp;&nbsp;&#09&#09&#09&#09&#09&#"
-//        + "09&#09&#09&#09&#09 replyBy<br><br>Reply to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 directionTo<"
-//        + "br><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyToEmail<br><br>Urgent &nbsp;&#09&#09&#09"
-//        + "&#09&#09&#09&#09&#09&#09&#09&#09 isUrgent<br><br>Referral date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#0"
-//        + "9 replyDate<br><br>Hearing date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 None<br><br>Referral subject "
-//        + "&nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09 null<br><br>Directions &nbsp;&nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&"
-//        + "#09&#09&#09 details<br><br>Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" dow"
-//        + "nload>null</a>&nbsp;<br><br>General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr>";
-//
-//    private final String expectedMultipleReplyDetails = "<h3>Reply 1</h3><pre>Reply by &nbsp;&nbsp;&#09&#09&#09&#09&#0"
-//        + "9&#09&#09&#09&#09&#09 replyBy<br><br>Reply to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 directio"
-//        + "nTo<br><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyToEmail<br><br>Urgent &nbsp;&#09&#09&"
-//        + "#09&#09&#09&#09&#09&#09&#09&#09&#09 isUrgent<br><br>Referral date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&"
-//        + "#09 replyDate<br><br>Hearing date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 None<br><br>Referral subject"
-//        + " &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09 null<br><br>Directions &nbsp;&nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&"
-//        + "#09&#09&#09 details<br><br>Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" down"
-//        + "load>null</a>&nbsp;<br><br>General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr><h3>Repl"
-//        + "y 2</h3><pre>Reply by &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 replyBy<br><br>Reply to &nbsp;&nb"
-//        + "sp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 directionTo<br><br>Email address &nbsp;&#09&#09&#09&#09&#09&#0"
-//        + "9&#09&#09 replyToEmail<br><br>Urgent &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 isUrgent<br><br>Ref"
-//        + "erral date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyDate<br><br>Hearing date &nbsp;&nbsp;&#09&#09&"
-//        + "#09&#09&#09&#09&#09&#09 None<br><br>Referral subject &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09 null<br><br>D"
-//        + "irections &nbsp;&nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 details<br><br>Documents &nbsp;&#09&#09&#0"
-//        + "9&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>null</a>&nbsp;<br><br>General notes &nbsp;&#09&#"
-//        + "09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr>";
-
-    private final String expectedHearingReferralDetailsSingleReply = "null<h3>Referral</h3><pre>Referred by &nbsp;&#0"
+    private final String expectedHearingReferralDetailsSingleReply = "<h3>Referral</h3><pre>Referred by &nbsp;&#0"
         + "9&#09&#09&#"
         + "09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp"
         + "; null<br><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Urgent &nbsp;&#09&#09&"
@@ -102,7 +67,7 @@ class ReferralHelperTest {
         + "p;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>null</a>&nbsp;<br><br>General notes "
         + "&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr>";
 
-    private final String expectedHearingReferralDetailsMultipleReplies = "null<h3>Referral</h3><pre>Referred by &nbsp"
+    private final String expectedHearingReferralDetailsMultipleReplies = "<h3>Referral</h3><pre>Referred by &nbsp"
         + ";&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#"
         + "09&#09&#09&nbsp; null<br><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Urgent"
         + " &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referral date &#09&#09&#09&#09&#09&#"
@@ -180,7 +145,7 @@ class ReferralHelperTest {
         caseData.setReferralDetails("This is an explanation");
         caseData.setReferralInstruction("Custom instructions for judge");
 
-        referralHelper.createReferral(caseData, "");
+        referralHelper.createReferral(caseData, "Judge Judy");
 
         String expected = "ReferralType(referralNumber=1, referralHearingDate=None, referCaseTo=Judge Judy, referentE"
             + "mail=judge.judy@aol.com, isUrgent=Yes, referralSubject=Subject line here, referralSubjectSpecify=Cust"
@@ -210,7 +175,7 @@ class ReferralHelperTest {
 
     @Test
     void saveTheUserDetailsOfTheReferrerWithTheReferral() {
-        referralHelper.createReferral(caseData, "");
+        referralHelper.createReferral(caseData, "Judge Judy");
 
         String referredBy = caseData.getReferralCollection().get(0).getValue().getReferredBy();
 
@@ -247,18 +212,16 @@ class ReferralHelperTest {
     @Test
     void whenCalledWithOneReferral_ReturnOneDropdownItem() {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
-        referralHelper.populateSelectReferralDropdown(caseData);
 
-        assertEquals(1, caseData.getSelectReferralToReply().getListItems().size());
+        assertEquals(1, referralHelper.populateSelectReferralDropdown(caseData));
     }
 
     @Test
     void whenCalledWithMultipleReferrals_ReturnMultipleDropdownItems() {
         ReferralTypeItem referralTypeItem = createReferralTypeItem();
         caseData.setReferralCollection(List.of(referralTypeItem, referralTypeItem, referralTypeItem));
-        referralHelper.populateSelectReferralDropdown(caseData);
 
-        assertEquals(3, caseData.getSelectReferralToReply().getListItems().size());
+        assertEquals(3, referralHelper.populateSelectReferralDropdown(caseData));
     }
 
     @Test
@@ -341,6 +304,7 @@ class ReferralHelperTest {
         referralType.setReferralNumber("1");
         referralType.setReferralSubject("Other");
         referralTypeItem.setValue(referralType);
+        referralType.setReferralStatus(ReferralStatus.AWAITING_INSTRUCTIONS);
         return referralTypeItem;
     }
 

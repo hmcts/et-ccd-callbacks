@@ -9,6 +9,7 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralReplyTypeItem;
@@ -104,16 +105,22 @@ public class ReferralHelper {
         String trackType = caseData.getTrackType();
         StringBuilder hearingDetails = new StringBuilder();
         hearingDetails.append(GUIDANCE_DOC_LINK);
-        IntWrapper count = new IntWrapper(0);
+        int count = 0;
         boolean singleHearing = caseData.getHearingCollection().size() == 1;
+
         for (HearingTypeItem hearing : caseData.getHearingCollection()) {
-            hearingDetails.append(hearing.getValue().getHearingDateCollection().stream()
-                .map(h -> String.format(
-                    HEARING_DETAILS, singleHearing ? "" : count.incrementAndReturnValue(),
-                    UtilHelper.formatLocalDate(h.getValue().getListedDate()),
-                    hearing.getValue().getHearingType(), trackType))
-                .collect(Collectors.joining()));
+            for (DateListedTypeItem hearingDates : hearing.getValue().getHearingDateCollection()) {
+                hearingDetails.append(
+                    String.format(
+                        HEARING_DETAILS,
+                        singleHearing ? "" : ++count,
+                        UtilHelper.formatLocalDate(hearingDates.getValue().getListedDate()),
+                        hearing.getValue().getHearingType(),
+                        trackType != null ? trackType : "N/A")
+                );
+            }
         }
+
         hearingDetails.append("<hr>");
         return hearingDetails.toString();
     }
@@ -171,7 +178,7 @@ public class ReferralHelper {
      * @param caseData contains all the case data
      * @param userToken The user token of the logged-in user
      */
-    public void createReferral(CaseData caseData, String userToken) {
+    public void createReferral(CaseData caseData, String userFullName) {
         if (CollectionUtils.isEmpty(caseData.getReferralCollection())) {
             caseData.setReferralCollection(new ArrayList<>());
         }
@@ -190,8 +197,7 @@ public class ReferralHelper {
 
         referralType.setReferralDate(Helper.getCurrentDate());
 
-        UserDetails userDetails = userService.getUserDetails(userToken);
-        referralType.setReferredBy(userDetails.getFirstName() + " " + userDetails.getLastName());
+        referralType.setReferredBy(userFullName);
 
         referralType.setReferralStatus(ReferralStatus.AWAITING_INSTRUCTIONS);
 
@@ -212,33 +218,22 @@ public class ReferralHelper {
      * @param caseData contains all the case data
      * @return Returns next hearing date in "dd MMM yyyy" format or "None"
      */
-    private String getNearestHearingToReferral(CaseData caseData) {
-        List<HearingTypeItem> hearingCollection = caseData.getHearingCollection();
+    private static String getNearestHearingToReferral(CaseData caseData) {
+        String earliestFutureHearingDate = HearingsHelper.getEarliestFutureHearingDate(caseData.getHearingCollection());
 
-        if (CollectionUtils.isEmpty(hearingCollection)) {
+        if (earliestFutureHearingDate == null) {
             return "None";
         }
 
-        Date nextHearingAfterReferral = null;
-        for (HearingTypeItem hearing : hearingCollection) {
-            Date hearingStartDate;
-            try {
-                hearingStartDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
-                    .parse(
-                        hearing.getValue().getHearingDateCollection().get(0).getValue().getHearingTimingStart()
-                    );
-            } catch (ParseException e) {
-                log.info("Failed to parse hearing date when creating new referral");
-                continue;
-            }
-
-            if (hearingStartDate.after(new Date()) && (nextHearingAfterReferral == null
-                || hearingStartDate.before(nextHearingAfterReferral))) {
-                nextHearingAfterReferral = hearingStartDate;
-            }
+        Date hearingStartDate;
+        try {
+            hearingStartDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(earliestFutureHearingDate);
+        } catch (ParseException e) {
+            log.info("Failed to parse hearing date when creating new referral");
+            return "None";
         }
-        return nextHearingAfterReferral == null ? "None" :
-            new SimpleDateFormat("dd MMM yyyy").format(nextHearingAfterReferral);
+
+        return new SimpleDateFormat("dd MMM yyyy").format(hearingStartDate);
     }
 
     /**

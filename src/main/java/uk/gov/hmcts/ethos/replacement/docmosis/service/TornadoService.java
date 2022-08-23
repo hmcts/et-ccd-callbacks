@@ -18,6 +18,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
@@ -249,7 +250,7 @@ public class TornadoService {
         HttpURLConnection connection = null;
         try {
             connection = createConnection();
-            buildDocumentInstruction(connection, caseData, documentName);
+            buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
             return checkResponseStatus(userToken, connection, documentName, caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
@@ -259,9 +260,10 @@ public class TornadoService {
         }
     }
 
-    private void buildDocumentInstruction(HttpURLConnection connection, CaseData caseData, String documentName)
+    private void buildDocumentInstruction(HttpURLConnection connection, CaseData caseData, String documentName,
+                                          String caseTypeId)
             throws IOException {
-        String documentContent = getDocumentContent(caseData, documentName);
+        String documentContent = getDocumentContent(caseData, documentName, caseTypeId);
 
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream(),
                 StandardCharsets.UTF_8)) {
@@ -270,7 +272,8 @@ public class TornadoService {
         }
     }
 
-    private String getDocumentContent(CaseData caseData, String documentName) throws JsonProcessingException {
+    private String getDocumentContent(CaseData caseData, String documentName, String caseTypeId)
+            throws JsonProcessingException {
         if (isNullOrEmpty(documentName)) {
             throw new NullPointerException("Document name cannot be null or empty");
         }
@@ -279,6 +282,9 @@ public class TornadoService {
                 return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             case "ET3 Processing.pdf":
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            case "Initial Consideration.pdf" :
+                return InitialConsiderationHelper.getDocumentRequest(
+                        caseData, tornadoConnection.getAccessKey(), caseTypeId);
             default:
                 throw new IllegalArgumentException("Unexpected document name " + documentName);
         }

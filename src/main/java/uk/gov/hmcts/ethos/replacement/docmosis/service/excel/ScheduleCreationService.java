@@ -38,6 +38,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleH
 
 @Slf4j
 @Service("scheduleCreationService")
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.LawOfDemeter", "PMD.CloseResource", "PMD.PrematureDeclaration"})
 public class ScheduleCreationService {
 
     private final List<String> multipleHeaders = new ArrayList<>(Arrays.asList(HEADER_1, HEADER_2));
@@ -136,7 +137,7 @@ public class ScheduleCreationService {
                         var columnIndex = 0;
                         var schedulePayload = (SchedulePayload) item;
                         XSSFRow row = sheet.createRow(rowIndex[0] + startingRow);
-                        row.setHeightInPoints(((float) 4.5 * sheet.getDefaultRowHeightInPoints()));
+                        row.setHeightInPoints((float) 4.5 * sheet.getDefaultRowHeightInPoints());
                         createCell(row, columnIndex, schedulePayload.getEthosCaseRef(), cellStyle);
                         columnIndex++;
                         createCell(row, columnIndex, getClaimantAddress(schedulePayload), cellStyle);

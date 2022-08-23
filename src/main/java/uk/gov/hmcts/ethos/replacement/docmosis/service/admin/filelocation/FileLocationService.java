@@ -19,6 +19,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.PrematureDeclaration"})
 public class FileLocationService {
     private final FileLocationRepository fileLocationRepository;
 

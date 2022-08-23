@@ -20,7 +20,7 @@ Scenario('ET1 Case Vetting', async ({I}) => {
     await et1Vetting(I, eventNames.ET1_VETTING);
     //await pageOneEt1Vetting.et1VettingProcessingPageOne
   
-}).tag('@RET-BAT');
+}).tag('@wip');
     //.retry(testConfig.TestRetryScenarios)   
   
   

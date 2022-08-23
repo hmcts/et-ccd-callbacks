@@ -33,6 +33,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 
 @Slf4j
 @Service("bulkSearchService")
+@SuppressWarnings({"PMD.ConfusingTernary",  "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.DoNotUseThreads", "PMD.GodClass", "PMD.UnnecessaryFullyQualifiedName", "PMD.NPathComplexity",
+    "PMD.NcssCount", "PMD.LawOfDemeter", "PMD.TooManyMethods", "PMD.PreserveStackTrace", "PMD.ExcessiveMethodLength"})
 public class BulkSearchService {
 
     private static final String MESSAGE = "Failed to search cases for case id : ";
@@ -279,9 +282,9 @@ public class BulkSearchService {
                         alreadyTakenIds.add(caseData.getEthosCaseReference());
                     }
                 }
-                if ((creationFlag && submitEvent.getState().equals(SUBMITTED_STATE)
-                        && !bulkDetails.getCaseData().getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE))
-                        || (!creationFlag && !submitEvent.getState().equals(ACCEPTED_STATE))) {
+                if (creationFlag && submitEvent.getState().equals(SUBMITTED_STATE)
+                        && !bulkDetails.getCaseData().getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE)
+                        || !creationFlag && !submitEvent.getState().equals(ACCEPTED_STATE)) {
                     unprocessableState.add(submitEvent.getCaseData().getEthosCaseReference());
                 }
             }

@@ -111,7 +111,7 @@
     </rule>
     <rule ref="category/java/design.xml/CognitiveComplexity">
         <properties>
-            <property name="reportLevel" value="25" />
+            <property name="reportLevel" value="90" />
         </properties>
     </rule>
 </ruleset>

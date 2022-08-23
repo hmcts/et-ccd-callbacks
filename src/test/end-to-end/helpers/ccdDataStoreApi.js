@@ -212,7 +212,7 @@ async function executeAcceptanceEvent() {
     let eventToken = await initiateAcceptanceEvent.preAccepteventToken;
     const executeUrl = `/cases/${caseId}/events`;
     const ccdApiUrl = `http://ccd-data-store-api-${env}.service.core-compute-${env}.internal`;
-    // logger.info('using existing cased id =>', caseId);
+    logger.info('using existing cased id =>', caseId);
     let executeEventBody = {
         "preAcceptCase": {
             "caseAccepted": "Yes",
@@ -235,20 +235,7 @@ async function executeAcceptanceEvent() {
     return nextEventExecutionResponse;
 }
 
-async function processCaseToAcceptedState() {
-    await initiateEt1Vetting();
-    await executeEt1Vetting();
-    await initiateAcceptanceEvent();
-    await executeAcceptanceEvent();
-
-};
-
-
 module.exports = {
     createCaseInCcd,
-    createECMCase,
-    //initiateEt1Vetting,
-    //executeEvent,
-    //updateECMCaseInCcd,
-    processCaseToAcceptedState
+    createECMCase
 };

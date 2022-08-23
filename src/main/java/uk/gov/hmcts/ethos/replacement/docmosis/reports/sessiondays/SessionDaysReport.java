@@ -31,13 +31,19 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEAR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingDurationInMinutes;
 
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
+    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.UnnecessaryFullyQualifiedName",
+    "PMD.LawOfDemeter"})
 public class SessionDaysReport {
 
     public static final String ONE_HOUR = "One Hour";
     public static final String HALF_DAY = "Half Day";
     public static final String FULL_DAY = "Full Day";
     public static final String NONE = "None";
-
+    private static final int ZERO = 0;
+    private static final int SIXTY = 60;
+    private static final int HUNDRED_EIGHTY = 180;
     private final SessionDaysReportDataSource reportDataSource;
     private final JudgeService judgeService;
     private ReportParams params;
@@ -332,11 +338,11 @@ public class SessionDaysReport {
     }
 
     private String getSessionType(long duration) {
-        if (duration > 0 && duration < 60) {
+        if (duration > ZERO && duration < SIXTY) {
             return ONE_HOUR;
-        } else if (duration >= 60 && duration <= 180) {
+        } else if (duration >= SIXTY && duration <= HUNDRED_EIGHTY) {
             return HALF_DAY;
-        } else if (duration > 180) {
+        } else if (duration > HUNDRED_EIGHTY) {
             return FULL_DAY;
         } else {
             return NONE;

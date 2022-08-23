@@ -290,14 +290,18 @@ public class Et1VettingService {
 
         if (caseData.getJurCodesCollection().stream()
             .anyMatch(c -> JUR_CODE_CONCILIATION_TRACK_OP.contains(c.getValue().getJuridictionCodesList()))) {
+            caseData.setTrackType(TRACK_OPEN);
             return String.format(TRACK_ALLOCATION_HTML, TRACK_OPEN);
         } else if (caseData.getJurCodesCollection().stream()
             .anyMatch(c -> JUR_CODE_CONCILIATION_TRACK_ST.contains(c.getValue().getJuridictionCodesList()))) {
+            caseData.setTrackType(TRACK_STANDARD);
             return String.format(TRACK_ALLOCATION_HTML, TRACK_STANDARD);
         } else if (caseData.getJurCodesCollection().stream()
             .anyMatch(c -> JUR_CODE_CONCILIATION_TRACK_SH.contains(c.getValue().getJuridictionCodesList()))) {
+            caseData.setTrackType(TRACK_SHORT);
             return String.format(TRACK_ALLOCATION_HTML, TRACK_SHORT);
         } else {
+            caseData.setTrackType(TRACK_NO);
             return String.format(TRACK_ALLOCATION_HTML, TRACK_NO);
         }
     }

@@ -17,6 +17,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @Service("defaultValuesReaderService")
+@SuppressWarnings({"PMD.LinguisticNaming"})
 public class DefaultValuesReaderService {
 
     private final CaseDefaultValuesConfiguration config;

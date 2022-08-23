@@ -15,7 +15,7 @@ import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CreateReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
@@ -48,7 +48,7 @@ class CreateReferralControllerTest {
     private UserService userService;
     @SpyBean
     @Autowired
-    private CreateReferralHelper createReferralHelper;
+    private ReferralHelper referralHelper;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -82,7 +82,7 @@ class CreateReferralControllerTest {
             .andExpect(jsonPath("$.data.referralHearingDetails", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(createReferralHelper, times(1)).populateHearingDetails(any());
+        verify(referralHelper, times(1)).populateHearingDetails(any());
     }
 
     @Test
@@ -93,7 +93,7 @@ class CreateReferralControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isForbidden());
-        verify(createReferralHelper, never()).populateHearingDetails(any());
+        verify(referralHelper, never()).populateHearingDetails(any());
     }
 
     @Test

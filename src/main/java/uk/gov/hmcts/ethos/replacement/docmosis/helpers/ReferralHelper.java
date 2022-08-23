@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -143,23 +143,31 @@ public class ReferralHelper {
 
     private String populateReplyDetails(CaseData caseData) {
         ReferralType referral = getSelectedReferral(caseData);
-        IntWrapper count = new IntWrapper(0);
         List<ReferralReplyTypeItem> replyCollection = referral.getReferralReplyCollection();
         if (replyCollection == null) {
             return "";
         }
+
+        AtomicInteger count = new AtomicInteger();
         boolean singleReply = replyCollection.size() == 1;
         return replyCollection.stream()
-            .map(r -> String.format(REPLY_DETAILS, singleReply ? "" : count.incrementAndReturnValue(),
+            .map(r -> String.format(REPLY_DETAILS, singleReply ? "" : count.incrementAndGet(),
                 r.getValue().getReplyBy(), r.getValue().getDirectionTo(), r.getValue().getReplyToEmailAddress(),
                 r.getValue().getIsUrgentReply(), r.getValue().getReplyDate(),
                 getNearestHearingToReferral(caseData), referral.getReferralSubject(),
-                r.getValue().getDirectionDetails(), r.getValue().getReplyDocument() != null
-                    ? r.getValue().getReplyDocument().stream()
-                    .map(d -> String.format(DOCUMENT_LINK, createDocLinkBinary(d),
-                        d.getValue().getUploadedDocument().getDocumentFilename()))
-                    .collect(Collectors.joining()) : "",
+                r.getValue().getDirectionDetails(), createDocLinkFromCollection(r.getValue().getReplyDocument()),
                 r.getValue().getReplyGeneralNotes()))
+            .collect(Collectors.joining());
+    }
+
+    private String createDocLinkFromCollection(List<DocumentTypeItem> docItem) {
+        if (docItem == null) {
+            return "";
+        }
+
+        return docItem.stream()
+            .map(d -> String.format(DOCUMENT_LINK, createDocLinkBinary(d),
+                d.getValue().getUploadedDocument().getDocumentFilename()))
             .collect(Collectors.joining());
     }
 
@@ -176,7 +184,7 @@ public class ReferralHelper {
     /**
      * Creates a referral and adds it to the referral collection.
      * @param caseData contains all the case data
-     * @param userToken The user token of the logged-in user
+     * @param userFullName Full name of the logged-in user
      */
     public void createReferral(CaseData caseData, String userFullName) {
         if (CollectionUtils.isEmpty(caseData.getReferralCollection())) {

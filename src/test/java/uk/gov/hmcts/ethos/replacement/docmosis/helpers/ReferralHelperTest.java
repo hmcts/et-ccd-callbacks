@@ -172,7 +172,6 @@ class ReferralHelperTest {
         assertEquals(2, caseData.getReferralCollection().size());
     }
 
-
     @Test
     void saveTheUserDetailsOfTheReferrerWithTheReferral() {
         referralHelper.createReferral(caseData, "Judge Judy");
@@ -212,16 +211,16 @@ class ReferralHelperTest {
     @Test
     void whenCalledWithOneReferral_ReturnOneDropdownItem() {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
-
-        assertEquals(1, referralHelper.populateSelectReferralDropdown(caseData));
+        caseData.setSelectReferralToReply(referralHelper.populateSelectReferralDropdown(caseData));
+        assertEquals(1, caseData.getSelectReferralToReply().getListItems().size());
     }
 
     @Test
     void whenCalledWithMultipleReferrals_ReturnMultipleDropdownItems() {
         ReferralTypeItem referralTypeItem = createReferralTypeItem();
         caseData.setReferralCollection(List.of(referralTypeItem, referralTypeItem, referralTypeItem));
-
-        assertEquals(3, referralHelper.populateSelectReferralDropdown(caseData));
+        caseData.setSelectReferralToReply(referralHelper.populateSelectReferralDropdown(caseData));
+        assertEquals(3, caseData.getSelectReferralToReply().getListItems().size());
     }
 
     @Test
@@ -233,43 +232,6 @@ class ReferralHelperTest {
         assertEquals(FALSE, referralHelper.isJudge(""));
     }
 
-//    @Test
-//    void populateReferralDetails() {
-//        caseData.setSelectReferralToReply(new DynamicFixedListType("1"));
-//        caseData.setReferralCollection(List.of(createReferralTypeItem()));
-//        assertEquals(expectedReferralDetails, referralHelper.populateReferralDetails(caseData));
-//    }
-
-//    @Test
-//    void populateReplyDetails_Single() {
-//        caseData.setSelectReferralToReply(new DynamicFixedListType("1"));
-//        caseData.setReferralCollection(List.of(createReferralTypeItem()));
-//        ReferralType referral = new ReferralType();
-//        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1")));
-//
-//        ReferralTypeItem referralTypeItem = new ReferralTypeItem();
-//        referralTypeItem.setId("1");
-//        referralTypeItem.setValue(referral);
-//        caseData.setReferralCollection(List.of(referralTypeItem));
-//
-//        assertEquals(expectedSingleReplyDetails, referralHelper.populateReplyDetails(caseData));
-//    }
-//
-//    @Test
-//    void populateReplyDetails_Multiple() {
-//        caseData.setSelectReferralToReply(new DynamicFixedListType("1"));
-//        ReferralType referral = new ReferralType();
-//        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1"),
-//            createReferralReplyTypeItem("2")));
-//
-//        ReferralTypeItem referralTypeItem = new ReferralTypeItem();
-//        referralTypeItem.setId("1");
-//        referralTypeItem.setValue(referral);
-//        caseData.setReferralCollection(List.of(referralTypeItem));
-//
-//        assertEquals(expectedMultipleReplyDetails, referralHelper.populateReplyDetails(caseData));
-//    }
-
     @Test
     void populateHearingReferralDetails_SingleReply() {
         caseData.setSelectReferralToReply(new DynamicFixedListType("1"));
@@ -280,7 +242,8 @@ class ReferralHelperTest {
         referralTypeItem.setValue(referral);
         caseData.setReferralCollection(List.of(referralTypeItem));
 
-        assertEquals(expectedHearingReferralDetailsSingleReply, referralHelper.populateHearingReferralDetails(caseData));
+        assertEquals(expectedHearingReferralDetailsSingleReply,
+            referralHelper.populateHearingReferralDetails(caseData));
     }
 
     @Test

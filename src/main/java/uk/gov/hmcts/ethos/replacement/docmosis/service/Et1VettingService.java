@@ -39,6 +39,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrac
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.LiteralsFirstInComparisons",
+    "PMD.FieldNamingConventions", "PMD.LawOfDemeter", "PMD.TooManyMethods", "PMD.ImplicitSwitchFallThrough",
+    "PMD.SwitchStmtsShouldHaveDefault"})
 public class Et1VettingService {
     private static final String ET1_DOC_TYPE = "ET1";
     private static final String ACAS_DOC_TYPE = "ACAS Certificate";
@@ -88,7 +91,8 @@ public class Et1VettingService {
     private static final String TRIBUNAL_SCOTLAND = "Scotland";
     private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br><br><br>";
     private static final String NO_ACAS_CERT_DISPLAY = "No certificate has been provided.<br><br><br>";
-
+    private static final int FIVE = 5;
+    private static final int ONE = 1;
     private final JpaVenueService jpaVenueService;
 
     /**
@@ -153,7 +157,7 @@ public class Et1VettingService {
                     .collect(Collectors.joining());
         }
 
-        if (acasCount.getValue() > 5) {
+        if (acasCount.getValue() > FIVE) {
             acasDisplay = String.format(BEFORE_LABEL_ACAS_OPEN_TAB, caseDetails.getCaseId());
         }
 
@@ -183,7 +187,7 @@ public class Et1VettingService {
      * @return et1VettingRespondentDetailsMarkUp
      */
     private String initialRespondentDetailsMarkUp(CaseData caseData) {
-        if (caseData.getRespondentCollection().size() == 1) {
+        if (caseData.getRespondentCollection().size() == ONE) {
             RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
             return String.format(RESPONDENT_DETAILS, "",
                     respondentSumType.getRespondentName(),

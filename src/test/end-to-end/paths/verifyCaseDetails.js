@@ -16,7 +16,7 @@ Scenario('Verify Case Details ', async ({I}) => {
     console.log("... case id =>" +caseNumber);
     await caseDetails(I, caseNumber, eventNames.CASE_DETAILS, 'A Clerk', 'Casework Table', 'Standard Track');
 
-}).tag('@wip')
+}).tag('@tester')
     .tag('@nightly')
     .tag('@crossbrowser')
     .retry(testConfig.TestRetryScenarios);

@@ -21,5 +21,5 @@ module.exports =  async function () {
     I.see('Email documents to Acas');
     await I.click(commonConfig.continueButton);
     I.waitForVisible(commonConfig.continueButton, 15);
-    await I.click(commonConfig.cancelProcess);
+    await I.click(commonConfig.submit);
 }

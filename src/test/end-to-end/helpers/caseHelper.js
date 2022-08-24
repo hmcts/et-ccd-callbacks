@@ -116,7 +116,7 @@ async function initialConsideration(I, eventName) {
     await I.wait(3);
     await I.startInitialConsideration();
     await I.initialConsiderationRule26();
-    //await I.initialConsiderationCheckYourAnswers();
+    await I.initialConsiderationCheckYourAnswers();
 }
 
 async function et1Serving(I, eventName) {
@@ -162,6 +162,20 @@ async function et1Vetting(I, eventName) {
     await I.checkYourAnswersET1Vetting();
 }
 
+async function createAdminReferral(emailAddress,details) {
+    await I.createAdminReferrals(emailAddress,details)
+    await I.wait(3);
+}
+
+async function createJudgeReferral(emailAddress,details) {
+    await I.createJudgeReferrals(emailAddress,details)
+    await I.wait(3);
+}
+
+async function createLegalRepReferral(emailAddress,details) {
+    await I.createLegalRepReferrals(emailAddress,details)
+    await I.wait(3);
+}
 module.exports = {
     acceptCaseEvent,
     caseDetails,

@@ -61,6 +61,11 @@ module.exports = () => {
         et3ProcessingWithNoResponse: steps.et3Processing.et3ProcessingPageNoET3Response,
         et1ServingProcess:steps.et1Serving.processEt1Serving,
         et3NotificationProcess:steps.et3Notification.processEt3Notification,
-        et3ResponseProcess:steps.et3Response.processEt3Response
+        et3ResponseProcess:steps.et3Response.processEt3Response,
+        createAdminReferrals:steps.referrals.createAdminReferrals,
+        createJudgeReferrals:steps.referrals.createJudgeReferrals,
+        createLegalRepReferrals:steps.referrals.createLegalOfficerReferrals,
+        replyReferrals:steps.referrals.replyReferrals,
+        closeReferrals:steps.referrals.closeReferrals
     });
 };

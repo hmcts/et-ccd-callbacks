@@ -23,7 +23,9 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-employment-englandwales",
                 "caseworker-employment-etjudge",
                 "caseworker-employment-etjudge-englandwales",
-                "citizen"
+                "citizen",
+                "caseworker-employment-legalrep-solicitor",
+                "caseworker-et-pcqextractor"
         );
         // Import our definition.
         byte[] def = Files.readAllBytes(

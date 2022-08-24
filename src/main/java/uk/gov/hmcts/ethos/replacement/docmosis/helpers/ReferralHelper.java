@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service
+@Component
 public class ReferralHelper {
     private final UserService userService;
     private static final String TRUE = "True";
@@ -268,7 +268,7 @@ public class ReferralHelper {
      * @param caseData contains all the case data
      */
     public static DynamicFixedListType populateSelectReferralDropdown(CaseData caseData) {
-        if (org.springframework.util.CollectionUtils.isEmpty(caseData.getReferralCollection())) {
+        if (CollectionUtils.isEmpty(caseData.getReferralCollection())) {
             return null;
         }
 

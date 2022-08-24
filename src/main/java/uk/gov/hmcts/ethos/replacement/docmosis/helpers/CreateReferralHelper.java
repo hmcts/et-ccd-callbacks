@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Slf4j
+@SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.LinguisticNaming", "PDM.TooManyFields",
+    "PMD.ConfusingTernary", "PMD.SimpleDateFormatNeedsLocale"})
 public class CreateReferralHelper {
     private static final String GUIDANCE_DOC_LINK = "<hr>To help you complete this form, open the "
         + "<a href=\"url\">referral guidance documents</a>";
@@ -71,7 +73,7 @@ public class CreateReferralHelper {
 
         ReferralType referralType = new ReferralType();
 
-        referralType.setReferralNumber(String.valueOf((caseData.getReferralCollection().size() + 1)));
+        referralType.setReferralNumber(String.valueOf(caseData.getReferralCollection().size() + 1));
         referralType.setReferCaseTo(caseData.getReferCaseTo());
         referralType.setIsUrgent(caseData.getIsUrgent());
         referralType.setReferralSubject(caseData.getReferralSubject());

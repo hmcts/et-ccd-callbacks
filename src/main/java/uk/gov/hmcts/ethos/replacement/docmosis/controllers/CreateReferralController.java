@@ -29,6 +29,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/createReferral")
 @RestController
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class CreateReferralController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";

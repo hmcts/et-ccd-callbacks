@@ -27,6 +27,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/replyReferral")
 @RestController
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class ReplyToReferralController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;

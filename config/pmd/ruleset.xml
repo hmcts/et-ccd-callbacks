@@ -114,4 +114,9 @@
             <property name="reportLevel" value="90" />
         </properties>
     </rule>
+    <rule ref="category/java/design.xml/TooManyFields">
+        <properties>
+            <property name="maxfields" value="100" />
+        </properties>
+    </rule>
 </ruleset>

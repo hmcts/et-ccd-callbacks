@@ -34,11 +34,11 @@ public class ServingService {
     public String generateOtherTypeDocumentLink(List<DocumentTypeItem> docList) {
         String documentLinks = "";
         if (CollectionUtils.isNotEmpty(docList)) {
-            documentLinks = (docList
+            documentLinks = docList
                 .stream()
                 .filter(d -> d.getValue().getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE))
                 .map(d -> createDocLinkBinary(d))
-                .collect(Collectors.joining()));
+                .collect(Collectors.joining());
         }
 
         return documentLinks;

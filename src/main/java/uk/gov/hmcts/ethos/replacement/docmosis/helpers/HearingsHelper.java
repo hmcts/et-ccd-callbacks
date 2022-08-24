@@ -31,8 +31,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POST
     "PMD.ImplicitSwitchFallThrough", "PMD.ConsecutiveAppendsShouldReuse", "PMD.LawOfDemeter",
     "PMD.CognitiveComplexity", "PMD.AvoidDeeplyNestedIfStmts"})
 public class HearingsHelper {
-    private HearingsHelper() {
-    }
 
     public static final String HEARING_CREATION_NUMBER_ERROR = "A new hearing can only "
             + "be added from the List Hearing menu item";
@@ -222,8 +220,9 @@ public class HearingsHelper {
             .getValue().getListedDate();
     }
 
-    private static DateListedTypeItem mapEarliest(HearingTypeItem o) {
-        List<DateListedTypeItem> futureHearings = filterFutureHearings(o.getValue().getHearingDateCollection());
+    private static DateListedTypeItem mapEarliest(HearingTypeItem hearingTypeItem) {
+        List<DateListedTypeItem> futureHearings = filterFutureHearings(hearingTypeItem.getValue()
+            .getHearingDateCollection());
         if (futureHearings.isEmpty()) {
             return null;
         }

@@ -141,7 +141,7 @@ public class ReplyToReferralController {
     }
 
     /**
-     * Called after submitting a reply to referral event
+     * Called after submitting a reply to referral event.
      * Returns the confirmation header and body
      *
      * @param ccdRequest holds the request and case data

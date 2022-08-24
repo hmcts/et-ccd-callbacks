@@ -109,7 +109,7 @@ public class CreateReferralController {
     }
 
     /**
-     * Called after submitting a create referral event
+     * Called after submitting a create referral event.
      * Returns the confirmation header and body
      *
      * @param ccdRequest holds the request and case data

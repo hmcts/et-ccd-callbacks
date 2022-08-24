@@ -145,7 +145,7 @@ public class BulkSearchService {
         }
         bulkData.setFlag1(null);
         bulkData.setFlag2(null);
-        bulkData.setEQP(null);
+        bulkData.setEqp(null);
         bulkData.setSubmissionRef(null);
         bulkData.setState(null);
         return bulkData;
@@ -316,7 +316,7 @@ public class BulkSearchService {
             String positionTypeFilter = bulkData.getPositionType();
             String flag1Filter = bulkData.getFlag1();
             String flag2Filter = bulkData.getFlag2();
-            String eqpFilter = bulkData.getEQP();
+            String eqpFilter = bulkData.getEqp();
             String claimantRepOrgFilter = bulkData.getClaimantOrg();
             String respondentRepOrgFilter = bulkData.getRespondentOrg();
             String submissionRefFilter = bulkData.getSubmissionRef();
@@ -342,7 +342,7 @@ public class BulkSearchService {
                 Predicate<MultipleTypeItem> flag2Predicate = d -> d.getValue() != null
                         && flag2Filter.equals(d.getValue().getFlag2M());
                 Predicate<MultipleTypeItem> eqpPredicate = d -> d.getValue() != null
-                        && eqpFilter.equals(d.getValue().getEQPM());
+                        && eqpFilter.equals(d.getValue().getEqpm());
                 Predicate<MultipleTypeItem> submissionRefPredicate = d -> d.getValue() != null
                         && submissionRefFilter.equals(d.getValue().getFeeGroupReferenceM());
                 Predicate<MultipleTypeItem> claimantRepOrgPredicate = d -> d.getValue() != null

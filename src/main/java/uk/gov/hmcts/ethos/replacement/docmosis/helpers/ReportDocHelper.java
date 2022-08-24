@@ -367,9 +367,9 @@ public class ReportDocHelper {
             sb.append("\"ConNone_Percent_26_Week\":\"").append(
                     nullCheck(localReportSummary.getConNone26wkTotalPerCent())).append(NEW_LINE);
             sb.append("\"ConNone_Total_Not_26_Week\":\"").append(
-                    nullCheck(localReportSummary.getXConNone26wkTotal())).append(NEW_LINE);
+                    nullCheck(localReportSummary.getNotConNone26wkTotal())).append(NEW_LINE);
             sb.append("\"ConNone_Percent_Not_26_Week\":\"").append(
-                    nullCheck(localReportSummary.getXConNone26wkTotalPerCent())).append(NEW_LINE);
+                    nullCheck(localReportSummary.getNotConNone26wkTotalPerCent())).append(NEW_LINE);
             sb.append("\"ConFast_Total\":\"").append(
                     nullCheck(localReportSummary.getConFastTotal())).append(NEW_LINE);
             sb.append("\"ConFast_Total_26_Week\":\"").append(
@@ -377,9 +377,9 @@ public class ReportDocHelper {
             sb.append("\"ConFast_Percent_26_Week\":\"").append(
                     nullCheck(localReportSummary.getConFast26wkTotalPerCent())).append(NEW_LINE);
             sb.append("\"ConFast_Total_Not_26_Week\":\"").append(
-                    nullCheck(localReportSummary.getXConFast26wkTotal())).append(NEW_LINE);
+                    nullCheck(localReportSummary.getNotConFast26wkTotal())).append(NEW_LINE);
             sb.append("\"ConFast_Percent_Not_26_Week\":\"").append(
-                    nullCheck(localReportSummary.getXConFast26wkTotalPerCent())).append(NEW_LINE);
+                    nullCheck(localReportSummary.getNotConFast26wkTotalPerCent())).append(NEW_LINE);
             sb.append("\"ConStd_Total\":\"").append(
                     nullCheck(localReportSummary.getConStdTotal())).append(NEW_LINE);
             sb.append("\"ConStd_Total_26_Week\":\"").append(
@@ -387,9 +387,9 @@ public class ReportDocHelper {
             sb.append("\"ConStd_Percent_26_Week\":\"").append(
                     nullCheck(localReportSummary.getConStd26wkTotalPerCent())).append(NEW_LINE);
             sb.append("\"ConStd_Total_Not_26_Week\":\"").append(
-                    nullCheck(localReportSummary.getXConStd26wkTotal())).append(NEW_LINE);
+                    nullCheck(localReportSummary.getNotConStd26wkTotal())).append(NEW_LINE);
             sb.append("\"ConStd_Percent_Not_26_Week\":\"").append(
-                    nullCheck(localReportSummary.getXConStd26wkTotalPerCent())).append(NEW_LINE);
+                    nullCheck(localReportSummary.getNotConStd26wkTotalPerCent())).append(NEW_LINE);
             sb.append("\"ConOpen_Total\":\"").append(
                     nullCheck(localReportSummary.getConOpenTotal())).append(NEW_LINE);
             sb.append("\"ConOpen_Total_26_Week\":\"").append(
@@ -397,9 +397,9 @@ public class ReportDocHelper {
             sb.append("\"ConOpen_Percent_26_Week\":\"").append(
                     nullCheck(localReportSummary.getConOpen26wkTotalPerCent())).append(NEW_LINE);
             sb.append("\"ConOpen_Total_Not_26_Week\":\"").append(
-                    nullCheck(localReportSummary.getXConOpen26wkTotal())).append(NEW_LINE);
+                    nullCheck(localReportSummary.getNotConOpen26wkTotal())).append(NEW_LINE);
             sb.append("\"ConOpen_Percent_Not_26_Week\":\"").append(
-                    nullCheck(localReportSummary.getXConOpen26wkTotalPerCent())).append(NEW_LINE);
+                    nullCheck(localReportSummary.getNotConOpen26wkTotalPerCent())).append(NEW_LINE);
 
         }
 

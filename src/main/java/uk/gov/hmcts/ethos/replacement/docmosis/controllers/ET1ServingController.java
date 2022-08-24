@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.ET1ServingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -31,7 +31,7 @@ public class ET1ServingController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
     private final VerifyTokenService verifyTokenService;
-    private final ET1ServingService et1ServingService;
+    private final ServingService servingService;
 
     /**
      * This service Gets userToken as a parameter for security validation
@@ -66,9 +66,9 @@ public class ET1ServingController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setOtherTypeDocumentName(
-            et1ServingService.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
-        caseData.setClaimantAndRespondentAddresses(et1ServingService.generateClaimantAndRespondentAddress(caseData));
-        caseData.setEmailLinkToAcas(et1ServingService.generateEmailLinkToAcas(caseData));
+                servingService.generateOtherTypeDocumentLink(caseData.getServingDocumentCollection()));
+        caseData.setClaimantAndRespondentAddresses(servingService.generateClaimantAndRespondentAddress(caseData));
+        caseData.setEmailLinkToAcas(servingService.generateEmailLinkToAcas(caseData, false));
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }

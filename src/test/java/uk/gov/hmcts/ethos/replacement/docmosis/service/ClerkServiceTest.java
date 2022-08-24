@@ -79,7 +79,8 @@ class ClerkServiceTest {
         var clerkService = new ClerkService(courtWorkerService);
         clerkService.initialiseClerkResponsible(SCOTLAND_LISTING_CASE_TYPE_ID, listingData);
 
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(listingData.getClerkResponsible(), "scotland", "Scotland ");
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
+                listingData.getClerkResponsible(), "scotland", "Scotland ");
     }
 
     @ParameterizedTest
@@ -92,7 +93,8 @@ class ClerkServiceTest {
         var clerkService = new ClerkService(courtWorkerService);
         clerkService.initialiseClerkResponsible(ENGLANDWALES_LISTING_CASE_TYPE_ID, listingData);
 
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(listingData.getClerkResponsible(), "clerk", "Clerk ");
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
+                listingData.getClerkResponsible(), "clerk", "Clerk ");
     }
 
     private static Stream<Arguments> testInitialiseClerkResponsibleListingDataEnglandWales() {

@@ -244,7 +244,7 @@ public class BulkUpdateService {
         bulkData.setRespondentSurnameV2(null);
         bulkData.setFlag1Update(null);
         bulkData.setFlag2Update(null);
-        bulkData.setEQPUpdate(null);
+        bulkData.setEqpUpdate(null);
         bulkData.setOutcomeUpdate(null);
         bulkData.setManagingOffice(null);
         bulkData.setFileLocationAberdeen(null);
@@ -422,10 +422,10 @@ public class BulkUpdateService {
                 updated = true;
                 submitEvent.getCaseData().setFlag2(flag2NewValue);
             }
-            String eqpNewValue = bulkData.getEQPUpdate();
+            String eqpNewValue = bulkData.getEqpUpdate();
             if (!isNullOrEmpty(eqpNewValue)) {
                 updated = true;
-                submitEvent.getCaseData().setEQP(eqpNewValue);
+                submitEvent.getCaseData().setEqp(eqpNewValue);
             }
             return updateOldSubmitBulk(updated, multipleReferenceUpdated, submitBulkEvent,
                     submitEvent, new SubmitBulkEventSubmitEventType());

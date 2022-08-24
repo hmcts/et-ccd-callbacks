@@ -84,6 +84,20 @@ class FileLocationServiceTest {
     }
 
     @Test
+    void shouldDeleteFileLocation() {
+        when(fileLocationRepository.existsByCodeAndTribunalOffice(fileLocationCode,
+                TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(false);
+        when(fileLocationRepository.existsByNameAndTribunalOffice(fileLocationName,
+                TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(false);
+        when(fileLocationRepository.findByCodeAndTribunalOffice(fileLocationCode,
+                TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(fileLocation);
+
+        List<String> errors = fileLocationService.deleteFileLocation(adminData);
+        verify(fileLocationRepository, times(1)).delete(fileLocation);
+        assertEquals(0, errors.size());
+    }
+
+    @Test
     void shouldUpdateFileLocation_ReturnFileLocationNameAndOfficeConflictError() {
         when(fileLocationRepository.existsByNameAndTribunalOffice(fileLocationName,
                 TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(true);
@@ -117,7 +131,7 @@ class FileLocationServiceTest {
 
         List<String> errors = fileLocationService.midEventSelectTribunalOffice(adminData);
         assertEquals(1, errors.size());
-        assertEquals("There is not any file location found in the Aberdeen office", errors.get(0));
+        assertEquals("No file location found in the Aberdeen office", errors.get(0));
     }
 
     @Test
@@ -143,7 +157,7 @@ class FileLocationServiceTest {
         List<String> errors = fileLocationService.midEventSelectFileLocation(adminData);
 
         assertEquals(1, errors.size());
-        assertEquals("There is not any file location found with the testCode location code", errors.get(0));
+        assertEquals("No file location found with the testCode location code", errors.get(0));
     }
 
     private AdminData createAdminData() {

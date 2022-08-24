@@ -112,8 +112,8 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String DYNAMIC_DEPOSIT_ORDER_URL = "/dynamicDepositOrder";
     private static final String DYNAMIC_JUDGMENT_URL = "/dynamicJudgments";
     private static final String JUDGEMENT_SUBMITTED_URL = "/judgementSubmitted";
-    private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL = "/reinstateClosedCaseMidEventValidation";
-
+    private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL =
+            "/reinstateClosedCaseMidEventValidation";
 
     @Autowired
     private WebApplicationContext applicationContext;

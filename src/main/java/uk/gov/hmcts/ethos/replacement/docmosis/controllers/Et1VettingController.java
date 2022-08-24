@@ -18,7 +18,9 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -39,6 +41,7 @@ public class Et1VettingController {
 
     private final VerifyTokenService verifyTokenService;
     private final Et1VettingService et1VettingService;
+    private final DocumentManagementService documentManagementService;
 
     /**
      * Initialise ET1 case vetting.
@@ -138,6 +141,35 @@ public class Et1VettingController {
 
         caseData.setEt1AddressDetails(et1VettingService.getAddressesHtml(caseData));
         et1VettingService.populateHearingVenue(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    /**
+     * About to Submit callback which handle the submission of data from the event into CCD and also generates a PDF
+     * of the ET1 Vetting data.
+     * @param userToken Used for authorisation
+     * @param ccdRequest CaseData which is a generic data type for most of the methods which holds ET1 case data
+     * @return caseData in ccdRequest
+     */
+    @PostMapping(value = "/et1VettingAboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Generates the PDF for ET1 Vetting.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> et1VettingAboutToSubmit(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
+            @RequestBody CCDRequest ccdRequest) {
+        log.info("ET1 CASE VETTING ABOUT TO SUBMIT ---> {}", ccdRequest.getCaseDetails().getCaseId());
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        DocumentInfo documentInfo = et1VettingService.generateEt1VettingDocument(caseData, userToken,
+                ccdRequest.getCaseDetails().getCaseTypeId());
+        caseData.setEt1VettingDocument(documentManagementService.addDocumentToDocumentField(documentInfo));
         return getCallbackRespEntityNoErrors(caseData);
     }
 

@@ -181,7 +181,7 @@ public class BulkHelper {
         multipleType.setCurrentPositionM(Optional.ofNullable(caseData.getPositionType()).orElse(" "));
         multipleType.setFlag1M(Optional.ofNullable(caseData.getFlag1()).orElse(" "));
         multipleType.setFlag2M(Optional.ofNullable(caseData.getFlag2()).orElse(" "));
-        multipleType.setEQPM(Optional.ofNullable(caseData.getEQP()).orElse(" "));
+        multipleType.setEqpm(Optional.ofNullable(caseData.getEqp()).orElse(" "));
         multipleType.setLeadClaimantM(Optional.ofNullable(caseData.getLeadClaimant()).orElse(NO));
         return multipleType;
     }
@@ -240,7 +240,7 @@ public class BulkHelper {
         searchType.setRespondentPostCodeS(multipleType.getRespondentPostCodeM());
         searchType.setFlag1S(multipleType.getFlag1M());
         searchType.setFlag2S(multipleType.getFlag2M());
-        searchType.setEQPS(multipleType.getEQPM());
+        searchType.setEqps(multipleType.getEqpm());
         searchType.setRespondentRepOrgS(multipleType.getRespondentRepOrgM());
         searchType.setClaimantRepOrgS(multipleType.getClaimantRepOrgM());
         return searchType;

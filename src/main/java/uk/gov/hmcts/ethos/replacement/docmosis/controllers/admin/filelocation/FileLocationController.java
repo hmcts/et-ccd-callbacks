@@ -19,8 +19,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.FileLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation.SaveFileLocationException;
-import java.util.Arrays;
+
 import java.util.List;
+
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -79,7 +80,7 @@ public class FileLocationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         fileLocationService.initAdminData(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityNoErrors(adminData);
@@ -105,9 +106,9 @@ public class FileLocationController {
     @Operation(summary = "Add File Location")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
-             content = {
+            content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-             }),
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -123,7 +124,7 @@ public class FileLocationController {
         try {
             fileLocationService.saveFileLocation(adminData);
         } catch (SaveFileLocationException e) {
-            return CCDCallbackResponse.getCallbackRespEntityErrors(Arrays.asList(e.getMessage()), adminData);
+            return CCDCallbackResponse.getCallbackRespEntityErrors(List.of(e.getMessage()), adminData);
         }
 
         return CCDCallbackResponse.getCallbackRespEntityNoErrors(adminData);
@@ -161,7 +162,7 @@ public class FileLocationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
-        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = fileLocationService.midEventSelectTribunalOffice(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
@@ -199,7 +200,7 @@ public class FileLocationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
-        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = fileLocationService.midEventSelectFileLocation(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
@@ -238,8 +239,47 @@ public class FileLocationController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
-        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = fileLocationService.updateFileLocation(adminData);
+
+        return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
+    }
+
+    /**
+     * This service Gets userToken as a parameter for security validation
+     * and ccdRequest data which has adminData as an object.
+     * It is used to delete file location name for the selected file location code
+     * Returns a list of errors. For this method there may be one of two errors which are
+     * ERROR_FILE_LOCATION_NOT_FOUND_BY_TRIBUNAL_OFFICE defined as
+     * "There is not any file location found in the %s office"
+     * ERROR_FILE_LOCATION_NOT_FOUND_BY_FILE_LOCATION_CODE defined as
+     * "There is not any file location found with the %s location code"
+     *
+     * @param  userToken        Used for authorisation
+     *
+     * @param ccdRequest        AdminData which is a generic data type for most of the
+     *                          methods which holds file location code, file location name
+     *                          and tribunal office.
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse that
+     *                          includes adminData with a list of file locations
+     */
+    @PostMapping(value = "/deleteFileLocation", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Delete file location")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> deleteFileLocation(
+            @RequestHeader("Authorization") String userToken,
+            @RequestBody CCDRequest ccdRequest) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
+        }
+
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
+        List<String> errors = fileLocationService.deleteFileLocation(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }

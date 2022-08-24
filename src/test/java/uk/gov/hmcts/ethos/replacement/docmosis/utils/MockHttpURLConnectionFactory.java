@@ -20,7 +20,7 @@ public class MockHttpURLConnectionFactory {
         given(urlStreamHandlerFactory.createURLStreamHandler("http")).willReturn(httpUrlStreamHandler);
     }
 
-    public MockHttpURLConnectionFactory() {
+    private MockHttpURLConnectionFactory() {
         // All access through static methods
     }
 

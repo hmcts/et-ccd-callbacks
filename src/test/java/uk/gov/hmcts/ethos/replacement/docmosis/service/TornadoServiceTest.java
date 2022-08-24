@@ -153,7 +153,8 @@ public class TornadoServiceTest {
         mockConnectionSuccess();
         ListingData listingData = createListingData();
 
-        DocumentInfo documentInfo = tornadoService.listingGeneration(authToken, listingData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        DocumentInfo documentInfo = tornadoService.listingGeneration(
+                authToken, listingData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
 
         verifyDocumentInfo(documentInfo);
     }
@@ -165,7 +166,8 @@ public class TornadoServiceTest {
         bulkData.setScheduleDocName(LIST_CASES_CONFIG);
         bulkData.setSearchCollection(new ArrayList<>());
 
-        DocumentInfo documentInfo = tornadoService.scheduleGeneration(authToken, bulkData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        DocumentInfo documentInfo = tornadoService.scheduleGeneration(
+                authToken, bulkData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
 
         verifyDocumentInfo(documentInfo);
     }
@@ -180,6 +182,52 @@ public class TornadoServiceTest {
                 ENGLANDWALES_LISTING_CASE_TYPE_ID);
 
         verifyDocumentInfo(documentInfo);
+    }
+
+    @Test
+    public void generateEt1VettingDocument() throws IOException {
+        mockConnectionSuccess();
+        DocumentInfo documentInfo = tornadoService.generateEventDocument(
+                new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID, "ET1 Vetting.pdf");
+        verifyDocumentInfo(documentInfo);
+    }
+
+    @Test
+    public void generateEt3VettingDocument() throws IOException {
+        mockConnectionSuccess();
+        DocumentInfo documentInfo = tornadoService.generateEventDocument(
+                new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID, "ET3 Processing.pdf");
+        verifyDocumentInfo(documentInfo);
+    }
+
+    @Test
+    public void generateInConEWDocument() throws IOException {
+        mockConnectionSuccess();
+        DocumentInfo documentInfo = tornadoService.generateEventDocument(
+                new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID, "Initial Consideration.pdf");
+        verifyDocumentInfo(documentInfo);
+    }
+
+    @Test
+    public void generateInConSCDocument() throws IOException {
+        mockConnectionSuccess();
+        DocumentInfo documentInfo = tornadoService.generateEventDocument(
+                new CaseData(), authToken, SCOTLAND_CASE_TYPE_ID, "Initial Consideration.pdf");
+        verifyDocumentInfo(documentInfo);
+    }
+
+    @Test(expected = IOException.class)
+    public void generateDocument_exception() throws IOException {
+        when(tornadoConnection.createConnection()).thenThrow(IOException.class);
+        tornadoService.generateEventDocument(new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID,
+                "random-string");
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void generateDocument_noDocumentName() throws IOException {
+        mockConnectionSuccess();
+        tornadoService.generateEventDocument(new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID,
+                null);
     }
 
     private void createUserService() {

@@ -45,7 +45,8 @@ public class ScotlandAllocatedHearingServiceTest {
         var courtWorkerSelectionService = mockCourtWorkerSelectionService();
         var roomSelectionService = mockRoomSelectionService();
         scotlandAllocateHearingService = new ScotlandAllocateHearingService(hearingSelectionService,
-                judgeSelectionService, scotlandVenueSelectionService, courtWorkerSelectionService, roomSelectionService);
+                judgeSelectionService, scotlandVenueSelectionService,
+                courtWorkerSelectionService, roomSelectionService);
     }
 
     @Test

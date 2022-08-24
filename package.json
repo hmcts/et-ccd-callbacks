@@ -62,8 +62,5 @@
     "moment": "^2.29.2",
     "yargs-parser": "^21.0.1",
     "file-type": "^17.1.3"
-  },
-  "scripts": {
-    "setup": "git submodule update --init --recursive && yarn --cwd ccd-definition-processor install"
   }
 }

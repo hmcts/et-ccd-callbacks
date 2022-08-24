@@ -4,9 +4,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.rse.ccd.lib.api.CFTLib;
 import uk.gov.hmcts.rse.ccd.lib.api.CFTLibConfigurer;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 @Component
 public class CftlibConfig implements CFTLibConfigurer {
     @Override
@@ -15,25 +12,34 @@ public class CftlibConfig implements CFTLibConfigurer {
         lib.createIdamUser("ccd.docker.default@hmcts.net",
                 "ccd-import");
 
-        // Create a test user in the idam simulator.
-        lib.createIdamUser("a@b.com",
+        // Create test users in the idam simulator.
+        lib.createIdamUser("englandwales@hmcts.net",
                 "caseworker",
                 "caseworker-employment",
                 "caseworker-employment-englandwales");
+
+        lib.createIdamUser("scotland@hmcts.net",
+                "caseworker",
+                "caseworker-employment",
+                "caseworker-employment-scotland");
+
+        lib.createIdamUser("admin@hmcts.net",
+                "caseworker",
+                "caseworker-employment",
+                "caseworker-employment-api");
+
         // Create our roles in CCD to allow our definition to import.
         lib.createRoles(
                 "caseworker-employment",
                 "caseworker-employment-api",
                 "caseworker-employment-englandwales",
+                "caseworker-employment-scotland",
                 "caseworker-employment-etjudge",
                 "caseworker-employment-etjudge-englandwales",
+                "caseworker-employment-etjudge-scotland",
                 "citizen",
                 "caseworker-employment-legalrep-solicitor",
                 "caseworker-et-pcqextractor"
         );
-        // Import our definition.
-        byte[] def = Files.readAllBytes(
-                Path.of("et-ccd-definitions-englandwales/definitions/xlsx/et-englandwales-ccd-config-cftlib.xlsx"));
-        lib.importDefinition(def);
     }
 }

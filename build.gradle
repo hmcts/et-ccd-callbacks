@@ -368,21 +368,7 @@ wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
 
-task yarnInstallDefinitions(type: Exec) {
-    commandLine 'yarn', 'install'
-    workingDir project.file('et-ccd-definitions-englandwales')
-}
-
-// Build the definition with a localhost callback URL for running with cftlib
-task generateXlsx(type: Exec, dependsOn: yarnInstallDefinitions) {
-    commandLine 'yarn', 'json2xlsx', '-D', './definitions/json', '-o', './definitions/xlsx/et-englandwales-ccd-config-cftlib.xlsx'
-    workingDir project.file('et-ccd-definitions-englandwales')
-    environment 'CCD_DEF_URL', 'http://localhost:4452'
-    environment 'ET_COS_URL', 'http://localhost:8081'
-}
-
 bootWithCCD {
-    dependsOn generateXlsx
     // Simulates idam and s2s locally.
     authMode = uk.gov.hmcts.rse.AuthMode.Local
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos'

@@ -5,7 +5,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -178,7 +177,7 @@ public class ReferralHelper {
 
     private ReferralType getSelectedReferral(CaseData caseData) {
         return caseData.getReferralCollection()
-            .get(Integer.parseInt(caseData.getSelectReferralToReply().getValue().getCode()) - 1).getValue();
+            .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
     }
 
     /**
@@ -284,17 +283,16 @@ public class ReferralHelper {
     /**
      * Creates a referral reply and adds it to the referral reply collection.
      * @param caseData contains all the case data
-     * @param userToken The user token of the logged-in user
+     * @param userFullName The full name of the logged-in user
      */
-    public void createReferralReply(CaseData caseData, String userToken) {
+    public void createReferralReply(CaseData caseData, String userFullName) {
         ReferralType referral = getSelectedReferral(caseData);
         if (CollectionUtils.isEmpty(referral.getReferralReplyCollection())) {
             referral.setReferralReplyCollection(new ArrayList<>());
         }
         ReferralReplyType referralReply = new ReferralReplyType();
 
-        UserDetails userDetails = userService.getUserDetails(userToken);
-        referralReply.setReplyBy(userDetails.getFirstName() + " " + userDetails.getLastName());
+        referralReply.setReplyBy(userFullName);
         referralReply.setReplyDate(Helper.getCurrentDate());
         referralReply.setDirectionTo(caseData.getDirectionTo() != null 
             ? caseData.getDirectionTo() : caseData.getReplyTo());        
@@ -332,6 +330,19 @@ public class ReferralHelper {
         caseData.setReplyGeneralNotes(null);
         caseData.setReplyTo(null);
         caseData.setReplyDetails(null);
+    }
+
+    /**
+     * Resets the case data fields relating to closing a referral so that they won't be auto populated when
+     * creating
+     * a new referral.
+     * @param caseData contains all the case data
+     */
+    public void clearCloseReferralDataFromCaseData(CaseData caseData) {
+        caseData.setSelectReferral(null);
+        caseData.setCloseReferralHearingDetails(null);
+        caseData.setConfirmCloseReferral(null);
+        caseData.setCloseReferralGeneralNotes(null);
     }
 
     public void setReferralStatusToClosed(CaseData caseData) {

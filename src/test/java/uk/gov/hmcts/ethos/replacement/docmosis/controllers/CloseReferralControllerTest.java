@@ -107,6 +107,7 @@ class CloseReferralControllerTest {
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
         verify(referralHelper, times(1)).setReferralStatusToClosed(any());
+        verify(referralHelper, times(1)).clearCloseReferralDataFromCaseData(any());
     }
 
     @Test

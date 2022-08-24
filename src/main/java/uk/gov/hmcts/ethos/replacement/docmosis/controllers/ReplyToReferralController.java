@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -31,6 +33,7 @@ public class ReplyToReferralController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
     private final ReferralHelper referralHelper;
+    private final UserService userService;
     private static final String COMPLETE_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
         + "<p>We have recorded your reply. You can view it in the "
@@ -65,7 +68,7 @@ public class ReplyToReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setIsJudge(referralHelper.isJudge(userToken));
-        caseData.setSelectReferralToReply(referralHelper.populateSelectReferralDropdown(caseData));
+        caseData.setSelectReferral(referralHelper.populateSelectReferralDropdown(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -129,7 +132,11 @@ public class ReplyToReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        referralHelper.createReferralReply(caseData, userToken);
+        UserDetails userDetails = userService.getUserDetails(userToken);
+        referralHelper.createReferralReply(
+            caseData,
+            String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName())
+        );
         return getCallbackRespEntityNoErrors(caseData);
     }
 

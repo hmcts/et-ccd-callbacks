@@ -11,6 +11,10 @@ import java.nio.file.Path;
 public class CftlibConfig implements CFTLibConfigurer {
     @Override
     public void configure(CFTLib lib) throws Exception {
+        // Create importer user
+        lib.createIdamUser("ccd.docker.default@hmcts.net",
+                "ccd-import");
+
         // Create a test user in the idam simulator.
         lib.createIdamUser("a@b.com",
                 "caseworker",

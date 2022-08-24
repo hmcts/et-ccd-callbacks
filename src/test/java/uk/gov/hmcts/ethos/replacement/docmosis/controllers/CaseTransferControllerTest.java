@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferSameCountryService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferToEcmService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -40,6 +41,7 @@ public class CaseTransferControllerTest {
     private static final String CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL =
             "/caseTransfer/transferSameCountryEccLinkedCase";
     private static final String CASE_TRANSFER_DIFFERENT_COUNTRY_URL = "/caseTransfer/transferDifferentCountry";
+    private static final String CASE_TRANSFER_TO_ECM = "/caseTransfer/transferToEcm";
 
     @MockBean
     VerifyTokenService verifyTokenService;
@@ -49,6 +51,9 @@ public class CaseTransferControllerTest {
 
     @MockBean
     CaseTransferDifferentCountryService caseTransferDifferentCountryService;
+
+    @MockBean
+    CaseTransferToEcmService caseTransferToEcmService;
 
     @Autowired
     JsonMapper jsonMapper;
@@ -246,5 +251,38 @@ public class CaseTransferControllerTest {
                 .andExpect(status().isForbidden());
 
         verify(caseTransferDifferentCountryService, never()).transferCase(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+    }
+
+    @Test
+    public void testCaseTransferToECM() throws Exception {
+        var ccdRequest = CCDRequestBuilder.builder().build();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mockMvc.perform(post(CASE_TRANSFER_TO_ECM)
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testCaseTransferToEcmError400() throws Exception {
+        mockMvc.perform(post(CASE_TRANSFER_TO_ECM)
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("error"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testCaseTransferToEcmForbidden() throws Exception {
+        var ccdRequest = CCDRequestBuilder.builder().build();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+
+        mockMvc.perform(post(CASE_TRANSFER_TO_ECM)
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
     }
 }

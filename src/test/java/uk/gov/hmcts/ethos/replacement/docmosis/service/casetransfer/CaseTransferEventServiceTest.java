@@ -51,4 +51,28 @@ class CaseTransferEventServiceTest {
                 List.of("120001/2021"), TribunalOffice.NEWCASTLE.getOfficeName(), "Test position type",
                 null, "Test reason", SINGLE_CASE_TYPE, NO, null, true, "120002/2021");
     }
+
+    @Test
+    void testEcmTransfer() {
+        var params = CaseTransferToEcmParams.builder()
+                .userToken("test-token")
+                .caseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+                .jurisdiction("EMPLOYMENT")
+                .ethosCaseReferences(List.of("120001/2021"))
+                .newCaseTypeId(TribunalOffice.NEWCASTLE.getOfficeName())
+                .positionType("Test position type")
+                .reason("Test reason")
+                .confirmationRequired(false)
+                .sourceEthosCaseReference("120002/2021")
+                .build();
+
+        var errors = caseTransferEventService.transferToEcm(params);
+
+        Assertions.assertTrue(errors.isEmpty());
+        verify(persistentQHelperService, times(1)).sendTransferToEcmEvent(
+                "test-token", ENGLANDWALES_CASE_TYPE_ID, "EMPLOYMENT", new ArrayList<>(),
+                List.of("120001/2021"), TribunalOffice.NEWCASTLE.getOfficeName(), "Test position type",
+                null, "Test reason", NO, "120002/2021");
+
+    }
 }

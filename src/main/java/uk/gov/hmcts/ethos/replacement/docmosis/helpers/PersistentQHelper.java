@@ -10,6 +10,7 @@ import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DetachDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.PreAcceptDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.RejectDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.ResetStateDataModel;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.TransferToEcmDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.UpdateDataModel;
 import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -172,5 +173,17 @@ public class PersistentQHelper {
 
     public static UpdateDataModel getUpdateDataModel(MultipleData multipleData, CaseData caseData) {
         return UpdateDataModelBuilder.build(multipleData, caseData);
+    }
+
+    public static TransferToEcmDataModel getTransferToEcmModel(String ccdGatewayBaseUrl, String officeCT,
+                                                               String positionTypeCT, String reasonForCT,
+                                                               String sourceEthosCaseReference) {
+        return TransferToEcmDataModel.builder()
+                .officeCT(officeCT)
+                .positionTypeCT(positionTypeCT)
+                .ccdGatewayBaseUrl(ccdGatewayBaseUrl)
+                .reasonForCT(reasonForCT)
+                .sourceEthosCaseReference(sourceEthosCaseReference)
+                .build();
     }
 }

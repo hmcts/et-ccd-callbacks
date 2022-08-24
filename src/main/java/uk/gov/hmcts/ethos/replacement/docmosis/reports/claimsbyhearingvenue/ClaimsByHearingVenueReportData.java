@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
@@ -8,6 +9,7 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import java.util.ArrayList;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = false)
 @Getter
 @Setter
 public class ClaimsByHearingVenueReportData extends ListingData {

@@ -22,7 +22,6 @@ public class BulkAddSinglesValidatorTest {
 
     private MultipleDetails multipleDetails;
     private final String authToken = "some-token";
-    private final String multipleReference = "2500001/2021";
     private List<String> ethosCaseReferences;
     private List<ValidatedSingleCase> validatedSingleCases;
 
@@ -35,8 +34,8 @@ public class BulkAddSinglesValidatorTest {
 
         validatedSingleCases = new ArrayList<>();
         singleCasesValidator = mock(SingleCasesValidator.class);
-        when(singleCasesValidator.getValidatedCases(ethosCaseReferences, multipleDetails,
-                multipleReference, authToken)).thenReturn(validatedSingleCases);
+        when(singleCasesValidator.getValidatedCases(ethosCaseReferences, multipleDetails, authToken))
+                .thenReturn(validatedSingleCases);
 
         bulkAddSinglesValidator = new BulkAddSinglesValidator(singleCasesImporter, singleCasesValidator);
     }
@@ -85,8 +84,8 @@ public class BulkAddSinglesValidatorTest {
     public void shouldReturnErrorWhenValidationThrowsException() throws IOException {
         ethosCaseReferences.add("case1");
         validatedSingleCases.add(ValidatedSingleCase.createValidCase("case1"));
-        when(singleCasesValidator.getValidatedCases(ethosCaseReferences, multipleDetails, multipleReference,
-                authToken)).thenThrow(IOException.class);
+        when(singleCasesValidator.getValidatedCases(ethosCaseReferences, multipleDetails, authToken))
+                .thenThrow(IOException.class);
 
         var errors = bulkAddSinglesValidator.validate(multipleDetails, authToken);
 
@@ -95,6 +94,7 @@ public class BulkAddSinglesValidatorTest {
     }
 
     private MultipleDetails createMultipleDetails() {
+        var multipleReference = "2500001/2021";
         var multipleData = new MultipleData();
         multipleData.setMultipleReference(multipleReference);
         var multipleDetails = new MultipleDetails();

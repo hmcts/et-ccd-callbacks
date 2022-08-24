@@ -694,7 +694,7 @@ public class CaseActionsForCaseWorkerController {
 
         List<String> errors = new ArrayList<>();
         var caseData =  ccdRequest.getCaseDetails().getCaseData();
-        eventValidationService.validateJurisdictionCodes(caseData, errors);
+        eventValidationService.validateJurisdiction(caseData, errors);
         log.info(EVENT_FIELDS_VALIDATION + errors);
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -857,10 +857,6 @@ public class CaseActionsForCaseWorkerController {
 
         var caseDetails = ccdRequest.getCaseDetails();
         List<String> errors = HearingsHelper.hearingMidEventValidation(caseDetails.getCaseData());
-        if ("updateHearing".equals(ccdRequest.getEventId())) {
-            errors.addAll(HearingsHelper.hearingTimeValidation(caseDetails.getCaseData()));
-        }
-
         return getCallbackRespEntity(errors, caseDetails);
     }
 
@@ -1150,4 +1146,5 @@ public class CaseActionsForCaseWorkerController {
             caseData.setEthosCaseReference(reference);
         }
     }
+
 }

@@ -11,10 +11,11 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
-import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -32,8 +33,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 public class DocumentHelperTest {
 
     private static final String DUMMY_CASE_TYPE_ID = "dummy case type id";
-    private static final String MANCHESTER_VENUE_ADDRESS = "Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, Manchester, M3 2JA";
-    private static final String GLASGOW_VENUE_ADDRESS = "Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT";
+    private static final String MANCHESTER_VENUE_ADDRESS =
+            "Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, Manchester, M3 2JA";
+    private static final String GLASGOW_VENUE_ADDRESS =
+            "Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT";
     private static final String ABERDEEN_VENUE_ADDRESS = "Ground Floor, AB1, 48 Huntly Street, Aberdeen, AB10 1SH";
     private CaseDetails caseDetails1;
     private CaseDetails caseDetails2;
@@ -49,13 +52,14 @@ public class DocumentHelperTest {
     private CaseDetails caseDetails13;
     private CaseDetails caseDetails14;
     private CaseDetails caseDetails15;
+    private CaseDetails caseDetails20;
     private CaseDetails caseDetailsEmpty;
     private CaseDetails caseDetailsScot1;
     private CaseDetails caseDetailsScot2;
     private CaseDetails caseDetailsScot3;
+    private CaseDetails caseDetailsScot4;
     private UserDetails userDetails;
     private VenueAddressReaderService venueAddressReaderService;
-    private HearingType hearingType;
 
     @Before
     public void setUp() throws Exception {
@@ -73,9 +77,11 @@ public class DocumentHelperTest {
         caseDetails13 = generateCaseDetails("caseDetailsTest13.json");
         caseDetails14 = generateCaseDetails("caseDetailsTest14.json");
         caseDetails15 = generateCaseDetails("caseDetailsTest15.json");
+        caseDetails20 = generateCaseDetails("caseDetailsTest20.json");
         caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
         caseDetailsScot2 = generateCaseDetails("caseDetailsScotTest2.json");
         caseDetailsScot3 = generateCaseDetails("caseDetailsScotTest3.json");
+        caseDetailsScot4 = generateCaseDetails("caseDetailsScotTest4.json");
 
         caseDetailsEmpty = new CaseDetails();
         caseDetailsEmpty.setCaseData(new CaseData());
@@ -1375,6 +1381,86 @@ public class DocumentHelperTest {
     }
 
     @Test
+    public void buildDocumentContent20() {
+        String expected = "{\n"
+                + "\"accessKey\":\"\",\n"
+                + "\"templateName\":\"EM-TRB-EGW-ENG-00043.docx\",\n"
+                + "\"outputName\":\"document.docx\",\n"
+                + "\"data\":{\n"
+                + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant\",\n"
+                + "\"claimant_rep_organisation\":\"RepresentativeOrganisation\",\n"
+                + "\"claimant_or_rep_addressLine1\":\"56 Block C\",\n"
+                + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street\",\n"
+                + "\"claimant_or_rep_addressLine3\":\"\",\n"
+                + "\"claimant_or_rep_town\":\"Manchester\",\n"
+                + "\"claimant_or_rep_county\":\"Lancashire\",\n"
+                + "\"claimant_or_rep_postCode\":\"M3 KJR\",\n"
+                + "\"claimant_reference\":\"1111111\",\n"
+                + "\"claimant_full_name\":\"Mr A J Rodriguez\",\n"
+                + "\"Claimant\":\"Mr A J Rodriguez\",\n"
+                + "\"claimant_addressLine1\":\"34\",\n"
+                + "\"claimant_addressLine2\":\"Low Street\",\n"
+                + "\"claimant_addressLine3\":\"\",\n"
+                + "\"claimant_town\":\"Manchester\",\n"
+                + "\"claimant_county\":\"Lancashire\",\n"
+                + "\"claimant_postCode\":\"M3 6gw\",\n"
+                + "\"respondent_or_rep_full_name\":\"Antonio Vazquez\",\n"
+                + "\"respondent_or_rep_addressLine1\":\"11 Small Street\",\n"
+                + "\"respondent_or_rep_addressLine2\":\"22 House\",\n"
+                + "\"respondent_or_rep_addressLine3\":\"\",\n"
+                + "\"respondent_or_rep_town\":\"Manchester\",\n"
+                + "\"respondent_or_rep_county\":\"North West\",\n"
+                + "\"respondent_or_rep_postCode\":\"M12 42R\",\n"
+                + "\"respondent_full_name\":\"Antonio Vazquez\",\n"
+                + "\"respondent_addressLine1\":\"11 Small Street\",\n"
+                + "\"respondent_addressLine2\":\"22 House\",\n"
+                + "\"respondent_addressLine3\":\"\",\n"
+                + "\"respondent_town\":\"Manchester\",\n"
+                + "\"respondent_county\":\"North West\",\n"
+                + "\"respondent_postCode\":\"M12 42R\",\n"
+                + "\"Respondent\":\"1. Antonio Vazquez\",\n"
+                + "\"resp_others\":\"2. Juan Garcia\\n3. Mike Jordan\",\n"
+                + "\"resp_address\":\"1. 11 Small Street, 22 House, Manchester, North West, M12 42R, "
+                + "UK\\n2. 12 Small Street, 24 House, Manchester, North West, M12 4ED, UK\\n3. 11 Small Street, "
+                + "22 House, Manchester, North West, M12 42R, UK\",\n"
+                + "\"Hearing_date\":\"\",\n"
+                + "\"Hearing_date_time\":\"\",\n"
+                + "\"Hearing_time\":\"\",\n"
+                + "\"Hearing_venue\":\"Manchester Employment Tribunals, "
+                + "Alexandra House, 14-22 The Parsonage, Manchester, M3 2JA\",\n"
+                + "\"Hearing_duration\":\"3 days\",\n"
+                + "\"t1_2\":\"true\",\n"
+                + "\"Court_addressLine1\":\"Manchester Employment Tribunal,\",\n"
+                + "\"Court_addressLine2\":\"Alexandra House,\",\n"
+                + "\"Court_addressLine3\":\"14-22 The Parsonage,\",\n"
+                + "\"Court_town\":\"Manchester,\",\n"
+                + "\"Court_county\":\"\",\n"
+                + "\"Court_postCode\":\"M3 2JA\",\n"
+                + "\"Court_telephone\":\"03577131270\",\n"
+                + "\"Court_fax\":\"07577126570\",\n"
+                + "\"Court_DX\":\"123456\",\n"
+                + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk\",\n"
+                + "\"i1_2_enhmcts\":\"[userImage:enhmcts.png]\",\n"
+                + "\"i1_2_enhmcts1\":\"[userImage:enhmcts.png]\",\n"
+                + "\"i1_2_enhmcts2\":\"[userImage:enhmcts.png]\",\n"
+                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\",\n"
+                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\",\n"
+                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\",\n"
+                + "\"Clerk\":\"Mike Jordan\",\n"
+                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\",\n"
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\",\n"
+                + "\"Case_No\":\"123456\",\n"
+                + "}\n"
+                + "}\n";
+
+        assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails20.getCaseData(), "",
+                userDetails, ENGLANDWALES_CASE_TYPE_ID,
+                caseDetails20.getCaseData().getCorrespondenceType(),
+                caseDetails20.getCaseData().getCorrespondenceScotType(),
+                null, null, venueAddressReaderService).toString());
+    }
+
+    @Test
     public void buildDocumentWithNotContent() {
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
@@ -1756,8 +1842,23 @@ public class DocumentHelperTest {
     }
 
     @Test
+    public void buildDocumentContentScot4() throws URISyntaxException, IOException {
+        when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(ABERDEEN_VENUE_ADDRESS);
+
+        String expectedResult = getExpectedResult("expectedDocumentContentScot4.json");
+        expectedResult = expectedResult.replace("current-date", UtilHelper.formatCurrentDate(LocalDate.now()));
+        expectedResult = expectedResult.replace("plus28",
+                UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28));
+        String actualResult = DocumentHelper.buildDocumentContent(caseDetailsScot4.getCaseData(), "",
+                userDetails, SCOTLAND_CASE_TYPE_ID,
+                caseDetailsScot4.getCaseData().getCorrespondenceType(),
+                caseDetailsScot4.getCaseData().getCorrespondenceScotType(),
+                null, null, venueAddressReaderService).toString();
+        assertEquals(expectedResult, actualResult.trim());
+    }
+
+    @Test
     public void buildScotDocumentTemplates() {
-        CaseDetails caseDetailsTemplates = new CaseDetails();
         CaseData caseData = new CaseData();
         CorrespondenceScotType correspondenceScotType = new CorrespondenceScotType();
         String topLevel = "Part_3_Scot";
@@ -1765,6 +1866,7 @@ public class DocumentHelperTest {
         correspondenceScotType.setTopLevelScotDocuments(topLevel);
         correspondenceScotType.setPart3ScotDocuments(part);
         caseData.setCorrespondenceScotType(correspondenceScotType);
+        CaseDetails caseDetailsTemplates = new CaseDetails();
         caseDetailsTemplates.setCaseData(caseData);
         assertEquals(getJson(topLevel, part), DocumentHelper.buildDocumentContent(caseDetailsTemplates.getCaseData(),
                 "", userDetails, SCOTLAND_CASE_TYPE_ID,
@@ -1847,7 +1949,6 @@ public class DocumentHelperTest {
 
     @Test
     public void buildDocumentTemplates() {
-        CaseDetails caseDetailsTemplates = new CaseDetails();
         CaseData caseData = new CaseData();
         CorrespondenceType correspondenceType = new CorrespondenceType();
         String topLevel = "Part_18";
@@ -1855,6 +1956,7 @@ public class DocumentHelperTest {
         correspondenceType.setTopLevelDocuments(topLevel);
         correspondenceType.setPart18Documents(part);
         caseData.setCorrespondenceType(correspondenceType);
+        CaseDetails caseDetailsTemplates = new CaseDetails();
         caseDetailsTemplates.setCaseData(caseData);
         String result = "{\n"
                 + "\"accessKey\":\"\",\n"
@@ -1990,6 +2092,16 @@ public class DocumentHelperTest {
 
     @Test
     public void buildDocumentContentMultiples() {
+        AddressLabelsAttributesType addressLabelsAttributesType = new AddressLabelsAttributesType();
+        addressLabelsAttributesType.setNumberOfCopies("1");
+        addressLabelsAttributesType.setStartingLabel("2");
+        addressLabelsAttributesType.setShowTelFax("1232312");
+        MultipleData multipleData = new MultipleData();
+        CorrespondenceType correspondenceType = new CorrespondenceType();
+        correspondenceType.setTopLevelDocuments(ADDRESS_LABELS_TEMPLATE);
+        multipleData.setCorrespondenceType(correspondenceType);
+        multipleData.setAddressLabelsAttributesType(addressLabelsAttributesType);
+        multipleData.setAddressLabelCollection(MultipleUtil.getAddressLabelTypeItemList());
         String expected = "{\n"
                 + "\"accessKey\":\"\",\n"
                 + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx\",\n"
@@ -2019,16 +2131,6 @@ public class DocumentHelperTest {
                 + "\"Case_No\":\"123456\",\n"
                 + "}\n"
                 + "}\n";
-        AddressLabelsAttributesType addressLabelsAttributesType = new AddressLabelsAttributesType();
-        addressLabelsAttributesType.setNumberOfCopies("1");
-        addressLabelsAttributesType.setStartingLabel("2");
-        addressLabelsAttributesType.setShowTelFax("1232312");
-        MultipleData multipleData = new MultipleData();
-        CorrespondenceType correspondenceType = new CorrespondenceType();
-        correspondenceType.setTopLevelDocuments(ADDRESS_LABELS_TEMPLATE);
-        multipleData.setCorrespondenceType(correspondenceType);
-        multipleData.setAddressLabelsAttributesType(addressLabelsAttributesType);
-        multipleData.setAddressLabelCollection(MultipleUtil.getAddressLabelTypeItemList());
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails2.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 multipleData.getCorrespondenceType(), multipleData.getCorrespondenceScotType(),
@@ -2047,7 +2149,7 @@ public class DocumentHelperTest {
     @Test
     public void getHearingByNumber() {
         String expectedHearingNumber = "2";
-        String expectedHearing_type = "Single";
+        String expectedHearingType = "Single";
         String expectedHearingVenue = "Manchester";
 
         String correspondenceHearingNumber = "2";
@@ -2055,12 +2157,23 @@ public class DocumentHelperTest {
         assertEquals(expectedHearingNumber,
                 DocumentHelper.getHearingByNumber(caseDetails1.getCaseData().getHearingCollection(),
                         correspondenceHearingNumber).getHearingNumber());
-        assertEquals(expectedHearing_type,
+        assertEquals(expectedHearingType,
                 DocumentHelper.getHearingByNumber(caseDetails1.getCaseData().getHearingCollection(),
                         correspondenceHearingNumber).getHearingType());
         assertEquals(expectedHearingVenue,
                 DocumentHelper.getHearingByNumber(caseDetails1.getCaseData().getHearingCollection(),
                         correspondenceHearingNumber).getHearingVenue().getSelectedLabel());
+    }
+
+    private String getExpectedResult(String resourceFileName) throws URISyntaxException, IOException {
+        String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+                .getResource(resourceFileName)).toURI())));
+        LocalDate currentLocalDate = LocalDate.now();
+        LocalDate currentLocalDatePlus28Days = currentLocalDate.plusDays(28);
+        return expectedJson.replace("current-date-placeholder",
+                        UtilHelper.formatCurrentDate(currentLocalDate))
+                .replace("current-date-plus28-placeholder",
+                        UtilHelper.formatCurrentDate(currentLocalDatePlus28Days));
     }
 
 }

@@ -8,9 +8,19 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.ecm.common.model.reports.claimsbyhearingvenue.ClaimsByHearingVenueCaseData;
+import uk.gov.hmcts.ecm.common.model.reports.claimsbyhearingvenue.ClaimsByHearingVenueSubmitEvent;
+import uk.gov.hmcts.ecm.common.model.reports.eccreport.EccReportCaseData;
+import uk.gov.hmcts.ecm.common.model.reports.eccreport.EccReportSubmitEvent;
+import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeCaseData;
+import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeSubmitEvent;
+import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsSubmitEvent;
 import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReportCaseData;
 import uk.gov.hmcts.ecm.common.model.reports.respondentsreport.RespondentsReportSubmitEvent;
+import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysCaseData;
+import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysSubmitEvent;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -32,10 +42,15 @@ import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport.EccReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype.HearingsByHearingTypeReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeCaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeSearchResult;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.respondentsreport.RespondentsReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays.SessionDaysReportData;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,22 +59,29 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_BY_HEARING_VENUE_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_BY_HEARING_TYPE_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SESSION_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AWAITING_JUDGMENT_REPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ECC_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
@@ -73,6 +95,8 @@ public class ReportDataServiceTest {
     @Spy
     private CaseDetails caseDetails;
     private ListingDetails listingDetails;
+    @Mock
+    private UserService userService;
 
     @Before
     public void setUp() {
@@ -88,8 +112,6 @@ public class ReportDataServiceTest {
         listingDetails.setCaseData(listingData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.setJurisdiction("EMPLOYMENT");
-
-        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         DateListedType dateListedType = new DateListedType();
         dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType.setHearingClerk(new DynamicFixedListType("Clerk"));
@@ -97,10 +119,9 @@ public class ReportDataServiceTest {
         dateListedType.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue"));
         dateListedType.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
         dateListedType.setListedDate("2019-12-12T12:11:00.000");
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setId("123");
         dateListedTypeItem.setValue(dateListedType);
-
-        DateListedTypeItem dateListedTypeItem1 = new DateListedTypeItem();
         DateListedType dateListedType1 = new DateListedType();
         dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType1.setHearingClerk(new DynamicFixedListType("Clerk"));
@@ -108,10 +129,9 @@ public class ReportDataServiceTest {
         dateListedType1.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue"));
         dateListedType1.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
         dateListedType1.setListedDate("2019-12-10T12:11:00.000");
+        DateListedTypeItem dateListedTypeItem1 = new DateListedTypeItem();
         dateListedTypeItem1.setId("124");
         dateListedTypeItem1.setValue(dateListedType1);
-
-        DateListedTypeItem dateListedTypeItem2 = new DateListedTypeItem();
         DateListedType dateListedType2 = new DateListedType();
         dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType2.setHearingClerk(new DynamicFixedListType("Clerk1"));
@@ -120,10 +140,9 @@ public class ReportDataServiceTest {
         dateListedType2.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue2"));
         dateListedType2.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
         dateListedType2.setListedDate("2019-12-12T12:11:30.000");
+        DateListedTypeItem dateListedTypeItem2 = new DateListedTypeItem();
         dateListedTypeItem2.setId("124");
         dateListedTypeItem2.setValue(dateListedType2);
-
-        DateListedTypeItem dateListedTypeItem3 = new DateListedTypeItem();
         DateListedType dateListedType3 = new DateListedType();
         dateListedType3.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType3.setHearingClerk(new DynamicFixedListType("Clerk3"));
@@ -132,24 +151,24 @@ public class ReportDataServiceTest {
         dateListedType3.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue2"));
         dateListedType3.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
         dateListedType3.setListedDate("2019-12-12T12:11:55.000");
+        DateListedTypeItem dateListedTypeItem3 = new DateListedTypeItem();
         dateListedTypeItem3.setId("124");
         dateListedTypeItem3.setValue(dateListedType3);
-
-        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         HearingType hearingType = new HearingType();
-        hearingType.setHearingDateCollection(new ArrayList<>(Arrays.asList(dateListedTypeItem, dateListedTypeItem1, dateListedTypeItem2)));
+        hearingType.setHearingDateCollection(new ArrayList<>(
+                Arrays.asList(dateListedTypeItem, dateListedTypeItem1, dateListedTypeItem2)));
         hearingType.setHearingVenue(new DynamicFixedListType("Aberdeen"));
         hearingType.setHearingEstLengthNum("2");
         hearingType.setHearingEstLengthNumType("hours");
         hearingType.setHearingType(HEARING_TYPE_PERLIMINARY_HEARING);
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setId("12345");
         hearingTypeItem.setValue(hearingType);
-
-        BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
         BFActionType bfActionType = new BFActionType();
         bfActionType.setBfDate("2019-12-10");
         bfActionType.setCleared("020-12-30");
         bfActionType.setAction(BFHelperTest.getBfActionsDynamicFixedList());
+        BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
         bfActionTypeItem.setId("0000");
         bfActionTypeItem.setValue(bfActionType);
         HearingTypeItem hearingTypeItem1 = new HearingTypeItem();
@@ -158,43 +177,38 @@ public class ReportDataServiceTest {
         hearingType1.setHearingType(HEARING_TYPE_PERLIMINARY_HEARING);
         hearingTypeItem1.setId("12345");
         hearingTypeItem1.setValue(hearingType1);
-
-        BFActionTypeItem bfActionTypeItem1 = new BFActionTypeItem();
         BFActionType bfActionType1 = new BFActionType();
         bfActionType1.setBfDate("2019-12-11");
         bfActionType1.setCleared("");
         bfActionType1.setAction(BFHelperTest.getBfActionsDynamicFixedList());
+        BFActionTypeItem bfActionTypeItem1 = new BFActionTypeItem();
         bfActionTypeItem1.setId("111");
         bfActionTypeItem1.setValue(bfActionType1);
-
-        BFActionTypeItem bfActionTypeItem2 = new BFActionTypeItem();
         BFActionType bfActionType2 = new BFActionType();
         bfActionType2.setBfDate("2019-12-12");
         bfActionType2.setCleared("");
         bfActionType2.setAction(BFHelperTest.getBfActionsDynamicFixedList());
+        BFActionTypeItem bfActionTypeItem2 = new BFActionTypeItem();
         bfActionTypeItem2.setId("222");
         bfActionTypeItem2.setValue(bfActionType2);
-
-        BFActionTypeItem bfActionTypeItem3 = new BFActionTypeItem();
         BFActionType bfActionType3 = new BFActionType();
         bfActionType3.setBfDate("2019-12-13");
         bfActionType3.setCleared("");
         bfActionType3.setAction(BFHelperTest.getBfActionsDynamicFixedList());
+        BFActionTypeItem bfActionTypeItem3 = new BFActionTypeItem();
         bfActionTypeItem3.setId("333");
         bfActionTypeItem3.setValue(bfActionType3);
-
-        BFActionTypeItem bfActionTypeItem4 = new BFActionTypeItem();
         BFActionType bfActionType4 = new BFActionType();
         bfActionType4.setBfDate("2019-12-10");
         bfActionType4.setCleared("020-12-30");
         bfActionType4.setNotes("Test0");
+        BFActionTypeItem bfActionTypeItem4 = new BFActionTypeItem();
         bfActionTypeItem4.setId("0000");
         bfActionTypeItem4.setValue(bfActionType4);
-
-        JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
         JurCodesType jurCodesType = new JurCodesType();
         jurCodesType.setJuridictionCodesList("ABC");
         jurCodesType.setJudgmentOutcome(JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING);
+        JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
         jurCodesTypeItem.setId("000");
         jurCodesTypeItem.setValue(jurCodesType);
 
@@ -240,7 +254,8 @@ public class ReportDataServiceTest {
                 List.of(caseDataBuilder.withPositionType("Draft with members")
                         .withHearing("1970-01-01T00:00:00.000", HEARING_STATUS_HEARD)
                         .buildAsSubmitEvent(ACCEPTED_STATE)));
-        var listingDataResult = (CasesAwaitingJudgmentReportData) reportDataService.generateReportData(listingDetails, "authToken");
+        var listingDataResult = (CasesAwaitingJudgmentReportData) reportDataService
+                .generateReportData(listingDetails, "authToken");
         assertEquals("name", listingDataResult.getDocumentName());
         assertEquals(CASES_AWAITING_JUDGMENT_REPORT, listingDataResult.getReportType());
     }
@@ -262,7 +277,8 @@ public class ReportDataServiceTest {
                 .thenReturn(result);
         when(ccdClient.buildAndGetElasticSearchRequestWithRetriesMultiples(anyString(), anyString(), anyString()))
                 .thenReturn(new ArrayList<>());
-        var listingDataResult = (NoPositionChangeReportData) reportDataService.generateReportData(listingDetails, "authToken");
+        var listingDataResult = (NoPositionChangeReportData) reportDataService
+                .generateReportData(listingDetails, "authToken");
         assertEquals("name", listingDataResult.getDocumentName());
         assertEquals(NO_CHANGE_IN_CURRENT_POSITION_REPORT, listingDataResult.getReportType());
         assertEquals("2021-12-12", listingDataResult.getReportDate());
@@ -292,10 +308,33 @@ public class ReportDataServiceTest {
                 .thenReturn(result);
         when(ccdClient.buildAndGetElasticSearchRequestWithRetriesMultiples(anyString(), anyString(), anyString()))
                 .thenReturn(List.of(submitMultipleData));
-        var listingDataResult = (NoPositionChangeReportData) reportDataService.generateReportData(listingDetails, "authToken");
+        var listingDataResult = (NoPositionChangeReportData) reportDataService
+                .generateReportData(listingDetails, "authToken");
         assertEquals("name", listingDataResult.getDocumentName());
         assertEquals(NO_CHANGE_IN_CURRENT_POSITION_REPORT, listingDataResult.getReportType());
         assertEquals("2021-12-12", listingDataResult.getReportDate());
+    }
+
+    @Test
+    public void generateHearingToJudgmentsReportData() throws IOException {
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        listingDetails.getCaseData().setReportType(HEARINGS_TO_JUDGEMENTS_REPORT);
+        listingDetails.getCaseData().setDocumentName("name");
+        listingDetails.getCaseData().setHearingDateType("Ranged");
+        listingDetails.getCaseData().setListingDate("2021-07-13");
+        listingDetails.getCaseData().setListingDateFrom("2021-07-12");
+        listingDetails.getCaseData().setListingDateTo("2021-07-14");
+        when(ccdClient.hearingsToJudgementsSearch(anyString(), anyString(), anyString()))
+                .thenReturn(List.of(new HearingsToJudgmentsSubmitEvent()));
+        var listingDataResult = (HearingsToJudgmentsReportData)reportDataService
+                .generateReportData(listingDetails, "authToken");
+        assertEquals("name", listingDataResult.getDocumentName());
+        assertEquals(HEARINGS_TO_JUDGEMENTS_REPORT, listingDataResult.getReportType());
+        assertEquals("Ranged", listingDataResult.getHearingDateType());
+        assertEquals("2021-07-13", listingDataResult.getListingDate());
+        assertEquals("2021-07-12", listingDataResult.getListingDateFrom());
+        assertEquals("2021-07-14", listingDataResult.getListingDateTo());
     }
 
     @Test
@@ -311,7 +350,8 @@ public class ReportDataServiceTest {
         var submitEvent = new RespondentsReportSubmitEvent();
         submitEvent.setCaseData(new RespondentsReportCaseData());
         when(ccdClient.respondentsReportSearch(anyString(), anyString(), anyString())).thenReturn(List.of(submitEvent));
-        var listingDataResult = (RespondentsReportData) reportDataService.generateReportData(listingDetails, "authToken");
+        var listingDataResult = (RespondentsReportData) reportDataService
+                .generateReportData(listingDetails, "authToken");
         assertEquals("name", listingDataResult.getDocumentName());
         assertEquals(RESPONDENTS_REPORT, listingDataResult.getReportType());
         assertEquals("Ranged", listingDataResult.getHearingDateType());
@@ -319,4 +359,107 @@ public class ReportDataServiceTest {
         assertEquals("2022-01-31", listingDataResult.getListingDateFrom());
         assertEquals("2022-02-08", listingDataResult.getListingDateTo());
     }
+
+    @Test
+    public void generateClaimsByHearingVenueReport() throws IOException {
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        listingDetails.setCaseId("caseId");
+        listingDetails.getCaseData().setReportType(CLAIMS_BY_HEARING_VENUE_REPORT);
+        listingDetails.getCaseData().setDocumentName(CLAIMS_BY_HEARING_VENUE_REPORT);
+        listingDetails.getCaseData().setHearingDateType(RANGE_HEARING_DATE_TYPE);
+        listingDetails.getCaseData().setListingDate("2021-12-15");
+        listingDetails.getCaseData().setListingDateFrom("2021-12-03");
+        listingDetails.getCaseData().setListingDateTo("2021-12-18");
+
+        var submitEvent = new ClaimsByHearingVenueSubmitEvent();
+        submitEvent.setCaseData(new ClaimsByHearingVenueCaseData());
+
+        when(ccdClient.claimsByHearingVenueSearch(anyString(), anyString(), anyString()))
+                .thenReturn(List.of(submitEvent));
+        var userDetails = new UserDetails();
+        when(userService.getUserDetails(anyString())).thenReturn(userDetails);
+
+        var listingDataResult = (ClaimsByHearingVenueReportData) reportDataService.generateReportData(listingDetails,
+                "authToken");
+        assertEquals(CLAIMS_BY_HEARING_VENUE_REPORT, listingDataResult.getDocumentName());
+        assertEquals(CLAIMS_BY_HEARING_VENUE_REPORT, listingDataResult.getReportType());
+        assertEquals(RANGE_HEARING_DATE_TYPE, listingDataResult.getHearingDateType());
+        assertNull(listingDataResult.getListingDate());
+        assertEquals("2021-12-03", listingDataResult.getListingDateFrom());
+        assertEquals("2021-12-18", listingDataResult.getListingDateTo());
+    }
+
+    @Test
+    public void generateSessionDaysReportData() throws IOException {
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        listingDetails.setCaseId("caseId");
+        listingDetails.getCaseData().setReportType(SESSION_DAYS_REPORT);
+        listingDetails.getCaseData().setDocumentName("name");
+        listingDetails.getCaseData().setHearingDateType("Ranged");
+        listingDetails.getCaseData().setListingDate("2021-07-13");
+        listingDetails.getCaseData().setListingDateFrom("2021-07-12");
+        listingDetails.getCaseData().setListingDateTo("2021-07-14");
+        var submitEvent = new SessionDaysSubmitEvent();
+        submitEvent.setCaseData(new SessionDaysCaseData());
+        when(ccdClient.sessionDaysSearch(anyString(), anyString(), anyString())).thenReturn(List.of(submitEvent));
+        var listingDataResult = (SessionDaysReportData)reportDataService
+                .generateReportData(listingDetails, "authToken");
+        assertEquals("name", listingDataResult.getDocumentName());
+        assertEquals(SESSION_DAYS_REPORT, listingDataResult.getReportType());
+        assertEquals("Ranged", listingDataResult.getHearingDateType());
+        assertEquals("2021-07-13", listingDataResult.getListingDate());
+        assertEquals("2021-07-12", listingDataResult.getListingDateFrom());
+        assertEquals("2021-07-14", listingDataResult.getListingDateTo());
+    }
+
+    @Test
+    public void generateEccReportData() throws IOException {
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        listingDetails.setCaseId("caseId");
+        listingDetails.getCaseData().setReportType(ECC_REPORT);
+        listingDetails.getCaseData().setDocumentName("name");
+        listingDetails.getCaseData().setHearingDateType("Ranged");
+        listingDetails.getCaseData().setListingDate("2021-07-13");
+        listingDetails.getCaseData().setListingDateFrom("2021-07-12");
+        listingDetails.getCaseData().setListingDateTo("2021-07-14");
+        var submitEvent = new EccReportSubmitEvent();
+        submitEvent.setCaseData(new EccReportCaseData());
+        when(ccdClient.eccReportSearch(anyString(), anyString(), anyString())).thenReturn(List.of(submitEvent));
+        var listingDataResult = (EccReportData) reportDataService.generateReportData(listingDetails, "authToken");
+        assertEquals("name", listingDataResult.getDocumentName());
+        assertEquals(ECC_REPORT, listingDataResult.getReportType());
+        assertEquals("Ranged", listingDataResult.getHearingDateType());
+        assertEquals("2021-07-13", listingDataResult.getListingDate());
+        assertEquals("2021-07-12", listingDataResult.getListingDateFrom());
+        assertEquals("2021-07-14", listingDataResult.getListingDateTo());
+    }
+
+    @Test
+    public void generateHearingsByHearingTypeReportData() throws IOException {
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        listingDetails.setCaseId("caseId");
+        listingDetails.getCaseData().setReportType(HEARINGS_BY_HEARING_TYPE_REPORT);
+        listingDetails.getCaseData().setDocumentName("name");
+        listingDetails.getCaseData().setHearingDateType("Ranged");
+        listingDetails.getCaseData().setListingDate("2021-07-13");
+        listingDetails.getCaseData().setListingDateFrom("2021-07-12");
+        listingDetails.getCaseData().setListingDateTo("2021-07-14");
+        var submitEvent = new HearingsByHearingTypeSubmitEvent();
+        submitEvent.setCaseData(new HearingsByHearingTypeCaseData());
+        when(ccdClient.hearingsByHearingTypeSearch(anyString(), anyString(), anyString()))
+                .thenReturn(List.of(submitEvent));
+        var listingDataResult = (HearingsByHearingTypeReportData)reportDataService
+                .generateReportData(listingDetails, "authToken");
+        assertEquals("name", listingDataResult.getDocumentName());
+        assertEquals(HEARINGS_BY_HEARING_TYPE_REPORT, listingDataResult.getReportType());
+        assertEquals("Ranged", listingDataResult.getHearingDateType());
+        assertEquals("2021-07-13", listingDataResult.getListingDate());
+        assertEquals("2021-07-12", listingDataResult.getListingDateFrom());
+        assertEquals("2021-07-14", listingDataResult.getListingDateTo());
+    }
+
 }

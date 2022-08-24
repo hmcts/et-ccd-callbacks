@@ -39,7 +39,8 @@ public class BulkAddSinglesControllerTest {
     @Test
     public void shouldHandleInvalidTokenForValidation() {
         when(verifyTokenService.verifyTokenSignature(authToken)).thenReturn(false);
-        var response = bulkAddSinglesController.bulkAddSingleCasesImportFileMidEventValidation(multipleRequest,
+        ResponseEntity<MultipleCallbackResponse> response =
+                bulkAddSinglesController.bulkAddSingleCasesImportFileMidEventValidation(multipleRequest,
                 authToken);
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
@@ -47,31 +48,34 @@ public class BulkAddSinglesControllerTest {
     @Test
     public void shouldHandleInvalidTokenForCallback() {
         when(verifyTokenService.verifyTokenSignature(authToken)).thenReturn(false);
-        var response = bulkAddSinglesController.bulkAddSingleCasesToMultiple(multipleRequest, authToken);
+        ResponseEntity<MultipleCallbackResponse> response =
+                bulkAddSinglesController.bulkAddSingleCasesToMultiple(multipleRequest, authToken);
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
     public void shouldReturnValidationResponse() {
         when(verifyTokenService.verifyTokenSignature(authToken)).thenReturn(true);
-        var multipleDetails = mock(MultipleDetails.class);
+        MultipleDetails multipleDetails = mock(MultipleDetails.class);
         when(multipleRequest.getCaseDetails()).thenReturn(multipleDetails);
-        var errors = List.of("Error 1", "Error 2", "Error 3");
+        List<String> errors = List.of("Error 1", "Error 2", "Error 3");
         when(bulkAddSinglesValidator.validate(multipleDetails, authToken)).thenReturn(errors);
 
-        var response = bulkAddSinglesController.bulkAddSingleCasesImportFileMidEventValidation(multipleRequest, authToken);
+        ResponseEntity<MultipleCallbackResponse> response = bulkAddSinglesController
+                .bulkAddSingleCasesImportFileMidEventValidation(multipleRequest, authToken);
         verifyResponse(response);
     }
 
     @Test
     public void shouldReturnCallbackResponse() {
         when(verifyTokenService.verifyTokenSignature(authToken)).thenReturn(true);
-        var multipleDetails = mock(MultipleDetails.class);
+        MultipleDetails multipleDetails = mock(MultipleDetails.class);
         when(multipleRequest.getCaseDetails()).thenReturn(multipleDetails);
-        var errors = List.of("Error 1", "Error 2", "Error 3");
+        List<String> errors = List.of("Error 1", "Error 2", "Error 3");
         when(bulkAddSinglesService.execute(multipleDetails, authToken)).thenReturn(errors);
 
-        var response = bulkAddSinglesController.bulkAddSingleCasesToMultiple(multipleRequest, authToken);
+        ResponseEntity<MultipleCallbackResponse> response =
+                bulkAddSinglesController.bulkAddSingleCasesToMultiple(multipleRequest, authToken);
         verifyResponse(response);
     }
 

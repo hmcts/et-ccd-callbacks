@@ -370,11 +370,21 @@ wrapper {
 
 bootWithCCD {
     // Simulates idam and s2s locally.
+    // See rse-cft-lib/LibRunnerTask
     authMode = uk.gov.hmcts.rse.AuthMode.Local
-    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos'
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,evidence'
 
+    // ccd-data-store-api
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,aac_manage_case_assignment,ccd_case_document_am_api,am_role_assignment_service,et_cos,et_msg_handler'
-    environment 'SERVICES_CCD_ACTIVITY_API', 'http://localhost:4452'
+
+    // ccd-case-document-am-api
+    environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
+
+    // xui-manage-cases
+    environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'
+    environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
     environment 'XUI_LD_ID', System.getenv('XUI_LD_ID')
+
+    // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'
 }

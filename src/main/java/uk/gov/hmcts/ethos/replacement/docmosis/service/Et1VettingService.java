@@ -382,7 +382,7 @@ public class Et1VettingService {
     public DocumentInfo generateEt1VettingDocument(CaseData caseData, String userToken, String caseTypeId) {
         try {
             return tornadoService.generateEventDocument(caseData, userToken,
-                    caseTypeId, "ET1Vetting.pdf");
+                    caseTypeId, "ET1 Vetting.pdf");
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }

@@ -16,7 +16,9 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3VettingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
@@ -54,6 +56,10 @@ class Et3VettingControllerTest {
     private WebApplicationContext applicationContext;
     @MockBean
     private VerifyTokenService verifyTokenService;
+    @MockBean
+    private DocumentManagementService documentManagementService;
+    @MockBean
+    private TornadoService tornadoService;
     private MockMvc mvc;
     private CCDRequest ccdRequest;
 

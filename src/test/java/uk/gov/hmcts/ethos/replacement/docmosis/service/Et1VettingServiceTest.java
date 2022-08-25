@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
@@ -21,15 +22,21 @@ import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice.JpaVenueService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.LEEDS;
 import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.MANCHESTER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_OPEN;
 
 @ExtendWith(SpringExtension.class)
@@ -39,9 +46,13 @@ class Et1VettingServiceTest {
     private Et1VettingService et1VettingService;
 
     private CaseDetails caseDetails;
+    private DocumentInfo documentInfo;
 
     @Mock
     private JpaVenueService jpaVenueService;
+
+    @Mock
+    private TornadoService tornadoService;
 
     private static final String ET1_DOC_TYPE = "ET1";
     private static final String ACAS_DOC_TYPE = "ACAS Certificate";
@@ -153,7 +164,7 @@ class Et1VettingServiceTest {
 
     @BeforeEach
     void setUp() {
-        et1VettingService = new Et1VettingService(jpaVenueService);
+        et1VettingService = new Et1VettingService(tornadoService, jpaVenueService);
         caseDetails = CaseDataBuilder.builder()
             .withClaimantIndType("Doris", "Johnson")
             .withClaimantType("232 Petticoat Square", "3 House", null,
@@ -372,6 +383,23 @@ class Et1VettingServiceTest {
             .isEqualTo(expectedOfficeLocation);
         assertThat(caseData.getRegionalOffice())
             .isEqualTo(expectedRegionalOffice);
+    }
+
+    @Test
+    void generateEt1VettingDocument() throws IOException {
+        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
+                anyString(), anyString())).thenReturn(documentInfo);
+        DocumentInfo documentInfo1 = et1VettingService.generateEt1VettingDocument(new CaseData(), "userToken",
+                ENGLANDWALES_CASE_TYPE_ID);
+        assertThat(documentInfo).isEqualTo(documentInfo1);
+    }
+
+    @Test
+    void generateEt1VettingDocumentExceptions() throws IOException {
+        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
+                anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
+        assertThrows(Exception.class, () -> et1VettingService.generateEt1VettingDocument(new CaseData(), "userToken",
+                ENGLANDWALES_CASE_TYPE_ID));
     }
 
     @Test

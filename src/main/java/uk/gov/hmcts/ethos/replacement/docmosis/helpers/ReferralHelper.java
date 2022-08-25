@@ -34,7 +34,7 @@ public final class ReferralHelper {
     private static final String JUDGE_ROLE_ENG = "caseworker-employment-etjudge-englandwales";
     private static final String JUDGE_ROLE_SCOT = "caseworker-employment-etjudge-scotland";
     private static final String GUIDANCE_DOC_LINK = "<hr>To help you complete this form, open the "
-        + "<a href=\"url\">referral guidance documents</a>";
+        + "<a href=\"url\" target=\"_blank\">referral guidance documents</a>";
     private static final String HEARING_DETAILS = "<hr><h3>Hearing details %s</h3>"
         + "<pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Hearing &#09&#09&#09&#09&nbsp; %s"
@@ -48,9 +48,7 @@ public final class ReferralHelper {
         + "<br><br>Referral date &#09&#09&#09&#09&#09&#09&#09&#09&#09 %s"
         + "<br><br>Next hearing date &#09&#09&#09&#09&#09&#09&#09 %s"
         + "<br><br>Referral subject &#09&#09&#09&#09&#09&#09&#09&#09 %s"
-        + "<br><br>Details of the referral &#09&#09&#09&#09&#09&#09 %s"
-        + "<br><br>Documents &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
-        + "<br><br>Recommended instructions &nbsp;&#09&#09&#09&nbsp; %s</pre><hr>";
+        + "<br><br>Details of the referral &#09&#09&#09&#09&#09&#09 %s%s%s</pre><hr>";
 
     private static final String REPLY_DETAILS = "<h3>Reply %s</h3>"
         + "<pre>Reply by &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 %s"
@@ -66,6 +64,8 @@ public final class ReferralHelper {
         + " <a href=\"%s\" download>%s</a>&nbsp;";
 
     private static final String GENERAL_NOTES = "<br><br>General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 %s";
+
+    private static final String INSTRUCTIONS = "<br><br>Recommended instructions &nbsp;&#09&#09&#09&nbsp; %s";
 
     /**
      * Checks to see if the user is a judge.
@@ -130,7 +130,7 @@ public final class ReferralHelper {
             referral.getReferentEmail(), referral.getIsUrgent(), referral.getReferralDate(),
             getNearestHearingToReferral(caseData),
             referral.getReferralSubject(), referral.getReferralDetails(), referralDocLink,
-            referral.getReferralInstruction());
+            createReferralInstructions(referral.getReferralInstruction()));
     }
 
     private static String populateReplyDetails(CaseData caseData) {
@@ -150,6 +150,13 @@ public final class ReferralHelper {
                 r.getValue().getDirectionDetails(), createDocLinkFromCollection(r.getValue().getReplyDocument()),
                 createGeneralNotes(r.getValue().getReplyGeneralNotes())))
             .collect(Collectors.joining());
+    }
+
+    private static String createReferralInstructions(String instructions) {
+        if (instructions == null) {
+            return "";
+        }
+        return String.format(INSTRUCTIONS, instructions);
     }
 
     private static String createGeneralNotes(String notes) {
@@ -232,21 +239,18 @@ public final class ReferralHelper {
             return "None";
         }
 
-        Date hearingStartDate;
         try {
-            hearingStartDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(earliestFutureHearingDate);
+            Date hearingStartDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(earliestFutureHearingDate);
+            return new SimpleDateFormat("dd MMM yyyy").format(hearingStartDate);
         } catch (ParseException e) {
             log.info("Failed to parse hearing date when creating new referral");
             return "None";
         }
-
-        return new SimpleDateFormat("dd MMM yyyy").format(hearingStartDate);
     }
 
     /**
      * Resets the case data fields relating to creating a referral so that they won't be auto populated when
-     * creating
-     * a new referral.
+     * creating a new referral.
      * @param caseData contains all the case data
      */
     public static void clearReferralDataFromCaseData(CaseData caseData) {
@@ -294,14 +298,15 @@ public final class ReferralHelper {
 
         referralReply.setReplyBy(userFullName);
         referralReply.setReplyDate(Helper.getCurrentDate());
-        referralReply.setDirectionTo(caseData.getDirectionTo() != null 
-            ? caseData.getDirectionTo() : caseData.getReplyTo());        
         referralReply.setReplyToEmailAddress(caseData.getReplyToEmailAddress());
         referralReply.setIsUrgentReply(caseData.getIsUrgentReply());
-        referralReply.setDirectionDetails(caseData.getDirectionDetails() != null
-            ? caseData.getDirectionDetails() : caseData.getReplyDetails());
         referralReply.setReplyDocument(caseData.getReplyDocument());
         referralReply.setReplyGeneralNotes(caseData.getReplyGeneralNotes());
+        referralReply.setDirectionTo(caseData.getDirectionTo() != null
+            ? caseData.getDirectionTo() : caseData.getReplyTo());
+
+        referralReply.setDirectionDetails(caseData.getDirectionDetails() != null
+            ? caseData.getDirectionDetails() : caseData.getReplyDetails());
 
         ReferralReplyTypeItem referralReplyTypeItem = new ReferralReplyTypeItem();
         referralReplyTypeItem.setId(UUID.randomUUID().toString());
@@ -316,8 +321,7 @@ public final class ReferralHelper {
 
     /**
      * Resets the case data fields relating to replying to a referral so that they won't be auto populated when
-     * creating
-     * a new referral.
+     * creating a new referral.
      * @param caseData contains all the case data
      */
     public static void clearReferralReplyDataFromCaseData(CaseData caseData) {
@@ -334,8 +338,7 @@ public final class ReferralHelper {
 
     /**
      * Resets the case data fields relating to closing a referral so that they won't be auto populated when
-     * creating
-     * a new referral.
+     * creating a new referral.
      * @param caseData contains all the case data
      */
     public static void clearCloseReferralDataFromCaseData(CaseData caseData) {

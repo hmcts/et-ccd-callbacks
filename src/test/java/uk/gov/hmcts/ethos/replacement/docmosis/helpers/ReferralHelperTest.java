@@ -6,10 +6,14 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -38,58 +42,64 @@ class ReferralHelperTest {
     private static final String TRUE = "True";
     private static final String FALSE = "False";
 
-    private final String expectedSingleHearingDetails = "<hr>To help you complete this form, open the <a href=\"url\">"
-        + "referral guidance documents</a><hr><h3>Hearing details </h3><pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp; 25 "
-        + "December 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#09&#09&#09"
-        + " N/A</pre><hr>";
+    private final String expectedSingleHearingDetails = "<hr>To help you complete this form, open the <a href=\"url\" "
+        + "target=\"_blank\">referral guidance documents</a><hr><h3>Hearing details </h3><pre>Date &nbsp;&#09&#09&#09&#"
+        + "09&#09&nbsp; 25 December 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#0"
+        + "9&#09&#09 N/A</pre><hr>";
 
-    private final String expectedMultipleHearingDetails = "<hr>To help you complete this form, open the <a href="
-        + "\"url\">referral guidance documents</a><hr><h3>Hearing details 1</h3><pre>Date &nbsp;&#09&#09&#09&#09&#0"
-        + "9&nbsp; 25 December 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#0"
+    private final String expectedMultipleHearingDetails = "<hr>To help you complete this form, open the <a href=\"url\""
+        + " target=\"_blank\">referral guidance documents</a><hr><h3>Hearing details 1</h3><pre>Date &nbsp;&#09&#09&#0"
+        + "9&#09&#09&nbsp; 25 December 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#0"
         + "9&#09&#09&#09 N/A</pre><hr><h3>Hearing details 2</h3><pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp; 26 December"
-        + " 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#09&#09&#09 N/A<"
-        + "/pre><hr>";
+        + " 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#09&#09&#09 N/A</pre><hr>";
 
-    private final String expectedHearingReferralDetailsSingleReply = "<h3>Referral</h3><pre>Referred by &nbsp;&#0"
-        + "9&#09&#09&#"
-        + "09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp"
-        + "; null<br><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Urgent &nbsp;&#09&#09&"
-        + "#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referral date &#09&#09&#09&#09&#09&#09&#09&#09&#09 nu"
-        + "ll<br><br>Next hearing date &#09&#09&#09&#09&#09&#09&#09 None<br><br>Referral subject &#09&#09&#09&#09&#09&"
-        + "#09&#09&#09 null<br><br>Details of the referral &#09&#09&#09&#09&#09&#09 null<br><br>Documents &nbsp;&nbsp;"
-        + "&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; <br><br>Recommended instructions &nbsp;&#09&#09&#09&nbsp; null</"
-        + "pre><hr><h3>Reply </h3><pre>Reply by &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 replyBy<br><br>Re"
-        + "ply to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 directionTo<br><br>Email address &nbsp;&#09&#09"
-        + "&#09&#09&#09&#09&#09&#09 replyToEmail<br><br>Urgent &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 isUr"
+    private final String expectedHearingReferralDetailsSingleReply = "<hr>To help you complete this form, open the <a"
+        + " href=\"url\" target=\"_blank\">referral guidance documents</a><hr><h3>Hearing details </h3><pre>Date &nbs"
+        + "p;&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&nbsp; null<br><br>Type &nbsp"
+        + ";&nbsp;&#09&#09&#09&#09&#09 N/A</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09&#09&#09&"
+        + "#09&#09&#09&nbsp; null<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><"
+        + "br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Urgent &nbsp;&#09&#09&#09&#09&#0"
+        + "9&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referral date &#09&#09&#09&#09&#09&#09&#09&#09&#09 null<br><br"
+        + ">Next hearing date &#09&#09&#09&#09&#09&#09&#09 11 Nov 2030<br><br>Referral subject &#09&#09&#09&#09&#09&#"
+        + "09&#09&#09 null<br><br>Details of the referral &#09&#09&#09&#09&#09&#09 null<br><br>Documents &nbsp;&#09&"
+        + "#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;<br><br>Documents &n"
+        + "bsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;</pre><hr>"
+        + "<h3>Reply </h3><pre>Reply by &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 replyBy<br><br>Reply to &"
+        + "nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 directionTo<br><br>Email address &nbsp;&#09&#09&#09&#0"
+        + "9&#09&#09&#09&#09 replyToEmail<br><br>Urgent &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 isUrgent<b"
+        + "r><br>Referral date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyDate<br><br>Hearing date &nbsp;&nbsp"
+        + ";&#09&#09&#09&#09&#09&#09&#09&#09 11 Nov 2030<br><br>Referral subject &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&"
+        + "#09 null<br><br>Directions &nbsp;&nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 details<br><br>Documents "
+        + "&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;<br><br>"
+        + "General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr>";
+
+    private final String expectedHearingReferralDetailsMultipleReplies = "<hr>To help you complete this form, open the"
+        + " <a href=\"url\" target=\"_blank\">referral guidance documents</a><hr><h3>Hearing details </h3><pre>Date &"
+        + "nbsp;&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&nbsp; null<br><br>Type &n"
+        + "bsp;&nbsp;&#09&#09&#09&#09&#09 N/A</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09&#09&#"
+        + "09&#09&#09&#09&nbsp; null<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<b"
+        + "r><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Urgent &nbsp;&#09&#09&#09&#09"
+        + "&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referral date &#09&#09&#09&#09&#09&#09&#09&#09&#09 null<br>"
+        + "<br>Next hearing date &#09&#09&#09&#09&#09&#09&#09 11 Nov 2030<br><br>Referral subject &#09&#09&#09&#09&#0"
+        + "9&#09&#09&#09 null<br><br>Details of the referral &#09&#09&#09&#09&#09&#09 null<br><br>Documents &nbsp;&#0"
+        + "9&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;<br><br>Documents"
+        + " &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;</pre>"
+        + "<hr><h3>Reply 1</h3><pre>Reply by &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 replyBy<br><br>Repl"
+        + "y to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 directionTo<br><br>Email address &nbsp;&#09&#09&"
+        + "#09&#09&#09&#09&#09&#09 replyToEmail<br><br>Urgent &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 isUr"
         + "gent<br><br>Referral date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyDate<br><br>Hearing date &nbsp;"
-        + "&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 None<br><br>Referral subject &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09"
-        + " null<br><br>Directions &nbsp;&nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 details<br><br>Documents &nbs"
-        + "p;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>null</a>&nbsp;<br><br>General notes "
-        + "&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr>";
-
-    private final String expectedHearingReferralDetailsMultipleReplies = "<h3>Referral</h3><pre>Referred by &nbsp"
-        + ";&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#"
-        + "09&#09&#09&nbsp; null<br><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Urgent"
-        + " &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referral date &#09&#09&#09&#09&#09&#"
-        + "09&#09&#09&#09 null<br><br>Next hearing date &#09&#09&#09&#09&#09&#09&#09 None<br><br>Referral subject &#09"
-        + "&#09&#09&#09&#09&#09&#09&#09 null<br><br>Details of the referral &#09&#09&#09&#09&#09&#09 null<br><br>Docume"
-        + "nts &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; <br><br>Recommended instructions &nbsp;&#09&#09"
-        + "&#09&nbsp; null</pre><hr><h3>Reply 1</h3><pre>Reply by &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#0"
-        + "9 replyBy<br><br>Reply to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 directionTo<br><br>Email ad"
-        + "dress &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyToEmail<br><br>Urgent &nbsp;&#09&#09&#09&#09&#09&#09&#09"
-        + "&#09&#09&#09&#09 isUrgent<br><br>Referral date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyDate<br><"
-        + "br>Hearing date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 None<br><br>Referral subject &nbsp;&nbsp;&#09"
-        + "&#09&#09&#09&#09&#09&#09 null<br><br>Directions &nbsp;&nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 det"
-        + "ails<br><br>Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>null</a>"
-        + "&nbsp;<br><br>General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr><h3>Reply 2</h3><pr"
-        + "e>Reply by &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 replyBy<br><br>Reply to &nbsp;&nbsp;&#09&#"
-        + "09&#09&#09&#09&#09&#09&#09&#09&#09 directionTo<br><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 "
-        + "replyToEmail<br><br>Urgent &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 isUrgent<br><br>Referral dat"
-        + "e &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyDate<br><br>Hearing date &nbsp;&nbsp;&#09&#09&#09&#09&#"
-        + "09&#09&#09&#09 None<br><br>Referral subject &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09 null<br><br>Directions"
-        + " &nbsp;&nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 details<br><br>Documents &nbsp;&#09&#09&#09&#09&#09"
-        + "&#09&#09&#09&#09 <a href=\"/documents/\" download>null</a>&nbsp;<br><br>General notes &nbsp;&#09&#09&#09&#09"
-        + "&#09&#09&#09&#09 replyNotes</pre><hr>";
+        + "&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 11 Nov 2030<br><br>Referral subject &nbsp;&nbsp;&#09&#09&#09&#09&#0"
+        + "9&#09&#09 null<br><br>Directions &nbsp;&nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 details<br><br>Doc"
+        + "uments &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;<"
+        + "br><br>General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr><h3>Reply 2</h3><pre>Repl"
+        + "y by &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 replyBy<br><br>Reply to &nbsp;&nbsp;&#09&#09&#09"
+        + "&#09&#09&#09&#09&#09&#09&#09 directionTo<br><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 reply"
+        + "ToEmail<br><br>Urgent &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 isUrgent<br><br>Referral date &nb"
+        + "sp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyDate<br><br>Hearing date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#0"
+        + "9&#09&#09 11 Nov 2030<br><br>Referral subject &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09 null<br><br>Directi"
+        + "ons &nbsp;&nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 details<br><br>Documents &nbsp;&#09&#09&#09&#0"
+        + "9&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;<br><br>General notes &nbsp;&"
+        + "#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr>";
 
     private final String expectedCreatedReferralReply = "ReferralReplyType(directionTo=directionTo, replyToEmailAddre"
         + "ss=replyTo, isUrgentReply=isUrgent, directionDetails=directionDetails, replyDocument=null, replyGeneralNot"
@@ -106,6 +116,7 @@ class ReferralHelperTest {
         when(userService.getUserDetails("")).thenReturn(userDetails);
         caseData = CaseDataBuilder.builder().build();
         caseData.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
+        addHearingToCaseData(caseData);
     }
 
     @Test
@@ -150,15 +161,16 @@ class ReferralHelperTest {
 
         ReferralHelper.createReferral(caseData, "Judge Judy");
 
-        String expected = "ReferralType(referralNumber=1, referralHearingDate=None, referCaseTo=Judge Judy, referentE"
+        String expected = "ReferralType(referralNumber=1, referralHearingDate=11 Nov 2030, referCaseTo=Judge Judy, re"
+            + "ferentE"
             + "mail=judge.judy@aol.com, isUrgent=Yes, referralSubject=Subject line here, referralSubjectSpecify=Cust"
             + "om subject line, referralDetails=This is an explanation, referralDocument=[DocumentTypeItem(id=1, value"
             + "=DocumentType(typeOfDocument=null, uploadedDocument=UploadedDocumentType(documentBinaryUrl=binaryUrl/d"
-            + "ocuments/, documentFilename=null, documentUrl=null), ownerDocument=null, creationDate=null, shortDescri"
-            + "ption=null)), DocumentTypeItem(id=2, value=DocumentType(typeOfDocument=null, uploadedDocument=UploadedD"
-            + "ocumentType(documentBinaryUrl=binaryUrl/documents/, documentFilename=null, documentUrl=null), ownerDocu"
-            + "ment=null, creationDate=null, shortDescription=null))], referralInstruction=Custom instructions for ju"
-            + "dge, referredBy=Judge Judy, referralDate="
+            + "ocuments/, documentFilename=testFileName, documentUrl=null), ownerDocument=null, creationDate=null, sho"
+            + "rtDescription=null)), DocumentTypeItem(id=2, value=DocumentType(typeOfDocument=null, uploadedDocument=U"
+            + "ploadedDocumentType(documentBinaryUrl=binaryUrl/documents/, documentFilename=testFileName, documentUrl="
+            + "null), ownerDocument=null, creationDate=null, shortDescription=null))], referralInstruction=Custom inst"
+            + "ructions for judge, referredBy=Judge Judy, referralDate="
             + Helper.getCurrentDate()
             + ", referralStatus=Awaiting instructions, referralRep"
             + "lyCollection=null)";
@@ -238,6 +250,7 @@ class ReferralHelperTest {
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         ReferralType referral = new ReferralType();
         referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1")));
+        referral.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId("1");
         referralTypeItem.setValue(referral);
@@ -253,6 +266,7 @@ class ReferralHelperTest {
         ReferralType referral = new ReferralType();
         referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1"),
             createReferralReplyTypeItem("2")));
+        referral.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId("1");
         referralTypeItem.setValue(referral);
@@ -345,6 +359,7 @@ class ReferralHelperTest {
         DocumentType documentType = new DocumentType();
         documentType.setUploadedDocument(new UploadedDocumentType());
         documentType.getUploadedDocument().setDocumentBinaryUrl("binaryUrl/documents/");
+        documentType.getUploadedDocument().setDocumentFilename("testFileName");
         DocumentTypeItem document = new DocumentTypeItem();
         document.setId(id);
         document.setValue(documentType);
@@ -366,4 +381,20 @@ class ReferralHelperTest {
         referralReplyTypeItem.setValue(referralReplyType);
         return referralReplyTypeItem;
     }
+
+    private static void addHearingToCaseData(CaseData caseData) {
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingNumber("1");
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("Manchester", "Manchester")));
+        dateListedType.setListedDate("2030-11-11T00:00:00.000");
+        dateListedType.setHearingStatus("Listed");
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setValue(dateListedType);
+        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        hearingTypeItem.setValue(hearingType);
+        caseData.setHearingCollection(List.of(hearingTypeItem));
+    }
+
 }

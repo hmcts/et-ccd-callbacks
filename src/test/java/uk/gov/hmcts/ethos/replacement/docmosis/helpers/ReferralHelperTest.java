@@ -31,7 +31,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POST
 class ReferralHelperTest {
 
     private UserService userService;
-    private ReferralHelper referralHelper;
     private CaseData caseData;
 
     private static final String JUDGE_ROLE_ENG = "caseworker-employment-etjudge-englandwales";
@@ -94,7 +93,7 @@ class ReferralHelperTest {
 
     private final String expectedCreatedReferralReply = "ReferralReplyType(directionTo=directionTo, replyToEmailAddre"
         + "ss=replyTo, isUrgentReply=isUrgent, directionDetails=directionDetails, replyDocument=null, replyGeneralNot"
-        + "es=generalNotes, replyBy=Judge Alex, replyDate=24 Aug 2022)";
+        + "es=generalNotes, replyBy=Judge Alex, replyDate=" + Helper.getCurrentDate() + ")";
 
     @BeforeEach
     void setUp() {
@@ -105,7 +104,6 @@ class ReferralHelperTest {
         userDetails.setEmail("judge.judy@aol.com");
         userDetails.setRoles(new ArrayList<>(Arrays.asList(JUDGE_ROLE_ENG, JUDGE_ROLE_SCOT)));
         when(userService.getUserDetails("")).thenReturn(userDetails);
-        referralHelper = new ReferralHelper(userService);
         caseData = CaseDataBuilder.builder().build();
         caseData.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
     }
@@ -119,7 +117,7 @@ class ReferralHelperTest {
                 HEARING_STATUS_POSTPONED, false)
             .build();
 
-        assertThat(referralHelper.populateHearingDetails(caseData))
+        assertThat(ReferralHelper.populateHearingDetails(caseData))
             .isEqualTo(expectedSingleHearingDetails);
     }
 
@@ -136,7 +134,7 @@ class ReferralHelperTest {
                 HEARING_STATUS_HEARD, false)
             .build();
 
-        assertThat(referralHelper.populateHearingDetails(caseData))
+        assertThat(ReferralHelper.populateHearingDetails(caseData))
             .isEqualTo(expectedMultipleHearingDetails);
     }
 
@@ -150,7 +148,7 @@ class ReferralHelperTest {
         caseData.setReferralDetails("This is an explanation");
         caseData.setReferralInstruction("Custom instructions for judge");
 
-        referralHelper.createReferral(caseData, "Judge Judy");
+        ReferralHelper.createReferral(caseData, "Judge Judy");
 
         String expected = "ReferralType(referralNumber=1, referralHearingDate=None, referCaseTo=Judge Judy, referentE"
             + "mail=judge.judy@aol.com, isUrgent=Yes, referralSubject=Subject line here, referralSubjectSpecify=Cust"
@@ -171,15 +169,15 @@ class ReferralHelperTest {
 
     @Test
     void addNewReferralToReferralCollection() {
-        referralHelper.createReferral(caseData, "");
-        referralHelper.createReferral(caseData, "");
+        ReferralHelper.createReferral(caseData, "");
+        ReferralHelper.createReferral(caseData, "");
 
         assertEquals(2, caseData.getReferralCollection().size());
     }
 
     @Test
     void saveTheUserDetailsOfTheReferrerWithTheReferral() {
-        referralHelper.createReferral(caseData, "Judge Judy");
+        ReferralHelper.createReferral(caseData, "Judge Judy");
 
         String referredBy = caseData.getReferralCollection().get(0).getValue().getReferredBy();
 
@@ -195,7 +193,7 @@ class ReferralHelperTest {
         caseData.setReferralDetails("This is an explanation");
         caseData.setReferralInstruction("Custom instructions for judge");
 
-        referralHelper.createReferral(caseData, "");
+        ReferralHelper.createReferral(caseData, "");
 
         assertNull(caseData.getReferCaseTo());
         assertNull(caseData.getIsUrgent());
@@ -208,7 +206,7 @@ class ReferralHelperTest {
 
     @Test
     void whenCalledWithNoReferrals_ReturnEmptyDropdown() {
-        referralHelper.populateSelectReferralDropdown(caseData);
+        ReferralHelper.populateSelectReferralDropdown(caseData);
 
         assertNull(caseData.getSelectReferral());
     }
@@ -216,7 +214,7 @@ class ReferralHelperTest {
     @Test
     void whenCalledWithOneReferral_ReturnOneDropdownItem() {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
-        caseData.setSelectReferral(referralHelper.populateSelectReferralDropdown(caseData));
+        caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData));
         assertEquals(1, caseData.getSelectReferral().getListItems().size());
     }
 
@@ -224,17 +222,15 @@ class ReferralHelperTest {
     void whenCalledWithMultipleReferrals_ReturnMultipleDropdownItems() {
         ReferralTypeItem referralTypeItem = createReferralTypeItem();
         caseData.setReferralCollection(List.of(referralTypeItem, referralTypeItem, referralTypeItem));
-        caseData.setSelectReferral(referralHelper.populateSelectReferralDropdown(caseData));
+        caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData));
         assertEquals(3, caseData.getSelectReferral().getListItems().size());
     }
 
     @Test
     void isJudge() {
-        assertEquals(TRUE, referralHelper.isJudge(""));
-        UserDetails userDetails = new UserDetails();
-        userDetails.setRoles(new ArrayList<>());
-        when(userService.getUserDetails("")).thenReturn(userDetails);
-        assertEquals(FALSE, referralHelper.isJudge(""));
+        assertEquals(TRUE, ReferralHelper.isJudge(Arrays.asList(JUDGE_ROLE_ENG)));
+        assertEquals(TRUE, ReferralHelper.isJudge(Arrays.asList(JUDGE_ROLE_SCOT)));
+        assertEquals(FALSE, ReferralHelper.isJudge(Arrays.asList()));
     }
 
     @Test
@@ -248,7 +244,7 @@ class ReferralHelperTest {
         caseData.setReferralCollection(List.of(referralTypeItem));
 
         assertEquals(expectedHearingReferralDetailsSingleReply,
-            referralHelper.populateHearingReferralDetails(caseData));
+            ReferralHelper.populateHearingReferralDetails(caseData));
     }
 
     @Test
@@ -263,13 +259,13 @@ class ReferralHelperTest {
         caseData.setReferralCollection(List.of(referralTypeItem));
 
         assertEquals(expectedHearingReferralDetailsMultipleReplies,
-            referralHelper.populateHearingReferralDetails(caseData));
+            ReferralHelper.populateHearingReferralDetails(caseData));
     }
 
     @Test
     void clearReferralReplyDataFromCaseData() {
         setReferralReplyData();
-        referralHelper.clearReferralReplyDataFromCaseData(caseData);
+        ReferralHelper.clearReferralReplyDataFromCaseData(caseData);
 
         assertNull(caseData.getHearingAndReferralDetails());
         assertNull(caseData.getDirectionTo());
@@ -284,13 +280,13 @@ class ReferralHelperTest {
     @Test
     void createReferralReply() {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
-        DynamicFixedListType selectReferralList = referralHelper.populateSelectReferralDropdown(caseData);
+        DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData);
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);
         setReferralReplyData();
 
-        referralHelper.createReferralReply(caseData, "Judge Alex");
+        ReferralHelper.createReferralReply(caseData, "Judge Alex");
 
         assertEquals(expectedCreatedReferralReply,
             caseData.getReferralCollection().get(0).getValue()
@@ -303,8 +299,8 @@ class ReferralHelperTest {
         caseData.setCloseReferralHearingDetails("hearingDetails");
         caseData.setConfirmCloseReferral(new ArrayList<>());
         caseData.setCloseReferralGeneralNotes("generalNotes");
-        
-        referralHelper.clearCloseReferralDataFromCaseData(caseData);
+
+        ReferralHelper.clearCloseReferralDataFromCaseData(caseData);
         
         assertNull(caseData.getSelectReferral());
         assertNull(caseData.getCloseReferralHearingDetails());
@@ -315,12 +311,12 @@ class ReferralHelperTest {
     @Test
     void setReferralStatusToClosed() {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
-        DynamicFixedListType selectReferralList = referralHelper.populateSelectReferralDropdown(caseData);
+        DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData);
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);
 
-        referralHelper.setReferralStatusToClosed(caseData);
+        ReferralHelper.setReferralStatusToClosed(caseData);
         assertEquals(ReferralStatus.CLOSED, caseData.getReferralCollection().get(0).getValue().getReferralStatus());
     }
     

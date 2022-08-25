@@ -32,9 +32,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class ReplyToReferralController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
-    private final ReferralHelper referralHelper;
     private final UserService userService;
-    private static final String COMPLETE_REFERRAL_BODY = "<hr>"
+    private static final String REPLY_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
         + "<p>We have recorded your reply. You can view it in the "
         + "<a href=\"/cases/case-details/%s#Referrals\" target=\"_blank\">Referrals tab (opens in new tab)</a>.</p>";
@@ -67,8 +66,8 @@ public class ReplyToReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setIsJudge(referralHelper.isJudge(userToken));
-        caseData.setSelectReferral(referralHelper.populateSelectReferralDropdown(caseData));
+        caseData.setIsJudge(ReferralHelper.isJudge(userService.getUserDetails(userToken).getRoles()));
+        caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -80,7 +79,7 @@ public class ReplyToReferralController {
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/initHearingAndReferralDetails", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "initialize data for et3 vetting")
+    @Operation(summary = "initialize data for reply to referral event")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -100,7 +99,7 @@ public class ReplyToReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setHearingAndReferralDetails(referralHelper.populateHearingReferralDetails(caseData));
+        caseData.setHearingAndReferralDetails(ReferralHelper.populateHearingReferralDetails(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -133,7 +132,7 @@ public class ReplyToReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         UserDetails userDetails = userService.getUserDetails(userToken);
-        referralHelper.createReferralReply(
+        ReferralHelper.createReferralReply(
             caseData,
             String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName())
         );
@@ -142,7 +141,6 @@ public class ReplyToReferralController {
 
     /**
      * Called after submitting a reply to referral event.
-     * Returns the confirmation header and body
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
@@ -154,7 +152,7 @@ public class ReplyToReferralController {
         @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> completeInitialConsideration(
+    public ResponseEntity<CCDCallbackResponse> completeReplyToReferral(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader(value = "Authorization") String userToken) {
 
@@ -163,7 +161,7 @@ public class ReplyToReferralController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        String body = String.format(COMPLETE_REFERRAL_BODY,
+        String body = String.format(REPLY_REFERRAL_BODY,
             ccdRequest.getCaseDetails().getCaseId());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()

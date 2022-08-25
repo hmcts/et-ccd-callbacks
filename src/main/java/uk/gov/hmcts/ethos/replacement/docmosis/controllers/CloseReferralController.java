@@ -30,8 +30,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class CloseReferralController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
-    private final ReferralHelper referralHelper;
-    private static final String COMPLETE_REFERRAL_BODY = "<hr>"
+    private static final String CLOSE_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
         + "<p>We have closed this referral. You can still view it in the "
         + "<a href=\"/cases/case-details/%s#Referrals\" target=\"_blank\">Referrals tab (opens in new tab)</a>.</p>";
@@ -64,19 +63,19 @@ public class CloseReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setSelectReferral(referralHelper.populateSelectReferralDropdown(caseData));
+        caseData.setSelectReferral(ReferralHelper.populateSelectReferralDropdown(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 
     /**
      * Called for the second page of the Close Referral event.
-     * Populates the Referral hearing and reply detail's section on the page.
+     * Populates the Referral hearing and reply details section on the page.
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.
      */
     @PostMapping(value = "/initHearingAndReferralDetails", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "initialize data for et3 vetting")
+    @Operation(summary = "initialize data for close referral event")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -96,7 +95,7 @@ public class CloseReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setCloseReferralHearingDetails(referralHelper.populateHearingReferralDetails(caseData));
+        caseData.setCloseReferralHearingDetails(ReferralHelper.populateHearingReferralDetails(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -127,14 +126,13 @@ public class CloseReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        referralHelper.setReferralStatusToClosed(caseData);
-        referralHelper.clearCloseReferralDataFromCaseData(caseData);
+        ReferralHelper.setReferralStatusToClosed(caseData);
+        ReferralHelper.clearCloseReferralDataFromCaseData(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
     /**
      * Called after submitting a close referral event.
-     * Returns the confirmation header and body
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
@@ -155,7 +153,7 @@ public class CloseReferralController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        String body = String.format(COMPLETE_REFERRAL_BODY,
+        String body = String.format(CLOSE_REFERRAL_BODY,
                 ccdRequest.getCaseDetails().getCaseId());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()

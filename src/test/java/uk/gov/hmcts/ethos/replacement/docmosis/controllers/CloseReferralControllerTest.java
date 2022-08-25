@@ -11,20 +11,22 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
+import java.util.List;
+
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -43,8 +45,6 @@ class CloseReferralControllerTest {
 
     @MockBean
     private VerifyTokenService verifyTokenService;
-    @MockBean
-    private ReferralHelper referralHelper;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -63,6 +63,11 @@ class CloseReferralControllerTest {
                 Constants.HEARING_STATUS_HEARD,
                 true)
             .build();
+        caseData.setReferralCollection(List.of(createReferralTypeItem()));
+        DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData);
+        selectReferralList.setValue(new DynamicValueType());
+        selectReferralList.getValue().setCode("1");
+        caseData.setSelectReferral(selectReferralList);
         ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
     }
 
@@ -82,7 +87,6 @@ class CloseReferralControllerTest {
     @Test
     void initHearingAndReferralDetails_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(referralHelper.populateHearingReferralDetails(any())).thenReturn("hearingReferralDetails");
         mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -91,13 +95,11 @@ class CloseReferralControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(referralHelper, times(1)).populateHearingReferralDetails(any());
     }
 
     @Test
     void aboutToSubmitCloseReferral_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(referralHelper).createReferralReply(any(), any());
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -106,8 +108,6 @@ class CloseReferralControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(referralHelper, times(1)).setReferralStatusToClosed(any());
-        verify(referralHelper, times(1)).clearCloseReferralDataFromCaseData(any());
     }
 
     @Test
@@ -159,5 +159,15 @@ class CloseReferralControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isForbidden());
+    }
+
+    private ReferralTypeItem createReferralTypeItem() {
+        ReferralTypeItem referralTypeItem = new ReferralTypeItem();
+        ReferralType referralType = new ReferralType();
+        referralType.setReferralNumber("1");
+        referralType.setReferralSubject("Other");
+        referralTypeItem.setValue(referralType);
+        referralType.setReferralStatus("referralStatus");
+        return referralTypeItem;
     }
 }

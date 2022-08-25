@@ -2,8 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -15,7 +13,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.ReferralReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,9 +24,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Component
-public class ReferralHelper {
-    private final UserService userService;
+public final class ReferralHelper {
+
+    private ReferralHelper() {
+    }
+
     private static final String TRUE = "True";
     private static final String FALSE = "False";
     private static final String JUDGE_ROLE_ENG = "caseworker-employment-etjudge-englandwales";
@@ -61,23 +60,17 @@ public class ReferralHelper {
         + "<br><br>Referral date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 %s"
         + "<br><br>Hearing date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 %s"
         + "<br><br>Referral subject &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09 %s"
-        + "<br><br>Directions &nbsp;&nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 %s"
-        + "<br><br>Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 %s"
-        + "<br><br>General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 %s</pre><hr>";
+        + "<br><br>Directions &nbsp;&nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 %s%s%s</pre><hr>";
 
-    private static final String DOCUMENT_LINK =
-        "<a href=\"%s\" download>%s</a>&nbsp;";
+    private static final String DOCUMENT_LINK = "<br><br>Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09"
+        + " <a href=\"%s\" download>%s</a>&nbsp;";
 
-    @Autowired
-    public ReferralHelper(UserService userService) {
-        this.userService = userService;
-    }
+    private static final String GENERAL_NOTES = "<br><br>General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 %s";
 
     /**
      * Checks to see if the user is a judge.
      */
-    public String isJudge(String userToken) {
-        List<String> roles = userService.getUserDetails(userToken).getRoles();
+    public static String isJudge(List<String> roles) {
         if (roles.contains(JUDGE_ROLE_ENG) || roles.contains(JUDGE_ROLE_SCOT)) {
             return TRUE;
         }
@@ -87,7 +80,7 @@ public class ReferralHelper {
     /**
      * Populates Hearing, Referral and Replies details. For judges only hearing and referral details will be displayed.
      */
-    public String populateHearingReferralDetails(CaseData caseData) {
+    public static String populateHearingReferralDetails(CaseData caseData) {
         return populateHearingDetails(caseData) + populateReferralDetails(caseData)
             + populateReplyDetails(caseData);
     }
@@ -97,7 +90,7 @@ public class ReferralHelper {
      * already created before this event is started. Hearing details should contain the hearing date, hearing
      * type and the track type for each hearing.
      */
-    public String populateHearingDetails(CaseData caseData) {
+    public static String populateHearingDetails(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
             return "";
         }
@@ -124,7 +117,7 @@ public class ReferralHelper {
         return hearingDetails.toString();
     }
 
-    private String populateReferralDetails(CaseData caseData) {
+    private static String populateReferralDetails(CaseData caseData) {
         ReferralType referral = getSelectedReferral(caseData);
         String referralDocLink = "";
         if (CollectionUtils.isNotEmpty(referral.getReferralDocument())) {
@@ -140,7 +133,7 @@ public class ReferralHelper {
             referral.getReferralInstruction());
     }
 
-    private String populateReplyDetails(CaseData caseData) {
+    private static String populateReplyDetails(CaseData caseData) {
         ReferralType referral = getSelectedReferral(caseData);
         List<ReferralReplyTypeItem> replyCollection = referral.getReferralReplyCollection();
         if (replyCollection == null) {
@@ -155,11 +148,18 @@ public class ReferralHelper {
                 r.getValue().getIsUrgentReply(), r.getValue().getReplyDate(),
                 getNearestHearingToReferral(caseData), referral.getReferralSubject(),
                 r.getValue().getDirectionDetails(), createDocLinkFromCollection(r.getValue().getReplyDocument()),
-                r.getValue().getReplyGeneralNotes()))
+                createGeneralNotes(r.getValue().getReplyGeneralNotes())))
             .collect(Collectors.joining());
     }
 
-    private String createDocLinkFromCollection(List<DocumentTypeItem> docItem) {
+    private static String createGeneralNotes(String notes) {
+        if (notes == null) {
+            return "";
+        }
+        return String.format(GENERAL_NOTES, notes);
+    }
+
+    private static String createDocLinkFromCollection(List<DocumentTypeItem> docItem) {
         if (docItem == null) {
             return "";
         }
@@ -170,12 +170,12 @@ public class ReferralHelper {
             .collect(Collectors.joining());
     }
 
-    private String createDocLinkBinary(DocumentTypeItem documentTypeItem) {
+    private static String createDocLinkBinary(DocumentTypeItem documentTypeItem) {
         String documentBinaryUrl = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
         return documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
     }
 
-    private ReferralType getSelectedReferral(CaseData caseData) {
+    private static ReferralType getSelectedReferral(CaseData caseData) {
         return caseData.getReferralCollection()
             .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
     }
@@ -185,7 +185,7 @@ public class ReferralHelper {
      * @param caseData contains all the case data
      * @param userFullName Full name of the logged-in user
      */
-    public void createReferral(CaseData caseData, String userFullName) {
+    public static void createReferral(CaseData caseData, String userFullName) {
         if (CollectionUtils.isEmpty(caseData.getReferralCollection())) {
             caseData.setReferralCollection(new ArrayList<>());
         }
@@ -249,7 +249,7 @@ public class ReferralHelper {
      * a new referral.
      * @param caseData contains all the case data
      */
-    public void clearReferralDataFromCaseData(CaseData caseData) {
+    public static void clearReferralDataFromCaseData(CaseData caseData) {
         caseData.setReferralHearingDetails(null);
         caseData.setReferCaseTo(null);
         caseData.setReferentEmail(null);
@@ -285,7 +285,7 @@ public class ReferralHelper {
      * @param caseData contains all the case data
      * @param userFullName The full name of the logged-in user
      */
-    public void createReferralReply(CaseData caseData, String userFullName) {
+    public static void createReferralReply(CaseData caseData, String userFullName) {
         ReferralType referral = getSelectedReferral(caseData);
         if (CollectionUtils.isEmpty(referral.getReferralReplyCollection())) {
             referral.setReferralReplyCollection(new ArrayList<>());
@@ -320,7 +320,7 @@ public class ReferralHelper {
      * a new referral.
      * @param caseData contains all the case data
      */
-    public void clearReferralReplyDataFromCaseData(CaseData caseData) {
+    public static void clearReferralReplyDataFromCaseData(CaseData caseData) {
         caseData.setHearingAndReferralDetails(null);
         caseData.setDirectionTo(null);
         caseData.setReplyToEmailAddress(null);
@@ -338,14 +338,14 @@ public class ReferralHelper {
      * a new referral.
      * @param caseData contains all the case data
      */
-    public void clearCloseReferralDataFromCaseData(CaseData caseData) {
+    public static void clearCloseReferralDataFromCaseData(CaseData caseData) {
         caseData.setSelectReferral(null);
         caseData.setCloseReferralHearingDetails(null);
         caseData.setConfirmCloseReferral(null);
         caseData.setCloseReferralGeneralNotes(null);
     }
 
-    public void setReferralStatusToClosed(CaseData caseData) {
+    public static void setReferralStatusToClosed(CaseData caseData) {
         ReferralType referral = getSelectedReferral(caseData);
         referral.setReferralStatus(ReferralStatus.CLOSED);
     }

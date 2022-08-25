@@ -33,8 +33,7 @@ public class CreateReferralController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
-    private final ReferralHelper referralHelper;
-    private static final String COMPLETE_REFERRAL_BODY = "<hr>"
+    private static final String CREATE_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
         + "<p>Your referral has been sent. Replies and instructions will appear in the "
         + "<a href=\"/cases/case-details/%s#Referrals\" target=\"_blank\">Referrals tab (opens in new tab)</a>.</p>";
@@ -68,7 +67,7 @@ public class CreateReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setReferralHearingDetails(referralHelper.populateHearingDetails(caseData));
+        caseData.setReferralHearingDetails(ReferralHelper.populateHearingDetails(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -101,7 +100,7 @@ public class CreateReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         UserDetails userDetails = userService.getUserDetails(userToken);
-        referralHelper.createReferral(
+        ReferralHelper.createReferral(
             caseData,
             String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName())
         );
@@ -110,7 +109,6 @@ public class CreateReferralController {
 
     /**
      * Called after submitting a create referral event.
-     * Returns the confirmation header and body
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
@@ -122,7 +120,7 @@ public class CreateReferralController {
         @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> completeInitialConsideration(
+    public ResponseEntity<CCDCallbackResponse> completeCreateReferral(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader(value = "Authorization") String userToken) {
 
@@ -131,7 +129,7 @@ public class CreateReferralController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        String body = String.format(COMPLETE_REFERRAL_BODY,
+        String body = String.format(CREATE_REFERRAL_BODY,
             ccdRequest.getCaseDetails().getCaseId());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()

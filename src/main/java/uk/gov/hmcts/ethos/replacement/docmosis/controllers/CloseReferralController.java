@@ -85,7 +85,7 @@ public class CloseReferralController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> initHearingAndReferralDetails(
+    public ResponseEntity<CCDCallbackResponse> initHearingDetailsForCloseReferral(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader(value = "Authorization") String userToken) {
 

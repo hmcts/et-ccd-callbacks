@@ -89,7 +89,7 @@ public class ReplyToReferralController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> initHearingAndReferralDetails(
+    public ResponseEntity<CCDCallbackResponse> initHearingDetailsForReplyToReferral(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader(value = "Authorization") String userToken) {
 

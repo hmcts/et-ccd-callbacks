@@ -1,0 +1,16 @@
+{
+  "referals_tab": "mat-tab-label-0-7",
+  "create_new_referral": "#referralLinks > dt > ccd-markdown > div > markdown > p > a:nth-child(1)",
+  "reply_referral": "#referralLinks > dt > ccd-markdown > div > markdown > p > a:nth-child(3)",
+  "close_referral": "#referralLinks > dt > ccd-markdown > div > markdown > p > a:nth-child(5)",
+  "referCaseToAdmin": "#referCaseTo-Admin",
+  "referCaseToJudge": "#referCaseTo-Judge",
+  "referralEmail": "referentEmail",
+  "referCaseToLegalOfficer": "[id='referCaseTo-Legal officer']",
+  "selectYesIfUrgent": "#isUrgent_Yes",
+  "selectNotUrgent": "#isUrgent_No",
+  "refrerralSubjectDropdown": "#referralSubject",
+  "referralDetails": "#referralDetails",
+  "selectReferralToReply": "selectReferralToReply"
+
+}

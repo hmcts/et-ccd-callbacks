@@ -1,8 +1,5 @@
 async function acceptCaseEvent(I, caseId, eventName) {
     await I.wait(5);
-    await I.authenticateWithIdam();
-    await I.wait(5);
-    await I.amOnPage('/case-details/' + caseId);
     await I.chooseNextStep(eventName, 3);
     await I.acceptTheCase();
 }
@@ -114,6 +111,71 @@ async function generateReport(I, jurisdiction, caseType, eventName) {
     await I.executeCreateReport(jurisdiction, caseType, eventName);
 }
 
+async function initialConsideration(I, eventName) {
+    await I.chooseNextStep(eventName, 3);
+    await I.wait(3);
+    await I.startInitialConsideration();
+    await I.initialConsiderationRule26();
+    await I.initialConsiderationCheckYourAnswers();
+}
+
+async function et1Serving(I, eventName) {
+    await I.chooseNextStep(eventName, 3);
+    await I.wait(3);
+    await I.et1ServingProcess();
+}
+
+async function et3Notification(I, eventName) {
+    await I.chooseNextStep(eventName, 3);
+    await I.wait(3);
+    await I.et3NotificationProcess
+}
+
+async function et3ProcessingPage(I, eventName) {
+    await I.chooseNextStep(eventName, 3);
+    await I.wait(3);
+    await I.et3Processing();
+}
+
+async function et3Response(I, eventName) {
+    await I.chooseNextStep(eventName, 3);
+    await I.wait(3);
+    await I.et3ResponseProcess();
+}
+
+async function et1Vetting(I, eventName) {
+    await I.chooseNextStep(eventName, 3);
+    await I.wait(3);
+    await I.startet1Vetting();
+    await I.minReqInfoET1Vetting();
+    await I.minReqInfo2ET1Vetting();
+    await I.et1CaseVettingOptions1();
+    await I.caseDetails1ET1Vetting();
+    await I.caseDetails2ET1Vetting();
+    await I.caseDetails3ET1Vetting();
+    await I.caseDetails4ET1Vetting();
+    await I.furtherQET1Vetting();
+    await I.possibleReferal1ET1Vetting();
+    await I.possibleReferal2ET1Vetting();
+    await I.otherFactorsET1Vetting();
+    await I.finalNotesET1Vetting();
+    await I.checkYourAnswersET1Vetting();
+}
+
+async function createAdminReferral(emailAddress,details) {
+    await I.createAdminReferrals(emailAddress,details)
+    await I.wait(3);
+}
+
+async function createJudgeReferral(emailAddress,details) {
+    await I.createJudgeReferrals(emailAddress,details)
+    await I.wait(3);
+}
+
+async function createLegalRepReferral(emailAddress,details) {
+    await I.createLegalRepReferrals(emailAddress,details)
+    await I.wait(3);
+}
 module.exports = {
     acceptCaseEvent,
     caseDetails,
@@ -131,8 +193,13 @@ module.exports = {
     // printHearingLists,
     allocateHearing,
     hearingDetails,
-    hearingDetails,
     caseTransfer,
     judgment,
-    generateReport
+    generateReport,
+    initialConsideration,
+    et1Vetting,
+    et1Serving,
+    et3ProcessingPage,
+    et3Notification,
+    et3Response
 };

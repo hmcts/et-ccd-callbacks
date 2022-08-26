@@ -32,10 +32,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.PrematureDeclaration",
-    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
-    "PMD.LawOfDemeter"})
-public class HearingsToJudgmentsReport {
+    "PMD.GodClass", "PMD.PrematureDeclaration", "PMD.InsufficientStringBufferDeclaration",
+    "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions", "PMD.LawOfDemeter"})
+public final class HearingsToJudgmentsReport {
     static final String PERCENTAGE_FORMAT = "%.2f";
 
     static final List<String> VALID_CASE_STATES = Arrays.asList(

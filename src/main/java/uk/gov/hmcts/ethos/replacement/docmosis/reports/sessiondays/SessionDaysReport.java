@@ -32,10 +32,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTE
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingDurationInMinutes;
 
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
-    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.UnnecessaryFullyQualifiedName",
-    "PMD.LawOfDemeter"})
-public class SessionDaysReport {
+    "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.InsufficientStringBufferDeclaration",
+    "PMD.LiteralsFirstInComparisons", "PMD.UnnecessaryFullyQualifiedName", "PMD.LawOfDemeter"})
+public final class SessionDaysReport {
 
     public static final String ONE_HOUR = "One Hour";
     public static final String HALF_DAY = "Half Day";

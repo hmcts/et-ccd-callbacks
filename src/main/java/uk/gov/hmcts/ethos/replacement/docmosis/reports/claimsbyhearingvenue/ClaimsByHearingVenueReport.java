@@ -15,8 +15,8 @@ import java.util.List;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_BY_HEARING_VENUE_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
-@SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.AvoidInstantiatingObjectsInLoops"})
-public class ClaimsByHearingVenueReport {
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
+public final class ClaimsByHearingVenueReport {
     private static final String NULL_STRING_VALUE = "Null";
     private final ClaimsByHearingVenueReportDataSource dataSource;
 

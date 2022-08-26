@@ -33,9 +33,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals", "PMD.ExcessivePublicCount",
-    "PMD.ExcessiveImports", "PMD.ConfusingTernary", "PDM.CyclomaticComplexity",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.AvoidInstantiatingObjectsInLoops"})
-public class ECCHelper {
+    "PMD.ExcessiveImports", "PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.GodClass",
+    "PMD.AvoidInstantiatingObjectsInLoops"})
+public final class ECCHelper {
 
     private static final String JURISDICTION_CODE_ECC = "BOC";
     private static final String EMPLOYER_CONTRACT_CLAIM_CODE = "ECC";

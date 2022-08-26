@@ -48,10 +48,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @Slf4j
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
-    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
-    "PMD.LawOfDemeter", "PMD.SimpleDateFormatNeedsLocale"})
-public class Helper {
+    "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.InsufficientStringBufferDeclaration",
+    "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions", "PMD.LawOfDemeter",
+    "PMD.SimpleDateFormatNeedsLocale"})
+public final class Helper {
 
     public static final String HEARING_CREATION_NUMBER_ERROR = "A new hearing can only "
             + "be added from the List Hearing menu item";

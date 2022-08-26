@@ -30,10 +30,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @RequiredArgsConstructor
 @Service("multipleCreationService")
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
-    "PMD.LinguisticNaming", "PMD.LiteralsFirstInComparisons", "PMD.LooseCoupling",
-    "PMD.LawOfDemeter"})
-public class MultipleCreationService {
+    "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.LinguisticNaming", "PMD.LiteralsFirstInComparisons",
+    "PMD.LooseCoupling", "PMD.LawOfDemeter"})
+public final class MultipleCreationService {
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;

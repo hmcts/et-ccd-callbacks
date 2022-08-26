@@ -27,9 +27,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingDurationInMinutes;
 
-@SuppressWarnings({ "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass",
-    "PMD.LiteralsFirstInComparisons"})
-public class HearingsByHearingTypeReport {
+@SuppressWarnings({"PMD.GodClass", "PMD.LiteralsFirstInComparisons"})
+public final class HearingsByHearingTypeReport {
     private final HearingsByHearingTypeReportDataSource reportDataSource;
     private static final String COSTS_HEARING_TYPE = "Costs Hearing";
     private static final String VIDEO = "Video";

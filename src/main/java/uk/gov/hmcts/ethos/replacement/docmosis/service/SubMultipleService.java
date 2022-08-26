@@ -27,10 +27,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 @Slf4j
 @Service("subMultipleService")
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
-    "PMD.TooManyMethods", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
-    "PMD.LawOfDemeter"})
-public class SubMultipleService {
+    "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.TooManyMethods", "PMD.LiteralsFirstInComparisons",
+    "PMD.FieldNamingConventions", "PMD.LawOfDemeter"})
+public final class SubMultipleService {
 
     private final SubMultipleReferenceService subMultipleReferenceService;
     private static final String NO_SUB_MULTIPLES_FOUND = "No sub multiples have been found";

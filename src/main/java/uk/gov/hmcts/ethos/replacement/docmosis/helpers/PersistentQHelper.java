@@ -23,9 +23,8 @@ import java.util.List;
 import static uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreationSingleDataModel.builder;
 
 @Slf4j
-@SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.LawOfDemeter", "PMD.CognitiveComplexity",
-    "PMD.ConfusingTernary", "PMD.ExcessiveParameterList"})
-public class PersistentQHelper {
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.CognitiveComplexity", "PMD.ConfusingTernary", "PMD.ExcessiveParameterList"})
+public final class PersistentQHelper {
 
     private PersistentQHelper() {
     }

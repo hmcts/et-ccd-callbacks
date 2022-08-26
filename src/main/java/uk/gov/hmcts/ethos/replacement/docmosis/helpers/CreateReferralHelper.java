@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Slf4j
-@SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.LinguisticNaming", "PDM.TooManyFields",
-    "PMD.ConfusingTernary", "PMD.SimpleDateFormatNeedsLocale"})
-public class CreateReferralHelper {
+@SuppressWarnings({"PMD.LinguisticNaming", "PDM.TooManyFields", "PMD.ConfusingTernary",
+    "PMD.SimpleDateFormatNeedsLocale"})
+public final class CreateReferralHelper {
     private static final String GUIDANCE_DOC_LINK = "<hr>To help you complete this form, open the "
         + "<a href=\"url\">referral guidance documents</a>";
     private static final String HEARING_DETAILS = "<hr><h3>Hearing details %s</h3>"

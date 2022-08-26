@@ -6,8 +6,7 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
 import java.util.List;
 
-@SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal"})
-public class FixedListSheetReader {
+public final class FixedListSheetReader {
     private final List<FixedListSheetImporter> sheetImporters;
 
     static final String FIXED_LIST_SHEET_NAME = "Scrubbed";

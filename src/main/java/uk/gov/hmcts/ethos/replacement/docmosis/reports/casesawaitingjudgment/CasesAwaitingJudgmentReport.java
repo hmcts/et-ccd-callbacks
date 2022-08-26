@@ -31,9 +31,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTE
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.ReportDetail.NO_MULTIPLE_REFERENCE;
 
 @Slf4j
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal",
-    "PMD.InsufficientStringBufferDeclaration", "PMD.FieldNamingConventions", "PMD.LawOfDemeter"})
-public class CasesAwaitingJudgmentReport {
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.InsufficientStringBufferDeclaration",
+    "PMD.FieldNamingConventions", "PMD.LawOfDemeter"})
+public final class CasesAwaitingJudgmentReport {
 
     static final Collection<String> VALID_POSITION_TYPES = List.of(
             "Draft with members",

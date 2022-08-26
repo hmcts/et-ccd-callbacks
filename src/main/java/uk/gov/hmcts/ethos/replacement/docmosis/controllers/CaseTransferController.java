@@ -1,9 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +19,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferOfficeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferSameCountryService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferToEcmService;
 
 import java.util.List;
 
@@ -35,19 +39,25 @@ public class CaseTransferController {
     private final VerifyTokenService verifyTokenService;
     private final CaseTransferSameCountryService caseTransferSameCountryService;
     private final CaseTransferDifferentCountryService caseTransferDifferentCountryService;
+    private final CaseTransferToEcmService caseTransferToEcmService;
 
     public CaseTransferController(VerifyTokenService verifyTokenService,
                                   CaseTransferSameCountryService caseTransferSameCountryService,
-                                  CaseTransferDifferentCountryService caseTransferDifferentCountryService) {
+                                  CaseTransferDifferentCountryService caseTransferDifferentCountryService,
+                                  CaseTransferToEcmService caseTransferToEcmService) {
         this.verifyTokenService = verifyTokenService;
         this.caseTransferSameCountryService = caseTransferSameCountryService;
         this.caseTransferDifferentCountryService = caseTransferDifferentCountryService;
+        this.caseTransferToEcmService = caseTransferToEcmService;
     }
 
     @PostMapping(value = "/initTransferToScotland", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise case for transfer to Scotland")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -70,7 +80,10 @@ public class CaseTransferController {
     @PostMapping(value = "/initTransferToEnglandWales", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise case for transfer to England/Wales")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -94,7 +107,10 @@ public class CaseTransferController {
     @PostMapping(value = "/transferSameCountry", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Transfer a case to another office within the same country")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -116,7 +132,10 @@ public class CaseTransferController {
     @PostMapping(value = "/transferSameCountryEccLinkedCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Transfer a ECC linked case to another office within the same country")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -139,7 +158,10 @@ public class CaseTransferController {
     @PostMapping(value = "/transferDifferentCountry", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Transfer a case to another office in a different country")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -154,6 +176,26 @@ public class CaseTransferController {
         }
 
         List<String> errors = caseTransferDifferentCountryService.transferCase(ccdRequest.getCaseDetails(), userToken);
+
+        return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @PostMapping(value = "/transferToEcm", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Transfer a case to ECM")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")
+    })
+    public ResponseEntity<CCDCallbackResponse> transferToEcm(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        List<String> errors = caseTransferToEcmService.createCaseTransferToEcm(ccdRequest.getCaseDetails(), userToken);
 
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }

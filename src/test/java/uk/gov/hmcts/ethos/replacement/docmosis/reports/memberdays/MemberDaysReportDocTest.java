@@ -47,9 +47,7 @@ public class MemberDaysReportDocTest {
         detailItem.setHearingDuration("420");
         listingData.getReportDetails().add(detailItem);
 
-        var resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
-        var expectedDetailRowContent = new StringBuilder();
-
+        StringBuilder expectedDetailRowContent = new StringBuilder();
         expectedDetailRowContent.append("\"Listed_date\":\"").append(NEW_LINE);
         expectedDetailRowContent.append("\"Report_Office\":\"").append(NEW_LINE);
         expectedDetailRowContent.append("\"Total_Full_Days\":\"").append(NEW_LINE);
@@ -80,7 +78,7 @@ public class MemberDaysReportDocTest {
             .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))))
             .append("\"\n");
         expectedDetailRowContent.append("}]").append(",\n");
-
+        StringBuilder resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
         assertEquals(false, resultListingData.toString().isEmpty());
         assertEquals(expectedDetailRowContent.toString(), resultListingData.toString());
     }
@@ -115,9 +113,6 @@ public class MemberDaysReportDocTest {
         memberDaySummaryItem.setTotalDays("2");
 
         listingData.getMemberDaySummaryItems().add(memberDaySummaryItem);
-
-        var resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
-
         expectedDetailRowContent.append("\"memberDaySummaryItems\":[").append("\n");
         expectedDetailRowContent.append("{").append("\n");
         expectedDetailRowContent.append("\"Hearing_Date\":\"15 September 2021").append(NEW_LINE);
@@ -147,7 +142,7 @@ public class MemberDaysReportDocTest {
             .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))))
             .append("\"\n");
         expectedDetailRowContent.append("}]").append(",\n");
-
+        StringBuilder resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
         assertFalse(resultListingData.toString().isEmpty());
         assertEquals(expectedDetailRowContent.toString(), resultListingData.toString());
     }
@@ -178,9 +173,7 @@ public class MemberDaysReportDocTest {
         listingData.setFullDaysTotal("2");
         listingData.setTotalDays("2.0");
         listingData.getMemberDaySummaryItems().add(memberDaySummaryItem);
-
-        var resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
-        var expectedDetailRowContent = new StringBuilder();
+        StringBuilder expectedDetailRowContent = new StringBuilder();
         expectedDetailRowContent.append("\"Listed_date\":\"18 September 2021").append(NEW_LINE);
         expectedDetailRowContent.append("\"Report_Office\":\"MukeraCity").append(NEW_LINE);
         expectedDetailRowContent.append("\"Total_Full_Days\":\"2").append(NEW_LINE);
@@ -216,7 +209,7 @@ public class MemberDaysReportDocTest {
             .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))))
             .append("\"\n");
         expectedDetailRowContent.append("}]").append(",\n");
-
+        StringBuilder resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
         assertFalse(resultListingData.toString().isEmpty());
         assertEquals(expectedDetailRowContent.toString(), resultListingData.toString());
     }

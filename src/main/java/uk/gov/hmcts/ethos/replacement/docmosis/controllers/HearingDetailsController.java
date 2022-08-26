@@ -12,11 +12,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails.HearingDetailsService;
 
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @RestController
@@ -49,7 +54,7 @@ public class HearingDetailsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         hearingDetailsService.initialiseHearingDetails(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -70,10 +75,30 @@ public class HearingDetailsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         hearingDetailsService.handleListingSelected(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/hearingMidEventValidation", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "validates the hearing number and the hearing days to prevent their creation.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> hearingMidEventValidation(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = HearingsHelper.hearingTimeValidation(caseData);
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)

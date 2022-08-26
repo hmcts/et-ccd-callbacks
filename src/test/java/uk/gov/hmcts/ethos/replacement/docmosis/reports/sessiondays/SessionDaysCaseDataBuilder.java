@@ -20,7 +20,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 public class SessionDaysCaseDataBuilder {
     private final SessionDaysCaseData caseData = new SessionDaysCaseData();
 
-
     public void withNoHearings() {
         caseData.setHearingCollection(null);
     }
@@ -46,18 +45,18 @@ public class SessionDaysCaseDataBuilder {
         }
         type.setHearingNumber("1");
         item.setValue(type);
-        DateListedTypeItem dItem = new DateListedTypeItem();
-        dItem.setId(UUID.randomUUID().toString());
-        DateListedType dType = new DateListedType();
-        dType.setHearingStatus(hearingStatus);
-        dType.setHearingClerk(DynamicFixedListType.of(DynamicValueType.create("Clerk A", "Clerk A")));
-        dType.setListedDate("2022-01-20T11:00:00.000");
-        dType.setHearingTimingStart("2022-01-20T11:00:00.000");
-        dType.setHearingTimingFinish("2022-01-20T17:00:00.000");
-        dType.setHearingTimingBreak("2022-01-20T13:00:00");
-        dType.setHearingTimingResume("2022-01-20T13:30:00.000");
-        dItem.setValue(dType);
-        item.getValue().setHearingDateCollection(Collections.singletonList(dItem));
+        DateListedTypeItem dateItem = new DateListedTypeItem();
+        dateItem.setId(UUID.randomUUID().toString());
+        DateListedType dateType = new DateListedType();
+        dateType.setHearingStatus(hearingStatus);
+        dateType.setHearingClerk(DynamicFixedListType.of(DynamicValueType.create("Clerk A", "Clerk A")));
+        dateType.setListedDate("2022-01-20T11:00:00.000");
+        dateType.setHearingTimingStart("2022-01-20T11:00:00.000");
+        dateType.setHearingTimingFinish("2022-01-20T17:00:00.000");
+        dateType.setHearingTimingBreak("2022-01-20T13:00:00");
+        dateType.setHearingTimingResume("2022-01-20T13:30:00.000");
+        dateItem.setValue(dateType);
+        item.getValue().setHearingDateCollection(Collections.singletonList(dateItem));
         return item;
     }
 

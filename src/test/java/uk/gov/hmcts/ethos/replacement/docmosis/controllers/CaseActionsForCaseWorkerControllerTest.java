@@ -112,7 +112,8 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String DYNAMIC_DEPOSIT_ORDER_URL = "/dynamicDepositOrder";
     private static final String DYNAMIC_JUDGMENT_URL = "/dynamicJudgments";
     private static final String JUDGEMENT_SUBMITTED_URL = "/judgementSubmitted";
-    private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL = "/reinstateClosedCaseMidEventValidation";
+    private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL =
+            "/reinstateClosedCaseMidEventValidation";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -1189,7 +1190,8 @@ public class CaseActionsForCaseWorkerControllerTest {
     @Test
     public void amendCaseDetailsError500() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(eventValidationService.validateCaseState(isA(CaseDetails.class)))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
         when(eventValidationService.validateCurrentPosition(isA(CaseDetails.class))).thenReturn(true);
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent.toString())

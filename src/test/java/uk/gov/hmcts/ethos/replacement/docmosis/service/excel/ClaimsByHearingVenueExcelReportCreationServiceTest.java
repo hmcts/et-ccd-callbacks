@@ -1,11 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportDetail;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ClaimsByHearingVenueExcelReportCreationServiceTest {
     @Mock

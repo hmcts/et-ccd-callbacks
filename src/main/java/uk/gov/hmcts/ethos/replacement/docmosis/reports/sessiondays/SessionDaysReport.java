@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays;
 
-import com.microsoft.azure.servicebus.primitives.StringUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.elasticsearch.common.Strings;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -19,7 +18,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.JudgeServic
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,9 +29,10 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.Math.round;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays.MemberDaysReport.OLD_DATE_TIME_PATTERN3;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingDurationInMinutes;
 
 public class SessionDaysReport {
+
     public static final String ONE_HOUR = "One Hour";
     public static final String HALF_DAY = "Half Day";
     public static final String FULL_DAY = "Full Day";
@@ -146,7 +145,7 @@ public class SessionDaysReport {
             DateListedType dateListedType, List<SessionDaysReportSummary2> sessionDaysReportSummary2List) {
         Optional<SessionDaysReportSummary2> item = sessionDaysReportSummary2List.stream()
                 .filter(i -> !Strings.isNullOrEmpty(i.getDate())
-                && areDatesEqual(i.getDate(), dateListedType.getListedDate())).findFirst();
+                        && areDatesEqual(i.getDate(), dateListedType.getListedDate())).findFirst();
         if (item.isPresent()) {
             return item.get();
         }
@@ -285,7 +284,7 @@ public class SessionDaysReport {
                         reportDetail.setHearingSitAlone("Sit Alone".equals(
                                 hearingTypeItem.getValue().getHearingSitAlone()) ? "Y" : "");
                         setTelCon(hearingTypeItem, reportDetail);
-                        String duration = calculateDuration(dateListedTypeItem);
+                        String duration = getHearingDurationInMinutes(dateListedTypeItem);
                         reportDetail.setHearingDuration(duration);
                         reportDetail.setSessionType(getSessionType(Long.parseLong(duration)));
                         if (dateListedTypeItem.getValue().hasHearingClerk()) {
@@ -332,40 +331,6 @@ public class SessionDaysReport {
 
     }
 
-    private LocalDateTime convertHearingTime(String dateToConvert) {
-        return dateToConvert.endsWith(".000")
-                ? LocalDateTime.parse(dateToConvert, OLD_DATE_TIME_PATTERN)
-                : LocalDateTime.parse(dateToConvert, OLD_DATE_TIME_PATTERN3);
-    }
-
-    private String calculateDuration(DateListedTypeItem c) {
-        var dateListedType = c.getValue();
-        long duration = 0;
-        long breakDuration = 0;
-
-        var hearingTimingBreak = dateListedType.getHearingTimingBreak();
-        var hearingTimingResume = dateListedType.getHearingTimingResume();
-        //If there was a break and resumption during the hearing
-        if (!StringUtil.isNullOrEmpty(hearingTimingBreak)
-                && !StringUtil.isNullOrEmpty(hearingTimingResume)) {
-            var hearingBreak = convertHearingTime(hearingTimingBreak);
-            var hearingResume = convertHearingTime(hearingTimingResume);
-            breakDuration = ChronoUnit.MINUTES.between(hearingBreak, hearingResume);
-        }
-
-        var hearingTimingStart = dateListedType.getHearingTimingStart();
-        var hearingTimingFinish = dateListedType.getHearingTimingFinish();
-        if (!StringUtil.isNullOrEmpty(hearingTimingStart)
-                && !StringUtil.isNullOrEmpty(hearingTimingFinish)) {
-            var hearingStartTime = convertHearingTime(hearingTimingStart);
-            var hearingEndTime = convertHearingTime(hearingTimingFinish);
-            long startToEndDiffInMinutes = ChronoUnit.MINUTES.between(hearingStartTime, hearingEndTime);
-            duration = startToEndDiffInMinutes - breakDuration;
-        }
-
-        return String.valueOf(duration);
-    }
-
     private String getSessionType(long duration) {
         if (duration > 0 && duration < 60) {
             return ONE_HOUR;
@@ -377,4 +342,5 @@ public class SessionDaysReport {
             return NONE;
         }
     }
+
 }

@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FakeServiceBus {
-  @ConditionalOnProperty(name = "servicebus.fake", havingValue = "true", matchIfMissing = false)
-  @Bean("create-updates-send-client")
-  IQueueClient client() {
-    return Mockito.mock(IQueueClient.class);
-  }
+    @ConditionalOnProperty(name = "servicebus.fake", havingValue = "true", matchIfMissing = false)
+    @Bean("create-updates-send-client")
+    IQueueClient client() {
+        return Mockito.mock(IQueueClient.class);
+    }
 }

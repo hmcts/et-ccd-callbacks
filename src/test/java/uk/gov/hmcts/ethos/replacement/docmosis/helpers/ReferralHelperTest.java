@@ -41,20 +41,18 @@ class ReferralHelperTest {
     private static final String JUDGE_ROLE_SCOT = "caseworker-employment-etjudge-scotland";
     private static final String TRUE = "True";
     private static final String FALSE = "False";
+    private static final String INVALID_EMAIL_ERROR_MESSAGE = "The email address entered is invalid.";
 
-    private final String expectedSingleHearingDetails = "<hr>To help you complete this form, open the <a href=\"url\" "
-        + "target=\"_blank\">referral guidance documents</a><hr><h3>Hearing details </h3><pre>Date &nbsp;&#09&#09&#09&#"
+    private final String expectedSingleHearingDetails = "<hr><h3>Hearing details </h3><pre>Date &nbsp;&#09&#09&#09&#"
         + "09&#09&nbsp; 25 December 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#0"
         + "9&#09&#09 N/A</pre><hr>";
 
-    private final String expectedMultipleHearingDetails = "<hr>To help you complete this form, open the <a href=\"url\""
-        + " target=\"_blank\">referral guidance documents</a><hr><h3>Hearing details 1</h3><pre>Date &nbsp;&#09&#09&#0"
+    private final String expectedMultipleHearingDetails = "<hr><h3>Hearing details 1</h3><pre>Date &nbsp;&#09&#09&#0"
         + "9&#09&#09&nbsp; 25 December 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#0"
         + "9&#09&#09&#09 N/A</pre><hr><h3>Hearing details 2</h3><pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp; 26 December"
         + " 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#09&#09&#09 N/A</pre><hr>";
 
-    private final String expectedHearingReferralDetailsSingleReply = "<hr>To help you complete this form, open the <a"
-        + " href=\"url\" target=\"_blank\">referral guidance documents</a><hr><h3>Hearing details </h3><pre>Date &nbs"
+    private final String expectedHearingReferralDetailsSingleReply = "<hr><h3>Hearing details </h3><pre>Date &nbs"
         + "p;&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&nbsp; null<br><br>Type &nbsp"
         + ";&nbsp;&#09&#09&#09&#09&#09 N/A</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09&#09&#09&"
         + "#09&#09&#09&nbsp; null<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><"
@@ -73,8 +71,7 @@ class ReferralHelperTest {
         + "&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;<br><br>"
         + "General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr>";
 
-    private final String expectedHearingReferralDetailsMultipleReplies = "<hr>To help you complete this form, open the"
-        + " <a href=\"url\" target=\"_blank\">referral guidance documents</a><hr><h3>Hearing details </h3><pre>Date &"
+    private final String expectedHearingReferralDetailsMultipleReplies = "<hr><h3>Hearing details </h3><pre>Date &"
         + "nbsp;&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&nbsp; null<br><br>Type &n"
         + "bsp;&nbsp;&#09&#09&#09&#09&#09 N/A</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09&#09&#"
         + "09&#09&#09&#09&nbsp; null<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<b"
@@ -332,6 +329,15 @@ class ReferralHelperTest {
 
         ReferralHelper.setReferralStatusToClosed(caseData);
         assertEquals(ReferralStatus.CLOSED, caseData.getReferralCollection().get(0).getValue().getReferralStatus());
+    }
+
+    @Test
+    void validateEmail() {
+        List<String> errors = new ArrayList<>();
+        assertEquals(errors, ReferralHelper.validateEmail("valid.email@example.com"));
+
+        errors = new ArrayList<>(Arrays.asList(INVALID_EMAIL_ERROR_MESSAGE));
+        assertEquals(errors, ReferralHelper.validateEmail("invalid.email.example"));
     }
     
     private void setReferralReplyData() {

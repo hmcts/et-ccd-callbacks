@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import java.util.ArrayList;
+import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -74,6 +78,36 @@ public class CreateReferralController {
     }
 
     /**
+     * Called for the email validation of the Create Referral event.
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data and errors attached.
+     */
+    @PostMapping(value = "/validateReferentEmail", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "initialize data for referral create")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> validateReferentEmail(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = ReferralHelper.validateEmail(caseData.getReferentEmail());
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    /**
      * Called at the end of creating a referral, takes the information saved in case data and stores it in the
      * referral collection.
      * @param ccdRequest holds the request and case data
@@ -102,8 +136,6 @@ public class CreateReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         UserDetails userDetails = userService.getUserDetails(userToken);
-        emailService.sendReferralEmailYouHaveReceivedNewMessage(caseData);
-
         ReferralHelper.createReferral(
             caseData,
             String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName())
@@ -132,6 +164,9 @@ public class CreateReferralController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        emailService.sendReferralEmailYouHaveReceivedNewMessage(caseData);
 
         String body = String.format(CREATE_REFERRAL_BODY,
             ccdRequest.getCaseDetails().getCaseId());

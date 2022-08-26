@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.validator.routines.EmailValidator;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -33,8 +34,6 @@ public final class ReferralHelper {
     private static final String FALSE = "False";
     private static final String JUDGE_ROLE_ENG = "caseworker-employment-etjudge-englandwales";
     private static final String JUDGE_ROLE_SCOT = "caseworker-employment-etjudge-scotland";
-    private static final String GUIDANCE_DOC_LINK = "<hr>To help you complete this form, open the "
-        + "<a href=\"url\" target=\"_blank\">referral guidance documents</a>";
     private static final String HEARING_DETAILS = "<hr><h3>Hearing details %s</h3>"
         + "<pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Hearing &#09&#09&#09&#09&nbsp; %s"
@@ -67,6 +66,8 @@ public final class ReferralHelper {
 
     private static final String INSTRUCTIONS = "<br><br>Recommended instructions &nbsp;&#09&#09&#09&nbsp; %s";
 
+    private static final String INVALID_EMAIL_ERROR_MESSAGE = "The email address entered is invalid.";
+
     /**
      * Checks to see if the user is a judge.
      */
@@ -96,7 +97,6 @@ public final class ReferralHelper {
         }
         String trackType = caseData.getTrackType();
         StringBuilder hearingDetails = new StringBuilder();
-        hearingDetails.append(GUIDANCE_DOC_LINK);
         int count = 0;
         boolean singleHearing = caseData.getHearingCollection().size() == 1;
 
@@ -351,5 +351,14 @@ public final class ReferralHelper {
     public static void setReferralStatusToClosed(CaseData caseData) {
         ReferralType referral = getSelectedReferral(caseData);
         referral.setReferralStatus(ReferralStatus.CLOSED);
+    }
+
+    public static List<String> validateEmail(String email) {
+        List<String> errors = new ArrayList<>();
+        if (!EmailValidator.getInstance().isValid(email)) {
+            errors.add(INVALID_EMAIL_ERROR_MESSAGE);
+        }
+
+        return errors;
     }
 }

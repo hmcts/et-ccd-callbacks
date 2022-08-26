@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -33,6 +34,7 @@ public class ReplyToReferralController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
     private final UserService userService;
+    private final EmailService emailService;
     private static final String REPLY_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
         + "<p>We have recorded your reply. You can view it in the "
@@ -132,6 +134,15 @@ public class ReplyToReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         UserDetails userDetails = userService.getUserDetails(userToken);
+
+        // TODO: This might need to be moved to the submitted event
+        // TODO: The logic for choosing the right method is not correct - refer to figma
+        if ("Judge".equals(caseData.getReferCaseTo())) {
+            emailService.sendReferralEmailYouHaveReceivedNewMessage(caseData);
+        } else {
+            emailService.sendReferralEmailJudgeHasSentDirections(caseData);
+        }
+
         ReferralHelper.createReferralReply(
             caseData,
             String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName())

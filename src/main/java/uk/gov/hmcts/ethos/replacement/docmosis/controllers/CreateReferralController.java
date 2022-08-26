@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -33,6 +34,7 @@ public class CreateReferralController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
+    private final EmailService emailService;
     private static final String CREATE_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
         + "<p>Your referral has been sent. Replies and instructions will appear in the "
@@ -100,6 +102,8 @@ public class CreateReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         UserDetails userDetails = userService.getUserDetails(userToken);
+        emailService.sendReferralEmailYouHaveReceivedNewMessage(caseData);
+
         ReferralHelper.createReferral(
             caseData,
             String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName())

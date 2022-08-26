@@ -39,8 +39,8 @@ public class BulkAddSinglesValidator {
         }
 
         try {
-            var validatedSingleCases = singleCasesValidator.getValidatedCases(ethosCaseReferences,
-                    multipleDetails, multipleEthosReference, authToken);
+            var validatedSingleCases = singleCasesValidator.getValidatedCases(ethosCaseReferences, multipleDetails,
+                    authToken);
 
             return validatedSingleCases.stream()
                     .filter(Predicate.not(ValidatedSingleCase::isValid))

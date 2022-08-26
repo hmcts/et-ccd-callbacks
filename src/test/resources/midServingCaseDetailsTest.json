@@ -1,0 +1,80 @@
+{
+  "case_data": {
+    "ethosCaseReference": "2120001/2019",
+    "servingDocumentCollection": [
+      {
+        "id": "5d21f579-aff5-402a-9d07-2af828200882",
+        "value": {
+          "typeOfDocument": "Another type of document",
+          "shortDescription": "Test description",
+          "uploadedDocument": {
+            "document_url": "test-document-url",
+            "document_filename": "test-filename.xlsx",
+            "document_binary_url": "/documents/test-document/binary"
+          }
+        }
+      }
+    ],
+    "claimantType": {
+      "claimant_addressUK": {
+        "AddressLine1": "232 Petticoat Square",
+        "AddressLine2": "22 House",
+        "PostTown": "London",
+        "PostCode": "W10 4AG",
+        "Country": "United Kingdom"
+      }
+    },
+    "respondentCollection": [
+      {
+        "id" : "123345",
+        "value" : {
+          "respondent_address": {
+            "AddressLine1": "11 Small Street",
+            "AddressLine2": "22 House",
+            "Country": "UK",
+            "County": "North West",
+            "PostCode": "M12 42R",
+            "PostTown": "Manchester"
+          },
+          "respondent_name": "Antonio Vazquez",
+          "respondent_contact_preference": "Post",
+          "respondent_email": "Antonio@gmail.com",
+          "respondent_phone1": "07577136570",
+          "respondent_phone2": "07577136570",
+          "response_referred_to_judge": "2019-12-22",
+          "response_returned_from_judge": "2019-12-21",
+          "responseStruckOut": "No"
+        }
+      },
+      {
+        "id" : "123345678",
+        "value" : {
+          "respondent_address": {
+            "AddressLine1": "12 Small Street",
+            "AddressLine2": "24 House",
+            "Country": "UK",
+            "County": "North West",
+            "PostCode": "M12 4ED",
+            "PostTown": "Manchester"
+          },
+          "respondent_name": "Juan Garcia",
+          "respondent_contact_preference": "Post",
+          "respondent_email": "JuanGarcia@gmail.com",
+          "respondent_phone1": "07577136570",
+          "respondent_phone2": "07577136570",
+          "response_referred_to_judge": "2019-12-22",
+          "response_returned_from_judge": "2019-12-22",
+          "responseStruckOut": "No"
+        }
+      }
+    ],
+    "claimantIndType": {
+      "claimant_last_name": "Johnson",
+      "claimant_first_names": "Doris"
+    },
+    "servingDocumentRecipient": [
+      "Claimant",
+      "Respondent"
+    ]
+  }
+}

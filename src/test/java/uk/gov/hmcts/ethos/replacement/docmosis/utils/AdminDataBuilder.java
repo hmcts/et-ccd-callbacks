@@ -41,7 +41,8 @@ public class AdminDataBuilder {
         return this;
     }
 
-    public AdminDataBuilder withJudgeData(String judgeCode, String judgeName, String tribunalOffice, String employmentStatus) {
+    public AdminDataBuilder withJudgeData(String judgeCode, String judgeName, String tribunalOffice, 
+                                          String employmentStatus) {
         if (adminData.getJudgeCode() == null) {
             adminData.setJudgeCode(judgeCode);
         }
@@ -66,13 +67,29 @@ public class AdminDataBuilder {
         return ccdRequest;
     }
 
-    public AdminDataBuilder withEmployeeMember(String tribunalOffice, String employeeMemberCode, String employeeMemberName) {
+    public AdminDataBuilder withEmployeeMember(String tribunalOffice, String employeeMemberCode,
+                                               String employeeMemberName) {
         var employeeMember = new AdminCourtWorker();
         employeeMember.setTribunalOffice(tribunalOffice);
         employeeMember.setCourtWorkerCode(employeeMemberCode);
         employeeMember.setCourtWorkerName(employeeMemberName);
 
         adminData.setAdminCourtWorker(employeeMember);
+        return this;
+    }
+
+    public AdminDataBuilder withFileLocationData(String fileLocationCode, String fileLocationName,
+                                                 String tribunalOffice) {
+        if (adminData.getFileLocationCode() == null) {
+            adminData.setFileLocationCode(fileLocationCode);
+        }
+        if (adminData.getFileLocationName() == null) {
+            adminData.setFileLocationName(fileLocationName);
+        }
+        if (adminData.getTribunalOffice() == null) {
+            adminData.setTribunalOffice(tribunalOffice);
+        }
+
         return this;
     }
 }

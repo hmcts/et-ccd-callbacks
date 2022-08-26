@@ -74,7 +74,8 @@ public class ReferenceDataControllerTest {
 
     @Test
     public void hearingVenueReferenceData() throws Exception {
-        when(referenceService.fetchHearingVenueRefData(isA(CaseDetails.class), eq(AUTH_TOKEN))).thenReturn(submitEvent.getCaseData());
+        when(referenceService.fetchHearingVenueRefData(
+                isA(CaseDetails.class), eq(AUTH_TOKEN))).thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
         mvc.perform(post(HEARING_VENUE_REFERENCE_DATA)
                 .content(requestContent.toString())
@@ -88,7 +89,8 @@ public class ReferenceDataControllerTest {
 
     @Test
     public void dateListedReferenceData() throws Exception {
-        when(referenceService.fetchDateListedRefData(isA(CaseDetails.class), eq(AUTH_TOKEN))).thenReturn(submitEvent.getCaseData());
+        when(referenceService.fetchDateListedRefData(
+                isA(CaseDetails.class), eq(AUTH_TOKEN))).thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
         mvc.perform(post(DATE_LISTED_REFERENCE_DATA)
                 .content(requestContent.toString())
@@ -120,7 +122,8 @@ public class ReferenceDataControllerTest {
 
     @Test
     public void hearingVenueReferenceDataError500() throws Exception {
-        when(referenceService.fetchHearingVenueRefData(isA(CaseDetails.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(referenceService.fetchHearingVenueRefData(
+                isA(CaseDetails.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
         mvc.perform(post(HEARING_VENUE_REFERENCE_DATA)
                 .content(requestContent.toString())
@@ -131,7 +134,8 @@ public class ReferenceDataControllerTest {
 
     @Test
     public void dateListedReferenceDataError500() throws Exception {
-        when(referenceService.fetchDateListedRefData(isA(CaseDetails.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(referenceService.fetchDateListedRefData(
+                isA(CaseDetails.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
         mvc.perform(post(DATE_LISTED_REFERENCE_DATA)
                 .content(requestContent.toString())

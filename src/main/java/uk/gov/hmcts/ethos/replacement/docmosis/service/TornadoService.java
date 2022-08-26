@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +15,10 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
@@ -27,7 +31,9 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LETTER_ADDRESS_ALLOCATED_OFFICE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
@@ -38,6 +44,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 @Service("tornadoService")
 public class TornadoService {
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
+    private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
 
     private final TornadoConnection tornadoConnection;
     private final DocumentManagementService documentManagementService;
@@ -187,13 +194,21 @@ public class TornadoService {
         try (var is = conn.getInputStream()) {
             bytes = getBytesFromInputStream(os, is);
         }
-
-        var documentSelfPath = documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME,
-                APPLICATION_DOCX_VALUE, caseTypeId);
+        URI documentSelfPath = uploadDocument(documentName, authToken, bytes, caseTypeId);
         log.info("URI documentSelfPath uploaded and created: " + documentSelfPath.toString());
         var downloadUrl = documentManagementService.generateDownloadableURL(documentSelfPath);
         var markup = documentManagementService.generateMarkupDocument(downloadUrl);
         return generateDocumentInfo(documentName, documentSelfPath, markup);
+    }
+
+    private URI uploadDocument(String documentName, String authToken, byte[] bytes, String caseTypeId) {
+        if (documentName.endsWith(".pdf")) {
+            return documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME_PDF,
+                    APPLICATION_PDF_VALUE, caseTypeId);
+        } else {
+            return documentManagementService.uploadDocument(authToken, bytes, OUTPUT_FILE_NAME,
+                    APPLICATION_DOCX_VALUE, caseTypeId);
+        }
     }
 
     private byte[] getBytesFromInputStream(ByteArrayOutputStream os, InputStream is) throws IOException {
@@ -216,5 +231,62 @@ public class TornadoService {
     private void writeOutputStream(OutputStreamWriter outputStreamWriter, StringBuilder sb) throws IOException {
         outputStreamWriter.write(sb.toString());
         outputStreamWriter.flush();
+    }
+
+    /**
+     * This method calls the helper method to create the data to be passed through to Tornado and then checks whether
+     * it can reach the service.
+     * @param caseData contains the data needed to generate the PDF
+     * @param userToken contains the user authentication token
+     * @param caseTypeId reference for which casetype the document is being uploaded to
+     * @param documentName name of the document
+     * @return DocumentInfo which contains the URL and markup of the uploaded document
+     * @throws IOException if the call to Tornado has failed, an exception will be thrown. This could be due to
+     timeout or maybe a bad gateway.
+     */
+    public DocumentInfo generateEventDocument(CaseData caseData, String userToken, String caseTypeId,
+                                              String documentName)
+        throws IOException {
+        HttpURLConnection connection = null;
+        try {
+            connection = createConnection();
+            buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
+            return checkResponseStatus(userToken, connection, documentName, caseTypeId);
+        } catch (IOException exception) {
+            log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
+            throw exception;
+        } finally {
+            closeConnection(connection);
+        }
+    }
+
+    private void buildDocumentInstruction(HttpURLConnection connection, CaseData caseData, String documentName,
+                                          String caseTypeId)
+            throws IOException {
+        String documentContent = getDocumentContent(caseData, documentName, caseTypeId);
+
+        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream(),
+                StandardCharsets.UTF_8)) {
+            outputStreamWriter.write(documentContent);
+            outputStreamWriter.flush();
+        }
+    }
+
+    private String getDocumentContent(CaseData caseData, String documentName, String caseTypeId)
+            throws JsonProcessingException {
+        if (isNullOrEmpty(documentName)) {
+            throw new NullPointerException("Document name cannot be null or empty");
+        }
+        switch (documentName) {
+            case "ET1 Vetting.pdf":
+                return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            case "ET3 Processing.pdf":
+                return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            case "Initial Consideration.pdf" :
+                return InitialConsiderationHelper.getDocumentRequest(
+                        caseData, tornadoConnection.getAccessKey(), caseTypeId);
+            default:
+                throw new IllegalArgumentException("Unexpected document name " + documentName);
+        }
     }
 }

@@ -13,6 +13,7 @@ module.exports = () => {
         executeClaimantRepresentative:steps.amendClaimantRepresentative.amendClaimantRepresentative,
         executeRespondentDetails:steps.amendRespondentDetails.amendRespondentDetails,
         amendTheCaseDetails:steps.amendCaseDetails.amendCaseDetails,
+        amendCaseDetailsWithCaseCurrentPosition:steps.amendCaseDetails.amendCaseDetailsWithCasePosition,
         executeRespondentRepresentative:steps.amendRespondentRepresentative.amendRespondentRepresentative,
         executeAddAmendJurisdiction:steps.amendJurisdiction.addAmendJurisdiction,
         executeCloseCase:steps.desposeCase.desposeCase,
@@ -23,9 +24,11 @@ module.exports = () => {
         executeAddAmendHearing:steps.amendHearing.addAmendHearing,
         executeAllocateHearing:steps.allocateHearing.allocateHearing,
         executeHearingDetails:steps.hearingDetails.hearingDetails,
+        amendHearingDetails:steps.hearingDetails.updateHearingDetails,
         // executePrintHearingLists:steps.printHearingLists.printHearingLists,
         executeCaseTransfer:steps.caseTransfer.caseTransfer,
         executeJudgment:steps.amendJudgment.addAmendJudgment,
+        executeCreateReport: steps.createReport.createReport,
         selectNewCase: steps.newCase.newCase,
         selectCaseTypeOptions: steps.createCase.createCase,
         enterCreateCasePage1: steps.createCasePages.page1initiateCase1,
@@ -37,5 +40,6 @@ module.exports = () => {
         enterClaimantRepresentedPage7: steps.createCasePages.page7claimantRepresented,
         enterUploadDocPage8: steps.createCasePages.page8UploadDocumentsPage,
         submitPage9: steps.createCasePages.page9SubmitPage
+
     });
 };

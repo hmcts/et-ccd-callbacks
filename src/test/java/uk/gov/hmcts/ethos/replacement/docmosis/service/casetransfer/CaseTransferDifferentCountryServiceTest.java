@@ -175,8 +175,8 @@ class CaseTransferDifferentCountryServiceTest {
 
         verify(caseTransferEventService, times(2)).transfer(caseTransferEventParamsArgumentCaptor.capture());
         var params = caseTransferEventParamsArgumentCaptor.getAllValues();
-        verifyCaseTransferEventParams(claimantEthosCaseReference,claimantEthosCaseReference, officeCT, params.get(0));
-        verifyCaseTransferEventParams(eccCaseReference,claimantEthosCaseReference, officeCT, params.get(1));
+        verifyCaseTransferEventParams(claimantEthosCaseReference, claimantEthosCaseReference, officeCT, params.get(0));
+        verifyCaseTransferEventParams(eccCaseReference, claimantEthosCaseReference, officeCT, params.get(1));
     }
 
     @Test
@@ -198,9 +198,9 @@ class CaseTransferDifferentCountryServiceTest {
 
         verify(caseTransferEventService, times(3)).transfer(caseTransferEventParamsArgumentCaptor.capture());
         var params = caseTransferEventParamsArgumentCaptor.getAllValues();
-        verifyCaseTransferEventParams(claimantEthosCaseReference,claimantEthosCaseReference, officeCT, params.get(0));
-        verifyCaseTransferEventParams(eccCases.get(0),claimantEthosCaseReference, officeCT, params.get(1));
-        verifyCaseTransferEventParams(eccCases.get(1),claimantEthosCaseReference, officeCT, params.get(2));
+        verifyCaseTransferEventParams(claimantEthosCaseReference, claimantEthosCaseReference, officeCT, params.get(0));
+        verifyCaseTransferEventParams(eccCases.get(0), claimantEthosCaseReference, officeCT, params.get(1));
+        verifyCaseTransferEventParams(eccCases.get(1), claimantEthosCaseReference, officeCT, params.get(2));
     }
 
     @Test
@@ -221,7 +221,7 @@ class CaseTransferDifferentCountryServiceTest {
 
         verify(caseTransferEventService, times(2)).transfer(caseTransferEventParamsArgumentCaptor.capture());
         var params = caseTransferEventParamsArgumentCaptor.getAllValues();
-        verifyCaseTransferEventParams(claimantEthosCaseReference,eccCaseReference, officeCT, params.get(0));
+        verifyCaseTransferEventParams(claimantEthosCaseReference, eccCaseReference, officeCT, params.get(0));
         verifyCaseTransferEventParams(eccCaseReference, eccCaseReference, officeCT, params.get(1));
     }
 
@@ -257,8 +257,8 @@ class CaseTransferDifferentCountryServiceTest {
                 .buildAsCaseDetails(caseTypeId, jurisdiction);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken)).thenReturn(Collections.emptyList());
 
-        Assertions.assertThrows(IllegalStateException.class,
-                () -> caseTransferDifferentCountryService.transferCase(caseDetails, userToken));
+        Assertions.assertThrows(IllegalStateException.class, () -> caseTransferDifferentCountryService.transferCase(
+                caseDetails, userToken));
 
         verify(caseTransferEventService, never()).transfer(isA(CaseTransferEventParams.class));
     }
@@ -294,7 +294,7 @@ class CaseTransferDifferentCountryServiceTest {
         }
 
         if (hearingStatus != null) {
-            builder.withHearing("1", null, null)
+            builder.withHearing("1", null, null, null, null, null, null)
                     .withHearingSession(0, "1", "2021-12-25", hearingStatus, false);
         }
 

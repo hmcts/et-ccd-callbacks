@@ -82,7 +82,7 @@ public class EventValidationService {
             + "jurisdiction code %s.";
     public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "Disposal Date must match one of the "
             + "hearing dates for jurisdiction code %s.";
-    private static final int THIRTY = 30;
+    private static final int THIRTY_DAYS = 30;
 
     public List<String> validateReceiptDate(CaseData caseData) {
         List<String> errors = new ArrayList<>();
@@ -478,7 +478,7 @@ public class EventValidationService {
             var startDate = LocalDate.parse(listingFrom);
             var endDate = LocalDate.parse(listingTo);
             var numberOfDays = DAYS.between(startDate, endDate);
-            if (numberOfDays > THIRTY) {
+            if (numberOfDays > THIRTY_DAYS) {
                 errors.add(INVALID_LISTING_DATE_RANGE_ERROR_MESSAGE);
             }
         }

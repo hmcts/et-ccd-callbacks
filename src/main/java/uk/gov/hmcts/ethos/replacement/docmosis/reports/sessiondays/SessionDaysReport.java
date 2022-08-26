@@ -40,9 +40,9 @@ public final class SessionDaysReport {
     public static final String HALF_DAY = "Half Day";
     public static final String FULL_DAY = "Full Day";
     public static final String NONE = "None";
-    private static final int ZERO = 0;
-    private static final int SIXTY = 60;
-    private static final int HUNDRED_EIGHTY = 180;
+    private static final int ZERO_MINUTES = 0;
+    private static final int SIXTY_MINUTES = 60;
+    private static final int HUNDRED_EIGHTY_MINUTES = 180;
     private final SessionDaysReportDataSource reportDataSource;
     private final JudgeService judgeService;
     private ReportParams params;
@@ -337,11 +337,11 @@ public final class SessionDaysReport {
     }
 
     private String getSessionType(long duration) {
-        if (duration > ZERO && duration < SIXTY) {
+        if (duration > ZERO_MINUTES && duration < SIXTY_MINUTES) {
             return ONE_HOUR;
-        } else if (duration >= SIXTY && duration <= HUNDRED_EIGHTY) {
+        } else if (duration >= SIXTY_MINUTES && duration <= HUNDRED_EIGHTY_MINUTES) {
             return HALF_DAY;
-        } else if (duration > HUNDRED_EIGHTY) {
+        } else if (duration > HUNDRED_EIGHTY_MINUTES) {
             return FULL_DAY;
         } else {
             return NONE;

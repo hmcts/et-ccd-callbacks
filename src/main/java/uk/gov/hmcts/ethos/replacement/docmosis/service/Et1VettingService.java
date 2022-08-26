@@ -96,7 +96,7 @@ public class Et1VettingService {
     private static final String TRIBUNAL_SCOTLAND = "Scotland";
     private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br><br><br>";
     private static final String NO_ACAS_CERT_DISPLAY = "No certificate has been provided.<br><br><br>";
-    private static final int FIVE = 5;
+    private static final int FIVE_ACAS_DOC_TYPE_ITEMS_COUNT = 5;
     private static final int ONE = 1;
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
     private final JpaVenueService jpaVenueService;
@@ -163,7 +163,7 @@ public class Et1VettingService {
                     .collect(Collectors.joining());
         }
 
-        if (acasCount.getValue() > FIVE) {
+        if (acasCount.getValue() > FIVE_ACAS_DOC_TYPE_ITEMS_COUNT) {
             acasDisplay = String.format(BEFORE_LABEL_ACAS_OPEN_TAB, caseDetails.getCaseId());
         }
 

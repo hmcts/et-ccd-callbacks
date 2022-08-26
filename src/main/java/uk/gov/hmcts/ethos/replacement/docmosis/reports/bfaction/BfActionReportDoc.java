@@ -17,6 +17,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_O
     "PMD.ConsecutiveAppendsShouldReuse" })
 public class BfActionReportDoc {
 
+    private static final int ONE_REMAINING_ITEM = 1;
+
     public StringBuilder getReportDocPart(ListingData data) {
         return getBfActionReportDoc(data);
     }
@@ -43,10 +45,9 @@ public class BfActionReportDoc {
         }
 
         var itemsCount = bfDateTypeItems.size();
-        int one = 1;
         for (var i = 0; i < itemsCount; i++) {
             bfActionItemsListContent.append(getBfActionRow(bfDateTypeItems.get(i)));
-            if ((itemsCount - i) > one) {
+            if ((itemsCount - i) > ONE_REMAINING_ITEM) {
                 bfActionItemsListContent.append(",\n");
             }
         }

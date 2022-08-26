@@ -15,7 +15,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_O
     "PMD.FieldNamingConventions", "PMD.LawOfDemeter", "PMD.ConsecutiveAppendsShouldReuse",
     "PMD.ConsecutiveLiteralAppends", "PMD.InsufficientStringBufferDeclaration"})
 public class MemberDaysReportDoc {
-    private static final int ONE = 1;
+    private static final int ONE_REMAINING_ITEM = 1;
 
     public StringBuilder getReportDocPart(ListingData data) {
         return getMemberDaysReport(data);
@@ -65,7 +65,7 @@ public class MemberDaysReportDoc {
         var itemsCount = memberDaySummaryItems.size();
         for (var i = 0; i < itemsCount; i++) {
             reportSummaryContent.append(getMemberDaySummaryRow(memberDaySummaryItems.get(i)));
-            if ((itemsCount - i) > ONE) {
+            if ((itemsCount - i) > ONE_REMAINING_ITEM) {
                 reportSummaryContent.append(",\n");
             }
         }
@@ -97,7 +97,7 @@ public class MemberDaysReportDoc {
         var detailEntriesCount = reportDetails.size();
         for (var i = 0; i < detailEntriesCount; i++) {
             reportDetailsContent.append(getMemberDayReportDetailRow(reportDetails.get(i)));
-            if ((detailEntriesCount - i) > ONE) {
+            if ((detailEntriesCount - i) > ONE_REMAINING_ITEM) {
                 reportDetailsContent.append(",\n");
             }
         }

@@ -68,7 +68,7 @@ public class ReportDocHelper {
     private static final String CASE_REFERENCE = "{\"Case_Reference\":\"";
     private static final String CANNOT_CREATE_REPORT_DATA_EXCEPTION = "Unable to create report data";
     private static final String LISTING_DATA_STATE_EXCEPTION = "ListingData is not instanceof ";
-    private static final int FIVE = 5;
+    private static final int FIFTH_DAY = 5;
 
     private ReportDocHelper() {
     }
@@ -573,7 +573,7 @@ public class ReportDocHelper {
         int claimServedTypeItemsCount = claimServedTypeItems.size();
         var claimServedTypeItemsListSize = String.valueOf(claimServedTypeItems.size());
 
-        if (dayNumber >= FIVE) {
+        if (dayNumber >= FIFTH_DAY) {
             claimServedTypeItems.sort(Comparator.comparingInt(item ->
                 Integer.parseInt(item.getValue().getActualNumberOfDays())));
         }
@@ -582,7 +582,7 @@ public class ReportDocHelper {
 
         if (claimServedTypeItemsCount == 0) {
             reportContent.append(CASE_REFERENCE).append(claimServedTypeItemsListSize).append(NEW_LINE);
-            if (dayNumber >= FIVE) {
+            if (dayNumber >= FIFTH_DAY) {
                 reportContent.append("\"Actual_Number_Of_Days\":\"")
                         .append(claimServedTypeItemsListSize).append(NEW_LINE);
             }

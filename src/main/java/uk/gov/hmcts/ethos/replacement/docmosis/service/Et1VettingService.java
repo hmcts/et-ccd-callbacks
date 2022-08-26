@@ -97,7 +97,7 @@ public class Et1VettingService {
     private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br><br><br>";
     private static final String NO_ACAS_CERT_DISPLAY = "No certificate has been provided.<br><br><br>";
     private static final int FIVE_ACAS_DOC_TYPE_ITEMS_COUNT = 5;
-    private static final int ONE = 1;
+    private static final int ONE_RESPONDENT_COUNT = 1;
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
     private final JpaVenueService jpaVenueService;
 
@@ -193,7 +193,7 @@ public class Et1VettingService {
      * @return et1VettingRespondentDetailsMarkUp
      */
     private String initialRespondentDetailsMarkUp(CaseData caseData) {
-        if (caseData.getRespondentCollection().size() == ONE) {
+        if (caseData.getRespondentCollection().size() == ONE_RESPONDENT_COUNT) {
             RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
             return String.format(RESPONDENT_DETAILS, "",
                     respondentSumType.getRespondentName(),

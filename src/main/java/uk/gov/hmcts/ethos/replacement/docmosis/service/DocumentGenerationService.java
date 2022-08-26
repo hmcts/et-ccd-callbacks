@@ -52,11 +52,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @Service("documentGenerationService")
-@SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.ConfusingTernary",
-    "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops", "PMD.GodClass", "PMD.CognitiveComplexity",
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
     "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
-    "PMD.LawOfDemeter", "PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.PreserveStackTrace", "PMD.LinguisticNaming",
-    "PMD.PrematureDeclaration"})
+    "PMD.LawOfDemeter", "PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.PreserveStackTrace",
+    "PMD.LinguisticNaming", "PMD.PrematureDeclaration"})
 public class DocumentGenerationService {
 
     private final TornadoService tornadoService;

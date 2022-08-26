@@ -29,6 +29,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 @SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.ConfusingTernary",
     "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops", "PMD.GodClass", "PMD.CognitiveComplexity",
     "PMD.TooManyMethods", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions", "PMD.LawOfDemeter"})
+
 public class SubMultipleService {
 
     private final SubMultipleReferenceService subMultipleReferenceService;

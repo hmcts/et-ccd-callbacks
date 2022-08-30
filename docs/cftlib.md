@@ -121,3 +121,9 @@ Set the following environment variable to `false`
 ```bash
 CFTLIB_IMPORT_CCD_DEFS_ON_BOOT
 ```
+
+## Reset
+Execute the following command to remove all docker resources created by the CFTlib plugin.
+```bash
+./bin/cftlib-clean.sh
+```

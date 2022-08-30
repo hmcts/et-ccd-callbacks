@@ -10,10 +10,20 @@ plugins {
     id 'au.com.dius.pact' version '4.3.11'
     id 'io.freefair.lombok' version '6.5.0.3'
     id 'org.sonarqube' version '3.4.0.2513'
+    id 'pmd'
 }
 
 group = 'uk.gov.hmcts.et'
 version = '0.0.1'
+
+pmd {
+    toolVersion = "6.41.0"
+    sourceSets = [sourceSets.main]
+    reportsDir = file("$project.buildDir/reports/pmd")
+    // https://github.com/pmd/pmd/issues/876
+    ruleSets = []
+    ruleSetFiles = files("config/pmd/ruleset.xml")
+}
 
 allprojects {
     sourceCompatibility = '11.0'

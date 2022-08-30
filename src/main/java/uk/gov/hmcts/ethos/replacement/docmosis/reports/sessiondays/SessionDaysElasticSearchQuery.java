@@ -13,7 +13,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICS
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_HEARING_LISTED_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD;
 
-public class SessionDaysElasticSearchQuery {
+public final class SessionDaysElasticSearchQuery {
     private SessionDaysElasticSearchQuery() {
         // Access through static methods
     }

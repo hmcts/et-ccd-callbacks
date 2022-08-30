@@ -25,6 +25,7 @@ import java.util.List;
 
 @Slf4j
 @Service
+@SuppressWarnings({"PMD.CloseResource", "PMD.LawOfDemeter"})
 public class ClaimsByHearingVenueExcelReportCreationService {
     private static final String EXCEL_REPORT_WORKBOOK_NAME = "Claims By Hearing Venue Report";
     private static final String CASE_NUMBER_HEADER = "Case Number";

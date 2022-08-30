@@ -32,6 +32,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class InitialConsiderationController {
 
     private final VerifyTokenService verifyTokenService;

@@ -35,6 +35,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleH
 
 @Slf4j
 @Service("excelReadingService")
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.LiteralsFirstInComparisons", "PMD.LawOfDemeter",
+    "PMD.LinguisticNaming"})
 public class ExcelReadingService {
 
     private static final String ERROR_SHEET_NAME_NOT_FOUND = "Worksheet name not found";

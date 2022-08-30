@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReportData;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.ReportSummary;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -104,10 +106,18 @@ public class BfActionReportDocTest {
         assertEquals(bfActionReportDocTestSingleDateResource, resultListingData.toString());
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrowIllegalStateExceptionForListingDataNotABfActionReportDataType() throws Exception {
+        CasesAwaitingJudgmentReportData casesAwaitingJudgmentReportData = new CasesAwaitingJudgmentReportData(
+            new ReportSummary("Test Office"));
+        var resultListingData = bfActionReportDoc.getReportDocPart(casesAwaitingJudgmentReportData);
+    }
+
     private String getBfActionDocTestFileContent(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
             .getResource(jsonFileName)).toURI())));
         // returns the content by excluding the opening and closing curly brackets
         return json.substring(1, (json.length() - 1));
     }
+
 }

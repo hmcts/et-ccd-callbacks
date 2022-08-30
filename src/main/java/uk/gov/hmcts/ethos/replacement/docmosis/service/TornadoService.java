@@ -42,6 +42,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 @Slf4j
 @RequiredArgsConstructor
 @Service("tornadoService")
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.LawOfDemeter", "PMD.AvoidThrowingNullPointerException"})
 public class TornadoService {
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
@@ -93,7 +94,7 @@ public class TornadoService {
     }
 
     private DefaultValues getAllocatedCourtAddress(CaseData caseData, String caseTypeId, MultipleData multipleData) {
-        if ((multipleData != null && isAllocatedOffice(caseTypeId, multipleData.getCorrespondenceScotType()))
+        if (multipleData != null && isAllocatedOffice(caseTypeId, multipleData.getCorrespondenceScotType())
                 || isAllocatedOffice(caseTypeId, caseData.getCorrespondenceScotType())) {
             return defaultValuesReaderService.getDefaultValues(caseData.getAllocatedOffice());
         }

@@ -11,7 +11,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class EccReport {
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.AppendCharacterWithChar", "PMD.CognitiveComplexity", "PMD.InsufficientStringBufferDeclaration",
+    "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions", "PMD.LawOfDemeter"})
+public final class EccReport {
 
     private final EccReportDataSource reportDataSource;
 

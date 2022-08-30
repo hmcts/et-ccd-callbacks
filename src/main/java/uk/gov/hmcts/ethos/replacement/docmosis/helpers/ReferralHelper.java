@@ -28,10 +28,9 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.LinguisticNaming", "PMD.ConfusingTernary",
+    "PMD.SimpleDateFormatNeedsLocale"})
 public final class ReferralHelper {
-
-    private ReferralHelper() {
-    }
 
     private static final String TRUE = "True";
     private static final String FALSE = "False";
@@ -74,6 +73,9 @@ public final class ReferralHelper {
     private static final String JUDGE_DIRECTION_BODY = "A judge has sent directions on this employment tribunal case.";
 
     private static final String GENERIC_MESSAGE_BODY = "You have a new message about this employment tribunal case.";
+
+    private ReferralHelper() {
+    }
 
     /**
      * Checks to see if the user is a judge.
@@ -206,7 +208,7 @@ public final class ReferralHelper {
 
         ReferralType referralType = new ReferralType();
 
-        referralType.setReferralNumber(String.valueOf((caseData.getReferralCollection().size() + 1)));
+        referralType.setReferralNumber(String.valueOf(caseData.getReferralCollection().size() + 1));
         referralType.setReferCaseTo(caseData.getReferCaseTo());
         referralType.setIsUrgent(caseData.getIsUrgent());
         referralType.setReferralSubject(caseData.getReferralSubject());

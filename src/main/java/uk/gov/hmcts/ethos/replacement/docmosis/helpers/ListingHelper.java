@@ -45,9 +45,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_PUBLIC
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_STAFF;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.IT56_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.IT57_TEMPLATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LISTINGS;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LISTINGS_DEV;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LISTINGS_USER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIVE_CASELOAD_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
@@ -79,6 +76,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANG
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
 @Slf4j
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.LooseCoupling", "PDM.CyclomaticComplexity",
+    "PMD.AvoidInstantiatingObjectsInLoops", "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass",
+    "PMD.CognitiveComplexity", "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons",
+    "PMD.FieldNamingConventions", "PMD.LawOfDemeter",  "PMD.ConsecutiveLiteralAppends",
+    "PMD.ConsecutiveAppendsShouldReuse", "PMD.LinguisticNaming", "PMD.NPathComplexity", "PMD.ExcessiveImports"})
 public class ListingHelper {
 
     private static final String ROOM_NOT_ALLOCATED = "* Not Allocated";
@@ -219,10 +221,10 @@ public class ListingHelper {
         boolean rule50b = caseData.getRestrictedReporting() != null
                 && caseData.getRestrictedReporting().getRule503b() != null
                 && caseData.getRestrictedReporting().getRule503b().equals(YES);
-        if ((rule50b && isPublicType) || (rule50d && isPublicType)) {
+        if (rule50b && isPublicType || rule50d && isPublicType) {
             listingType.setClaimantName(" ");
             listingType.setRespondent(" ");
-        } else if ((rule50b && isPressListType) || (rule50d && isPressListType)) {
+        } else if (rule50b && isPressListType || rule50d && isPressListType) {
             listingType.setClaimantName(RULE_50_APPLIES);
             listingType.setRespondent(RULE_50_APPLIES);
         } else {
@@ -317,37 +319,6 @@ public class ListingHelper {
         return sb;
     }
 
-    private static String getListingCaseTypeSingleOrListings(String caseType) {
-        if (caseType.endsWith(LISTINGS) || caseType.endsWith(LISTINGS_DEV) || caseType.endsWith(LISTINGS_USER)) {
-            return UtilHelper.getListingCaseTypeId(caseType);
-        } else {
-            return caseType;
-        }
-    }
-
-    private static String getOfficeName(String caseType) {
-        int index = findOfficeNameInUpperCase(caseType);
-        if (index != 0) {
-            var upperCaseLetter = Character.toString(caseType.charAt(index));
-            return caseType.replace(upperCaseLetter, " " + upperCaseLetter);
-        } else {
-            return caseType;
-        }
-    }
-
-    private static int findOfficeNameInUpperCase(String caseType) {
-        var count = 0;
-        for (var i = 0; i < caseType.length(); i++) {
-            if (Character.isUpperCase(caseType.charAt(i))) {
-                count++;
-            }
-            if (count == 2) {
-                return i;
-            }
-        }
-        return 0;
-    }
-
     private static StringBuilder getLogo(String caseType) {
         var sb = new StringBuilder();
         if (caseType.equals(SCOTLAND_LISTING_CASE_TYPE_ID)) {
@@ -378,7 +349,7 @@ public class ListingHelper {
 
     private static boolean isEmptyHearingDate(ListingType listingType) {
         if (listingType.getCauseListDate() != null) {
-            return listingType.getCauseListDate().trim().isEmpty();
+            return isNullOrEmpty(listingType.getCauseListDate());
         }
         return true;
     }
@@ -388,7 +359,7 @@ public class ListingHelper {
                 .stream()
                 .filter(listingTypeItem -> !isEmptyHearingDate(listingTypeItem.getValue()))
                 .collect(Collectors.groupingBy(listingTypeItem -> listingTypeItem.getValue().getCauseListDate(),
-                    () -> new TreeMap<>(getDateComparator()), Collectors.toList()));
+                    () -> new TreeMap<>(getDateComparator()), toList()));
     }
 
     private static Iterator<Map.Entry<String, List<ListingTypeItem>>> getEntriesByDate(StringBuilder sb,
@@ -454,7 +425,7 @@ public class ListingHelper {
 
     private static boolean isEmptyHearingRoom(ListingType listingType) {
         if (listingType.getHearingRoom() != null) {
-            return listingType.getHearingRoom().trim().isEmpty();
+            return isNullOrEmpty(listingType.getHearingRoom());
         }
         return true;
     }
@@ -465,7 +436,7 @@ public class ListingHelper {
                 .stream()
                 .filter(listingTypeItem -> !isEmptyHearingRoom(listingTypeItem.getValue()))
                 .collect(Collectors.groupingBy(listingTypeItem -> listingTypeItem.getValue().getHearingRoom(),
-                    () -> new TreeMap<>(getVenueComparator()), Collectors.toList()));
+                    () -> new TreeMap<>(getVenueComparator()), toList()));
         List<ListingTypeItem> notAllocated = listingSubCollection
                 .stream()
                 .filter(listingTypeItem -> isEmptyHearingRoom(listingTypeItem.getValue()))
@@ -479,7 +450,7 @@ public class ListingHelper {
 
     private static boolean isEmptyHearingVenue(ListingType listingType) {
         if (listingType.getCauseListVenue() != null) {
-            return listingType.getCauseListVenue().trim().isEmpty();
+            return isNullOrEmpty(listingType.getCauseListVenue());
         }
         return true;
     }
@@ -490,7 +461,7 @@ public class ListingHelper {
                 .stream()
                 .filter(listingTypeItem -> !isEmptyHearingVenue(listingTypeItem.getValue()))
                 .collect(Collectors.groupingBy(listingTypeItem -> listingTypeItem.getValue().getCauseListVenue(),
-                    () -> new TreeMap<>(getVenueComparator()), Collectors.toList()));
+                    () -> new TreeMap<>(getVenueComparator()), toList()));
         List<ListingTypeItem> notAllocated = listingData.getListingCollection()
                 .stream()
                 .filter(listingTypeItem -> isEmptyHearingVenue(listingTypeItem.getValue()))
@@ -749,7 +720,7 @@ public class ListingHelper {
             return localDateFrom.isEqual(localDate);
         } else {
             var localDateTo = LocalDate.parse(dateToSearchTo, OLD_DATE_TIME_PATTERN2);
-            return (!localDate.isBefore(localDateFrom)) && (!localDate.isAfter(localDateTo));
+            return !localDate.isBefore(localDateFrom) && !localDate.isAfter(localDateTo);
         }
     }
 
@@ -761,7 +732,7 @@ public class ListingHelper {
             return localDateFrom.isEqual(localDate);
         } else {
             var localDateTo = LocalDate.parse(dateToSearchTo, OLD_DATE_TIME_PATTERN2);
-            return (!localDate.isBefore(localDateFrom)) && (!localDate.isAfter(localDateTo));
+            return !localDate.isBefore(localDateFrom) && !localDate.isAfter(localDateTo);
         }
     }
 

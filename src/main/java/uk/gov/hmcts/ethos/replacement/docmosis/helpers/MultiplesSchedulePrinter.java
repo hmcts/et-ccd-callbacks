@@ -10,7 +10,8 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 @Slf4j
-public class MultiplesSchedulePrinter {
+@SuppressWarnings({"PMD.LawOfDemeter"})
+public final class MultiplesSchedulePrinter {
 
     private MultiplesSchedulePrinter() {
     }

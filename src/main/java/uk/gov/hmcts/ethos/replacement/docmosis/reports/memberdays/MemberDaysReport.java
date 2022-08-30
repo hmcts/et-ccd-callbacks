@@ -25,6 +25,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingDurationInMinutes;
 
 @Slf4j
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.LiteralsFirstInComparisons",
+    "PMD.FieldNamingConventions", "PMD.LawOfDemeter"})
 public class MemberDaysReport {
     private static final int MINUTES = 60;
     private static final String FULL_PANEL = "Full Panel";
@@ -168,15 +170,16 @@ public class MemberDaysReport {
         summaryItem.setFullDays(String.valueOf(fullDaysTotal));
         var halfDaysTotal = dayCounts.get(1);
         summaryItem.setHalfDays(String.valueOf(halfDaysTotal));
-        var totalDays = (double)fullDaysTotal + ((double)(halfDaysTotal) / 2.0);
+        var totalDays = (double)fullDaysTotal + (double)halfDaysTotal / 2.0;
         summaryItem.setTotalDays(String.valueOf(totalDays));
     }
 
     private List<Integer> getFullMembersDayCount(List<MemberDaysReportDetail> reportDetails) {
         int fullDayTotal = 0;
         int halfDayTotal = 0;
+        int fullDayHearingDuration = 3;
         for (var detail: reportDetails) {
-            if ((Integer.parseInt(detail.getHearingDuration()) / MINUTES) >= 3) {
+            if ((Integer.parseInt(detail.getHearingDuration()) / MINUTES) >= fullDayHearingDuration) {
                 fullDayTotal = fullDayTotal + getPanelMembersTotalDuration(detail);
             } else {
                 halfDayTotal = halfDayTotal + getPanelMembersTotalDuration(detail);

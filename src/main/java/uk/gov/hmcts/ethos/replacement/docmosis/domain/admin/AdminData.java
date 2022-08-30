@@ -10,6 +10,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.VenueImport;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
+@SuppressWarnings({"PMD.TooManyFields"})
 public class AdminData {
     @JsonProperty("name")
     private String name;

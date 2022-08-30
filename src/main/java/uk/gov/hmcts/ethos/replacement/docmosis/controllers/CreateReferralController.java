@@ -35,6 +35,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/createReferral")
 @RestController
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class CreateReferralController {
 
     @Value("${referral.template.id}")

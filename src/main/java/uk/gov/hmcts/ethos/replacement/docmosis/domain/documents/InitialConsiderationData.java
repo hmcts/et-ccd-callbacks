@@ -11,6 +11,7 @@ import java.util.List;
  */
 @SuperBuilder
 @Data
+@SuppressWarnings({"PMD.LinguisticNaming", "PDM.TooManyFields"})
 public class InitialConsiderationData {
 
     @JsonProperty("caseNumber")

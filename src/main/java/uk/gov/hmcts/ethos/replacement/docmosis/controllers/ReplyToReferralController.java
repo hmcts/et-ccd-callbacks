@@ -176,7 +176,7 @@ public class ReplyToReferralController {
         UserDetails userDetails = userService.getUserDetails(userToken);
 
         emailService.sendEmail(referralTemplateId, caseData.getReplyToEmailAddress(),
-            ReferralHelper.buildPersonalisation(caseData, caseData.getIsJudge().equals(TRUE), false));
+            ReferralHelper.buildPersonalisation(caseData, TRUE.equals(caseData.getIsJudge()), false));
 
         ReferralHelper.createReferralReply(
             caseData,

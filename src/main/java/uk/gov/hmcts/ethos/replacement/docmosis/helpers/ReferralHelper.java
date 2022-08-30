@@ -19,10 +19,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -372,7 +372,7 @@ public final class ReferralHelper {
     }
 
     public static Map<String, String> buildPersonalisation(CaseData caseData, boolean isJudge, boolean isNewReferral) {
-        Map<String, String> personalisation = new HashMap<>();
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
         personalisation.put("emailFlag", isNewReferral
             ? getEmailFlag(caseData.getIsUrgent()) : getEmailFlag(caseData.getIsUrgentReply()));

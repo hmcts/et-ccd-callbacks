@@ -69,7 +69,9 @@ class CreateReferralControllerTest {
                 Constants.HEARING_STATUS_HEARD,
                 true)
             .build();
-
+        caseData.setEthosCaseReference("caseRef");
+        caseData.setClaimant("claimant");
+        caseData.setIsUrgent("Yes");
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
     }

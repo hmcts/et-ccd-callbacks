@@ -91,6 +91,9 @@ class ReplyToReferralControllerTest {
         caseData.setHearingCollection(hearings);
         caseData.setIsJudge("Yes");
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
+        caseData.setEthosCaseReference("caseRef");
+        caseData.setClaimant("claimant");
+        caseData.setIsUrgent("Yes");
         ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
 
         UserDetails userDetails = new UserDetails();

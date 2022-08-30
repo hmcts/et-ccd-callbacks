@@ -378,6 +378,9 @@ bootWithCCD {
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,aac_manage_case_assignment,ccd_case_document_am_api,am_role_assignment_service,et_cos,et_msg_handler'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
 
+    // ccd-definition-store-api
+    environment 'WELSH_TRANSLATION_ENABLED', 'false'
+
     // ccd-case-document-am-api
     environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
 

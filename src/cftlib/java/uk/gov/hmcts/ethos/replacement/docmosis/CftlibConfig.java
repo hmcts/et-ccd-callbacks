@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.rse.ccd.lib.ControlPlane;
 import uk.gov.hmcts.rse.ccd.lib.api.CFTLib;
 import uk.gov.hmcts.rse.ccd.lib.api.CFTLibConfigurer;
 
@@ -10,6 +11,75 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Configures the cftlib plugin so that the environment is ready for use with this et-ccd-callbacks service. To start
+ * the cftlib environment see the bootWithCCD Gradle task.
+ *
+ * <p>
+ * The environment is configured with:
+ * <ul>
+ *     <li>CCD roles</li>
+ *     <li>User accounts</li>
+ *     <li>Imported CCD configuration</li>
+ *     <li>DM Store service</li>
+ * </ul>
+ * </p>
+ *
+ * <p>
+ * To automatically import CCD definitions at startup the following environment variables should be set to point to the
+ * location of the local version of the git repository:
+ *
+ * <ul>
+ *     <li>ENGLANDWALES_CCD_CONFIG_PATH</li>
+ *     <li>SCOTLAND_CCD_CONFIG_PATH</li>
+ *     <li>ADMIN_CCD_CONFIG_PATH</li>
+ * </ul>
+ *
+ * If you do not wish the CCD definitions to be imported at startup then set the following environment variable to false
+ * <pre>
+ *     CFTLIB_IMPORT_CCD_DEFS_ON_BOOT
+ * </pre>
+ * </p>
+ *
+ * <p>
+ * The user accounts created are as follows. All accounts use a password of 'password'
+ *
+ * <table>
+ *     <col width="50%"/>
+ *     <col width="25%"/>
+ *     <col width="25%"/>
+ *     <thead>
+ *         <tr>
+ *             <td>Email</td>
+ *             <td>Roles</td>
+ *             <td>Purpose</td>
+ *         </tr>
+ *     </thead>
+ *     <tbody>
+ *         <tr>
+ *             <td>ccd.docker.default@hmcts.net</td>
+ *             <td>ccd-import</td>
+ *             <td>Used to import CCD definitions</td>
+ *         </tr>
+ *         <tr>
+ *             <td>englandwales@hmcts.net</td>
+ *             <td>caseworker, caseworker-employment, caseworker-employment-englandwales</td>
+ *             <td>Caseworker account for England/Wales cases</td>
+ *         </tr>
+ *         <tr>
+ *             <td>scotland@hmcts.net</td>
+ *             <td>caseworker, caseworker-employment, caseworker-employment-scotland</td>
+ *             <td>Caseworker account for Scotland cases</td>
+ *         </tr>
+ *         <tr>
+ *             <td>admin@hmcts.net</td>
+ *             <td>caseworker, caseworker-employment, caseworker-employment-api</td>
+ *             <td>Admin account</td>
+ *         </tr>
+ *     </tbody>
+ * </table>
+ * </p>
+ */
 @Component
 @Slf4j
 public class CftlibConfig implements CFTLibConfigurer {
@@ -31,6 +101,7 @@ public class CftlibConfig implements CFTLibConfigurer {
         createRoles(lib);
         createUsers(lib);
         importCcdDefinitions(lib);
+        startDmStore();
     }
 
     private void createRoles(CFTLib lib) {
@@ -99,5 +170,10 @@ public class CftlibConfig implements CFTLibConfigurer {
         } catch (IOException e) {
             log.error("Unable to import {},", file);
         }
+    }
+
+    private void startDmStore() {
+        ControlPlane.waitForDB();
+        DmStore.start();
     }
 }

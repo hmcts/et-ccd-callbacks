@@ -1,0 +1,123 @@
+# RSE CFT lib
+
+[RSE CFT lib](https://github.com/hmcts/rse-cft-lib) is a Gradle plugin that delivers a local CCD/ExUI environment in which et-ccd-callbacks can be developed and tested.
+The key advantage of CFT lib over using [ECM CCD Docker]() as a development environment is a lower RAM requirement.
+
+The integration between the plugin and et-ccd-callbacks can be found in
+* build.gradle - see bootWithCCD
+* src/cftlib
+* src/main/resources/application-cftlib.properties
+
+The integration will boot the environment with the following automatically created:
+* CCD roles
+* Users
+* CCD definitions imported (requires additional configuration)
+* Starts dm-store service for document management
+
+**_Note the CFTLib plugin supports Spring Boot DevTools automatic restart._**
+
+## Setup
+
+### Environment Variables
+| Variable                       | Purpose                                         |
+|--------------------------------|-------------------------------------------------|
+| ET_COS_CFTLIB_DB_PASSWORD      | Local et_cos database password                  |
+| XUI_LD_ID                      | Launch Darkly Client Id                         |
+| SPRING_PROFILES_ACTIVE         | Set to ```cftlib``` to use cftlib Spring profile |
+| ENGLANDWALES_CCD_CONFIG_PATH   | Set to the path of your local et-ccd-definitions-englandwales GitHub repository
+| SCOTLAND_CCD_CONFIG_PATH       | Set to the path of your local et-ccd-definitions-scotland GitHub repository
+| ADMIN_CCD_CONFIG_PATH          | Set to the path of your local et-ccd-definitions-admin GitHub repository
+| CFTLIB_IMPORT_CCD_DEFS_ON_BOOT | Optional<br/>Set to `false` to prevent CCD definitions from being imported at startup
+
+### Azure Service Bus
+You must either provide a connection string in an environment variable to a queue in Azure or
+configure a fake service bus.
+
+If you require a real Azure queue then ask one of the team to set this up.
+
+| Variable | Purpose                                              |
+| -------- |------------------------------------------------------|
+| CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING | Connection string for create-updates queue in Azure  |
+
+Or, if no development queue is available, set the following environment variable to use the fake.
+
+| Variable | Purpose                                             |
+| -------- |-----------------------------------------------------|
+| SERVICEBUS_FAKE | Set to ```true``` to enable fake service bus client |
+
+### RSE IdAM Simulator
+
+Make sure you have the latest RSE IdAM Simulator image
+```bash
+docker pull hmctspublic.azurecr.io/hmcts/rse/rse-idam-simulator:latest
+```
+
+## Run
+```bash
+    ./gradlew bootWithCCD
+```
+
+Once the services are all booted (i.e. when the log messages stop) then ExUI is accessible from:
+
+http://localhost:3000
+
+## Logins
+
+All logins use a password of `password`.
+
+| Username               | Roles                                                                 | Purpose
+|------------------------|-----------------------------------------------------------------------| --- 
+| englandwales@hmcts.net | caseworker, caseworker-employment, caseworker-employment-englandwales | Caseworker access to England/Wales cases
+| scotland@hmcts.net     | caseworker, caseworker-employment, caseworker-employment-scotland     | Caseworker access to Scotland cases
+| admin@hmcts.net        | caseworker, caseworker-employment, caseworker-employment-api          | Admin account with access to all cases
+
+## Importing CCD Definitions
+
+et-ccd-callbacks uses 3 CCD definition files that are maintained in separate repositories:
+* [England/Wales](https://github.com/hmcts/et-ccd-definitions-englandwales)
+* [Scotland](https://github.com/hmcts/et-ccd-definitions-scotland)
+* [ECM Admin](https://github.com/hmcts/et-ccd-definitions-admin)
+
+CCD definitions can be imported automatically at startup and also imported manually.
+
+In order for the CCD definitions to be imported automatically as part of the Gradle bootWithCCD task it is
+necessary to
+* Configure where the local version is located
+* Generate the cftlib versions locally
+
+### Configure local CCD Definition locations
+The following environment variables must be set to point to the local directory of the repository:
+
+| Repository                      | Environment Variable 
+|---------------------------------| --- 
+| et-ccd-definitions-englandwales | ENGLANDWALES_CCD_CONFIG_PATH
+| et-ccd-definitions-scotland     | SCOTLAND_CCD_CONFIG_PATH
+| et-ccd-definitions-admin        | ADMIN_CCD_CONFIG_PATH
+
+### Generate cftlib CCD definitions
+From each of the CCD definition repositories execute:
+```bash
+yarn generate-excel-cftlib
+```
+
+### Import CCD definitions manually
+The CCD definition locations must have been configured as in the previous section and the version 
+of the definitions to be imported must have been generated. 
+
+Execute the following
+```bash
+./bin/import-ccd-definition.sh [e|s|a]
+```
+The argument should be:
+* `e` for importing England/Wales
+* `s` for importing Scotland
+* `a` for importing ECM Admin
+
+### Configure CCD definitions not to be automatically imported
+It is possible to configure the bootWithCCD task not to automatically import CCD definitions.
+In this scenario it then becomes a manual task to import CCD definitions.
+
+Set the following environment variable to `false`
+```bash
+CFTLIB_IMPORT_CCD_DEFS_ON_BOOT
+```

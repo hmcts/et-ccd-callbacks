@@ -11,9 +11,13 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+/**
+ * REST Controller for Stub API to test API calls from an external network/service.
+ */
 @RequiredArgsConstructor
 @RestController
 @Slf4j
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class StubApiController {
     private final VerifyTokenService verifyTokenService;
 

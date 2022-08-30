@@ -40,7 +40,7 @@ class StubApiControllerTest {
     }
 
     @Test
-    void stubApi_Success() throws Exception {
+    void stubApiSuccess() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(get(STUB_API)
                     .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN))
@@ -49,7 +49,7 @@ class StubApiControllerTest {
     }
 
     @Test
-    void stubApi_InvalidToken() throws Exception {
+    void stubApiInvalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(get(STUB_API)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN))

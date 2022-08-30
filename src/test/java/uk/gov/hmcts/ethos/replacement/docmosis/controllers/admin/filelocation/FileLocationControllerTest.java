@@ -39,6 +39,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({FileLocationController.class, JsonMapper.class})
+@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.UnnecessaryFullyQualifiedName", "PMD.UnusedPrivateField"})
 class FileLocationControllerTest {
 
     @MockBean

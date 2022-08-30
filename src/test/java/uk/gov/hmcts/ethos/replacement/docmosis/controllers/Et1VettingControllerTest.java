@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -41,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({Et1VettingController.class, JsonMapper.class})
+@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.LawOfDemeter", "PMD.UnusedPrivateField"})
 class Et1VettingControllerTest {
 
     private static final String INIT_CASE_VETTING_ENDPOINT = "/initialiseEt1Vetting";
@@ -182,7 +182,7 @@ class Et1VettingControllerTest {
         mockMvc.perform(post(ET1_PROCESSING_COMPLETE_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
@@ -195,7 +195,7 @@ class Et1VettingControllerTest {
         mockMvc.perform(post(ET1_PROCESSING_COMPLETE_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
             .andExpect(status().isForbidden());
     }
 
@@ -204,7 +204,7 @@ class Et1VettingControllerTest {
         mockMvc.perform(post(ET1_PROCESSING_COMPLETE_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
             .andExpect(status().isBadRequest());
     }
 
@@ -214,7 +214,7 @@ class Et1VettingControllerTest {
         mockMvc.perform(post(ET1_VETTING_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
                 .andExpect(jsonPath("$.errors", nullValue()))
@@ -227,7 +227,7 @@ class Et1VettingControllerTest {
         mockMvc.perform(post(ET1_VETTING_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
@@ -236,7 +236,7 @@ class Et1VettingControllerTest {
         mockMvc.perform(post(ET1_VETTING_ABOUT_TO_SUBMIT)
                         .content("garbage content")
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 }

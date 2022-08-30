@@ -41,6 +41,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @RunWith(SpringRunner.class)
 @WebMvcTest({Et3VettingController.class, Et3VettingService.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
+@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.LawOfDemeter", "PMD.UnusedPrivateField"})
 class Et3VettingControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String POPULATE_ET3_DATES_URL = "/et3Vetting/midPopulateRespondentEt3Response";

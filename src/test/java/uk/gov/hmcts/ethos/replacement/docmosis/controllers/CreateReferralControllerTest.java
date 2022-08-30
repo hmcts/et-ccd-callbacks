@@ -32,6 +32,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CreateReferralController.class, JsonMapper.class})
+@SuppressWarnings({"PMD.MethodNamingConventions"})
 class CreateReferralControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String START_CREAT_REFERRAL_URL = "/createReferral/aboutToStart";

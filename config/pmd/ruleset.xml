@@ -32,6 +32,7 @@
     <rule ref="category/java/codestyle.xml/MethodNamingConventions">
         <properties>
             <property name="junit4TestPattern" value="[a-z][a-zA-Z0-9_]+"/>
+            <property name="junit5TestPattern" value="[a-z][a-zA-Z0-9_]*" />
         </properties>
     </rule>
     <rule ref="category/java/codestyle.xml/FieldNamingConventions">
@@ -59,7 +60,7 @@
     </rule>
     <rule ref="category/java/design.xml/ExcessiveImports">
         <properties>
-            <property name="minimum" value="45"/><!-- should be reduced -->
+            <property name="minimum" value="80"/><!-- should be reduced -->
         </properties>
     </rule>
     <rule ref="category/java/design.xml/LawOfDemeter">
@@ -116,7 +117,22 @@
     </rule>
     <rule ref="category/java/design.xml/TooManyFields">
         <properties>
-            <property name="maxfields" value="100" />
+            <property name="maxfields" value="200" />
+        </properties>
+    </rule>
+    <rule ref="category/java/design.xml/TooManyMethods">
+        <properties>
+            <property name="maxmethods" value="150" />
+        </properties>
+    </rule>
+    <rule ref="category/java/design.xml/ExcessivePublicCount">
+        <properties>
+            <property name="minimum" value="200" /><!-- should be reduced say to 45, the default-->
+        </properties>
+    </rule>
+    <rule ref="category/java/design.xml/ExcessiveClassLength">
+        <properties>
+            <property name="minimum" value="2000.0" />
         </properties>
     </rule>
 </ruleset>

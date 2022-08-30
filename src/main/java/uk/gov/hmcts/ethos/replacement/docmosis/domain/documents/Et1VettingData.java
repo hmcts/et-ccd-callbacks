@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
  */
 @SuperBuilder
 @Data
+@SuppressWarnings({"PMD.LinguisticNaming", "PDM.TooManyFields"})
 public class Et1VettingData {
 
     @JsonProperty("ethosCaseReference")

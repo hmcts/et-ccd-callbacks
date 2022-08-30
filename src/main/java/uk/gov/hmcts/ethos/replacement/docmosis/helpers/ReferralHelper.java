@@ -369,14 +369,7 @@ public final class ReferralHelper {
         return errors;
     }
 
-    public static Map<String, String> sendReferralEmail(CaseData caseData, boolean isJudge, boolean isNewReferral) {
-        Map<String, String> personalisation = buildPersonalisation(caseData, isNewReferral);
-        personalisation.put("body", isJudge ? JUDGE_DIRECTION_BODY : GENERIC_MESSAGE_BODY);
-
-        return personalisation;
-    }
-
-    private static Map<String, String> buildPersonalisation(CaseData caseData, boolean isNewReferral) {
+    public static Map<String, String> buildPersonalisation(CaseData caseData, boolean isJudge, boolean isNewReferral) {
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
         personalisation.put("emailFlag", isNewReferral
@@ -386,6 +379,7 @@ public final class ReferralHelper {
             caseData.getRespondentCollection().stream().map(o -> o.getValue().getRespondentName())
                 .collect(Collectors.joining(", ")));
         personalisation.put("date", getNearestHearingToReferral(caseData, "Not set"));
+        personalisation.put("body", isJudge ? JUDGE_DIRECTION_BODY : GENERIC_MESSAGE_BODY);
         return personalisation;
     }
 

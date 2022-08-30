@@ -143,7 +143,7 @@ public class CreateReferralController {
         UserDetails userDetails = userService.getUserDetails(userToken);
 
         emailService.sendEmail(referralTemplateId, caseData.getReferentEmail(),
-            ReferralHelper.sendReferralEmail(caseData, false, true));
+            ReferralHelper.buildPersonalisation(caseData, false, true));
 
         ReferralHelper.createReferral(
             caseData,

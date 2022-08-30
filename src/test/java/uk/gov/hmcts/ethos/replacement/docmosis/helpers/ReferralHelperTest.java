@@ -346,14 +346,14 @@ class ReferralHelperTest {
     }
 
     @Test
-    void sendReferralEmail() {
+    void buildPersonalisation() {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
         caseData.setEthosCaseReference("caseRef");
         caseData.setClaimant("claimant");
         caseData.setIsUrgent("Yes");
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
 
-        assertEquals(getExpectedPersonalisation(), ReferralHelper.sendReferralEmail(caseData, false, true));
+        assertEquals(getExpectedPersonalisation(), ReferralHelper.buildPersonalisation(caseData, false, true));
     }
 
     private Map<String, String> getExpectedPersonalisation() {

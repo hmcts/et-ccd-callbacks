@@ -16,8 +16,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.VenueSelectionService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @RestController

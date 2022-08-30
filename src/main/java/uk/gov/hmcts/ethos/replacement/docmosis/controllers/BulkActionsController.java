@@ -30,10 +30,10 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_ALL_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SELECT_ALL_VALUE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SELECT_NONE_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.BulkCreationService.BULK_CREATION_STEP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.BulkCreationService.UPDATE_SINGLES_STEP;
 

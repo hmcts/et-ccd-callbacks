@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted;
 
 import org.junit.Test;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -21,25 +21,25 @@ import java.util.List;
 import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_OPEN_TRACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_STANDARD_TRACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_WITHDRAWN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_REMEDY;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_OUTCOME_DISMISSED_AT_HEARING;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_INPUT_IN_ERROR;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_TRANSFERRED_OTHER_COUNTRY;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_TRANSFERRED_SAME_COUNTRY;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CLOSED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CONCILIATION_TRACK_OPEN_TRACK;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CONCILIATION_TRACK_STANDARD_TRACK;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_STATUS_HEARD;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_STATUS_WITHDRAWN;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_REMEDY;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING;
+import static uk.gov.hmcts.et.common.model.helper.Constants.JURISDICTION_OUTCOME_DISMISSED_AT_HEARING;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.et.common.model.helper.Constants.POSITION_TYPE_CASE_INPUT_IN_ERROR;
+import static uk.gov.hmcts.et.common.model.helper.Constants.POSITION_TYPE_CASE_TRANSFERRED_OTHER_COUNTRY;
+import static uk.gov.hmcts.et.common.model.helper.Constants.POSITION_TYPE_CASE_TRANSFERRED_SAME_COUNTRY;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SUBMITTED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport.COMPLETED_PER_SESSION_FORMAT;
 
 public class CaseCompletedReportTest {

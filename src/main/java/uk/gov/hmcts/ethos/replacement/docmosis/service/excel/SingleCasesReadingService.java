@@ -3,10 +3,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
-import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadEvent;
+import uk.gov.hmcts.et.common.client.CcdClient;
+import uk.gov.hmcts.et.common.helpers.UtilHelper;
+import uk.gov.hmcts.et.common.model.labels.LabelPayloadEvent;
+import uk.gov.hmcts.et.common.model.schedule.SchedulePayloadEvent;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 
 import java.util.ArrayList;

@@ -7,7 +7,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReadingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.MultipleDataBuilder;
@@ -26,8 +26,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.UPDATING_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.MultipleTransferDifferentCountryService.CASE_TRANSFERRED_POSITION_TYPE;
 
 @ExtendWith(SpringExtension.class)

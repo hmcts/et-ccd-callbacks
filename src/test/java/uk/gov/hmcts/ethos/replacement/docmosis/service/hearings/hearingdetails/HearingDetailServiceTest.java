@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails;
 
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.ecm.common.model.helper.Constants;
+import uk.gov.hmcts.et.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;

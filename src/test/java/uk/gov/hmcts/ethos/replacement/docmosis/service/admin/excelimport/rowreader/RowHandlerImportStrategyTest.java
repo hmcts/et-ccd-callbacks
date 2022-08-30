@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowrea
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.eq;

@@ -36,10 +36,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)

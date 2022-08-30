@@ -7,8 +7,8 @@ import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.Nullable;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.helpers.UtilHelper;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
@@ -32,10 +32,10 @@ import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_STATUS_LISTED;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.et.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 
 /**
  * ET3 vetting helper provides methods to assist with the ET3 vetting pages

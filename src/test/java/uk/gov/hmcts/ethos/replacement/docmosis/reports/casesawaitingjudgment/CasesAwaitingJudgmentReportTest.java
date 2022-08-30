@@ -2,8 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment;
 
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
-import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 
@@ -18,19 +18,19 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_WITHDRAWN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_COSTS_HEARING;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_MEDIATION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ACCEPTED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CLOSED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_STATUS_HEARD;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_STATUS_LISTED;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_STATUS_WITHDRAWN;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_COSTS_HEARING;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_MEDIATION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
 public class CasesAwaitingJudgmentReportTest {
 

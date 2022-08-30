@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
@@ -25,11 +25,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ExtendWith(SpringExtension.class)

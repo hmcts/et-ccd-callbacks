@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.junit.Test;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
@@ -9,8 +9,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 public class FlagsImageHelperTest {
 

@@ -46,9 +46,9 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getListingCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getMultipleCallbackRespEntity;
 

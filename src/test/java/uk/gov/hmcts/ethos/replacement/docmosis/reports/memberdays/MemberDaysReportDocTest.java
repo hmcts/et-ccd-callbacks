@@ -8,8 +8,8 @@ import java.text.DecimalFormat;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NEW_LINE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 public class MemberDaysReportDocTest {

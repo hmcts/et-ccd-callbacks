@@ -3,8 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.exceptions.CaseRetrievalException;
+import uk.gov.hmcts.et.common.client.CcdClient;
+import uk.gov.hmcts.et.common.exceptions.CaseRetrievalException;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
@@ -37,12 +37,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.JudgeServic
 
 import java.time.LocalDate;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_BY_HEARING_VENUE_REPORT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARINGS_BY_HEARING_TYPE_REPORT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SESSION_DAYS_REPORT;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CLAIMS_BY_HEARING_VENUE_REPORT;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARINGS_BY_HEARING_TYPE_REPORT;
+import static uk.gov.hmcts.et.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
+import static uk.gov.hmcts.et.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
+import static uk.gov.hmcts.et.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SESSION_DAYS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.CASES_AWAITING_JUDGMENT_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ECC_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS_TO_JUDGEMENTS_REPORT;

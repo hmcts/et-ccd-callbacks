@@ -2,9 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.helper.DefaultValues;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.BulkData;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -34,15 +34,15 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_STAFF;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LETTER_ADDRESS_ALLOCATED_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIST_CASES_CONFIG;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_DOC_ETCL;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_ETCL_STAFF;
+import static uk.gov.hmcts.et.common.model.helper.Constants.LETTER_ADDRESS_ALLOCATED_OFFICE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.LIST_CASES_CONFIG;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
 public class TornadoServiceTest {
     private TornadoService tornadoService;

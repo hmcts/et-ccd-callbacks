@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.et.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
+import static uk.gov.hmcts.et.common.model.helper.Constants.BF_ACTION_ACAS;
 
 @Slf4j
 public class BFHelper {

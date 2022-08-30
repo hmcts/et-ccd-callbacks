@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;

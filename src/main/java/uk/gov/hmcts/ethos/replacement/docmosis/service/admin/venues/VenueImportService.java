@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.venues;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FileLocationFixedListSheetImporter;

@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports;
 import org.assertj.core.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
@@ -16,12 +16,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.FLAG_ECC;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
 class CaseSourceLocalReportTest {
 

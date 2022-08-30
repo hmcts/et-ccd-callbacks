@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
+import uk.gov.hmcts.et.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.et.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.et.common.model.bulk.types.CaseType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -26,11 +26,11 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_1;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_2;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;

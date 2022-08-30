@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments;
 
 import org.junit.Test;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
-import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsSubmitEvent;
+import uk.gov.hmcts.et.common.client.CcdClient;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.reports.hearingstojudgments.HearingsToJudgmentsSubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 
 import java.io.IOException;

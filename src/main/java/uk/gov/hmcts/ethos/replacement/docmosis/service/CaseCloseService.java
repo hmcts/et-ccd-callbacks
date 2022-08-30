@@ -7,7 +7,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import java.util.ArrayList;
 import java.util.List;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_CLOSED_POSITION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CASE_CLOSED_POSITION;
 
 @Slf4j
 @Service("caseCloseService")

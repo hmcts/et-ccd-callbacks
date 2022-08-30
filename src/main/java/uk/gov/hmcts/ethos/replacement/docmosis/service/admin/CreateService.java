@@ -2,14 +2,14 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin;
 
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.et.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MAX_ES_SIZE;
 
 @Service
 public class CreateService {

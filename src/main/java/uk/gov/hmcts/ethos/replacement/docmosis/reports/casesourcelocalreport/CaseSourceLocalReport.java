@@ -14,10 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.FLAG_ECC;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
 
 @Service
 @Slf4j

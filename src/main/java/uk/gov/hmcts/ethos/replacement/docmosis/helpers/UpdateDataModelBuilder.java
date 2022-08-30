@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.UpdateDataModel;
+import uk.gov.hmcts.et.common.model.servicebus.datamodel.UpdateDataModel;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 
 public class UpdateDataModelBuilder {
 

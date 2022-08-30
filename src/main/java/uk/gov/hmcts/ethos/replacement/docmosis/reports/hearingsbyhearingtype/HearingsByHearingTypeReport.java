@@ -3,8 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.Strings;
-import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeCaseData;
-import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeSubmitEvent;
+import uk.gov.hmcts.et.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeCaseData;
+import uk.gov.hmcts.et.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
@@ -18,14 +18,14 @@ import java.util.Comparator;
 import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_RECONSIDERATION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_REMEDY;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING_CM;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_STATUS_HEARD;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_RECONSIDERATION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_REMEDY;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING_CM;
+import static uk.gov.hmcts.et.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingDurationInMinutes;
 
 public class HearingsByHearingTypeReport {

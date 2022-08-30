@@ -20,7 +20,7 @@ import uk.gov.hmcts.ethos.replacement.functional.util.TestUtil;
 import java.io.IOException;
 import java.net.URL;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 
 @Category(ComponentTest.class)
 @RunWith(SerenityRunner.class)

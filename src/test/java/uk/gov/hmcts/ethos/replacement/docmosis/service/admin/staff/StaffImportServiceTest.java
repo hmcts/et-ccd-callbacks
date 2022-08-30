@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.idam.models.UserDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.Document;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.ImportFile;

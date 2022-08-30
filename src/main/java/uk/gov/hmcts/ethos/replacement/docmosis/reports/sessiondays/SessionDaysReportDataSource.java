@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays;
 
-import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysSubmitEvent;
+import uk.gov.hmcts.et.common.model.reports.sessiondays.SessionDaysSubmitEvent;
 
 import java.util.List;
 

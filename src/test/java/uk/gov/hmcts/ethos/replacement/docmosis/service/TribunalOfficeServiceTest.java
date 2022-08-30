@@ -10,7 +10,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.TribunalOfficesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;

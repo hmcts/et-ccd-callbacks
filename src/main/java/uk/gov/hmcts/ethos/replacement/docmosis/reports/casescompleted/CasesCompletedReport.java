@@ -17,25 +17,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NUMBER_FOUR;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NUMBER_ONE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NUMBER_THREE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NUMBER_TWO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_OPEN_TRACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_STANDARD_TRACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING_CM;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING_CM_TCC;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_OUTCOME_DISMISSED_AT_HEARING;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_OUTCOME_UNSUCCESSFUL_AT_HEARING;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_INPUT_IN_ERROR;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_TRANSFERRED_OTHER_COUNTRY;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_TRANSFERRED_SAME_COUNTRY;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CLOSED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CONCILIATION_TRACK_NUMBER_FOUR;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CONCILIATION_TRACK_NUMBER_ONE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CONCILIATION_TRACK_NUMBER_THREE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CONCILIATION_TRACK_NUMBER_TWO;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CONCILIATION_TRACK_OPEN_TRACK;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CONCILIATION_TRACK_STANDARD_TRACK;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING_CM;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING_CM_TCC;
+import static uk.gov.hmcts.et.common.model.helper.Constants.JURISDICTION_OUTCOME_DISMISSED_AT_HEARING;
+import static uk.gov.hmcts.et.common.model.helper.Constants.JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING;
+import static uk.gov.hmcts.et.common.model.helper.Constants.JURISDICTION_OUTCOME_UNSUCCESSFUL_AT_HEARING;
+import static uk.gov.hmcts.et.common.model.helper.Constants.POSITION_TYPE_CASE_INPUT_IN_ERROR;
+import static uk.gov.hmcts.et.common.model.helper.Constants.POSITION_TYPE_CASE_TRANSFERRED_OTHER_COUNTRY;
+import static uk.gov.hmcts.et.common.model.helper.Constants.POSITION_TYPE_CASE_TRANSFERRED_SAME_COUNTRY;
 
 @Service
 @Slf4j

@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedl
 
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 
 import java.util.List;
 

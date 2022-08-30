@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
 @Service("caseTransferService")
 @RequiredArgsConstructor

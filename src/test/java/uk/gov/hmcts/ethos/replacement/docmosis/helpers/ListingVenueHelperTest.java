@@ -8,12 +8,12 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import java.util.Map;
 import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_ABERDEEN_VENUE_FIELD_NAME;
-import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_DUNDEE_VENUE_FIELD_NAME;
-import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_EDINBURGH_VENUE_FIELD_NAME;
-import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_GLASGOW_VENUE_FIELD_NAME;
-import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_VENUE_FIELD_NAME;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
+import static uk.gov.hmcts.et.common.helpers.ESHelper.LISTING_ABERDEEN_VENUE_FIELD_NAME;
+import static uk.gov.hmcts.et.common.helpers.ESHelper.LISTING_DUNDEE_VENUE_FIELD_NAME;
+import static uk.gov.hmcts.et.common.helpers.ESHelper.LISTING_EDINBURGH_VENUE_FIELD_NAME;
+import static uk.gov.hmcts.et.common.helpers.ESHelper.LISTING_GLASGOW_VENUE_FIELD_NAME;
+import static uk.gov.hmcts.et.common.helpers.ESHelper.LISTING_VENUE_FIELD_NAME;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ALL_VENUES;
 
 class ListingVenueHelperTest {
 

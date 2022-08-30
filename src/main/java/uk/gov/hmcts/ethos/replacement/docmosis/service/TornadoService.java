@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
+import uk.gov.hmcts.et.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.bulk.BulkData;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
@@ -34,9 +34,9 @@ import java.nio.charset.StandardCharsets;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LETTER_ADDRESS_ALLOCATED_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.LETTER_ADDRESS_ALLOCATED_OFFICE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.OUTPUT_FILE_NAME;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService.APPLICATION_DOCX_VALUE;
 
 @Slf4j

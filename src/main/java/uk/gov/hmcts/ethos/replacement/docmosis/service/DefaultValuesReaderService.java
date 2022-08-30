@@ -1,19 +1,17 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
+import uk.gov.hmcts.et.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
-
-import java.util.Optional;
-
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @Service("defaultValuesReaderService")
@@ -107,6 +105,21 @@ public class DefaultValuesReaderService {
 
     private Address getTribunalCorrespondenceAddress(DefaultValues defaultValues) {
         Address address = new Address();
+        address.setAddressLine1(
+                Optional.ofNullable(defaultValues.getTribunalCorrespondenceAddressLine1()).orElse(""));
+        address.setAddressLine2(
+                Optional.ofNullable(defaultValues.getTribunalCorrespondenceAddressLine2()).orElse(""));
+        address.setAddressLine3(
+                Optional.ofNullable(defaultValues.getTribunalCorrespondenceAddressLine3()).orElse(""));
+        address.setPostTown(
+                Optional.ofNullable(defaultValues.getTribunalCorrespondenceTown()).orElse(""));
+        address.setPostCode(
+                Optional.ofNullable(defaultValues.getTribunalCorrespondencePostCode()).orElse(""));
+        return address;
+    }
+
+    private uk.gov.hmcts.ecm.common.model.ccd.Address getEcmTribunalCorrespondenceAddress(DefaultValues defaultValues) {
+        uk.gov.hmcts.ecm.common.model.ccd.Address address = new uk.gov.hmcts.ecm.common.model.ccd.Address();
         address.setAddressLine1(
                 Optional.ofNullable(defaultValues.getTribunalCorrespondenceAddressLine1()).orElse(""));
         address.setAddressLine2(

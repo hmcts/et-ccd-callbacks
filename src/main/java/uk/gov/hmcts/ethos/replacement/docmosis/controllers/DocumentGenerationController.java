@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
+import uk.gov.hmcts.et.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -29,7 +29,7 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_EMPTY_ERROR;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ADDRESS_LABELS_EMPTY_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 

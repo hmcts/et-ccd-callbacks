@@ -10,8 +10,8 @@ import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
 class GenerateReportServiceTest {

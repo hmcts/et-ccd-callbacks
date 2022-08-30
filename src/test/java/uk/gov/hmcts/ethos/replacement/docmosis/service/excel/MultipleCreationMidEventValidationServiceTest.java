@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.et.common.model.bulk.types.CaseType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -27,12 +27,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ACCEPTED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationMidEventValidationService.CASE_BELONGS_DIFFERENT_OFFICE;
 
 @RunWith(SpringJUnit4ClassRunner.class)

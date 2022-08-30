@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Room;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Venue;
 

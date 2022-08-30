@@ -7,7 +7,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 
 import java.util.List;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NO;
 
 @Slf4j
 @Service("multipleDMidEventValidationService")

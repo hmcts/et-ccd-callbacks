@@ -6,9 +6,9 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.model.helper.BulkCasesPayload;
-import uk.gov.hmcts.ecm.common.model.helper.BulkRequestPayload;
+import uk.gov.hmcts.et.common.client.CcdClient;
+import uk.gov.hmcts.et.common.model.helper.BulkCasesPayload;
+import uk.gov.hmcts.et.common.model.helper.BulkRequestPayload;
 import uk.gov.hmcts.et.common.model.bulk.BulkData;
 import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
 import uk.gov.hmcts.et.common.model.bulk.BulkRequest;
@@ -37,8 +37,8 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class BulkSearchServiceTest {

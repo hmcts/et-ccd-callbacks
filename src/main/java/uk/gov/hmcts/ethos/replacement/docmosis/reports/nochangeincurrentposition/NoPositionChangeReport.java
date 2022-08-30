@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentpositio
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.et.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ACCEPTED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
+import static uk.gov.hmcts.et.common.model.helper.Constants.REJECTED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SUBMITTED_STATE;
 
 @Slf4j
 public class NoPositionChangeReport {

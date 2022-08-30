@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.servingclaims;
 import org.assertj.core.util.Strings;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -18,12 +18,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRANSFERRED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ACCEPTED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CLOSED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.TRANSFERRED_STATE;
 
 public class ServingClaimsReportTest {
 

@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.SortedMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 
 @Slf4j
 @Service("multipleBatchUpdate2Service")

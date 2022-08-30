@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.et.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.groupingBy;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_STATUS_HEARD;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MEMBER_DAYS_REPORT;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingDurationInMinutes;
 
 @Slf4j

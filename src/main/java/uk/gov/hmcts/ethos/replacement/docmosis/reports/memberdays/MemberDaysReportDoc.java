@@ -7,7 +7,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_OFFICE;
 

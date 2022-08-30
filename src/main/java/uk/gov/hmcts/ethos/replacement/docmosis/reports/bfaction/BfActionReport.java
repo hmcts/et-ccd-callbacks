@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
+import static uk.gov.hmcts.et.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 
 public class BfActionReport {
     public ListingData runReport(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {

@@ -7,8 +7,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.PersistentQHelperService;
 import java.util.ArrayList;
 import java.util.List;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 
 @Service
 public class CaseTransferEventService {

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CaseDetails;

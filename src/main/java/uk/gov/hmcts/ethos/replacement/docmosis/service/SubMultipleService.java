@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.model.helper.BulkRequestPayload;
+import uk.gov.hmcts.et.common.model.helper.BulkRequestPayload;
 import uk.gov.hmcts.et.common.model.bulk.BulkData;
 import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
 import uk.gov.hmcts.et.common.model.bulk.items.MidSearchTypeItem;
@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_SELECT_ALL_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.DEFAULT_SELECT_ALL_VALUE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SELECT_NONE_VALUE;
 
 @Slf4j
 @Service("subMultipleService")

@@ -13,13 +13,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
+import uk.gov.hmcts.et.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.*;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -52,19 +53,16 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CLOSED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MID_EVENT_CALLBACK;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.et.common.model.helper.Constants.REJECTED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SUBMITTED_CALLBACK;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -312,34 +310,55 @@ public class CaseActionsForCaseWorkerController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-
+        List<String> errors = new ArrayList<>();
         var caseDetails = ccdRequest.getCaseDetails();
         var caseData = caseDetails.getCaseData();
-        List<String> errors = eventValidationService.validateReceiptDate(caseData);
+            errors = eventValidationService.validateReceiptDate(caseData);
 
-        if (!eventValidationService.validateCaseState(caseDetails)) {
-            errors.add(caseData.getEthosCaseReference() + " Case has not been Accepted.");
-        }
+            if (!eventValidationService.validateCaseState(caseDetails)) {
+                errors.add(caseData.getEthosCaseReference() + " Case has not been Accepted.");
+            }
 
-        if (!eventValidationService.validateCurrentPosition(caseDetails)) {
-            errors.add("To set the current position to 'Case closed' "
-                    + "and to close the case, please take the Close Case action.");
-        }
-
-        if (errors.isEmpty()) {
-            var defaultValues = getPostDefaultValues(caseDetails);
-            log.info("Post Default values loaded: " + defaultValues);
-            defaultValuesReaderService.getCaseData(caseData, defaultValues);
-            caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
-            FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
-
-            addSingleCaseToMultipleService.addSingleCaseToMultipleLogic(
-                    userToken, caseData, caseDetails.getCaseTypeId(),
-                    caseDetails.getJurisdiction(),
-                    caseDetails.getCaseId(), errors);
-        }
-
+            if (!eventValidationService.validateCurrentPosition(caseDetails)) {
+                errors.add("To set the current position to 'Case closed' "
+                        + "and to close the case, please take the Close Case action.");
+            }
+            if (errors.isEmpty()) {
+                var defaultValues = getPostDefaultValues(caseDetails);
+                log.info("Post Default values loaded: " + defaultValues);
+                defaultValuesReaderService.getCaseData(caseData, defaultValues);
+                caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
+                FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
+                addSingleCaseToMultipleService.addSingleCaseToMultipleLogic(
+                        userToken, caseData, caseDetails.getCaseTypeId(),
+                        caseDetails.getJurisdiction(),
+                        caseDetails.getCaseId(), errors);
+            }
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = "/amendEcmCaseDetails", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "amend the Ecm case details for a single case")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<uk.gov.hmcts.ecm.common.model.ccd.CCDCallbackResponse> amendEcmCaseDetails(
+            @RequestBody uk.gov.hmcts.ecm.common.model.ccd.CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+        log.info("AMEND ECM CASE DETAILS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+        var caseDetails = ccdRequest.getCaseDetails();
+        var caseData = caseDetails.getCaseData();
+        return getEcmCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/amendClaimantDetails", consumes = APPLICATION_JSON_VALUE)
@@ -1135,7 +1154,11 @@ public class CaseActionsForCaseWorkerController {
     }
 
     private DefaultValues getPostDefaultValues(CaseDetails caseDetails) {
-        return defaultValuesReaderService.getDefaultValues(caseDetails.getCaseData().getManagingOffice());
+        if (caseDetails.getCaseTypeId().equals(ENGLANDWALES_CASE_TYPE_ID) ||
+                caseDetails.getCaseTypeId().equals(SCOTLAND_CASE_TYPE_ID)) {
+            return defaultValuesReaderService.getDefaultValues(caseDetails.getCaseData().getManagingOffice());
+        }
+        return defaultValuesReaderService.getDefaultValues(caseDetails.getCaseTypeId());
     }
 
     private void generateEthosCaseReference(CaseData caseData, CCDRequest ccdRequest) {

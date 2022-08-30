@@ -2,9 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.ecm.common.model.helper.Constants;
-import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.Constants;
+import uk.gov.hmcts.et.common.model.helper.DefaultValues;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -21,9 +21,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_CLOSED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.POSITION_TYPE_CASE_CLOSED;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 
 public class DefaultValuesReaderServiceTest {
 

@@ -2,28 +2,28 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DIGITAL_FILE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DO_NOT_POSTPONE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_LIVE_APPEAL;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_REPORTING;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_RESERVED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_RULE_503B;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_SENSITIVE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_WITH_OUTSTATION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.IMAGE_FILE_EXTENSION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.IMAGE_FILE_PRECEDING;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ONE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ZERO;
+import static uk.gov.hmcts.et.common.model.helper.Constants.FLAG_DIGITAL_FILE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.FLAG_DO_NOT_POSTPONE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.FLAG_ECC;
+import static uk.gov.hmcts.et.common.model.helper.Constants.FLAG_LIVE_APPEAL;
+import static uk.gov.hmcts.et.common.model.helper.Constants.FLAG_REPORTING;
+import static uk.gov.hmcts.et.common.model.helper.Constants.FLAG_RESERVED;
+import static uk.gov.hmcts.et.common.model.helper.Constants.FLAG_RULE_503B;
+import static uk.gov.hmcts.et.common.model.helper.Constants.FLAG_SENSITIVE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.FLAG_WITH_OUTSTATION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.IMAGE_FILE_EXTENSION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.IMAGE_FILE_PRECEDING;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ONE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ZERO;
 
 @Slf4j
 public class FlagsImageHelper {

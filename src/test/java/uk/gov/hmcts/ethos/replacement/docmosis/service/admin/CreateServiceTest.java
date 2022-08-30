@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.et.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 
 import java.io.IOException;

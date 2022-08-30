@@ -4,10 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.helper.BulkRequestPayload;
+import uk.gov.hmcts.et.common.client.CcdClient;
+import uk.gov.hmcts.et.common.exceptions.CaseCreationException;
+import uk.gov.hmcts.et.common.helpers.UtilHelper;
+import uk.gov.hmcts.et.common.model.helper.BulkRequestPayload;
 import uk.gov.hmcts.et.common.model.bulk.BulkData;
 import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
 import uk.gov.hmcts.et.common.model.bulk.MultRefComplexType;
@@ -45,13 +45,13 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_SELECT_ALL_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NUMBER_THREADS;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ACCEPTED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.DEFAULT_SELECT_ALL_VALUE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NUMBER_THREADS;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SELECT_NONE_VALUE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SUBMITTED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 
 @Slf4j
 @Service("bulkUpdateService")

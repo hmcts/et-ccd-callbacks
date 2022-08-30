@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport;
 
-import uk.gov.hmcts.ecm.common.model.reports.eccreport.EccReportCaseData;
-import uk.gov.hmcts.ecm.common.model.reports.eccreport.EccReportSubmitEvent;
+import uk.gov.hmcts.et.common.model.reports.eccreport.EccReportCaseData;
+import uk.gov.hmcts.et.common.model.reports.eccreport.EccReportSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;

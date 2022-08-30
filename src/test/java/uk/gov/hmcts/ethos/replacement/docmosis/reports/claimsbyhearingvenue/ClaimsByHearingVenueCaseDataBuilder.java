@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue;
 
-import uk.gov.hmcts.ecm.common.model.reports.claimsbyhearingvenue.ClaimsByHearingVenueCaseData;
-import uk.gov.hmcts.ecm.common.model.reports.claimsbyhearingvenue.ClaimsByHearingVenueSubmitEvent;
+import uk.gov.hmcts.et.common.model.reports.claimsbyhearingvenue.ClaimsByHearingVenueCaseData;
+import uk.gov.hmcts.et.common.model.reports.claimsbyhearingvenue.ClaimsByHearingVenueSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;

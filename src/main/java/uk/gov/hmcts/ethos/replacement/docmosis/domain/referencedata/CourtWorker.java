@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata;
 
 import lombok.Data;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

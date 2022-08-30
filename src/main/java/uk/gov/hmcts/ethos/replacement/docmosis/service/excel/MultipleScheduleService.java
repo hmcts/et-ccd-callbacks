@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
+import uk.gov.hmcts.et.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
@@ -23,7 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NO_CASES_SEARCHED;
 
 @Slf4j
 @RequiredArgsConstructor

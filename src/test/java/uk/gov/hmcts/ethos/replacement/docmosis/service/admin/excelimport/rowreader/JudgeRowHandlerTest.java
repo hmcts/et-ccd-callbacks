@@ -5,7 +5,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Judge;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository;
 

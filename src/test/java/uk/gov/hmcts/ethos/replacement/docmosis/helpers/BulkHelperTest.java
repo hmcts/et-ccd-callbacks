@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.et.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.MultipleType;
@@ -31,8 +31,8 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.PENDING_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.PENDING_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SUBMITTED_STATE;
 
 public class BulkHelperTest {
 

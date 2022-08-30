@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
-import uk.gov.hmcts.ecm.common.model.reports.eccreport.EccReportSubmitEvent;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.reports.eccreport.EccReportSubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 
 import java.time.LocalDateTime;
@@ -12,11 +12,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
 class EccReportTest {
 

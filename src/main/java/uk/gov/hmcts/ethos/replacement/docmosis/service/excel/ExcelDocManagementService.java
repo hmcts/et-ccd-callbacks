@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
+import uk.gov.hmcts.et.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.CaseImporterFile;
@@ -24,7 +24,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.SortedMap;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.DATE_TIME_USER_FRIENDLY_PATTERN;
+import static uk.gov.hmcts.et.common.model.helper.Constants.DATE_TIME_USER_FRIENDLY_PATTERN;
 
 @Slf4j
 @RequiredArgsConstructor

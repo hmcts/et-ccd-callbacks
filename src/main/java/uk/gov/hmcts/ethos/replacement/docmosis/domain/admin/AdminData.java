@@ -54,4 +54,18 @@ public class AdminData {
     private String courtWorkerName;
     @JsonProperty("courtWorkerSelectList")
     private DynamicFixedListType courtWorkerSelectList;
+
+    //Ref data fixes
+    @JsonProperty("hearingDateType")
+    private String hearingDateType;
+    @JsonProperty("listingDate")
+    private String listingDate;
+    @JsonProperty("listingDateFrom")
+    private String listingDateFrom;
+    @JsonProperty("listingDateTo")
+    private String listingDateTo;
+    @JsonProperty("listingVenue")
+    private String listingVenue;
+    @JsonProperty("refDataType")
+    private String refDataType;
 }

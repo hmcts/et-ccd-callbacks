@@ -37,6 +37,14 @@ public class CallbackRespHelper {
     }
 
     @NotNull
+    public static ResponseEntity<uk.gov.hmcts.ecm.common.model.ccd.CCDCallbackResponse> getEcmCallbackRespEntityNoErrors(
+            uk.gov.hmcts.ecm.common.model.ccd.CaseData caseData) {
+        return ResponseEntity.ok(uk.gov.hmcts.ecm.common.model.ccd.CCDCallbackResponse.builder()
+                .data(caseData)
+                .build());
+    }
+
+    @NotNull
     public static ResponseEntity<CCDCallbackResponse> getCallbackRespEntityErrors(
             List<String> errors, CaseData caseData) {
 

@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.CourtWorkerService;

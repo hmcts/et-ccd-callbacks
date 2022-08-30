@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.et.common.helpers.UtilHelper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_OFFICE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_CASES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData.REPORT_DATE;

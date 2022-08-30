@@ -6,7 +6,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
+import uk.gov.hmcts.et.common.model.labels.LabelPayloadEvent;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
@@ -30,8 +30,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NO_CASES_SEARCHED;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleLetterServiceTest {

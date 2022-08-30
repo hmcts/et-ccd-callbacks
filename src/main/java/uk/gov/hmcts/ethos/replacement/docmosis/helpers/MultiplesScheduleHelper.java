@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
-import uk.gov.hmcts.ecm.common.model.schedule.SchedulePayloadES;
-import uk.gov.hmcts.ecm.common.model.schedule.types.ScheduleClaimantIndType;
-import uk.gov.hmcts.ecm.common.model.schedule.types.ScheduleClaimantType;
+import uk.gov.hmcts.et.common.model.helper.SchedulePayload;
+import uk.gov.hmcts.et.common.model.schedule.SchedulePayloadES;
+import uk.gov.hmcts.et.common.model.schedule.types.ScheduleClaimantIndType;
+import uk.gov.hmcts.et.common.model.schedule.types.ScheduleClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -17,8 +17,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_SCHEDULE_CONFIG;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_SCHEDULE_DETAILED_CONFIG;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MULTIPLE_SCHEDULE_CONFIG;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MULTIPLE_SCHEDULE_DETAILED_CONFIG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j

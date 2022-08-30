@@ -24,11 +24,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.formatLocalDate;
-import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.formatLocalDateTime;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.COMPANY_TYPE_CLAIMANT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FILE_EXTENSION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
+import static uk.gov.hmcts.et.common.helpers.UtilHelper.formatLocalDate;
+import static uk.gov.hmcts.et.common.helpers.UtilHelper.formatLocalDateTime;
+import static uk.gov.hmcts.et.common.model.helper.Constants.COMPANY_TYPE_CLAIMANT;
+import static uk.gov.hmcts.et.common.model.helper.Constants.FILE_EXTENSION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
 
 public class DocumentUtil {
 

@@ -10,7 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;

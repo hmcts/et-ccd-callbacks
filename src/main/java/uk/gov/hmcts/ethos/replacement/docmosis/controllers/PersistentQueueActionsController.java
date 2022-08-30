@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ecm.common.model.helper.BulkRequestPayload;
+import uk.gov.hmcts.et.common.model.helper.BulkRequestPayload;
 import uk.gov.hmcts.et.common.model.bulk.BulkCallbackResponse;
 import uk.gov.hmcts.et.common.model.bulk.BulkRequest;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
@@ -26,7 +26,7 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.BulkCreationService.UPDATE_SINGLES_PQ_STEP;
 
 @Slf4j

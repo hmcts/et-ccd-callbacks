@@ -6,7 +6,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;

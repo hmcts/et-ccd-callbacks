@@ -17,7 +17,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsidera
 import java.util.Optional;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @Slf4j
 public class InitialConsiderationHelper {

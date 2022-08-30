@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.UPDATING_STATE;
 
 @Service
 @RequiredArgsConstructor

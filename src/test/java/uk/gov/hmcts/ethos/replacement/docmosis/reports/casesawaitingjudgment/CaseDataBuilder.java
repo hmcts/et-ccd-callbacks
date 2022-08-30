@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment;
 
-import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CaseData;
-import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
+import uk.gov.hmcts.et.common.model.reports.casesawaitingjudgment.CaseData;
+import uk.gov.hmcts.et.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
@@ -12,8 +12,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
 
 import java.util.ArrayList;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
 public class CaseDataBuilder {
 

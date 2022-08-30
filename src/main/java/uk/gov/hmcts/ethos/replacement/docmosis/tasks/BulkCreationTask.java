@@ -1,15 +1,15 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.tasks;
 
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.et.common.client.CcdClient;
+import uk.gov.hmcts.et.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 
 import java.io.IOException;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.PENDING_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.PENDING_STATE;
 
 @Slf4j
 public class BulkCreationTask implements Runnable {

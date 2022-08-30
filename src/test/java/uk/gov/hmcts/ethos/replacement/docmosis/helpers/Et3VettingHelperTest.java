@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
@@ -15,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MSL_HEARING_FORMAT_VIDEO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_STATUS_LISTED;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MSL_HEARING_FORMAT_VIDEO;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.ET3_TABLE_DATA;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.NO_CLAIM_SERVED_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper.NO_ET3_RESPONSE;

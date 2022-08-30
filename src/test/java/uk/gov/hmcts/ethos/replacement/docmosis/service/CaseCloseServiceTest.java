@@ -7,7 +7,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_CLOSED_POSITION;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CASE_CLOSED_POSITION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseService.REINSTATE_CANNOT_CASE_CLOSED_ERROR_MESSAGE;
 
 class CaseCloseServiceTest {

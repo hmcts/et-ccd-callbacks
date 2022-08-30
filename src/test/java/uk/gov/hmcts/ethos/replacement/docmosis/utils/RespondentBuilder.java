@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 
 /**
  * Contains helper methods to build a respondent object. Each method returns an instance of itself to aid with

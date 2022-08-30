@@ -3,10 +3,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.helper.BulkCasesPayload;
-import uk.gov.hmcts.ecm.common.model.helper.BulkRequestPayload;
+import uk.gov.hmcts.et.common.client.CcdClient;
+import uk.gov.hmcts.et.common.helpers.UtilHelper;
+import uk.gov.hmcts.et.common.model.helper.BulkCasesPayload;
+import uk.gov.hmcts.et.common.model.helper.BulkRequestPayload;
 import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
 import uk.gov.hmcts.et.common.model.bulk.BulkRequest;
 import uk.gov.hmcts.et.common.model.bulk.items.MultipleTypeItem;
@@ -25,10 +25,10 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NUMBER_THREADS;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NUMBER_THREADS;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
 @Slf4j
 @Service("bulkCreationService")

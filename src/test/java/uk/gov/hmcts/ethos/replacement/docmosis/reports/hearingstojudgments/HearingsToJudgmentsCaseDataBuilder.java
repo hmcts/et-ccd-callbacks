@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments;
 
-import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsCaseData;
-import uk.gov.hmcts.ecm.common.model.reports.hearingstojudgments.HearingsToJudgmentsSubmitEvent;
+import uk.gov.hmcts.et.common.model.reports.hearingstojudgments.HearingsToJudgmentsCaseData;
+import uk.gov.hmcts.et.common.model.reports.hearingstojudgments.HearingsToJudgmentsSubmitEvent;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;

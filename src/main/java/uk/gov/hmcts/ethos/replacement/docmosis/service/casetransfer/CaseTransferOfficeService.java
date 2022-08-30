@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer;
 
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;

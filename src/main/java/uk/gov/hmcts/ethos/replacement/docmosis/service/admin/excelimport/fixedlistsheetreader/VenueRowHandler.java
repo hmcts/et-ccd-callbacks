@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedl
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Venue;
 
 import java.util.ArrayList;

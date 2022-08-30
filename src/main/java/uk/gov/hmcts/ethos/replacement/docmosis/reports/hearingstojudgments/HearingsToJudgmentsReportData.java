@@ -9,7 +9,7 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import java.util.ArrayList;
 import java.util.List;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper.addJsonCollection;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_OFFICE;

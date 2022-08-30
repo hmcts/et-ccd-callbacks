@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
+import uk.gov.hmcts.et.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition;
 
 import org.junit.Test;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.client.CcdClient;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCaseSearchResult;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 

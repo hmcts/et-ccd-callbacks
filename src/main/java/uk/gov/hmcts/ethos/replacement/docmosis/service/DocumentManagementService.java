@@ -12,7 +12,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
+import uk.gov.hmcts.et.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import static java.util.Collections.singletonList;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
+import static uk.gov.hmcts.et.common.model.helper.Constants.OUTPUT_FILE_NAME;
 
 @Service
 @Slf4j

@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport;
 
 import org.junit.Test;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
-import uk.gov.hmcts.ecm.common.model.reports.eccreport.EccReportSubmitEvent;
+import uk.gov.hmcts.et.common.client.CcdClient;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.reports.eccreport.EccReportSubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 
@@ -16,8 +16,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 public class EccReportCcdReportDataSourceTest {
 

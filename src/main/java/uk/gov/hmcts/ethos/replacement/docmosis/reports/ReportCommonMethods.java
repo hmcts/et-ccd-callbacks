@@ -5,7 +5,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
+import static uk.gov.hmcts.et.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays.MemberDaysReport.OLD_DATE_TIME_PATTERN3;
 
 public class ReportCommonMethods {

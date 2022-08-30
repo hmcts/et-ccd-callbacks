@@ -3,10 +3,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.model.helper.Constants;
-import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CaseData;
-import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
+import uk.gov.hmcts.et.common.helpers.UtilHelper;
+import uk.gov.hmcts.et.common.model.helper.Constants;
+import uk.gov.hmcts.et.common.model.reports.casesawaitingjudgment.CaseData;
+import uk.gov.hmcts.et.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
@@ -23,11 +23,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
+import static uk.gov.hmcts.et.common.model.helper.Constants.CLOSED_STATE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.HEARING_STATUS_HEARD;
+import static uk.gov.hmcts.et.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
+import static uk.gov.hmcts.et.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.ReportDetail.NO_MULTIPLE_REFERENCE;
 
 @Slf4j

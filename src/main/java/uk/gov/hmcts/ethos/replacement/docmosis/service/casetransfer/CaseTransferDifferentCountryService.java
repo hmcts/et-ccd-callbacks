@@ -9,7 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import java.util.ArrayList;
 import java.util.List;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.et.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
 @Service
 @RequiredArgsConstructor

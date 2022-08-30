@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader;
 
 import org.apache.poi.xssf.usermodel.XSSFSheet;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.helper.TribunalOffice;
 
 public interface FixedListSheetImporter {
 

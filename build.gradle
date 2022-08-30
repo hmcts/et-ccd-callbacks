@@ -360,7 +360,7 @@ dependencies {
     integrationTestImplementation sourceSets.main.runtimeClasspath
     integrationTestImplementation sourceSets.test.runtimeClasspath
 
-    cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '4.4.0'
+    cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '4.7.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
 }
 

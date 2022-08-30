@@ -43,3 +43,15 @@ variable "team_contact" {
   description = "Team contact"
   default     = "#et-tech"
 }
+
+variable "apim_suffix" {
+  default = ""
+}
+
+variable "aks_subscription_id" {
+}
+
+variable "etstub_product_name" {
+  type    = string
+  default = "etstub"
+}

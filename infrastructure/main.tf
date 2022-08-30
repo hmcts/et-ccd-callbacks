@@ -10,6 +10,13 @@ locals {
       "Team Contact", var.team_contact
     )
   )
+
+  api_mgmt_suffix = var.apim_suffix == "" ? var.env : var.apim_suffix
+  api_mgmt_name   = "cft-api-mgmt-${local.api_mgmt_suffix}"
+  api_mgmt_rg     = join("-", ["cft", var.env, "network-rg"])
+
+  et_cos_url = join("", ["http://et-cos-", var.env, ".service.core-compute-", var.env, ".internal"])
+  s2sUrl     = join("", ["http://rpe-service-auth-provider-", var.env, ".service.core-compute-", var.env, ".internal"])
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -67,4 +74,25 @@ resource "azurerm_key_vault_secret" "et_cos_s2s_secret" {
   name         = "et-cos-s2s-secret"
   value        = data.azurerm_key_vault_secret.et_cos_s2s_key.value
   key_vault_id = module.key-vault.key_vault_id
+}
+
+data "azurerm_key_vault_secret" "s2s_client_id" {
+  key_vault_id = module.key-vault.key_vault_id
+  name         = "gateway-s2s-client-id"
+}
+
+provider "azurerm" {
+  alias           = "aks-cftapps"
+  subscription_id = var.aks_subscription_id
+  features {}
+}
+
+resource "azurerm_api_management_user" "et_api_management_user" {
+  api_management_name = local.api_mgmt_name
+  email               = local.api_mgmt_rg
+  first_name          = "Harpreet"
+  last_name           = "Jhita"
+  resource_group_name = ""
+  user_id             = ""
+  provider            = azurerm.aks-cftapps
 }

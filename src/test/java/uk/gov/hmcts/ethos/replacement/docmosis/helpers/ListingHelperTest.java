@@ -68,7 +68,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
-public class ListingHelperTest {
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LawOfDemeter", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.LinguisticNaming", "PMD.ExcessiveMethodLength", "PMD.NcssCount", "PMD.JUnit5TestShouldBePackagePrivate",
+    "PMD.ConfusingTernary"})
+class ListingHelperTest {
 
     private ListingDetails listingDetails;
     private ListingDetails listingDetails2;

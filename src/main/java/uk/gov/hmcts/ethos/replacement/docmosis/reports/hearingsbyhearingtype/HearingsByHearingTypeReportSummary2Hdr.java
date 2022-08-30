@@ -7,8 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class HearingsByHearingTypeReportSummary2Hdr {
 
+@SuppressWarnings({"PMD.FieldDeclarationsShouldBeAtStartOfClass"})
+public class HearingsByHearingTypeReportSummary2Hdr {
     HearingsByHearingTypeReportSummary2Hdr(String subSplit) {
         fields = new ReportFields();
         fields.setSubSplit(subSplit);

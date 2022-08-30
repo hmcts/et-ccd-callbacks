@@ -13,6 +13,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * ET3 Response Helper provides methods to assist with the ET3 Response Form event.
  */
 @Slf4j
+@SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.LinguisticNaming",
+    "PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions", "PMD.PrematureDeclaration"})
 public class Et3ResponseHelper {
 
     private static final String CLAIMANT_NAME_TABLE = "<pre> ET1 claimant name&#09&#09&#09&#09 %s</pre><hr>";

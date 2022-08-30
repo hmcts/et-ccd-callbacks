@@ -15,7 +15,8 @@ import java.util.List;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_BY_HEARING_VENUE_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
-public class ClaimsByHearingVenueReport {
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
+public final class ClaimsByHearingVenueReport {
     private static final String NULL_STRING_VALUE = "Null";
     private final ClaimsByHearingVenueReportDataSource dataSource;
 
@@ -98,31 +99,30 @@ public class ClaimsByHearingVenueReport {
     }
 
     private String getClaimantPostcode(ClaimantType claimantType) {
-        return (claimantType != null && claimantType.getClaimantAddressUK() != null
-            && StringUtils.isNotBlank(claimantType.getClaimantAddressUK().getPostCode()))
+        return claimantType != null && claimantType.getClaimantAddressUK() != null
+            && StringUtils.isNotBlank(claimantType.getClaimantAddressUK().getPostCode())
             ? claimantType.getClaimantAddressUK().getPostCode() : NULL_STRING_VALUE;
     }
 
     private String getClaimantWorkPostcode(ClaimantWorkAddressType claimantWorkAddressType) {
-        return (claimantWorkAddressType != null && claimantWorkAddressType.getClaimantWorkAddress() != null
-            && StringUtils.isNotBlank(claimantWorkAddressType.getClaimantWorkAddress().getPostCode()))
+        return claimantWorkAddressType != null && claimantWorkAddressType.getClaimantWorkAddress() != null
+            && StringUtils.isNotBlank(claimantWorkAddressType.getClaimantWorkAddress().getPostCode())
             ? claimantWorkAddressType.getClaimantWorkAddress().getPostCode() : NULL_STRING_VALUE;
     }
 
     private String getRespondentPostcode(List<RespondentSumTypeItem> respondentItems) {
-        return (CollectionUtils.isNotEmpty(respondentItems)
+        return CollectionUtils.isNotEmpty(respondentItems)
             && respondentItems.get(0).getValue().getRespondentAddress() != null
             && StringUtils.isNotBlank(respondentItems.get(0).getValue()
-            .getRespondentAddress().getPostCode()))
+            .getRespondentAddress().getPostCode())
             ? respondentItems.get(0).getValue().getRespondentAddress().getPostCode() : NULL_STRING_VALUE;
     }
 
     private String getRespondentET3Postcode(List<RespondentSumTypeItem> respondentItems) {
 
-        return (CollectionUtils.isNotEmpty(respondentItems)
+        return CollectionUtils.isNotEmpty(respondentItems)
             && respondentItems.get(0).getValue().getResponseRespondentAddress() != null
-            && StringUtils.isNotBlank(respondentItems.get(0).getValue()
-            .getResponseRespondentAddress().getPostCode()))
+            && StringUtils.isNotBlank(respondentItems.get(0).getValue().getResponseRespondentAddress().getPostCode())
             ? respondentItems.get(0).getValue().getResponseRespondentAddress().getPostCode() : NULL_STRING_VALUE;
     }
 }

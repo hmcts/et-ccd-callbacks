@@ -76,7 +76,6 @@ public class ReportDocHelperTest {
     private ListingDetails reportDetails3;
     private ListingDetails reportDetails4;
     private ListingDetails reportDetails5;
-    private ListingDetails reportDetails6;
     private ListingDetails reportDetailsClaimsServed;
     private UserDetails userDetails;
 
@@ -87,7 +86,6 @@ public class ReportDocHelperTest {
         reportDetails3 = generateReportDetails("reportDetailsTest3.json");
         reportDetails4 = generateReportDetails("reportDetailsTest4.json");
         reportDetails5 = generateReportDetails("reportDetailsTest5.json");
-        reportDetails6 = generateReportDetails("reportDetailsTest6.json");
         reportDetailsClaimsServed = generateReportDetails("reportDetailsTestClaimsServed.json");
         userDetails = HelperTest.getUserDetails();
     }
@@ -251,8 +249,35 @@ public class ReportDocHelperTest {
     public void testCasesAwaitingJudgementInvalidListingData() {
         ListingData listingData = new ListingData();
         listingData.setReportType(CASES_AWAITING_JUDGMENT_REPORT);
-
         ReportDocHelper.buildReportDocumentContent(listingData, "access-key", "template-name", userDetails);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrowIllegalStateExceptionForHearingsByHearingTypeReportDataType() throws Exception {
+        ListingData hearingsByHearingType = new EccReportData("test office");
+        hearingsByHearingType.setReportType(HEARINGS_BY_HEARING_TYPE_REPORT);
+        ReportDocHelper.buildReportDocumentContent(hearingsByHearingType, "access-key", "template-name", userDetails);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrowIllegalStateExceptionForRespondentsReportDataType() throws Exception {
+        ListingData respondentsReportData = new EccReportData("test Respondents Report office");
+        respondentsReportData.setReportType(RESPONDENTS_REPORT);
+        ReportDocHelper.buildReportDocumentContent(respondentsReportData, "access-key", "template-name", userDetails);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrowIllegalStateExceptionForSessionDaysReportDataType() throws Exception {
+        ListingData sessionDaysReportData = new EccReportData("test sessionDays Report office");
+        sessionDaysReportData.setReportType(SESSION_DAYS_REPORT);
+        ReportDocHelper.buildReportDocumentContent(sessionDaysReportData, "access-key", "template-name", userDetails);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrowIllegalStateExceptionForEccReportDataType() throws Exception {
+        ListingData eccReportData = new SessionDaysReportData(new SessionDaysReportSummary("test office"));
+        eccReportData.setReportType(ECC_REPORT);
+        ReportDocHelper.buildReportDocumentContent(eccReportData, "access-key", "template-name", userDetails);
     }
 
     @Test

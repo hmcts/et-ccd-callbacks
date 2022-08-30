@@ -25,6 +25,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.SE
 
 @Slf4j
 @Service("multipleDynamicListFlagsService")
+@SuppressWarnings({"PMD.ConfusingTernary"})
 public class MultipleDynamicListFlagsService {
 
     private final ExcelReadingService excelReadingService;

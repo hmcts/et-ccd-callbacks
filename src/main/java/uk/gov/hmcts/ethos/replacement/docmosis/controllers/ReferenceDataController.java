@@ -25,6 +25,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class ReferenceDataController {
 
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";

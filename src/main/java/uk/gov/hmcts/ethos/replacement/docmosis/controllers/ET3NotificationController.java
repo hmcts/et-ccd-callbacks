@@ -25,6 +25,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class ET3NotificationController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";

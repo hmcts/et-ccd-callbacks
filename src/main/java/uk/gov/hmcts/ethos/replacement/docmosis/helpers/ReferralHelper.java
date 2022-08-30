@@ -24,10 +24,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.LinguisticNaming", "PMD.ConfusingTernary",
+    "PMD.SimpleDateFormatNeedsLocale"})
 public final class ReferralHelper {
-
-    private ReferralHelper() {
-    }
 
     private static final String TRUE = "True";
     private static final String FALSE = "False";
@@ -66,6 +65,9 @@ public final class ReferralHelper {
     private static final String GENERAL_NOTES = "<br><br>General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 %s";
 
     private static final String INSTRUCTIONS = "<br><br>Recommended instructions &nbsp;&#09&#09&#09&nbsp; %s";
+
+    private ReferralHelper() {
+    }
 
     /**
      * Checks to see if the user is a judge.
@@ -199,7 +201,7 @@ public final class ReferralHelper {
 
         ReferralType referralType = new ReferralType();
 
-        referralType.setReferralNumber(String.valueOf((caseData.getReferralCollection().size() + 1)));
+        referralType.setReferralNumber(String.valueOf(caseData.getReferralCollection().size() + 1));
         referralType.setReferCaseTo(caseData.getReferCaseTo());
         referralType.setIsUrgent(caseData.getIsUrgent());
         referralType.setReferralSubject(caseData.getReferralSubject());

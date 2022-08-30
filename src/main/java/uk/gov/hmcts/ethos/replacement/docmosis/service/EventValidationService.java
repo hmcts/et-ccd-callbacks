@@ -71,6 +71,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getActiveRe
 
 @Slf4j
 @Service("eventValidationService")
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.TooManyMethods",
+    "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.ExcessiveImports", "PMD.LiteralsFirstInComparisons",
+    "PMD.UnnecessaryFullyQualifiedName", "PMD.LawOfDemeter", "PMD.UseConcurrentHashMap"})
 public class EventValidationService {
 
     private static final List<String> INVALID_STATES_FOR_CLOSED_CURRENT_POSITION = List.of(
@@ -79,6 +82,7 @@ public class EventValidationService {
             + "jurisdiction code %s.";
     public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "Disposal Date must match one of the "
             + "hearing dates for jurisdiction code %s.";
+    private static final int THIRTY_DAYS = 30;
 
     public List<String> validateReceiptDate(CaseData caseData) {
         List<String> errors = new ArrayList<>();
@@ -161,9 +165,9 @@ public class EventValidationService {
                     var validLink = false;
                     while (respItr.hasNext()) {
                         var respondentSumType = respItr.next().getValue();
-                        if ((respRepName.equals(respondentSumType.getRespondentName()))
-                                || (respondentSumType.getResponseRespondentName() != null
-                                && respRepName.equals(respondentSumType.getResponseRespondentName()))) {
+                        if (respRepName.equals(respondentSumType.getRespondentName())
+                                || respondentSumType.getResponseRespondentName() != null
+                                && respRepName.equals(respondentSumType.getResponseRespondentName())) {
                             validLink = true;
                             caseData.getRepCollection().get(index - 1).getValue().setRespRepName(respRepName);
                             break;
@@ -389,7 +393,7 @@ public class EventValidationService {
         }
     }
 
-    private void getJurisdictionCodesErrors(List<String> errors, List<String> jurCodesDoesNotExist,
+    private void setJurisdictionCodesErrors(List<String> errors, List<String> jurCodesDoesNotExist,
                                             Map<String, List<String>> duplicatedJurCodesMap) {
         if (!jurCodesDoesNotExist.isEmpty()) {
             errors.add(JURISDICTION_CODES_EXISTENCE_ERROR + String.join(", ", jurCodesDoesNotExist));
@@ -427,7 +431,7 @@ public class EventValidationService {
                         judgementType.getJudgementType());
 
             }
-            getJurisdictionCodesErrors(errors, jurCodesDoesNotExist, duplicatedJurCodesMap);
+            setJurisdictionCodesErrors(errors, jurCodesDoesNotExist, duplicatedJurCodesMap);
         }
         return errors;
     }
@@ -474,7 +478,7 @@ public class EventValidationService {
             var startDate = LocalDate.parse(listingFrom);
             var endDate = LocalDate.parse(listingTo);
             var numberOfDays = DAYS.between(startDate, endDate);
-            if (numberOfDays > 30) {
+            if (numberOfDays > THIRTY_DAYS) {
                 errors.add(INVALID_LISTING_DATE_RANGE_ERROR_MESSAGE);
             }
         }

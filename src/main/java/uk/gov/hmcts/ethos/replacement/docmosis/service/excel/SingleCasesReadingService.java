@@ -16,6 +16,7 @@ import java.util.List;
 
 @Slf4j
 @Service("singleCasesReadingService")
+@SuppressWarnings({"PMD.LooseCoupling"})
 public class SingleCasesReadingService {
 
     private final CcdClient ccdClient;

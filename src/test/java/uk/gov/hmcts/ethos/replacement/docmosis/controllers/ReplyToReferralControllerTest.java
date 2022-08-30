@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,6 +54,7 @@ class ReplyToReferralControllerTest {
     private static final String INIT_HEARING_AND_REFERRAL_DETAILS_URL = "/replyReferral/initHearingAndReferralDetails";
     private static final String ABOUT_TO_SUBMIT_URL = "/replyReferral/aboutToSubmit";
     private static final String SUBMITTED_REFERRAL_URL = "/replyReferral/completeReplyToReferral";
+    private static final String VALIDATE_EMAIL_URL = "/replyReferral/validateReplyToEmail";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -94,6 +96,7 @@ class ReplyToReferralControllerTest {
         caseData.setEthosCaseReference("caseRef");
         caseData.setClaimant("claimant");
         caseData.setIsUrgent("Yes");
+        caseData.setReplyToEmailAddress("test@gmail.com");
         ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
 
         UserDetails userDetails = new UserDetails();
@@ -187,6 +190,27 @@ class ReplyToReferralControllerTest {
     void completeReplyToReferral_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void validateReplyToEmail_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(VALIDATE_EMAIL_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors", hasSize(0)));
+    }
+
+    @Test
+    void validateReplyToEmail_invalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(VALIDATE_EMAIL_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -8,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +23,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.util.List;
+import javax.validation.constraints.NotEmpty;
+
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
@@ -33,6 +36,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequiredArgsConstructor
 public class ReplyToReferralController {
+    @Value("${referral.template.id}")
+    @NotEmpty
+    public String referralTemplateId;
+
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String TRUE = "True";
     private final VerifyTokenService verifyTokenService;
@@ -167,6 +174,9 @@ public class ReplyToReferralController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         UserDetails userDetails = userService.getUserDetails(userToken);
 
+        emailService.sendEmail(referralTemplateId, caseData.getReplyToEmailAddress(),
+            ReferralHelper.sendReferralEmail(caseData, caseData.getIsJudge().equals(TRUE), false));
+
         ReferralHelper.createReferralReply(
             caseData,
             String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName())
@@ -195,13 +205,6 @@ public class ReplyToReferralController {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        if (caseData.getIsJudge().equals(TRUE)) {
-            emailService.sendReferralEmailJudgeHasSentDirections(caseData);
-        } else {
-            emailService.sendReferralEmailYouHaveReceivedNewMessage(caseData);
         }
 
         String body = String.format(REPLY_REFERRAL_BODY,

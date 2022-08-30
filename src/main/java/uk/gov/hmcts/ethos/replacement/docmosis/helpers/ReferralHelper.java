@@ -19,10 +19,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 public final class ReferralHelper {
@@ -67,6 +70,10 @@ public final class ReferralHelper {
     private static final String INSTRUCTIONS = "<br><br>Recommended instructions &nbsp;&#09&#09&#09&nbsp; %s";
 
     private static final String INVALID_EMAIL_ERROR_MESSAGE = "The email address entered is invalid.";
+
+    private static final String JUDGE_DIRECTION_BODY = "A judge has sent directions on this employment tribunal case.";
+
+    private static final String GENERIC_MESSAGE_BODY = "You have a new message about this employment tribunal case.";
 
     /**
      * Checks to see if the user is a judge.
@@ -128,7 +135,7 @@ public final class ReferralHelper {
         }
         return String.format(REFERRAL_DETAILS, referral.getReferredBy(), referral.getReferCaseTo(),
             referral.getReferentEmail(), referral.getIsUrgent(), referral.getReferralDate(),
-            getNearestHearingToReferral(caseData),
+            getNearestHearingToReferral(caseData, "None"),
             referral.getReferralSubject(), referral.getReferralDetails(), referralDocLink,
             createReferralInstructions(referral.getReferralInstruction()));
     }
@@ -146,7 +153,7 @@ public final class ReferralHelper {
             .map(r -> String.format(REPLY_DETAILS, singleReply ? "" : count.incrementAndGet(),
                 r.getValue().getReplyBy(), r.getValue().getDirectionTo(), r.getValue().getReplyToEmailAddress(),
                 r.getValue().getIsUrgentReply(), r.getValue().getReplyDate(),
-                getNearestHearingToReferral(caseData), referral.getReferralSubject(),
+                getNearestHearingToReferral(caseData, "None"), referral.getReferralSubject(),
                 r.getValue().getDirectionDetails(), createDocLinkFromCollection(r.getValue().getReplyDocument()),
                 createGeneralNotes(r.getValue().getReplyGeneralNotes())))
             .collect(Collectors.joining());
@@ -215,7 +222,7 @@ public final class ReferralHelper {
 
         referralType.setReferralStatus(ReferralStatus.AWAITING_INSTRUCTIONS);
 
-        referralType.setReferralHearingDate(getNearestHearingToReferral(caseData));
+        referralType.setReferralHearingDate(getNearestHearingToReferral(caseData, "None"));
 
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId(UUID.randomUUID().toString());
@@ -232,11 +239,11 @@ public final class ReferralHelper {
      * @param caseData contains all the case data
      * @return Returns next hearing date in "dd MMM yyyy" format or "None"
      */
-    private static String getNearestHearingToReferral(CaseData caseData) {
+    private static String getNearestHearingToReferral(CaseData caseData, String defaultValue) {
         String earliestFutureHearingDate = HearingsHelper.getEarliestFutureHearingDate(caseData.getHearingCollection());
 
         if (earliestFutureHearingDate == null) {
-            return "None";
+            return defaultValue;
         }
 
         try {
@@ -244,7 +251,7 @@ public final class ReferralHelper {
             return new SimpleDateFormat("dd MMM yyyy").format(hearingStartDate);
         } catch (ParseException e) {
             log.info("Failed to parse hearing date when creating new referral");
-            return "None";
+            return defaultValue;
         }
     }
 
@@ -360,5 +367,29 @@ public final class ReferralHelper {
         }
 
         return errors;
+    }
+
+    public static Map<String, String> sendReferralEmail(CaseData caseData, boolean isJudge, boolean isNewReferral) {
+        Map<String, String> personalisation = buildPersonalisation(caseData, isNewReferral);
+        personalisation.put("body", isJudge ? JUDGE_DIRECTION_BODY : GENERIC_MESSAGE_BODY);
+
+        return personalisation;
+    }
+
+    private static Map<String, String> buildPersonalisation(CaseData caseData, boolean isNewReferral) {
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseNumber", caseData.getEthosCaseReference());
+        personalisation.put("emailFlag", isNewReferral
+            ? getEmailFlag(caseData.getIsUrgent()) : getEmailFlag(caseData.getIsUrgentReply()));
+        personalisation.put("claimant", caseData.getClaimant());
+        personalisation.put("respondents",
+            caseData.getRespondentCollection().stream().map(o -> o.getValue().getRespondentName())
+                .collect(Collectors.joining(", ")));
+        personalisation.put("date", getNearestHearingToReferral(caseData, "Not set"));
+        return personalisation;
+    }
+
+    private static String getEmailFlag(String isUrgent) {
+        return YES.equals(isUrgent) ? "URGENT" : "";
     }
 }

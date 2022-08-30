@@ -11,18 +11,23 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -338,6 +343,37 @@ class ReferralHelperTest {
 
         errors = new ArrayList<>(Arrays.asList(INVALID_EMAIL_ERROR_MESSAGE));
         assertEquals(errors, ReferralHelper.validateEmail("invalid.email.example"));
+    }
+
+    @Test
+    void sendReferralEmail() {
+        caseData.setReferralCollection(List.of(createReferralTypeItem()));
+        caseData.setEthosCaseReference("caseRef");
+        caseData.setClaimant("claimant");
+        caseData.setIsUrgent("Yes");
+        caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
+
+        assertEquals(getExpectedPersonalisation(), ReferralHelper.sendReferralEmail(caseData, false, true));
+    }
+
+    private Map<String, String> getExpectedPersonalisation() {
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseNumber", "caseRef");
+        personalisation.put("emailFlag", "URGENT");
+        personalisation.put("claimant", "claimant");
+        personalisation.put("respondents", "Andrew Smith");
+        personalisation.put("date", "11 Nov 2030");
+        personalisation.put("body", "You have a new message about this employment tribunal case.");
+        return personalisation;
+    }
+
+    private RespondentSumTypeItem createRespondentType() {
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName("Andrew Smith");
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(respondentSumType);
+
+        return respondentSumTypeItem;
     }
     
     private void setReferralReplyData() {

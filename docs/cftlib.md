@@ -19,15 +19,15 @@ The integration will boot the environment with the following automatically creat
 ## Setup
 
 ### Environment Variables
-| Variable                       | Purpose                                         |
-|--------------------------------|-------------------------------------------------|
-| ET_COS_CFTLIB_DB_PASSWORD      | Local et_cos database password                  |
-| XUI_LD_ID                      | Launch Darkly Client Id                         |
-| SPRING_PROFILES_ACTIVE         | Set to ```cftlib``` to use cftlib Spring profile |
-| ENGLANDWALES_CCD_CONFIG_PATH   | Set to the path of your local et-ccd-definitions-englandwales GitHub repository
-| SCOTLAND_CCD_CONFIG_PATH       | Set to the path of your local et-ccd-definitions-scotland GitHub repository
-| ADMIN_CCD_CONFIG_PATH          | Set to the path of your local et-ccd-definitions-admin GitHub repository
-| CFTLIB_IMPORT_CCD_DEFS_ON_BOOT | Optional<br/>Set to `false` to prevent CCD definitions from being imported at startup
+| Variable                       | Purpose                                                                               |
+|--------------------------------|---------------------------------------------------------------------------------------|
+| ET_COS_CFTLIB_DB_PASSWORD      | Local et_cos database password<br/>Set to `postgres`                                  |
+| XUI_LD_ID                      | Launch Darkly Client Id                                                               |
+| SPRING_PROFILES_ACTIVE         | Set to ```cftlib``` to use cftlib Spring profile                                      |
+| ENGLANDWALES_CCD_CONFIG_PATH   | Set to the path of your local et-ccd-definitions-englandwales GitHub repository       
+| SCOTLAND_CCD_CONFIG_PATH       | Set to the path of your local et-ccd-definitions-scotland GitHub repository           
+| ADMIN_CCD_CONFIG_PATH          | Set to the path of your local et-ccd-definitions-admin GitHub repository              
+| CFTLIB_IMPORT_CCD_DEFS_ON_BOOT | Optional<br/>Set to `false` to prevent CCD definitions from being imported at startup 
 
 ### Azure Service Bus
 You must either provide a connection string in an environment variable to a queue in Azure or

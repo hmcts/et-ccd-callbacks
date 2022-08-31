@@ -1,13 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.service.notify.NotificationClient;
 
 @Component
 public class EmailClient extends NotificationClient {
 
-    public EmailClient(@Value("${uk.gov.notify.api.key}") String apiKey) {
-        super(apiKey);
+    public EmailClient() {
+        super("apiKey");
     }
 } 

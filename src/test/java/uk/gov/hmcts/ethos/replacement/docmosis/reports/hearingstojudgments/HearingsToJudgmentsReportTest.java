@@ -44,6 +44,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CA
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@SuppressWarnings({"PMD.ExcessiveParameterList", "PMD.LawOfDemeter"})
 class HearingsToJudgmentsReportTest {
 
     HearingsToJudgmentsReportDataSource hearingsToJudgmentsReportDataSource;

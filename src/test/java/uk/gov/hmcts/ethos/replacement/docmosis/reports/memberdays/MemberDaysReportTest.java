@@ -35,6 +35,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CA
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
+@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.LawOfDemeter", "PMD.NcssCount"})
 class MemberDaysReportTest {
     private List<SubmitEvent> submitEvents;
     private ListingDetails listingDetails;
@@ -141,7 +142,7 @@ class MemberDaysReportTest {
         jurCodesTypeItem.setId("000");
         jurCodesTypeItem.setValue(jurCodesType);
 
-        List<HearingTypeItem> hearingTypeItems = new ArrayList<HearingTypeItem>();
+        List<HearingTypeItem> hearingTypeItems = new ArrayList<>();
         hearingTypeItems.add(hearingTypeItem);
         caseData.setHearingCollection(hearingTypeItems);
         submitEvent1.setCaseData(caseData);
@@ -168,7 +169,7 @@ class MemberDaysReportTest {
             dateListedTypeItem1, dateListedTypeItem2, dateListedTypeItem3)));
         hearingTypeItem2.setValue(hearingType2);
 
-        List<HearingTypeItem> hearingTypeItems2 = new ArrayList<HearingTypeItem>();
+        List<HearingTypeItem> hearingTypeItems2 = new ArrayList<>();
         hearingTypeItems2.add(hearingTypeItem2);
         caseData2.setHearingCollection(hearingTypeItems2);
 
@@ -210,7 +211,7 @@ class MemberDaysReportTest {
         HearingTypeItem hearingTypeItem3 = new HearingTypeItem();
         hearingTypeItem3.setId("1234500033");
 
-        List<HearingTypeItem> hearingTypeItems3 = new ArrayList<HearingTypeItem>();
+        List<HearingTypeItem> hearingTypeItems3 = new ArrayList<>();
         hearingTypeItems3.add(hearingTypeItem3);
         DateListedType dateListedType6 = new DateListedType();
         dateListedType6.setHearingStatus(HEARING_STATUS_HEARD);
@@ -455,12 +456,13 @@ class MemberDaysReportTest {
         if (dateListed == null) {
             return false;
         }
-        String datePart = null;
+        String datePart;
         if (dateListed.contains("T")) {
             datePart = dateListed.split("T")[0];
-        }
-        if (dateListed.contains(" ")) {
+        } else if (dateListed.contains(" ")) {
             datePart = dateListed.split(" ")[0];
+        } else {
+            return false;
         }
 
         LocalDate hearingListedDate = LocalDate.parse(datePart);

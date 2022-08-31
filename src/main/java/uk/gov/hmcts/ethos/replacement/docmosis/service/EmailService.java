@@ -10,12 +10,11 @@ import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
-@Service
+@Service("emailService")
 public class EmailService {
 
     private final EmailClient emailClient;
 
-    @Autowired
     public EmailService(EmailClient emailClient) {
         this.emailClient = emailClient;
     }

@@ -21,7 +21,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-public class UpdateDataModelBuilder {
+public final class UpdateDataModelBuilder {
 
     private UpdateDataModelBuilder() {
         // Access through static methods

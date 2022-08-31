@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 @Slf4j
 @RequiredArgsConstructor
 @Service("caseCreationForCaseWorkerService")
+@SuppressWarnings({ "PMD.PreserveStackTrace"})
 public class CaseCreationForCaseWorkerService {
 
     private static final String MESSAGE = "Failed to create new case for case id : ";

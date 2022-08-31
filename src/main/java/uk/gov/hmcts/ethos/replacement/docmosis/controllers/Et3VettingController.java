@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3VettingService;
@@ -40,6 +41,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/et3Vetting")
 @RestController
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class Et3VettingController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -258,7 +260,8 @@ public class Et3VettingController {
 
     /**
      * During processing the ET3 journey data is stored onto case data, this method saves that information onto the
-     * respondent selected at the start of vetting. The leftover information on case data will be deleted.
+     * respondent selected at the start of vetting. The leftover information on case data will be deleted. This method
+     * will also generate a document for the Vetting process and save it onto a respondent
      * @param ccdRequest generic request from CCD
      * @param userToken authentication token to verify the user
      * @return this will return and display a message to the user on the next steps.
@@ -283,8 +286,9 @@ public class Et3VettingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
-        et3VettingService.saveEt3VettingToRespondent(caseData);
+        DocumentInfo documentInfo = et3VettingService.generateEt3ProcessingDocument(caseData, userToken,
+                ccdRequest.getCaseDetails().getCaseTypeId());
+        et3VettingService.saveEt3VettingToRespondent(caseData, documentInfo);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

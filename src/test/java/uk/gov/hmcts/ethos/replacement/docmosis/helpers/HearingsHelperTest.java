@@ -6,10 +6,12 @@ import org.junit.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -235,6 +237,41 @@ public class HearingsHelperTest {
         assertTrue(errors.contains(HEARING_FINISH_FUTURE));
         assertFalse(errors.contains(HEARING_BREAK_FUTURE));
         assertFalse(errors.contains(HEARING_RESUME_FUTURE));
+    }
+
+    @Test
+    public void earliestDateReturnsEarliestDate() {
+        var hearingCollection = caseDetails1.getCaseData().getHearingCollection();
+        setListingDate(hearingCollection, 0, 2, "2100-02-01T01:01:01.000");
+        setListingDate(hearingCollection, 1, 0, "2100-03-01T01:01:01.000");
+        setListingDate(hearingCollection, 1, 1, "2100-01-01T01:01:01.000");
+        setListingDate(hearingCollection, 2, 1, "2100-04-01T01:01:01.000");
+        String actual = HearingsHelper.getEarliestFutureHearingDate(hearingCollection);
+        assertEquals("2100-01-01T01:01:01.000", actual);
+    }
+
+    @Test
+    public void earliestDateHandlesAHearingWithNoDatesInFuture() {
+        var hearingCollection = caseDetails1.getCaseData().getHearingCollection();
+        setListingDate(hearingCollection, 0, 2, "2100-02-01T01:01:01.000");
+        setListingDate(hearingCollection, 1, 0, "1999-01-01T01:01:01.000");
+        setListingDate(hearingCollection, 1, 1, "1999-01-01T01:01:01.000");
+        setListingDate(hearingCollection, 1, 2, "1999-01-01T01:01:01.000");
+        setListingDate(hearingCollection, 2, 1, "2100-04-01T01:01:01.000");
+        String actual = HearingsHelper.getEarliestFutureHearingDate(hearingCollection);
+        assertEquals("2100-02-01T01:01:01.000", actual);
+    }
+
+    @Test
+    public void earliestDateReturnsNullWhenHearingCollectionIsEmpty() {
+        caseDetails1.getCaseData().setHearingCollection(new ArrayList<>());
+        String actual = HearingsHelper.getEarliestFutureHearingDate(caseDetails1.getCaseData().getHearingCollection());
+        assertNull(actual);
+    }
+
+    private void setListingDate(List<HearingTypeItem> hearingCollection, int hearingIndex, int dateIndex, String date) {
+        hearingCollection.get(hearingIndex).getValue().getHearingDateCollection()
+            .get(dateIndex).getValue().setListedDate(date);
     }
 
     private void setValidHearingStartFinishTimes() {

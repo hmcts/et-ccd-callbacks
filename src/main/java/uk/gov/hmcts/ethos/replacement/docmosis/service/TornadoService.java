@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +16,9 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
@@ -28,6 +31,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LETTER_ADDRESS_ALLOCATED_OFFICE;
@@ -38,6 +42,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 @Slf4j
 @RequiredArgsConstructor
 @Service("tornadoService")
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.LawOfDemeter", "PMD.AvoidThrowingNullPointerException"})
 public class TornadoService {
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
@@ -89,7 +94,7 @@ public class TornadoService {
     }
 
     private DefaultValues getAllocatedCourtAddress(CaseData caseData, String caseTypeId, MultipleData multipleData) {
-        if ((multipleData != null && isAllocatedOffice(caseTypeId, multipleData.getCorrespondenceScotType()))
+        if (multipleData != null && isAllocatedOffice(caseTypeId, multipleData.getCorrespondenceScotType())
                 || isAllocatedOffice(caseTypeId, caseData.getCorrespondenceScotType())) {
             return defaultValuesReaderService.getDefaultValues(caseData.getAllocatedOffice());
         }
@@ -230,7 +235,7 @@ public class TornadoService {
     }
 
     /**
-     * This method calls the helper method to create the data to be passed through to Tornardo and then checks whether
+     * This method calls the helper method to create the data to be passed through to Tornado and then checks whether
      * it can reach the service.
      * @param caseData contains the data needed to generate the PDF
      * @param userToken contains the user authentication token
@@ -240,13 +245,13 @@ public class TornadoService {
      * @throws IOException if the call to Tornado has failed, an exception will be thrown. This could be due to
      timeout or maybe a bad gateway.
      */
-    public DocumentInfo generateEt1VettingDocument(CaseData caseData, String userToken, String caseTypeId,
-                                                   String documentName)
+    public DocumentInfo generateEventDocument(CaseData caseData, String userToken, String caseTypeId,
+                                              String documentName)
         throws IOException {
         HttpURLConnection connection = null;
         try {
             connection = createConnection();
-            buildEt1VettingInstruction(connection, caseData);
+            buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
             return checkResponseStatus(userToken, connection, documentName, caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
@@ -256,12 +261,33 @@ public class TornadoService {
         }
     }
 
-    private void buildEt1VettingInstruction(HttpURLConnection connection, CaseData caseData)
+    private void buildDocumentInstruction(HttpURLConnection connection, CaseData caseData, String documentName,
+                                          String caseTypeId)
             throws IOException {
+        String documentContent = getDocumentContent(caseData, documentName, caseTypeId);
+
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream(),
                 StandardCharsets.UTF_8)) {
-            outputStreamWriter.write(Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey()));
+            outputStreamWriter.write(documentContent);
             outputStreamWriter.flush();
+        }
+    }
+
+    private String getDocumentContent(CaseData caseData, String documentName, String caseTypeId)
+            throws JsonProcessingException {
+        if (isNullOrEmpty(documentName)) {
+            throw new NullPointerException("Document name cannot be null or empty");
+        }
+        switch (documentName) {
+            case "ET1 Vetting.pdf":
+                return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            case "ET3 Processing.pdf":
+                return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            case "Initial Consideration.pdf" :
+                return InitialConsiderationHelper.getDocumentRequest(
+                        caseData, tornadoConnection.getAccessKey(), caseTypeId);
+            default:
+                throw new IllegalArgumentException("Unexpected document name " + documentName);
         }
     }
 }

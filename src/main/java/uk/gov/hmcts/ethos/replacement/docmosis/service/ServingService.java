@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.UnusedPrivateField",
+    "PMD.LiteralsFirstInComparisons"})
 public class ServingService {
     public static final String SERVING_DOCUMENT_OTHER_TYPE = "Another type of document";
     private static final String SERVING_RECIPIENT_CLAIMANT = "Claimant";
@@ -32,11 +34,11 @@ public class ServingService {
     public String generateOtherTypeDocumentLink(List<DocumentTypeItem> docList) {
         String documentLinks = "";
         if (CollectionUtils.isNotEmpty(docList)) {
-            documentLinks = (docList
+            documentLinks = docList
                 .stream()
                 .filter(d -> d.getValue().getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE))
                 .map(d -> createDocLinkBinary(d))
-                .collect(Collectors.joining()));
+                .collect(Collectors.joining());
         }
 
         return documentLinks;

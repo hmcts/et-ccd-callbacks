@@ -439,6 +439,8 @@ class Et1VettingServiceTest {
         String expected = String.format(TRACK_ALLOCATION_HTML, TRACK_OPEN);
         assertThat(et1VettingService.populateEt1TrackAllocationHtml(caseData))
             .isEqualTo(expected);
+        assertThat(caseData.getTrackType())
+            .isEqualTo(TRACK_OPEN);
     }
 
     @Test
@@ -457,7 +459,7 @@ class Et1VettingServiceTest {
 
     @Test
     void generateEt1VettingDocument() throws IOException {
-        when(tornadoService.generateEt1VettingDocument(any(CaseData.class), anyString(),
+        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
                 anyString(), anyString())).thenReturn(documentInfo);
         DocumentInfo documentInfo1 = et1VettingService.generateEt1VettingDocument(new CaseData(), "userToken",
                 ENGLANDWALES_CASE_TYPE_ID);
@@ -466,7 +468,7 @@ class Et1VettingServiceTest {
 
     @Test
     void generateEt1VettingDocumentExceptions() throws IOException {
-        when(tornadoService.generateEt1VettingDocument(any(CaseData.class), anyString(),
+        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
                 anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
         assertThrows(Exception.class, () -> et1VettingService.generateEt1VettingDocument(new CaseData(), "userToken",
                 ENGLANDWALES_CASE_TYPE_ID));

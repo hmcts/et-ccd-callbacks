@@ -14,16 +14,23 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
+    "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
+    "PMD.GodClass", "PMD.ConfusingTernary", "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal",
+    "PMD.ImplicitSwitchFallThrough", "PMD.ConsecutiveAppendsShouldReuse", "PMD.LawOfDemeter",
+    "PMD.CognitiveComplexity", "PMD.AvoidDeeplyNestedIfStmts"})
 public class HearingsHelper {
-    private HearingsHelper() {
-    }
 
     public static final String HEARING_CREATION_NUMBER_ERROR = "A new hearing can only "
             + "be added from the List Hearing menu item";
@@ -38,6 +45,9 @@ public class HearingsHelper {
     public static final String HEARING_BREAK_RESUME_INVALID = "%s contains a hearing with break and "
             + "resume times of 00:00:00. If the hearing had a break then please update the times. If there was no "
             + "break, please remove the hearing date and times from the break and resume fields before continuing.";
+
+    private HearingsHelper() {
+    }
 
     public static String findHearingNumber(CaseData caseData, String hearingDate) {
         if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
@@ -192,4 +202,36 @@ public class HearingsHelper {
                 .anyMatch(dateListedTypeItem -> hearingDate.equals(dateListedTypeItem.getValue().getListedDate()));
     }
 
+    public static String getEarliestFutureHearingDate(List<HearingTypeItem> hearingCollection) {
+        if (CollectionUtils.isEmpty(hearingCollection)) {
+            return null;
+        }
+
+        List<DateListedTypeItem> earliestDatePerHearing = hearingCollection.stream()
+            .map(HearingsHelper::mapEarliest)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        if (earliestDatePerHearing.isEmpty()) {
+            return null;
+        }
+
+        return Collections.min(earliestDatePerHearing, Comparator.comparing(c -> c.getValue().getListedDate()))
+            .getValue().getListedDate();
+    }
+
+    private static DateListedTypeItem mapEarliest(HearingTypeItem hearingTypeItem) {
+        List<DateListedTypeItem> futureHearings = filterFutureHearings(hearingTypeItem.getValue()
+            .getHearingDateCollection());
+        if (futureHearings.isEmpty()) {
+            return null;
+        }
+        return Collections.min(futureHearings, Comparator.comparing(c -> c.getValue().getListedDate()));
+    }
+
+    private static List<DateListedTypeItem> filterFutureHearings(List<DateListedTypeItem> hearingDateCollection) {
+        return hearingDateCollection.stream()
+            .filter(d -> isDateInFuture(d.getValue().getListedDate(), LocalDateTime.now()))
+            .collect(Collectors.toList());
+    }
 }

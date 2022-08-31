@@ -22,6 +22,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_
 
 @Slf4j
 @Service("multipleCreationMidEventValidationService")
+@SuppressWarnings({"PMD.InefficientEmptyStringCheck"})
+
 public class MultipleCreationMidEventValidationService {
 
     public static final String CASE_STATE_ERROR = " cases have not been Accepted.";

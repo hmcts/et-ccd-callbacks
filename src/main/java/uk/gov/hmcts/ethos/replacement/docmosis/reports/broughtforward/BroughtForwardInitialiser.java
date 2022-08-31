@@ -8,6 +8,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 
 @Service
+@SuppressWarnings({"PMD.LawOfDemeter"})
 public class BroughtForwardInitialiser {
 
     private final ClerkService clerkService;

@@ -16,7 +16,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICS
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_STATE_KEYWORD;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReport.VALID_CASE_STATES;
 
-class HearingsToJudgmentsElasticSearchQuery {
+final class HearingsToJudgmentsElasticSearchQuery {
 
     private HearingsToJudgmentsElasticSearchQuery() {
         // Access through static methods

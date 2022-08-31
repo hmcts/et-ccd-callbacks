@@ -18,9 +18,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,7 +47,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POST
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @Slf4j
-public class Helper {
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.InsufficientStringBufferDeclaration",
+    "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions", "PMD.LawOfDemeter",
+    "PMD.SimpleDateFormatNeedsLocale"})
+public final class Helper {
 
     public static final String HEARING_CREATION_NUMBER_ERROR = "A new hearing can only "
             + "be added from the List Hearing menu item";
@@ -258,5 +264,13 @@ public class Helper {
      */
     public static Object intersectProperties(Object sourceObject, Class<?> targetClassType) {
         return mapper.convertValue(sourceObject, targetClassType);
+    }
+
+    /**
+     * Gives current date in string format.
+     * @return current date in "dd MMM yyy" format
+     */
+    public static String getCurrentDate() {
+        return new SimpleDateFormat("dd MMM yyyy").format(new Date());
     }
 }

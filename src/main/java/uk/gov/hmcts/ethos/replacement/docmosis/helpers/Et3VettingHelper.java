@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -15,6 +18,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et3VettingData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et3VettingDocument;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
@@ -34,9 +40,22 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 /**
  * ET3 vetting helper provides methods to assist with the ET3 vetting pages
  * this includes formatting markdown and querying the state of the ET3 response.
+ * This also includes part of the document generation for the ET3 Vetting process. It creates the data needed by
+ * Docmosis in order to generate a document.
  */
 @Slf4j
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
+    "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
+    "PMD.GodClass", "PMD.ConfusingTernary", "PDM.CyclomaticComplexity",
+    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.ClassNamingConventions",
+    "PMD.AvoidInstantiatingObjectsInLoops", "PMD.CognitiveComplexity", "PMD.PrematureDeclaration",
+    "PMD.LinguisticNaming", "PMD.InsufficientStringBufferDeclaration", "PMD.ConsecutiveLiteralAppends",
+    "PMD.LiteralsFirstInComparisons", "PMD.UnnecessaryFullyQualifiedName", "PMD.LawOfDemeter"})
 public class Et3VettingHelper {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-01145.docx";
+    private static final String OUTPUT_NAME = "ET3 Processing.pdf";
 
     static final String NO_RESPONDENTS_FOUND_ERROR = "No respondents found for case %s";
     static final String NO_CLAIM_SERVED_DATE = "Cannot proceed as there is no claim served date";
@@ -75,6 +94,7 @@ public class Et3VettingHelper {
 
     private Et3VettingHelper() {
         //Access through static methods
+        OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     /**
@@ -397,6 +417,81 @@ public class Et3VettingHelper {
             : TribunalOffice.SCOTLAND.getOfficeName();
 
         caseData.setEt3TribunalLocation(String.format(ET3_TRIBUNAL_TABLE, tribunalOffice, managingOffice));
+    }
+
+    /**
+     * This method generates the request which will be sent to Docmosis to generate the document.
+     * @param caseData where the data is stored
+     * @param userToken token to access tornado
+     * @return a string which contains a JSON payload which contains the data needed to generate the document
+     * @throws JsonProcessingException if the JSON cannot be correctly generated
+     */
+    public static String getDocumentRequest(CaseData caseData, String userToken) throws JsonProcessingException {
+        Et3VettingData et3VettingData = Et3VettingData.builder()
+                .ethosCaseReference(caseData.getEthosCaseReference())
+                .et3IsThereAnEt3Response(defaultIfEmpty(caseData.getEt3IsThereAnEt3Response(), null))
+                .et3NoEt3Response(defaultIfEmpty(caseData.getEt3NoEt3Response(), null))
+                .et3GeneralNotes(defaultIfEmpty(caseData.getEt3GeneralNotes(), null))
+                .et3IsThereACompaniesHouseSearchDocument(
+                        defaultIfEmpty(caseData.getEt3IsThereACompaniesHouseSearchDocument(), null))
+                .et3GeneralNotesCompanyHouse(defaultIfEmpty(caseData.getEt3GeneralNotesCompanyHouse(), null))
+                .et3IsThereAnIndividualSearchDocument(
+                        defaultIfEmpty(caseData.getEt3IsThereAnIndividualSearchDocument(), null))
+                .et3GeneralNotesIndividualInsolvency(
+                        defaultIfEmpty(caseData.getEt3GeneralNotesIndividualInsolvency(), null))
+                .et3LegalIssue(defaultIfEmpty(caseData.getEt3LegalIssue(), null))
+                .et3LegalIssueGiveDetails(defaultIfEmpty(caseData.getEt3LegalIssueGiveDetails(), null))
+                .et3GeneralNotesLegalEntity(defaultIfEmpty(caseData.getEt3GeneralNotesLegalEntity(), null))
+                .et3ResponseInTime(defaultIfEmpty(caseData.getEt3ResponseInTime(), null))
+                .et3ResponseInTimeDetails(defaultIfEmpty(caseData.getEt3ResponseInTimeDetails(), null))
+                .et3DoWeHaveRespondentsName(defaultIfEmpty(caseData.getEt3DoWeHaveRespondentsName(), null))
+                .et3GeneralNotesRespondentName(defaultIfEmpty(caseData.getEt3GeneralNotesRespondentName(), null))
+                .et3DoesRespondentsNameMatch(defaultIfEmpty(caseData.getEt3DoesRespondentsNameMatch(), null))
+                .et3RespondentNameMismatchDetails(defaultIfEmpty(caseData.getEt3RespondentNameMismatchDetails(), null))
+                .et3GeneralNotesRespondentNameMatch(
+                        defaultIfEmpty(caseData.getEt3GeneralNotesRespondentNameMatch(), null))
+                .et3DoWeHaveRespondentsAddress(defaultIfEmpty(caseData.getEt3DoWeHaveRespondentsAddress(), null))
+                .et3DoesRespondentsAddressMatch(defaultIfEmpty(caseData.getEt3DoesRespondentsAddressMatch(), null))
+                .et3RespondentAddressMismatchDetails(
+                        defaultIfEmpty(caseData.getEt3RespondentAddressMismatchDetails(), null))
+                .et3GeneralNotesRespondentAddress(defaultIfEmpty(caseData.getEt3GeneralNotesRespondentAddress(), null))
+                .et3GeneralNotesAddressMatch(defaultIfEmpty(caseData.getEt3GeneralNotesAddressMatch(), null))
+                .et3IsCaseListedForHearing(defaultIfEmpty(caseData.getEt3IsCaseListedForHearing(), null))
+                .et3IsCaseListedForHearingDetails(defaultIfEmpty(caseData.getEt3IsCaseListedForHearingDetails(), null))
+                .et3GeneralNotesCaseListed(defaultIfEmpty(caseData.getEt3GeneralNotesCaseListed(), null))
+                .et3IsThisLocationCorrect(defaultIfEmpty(caseData.getEt3IsThisLocationCorrect(), null))
+                .et3GeneralNotesTransferApplication(
+                        defaultIfEmpty(caseData.getEt3GeneralNotesTransferApplication(), null))
+                .et3RegionalOffice(defaultIfEmpty(caseData.getEt3RegionalOffice(), null))
+                .et3WhyWeShouldChangeTheOffice(defaultIfEmpty(caseData.getEt3WhyWeShouldChangeTheOffice(), null))
+                .et3ContestClaim(defaultIfEmpty(caseData.getEt3ContestClaim(), null))
+                .et3ContestClaimGiveDetails(defaultIfEmpty(caseData.getEt3ContestClaimGiveDetails(), null))
+                .et3GeneralNotesContestClaim(defaultIfEmpty(caseData.getEt3GeneralNotesContestClaim(), null))
+                .et3ContractClaimSection7(defaultIfEmpty(caseData.getEt3ContractClaimSection7(), null))
+                .et3ContractClaimSection7Details(defaultIfEmpty(caseData.getEt3ContractClaimSection7Details(), null))
+                .et3GeneralNotesContractClaimSection7(
+                        defaultIfEmpty(caseData.getEt3GeneralNotesContractClaimSection7(), null))
+                .et3Rule26(defaultIfEmpty(caseData.getEt3Rule26(), null))
+                .et3Rule26Details(defaultIfEmpty(caseData.getEt3Rule26Details(), null))
+                .et3SuggestedIssuesStrikeOut(defaultIfEmpty(caseData.getEt3SuggestedIssuesStrikeOut(), null))
+                .et3SuggestedIssueInterpreters(defaultIfEmpty(caseData.getEt3SuggestedIssueInterpreters(), null))
+                .et3SuggestedIssueJurisdictional(defaultIfEmpty(caseData.getEt3SuggestedIssueJurisdictional(), null))
+                .et3SuggestedIssueAdjustments(defaultIfEmpty(caseData.getEt3SuggestedIssueAdjustments(), null))
+                .et3SuggestedIssueRule50(defaultIfEmpty(caseData.getEt3SuggestedIssueRule50(), null))
+                .et3SuggestedIssueTimePoints(defaultIfEmpty(caseData.getEt3SuggestedIssueTimePoints(), null))
+                .et3GeneralNotesRule26(defaultIfEmpty(caseData.getEt3GeneralNotesRule26(), null))
+                .et3AdditionalInformation(defaultIfEmpty(caseData.getEt3AdditionalInformation(), null))
+                .build();
+
+        Et3VettingDocument et3VettingDocument = Et3VettingDocument.builder()
+                .accessKey(userToken)
+                .outputName(OUTPUT_NAME)
+                .templateName(TEMPLATE_NAME)
+                .et3VettingData(et3VettingData)
+                .build();
+
+        return OBJECT_MAPPER.writeValueAsString(et3VettingDocument);
+
     }
 
 }

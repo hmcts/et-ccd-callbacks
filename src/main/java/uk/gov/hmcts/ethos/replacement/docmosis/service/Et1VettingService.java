@@ -41,6 +41,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrac
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.LiteralsFirstInComparisons",
+    "PMD.FieldNamingConventions", "PMD.LawOfDemeter", "PMD.TooManyMethods", "PMD.ImplicitSwitchFallThrough",
+    "PMD.SwitchStmtsShouldHaveDefault"})
 public class Et1VettingService {
 
     private final TornadoService tornadoService;
@@ -93,6 +96,8 @@ public class Et1VettingService {
     private static final String TRIBUNAL_SCOTLAND = "Scotland";
     private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br><br><br>";
     private static final String NO_ACAS_CERT_DISPLAY = "No certificate has been provided.<br><br><br>";
+    private static final int FIVE_ACAS_DOC_TYPE_ITEMS_COUNT = 5;
+    private static final int ONE_RESPONDENT_COUNT = 1;
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
     private final JpaVenueService jpaVenueService;
 
@@ -158,7 +163,7 @@ public class Et1VettingService {
                     .collect(Collectors.joining());
         }
 
-        if (acasCount.getValue() > 5) {
+        if (acasCount.getValue() > FIVE_ACAS_DOC_TYPE_ITEMS_COUNT) {
             acasDisplay = String.format(BEFORE_LABEL_ACAS_OPEN_TAB, caseDetails.getCaseId());
         }
 
@@ -188,7 +193,7 @@ public class Et1VettingService {
      * @return et1VettingRespondentDetailsMarkUp
      */
     private String initialRespondentDetailsMarkUp(CaseData caseData) {
-        if (caseData.getRespondentCollection().size() == 1) {
+        if (caseData.getRespondentCollection().size() == ONE_RESPONDENT_COUNT) {
             RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
             return String.format(RESPONDENT_DETAILS, "",
                     respondentSumType.getRespondentName(),
@@ -290,14 +295,18 @@ public class Et1VettingService {
 
         if (caseData.getJurCodesCollection().stream()
             .anyMatch(c -> JUR_CODE_CONCILIATION_TRACK_OP.contains(c.getValue().getJuridictionCodesList()))) {
+            caseData.setTrackType(TRACK_OPEN);
             return String.format(TRACK_ALLOCATION_HTML, TRACK_OPEN);
         } else if (caseData.getJurCodesCollection().stream()
             .anyMatch(c -> JUR_CODE_CONCILIATION_TRACK_ST.contains(c.getValue().getJuridictionCodesList()))) {
+            caseData.setTrackType(TRACK_STANDARD);
             return String.format(TRACK_ALLOCATION_HTML, TRACK_STANDARD);
         } else if (caseData.getJurCodesCollection().stream()
             .anyMatch(c -> JUR_CODE_CONCILIATION_TRACK_SH.contains(c.getValue().getJuridictionCodesList()))) {
+            caseData.setTrackType(TRACK_SHORT);
             return String.format(TRACK_ALLOCATION_HTML, TRACK_SHORT);
         } else {
+            caseData.setTrackType(TRACK_NO);
             return String.format(TRACK_ALLOCATION_HTML, TRACK_NO);
         }
     }
@@ -383,8 +392,8 @@ public class Et1VettingService {
      */
     public DocumentInfo generateEt1VettingDocument(CaseData caseData, String userToken, String caseTypeId) {
         try {
-            return tornadoService.generateEt1VettingDocument(caseData, userToken,
-                    caseTypeId, "ET1Vetting.pdf");
+            return tornadoService.generateEventDocument(caseData, userToken,
+                    caseTypeId, "ET1 Vetting.pdf");
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }

@@ -18,5 +18,5 @@ public class Et1VettingDocument {
     @JsonProperty("outputName")
     private String outputName;
     @JsonProperty("data")
-    private Et1VettingData data;
+    private Et1VettingData et1VettingData;
 }

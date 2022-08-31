@@ -35,6 +35,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping("/admin/filelocation")
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.LawOfDemeter"})
 public class FileLocationController {
 
     /**

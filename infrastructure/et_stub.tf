@@ -33,21 +33,21 @@ data "template_file" "etstub_policy_template" {
   template = file(join("", [path.module, "/template/api-policy.xml"]))
 
   vars = {
-    s2s_client_id                   = data.azurerm_key_vault_secret.s2s_client_id.value
-    s2s_client_secret               = data.azurerm_key_vault_secret.et_cos_s2s_key.value
-    s2s_base_url                    = local.s2sUrl
+    s2s_client_id     = data.azurerm_key_vault_secret.s2s_client_id.value
+    s2s_client_secret = data.azurerm_key_vault_secret.et_cos_s2s_key.value
+    s2s_base_url      = local.s2sUrl
   }
 }
 
 module "mdl-et-stub-policy" {
-  source = "git@github.com:hmcts/cnp-module-api-mgmt-api-policy?ref=master"
+  source        = "git@github.com:hmcts/cnp-module-api-mgmt-api-policy?ref=master"
   api_mgmt_name = local.api_mgmt_name
-  api_mgmt_rg = local.api_mgmt_rg
+  api_mgmt_rg   = local.api_mgmt_rg
 
-  api_name = module.api-etstub-mgmt-product.name
+  api_name               = module.api-etstub-mgmt-product.name
   api_policy_xml_content = data.template_file.etstub_policy_template
 
-  providers     = {
+  providers = {
     azurerm = azurerm.aks-cftapps
   }
 }
@@ -55,11 +55,11 @@ module "mdl-et-stub-policy" {
 resource "azurerm_api_management_subscription" "etstub_subscription" {
   api_management_name = local.api_mgmt_name
   resource_group_name = local.api_mgmt_rg
-  user_id = azurerm_api_management_user.et_api_management_user.id
-  product_id = module.api-etstub-mgmt-product.id
+  user_id             = azurerm_api_management_user.et_api_management_user.id
+  product_id          = module.api-etstub-mgmt-product.id
   display_name        = "ET Stub Subscription"
-  state = "active"
-  provider = azurerm.aks-cftapps
+  state               = "active"
+  provider            = azurerm.aks-cftapps
 }
 
 resource "azurerm_key_vault_secret" "etstub_subscription_key" {

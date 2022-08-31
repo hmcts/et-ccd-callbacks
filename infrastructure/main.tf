@@ -89,10 +89,10 @@ provider "azurerm" {
 
 resource "azurerm_api_management_user" "et_api_management_user" {
   api_management_name = local.api_mgmt_name
-  email               = local.api_mgmt_rg
+  resource_group_name = local.api_mgmt_rg
   first_name          = "Harpreet"
   last_name           = "Jhita"
-  resource_group_name = ""
+  email               = "harpreet.jhita@justice.gov.uk"
   user_id             = ""
   provider            = azurerm.aks-cftapps
 }

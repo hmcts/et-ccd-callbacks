@@ -33,6 +33,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ExtendWith(SpringExtension.class)
+@SuppressWarnings({"PMD.UseUnderscoresInNumericLiterals", "PMD.LawOfDemeter", "PMD.FieldNamingConventions"})
 class AddSingleCaseToMultipleServiceTest {
 
     @Mock
@@ -43,11 +44,11 @@ class AddSingleCaseToMultipleServiceTest {
     private AddSingleCaseToMultipleService addSingleCaseToMultipleService;
 
     private CaseDetails caseDetails;
-    private final String userToken = "authString";
     private final String multipleCaseTypeId = ENGLANDWALES_BULK_CASE_TYPE_ID;
     private MultipleDetails multipleDetails;
     private List<SubmitMultipleEvent> submitMultipleEvents;
     private final List<String> caseIdCollection = List.of("21006/2020", "245000/2020", "245001/2020");
+    private static final String userToken = "authString";
 
     @BeforeEach
     void setUp() {

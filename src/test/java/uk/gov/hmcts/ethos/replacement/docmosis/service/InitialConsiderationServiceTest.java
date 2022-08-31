@@ -42,6 +42,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming"})
 @ExtendWith(SpringExtension.class)
 class InitialConsiderationServiceTest {
     private static final String EXPECTED_RESPONDENT_NAME =

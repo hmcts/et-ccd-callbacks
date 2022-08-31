@@ -65,6 +65,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TARGET_HEARING_DATE_INCREMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator.CLOSING_CASE_WITH_BF_OPEN_ERROR;
 
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming"})
 @ExtendWith(SpringExtension.class)
 class EventValidationServiceTest {
 

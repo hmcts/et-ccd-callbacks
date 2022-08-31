@@ -67,6 +67,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.NcssCount", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.UseProperClassLoader"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class CaseManagementForCaseWorkerServiceTest {
 
@@ -226,7 +228,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
         assertEquals(YES, caseData.getRespondentCollection().get(0).getValue().getResponseReceived());
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-            if (respondentSumTypeItem != caseData.getRespondentCollection().get(0)) {
+            if (!respondentSumTypeItem.equals(caseData.getRespondentCollection().get(0))) {
                 assertEquals(NO, respondentSumTypeItem.getValue().getResponseReceived());
             }
         }
@@ -431,8 +433,7 @@ public class CaseManagementForCaseWorkerServiceTest {
     public void buildFlagsImageFileNameForTrueFlagsFields() {
         CaseDetails caseDetails = ccdRequest15.getCaseDetails();
         FlagsImageHelper.buildFlagsImageFileName(caseDetails);
-        String expected = ""
-                + "<font color='DarkRed' size='5'> DO NOT POSTPONE </font>"
+        String expected = "<font color='DarkRed' size='5'> DO NOT POSTPONE </font>"
                 + "<font size='5'> - </font>"
                 + "<font color='Green' size='5'> LIVE APPEAL </font>"
                 + "<font size='5'> - </font>"
@@ -712,13 +713,15 @@ public class CaseManagementForCaseWorkerServiceTest {
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {
         RespondentSumTypeItem respondentSumTypeItem1 = createRespondentSumType(
                 "RespondentName1", false);
+        if (single) {
+            return new ArrayList<>(Collections.singletonList(respondentSumTypeItem1));
+        }
+
         RespondentSumTypeItem respondentSumTypeItem2 = createRespondentSumType(
                 "RespondentName2", false);
         RespondentSumTypeItem respondentSumTypeItem3 = createRespondentSumType(
                 "RespondentName3", true);
-        if (single) {
-            return new ArrayList<>(Collections.singletonList(respondentSumTypeItem1));
-        }
+
         return new ArrayList<>(
                 Arrays.asList(respondentSumTypeItem1, respondentSumTypeItem2, respondentSumTypeItem3));
     }

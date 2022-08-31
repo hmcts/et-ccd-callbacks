@@ -45,6 +45,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
+@SuppressWarnings({"PMD.UseProperClassLoader"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class DocumentGenerationServiceTest {
 
@@ -167,11 +168,11 @@ public class DocumentGenerationServiceTest {
     @Test
     public void setBfActionsScotland() {
         documentInfo.setDescription("TemplateName_72");
-        var c = new CorrespondenceScotType();
-        c.setClaimantOrRespondent(CLAIMANT);
-        c.setHearingNumber("1");
+        CorrespondenceScotType correspondenceScotType = new CorrespondenceScotType();
+        correspondenceScotType.setClaimantOrRespondent(CLAIMANT);
+        correspondenceScotType.setHearingNumber("1");
         caseDetails13.getCaseData().setCorrespondenceType(null);
-        caseDetails13.getCaseData().setCorrespondenceScotType(c);
+        caseDetails13.getCaseData().setCorrespondenceScotType(correspondenceScotType);
         caseDetails13.getCaseData().setCorrespondenceScotType(new CorrespondenceScotType());
         assertNull(caseDetails13.getCaseData().getBfActions());
         documentGenerationService.updateBfActions(documentInfo, caseDetails13.getCaseData());

@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.FieldNamingConventions", "PMD.UnnecessaryFullyQualifiedName"})
 public class BfActionReportDocTest {
     private BfActionReportDoc bfActionReportDoc;
     private String bfActionReportDocTestDateRangeResource;
@@ -110,14 +111,14 @@ public class BfActionReportDocTest {
     public void shouldThrowIllegalStateExceptionForListingDataNotABfActionReportDataType() throws Exception {
         CasesAwaitingJudgmentReportData casesAwaitingJudgmentReportData = new CasesAwaitingJudgmentReportData(
             new ReportSummary("Test Office"));
-        var resultListingData = bfActionReportDoc.getReportDocPart(casesAwaitingJudgmentReportData);
+        bfActionReportDoc.getReportDocPart(casesAwaitingJudgmentReportData);
     }
 
     private String getBfActionDocTestFileContent(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
             .getResource(jsonFileName)).toURI())));
         // returns the content by excluding the opening and closing curly brackets
-        return json.substring(1, (json.length() - 1));
+        return json.substring(1, json.length() - 1);
     }
 
 }

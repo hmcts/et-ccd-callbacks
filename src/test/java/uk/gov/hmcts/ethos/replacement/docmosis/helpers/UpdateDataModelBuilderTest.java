@@ -209,7 +209,7 @@ public class UpdateDataModelBuilderTest {
                                             String respondentRepresentative) {
         MultipleData multipleData = new MultipleData();
         multipleData.setBatchUpdateClaimantRep(new DynamicFixedListType(claimantRepresentative));
-        multipleData.setBatchUpdateJurisdiction(new DynamicFixedListType((jurisdiction)));
+        multipleData.setBatchUpdateJurisdiction(new DynamicFixedListType(jurisdiction));
         multipleData.setBatchUpdateRespondent(new DynamicFixedListType(respondent));
         multipleData.setBatchUpdateJudgment(new DynamicFixedListType(judgement));
         multipleData.setBatchUpdateRespondentRep(new DynamicFixedListType(respondentRepresentative));

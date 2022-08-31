@@ -23,6 +23,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_PO
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOURCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
+@SuppressWarnings({"PMD.FieldNamingConventions", "PMD.LawOfDemeter"})
 class CaseSourceLocalReportTest {
 
     private ListingDetails listingDetails;

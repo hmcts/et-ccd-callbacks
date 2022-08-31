@@ -16,6 +16,7 @@ import java.util.Objects;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.FieldNamingConventions", "PMD.UnnecessaryFullyQualifiedName"})
 class ServingServiceTest {
     private static CaseDetails caseDetails;
 

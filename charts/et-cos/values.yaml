@@ -18,6 +18,8 @@ java:
           alias: APP_INSIGHTS_KEY
         - name: tornado-access-key
           alias: TORNADO_ACCESS_KEY
+        - name: gov-notify-api-key
+          alias: GOV_NOTIFY_API_KEY
   environment:
     SERVER_PORT: 8081
     REFORM_TEAM: et

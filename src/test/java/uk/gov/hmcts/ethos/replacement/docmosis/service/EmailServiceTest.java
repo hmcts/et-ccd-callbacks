@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.EmailClient;
+import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
 
@@ -25,7 +25,7 @@ class EmailServiceTest {
     @InjectMocks
     private transient EmailService emailService;
     @Mock
-    private transient EmailClient emailClient;
+    private transient NotificationClient emailClient;
 
     private SendEmailResponse sendEmailResponse;
 

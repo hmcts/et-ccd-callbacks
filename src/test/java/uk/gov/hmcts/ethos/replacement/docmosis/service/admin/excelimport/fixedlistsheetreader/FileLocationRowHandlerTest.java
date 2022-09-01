@@ -48,7 +48,7 @@ class FileLocationRowHandlerTest {
         assertTrue(fileLocationRowHandler.accept(tribunalOffice, row));
     }
 
-    private static Stream<Arguments> testAcceptTrue() {
+    private static Stream<Arguments> testAcceptTrue() { //NOPMD - parameterized tests
         return Stream.of(
           Arguments.of(TribunalOffice.ABERDEEN, "fl_Locations_Aberdeen"),
                 Arguments.of(TribunalOffice.BRISTOL, "fl_Location"),
@@ -77,7 +77,7 @@ class FileLocationRowHandlerTest {
         assertFalse(fileLocationRowHandler.accept(tribunalOffice, row));
     }
 
-    private static Stream<Arguments> testAcceptFalse() {
+    private static Stream<Arguments> testAcceptFalse() { //NOPMD - parameterized tests
         return Stream.of(
                 Arguments.of(TribunalOffice.ABERDEEN, "fl_Location"),
                 Arguments.of(TribunalOffice.BRISTOL, "fl_Locations_Bristol"),

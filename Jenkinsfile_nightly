@@ -19,10 +19,13 @@ def component = "cos"
 
 def secrets = [
         "et-cos-${params.ENVIRONMENT}": [
-                secret('ccd-user-email', 'CCD_CASEWORKER_E2E_EMAIL'),
-                secret('ccd-user-password', 'CCD_CASEWORKER_E2E_PASSWORD'),
-                secret('et-cos-s2s-secret', 'SERVICE_SECRET'),
-                secret('idam-client-secret', 'IDAM_CLIENT_SECRET')
+                secret('et-ccd-caseworker-user-name', 'ET_CCD_CASEWORKER_USER_NAME'),
+                secret('et-ccd-caseworker-password', 'ET_CCD_CASEWORKER_PASSWORD'),
+                secret('et-caseworker-username', 'ET_CASEWORKER_USER_NAME'),
+                secret('et-caseworker-password', 'ET_CASEWORKER_PASSWORD'),
+                secret('et-judge-username', 'ET_JUDGE_USER_NAME'),
+                secret('et-judge-password', 'ET_JUDGE_PASSWORD'),
+                ecret('et-ccd-s2s-otp', 'ET_CCD_S2S_OTP')
         ]
 ]
 

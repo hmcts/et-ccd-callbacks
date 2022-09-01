@@ -67,9 +67,7 @@ import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_4;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.SHEET_NAME;
 
-@SuppressWarnings({"PMD.LooseCoupling", "PMD.LawOfDemeter", "PMD.LinguisticNaming",
-    "PMD.ExcessiveMethodLength", "PMD.UseUnderscoresInNumericLiterals", "PMD.JUnit5TestShouldBePackagePrivate",
-    "PMD.ConfusingTernary", "PMD.CloseResource"})
+@SuppressWarnings({"PMD.LooseCoupling", "PMD.LawOfDemeter", "PMD.CloseResource"})
 public final class MultipleUtil {
 
     public static final String TESTING_FILE_NAME = "MyFirstExcel.xlsx";
@@ -250,20 +248,20 @@ public final class MultipleUtil {
     public static List<SubmitEvent> getSubmitEvents() {
         SubmitEvent submitEvent1 = new SubmitEvent();
         submitEvent1.setCaseData(getCaseData("245000/2020"));
-        submitEvent1.setCaseId(1232121232);
+        submitEvent1.setCaseId(1_232_121_232);
         SubmitEvent submitEvent2 = new SubmitEvent();
         submitEvent2.setCaseData(getCaseData("245003/2020"));
-        submitEvent2.setCaseId(1232121233);
+        submitEvent2.setCaseId(1_232_121_233);
         return new ArrayList<>(Arrays.asList(submitEvent1, submitEvent2));
     }
 
     public static List<LabelPayloadEvent> getLabelPayloadEvents() {
         LabelPayloadEvent labelPayloadEvent1 = new LabelPayloadEvent();
         labelPayloadEvent1.setLabelPayloadES(getLabelPayloadES("245000/2020"));
-        labelPayloadEvent1.setCaseId(1232121232);
+        labelPayloadEvent1.setCaseId(1_232_121_232);
         LabelPayloadEvent labelPayloadEvent2 = new LabelPayloadEvent();
         labelPayloadEvent2.setLabelPayloadES(getLabelPayloadES("245003/2020"));
-        labelPayloadEvent2.setCaseId(1232121233);
+        labelPayloadEvent2.setCaseId(1_232_121_233);
         return new ArrayList<>(Arrays.asList(labelPayloadEvent1, labelPayloadEvent2));
     }
 
@@ -371,7 +369,7 @@ public final class MultipleUtil {
         multipleData.setCaseIdCollection(caseIdCollection);
         multipleData.setScheduleDocName(MULTIPLE_SCHEDULE_CONFIG);
         multipleData.setBatchUpdateType(BATCH_UPDATE_TYPE_1);
-        getDocumentCollection(multipleData);
+        setDocumentCollection(multipleData);
         multipleData.setSubMultipleCollection(getSubMultipleCollection());
         multipleData.setSubMultipleAction(getSubMultipleActionType());
         multipleData.setLeadCase("21006/2020");
@@ -385,7 +383,7 @@ public final class MultipleUtil {
         return multipleData;
     }
 
-    public static void getDocumentCollection(MultipleData multipleData) {
+    public static void setDocumentCollection(MultipleData multipleData) {
         CaseImporterFile caseImporterFile = new CaseImporterFile();
         caseImporterFile.setUploadedDocument(getUploadedDocumentType());
         caseImporterFile.setUploadUser("Eric Cooper");

@@ -14,8 +14,7 @@ import java.util.TreeMap;
 
 import static org.junit.Assert.assertEquals;
 
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LawOfDemeter", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.LinguisticNaming"})
+@SuppressWarnings({ "PMD.LinguisticNaming"})
 public class MultiplesHelperTest {
 
     private MultipleData multipleData;

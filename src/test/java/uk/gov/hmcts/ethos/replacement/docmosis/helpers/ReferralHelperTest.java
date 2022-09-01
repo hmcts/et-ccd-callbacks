@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 
-@SuppressWarnings({"PMD.SingularField", "PMD.LawOfDemeter", "PMD.LinguisticNaming"})
+@SuppressWarnings({"PMD.SingularField"})
 class ReferralHelperTest {
 
     private UserService userService;

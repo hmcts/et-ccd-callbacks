@@ -47,6 +47,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOUR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.UseUnderscoresInNumericLiterals",
+    "PMD.NullAssignment", "PMD.LawOfDemeter"})
 @RequiredArgsConstructor
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleTransferServiceTest {

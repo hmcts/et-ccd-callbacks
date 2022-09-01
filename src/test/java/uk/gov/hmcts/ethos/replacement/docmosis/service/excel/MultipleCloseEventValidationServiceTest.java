@@ -30,6 +30,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MISSING_JUDGEMENT_JURISDICTION_MESSAGE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MISSING_JURISDICTION_OUTCOME_ERROR_MESSAGE;
 
+@SuppressWarnings({"PMD.LooseCoupling", "PMD.UseUnderscoresInNumericLiterals"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleCloseEventValidationServiceTest {
 

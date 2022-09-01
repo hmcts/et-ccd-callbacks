@@ -41,6 +41,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRANSFERRED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.UseUnderscoresInNumericLiterals",
+    "PMD.LinguisticNaming"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleHelperServiceTest {
 

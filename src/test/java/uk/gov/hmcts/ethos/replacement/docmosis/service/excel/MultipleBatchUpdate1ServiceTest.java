@@ -16,6 +16,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+@SuppressWarnings({"PMD.LooseCoupling", "PMD.LawOfDemeter", "PMD.UseUnderscoresInNumericLiterals"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleBatchUpdate1ServiceTest {
 

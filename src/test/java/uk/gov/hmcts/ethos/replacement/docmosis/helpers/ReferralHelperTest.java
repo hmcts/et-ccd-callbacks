@@ -338,11 +338,8 @@ class ReferralHelperTest {
 
     @Test
     void validateEmail() {
-        List<String> errors = new ArrayList<>();
-        assertEquals(errors, ReferralHelper.validateEmail("valid.email@example.com"));
-
-        errors = new ArrayList<>(Arrays.asList(INVALID_EMAIL_ERROR_MESSAGE));
-        assertEquals(errors, ReferralHelper.validateEmail("invalid.email.example"));
+        assertThat(ReferralHelper.validateEmail("valid.email@example.com").contains(null));
+        assertThat(ReferralHelper.validateEmail("invalid.email.example").contains(INVALID_EMAIL_ERROR_MESSAGE));
     }
 
     @Test

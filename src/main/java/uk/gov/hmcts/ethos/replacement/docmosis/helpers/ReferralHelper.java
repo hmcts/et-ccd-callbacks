@@ -43,7 +43,7 @@ public final class ReferralHelper {
 
     private static final String REFERRAL_DETAILS = "<h3>Referral</h3>"
         + "<pre>Referred by &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
-        + "<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>**Referred to** &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Urgent &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Referral date &#09&#09&#09&#09&#09&#09&#09&#09&#09 %s"
@@ -104,7 +104,7 @@ public final class ReferralHelper {
         if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
             return "";
         }
-        String trackType = caseData.getTrackType();
+        String trackType = caseData.getConciliationTrack();
         StringBuilder hearingDetails = new StringBuilder();
         int count = 0;
         boolean singleHearing = caseData.getHearingCollection().size() == 1;
@@ -362,6 +362,10 @@ public final class ReferralHelper {
         referral.setReferralStatus(ReferralStatus.CLOSED);
     }
 
+    /**
+     * Validates email address by using the Apache Commons validator, returns an error if the email is invalid.
+     * @param email Contains email address of the person whom the referral is sent to.
+     */
     public static List<String> validateEmail(String email) {
         List<String> errors = new ArrayList<>();
         if (!EmailValidator.getInstance().isValid(email)) {
@@ -371,6 +375,13 @@ public final class ReferralHelper {
         return errors;
     }
 
+    /**
+     * Generates a map of personalised information that will be used for the
+     * placeholder fields in the Referral email template.
+     * @param caseData Contains all the case data.
+     * @param isJudge Flag for checking if a judge is creating the referral.
+     * @param isNewReferral Flag for checking is if it is a new referral.
+     */
     public static Map<String, String> buildPersonalisation(CaseData caseData, boolean isJudge, boolean isNewReferral) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());

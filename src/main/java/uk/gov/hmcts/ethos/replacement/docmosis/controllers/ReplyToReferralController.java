@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -24,32 +23,41 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
-import javax.validation.constraints.NotEmpty;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
+/**
+ * REST controller for the Referral Reply event pages, formats data appropriately for rendering on the front end.
+ */
 @Slf4j
 @RequestMapping("/replyReferral")
 @RestController
-@RequiredArgsConstructor
 @SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class ReplyToReferralController {
-    @Value("${referral.template.id}")
-    @NotEmpty
-    public String referralTemplateId;
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-    private static final String TRUE = "True";
+    private final String referralTemplateId;
     private final VerifyTokenService verifyTokenService;
     private final UserService userService;
     private final EmailService emailService;
+
+    private static final String INVALID_TOKEN = "Invalid Token {}";
+    private static final String TRUE = "True";
     private static final String REPLY_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
         + "<p>We have recorded your reply. You can view it in the "
         + "<a href=\"/cases/case-details/%s#Referrals\" target=\"_blank\">Referrals tab (opens in new tab)</a>.</p>";
+
+    public ReplyToReferralController(@Value("${referral.template.id}") String referralTemplateId,
+                                    VerifyTokenService verifyTokenService,
+                                    EmailService emailService, UserService userService) {
+        this.referralTemplateId = referralTemplateId;
+        this.emailService = emailService;
+        this.verifyTokenService = verifyTokenService;
+        this.userService = userService;
+    }
 
     /**
      * Called for the first page of the Reply to Referral event.

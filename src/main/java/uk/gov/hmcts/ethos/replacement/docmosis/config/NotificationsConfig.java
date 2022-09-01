@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.service.notify.NotificationClient;
 
+/**
+ * Instantiate NotificationClient bean for using the GOV.UK Notify client to send emails.
+ */
 @Configuration
 public class NotificationsConfig {
 

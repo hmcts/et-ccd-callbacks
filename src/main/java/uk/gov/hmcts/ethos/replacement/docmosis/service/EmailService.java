@@ -9,6 +9,10 @@ import uk.gov.service.notify.NotificationClientException;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * EmailService is a class that is used for sending email via the GOV.UK Notify service.
+ * For more detail, please view the documentation https://docs.notifications.service.gov.uk/java.html#send-an-email
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -16,6 +20,12 @@ public class EmailService {
 
     private final NotificationClient emailClient;
 
+    /**
+     * Sends email to an email address using a specified email template.
+     * @param templateId The template that of the email being sent.
+     * @param emailAddress The email address of the recipient.
+     * @param personalisation A map of values that contains the personalised information.
+     */
     public void sendEmail(String templateId, String emailAddress, Map<String, String> personalisation) {
 
         var referenceId = UUID.randomUUID().toString();

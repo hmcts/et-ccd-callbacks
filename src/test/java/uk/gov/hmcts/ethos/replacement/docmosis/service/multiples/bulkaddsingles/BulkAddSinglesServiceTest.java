@@ -37,7 +37,8 @@ public class BulkAddSinglesServiceTest {
     @Test
     public void shouldSubmitCases() throws ImportException {
         var ethosCaseReferences = List.of("case1");
-        when(singleCasesImporter.importCases(multipleDetails.getCaseData(), AUTH_TOKEN)).thenReturn(ethosCaseReferences);
+        when(singleCasesImporter.importCases(multipleDetails.getCaseData(), AUTH_TOKEN))
+                .thenReturn(ethosCaseReferences);
 
         var errors = bulkAddSinglesService.execute(multipleDetails, AUTH_TOKEN);
 

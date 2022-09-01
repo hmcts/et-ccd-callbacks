@@ -93,6 +93,6 @@ resource "azurerm_api_management_user" "et_api_management_user" {
   first_name          = "Harpreet"
   last_name           = "Jhita"
   email               = "harpreet.jhita@justice.gov.uk"
-  user_id             = ""
+  user_id             = "5931a75ae4bbd512288c880c"
   provider            = azurerm.aks-cftapps
 }

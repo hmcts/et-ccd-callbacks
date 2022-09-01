@@ -25,7 +25,7 @@ def secrets = [
                 secret('et-caseworker-password', 'ET_CASEWORKER_PASSWORD'),
                 secret('et-judge-username', 'ET_JUDGE_USER_NAME'),
                 secret('et-judge-password', 'ET_JUDGE_PASSWORD'),
-                ecret('et-ccd-s2s-otp', 'ET_CCD_S2S_OTP')
+                secret('et-ccd-s2s-otp', 'ET_CCD_S2S_OTP')
         ]
 ]
 

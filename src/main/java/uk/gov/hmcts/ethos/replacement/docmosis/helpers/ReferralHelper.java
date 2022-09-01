@@ -43,7 +43,7 @@ public final class ReferralHelper {
 
     private static final String REFERRAL_DETAILS = "<h3>Referral</h3>"
         + "<pre>Referred by &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
-        + "<br><br>**Referred to** &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
+        + "<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Urgent &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Referral date &#09&#09&#09&#09&#09&#09&#09&#09&#09 %s"

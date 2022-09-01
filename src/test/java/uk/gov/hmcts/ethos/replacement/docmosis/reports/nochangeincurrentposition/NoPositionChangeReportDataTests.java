@@ -95,7 +95,7 @@ class NoPositionChangeReportDataTests {
         }
         sb.append("],\n");
 
-        sb.append('\n').append(REPORT_DETAILS_MULTIPLE).append("\":[\n");
+        sb.append('\"').append(REPORT_DETAILS_MULTIPLE).append("\":[\n");
         if (CollectionUtils.isNotEmpty(reportData.getReportDetailsSingle())) {
             NoPositionChangeReportDetailMultiple rdMultiple = reportData.getReportDetailsMultiple().get(0);
             sb.append(buildDetailMultipleJsonString(

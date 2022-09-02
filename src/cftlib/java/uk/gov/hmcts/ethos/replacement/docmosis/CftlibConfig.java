@@ -101,7 +101,7 @@ public class CftlibConfig implements CFTLibConfigurer {
         createRoles(lib);
         createUsers(lib);
         importCcdDefinitions(lib);
-        startDmStore();
+        startDockerCompose();
     }
 
     private void createRoles(CFTLib lib) {
@@ -187,8 +187,8 @@ public class CftlibConfig implements CFTLibConfigurer {
         }
     }
 
-    private void startDmStore() {
+    private void startDockerCompose() {
         ControlPlane.waitForDB();
-        DmStore.start();
+        DockerComposeProcessRunner.start();
     }
 }

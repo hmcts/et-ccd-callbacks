@@ -41,6 +41,7 @@ public class EmailService {
 
         } catch (NotificationClientException e) {
             log.warn("Failed to send email. Reference ID: {}. Reason:", referenceId, e);
+            throw new RuntimeException(e);
         }
     }
 }

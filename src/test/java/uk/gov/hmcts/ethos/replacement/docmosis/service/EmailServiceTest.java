@@ -13,6 +13,7 @@ import uk.gov.service.notify.SendEmailResponse;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -55,6 +56,16 @@ class EmailServiceTest {
         emailService.sendEmail("templateId", "emailAddress", createPersonalisation());
 
         verify(emailClient, times(1)).sendEmail(anyString(), anyString(), anyMap(), anyString());
+    }
+
+    @Test
+    void sendEmail_fail() throws NotificationClientException {
+        when(emailClient.sendEmail(anyString(), anyString(), anyMap(), anyString()))
+            .thenThrow(new NotificationClientException("FailedToSendEmail"));
+
+        assertThatThrownBy(() -> emailService.sendEmail("templateId",
+            "emailAddress", createPersonalisation()))
+            .isInstanceOf(RuntimeException.class);
     }
 
     private Map<String, String> createPersonalisation() {

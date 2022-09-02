@@ -115,11 +115,6 @@
             <property name="reportLevel" value="90" />
         </properties>
     </rule>
-    <rule ref="category/java/design.xml/TooManyFields">
-        <properties>
-            <property name="maxfields" value="120" />
-        </properties>
-    </rule>
     <rule ref="category/java/design.xml/ExcessivePublicCount">
         <properties>
             <property name="minimum" value="150" /><!-- should be reduced say to 45, the default-->

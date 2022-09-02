@@ -30,7 +30,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MISSING_JUDGEMENT_JURISDICTION_MESSAGE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MISSING_JURISDICTION_OUTCOME_ERROR_MESSAGE;
 
-@SuppressWarnings({"PMD.LooseCoupling", "PMD.UseUnderscoresInNumericLiterals"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleCloseEventValidationServiceTest {
 
@@ -178,7 +177,7 @@ public class MultipleCloseEventValidationServiceTest {
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(CLOSED_STATE);
-        submitEvent.setCaseId(1232121232);
+        submitEvent.setCaseId(1_232_121_232);
         return submitEvent;
     }
 }

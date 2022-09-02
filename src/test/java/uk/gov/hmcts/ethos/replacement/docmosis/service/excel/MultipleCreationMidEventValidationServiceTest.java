@@ -35,7 +35,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationMidEventValidationService.CASE_BELONGS_DIFFERENT_OFFICE;
 
-@SuppressWarnings({"PMD.UseUnderscoresInNumericLiterals", "PMD.LawOfDemeter"})
+@SuppressWarnings({"PMD.LawOfDemeter"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ExtendWith(SpringExtension.class)
 class MultipleCreationMidEventValidationServiceTest {
@@ -66,7 +66,7 @@ class MultipleCreationMidEventValidationServiceTest {
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(ACCEPTED_STATE);
-        submitEvent.setCaseId(1232121232);
+        submitEvent.setCaseId(1_232_121_232);
 
         multipleDetails.getCaseData().setLeadCase(null);
 
@@ -170,7 +170,7 @@ class MultipleCreationMidEventValidationServiceTest {
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(ACCEPTED_STATE);
-        submitEvent.setCaseId(1232121232);
+        submitEvent.setCaseId(1_232_121_232);
 
         multipleDetails.getCaseData().setLeadCase(null);
 
@@ -273,7 +273,7 @@ class MultipleCreationMidEventValidationServiceTest {
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(SUBMITTED_STATE);
-        submitEvent.setCaseId(1232121232);
+        submitEvent.setCaseId(1_232_121_232);
 
         CaseData caseData1 = new CaseData();
         caseData1.setEthosCaseReference("245001/2020");
@@ -282,7 +282,7 @@ class MultipleCreationMidEventValidationServiceTest {
         SubmitEvent submitEvent1 = new SubmitEvent();
         submitEvent1.setCaseData(caseData1);
         submitEvent1.setState(SUBMITTED_STATE);
-        submitEvent1.setCaseId(1232121233);
+        submitEvent1.setCaseId(1_232_121_233);
 
         return new ArrayList<>(Arrays.asList(submitEvent, submitEvent1));
 

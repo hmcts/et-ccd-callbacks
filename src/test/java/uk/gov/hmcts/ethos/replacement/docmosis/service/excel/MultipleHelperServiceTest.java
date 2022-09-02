@@ -41,8 +41,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRANSFERRED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.UseUnderscoresInNumericLiterals",
-    "PMD.LinguisticNaming"})
+@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.LinguisticNaming"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleHelperServiceTest {
 
@@ -104,7 +103,7 @@ public class MultipleHelperServiceTest {
 
     @Test
     public void addLeadMarkUpWithCaseId() {
-        submitEventList.get(0).setCaseId(12345L);
+        submitEventList.get(0).setCaseId(12_345L);
         when(singleCasesReadingService.retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getLeadCase(),
@@ -520,7 +519,7 @@ public class MultipleHelperServiceTest {
         multipleDetails.getCaseData().setLeadCase(leadLink);
         String newLeadCase = "245000/2020";
         SubmitEvent submitEvent = new SubmitEvent();
-        submitEvent.setCaseId(10561843);
+        submitEvent.setCaseId(10_561_843);
         when(singleCasesReadingService.retrieveSingleCase(userToken, multipleDetails.getCaseTypeId(),
                 newLeadCase, multipleDetails.getCaseData().getMultipleSource()))
                 .thenReturn(submitEvent);

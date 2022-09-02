@@ -28,8 +28,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
 @Slf4j
 @RequiredArgsConstructor
 @Service("multipleScheduleService")
-@SuppressWarnings({"PMD.ConfusingTernary", "PMD.PreserveStackTrace", "PMD.UseUnderscoresInNumericLiterals",
-    "PMD.AvoidInstantiatingObjectsInLoops", "PMD.DoNotUseThreads"})
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.PreserveStackTrace", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.DoNotUseThreads"})
 public class MultipleScheduleService {
 
     private final ExcelReadingService excelReadingService;
@@ -38,7 +38,7 @@ public class MultipleScheduleService {
 
     public static final int ES_PARTITION_SIZE = 500;
     public static final int THREAD_NUMBER = 20;
-    public static final int SCHEDULE_LIMIT_CASES = 10000;
+    public static final int SCHEDULE_LIMIT_CASES = 10_000;
 
     public DocumentInfo bulkScheduleLogic(String userToken, MultipleDetails multipleDetails, List<String> errors) {
 

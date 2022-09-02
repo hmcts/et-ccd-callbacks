@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
@@ -69,7 +68,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.HEARINGS
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LawOfDemeter", "PMD.UnnecessaryFullyQualifiedName"})
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LawOfDemeter"})
 public class ReportDocHelperTest {
 
     private ListingDetails reportDetails;
@@ -569,7 +568,7 @@ public class ReportDocHelperTest {
         EccReportData reportData = new EccReportData(TribunalOffice.MANCHESTER.getOfficeName());
         reportData.setReportType(ECC_REPORT);
         reportData.setDocumentName("TestDocument");
-        reportData.setHearingDateType(Constants.RANGE_HEARING_DATE_TYPE);
+        reportData.setHearingDateType(RANGE_HEARING_DATE_TYPE);
         reportData.setListingDateFrom("2022-01-01");
         reportData.setListingDateTo("2022-01-10");
 
@@ -690,7 +689,7 @@ public class ReportDocHelperTest {
         HearingsToJudgmentsReportData reportData = new HearingsToJudgmentsReportData(reportSummary);
         reportData.setReportType(HEARINGS_TO_JUDGEMENTS_REPORT);
         reportData.setDocumentName("TestDocument");
-        reportData.setHearingDateType(Constants.RANGE_HEARING_DATE_TYPE);
+        reportData.setHearingDateType(RANGE_HEARING_DATE_TYPE);
         reportData.setListingDateFrom("2021-06-20");
         reportData.setListingDateTo("2021-09-20");
 
@@ -735,7 +734,7 @@ public class ReportDocHelperTest {
         RespondentsReportData reportData = new RespondentsReportData(reportSummary);
         reportData.setReportType(RESPONDENTS_REPORT);
         reportData.setDocumentName("TestDocument");
-        reportData.setHearingDateType(Constants.RANGE_HEARING_DATE_TYPE);
+        reportData.setHearingDateType(RANGE_HEARING_DATE_TYPE);
         reportData.setListingDateFrom("2022-01-01");
         reportData.setListingDateTo("2022-01-10");
 
@@ -764,7 +763,7 @@ public class ReportDocHelperTest {
         SessionDaysReportData reportData = new SessionDaysReportData(reportSummary);
         reportData.setReportType(SESSION_DAYS_REPORT);
         reportData.setDocumentName("TestDocument");
-        reportData.setHearingDateType(Constants.RANGE_HEARING_DATE_TYPE);
+        reportData.setHearingDateType(RANGE_HEARING_DATE_TYPE);
         reportData.setListingDateFrom("2022-01-01");
         reportData.setListingDateTo("2022-01-10");
 
@@ -797,7 +796,7 @@ public class ReportDocHelperTest {
         EccReportData reportData = new EccReportData("Manchester");
         reportData.setReportType(ECC_REPORT);
         reportData.setDocumentName("TestDocument");
-        reportData.setHearingDateType(Constants.RANGE_HEARING_DATE_TYPE);
+        reportData.setHearingDateType(RANGE_HEARING_DATE_TYPE);
         reportData.setListingDateFrom("2022-01-01");
         reportData.setListingDateTo("2022-01-10");
 

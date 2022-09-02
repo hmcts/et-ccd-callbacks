@@ -23,7 +23,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_C
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
-@SuppressWarnings({"PMD.UseUnderscoresInNumericLiterals"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class FixCaseApiServiceTest {
 
@@ -40,7 +39,7 @@ public class FixCaseApiServiceTest {
     @Before
     public void setUp() {
         userToken = "authToken";
-        ccdReference = 1643639063185009L;
+        ccdReference = 1_643_639_063_185_009L;
         String multipleReference = "246001";
 
         caseDetails = new CaseDetails();

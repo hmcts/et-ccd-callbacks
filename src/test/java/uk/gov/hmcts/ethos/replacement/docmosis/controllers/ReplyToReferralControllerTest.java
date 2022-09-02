@@ -18,8 +18,11 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
@@ -28,11 +31,14 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -48,11 +54,14 @@ class ReplyToReferralControllerTest {
     private static final String INIT_HEARING_AND_REFERRAL_DETAILS_URL = "/replyReferral/initHearingAndReferralDetails";
     private static final String ABOUT_TO_SUBMIT_URL = "/replyReferral/aboutToSubmit";
     private static final String SUBMITTED_REFERRAL_URL = "/replyReferral/completeReplyToReferral";
+    private static final String VALIDATE_EMAIL_URL = "/replyReferral/validateReplyToEmail";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
     private UserService userService;
+    @MockBean
+    private EmailService emailService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -82,6 +91,12 @@ class ReplyToReferralControllerTest {
 
         List<HearingTypeItem> hearings = new ArrayList<>();
         caseData.setHearingCollection(hearings);
+        caseData.setIsJudge("Yes");
+        caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
+        caseData.setEthosCaseReference("caseRef");
+        caseData.setClaimant("claimant");
+        caseData.setIsUrgent("Yes");
+        caseData.setReplyToEmailAddress("test@gmail.com");
         ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
 
         UserDetails userDetails = new UserDetails();
@@ -118,6 +133,7 @@ class ReplyToReferralControllerTest {
     @Test
     void aboutToSubmitReferralReply_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        doNothing().when(emailService).sendEmail(any(), any(), any());
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -180,6 +196,27 @@ class ReplyToReferralControllerTest {
             .andExpect(status().isForbidden());
     }
 
+    @Test
+    void validateReplyToEmail_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(VALIDATE_EMAIL_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors", hasSize(0)));
+    }
+
+    @Test
+    void validateReplyToEmail_invalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(VALIDATE_EMAIL_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isForbidden());
+    }
+
     private ReferralTypeItem createReferralTypeItem() {
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         ReferralType referralType = new ReferralType();
@@ -188,5 +225,14 @@ class ReplyToReferralControllerTest {
         referralTypeItem.setValue(referralType);
         referralType.setReferralStatus("referralStatus");
         return referralTypeItem;
+    }
+
+    private RespondentSumTypeItem createRespondentType() {
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName("Andrew Smith");
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(respondentSumType);
+
+        return respondentSumTypeItem;
     }
 }

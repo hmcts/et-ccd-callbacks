@@ -14,15 +14,23 @@ import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -37,11 +45,14 @@ class CreateReferralControllerTest {
     private static final String START_CREAT_REFERRAL_URL = "/createReferral/aboutToStart";
     private static final String ABOUT_TO_SUBMIT_URL = "/createReferral/aboutToSubmit";
     private static final String SUBMITTED_REFERRAL_URL = "/createReferral/completeCreateReferral";
+    private static final String VALIDATE_EMAIL_URL = "/createReferral/validateReferentEmail";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
     private UserService userService;
+    @MockBean
+    private EmailService emailService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -60,6 +71,11 @@ class CreateReferralControllerTest {
                 Constants.HEARING_STATUS_HEARD,
                 true)
             .build();
+        caseData.setEthosCaseReference("caseRef");
+        caseData.setClaimant("claimant");
+        caseData.setIsUrgent("Yes");
+        caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
+        caseData.setReferentEmail("test@gmail.com");
         ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
     }
 
@@ -91,6 +107,7 @@ class CreateReferralControllerTest {
     void aboutToSubmit_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(userService.getUserDetails(any())).thenReturn(new UserDetails());
+        doNothing().when(emailService).sendEmail(any(), any(), any());
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -130,5 +147,35 @@ class CreateReferralControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
             .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void validateReferentEmail_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(VALIDATE_EMAIL_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors", hasSize(0)));
+    }
+
+    @Test
+    void validateReferentEmail_invalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(VALIDATE_EMAIL_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isForbidden());
+    }
+
+    private RespondentSumTypeItem createRespondentType() {
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName("Andrew Smith");
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(respondentSumType);
+
+        return respondentSumTypeItem;
     }
 }

@@ -71,8 +71,8 @@ class CreateControllerTest {
 
         var result = resultActions.andReturn();
         var contentAsString = result.getResponse().getContentAsString();
-        var json = new JSONObject(contentAsString).getString("data");
-        var adminData = jsonMapper.fromJson(json, AdminData.class);
+        var json = new JSONObject(contentAsString).getJSONObject("data");
+        var adminData = jsonMapper.fromJson(json.toString(), AdminData.class);
 
         verify(createService, times(1)).initCreateAdmin(token);
         assertEquals(ADMIN_CASE_NAME, adminData.getName());

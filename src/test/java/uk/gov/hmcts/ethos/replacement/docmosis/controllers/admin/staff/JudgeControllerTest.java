@@ -35,7 +35,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeS
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({JudgeController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.LawOfDemeter"})
+@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.LawOfDemeter", "PMD.TooManyMethods"})
 class JudgeControllerTest {
 
     private static final String INIT_ADD_JUDGE_URL = "/admin/staff/initAddJudge";

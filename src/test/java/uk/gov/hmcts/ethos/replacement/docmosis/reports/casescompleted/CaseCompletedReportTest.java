@@ -42,7 +42,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport.COMPLETED_PER_SESSION_FORMAT;
 
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.LawOfDemeter", "PMD.UseShortArrayInitializer" })
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.LawOfDemeter", "PMD.UseShortArrayInitializer",
+    "PMD.TooManyMethods" })
 public class CaseCompletedReportTest {
 
     @Test

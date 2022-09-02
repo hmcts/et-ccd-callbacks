@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.TooManyMethods"})
 public class VenueSelectionServiceTest {
 
     @Test

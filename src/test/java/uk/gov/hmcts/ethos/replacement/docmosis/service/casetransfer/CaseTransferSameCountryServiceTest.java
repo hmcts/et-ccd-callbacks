@@ -35,7 +35,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferUtils.BF_ACTIONS_ERROR_MSG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferUtils.HEARINGS_ERROR_MSG;
 
-@SuppressWarnings({"PMD.LawOfDemeter"})
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.TooManyMethods"})
 @ExtendWith(SpringExtension.class)
 class CaseTransferSameCountryServiceTest {
 

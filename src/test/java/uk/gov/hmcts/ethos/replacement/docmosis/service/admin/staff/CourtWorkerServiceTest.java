@@ -32,7 +32,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtW
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.NO_WORKER_CODE_FOUND_ERROR_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.CourtWorkerService.SAVE_ERROR_MESSAGE;
 
-@SuppressWarnings({"PMD.LawOfDemeter"})
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.TooManyMethods"})
 class CourtWorkerServiceTest {
 
     private CourtWorkerRepository courtWorkerRepository;

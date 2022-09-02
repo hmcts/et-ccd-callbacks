@@ -68,7 +68,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForC
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.NcssCount", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.UseProperClassLoader"})
+    "PMD.UseProperClassLoader", "PMD.TooManyMethods"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class CaseManagementForCaseWorkerServiceTest {
 

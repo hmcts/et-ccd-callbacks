@@ -15,7 +15,7 @@ import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_GLASGOW_VENUE_FIE
 import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_VENUE_FIELD_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
 
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LawOfDemeter", "PMD.UnusedPrivateMethod" })
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LawOfDemeter", "PMD.UnusedPrivateMethod", "PMD.TooManyMethods"})
 class ListingVenueHelperTest {
 
     private static final String VENUE_NAME = "Test Venue";

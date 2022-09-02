@@ -91,7 +91,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper.CAUS
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.UnusedPrivateMethod", "PMD.ExcessiveImports", "PMD.UnusedPrivateField",
-    "PMD.LinguisticNaming"})
+    "PMD.LinguisticNaming", "PMD.TooManyMethods"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ListingServiceTest {
 

@@ -31,7 +31,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @SuppressWarnings({"PMD.ExcessiveClassLength", "PMD.LawOfDemeter", "PMD.UseProperClassLoader",
-    "PMD.LinguisticNaming", "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveMethodLength"})
+    "PMD.LinguisticNaming", "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveMethodLength", "PMD.TooManyMethods"})
 public class DocumentHelperTest {
 
     private static final String DUMMY_CASE_TYPE_ID = "dummy case type id";

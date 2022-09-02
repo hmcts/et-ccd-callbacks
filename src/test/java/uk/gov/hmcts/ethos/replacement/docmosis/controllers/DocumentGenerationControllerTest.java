@@ -46,7 +46,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @RunWith(SpringRunner.class)
 @WebMvcTest(DocumentGenerationController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.UnusedPrivateField"})
+@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 public class DocumentGenerationControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";

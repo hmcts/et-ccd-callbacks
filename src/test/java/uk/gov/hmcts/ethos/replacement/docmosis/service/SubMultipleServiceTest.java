@@ -26,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_ALL_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 
-@SuppressWarnings({"PMD.UnusedPrivateField"})
+@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.TooManyMethods"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SubMultipleServiceTest {
 

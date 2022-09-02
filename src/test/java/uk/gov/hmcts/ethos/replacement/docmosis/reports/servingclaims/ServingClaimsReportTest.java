@@ -25,7 +25,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CA
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRANSFERRED_STATE;
 
-@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.LawOfDemeter", "PMD.NcssCount"})
+@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.LawOfDemeter", "PMD.NcssCount", "PMD.TooManyMethods"})
 public class ServingClaimsReportTest {
 
     private List<SubmitEvent> submitEvents;

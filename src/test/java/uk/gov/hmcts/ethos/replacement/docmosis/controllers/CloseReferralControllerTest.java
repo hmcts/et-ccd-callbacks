@@ -69,6 +69,9 @@ class CloseReferralControllerTest {
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);
+        caseData.setEthosCaseReference("caseRef");
+        caseData.setClaimant("claimant");
+        caseData.setIsUrgent("Yes");
         ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
     }
 

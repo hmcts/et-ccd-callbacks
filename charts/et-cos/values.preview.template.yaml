@@ -18,5 +18,7 @@ java:
           alias: CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING
         - name: tornado-access-key
           alias: TORNADO_ACCESS_KEY
+        - name: gov-notify-api-key
+          alias: GOV_NOTIFY_API_KEY
   postgresql:
     enabled: true

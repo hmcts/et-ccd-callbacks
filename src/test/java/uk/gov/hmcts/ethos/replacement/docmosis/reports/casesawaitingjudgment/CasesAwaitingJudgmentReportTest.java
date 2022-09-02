@@ -32,8 +32,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.FieldNamingConventions",  "PMD.LawOfDemeter",
-    "PMD.UnnecessaryFullyQualifiedName" })
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.LawOfDemeter"})
 public class CasesAwaitingJudgmentReportTest {
 
     ReportDataSource reportDataSource;

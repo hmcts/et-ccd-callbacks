@@ -22,8 +22,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.FieldNamingConventions",  "PMD.LawOfDemeter",
-    "PMD.UnnecessaryFullyQualifiedName", "PMD.UseShortArrayInitializer" })
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.LawOfDemeter", "PMD.UseShortArrayInitializer" })
 public class SessionDaysTest {
 
     @Test

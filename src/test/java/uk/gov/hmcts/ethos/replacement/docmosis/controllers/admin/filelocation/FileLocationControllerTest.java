@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
@@ -39,7 +38,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({FileLocationController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.UnnecessaryFullyQualifiedName", "PMD.UnusedPrivateField"})
+
 class FileLocationControllerTest {
 
     @MockBean
@@ -65,7 +64,7 @@ class FileLocationControllerTest {
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/admin/filelocation/addFileLocation")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .header("Authorization", token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
@@ -91,7 +90,7 @@ class FileLocationControllerTest {
         doThrow(new SaveFileLocationException(error)).when(fileLocationService).saveFileLocation(adminData);
 
         mockMvc.perform(post("/admin/filelocation/addFileLocation")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .header("Authorization", token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(jsonPath("$.errors[0]", is(error)));
@@ -109,7 +108,7 @@ class FileLocationControllerTest {
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/admin/filelocation/addFileLocation")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .header("Authorization", token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
@@ -127,7 +126,7 @@ class FileLocationControllerTest {
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/admin/filelocation/initAdminData")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .header("Authorization", token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
@@ -141,7 +140,7 @@ class FileLocationControllerTest {
     @Test
     void testInitAdminDataBadRequest() throws Exception {
         mockMvc.perform(post("/admin/filelocation/initAdminData")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .header("Authorization", "user-token")
                         .content("bad-request"))
                 .andExpect(status().isBadRequest());
@@ -161,7 +160,7 @@ class FileLocationControllerTest {
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/admin/filelocation/updateFileLocation")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .header("Authorization", token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
@@ -182,7 +181,7 @@ class FileLocationControllerTest {
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/admin/filelocation/updateFileLocation")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .header("Authorization", token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
@@ -206,7 +205,7 @@ class FileLocationControllerTest {
         when(fileLocationService.updateFileLocation(adminData)).thenReturn(Arrays.asList(error));
 
         mockMvc.perform(post("/admin/filelocation/updateFileLocation")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .header("Authorization", token)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
@@ -228,7 +227,7 @@ class FileLocationControllerTest {
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/admin/filelocation/deleteFileLocation")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .header("Authorization", token)
                 .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
@@ -249,7 +248,7 @@ class FileLocationControllerTest {
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/admin/filelocation/deleteFileLocation")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .header("Authorization", token)
                 .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
@@ -273,7 +272,7 @@ class FileLocationControllerTest {
         when(fileLocationService.deleteFileLocation(adminData)).thenReturn(Collections.singletonList(error));
 
         mockMvc.perform(post("/admin/filelocation/deleteFileLocation")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .header("Authorization", token)
                 .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())

@@ -115,7 +115,13 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-employment-etjudge-scotland",
                 "citizen",
                 "caseworker-employment-legalrep-solicitor",
-                "caseworker-et-pcqextractor");
+                "caseworker-et-pcqextractor",
+                "caseworker-caa",
+                "pui-case-manager",
+                "pui-finance-manager",
+                "pui-organisation-manager",
+                "pui-user-manager"
+        );
     }
 
     private void createUsers(CFTLib lib) {
@@ -138,6 +144,15 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker",
                 "caseworker-employment",
                 "caseworker-employment-api");
+
+        lib.createIdamUser("superuser@etorganisation1.com",
+                "caseworker-caa",
+                "pui-case-manager",
+                "pui-organisation-manager",
+                "pui-user-manager");
+
+        lib.createIdamUser("solicitor1@etorganisation1.com",
+                "caseworker-employment-legalrep-solicitor");
     }
 
     private void importCcdDefinitions(CFTLib lib) {

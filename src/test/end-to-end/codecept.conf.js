@@ -8,8 +8,8 @@ exports.config = {
             url: config.TestUrl,
             waitForTimeout: 40000,
             getPageTimeout: 40000,
-            // waitForAction: 1000,
-            show: config.TestShowBrowserWindow,
+            waitForAction: 1000,
+            show: true,
             waitForNavigation: ['domcontentloaded'],
             restart: true,
             keepCookies: false,
@@ -22,7 +22,7 @@ exports.config = {
                     'height': 960
                 },
                 args: [
-                    '--headless',
+                    //'--headless',
                     '--disable-gpu',
                     '--no-sandbox',
                     '--allow-running-insecure-content',
@@ -40,7 +40,8 @@ exports.config = {
         JSWait: {require: './helpers/JSWait.js'},
     },
     include: {
-        I: './pages/steps.js'
+        I: './pages/steps.js',
+        createCasePages : './pages/create_case.js'
     },
     plugins: {
         screenshotOnFail: {

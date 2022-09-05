@@ -44,6 +44,7 @@ const states = {
 };
 
 module.exports = {
+    defaultPageClickWaitTime : 5,
     ccdUserType,
     eventNames,
     states

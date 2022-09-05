@@ -37,7 +37,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DynamicListHelper.DYNAMIC_HEARING_LABEL_FORMAT;
 
 @SuppressWarnings({"PMD.ExcessiveClassLength", "PMD.LawOfDemeter", "PMD.UseProperClassLoader",
-    "PMD.UnusedPrivateMethod", "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveMethodLength", "PMD.TooManyMethods"})
+    "PMD.UnusedPrivateMethod", "PMD.AvoidDuplicateLiterals", "PMD.ExcessiveMethodLength", "PMD.TooManyMethods",
+    "PMD.ExcessiveImports"})
 class DynamicListHelperTest {
 
     private CaseDetails caseDetails1;

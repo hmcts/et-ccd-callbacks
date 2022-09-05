@@ -35,7 +35,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Judge
 import static uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JudgeEmploymentStatus.UNKNOWN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays.SessionDaysReport.FULL_DAY;
 
-@SuppressWarnings("PMD.LawOfDemeter")
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ExcessiveImports"})
 class SessionDaysReportTest {
 
     SessionDaysReportDataSource reportDataSource;

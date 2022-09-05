@@ -56,7 +56,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
     "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
     "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
     "PMD.LawOfDemeter", "PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.PreserveStackTrace",
-    "PMD.LinguisticNaming", "PMD.PrematureDeclaration"})
+    "PMD.LinguisticNaming", "PMD.PrematureDeclaration", "PMD.CyclomaticComplexity"})
 public class DocumentGenerationService {
 
     private final TornadoService tornadoService;

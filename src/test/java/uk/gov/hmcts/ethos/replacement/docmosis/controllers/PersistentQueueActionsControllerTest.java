@@ -55,7 +55,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @RunWith(SpringRunner.class)
 @WebMvcTest(PersistentQueueActionsController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-@SuppressWarnings({"PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
 public class PersistentQueueActionsControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";

@@ -43,7 +43,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrac
 @RequiredArgsConstructor
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.LiteralsFirstInComparisons",
     "PMD.FieldNamingConventions", "PMD.LawOfDemeter", "PMD.TooManyMethods", "PMD.ImplicitSwitchFallThrough",
-    "PMD.SwitchStmtsShouldHaveDefault"})
+    "PMD.SwitchStmtsShouldHaveDefault", "PMD.ExcessiveImports"})
 public class Et1VettingService {
 
     private final TornadoService tornadoService;

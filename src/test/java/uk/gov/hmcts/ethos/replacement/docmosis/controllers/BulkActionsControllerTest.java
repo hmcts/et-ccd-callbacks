@@ -61,7 +61,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @RunWith(SpringRunner.class)
 @WebMvcTest(BulkActionsController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-@SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.TooManyMethods", "PMD.ExcessiveImports",
+    "PMD.ExcessiveClassLength", "PMD.CyclomaticComplexity"})
 public class BulkActionsControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";

@@ -35,7 +35,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.PENDING_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 
 @SuppressWarnings({"PMD.MethodNamingConventions", "PMD.LawOfDemeter", "PMD.UseProperClassLoader",
-    "PMD.LinguisticNaming"})
+    "PMD.LinguisticNaming", "PMD.ExcessiveImports"})
 public class BulkHelperTest {
 
     private List<SubmitEvent> submitEvents;

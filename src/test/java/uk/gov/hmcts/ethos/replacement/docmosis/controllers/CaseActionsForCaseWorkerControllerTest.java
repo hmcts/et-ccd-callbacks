@@ -75,7 +75,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @WebMvcTest(CaseActionsForCaseWorkerController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.LawOfDemeter", "PMD.AvoidDuplicateLiterals",
-    "PMD.TooManyMethods", "PMD.TooManyFields"})
+    "PMD.TooManyMethods", "PMD.TooManyFields", "PMD.ExcessiveImports", "PMD.ExcessivePublicCount",
+    "PMD.ExcessivePublicCount", "PMD.CyclomaticComplexity", "PMD.ExcessiveClassLength"})
 public class CaseActionsForCaseWorkerControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";

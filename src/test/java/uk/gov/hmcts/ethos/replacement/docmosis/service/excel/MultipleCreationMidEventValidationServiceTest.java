@@ -35,7 +35,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationMidEventValidationService.CASE_BELONGS_DIFFERENT_OFFICE;
 
-@SuppressWarnings({"PMD.LawOfDemeter"})
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ExcessiveImports"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ExtendWith(SpringExtension.class)
 class MultipleCreationMidEventValidationServiceTest {

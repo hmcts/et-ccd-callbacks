@@ -58,11 +58,6 @@
         <exclude name="DataClass"/>
         <exclude name="AvoidThrowingRawExceptionTypes"/>
     </rule>
-    <rule ref="category/java/design.xml/ExcessiveImports">
-        <properties>
-            <property name="minimum" value="80"/><!-- should be reduced -->
-        </properties>
-    </rule>
     <rule ref="category/java/design.xml/LawOfDemeter">
         <properties>
             <property name="violationSuppressRegex" value="(.*method chain calls.*|.*object not created locally.*)"/>
@@ -96,45 +91,6 @@
     <rule ref="category/java/codestyle.xml/ConfusingTernary">
         <properties>
             <property name="ignoreElseIf" value="true" />
-        </properties>
-    </rule>
-    <rule ref="category/java/design.xml/CyclomaticComplexity">
-        <properties>
-            <property name="classReportLevel" value="190" />
-            <property name="methodReportLevel" value="50" />
-            <property name="cycloOptions" value="" />
-        </properties>
-    </rule>
-    <rule ref="category/java/design.xml/NPathComplexity">
-        <properties>
-            <property name="reportLevel" value="555" />
-        </properties>
-    </rule>
-    <rule ref="category/java/design.xml/CognitiveComplexity">
-        <properties>
-            <property name="reportLevel" value="90" />
-        </properties>
-    </rule>
-    <rule ref="category/java/design.xml/ExcessivePublicCount">
-        <properties>
-            <property name="minimum" value="150" /><!-- should be reduced say to 45, the default-->
-        </properties>
-    </rule>
-    <rule ref="category/java/design.xml/ExcessiveClassLength">
-        <properties>
-            <property name="minimum" value="2000.0" />
-        </properties>
-    </rule>
-    <rule ref="category/java/design.xml/ExcessiveMethodLength">
-        <properties>
-            <property name="minimum" value="200.0" />
-        </properties>
-    </rule>
-    <rule ref="category/java/design.xml/NcssCount">
-        <properties>
-            <property name="methodReportLevel" value="180" />
-            <property name="classReportLevel" value="1500" />
-            <property name="ncssOptions" value="" />
         </properties>
     </rule>
 </ruleset>

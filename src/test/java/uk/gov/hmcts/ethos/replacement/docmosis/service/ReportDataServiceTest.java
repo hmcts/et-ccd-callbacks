@@ -84,7 +84,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ECC_REPO
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ExcessiveImports", "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ExcessiveImports", "PMD.ExcessiveImports", "PMD.NcssCount",
+    "PMD.ExcessiveMethodLength"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ReportDataServiceTest {
 

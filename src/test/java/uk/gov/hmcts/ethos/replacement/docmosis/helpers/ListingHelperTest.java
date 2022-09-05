@@ -69,7 +69,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANG
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
 @SuppressWarnings({"PMD.UseProperClassLoader", "PMD.JUnit5TestShouldBePackagePrivate", "PMD.LawOfDemeter",
-    "PMD.LinguisticNaming", "PMD.ExcessiveMethodLength", "PMD.ConfusingTernary"})
+    "PMD.LinguisticNaming", "PMD.ExcessiveMethodLength", "PMD.ConfusingTernary", "PMD.ExcessiveImports",
+    "PMD.ExcessiveClassLength", "PMD.NcssCount"})
 class ListingHelperTest {
 
     private ListingDetails listingDetails;

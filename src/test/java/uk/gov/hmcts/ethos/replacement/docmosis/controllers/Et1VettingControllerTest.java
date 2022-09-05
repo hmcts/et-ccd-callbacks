@@ -40,7 +40,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({Et1VettingController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.LawOfDemeter", "PMD.UnusedPrivateField", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.LawOfDemeter", "PMD.UnusedPrivateField", "PMD.TooManyMethods",
+    "PMD.ExcessiveImports"})
 class Et1VettingControllerTest {
 
     private static final String INIT_CASE_VETTING_ENDPOINT = "/initialiseEt1Vetting";

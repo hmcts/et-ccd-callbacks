@@ -45,8 +45,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.TooManyMethods"})
 @RunWith(SpringJUnit4ClassRunner.class)
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 public class DocumentGenerationServiceTest {
 
     @InjectMocks

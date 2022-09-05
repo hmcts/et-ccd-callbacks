@@ -34,7 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.LabelsHelper.ADDRESS_LABELS_RESULT_SELECTION_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.LabelsHelper.MAX_NUMBER_LABELS;
 
-@SuppressWarnings({"PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
 public class LabelsHelperTest {
 
     private MultipleDetails multipleDetails;

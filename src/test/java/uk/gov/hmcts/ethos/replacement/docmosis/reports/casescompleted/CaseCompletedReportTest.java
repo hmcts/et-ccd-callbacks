@@ -43,7 +43,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport.COMPLETED_PER_SESSION_FORMAT;
 
 @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.LawOfDemeter", "PMD.UseShortArrayInitializer",
-    "PMD.TooManyMethods" })
+    "PMD.TooManyMethods", "PMD.ExcessiveImports" })
 public class CaseCompletedReportTest {
 
     @Test

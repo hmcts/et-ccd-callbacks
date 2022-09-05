@@ -27,6 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @Slf4j
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class AcasController {
     private final VerifyTokenService verifyTokenService;
 
@@ -77,7 +78,7 @@ public class AcasController {
     })
     public ResponseEntity<Object> getCaseData(
             @RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken,
-            @RequestParam(name = "caseIds") List<String> caseIds) throws Exception {
+            @RequestParam(name = "caseIds") List<String> caseIds) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -102,7 +103,7 @@ public class AcasController {
 
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
-        submitEvent.setCaseId(1234567891234567L);
+        submitEvent.setCaseId(1_234_567_891_234_567L);
 
         CaseData caseData2 = new CaseData();
         caseData2.setClaimant("Jack Reeve");
@@ -111,7 +112,7 @@ public class AcasController {
 
         SubmitEvent submitEvent2 = new SubmitEvent();
         submitEvent2.setCaseData(caseData2);
-        submitEvent2.setCaseId(1234567891234567L);
+        submitEvent2.setCaseId(1_234_567_891_234_567L);
 
         return List.of(submitEvent, submitEvent2);
 

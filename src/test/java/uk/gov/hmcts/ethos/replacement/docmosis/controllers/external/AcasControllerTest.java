@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = DocmosisApplication.class)
 class AcasControllerTest {
 
-    private List<String> caseIds = new ArrayList<>();
+    private final List<String> caseIds = new ArrayList<>();
     private static final String AUTH_TOKEN = "some-token";
     private static final String GET_LAST_MODIFIED_CASE_LIST_URL = "/getLastModifiedCaseList";
     private static final String GET_CASE_DATA_URL = "/getCaseData";
@@ -56,7 +56,7 @@ class AcasControllerTest {
     }
 
     @Test
-    void getLastModifiedCaseList_NoParameter() throws Exception {
+    void getLastModifiedCaseListNoParameter() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(get(GET_LAST_MODIFIED_CASE_LIST_URL)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN))
@@ -64,7 +64,7 @@ class AcasControllerTest {
     }
 
     @Test
-    void getLastModifiedCaseList_InvalidToken() throws Exception {
+    void getLastModifiedCaseListInvalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(get(GET_LAST_MODIFIED_CASE_LIST_URL)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -82,7 +82,7 @@ class AcasControllerTest {
     }
 
     @Test
-    void getCaseData_NoParameter() throws Exception {
+    void getCaseDataNoParameter() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(get(GET_CASE_DATA_URL)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN))
@@ -90,7 +90,7 @@ class AcasControllerTest {
     }
 
     @Test
-    void getCaseData_InvalidToken() throws Exception {
+    void getCaseDataInvalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(get(GET_CASE_DATA_URL)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -99,7 +99,7 @@ class AcasControllerTest {
     }
 
     @Test
-    void getCaseData_listOfCaseIds() throws Exception {
+    void getCaseDatalistOfCaseIds() throws Exception {
         caseIds.add("1");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(get(GET_CASE_DATA_URL)

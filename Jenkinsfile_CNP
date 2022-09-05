@@ -11,18 +11,19 @@ def branchesToSync = ['demo', 'perftest', 'ithc']
 
 def secrets = [
         'et-cos-${env}': [
-                secret('ccd-user-email', 'CCD_CASEWORKER_E2E_EMAIL'),
-                secret('ccd-user-password', 'CCD_CASEWORKER_E2E_PASSWORD'),
-                secret('et-caseworker-email', 'ET_CASEWORKER_EMAIL'),
-                secret('et-caseworker-pwd', 'ET_CASEWORKER_PASSWORD'),
-                secret('et-judge-email', 'ET_JUDGE_EMAIL'),
-                secret('et-judge-pwd', 'ET_JUDGE_PASSWORD'),
-                secret('et-cos-s2s-secret', 'SERVICE_SECRET'),
-                secret('idam-client-secret', 'IDAM_CLIENT_SECRET')
+                secret('et-ccd-caseworker-user-name', 'ET_CCD_CASEWORKER_USER_NAME'),
+                secret('et-ccd-caseworker-password', 'ET_CCD_CASEWORKER_PASSWORD'),
+                secret('et-caseworker-username', 'ET_CASEWORKER_USER_NAME'),
+                secret('et-caseworker-password', 'ET_CASEWORKER_PASSWORD'),
+                secret('et-judge-4-username', 'ET_JUDGE_4_USER_NAME'),
+                secret('et-judge-4-password', 'ET_JUDGE_4_PASSWORD'),
+                secret('et-judge-username', 'ET_JUDGE_USER_NAME'),
+                secret('et-judge-password', 'ET_JUDGE_PASSWORD'),
+                secret('et-ccd-s2s-otp', 'ET_CCD_S2S_OTP')
         ],
-        's2s-${env}':  [
-                secret('microservicekey-ccd-gw', 'MICROSERVICE_CCD_GW')
-        ]
+        s2s-${env}':  [
+                        secret('microservicekey-ccd-gw', 'MICROSERVICE_CCD_GW')
+                ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {

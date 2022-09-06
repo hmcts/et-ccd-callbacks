@@ -45,7 +45,7 @@ module.exports = {
     is_there_an_acas_certificate_number_no : {xpath : '//input[@id=\'respondentCollection_0_respondent_ACAS_question_No\']'},
     acas_certificate_number_input : {xpath: '//input[@id=\'respondentCollection_0_respondent_ACAS\']'},
     respondent_phone_number : {xpath : '//input[@id=\'respondentCollection_0_respondent_phone1\']'},
-    et3_form_received_option : {xpath : '//input[@id=\'respondentCollection_0_responseReceived_No\']'},
+    et3_form_received_option_no : {xpath : '//input[@id=\'respondentCollection_0_responseReceived_No\']'},
     respondent_enter_uk_postcode : {xpath : '//input[@id=\'respondentCollection_0_respondent_address_respondent_address_postcodeInput\']'},
     respondent_select_an_address : {xpath : '//select[@name=\'address\']'},
   },
@@ -152,7 +152,7 @@ module.exports = {
     I.click(this.locators.find_address_button);
     I.wait(1);
     I.see('Select an address');
-    I.selectOption(this.locators.select_an_address,'1: Object');
+    I.selectOption(this.locators.claimant_select_an_address,'1: Object');
     I.fillField(this.locators.email_address, 'xxxx@test.com');
     I.selectOption(this.locators.contact_preference,'1: Email');
   },
@@ -168,18 +168,17 @@ module.exports = {
     I.see('Respondent Address');
     I.see('Enter a UK postcode');
     I.see('I can\'t enter a UK postcode');
-  }
+  },
 
   inputCreateCaseRespondentsPage() {
-    I.see('Respondents');
-    I.click('Add new');
-    I.wait(1);
-    I.see('Name of respondent');
-    I.see('Is there an ACAS Certificate number?');
-    I.see('Phone number (Optional)');
-    I.see('Has the ET3 form been received? (Optional)');
-    I.see('Respondent Address');
-    I.see('Enter a UK postcode');
-    I.see('I can\'t enter a UK postcode');
+    I.fillField('Trial Respondent');
+    I.selectOption(this.locators.is_there_an_acas_certificate_number_yes);
+    I.fillField(this.locators.acas_certificate_number_input,'ACAS1234');
+    I.fillField(this.locators.respondent_phone_number,'077030372385');
+    I.selectOption(this.locators.et3_form_received_option_no);
+    I.fillField(this.locators.respondent_enter_uk_postcode,'SS1 1AA');
+    I.click(this.locators.find_address_button);
+    I.selectOption(this.locators.respondent_select_an_address,'1: Object');
+
   }
 };

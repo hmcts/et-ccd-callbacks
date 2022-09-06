@@ -22,15 +22,15 @@ module.exports = {
     //Type of Claimant Page
     type_of_claimant_individual : {xpath : '//input[@id=\'claimant_TypeOfClaimant-Individual\']'},
     type_of_claimant_company : {xpath : '//input[@id=\'claimant_TypeOfClaimant-Company\']'},
-    title : {xpath : '//select[@id=\'claimantIndType_claimant_title1\']'},
+    title : {xpath : '//select[@id=\'claimantIndType_claimant_preferred_title\']'},
     first_name : {xpath : '//input[@id=\'claimantIndType_claimant_first_names\']'},
     last_name : {xpath : '//input[@id=\'claimantIndType_claimant_last_name\']'},
     date_of_birth_day : {xpath : '//input[@id=\'claimant_date_of_birth-day\']'},
     date_of_birth_month : {xpath : '//input[@id=\'claimant_date_of_birth-month\']'},
     date_of_birth_year : {xpath : '//input[@id=\'claimant_date_of_birth-year\']'},
     sex : {xpath : '//select[@id=\'claimantIndType_claimant_sex\']'},
-    gender_identity : {xpath : '//input[@id=\'claimantIndType_claimant_gender_identity\']'},
-    gender : {xpath : '//select[@id=\'claimantIndType_claimant_gender\']'},
+    gender_identity : {xpath : '//select[@id=\'claimantIndType_claimant_gender_identity_same\']'},
+    gender_identity_description : {xpath : '//input[@id=\'claimantIndType_claimant_gender_identity\']'},
     claimant_phone_number : { xpath : '//input[@id=\'claimantType_claimant_phone_number\']'},
     claimant_alternative_number : {xpath : '//input[@id=\'claimantType_claimant_mobile_number\']'},
     claimant_enter_uk_postcode : {xpath : '//input[@id=\'claimantType_claimant_addressUK_claimant_addressUK_postcodeInput\']'},
@@ -48,6 +48,11 @@ module.exports = {
     et3_form_received_option_no : {xpath : '//input[@id=\'respondentCollection_0_responseReceived_No\']'},
     respondent_enter_uk_postcode : {xpath : '//input[@id=\'respondentCollection_0_respondent_address_respondent_address_postcodeInput\']'},
     respondent_select_an_address : {xpath : '//select[@name=\'address\']'},
+
+    //Premises page
+    premises_title : {xpath: '//input[@id=\'companyPremises_premises\']'},
+    premises_enter_uk_postcode : {xpath : '//input[@id=\'companyPremises_address_address_postcodeInput\']'},
+    premises_select_an_address : {xpath : '//select[@id=\'companyPremises_address_address_addressList\']'},
   },
 
   async getHeaderValue() {
@@ -122,7 +127,7 @@ module.exports = {
     I.see('Year');
     I.see('Sex (Optional)');
     I.see('Gender Identity (Optional)');
-    I.see('Gender (Optional)');
+    I.see('Gender Identity description (Optional)');
     I.see('Phone number (Optional)');
     I.see('Alternative number (Optional)');
 
@@ -144,8 +149,8 @@ module.exports = {
     I.fillField(this.locators.date_of_birth_month, now.month());
     I.fillField(this.locators.date_of_birth_year, now.year());
     I.selectOption(this.locators.sex, '1: Male');
-    I.fillField(this.locators.gender_identity,'Test Gender');
-    I.selectOption(this.locators.gender, '1: Male');
+    I.selectOption(this.locators.gender_identity, '1: Yes');
+    I.fillField(this.locators.gender_identity_description,'Test Gender');
     I.fillField(this.locators.claimant_phone_number, '07928621415');
     I.fillField(this.locators.claimant_alternative_number, '07928621415');
     I.fillField(this.locators.claimant_enter_uk_postcode, 'SS1 1AA');
@@ -171,14 +176,28 @@ module.exports = {
   },
 
   inputCreateCaseRespondentsPage() {
-    I.fillField('Trial Respondent');
-    I.selectOption(this.locators.is_there_an_acas_certificate_number_yes);
+    I.fillField(this.locators.name_of_respondent,'Respondent Name');
+    I.checkOption(this.locators.is_there_an_acas_certificate_number_yes);
     I.fillField(this.locators.acas_certificate_number_input,'ACAS1234');
-    I.fillField(this.locators.respondent_phone_number,'077030372385');
-    I.selectOption(this.locators.et3_form_received_option_no);
+    I.fillField(this.locators.respondent_phone_number,'05909671016');
+    I.checkOption(this.locators.et3_form_received_option_no);
     I.fillField(this.locators.respondent_enter_uk_postcode,'SS1 1AA');
     I.click(this.locators.find_address_button);
     I.selectOption(this.locators.respondent_select_an_address,'1: Object');
+  },
 
+  verifyCreateCasePremisesPage() {
+    I.see('Premises');
+    I.see('Premises (Optional)');
+    I.see('Address');
+    I.see('Enter a UK postcode');
+    I.see('I can\'t enter a UK postcode');
+  },
+
+  inputCreateCasePremisesPage() {
+    I.fillField(this.locators.premises_title,'Respondents Premises');
+    I.fillField(this.locators.premises_enter_uk_postcode,'SS1 1AA');
+    I.click(this.locators.find_address_button);
+    I.selectOption(this.locators.premises_select_an_address,'1: Object');
   }
 };

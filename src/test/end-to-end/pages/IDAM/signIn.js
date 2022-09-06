@@ -7,7 +7,6 @@ module.exports = async function () {
     const I = this;
     I.amOnPage('/', 10);
     I.waitForText('Sign in');
-    I.wait(5);
     I.fillField('username', testConfig.TestEnvCWUser);
     I.fillField('password', testConfig.TestEnvCWPassword);
     I.click('input[value="Sign in"]');

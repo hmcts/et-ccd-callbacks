@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest({AcasController.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
+@SuppressWarnings({"PMD.LinguisticNaming"})
 class AcasControllerTest {
 
     private final List<String> caseIds = new ArrayList<>();

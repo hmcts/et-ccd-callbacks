@@ -6,8 +6,8 @@ exports.config = {
     helpers: {
         Puppeteer: {
             url: config.TestUrl,
-            waitForTimeout: 100000,
-            getPageTimeout: 100000,
+            waitForTimeout: 40000,
+            getPageTimeout: 40000,
             waitForAction: 1000,
             show: true,
             waitForNavigation: ['domcontentloaded'],

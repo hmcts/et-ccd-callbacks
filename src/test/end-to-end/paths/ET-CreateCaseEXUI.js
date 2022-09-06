@@ -5,25 +5,30 @@ Feature('ET Case Creation in EXUI');
 Scenario('Create a case in EXUI happy path England and Wales', async ({ I,createCasePages }) => {
 
     await I.authenticateWithIdam();
-    I.wait(5);
+    I.wait(8);
 
     createCasePages.clickCreateCaseLink();
-    I.wait(5);
+    I.wait(8);
 
     createCasePages.verifyCreateCaseInputPage();
     createCasePages.inputCreateCaseDetailsPage();
     createCasePages.clickStartButton();
-    I.wait(5);
+    I.wait(8);
 
     createCasePages.verifyCreateCaseDateOfReceiptInputPage();
     createCasePages.inputCreateCaseDateOfReceiptInputPage();
     createCasePages.clickContinueButton();
-    I.wait(5);
+    I.wait(8);
 
     createCasePages.verifyCreateCaseTypeOfClaimantPage();
     createCasePages.inputCreateCaseTypeOfClaimantPage();
     createCasePages.clickContinueButton();
-    I.wait(5);
+    I.wait(8);
+
+    createCasePages.verifyCreateCaseRespondentsPage();
+    createCasePages.inputCreateCaseRespondentsPage();
+    createCasePages.clickContinueButton();
+    I.wait(8);
 
 
 }).tag('@CreateCase')

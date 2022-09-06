@@ -66,6 +66,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @RunWith(SpringRunner.class)
 @WebMvcTest(ExcelActionsController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
+@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.LawOfDemeter", "PMD.UnusedPrivateField",
+    "PMD.TooManyMethods", "PMD.TooManyFields", "PMD.ExcessiveImports", "PMD.ExcessivePublicCount",
+    "PMD.ExcessiveClassLength", "PMD.CyclomaticComplexity"})
 public class ExcelActionsControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -93,7 +96,8 @@ public class ExcelActionsControllerTest {
     private static final String INITIALISE_BATCH_UPDATE_URL = "/initialiseBatchUpdate";
     private static final String INITIALISE_CLOSE_MULTIPLE_URL = "/initialiseCloseMultiple";
     private static final String FIX_MULTIPLE_CASE_API_URL = "/fixMultipleCaseApi";
-
+    private static final String AUTHORIZATION = "Authorization";
+    
     @Autowired
     private WebApplicationContext applicationContext;
 
@@ -185,7 +189,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATE_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -198,7 +202,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -211,7 +215,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(FIX_MULTIPLE_CASE_API_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -224,7 +228,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_MULTIPLE_API_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -237,7 +241,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(IMPORT_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -250,7 +254,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRE_ACCEPT_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -263,7 +267,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(INITIALISE_BATCH_UPDATE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -277,7 +281,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(BATCH_UPDATE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -290,7 +294,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -303,7 +307,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_LIST_FLAGS_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -316,7 +320,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -329,7 +333,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SUB_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -342,7 +346,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_CREATION_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -355,7 +359,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_AMEND_CASE_IDS_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -368,7 +372,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_SINGLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -381,7 +385,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_MID_BATCH_1_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -394,7 +398,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(INITIALISE_CLOSE_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -410,7 +414,7 @@ public class ExcelActionsControllerTest {
                 isA(MultipleDetails.class))).thenReturn(new ArrayList<>());
         mvc.perform(post(CLOSE_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -425,7 +429,7 @@ public class ExcelActionsControllerTest {
                 isA(MultipleDetails.class))).thenReturn(List.of("some error"));
         mvc.perform(post(CLOSE_MULTIPLE_URL)
                         .content(requestContent.toString())
-                        .header("Authorization", AUTH_TOKEN)
+                        .header(AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -438,7 +442,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_PAYLOAD_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -451,7 +455,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(RESET_MULTIPLE_STATE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -464,7 +468,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_LIST_OFFICES_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -477,7 +481,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_TRANSFER_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -489,7 +493,7 @@ public class ExcelActionsControllerTest {
     public void createMultipleError400() throws Exception {
         mvc.perform(post(CREATE_MULTIPLE_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -498,7 +502,7 @@ public class ExcelActionsControllerTest {
     public void amendMultipleError400() throws Exception {
         mvc.perform(post(AMEND_MULTIPLE_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -507,7 +511,7 @@ public class ExcelActionsControllerTest {
     public void fixMultipleCaseApi400() throws Exception {
         mvc.perform(post(FIX_MULTIPLE_CASE_API_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -516,7 +520,7 @@ public class ExcelActionsControllerTest {
     public void amendMultipleAPIError400() throws Exception {
         mvc.perform(post(AMEND_MULTIPLE_API_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -525,7 +529,7 @@ public class ExcelActionsControllerTest {
     public void uploadBulkExcelError400() throws Exception {
         mvc.perform(post(IMPORT_MULTIPLE_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -534,7 +538,7 @@ public class ExcelActionsControllerTest {
     public void preAcceptMultipleError400() throws Exception {
         mvc.perform(post(PRE_ACCEPT_MULTIPLE_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -543,7 +547,7 @@ public class ExcelActionsControllerTest {
     public void batchUpdateError400() throws Exception {
         mvc.perform(post(BATCH_UPDATE_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -552,7 +556,7 @@ public class ExcelActionsControllerTest {
     public void updateSubMultipleError400() throws Exception {
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -561,7 +565,7 @@ public class ExcelActionsControllerTest {
     public void dynamicListFlagsError400() throws Exception {
         mvc.perform(post(DYNAMIC_LIST_FLAGS_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -570,7 +574,7 @@ public class ExcelActionsControllerTest {
     public void multipleMidEventValidationError400() throws Exception {
         mvc.perform(post(MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -579,7 +583,7 @@ public class ExcelActionsControllerTest {
     public void subMultipleMidEventValidationError400() throws Exception {
         mvc.perform(post(SUB_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -588,7 +592,7 @@ public class ExcelActionsControllerTest {
     public void multipleCreationMidEventValidationError400() throws Exception {
         mvc.perform(post(MULTIPLE_CREATION_MID_EVENT_VALIDATION_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -597,7 +601,7 @@ public class ExcelActionsControllerTest {
     public void multipleAmendCaseIdsMidEventValidationError400() throws Exception {
         mvc.perform(post(MULTIPLE_AMEND_CASE_IDS_MID_EVENT_VALIDATION_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -606,7 +610,7 @@ public class ExcelActionsControllerTest {
     public void multipleSingleMidEventValidationError400() throws Exception {
         mvc.perform(post(MULTIPLE_SINGLE_MID_EVENT_VALIDATION_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -615,7 +619,7 @@ public class ExcelActionsControllerTest {
     public void multipleMidBatch1tValidationError400() throws Exception {
         mvc.perform(post(MULTIPLE_MID_BATCH_1_VALIDATION_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -624,7 +628,7 @@ public class ExcelActionsControllerTest {
     public void closeMultipleError400() throws Exception {
         mvc.perform(post(CLOSE_MULTIPLE_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -633,7 +637,7 @@ public class ExcelActionsControllerTest {
     public void updatePayloadMultipleError400() throws Exception {
         mvc.perform(post(UPDATE_PAYLOAD_MULTIPLE_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -642,7 +646,7 @@ public class ExcelActionsControllerTest {
     public void resetMultipleStateError400() throws Exception {
         mvc.perform(post(RESET_MULTIPLE_STATE_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -651,7 +655,7 @@ public class ExcelActionsControllerTest {
     public void dynamicListOfficesMultipleError400() throws Exception {
         mvc.perform(post(DYNAMIC_LIST_OFFICES_MULTIPLE_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -660,7 +664,7 @@ public class ExcelActionsControllerTest {
     public void multipleTransferError400() throws Exception {
         mvc.perform(post(MULTIPLE_TRANSFER_URL)
                 .content("error")
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -672,7 +676,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATE_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -684,7 +688,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -696,7 +700,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(IMPORT_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -708,7 +712,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRE_ACCEPT_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -720,7 +724,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(BATCH_UPDATE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -732,7 +736,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -745,7 +749,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_LIST_FLAGS_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -757,7 +761,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -770,7 +774,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SUB_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -783,7 +787,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_CREATION_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -796,7 +800,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_AMEND_CASE_IDS_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -809,7 +813,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_SINGLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -819,7 +823,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CREATE_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -829,7 +833,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -839,7 +843,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_MULTIPLE_API_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -849,7 +853,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(IMPORT_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -859,7 +863,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(PRE_ACCEPT_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -869,7 +873,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(BATCH_UPDATE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -879,7 +883,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(INITIALISE_BATCH_UPDATE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
         verify(fileLocationSelectionService, never()).initialiseFileLocation(isA(MultipleData.class));
@@ -890,7 +894,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -900,7 +904,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_LIST_FLAGS_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -910,7 +914,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -920,7 +924,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SUB_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -930,7 +934,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_CREATION_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -940,7 +944,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_AMEND_CASE_IDS_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -950,7 +954,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_SINGLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -960,7 +964,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_MID_BATCH_1_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -970,7 +974,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(INITIALISE_CLOSE_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
         verify(fileLocationSelectionService, never()).initialiseFileLocation(isA(MultipleData.class));
@@ -981,7 +985,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CLOSE_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -991,7 +995,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(FIX_MULTIPLE_CASE_API_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1001,7 +1005,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_PAYLOAD_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1011,7 +1015,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(RESET_MULTIPLE_STATE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1021,7 +1025,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_LIST_OFFICES_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1031,7 +1035,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_TRANSFER_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1041,7 +1045,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(LISTINGS_DATE_RANGE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -1054,7 +1058,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(LISTINGS_DATE_RANGE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1066,7 +1070,7 @@ public class ExcelActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(LISTINGS_DATE_RANGE_MID_EVENT_VALIDATION_URL)
                 .content(listingsValidationRequestContent.toString())
-                .header("Authorization", AUTH_TOKEN)
+                .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }

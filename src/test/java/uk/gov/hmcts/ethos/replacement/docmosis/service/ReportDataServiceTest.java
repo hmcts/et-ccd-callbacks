@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -85,6 +84,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ECC_REPO
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ExcessiveImports", "PMD.ExcessiveImports", "PMD.NcssCount",
+    "PMD.ExcessiveMethodLength"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ReportDataServiceTest {
 
@@ -92,15 +93,12 @@ public class ReportDataServiceTest {
     private ReportDataService reportDataService;
     @Mock
     private CcdClient ccdClient;
-    @Spy
-    private CaseDetails caseDetails;
     private ListingDetails listingDetails;
     @Mock
     private UserService userService;
 
     @Before
     public void setUp() {
-        caseDetails = new CaseDetails();
         listingDetails = new ListingDetails();
         ListingData listingData = new ListingData();
         listingData.setListingDate("2019-12-12");
@@ -238,6 +236,7 @@ public class ReportDataServiceTest {
         address.setPostTown("Manchester");
         caseData.setTribunalCorrespondenceAddress(address);
         caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         caseDetails.setJurisdiction("EMPLOYMENT");

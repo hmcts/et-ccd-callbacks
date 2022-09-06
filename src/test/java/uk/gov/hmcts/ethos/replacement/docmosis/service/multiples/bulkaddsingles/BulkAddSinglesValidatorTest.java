@@ -21,7 +21,7 @@ public class BulkAddSinglesValidatorTest {
     private SingleCasesValidator singleCasesValidator;
 
     private MultipleDetails multipleDetails;
-    private final String authToken = "some-token";
+    private static final String AUTH_TOKEN = "some-token";
     private List<String> ethosCaseReferences;
     private List<ValidatedSingleCase> validatedSingleCases;
 
@@ -30,11 +30,12 @@ public class BulkAddSinglesValidatorTest {
         multipleDetails = createMultipleDetails();
         ethosCaseReferences = new ArrayList<>();
         singleCasesImporter = mock(SingleCasesImporter.class);
-        when(singleCasesImporter.importCases(multipleDetails.getCaseData(), authToken)).thenReturn(ethosCaseReferences);
+        when(singleCasesImporter.importCases(multipleDetails.getCaseData(), AUTH_TOKEN))
+                .thenReturn(ethosCaseReferences);
 
         validatedSingleCases = new ArrayList<>();
         singleCasesValidator = mock(SingleCasesValidator.class);
-        when(singleCasesValidator.getValidatedCases(ethosCaseReferences, multipleDetails, authToken))
+        when(singleCasesValidator.getValidatedCases(ethosCaseReferences, multipleDetails, AUTH_TOKEN))
                 .thenReturn(validatedSingleCases);
 
         bulkAddSinglesValidator = new BulkAddSinglesValidator(singleCasesImporter, singleCasesValidator);
@@ -42,7 +43,7 @@ public class BulkAddSinglesValidatorTest {
 
     @Test
     public void shouldReturnImportError() {
-        var errors = bulkAddSinglesValidator.validate(multipleDetails, authToken);
+        var errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
 
         assertEquals(1, errors.size());
         assertEquals("No cases found", errors.get(0));
@@ -53,7 +54,7 @@ public class BulkAddSinglesValidatorTest {
         ethosCaseReferences.add("case1");
         validatedSingleCases.add(ValidatedSingleCase.createInvalidCase("case1", "Case not found"));
 
-        var errors = bulkAddSinglesValidator.validate(multipleDetails, authToken);
+        var errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
 
         assertEquals(1, errors.size());
         assertEquals("case1: Case not found", errors.get(0));
@@ -64,17 +65,17 @@ public class BulkAddSinglesValidatorTest {
         ethosCaseReferences.add("case1");
         validatedSingleCases.add(ValidatedSingleCase.createValidCase("case1"));
 
-        var errors = bulkAddSinglesValidator.validate(multipleDetails, authToken);
+        var errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
 
-        assertTrue((errors.isEmpty()));
+        assertTrue(errors.isEmpty());
     }
 
     @Test
     public void shouldReturnErrorWhenImportCasesFails() throws ImportException {
-        when(singleCasesImporter.importCases(multipleDetails.getCaseData(), authToken))
+        when(singleCasesImporter.importCases(multipleDetails.getCaseData(), AUTH_TOKEN))
                 .thenThrow(ImportException.class);
 
-        var errors = bulkAddSinglesValidator.validate(multipleDetails, authToken);
+        var errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
 
         assertEquals(1, errors.size());
         assertEquals("Unexpected error when importing single cases", errors.get(0));
@@ -84,10 +85,10 @@ public class BulkAddSinglesValidatorTest {
     public void shouldReturnErrorWhenValidationThrowsException() throws IOException {
         ethosCaseReferences.add("case1");
         validatedSingleCases.add(ValidatedSingleCase.createValidCase("case1"));
-        when(singleCasesValidator.getValidatedCases(ethosCaseReferences, multipleDetails, authToken))
+        when(singleCasesValidator.getValidatedCases(ethosCaseReferences, multipleDetails, AUTH_TOKEN))
                 .thenThrow(IOException.class);
 
-        var errors = bulkAddSinglesValidator.validate(multipleDetails, authToken);
+        var errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
 
         assertEquals(1, errors.size());
         assertEquals("Unexpected error when validating single cases", errors.get(0));

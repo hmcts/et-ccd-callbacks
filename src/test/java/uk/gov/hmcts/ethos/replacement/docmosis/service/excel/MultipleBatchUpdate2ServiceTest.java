@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@SuppressWarnings({"PMD.LooseCoupling"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleBatchUpdate2ServiceTest {
 

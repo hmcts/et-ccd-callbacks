@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
+@SuppressWarnings({"PMD.NcssCount", "PMD.ExcessiveMethodLength"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ReferenceServiceTest {
 

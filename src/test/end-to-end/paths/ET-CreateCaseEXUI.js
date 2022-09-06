@@ -3,20 +3,27 @@ const {ETConstants} = require('../pages/common/constants.js');
 Feature('ET Case Creation in EXUI');
 
 Scenario('Create a case in EXUI happy path England and Wales', async ({ I,createCasePages }) => {
+
     await I.authenticateWithIdam();
+    I.wait(5);
+
     createCasePages.clickCreateCaseLink();
-    I.wait(ETConstants.defaultPageClickWaitTime);
+    I.wait(5);
 
     createCasePages.verifyCreateCaseInputPage();
     createCasePages.inputCreateCaseDetailsPage();
     createCasePages.clickStartButton();
-    I.wait(ETConstants.defaultPageClickWaitTime);
+    I.wait(5);
 
     createCasePages.verifyCreateCaseDateOfReceiptInputPage();
     createCasePages.inputCreateCaseDateOfReceiptInputPage();
+    createCasePages.clickContinueButton();
+    I.wait(5);
 
-    //let caseId = await processCaseToAcceptedState();
-
+    createCasePages.verifyCreateCaseTypeOfClaimantPage();
+    createCasePages.inputCreateCaseTypeOfClaimantPage();
+    createCasePages.clickContinueButton();
+    I.wait(5);
 
 
 }).tag('@CreateCase')

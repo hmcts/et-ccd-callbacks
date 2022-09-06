@@ -44,8 +44,10 @@ const states = {
     TRANSFERRED: 'Transferred'
 };
 
+const timings = {defaultPageClickWaitTime : 5};
+
 module.exports = {
-    defaultPageClickWaitTime : 5,
+    timings,
     ccdUserType,
     eventNames,
     states

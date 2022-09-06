@@ -53,6 +53,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.UselessParentheses", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class BulkUpdateServiceTest {
 

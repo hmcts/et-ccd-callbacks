@@ -23,7 +23,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
 @SuppressWarnings({"PMD.ConfusingTernary", "PMD.GodClass", "PMD.TooManyMethods", "PMD.LiteralsFirstInComparisons",
-    "PMD.LawOfDemeter", "PMD.AvoidInstantiatingObjectsInLoops"})
+    "PMD.LawOfDemeter", "PMD.AvoidInstantiatingObjectsInLoops", "PMD.CyclomaticComplexity"})
 public final class MultiplesScheduleHelper {
 
     public static final String SUB_ZERO = "/0";

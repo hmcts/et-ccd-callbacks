@@ -41,7 +41,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.BulkCreationServic
 @RequiredArgsConstructor
 @RestController
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals", "PMD.UnnecessaryAnnotationValueElement",
-    "PMD.LawOfDemeter", "PMD.ConfusingTernary"})
+    "PMD.LawOfDemeter", "PMD.ConfusingTernary", "PMD.ExcessiveImports"})
 public class BulkActionsController {
 
     private static final String LOG_MESSAGE = "received notification request for bulk reference :    ";

@@ -80,7 +80,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDE
     "PMD.AvoidInstantiatingObjectsInLoops", "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass",
     "PMD.CognitiveComplexity", "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons",
     "PMD.FieldNamingConventions", "PMD.LawOfDemeter",  "PMD.ConsecutiveLiteralAppends",
-    "PMD.ConsecutiveAppendsShouldReuse", "PMD.LinguisticNaming", "PMD.NPathComplexity", "PMD.ExcessiveImports"})
+    "PMD.ConsecutiveAppendsShouldReuse", "PMD.LinguisticNaming", "PMD.NPathComplexity", "PMD.ExcessiveImports",
+    "PMD.CyclomaticComplexity"})
 public class ListingHelper {
 
     private static final String ROOM_NOT_ALLOCATED = "* Not Allocated";

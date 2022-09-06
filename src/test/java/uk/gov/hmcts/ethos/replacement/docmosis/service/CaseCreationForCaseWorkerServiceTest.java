@@ -36,10 +36,6 @@ public class CaseCreationForCaseWorkerServiceTest {
     private CCDRequest ccdRequest;
     private SubmitEvent submitEvent;
     private String authToken;
-    @Mock
-    private SingleReferenceService singleReferenceService;
-    @Mock
-    private MultipleReferenceService multipleReferenceService;
 
     @Before
     public void setUp() {

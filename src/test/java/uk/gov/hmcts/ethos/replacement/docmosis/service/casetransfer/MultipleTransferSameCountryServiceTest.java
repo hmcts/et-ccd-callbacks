@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
 
+@SuppressWarnings({"PMD.LawOfDemeter"})
 @ExtendWith(SpringExtension.class)
 class MultipleTransferSameCountryServiceTest {
 

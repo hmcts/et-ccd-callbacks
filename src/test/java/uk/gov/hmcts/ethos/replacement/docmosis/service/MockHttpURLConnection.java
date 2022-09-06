@@ -13,9 +13,9 @@ public class MockHttpURLConnection extends HttpURLConnection {
     private OutputStream outputStream;
     private InputStream errorStream;
 
-    public MockHttpURLConnection(URL u) {
+    public MockHttpURLConnection(URL url) {
         super(null);
-        this.url = u;
+        this.url = url;
     }
 
     @Override

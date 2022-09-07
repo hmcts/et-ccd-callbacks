@@ -25,9 +25,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,6 +37,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 
+@SuppressWarnings({"PMD.SingularField", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 class ReferralHelperTest {
 
     private UserService userService;
@@ -354,7 +355,7 @@ class ReferralHelperTest {
     }
 
     private Map<String, String> getExpectedPersonalisation() {
-        Map<String, String> personalisation = new HashMap<>();
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", "caseRef");
         personalisation.put("emailFlag", "URGENT");
         personalisation.put("claimant", "claimant");

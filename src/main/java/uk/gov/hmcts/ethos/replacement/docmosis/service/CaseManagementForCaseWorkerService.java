@@ -54,7 +54,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.TooManyMethods",
     "PMD.UnnecessaryFullyQualifiedName", "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.ExcessiveImports",
     "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions", "PMD.ImplicitSwitchFallThrough",
-    "PMD.LawOfDemeter", "PMD.PreserveStackTrace"})
+    "PMD.LawOfDemeter", "PMD.PreserveStackTrace", "PMD.CyclomaticComplexity"})
 public class CaseManagementForCaseWorkerService {
 
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;

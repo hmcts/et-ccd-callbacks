@@ -20,6 +20,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CA
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.generateListingDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.generateSubmitEventList;
 
+@SuppressWarnings({"PMD.LawOfDemeter"})
 class ReportHelperTest {
 
     @Test
@@ -64,7 +65,7 @@ class ReportHelperTest {
         assertEquals(expectedReportOffice, listingData.getLocalReportsDetailHdr().getReportOffice());
     }
 
-    private static Stream<Arguments> testLiveCaseloadShowsReportOfficeWithEmptyReport() {
+    private static Stream<Arguments> testLiveCaseloadShowsReportOfficeWithEmptyReport() { //NOPMD - parameterized tests
         return Stream.of(
                 Arguments.of(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.MANCHESTER.getOfficeName(),
                         TribunalOffice.MANCHESTER.getOfficeName()),

@@ -6,8 +6,6 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings({ "PMD.AvoidInstantiatingObjectsInLoops", "PMD.AppendCharacterWithChar", "PMD.CognitiveComplexity",
-    "PMD.InsufficientStringBufferDeclaration", "PMD.LawOfDemeter"})
 public final class EccReportData extends ListingData {
 
     @JsonIgnore

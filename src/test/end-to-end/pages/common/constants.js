@@ -27,6 +27,7 @@ const eventNames = {
     JUDGMENT: 'Judgment',
     CREATE_REPORT: 'Create Report',
     GENERATE_REPORT: 'Generate Report',
+    UPLOAD_DOCUMENT: 'Upload Document',
     INITIAL_CONSIDERATION: 'Initial Consideration',
     ET1_VETTING: 'ET1 case vetting',
     ET3_PROCESSING: 'ET3 Processing',

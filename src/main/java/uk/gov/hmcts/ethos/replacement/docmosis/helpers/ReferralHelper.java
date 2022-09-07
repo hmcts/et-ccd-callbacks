@@ -31,7 +31,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.LinguisticNaming", "PMD.ConfusingTernary",
-    "PMD.SimpleDateFormatNeedsLocale"})
+    "PMD.SimpleDateFormatNeedsLocale", "PMD.GodClass"})
 public final class ReferralHelper {
 
     private static final String TRUE = "True";

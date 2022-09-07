@@ -2,37 +2,45 @@ const testConfig = require('./../../config');
 const {ETConstants} = require('../pages/common/constants.js');
 Feature('ET Case Creation in EXUI');
 
-Scenario('Create a case in EXUI happy path England and Wales', async ({ I,createCasePages }) => {
+Scenario('Create a case in EXUI happy path England and Wales', async ({ I,createCasePages, createApplicationScreen}) => {
 
     await I.authenticateWithIdam();
 
     createCasePages.clickCreateCaseLink();
     I.wait(5);
 
-    createCasePages.verifyCreateCaseInputPage();
-    createCasePages.inputCreateCaseDetailsPage();
-    createCasePages.clickStartButton();
+    createCasePages.processCreateCaseInputPage();
     I.wait(5);
 
-    createCasePages.verifyCreateCaseDateOfReceiptInputPage();
-    createCasePages.inputCreateCaseDateOfReceiptInputPage();
-    createCasePages.clickContinueButton();
+    createCasePages.processCreateCaseDateOfReceiptPage();
     I.wait(5);
 
-    createCasePages.verifyCreateCaseTypeOfClaimantPage();
-    createCasePages.inputCreateCaseTypeOfClaimantPage();
-    createCasePages.clickContinueButton();
+    createCasePages.processCreateCaseTypeOfClaimantPage();
     I.wait(5);
 
-    createCasePages.verifyCreateCaseRespondentsPage();
-    createCasePages.inputCreateCaseRespondentsPage();
-    createCasePages.clickContinueButton();
+    createCasePages.processCreateCaseRespondentPage();
     I.wait(5);
 
-    createCasePages.verifyCreateCasePremisesPage();
-    createCasePages.inputCreateCasePremisesPage();
+    createCasePages.processClaimantWorkAddress();
     I.wait(5);
-    pause();
+
+    createCasePages.processCreateCaseOtherDetailsPage();
+    I.wait(5);
+
+    createCasePages.processIsClaimantRepresented();
+    I.wait(5);
+
+    createCasePages.processCreateCaseClaimantHearingPreferences();
+    I.wait(5);
+
+    createCasePages.clickSubmitButton();
+    I.wait(5);
+
+    await createApplicationScreen.getCaseNumberValue();
+    createApplicationScreen.verifyGeneralApplicationScreenValues();
+    createApplicationScreen.verifyCaseDetailsTab();
+
+
 
 
 }).tag('@CreateCase')

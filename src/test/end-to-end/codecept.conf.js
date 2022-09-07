@@ -6,8 +6,8 @@ exports.config = {
     helpers: {
         Puppeteer: {
             url: config.TestUrl,
-            waitForTimeout: 40000,
-            getPageTimeout: 40000,
+            waitForTimeout: 140000,
+            getPageTimeout: 140000,
             waitForAction: 1000,
             show: true,
             waitForNavigation: ['domcontentloaded'],
@@ -41,7 +41,8 @@ exports.config = {
     },
     include: {
         I: './pages/steps.js',
-        createCasePages : './pages/create_case.js'
+        createCasePages : './pages/create_case.js',
+        createApplicationScreen : './pages/create_application.js'
     },
     plugins: {
         screenshotOnFail: {

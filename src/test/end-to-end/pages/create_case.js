@@ -47,12 +47,35 @@ module.exports = {
     respondent_phone_number : {xpath : '//input[@id=\'respondentCollection_0_respondent_phone1\']'},
     et3_form_received_option_no : {xpath : '//input[@id=\'respondentCollection_0_responseReceived_No\']'},
     respondent_enter_uk_postcode : {xpath : '//input[@id=\'respondentCollection_0_respondent_address_respondent_address_postcodeInput\']'},
-    respondent_select_an_address : {xpath : '//select[@name=\'address\']'},
+    respondent_select_an_address : {xpath : '//select[@id=\'respondentCollection_0_respondent_address_respondent_address_addressList\']'},
 
-    //Premises page
+    //Respondent Premises page
     premises_title : {xpath: '//input[@id=\'companyPremises_premises\']'},
     premises_enter_uk_postcode : {xpath : '//input[@id=\'companyPremises_address_address_postcodeInput\']'},
     premises_select_an_address : {xpath : '//select[@id=\'companyPremises_address_address_addressList\']'},
+
+    //Claimant Work Address Page
+    claimants_work_address_question_no : {xpath : '//input[@id=\'claimantWorkAddressQuestion_No\']'},
+    claimant_work_address_enter_a_postcode : {xpath : '//input[@id=\'claimantWorkAddress_claimant_work_address_claimant_work_address_postcodeInput\']'},
+    claimant_work_address_select_an_address : {xpath : '//select[@id=\'claimantWorkAddress_claimant_work_address_claimant_work_address_addressList\']'},
+    claimant_work_address_phone_number : {xpath : '//input[@id=\'claimantWorkAddress_claimant_work_phone_number\']'},
+
+    //Other Details Page
+    other_details_claimant_occupation : {xpath : '//input[@id=\'claimantOtherType_claimant_occupation\']'},
+    claimant_employed_from_day : {xpath : '//input[@id=\'claimant_employed_from-day\']'},
+    claimant_employed_from_month : {xpath : '//input[@id=\'claimant_employed_from-month\']'},
+    claimant_employed_from_year : {xpath : '//input[@id=\'claimant_employed_from-year\']'},
+    currently_employed : {xpath : '//input[@id=\'claimantOtherType_claimant_employed_currently_Yes\']'},
+    notice_period_end_date_day : {xpath : '//input[@id=\'claimant_employed_notice_period-day\']'},
+    notice_period_end_date_month : {xpath : '//input[@id=\'claimant_employed_notice_period-month\']'},
+    notice_period_end_date_year : {xpath : '//input[@id=\'claimant_employed_notice_period-year\']'},
+    any_disabilities_or_special_needs : {xpath : '//input[@id=\'claimantOtherType_claimant_disabled_Yes\']'},
+    disabilities_please_provide_details : {xpath : '//textarea[@id=\'claimantOtherType_claimant_disabled_details\']'},
+
+    //Claimant Represented Page
+    is_the_claimant_represented : {xpath : '//input[@id=\'claimantRepresentedQuestion_No\']'},
+    hearing_preferences_neither : {xpath : '//input[@id=\'claimantHearingPreference_hearing_preferences-Neither\']'},
+    why_cant_claimant_not_take_part : {xpath : '//textarea[@id=\'claimantHearingPreference_hearing_assistance\']'},
   },
 
   async getHeaderValue() {
@@ -77,6 +100,10 @@ module.exports = {
 
   clickContinueButton() {
     I.click('Continue');
+  },
+
+  clickSubmitButton() {
+    I.click('Submit');
   },
 
   inputCreateCaseDetailsPage() {
@@ -183,9 +210,24 @@ module.exports = {
     I.checkOption(this.locators.et3_form_received_option_no);
     I.fillField(this.locators.respondent_enter_uk_postcode,'SS1 1AA');
     I.click(this.locators.find_address_button);
+    I.wait(1);
     I.selectOption(this.locators.respondent_select_an_address,'1: Object');
   },
 
+  verifyCreateCaseClaimantWorkAddressPage() {
+    I.see('Create Case');
+    I.see('Claimant Work Address');
+    I.see('Enter a UK postcode');
+    I.see('I can\'t enter a UK postcode');
+    I.see('Phone number (Optional)');
+  },
+
+  inputCreateCaseClaimantWorkAddressPage() {
+    I.fillField(this.locators.claimant_work_address_enter_a_postcode,'SS1 1AA');
+    I.click(this.locators.find_address_button);
+    I.selectOption(this.locators.claimant_work_address_select_an_address,'1: Object');
+    I.fillField(this.locators.claimant_work_address_phone_number,'07315621019')
+  },
   verifyCreateCasePremisesPage() {
     I.see('Premises');
     I.see('Premises (Optional)');
@@ -199,5 +241,100 @@ module.exports = {
     I.fillField(this.locators.premises_enter_uk_postcode,'SS1 1AA');
     I.click(this.locators.find_address_button);
     I.selectOption(this.locators.premises_select_an_address,'1: Object');
-  }
+  },
+
+  verifyCreateCaseOtherDetailsPage() {
+    I.see('Create Case');
+    I.see('Other details');
+    I.see('Occupation (Optional)');
+    I.see('Employed from (Optional)');
+    I.see('Day');I.see('Month');I.see('Year');
+    I.see('Is the employment continuing? (Optional)');
+    I.see('Are there any disabilities or special requirements? (Optional)');
+  },
+
+  inputCreateCaseOtherDetailsPage() {
+    const now = moment();
+    I.fillField(this.locators.other_details_claimant_occupation,'Test - Occupation');
+    I.fillField(this.locators.claimant_employed_from_day,now.day());
+    I.fillField(this.locators.claimant_employed_from_month,now.month());
+    I.fillField(this.locators.claimant_employed_from_year,now.year());
+    I.checkOption(this.locators.currently_employed);
+    I.wait(1);
+    I.see('Notice Period End Date (Optional)');
+    I.fillField(this.locators.notice_period_end_date_day,now.day());
+    I.fillField(this.locators.notice_period_end_date_month,now.month());
+    I.fillField(this.locators.notice_period_end_date_year,now.year());
+    I.checkOption(this.locators.any_disabilities_or_special_needs);
+    I.wait(1);
+    I.see('Notice Period End Date (Optional)');
+    I.fillField(this.locators.disabilities_please_provide_details, 'Has a condition');
+  },
+
+  verifyCreateCaseHearingPreferencesPage() {
+    I.see('Create Case');
+    I.see('Claimant Hearing Preferences');
+    I.see('What are the claimant\'s hearing preferences\n');
+    I.see('Video');I.see('Phone');I.see('Neither');
+  },
+
+  inputCreateCaseHearingPreferencesPage() {
+    I.checkOption(this.locators.hearing_preferences_neither);
+    I.wait(1);
+    I.see('Why is the claimant unable to take part in video or phone hearings');
+    I.fillField(this.locators.why_cant_claimant_not_take_part, 'Because of a Learning Condition');
+  },
+
+  processCreateCaseInputPage ()  {
+    this.verifyCreateCaseInputPage();
+    this.inputCreateCaseDetailsPage();
+    this.clickStartButton();
+  },
+
+  processCreateCaseDateOfReceiptPage() {
+    this.verifyCreateCaseDateOfReceiptInputPage();
+    this.inputCreateCaseDateOfReceiptInputPage();
+    this.clickContinueButton();
+  },
+
+  processCreateCaseTypeOfClaimantPage() {
+    this.verifyCreateCaseTypeOfClaimantPage();
+    this.inputCreateCaseTypeOfClaimantPage();
+    this.clickContinueButton();
+  },
+
+  processCreateCaseRespondentPage() {
+    this.verifyCreateCaseRespondentsPage();
+    this.inputCreateCaseRespondentsPage();
+    this.clickContinueButton();
+  },
+
+  processClaimantWorkAddress() {
+    I.see('Create Case');
+    I.see('Is this the same as the claimant\'s work address?');
+    I.checkOption(this.locators.claimants_work_address_question_no);
+    this.clickContinueButton();
+    this.verifyCreateCaseClaimantWorkAddressPage();
+    this.inputCreateCaseClaimantWorkAddressPage();
+    this.clickContinueButton();
+  },
+
+  processCreateCaseOtherDetailsPage() {
+    this.verifyCreateCaseOtherDetailsPage();
+    this.inputCreateCaseOtherDetailsPage();
+    this.clickContinueButton();
+  },
+
+  processIsClaimantRepresented() {
+    I.see('Create Case');
+    I.see('Is the Claimant Represented?');
+    I.checkOption(this.locators.is_the_claimant_represented);
+    this.clickContinueButton();
+  },
+
+  processCreateCaseClaimantHearingPreferences() {
+    this.verifyCreateCaseHearingPreferencesPage();
+    this.inputCreateCaseHearingPreferencesPage()
+    this.clickContinueButton();
+  },
 };

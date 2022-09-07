@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.UnusedPrivateMethod"})
 class ClerkServiceTest {
 
     @Test

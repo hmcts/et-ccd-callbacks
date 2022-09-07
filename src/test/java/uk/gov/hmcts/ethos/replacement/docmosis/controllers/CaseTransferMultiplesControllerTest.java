@@ -31,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CaseTransferMultiplesController.class, JsonMapper.class})
+@SuppressWarnings({"PMD.TooManyMethods"})
 class CaseTransferMultiplesControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";

@@ -33,7 +33,7 @@ public class TribunalOfficeServiceTest {
     @Autowired
     TribunalOfficesService tribunalOfficesService;
 
-    private static final Object[][] TEST_CASES = new Object[][] {
+    private static final Object[][] TEST_CASES = {
             { TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA" },
             { TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA" },
             { TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA" },

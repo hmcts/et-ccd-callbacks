@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.UnusedPrivateMethod"})
 class RespondentReportElasticSearchQueryTest {
 
     private static Stream<Arguments> queryShouldNotIncludeManagingOffice() {

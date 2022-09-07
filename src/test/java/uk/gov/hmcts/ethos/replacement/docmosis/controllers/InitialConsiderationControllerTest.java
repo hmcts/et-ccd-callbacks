@@ -38,6 +38,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({InitialConsiderationController.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
+@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.UnusedPrivateField", "PMD.ExcessiveImports"})
 class InitialConsiderationControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String COMPLETE_INITIAL_CONSIDERATION_URL = "/completeInitialConsideration";

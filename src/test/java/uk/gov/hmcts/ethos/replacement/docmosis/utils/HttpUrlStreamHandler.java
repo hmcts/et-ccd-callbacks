@@ -3,8 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@link URLStreamHandler} that allows us to control the {@link URLConnection URLConnections} that are returned
@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class HttpUrlStreamHandler extends URLStreamHandler {
 
-    private final Map<URL, URLConnection> connections = new HashMap<>();
+    private final Map<URL, URLConnection> connections = new ConcurrentHashMap<>();
 
     @Override
     protected URLConnection openConnection(URL url) {

@@ -29,7 +29,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ZERO;
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
     "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
     "PMD.GodClass", "PMD.ConfusingTernary", "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal",
-    "PMD.ImplicitSwitchFallThrough", "PMD.ConsecutiveAppendsShouldReuse", "PMD.LawOfDemeter"})
+    "PMD.ImplicitSwitchFallThrough", "PMD.ConsecutiveAppendsShouldReuse", "PMD.LawOfDemeter",
+    "PMD.CyclomaticComplexity"})
 public class FlagsImageHelper {
 
     private static final String COLOR_ORANGE = "Orange";

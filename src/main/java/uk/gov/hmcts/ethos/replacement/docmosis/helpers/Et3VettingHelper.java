@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +49,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
     "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.ClassNamingConventions",
     "PMD.AvoidInstantiatingObjectsInLoops", "PMD.CognitiveComplexity", "PMD.PrematureDeclaration",
     "PMD.LinguisticNaming", "PMD.InsufficientStringBufferDeclaration", "PMD.ConsecutiveLiteralAppends",
-    "PMD.LiteralsFirstInComparisons", "PMD.UnnecessaryFullyQualifiedName", "PMD.LawOfDemeter"})
+    "PMD.LiteralsFirstInComparisons", "PMD.LawOfDemeter", "PMD.ExcessiveImports"})
 public class Et3VettingHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -181,10 +180,10 @@ public class Et3VettingHelper {
     public static String formatAddressToHtml(Address address) {
         StringBuilder addressBuilder = new StringBuilder();
         addressBuilder.append(address.getAddressLine1());
-        if (!Strings.isNullOrEmpty(address.getAddressLine2())) {
+        if (!isNullOrEmpty(address.getAddressLine2())) {
             addressBuilder.append(BR_WITH_TAB).append(address.getAddressLine2());
         }
-        if (!Strings.isNullOrEmpty(address.getAddressLine3())) {
+        if (!isNullOrEmpty(address.getAddressLine3())) {
             addressBuilder.append(BR_WITH_TAB).append(address.getAddressLine3());
         }
         addressBuilder.append(BR_WITH_TAB).append(address.getPostTown())

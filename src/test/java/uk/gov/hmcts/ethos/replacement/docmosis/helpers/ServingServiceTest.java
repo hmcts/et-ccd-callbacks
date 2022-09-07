@@ -16,15 +16,16 @@ import java.util.Objects;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
+@SuppressWarnings({"PMD.UseProperClassLoader"})
 class ServingServiceTest {
     private static CaseDetails caseDetails;
 
-    private static ServingService ServingService;
+    private static ServingService servingService;
 
     @BeforeAll
     static void setUp() throws Exception {
         caseDetails = generateCaseDetails("midServingCaseDetailsTest.json");
-        ServingService = new ServingService();
+        servingService = new ServingService();
     }
 
     private static CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
@@ -40,7 +41,7 @@ class ServingServiceTest {
         String expectedDocumentName = "**<big>test-filename.xlsx</big>**<br/><small><a target=\"_blank\" "
             + "href=\"/documents/test-document/binary\">test-filename.xlsx</a></small><br/>";
         List<DocumentTypeItem> documentTypeItems = caseDetails.getCaseData().getServingDocumentCollection();
-        assertThat(ServingService
+        assertThat(servingService
             .generateOtherTypeDocumentLink(documentTypeItems), is(expectedDocumentName));
     }
 
@@ -54,7 +55,7 @@ class ServingServiceTest {
                 + "<br/>Manchester<br/>M12 4ED<br/><br/>";
 
         CaseData caseData = caseDetails.getCaseData();
-        assertThat(ServingService.generateClaimantAndRespondentAddress(caseData),
+        assertThat(servingService.generateClaimantAndRespondentAddress(caseData),
                 is(expectedClaimantAndRespondentAddress));
     }
 
@@ -71,7 +72,7 @@ class ServingServiceTest {
             + "has%20completed%20ET3%20notifications%20to%20the%20relevant%20parties.%0D%0A%0D%0AThe%20documents%20we"
             + "%20sent%20are%20attached%20to%20this%20email.%0D%0A%0D%0A";
         CaseData caseData = caseDetails.getCaseData();
-        assertThat(ServingService.generateEmailLinkToAcas(caseData, false), is(expectedEt1EmailLinkToAcas));
-        assertThat(ServingService.generateEmailLinkToAcas(caseData, true), is(expectedEt3EmailLinkToAcas));
+        assertThat(servingService.generateEmailLinkToAcas(caseData, false), is(expectedEt1EmailLinkToAcas));
+        assertThat(servingService.generateEmailLinkToAcas(caseData, true), is(expectedEt3EmailLinkToAcas));
     }
 }

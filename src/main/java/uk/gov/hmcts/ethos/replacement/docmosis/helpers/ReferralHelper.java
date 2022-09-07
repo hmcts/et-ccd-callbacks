@@ -34,6 +34,11 @@ public final class ReferralHelper {
 
     private static final String TRUE = "True";
     private static final String FALSE = "False";
+    private static final String NO_TRACK_OLD_NAME = "No Conciliation";
+    private static final String SHORT_TRACK_OLD_NAME = "Fast Track";
+    private static final String NO_TRACK_NAME = "No Track";
+    private static final String SHORT_TRACK_NAME = "Short track";
+
     private static final String JUDGE_ROLE_ENG = "caseworker-employment-etjudge-englandwales";
     private static final String JUDGE_ROLE_SCOT = "caseworker-employment-etjudge-scotland";
     private static final String HEARING_DETAILS = "<hr><h3>Hearing details %s</h3>"
@@ -104,7 +109,18 @@ public final class ReferralHelper {
         if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
             return "";
         }
-        String trackType = caseData.getConciliationTrack();
+
+        String trackType = "";
+        if (caseData.getConciliationTrack() != null) {
+            if (caseData.getConciliationTrack().equals(NO_TRACK_OLD_NAME)) {
+                trackType = NO_TRACK_NAME;
+            } else if (caseData.getConciliationTrack().equals(SHORT_TRACK_OLD_NAME)){
+                trackType = SHORT_TRACK_NAME;
+            } else {
+                trackType = caseData.getConciliationTrack();
+            }
+        }
+
         StringBuilder hearingDetails = new StringBuilder();
         int count = 0;
         boolean singleHearing = caseData.getHearingCollection().size() == 1;
@@ -117,7 +133,7 @@ public final class ReferralHelper {
                         singleHearing ? "" : ++count,
                         UtilHelper.formatLocalDate(hearingDates.getValue().getListedDate()),
                         hearing.getValue().getHearingType(),
-                        trackType != null ? trackType : "N/A")
+                        trackType.isEmpty() ? "N/A" : trackType)
                 );
             }
         }

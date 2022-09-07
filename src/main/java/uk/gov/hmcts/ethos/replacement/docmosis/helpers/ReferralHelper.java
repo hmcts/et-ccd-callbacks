@@ -25,6 +25,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
@@ -34,8 +36,6 @@ public final class ReferralHelper {
 
     private static final String TRUE = "True";
     private static final String FALSE = "False";
-    private static final String NO_TRACK_OLD_NAME = "No Conciliation";
-    private static final String SHORT_TRACK_OLD_NAME = "Fast Track";
     private static final String NO_TRACK_NAME = "No Track";
     private static final String SHORT_TRACK_NAME = "Short track";
 
@@ -110,17 +110,6 @@ public final class ReferralHelper {
             return "";
         }
 
-        String trackType = "";
-        if (caseData.getConciliationTrack() != null) {
-            if (caseData.getConciliationTrack().equals(NO_TRACK_OLD_NAME)) {
-                trackType = NO_TRACK_NAME;
-            } else if (caseData.getConciliationTrack().equals(SHORT_TRACK_OLD_NAME)){
-                trackType = SHORT_TRACK_NAME;
-            } else {
-                trackType = caseData.getConciliationTrack();
-            }
-        }
-
         StringBuilder hearingDetails = new StringBuilder();
         int count = 0;
         boolean singleHearing = caseData.getHearingCollection().size() == 1;
@@ -133,13 +122,31 @@ public final class ReferralHelper {
                         singleHearing ? "" : ++count,
                         UtilHelper.formatLocalDate(hearingDates.getValue().getListedDate()),
                         hearing.getValue().getHearingType(),
-                        trackType.isEmpty() ? "N/A" : trackType)
+                        getConciliationTrackName(caseData.getConciliationTrack()))
                 );
             }
         }
 
         hearingDetails.append("<hr>");
         return hearingDetails.toString();
+    }
+
+    /**
+     * This is required as we have to keep the old track names in CCD Config so that
+     * existing cases with the track values stored in database won't break.
+     */
+    private static String getConciliationTrackName(String conciliationTrack) {
+        if (conciliationTrack == null) {
+            return "N/A";
+        }
+        if (CONCILIATION_TRACK_NO_CONCILIATION.equals(conciliationTrack)) {
+            return NO_TRACK_NAME;
+        }
+        if (CONCILIATION_TRACK_FAST_TRACK.equals(conciliationTrack)) {
+            return SHORT_TRACK_NAME;
+        }
+
+        return conciliationTrack;
     }
 
     private static String populateReferralDetails(CaseData caseData) {

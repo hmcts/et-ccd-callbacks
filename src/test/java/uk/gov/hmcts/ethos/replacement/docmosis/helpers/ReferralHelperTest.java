@@ -34,6 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 
@@ -60,7 +62,8 @@ class ReferralHelperTest {
 
     private final String expectedHearingReferralDetailsSingleReply = "<hr><h3>Hearing details </h3><pre>Date &nbs"
         + "p;&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&nbsp; null<br><br>Type &nbsp"
-        + ";&nbsp;&#09&#09&#09&#09&#09 N/A</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09&#09&#09&"
+        + ";&nbsp;&#09&#09&#09&#09&#09 No Track</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09&#09&"
+        + "#09&"
         + "#09&#09&#09&nbsp; null<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><"
         + "br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Urgent &nbsp;&#09&#09&#09&#09&#0"
         + "9&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referral date &#09&#09&#09&#09&#09&#09&#09&#09&#09 null<br><br"
@@ -79,7 +82,8 @@ class ReferralHelperTest {
 
     private final String expectedHearingReferralDetailsMultipleReplies = "<hr><h3>Hearing details </h3><pre>Date &"
         + "nbsp;&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&nbsp; null<br><br>Type &n"
-        + "bsp;&nbsp;&#09&#09&#09&#09&#09 N/A</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09&#09&#"
+        + "bsp;&nbsp;&#09&#09&#09&#09&#09 Short track</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09"
+        + "&#09&#"
         + "09&#09&#09&#09&nbsp; null<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<b"
         + "r><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Urgent &nbsp;&#09&#09&#09&#09"
         + "&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referral date &#09&#09&#09&#09&#09&#09&#09&#09&#09 null<br>"
@@ -258,6 +262,7 @@ class ReferralHelperTest {
         referralTypeItem.setId("1");
         referralTypeItem.setValue(referral);
         caseData.setReferralCollection(List.of(referralTypeItem));
+        caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
 
         assertEquals(expectedHearingReferralDetailsSingleReply,
             ReferralHelper.populateHearingReferralDetails(caseData));
@@ -274,6 +279,7 @@ class ReferralHelperTest {
         referralTypeItem.setId("1");
         referralTypeItem.setValue(referral);
         caseData.setReferralCollection(List.of(referralTypeItem));
+        caseData.setConciliationTrack(CONCILIATION_TRACK_FAST_TRACK);
 
         assertEquals(expectedHearingReferralDetailsMultipleReplies,
             ReferralHelper.populateHearingReferralDetails(caseData));

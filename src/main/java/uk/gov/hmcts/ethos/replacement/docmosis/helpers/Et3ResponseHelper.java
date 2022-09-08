@@ -90,9 +90,9 @@ public class Et3ResponseHelper {
         setValue(UNCHECKED, no);
         setValue(UNCHECKED, other);
 
-        if (option.equals("Yes")) {
+        if ("Yes".equals(option)) {
             setValue(CHECKED, yes);
-        } else if (option.equals("No")) {
+        } else if ("No".equals(option)) {
             setValue(CHECKED, no);
         } else {
             setValue(CHECKED, other);
@@ -108,19 +108,20 @@ public class Et3ResponseHelper {
         switch  (title) {
             case "Mr":
                 data.setTitleMr(CHECKED);
-                return;
+                break;
             case "Mrs":
                 data.setTitleMrs(CHECKED);
-                return;
+                break;
             case "Miss":
                 data.setTitleMiss(CHECKED);
-                return;
+                break;
             case "Ms":
                 data.setTitleMs(CHECKED);
-                return;
+                break;
             default:
                 data.setTitleOther(CHECKED);
                 data.setTitleText(title);
+                break;
         }
     }
 
@@ -180,7 +181,7 @@ public class Et3ResponseHelper {
             data::setContinueNA);
         setCheck(caseData.getEt3ResponseIsPensionCorrect(), data::setPensionYes, data::setPensionNo,
             data::setPensionNA);
-        setCheck(caseData.getEt3ResponseContactPreference().equals("Post") ? "Yes" : "No", data::setContactPost,
+        setCheck("Post".equals(caseData.getEt3ResponseContactPreference()) ? "Yes" : "No", data::setContactPost,
             data::setContactEmail, null);
 
         data.setRepContactEmail("□");
@@ -192,10 +193,10 @@ public class Et3ResponseHelper {
         data.setBeforeAnnually("□");
         data.setTakehomeAnnually("□");
 
-        if (caseData.getEt3ResponsePayFrequency().equals("Weekly")) {
+        if ("Weekly".equals(caseData.getEt3ResponsePayFrequency())) {
             data.setBeforeWeekly(CHECKED);
             data.setTakehomeWeekly(CHECKED);
-        } else if (caseData.getEt3ResponsePayFrequency().equals("Monthly")) {
+        } else if ("Monthly".equals(caseData.getEt3ResponsePayFrequency())) {
             data.setBeforeMonthly(CHECKED);
             data.setTakehomeMonthly(CHECKED);
         } else {

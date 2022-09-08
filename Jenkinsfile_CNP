@@ -17,7 +17,6 @@ def secrets = [
                 secret('et-caseworker-password', 'ET_CASEWORKER_PASSWORD'),
                 secret('et-judge-4-username', 'ET_JUDGE_4_USER_NAME'),
                 secret('et-judge-4-password', 'ET_JUDGE_4_PASSWORD'),
-                secret('et-ccd-s2s-otp', 'ET_CCD_S2S_OTP')
         ],
         's2s-${env}':  [
                 secret('microservicekey-ccd-gw', 'MICROSERVICE_CCD_GW')

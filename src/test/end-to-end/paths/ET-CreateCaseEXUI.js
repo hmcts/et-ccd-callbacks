@@ -1,5 +1,8 @@
 const testConfig = require('./../../config');
 const {ETConstants} = require('../pages/common/constants.js');
+const { Logger } = require('@hmcts/nodejs-logging');
+const logger = Logger.getLogger('ET-CreateCaseEXUI.js');
+
 Feature('ET Case Creation in EXUI');
 
 Scenario('Create a case in EXUI happy path England and Wales', async ({ I,createCasePages, createApplicationScreen}) => {
@@ -7,43 +10,60 @@ Scenario('Create a case in EXUI happy path England and Wales', async ({ I,create
     await I.authenticateWithIdam();
 
     createCasePages.clickCreateCaseLink();
-    I.wait(5);
+    logger.info('The Create Case Link is clicked and completed');
+    //I.wait(7);
 
     createCasePages.processCreateCaseInputPage();
-    I.wait(5);
+    logger.info('The processing of  the Create Case Input page is completed...');
+    //I.wait(7);
 
     createCasePages.processCreateCaseDateOfReceiptPage();
-    I.wait(5);
+    logger.info('The processing of  the Date of Receipt page is completed...');
+    //I.wait(7);
 
     createCasePages.processCreateCaseTypeOfClaimantPage();
-    I.wait(5);
+    logger.info('The processing of  the Case Type of Claimant page is completed...');
+    //I.wait(7);
 
     createCasePages.processCreateCaseRespondentPage();
-    I.wait(5);
+    logger.info('The processing of  the Respondent page is completed...');
+    //I.wait(7);
 
     createCasePages.processClaimantWorkAddress();
-    I.wait(5);
+    logger.info('The processing of  the Claimant Work Address page is completed...');
+    //I.wait(7);
 
     createCasePages.processCreateCaseOtherDetailsPage();
-    I.wait(5);
+    logger.info('The processing of the Other Details page is completed...');
+    //I.wait(7);
 
     createCasePages.processIsClaimantRepresented();
-    I.wait(5);
+    logger.info('The processing of the Is Claimant Represented is completed...');
+    //I.wait(7);
 
     createCasePages.processCreateCaseClaimantHearingPreferences();
-    I.wait(5);
+    logger.info('The processing of the Hearing Preferences is completed...');
+    I.wait(7);
 
     createCasePages.clickSubmitButton();
-    I.wait(5);
+    logger.info('Create Application is Submitted');
+    I.wait(7);
 
-    await createApplicationScreen.getCaseNumberValue();
+    //await createApplicationScreen.getCaseNumberValue();
     createApplicationScreen.verifyGeneralApplicationScreenValues();
+    logger.info('General Application Screen Values are verified....');
     createApplicationScreen.verifyCaseDetailsTab();
+    logger.info('General Details Tab in Application Values are verified....');
+    createApplicationScreen.verifyClaimantDetailsTab();
+    logger.info('Claimant Details Tab in Application Values are verified....');
+    createApplicationScreen.verifyRespondentsTab();
+    logger.info('Respondents Tab in Application Values are verified....');
+    createApplicationScreen.verifyReferralsTab();
+    logger.info('Referrals Tab in Application Values are verified....');
+    createApplicationScreen.verifyHistoryTab();
+    logger.info('History Tab in Application Values are verified....');
 
-
-
-
-}).tag('@CreateCase')
+}).tag('@RET-BAT')
     //.retry(testConfig.TestRetryScenarios);
 
 /*async submitNewCase(user, name) {

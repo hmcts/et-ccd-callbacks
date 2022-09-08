@@ -1,23 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
-
-import java.util.Optional;
-
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.intersectProperties;
 
 @Slf4j
 @Service("et3ResponseService")
@@ -29,6 +17,13 @@ public class Et3ResponseService {
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
+    /**
+     * This method calls the tornado service to generate the PDF for the ET3 Response journey.
+     * @param caseData where the data is stored
+     * @param userToken user authentication token
+     * @param caseTypeId reference which caseType the document will be uploaded to
+     * @return DocumentInfo which contains the URL and description of the document uploaded to DM Store
+     */
     public DocumentInfo generateEt3ResponseDocument(CaseData caseData, String userToken, String caseTypeId) {
         try {
             return tornadoService.generateEventDocument(caseData, userToken,
@@ -38,6 +33,10 @@ public class Et3ResponseService {
         }
     }
 
+    /**
+     * Saves the generated ET3 Response form document onto case data.
+     * @param caseData where the data is stored
+     */
     public void saveEt3ResponseDocument(CaseData caseData, DocumentInfo documentInfo) {
         caseData.setEt3ResponseDocument(documentManagementService.addDocumentToDocumentField(documentInfo));
     }

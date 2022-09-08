@@ -2,8 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.domain.documents;
 
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.util.List;
 

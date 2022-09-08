@@ -16,6 +16,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentp
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData.TOTAL_MULTIPLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReportData.TOTAL_SINGLE;
 
+@SuppressWarnings({"PMD.ConsecutiveAppendsShouldReuse", "PMD.ConsecutiveLiteralAppends"})
 class NoPositionChangeReportDataTests {
 
     @Test
@@ -29,11 +30,11 @@ class NoPositionChangeReportDataTests {
 
     @Test
     void shouldReturnValidJsonWithEmptyValues() throws JsonProcessingException {
-        var reportSummary = new NoPositionChangeReportSummary("Office");
-        var reportData = new NoPositionChangeReportData(reportSummary, "2021-07-07");
-        var resultJsonString = reportData.toReportObjectString();
+        NoPositionChangeReportSummary reportSummary = new NoPositionChangeReportSummary("Office");
+        NoPositionChangeReportData reportData = new NoPositionChangeReportData(reportSummary, "2021-07-07");
+        StringBuilder resultJsonString = reportData.toReportObjectString();
 
-        var expectedJsonString = getExpectedJsonString(reportData);
+        StringBuilder expectedJsonString = getExpectedJsonString(reportData);
         assertEquals(expectedJsonString.toString(), resultJsonString.toString());
     }
 
@@ -68,13 +69,13 @@ class NoPositionChangeReportDataTests {
     }
 
     private StringBuilder getExpectedJsonString(NoPositionChangeReportData reportData) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(180);
         var reportSummary = reportData.getReportSummary();
         sb.append(buildSummaryJsonString(
                 reportSummary.getOffice(), reportData.getReportDate(), reportSummary.getTotalCases(),
                 reportSummary.getTotalSingleCases(), reportSummary.getTotalMultipleCases()));
 
-        sb.append("\"" + REPORT_DETAILS_SINGLE + "\":[\n");
+        sb.append('\"').append(REPORT_DETAILS_SINGLE).append("\":[\n");
         if (CollectionUtils.isNotEmpty(reportData.getReportDetailsSingle())
                 && reportData.getReportDetailsSingle().get(0) != null) {
             var rdSingle1 = reportData.getReportDetailsSingle().get(0);
@@ -90,18 +91,18 @@ class NoPositionChangeReportDataTests {
                     rdSingle2.getCaseReference(), rdSingle2.getYear(), rdSingle2.getCurrentPosition(),
                     rdSingle2.getDateToPosition(), rdSingle2.getRespondent()
             ));
-            sb.append("\n");
+            sb.append('\n');
         }
         sb.append("],\n");
 
-        sb.append("\"" + REPORT_DETAILS_MULTIPLE + "\":[\n");
+        sb.append('\"').append(REPORT_DETAILS_MULTIPLE).append("\":[\n");
         if (CollectionUtils.isNotEmpty(reportData.getReportDetailsSingle())) {
             NoPositionChangeReportDetailMultiple rdMultiple = reportData.getReportDetailsMultiple().get(0);
             sb.append(buildDetailMultipleJsonString(
                     rdMultiple.getCaseReference(), rdMultiple.getYear(), rdMultiple.getCurrentPosition(),
                     rdMultiple.getDateToPosition(), rdMultiple.getMultipleName()
             ));
-            sb.append("\n");
+            sb.append('\n');
         }
         sb.append("],\n");
         return sb;
@@ -120,27 +121,27 @@ class NoPositionChangeReportDataTests {
 
     private StringBuilder buildDetailSingleJsonString(String caseReference, String year, String currentPosition,
                                                       String dateToPosition, String respondent) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{");
+        StringBuilder sb = new StringBuilder(120);
+        sb.append('{');
         sb.append("\"caseReference\":\"").append(caseReference).append("\",");
         sb.append("\"year\":\"").append(year).append("\",");
         sb.append("\"currentPosition\":\"").append(currentPosition).append("\",");
         sb.append("\"dateToPosition\":\"").append(dateToPosition).append("\",");
-        sb.append("\"respondent\":\"").append(respondent).append("\"");
-        sb.append("}");
+        sb.append("\"respondent\":\"").append(respondent).append('\"');
+        sb.append('}');
         return sb;
     }
 
     private StringBuilder buildDetailMultipleJsonString(String caseReference, String year, String currentPosition,
                                                         String dateToPosition, String multipleName) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{");
+        StringBuilder sb = new StringBuilder(120);
+        sb.append('{');
         sb.append("\"caseReference\":\"").append(caseReference).append("\",");
         sb.append("\"year\":\"").append(year).append("\",");
         sb.append("\"currentPosition\":\"").append(currentPosition).append("\",");
         sb.append("\"dateToPosition\":\"").append(dateToPosition).append("\",");
-        sb.append("\"multipleName\":\"").append(multipleName).append("\"");
-        sb.append("}");
+        sb.append("\"multipleName\":\"").append(multipleName).append('\"');
+        sb.append('}');
         return sb;
     }
 }

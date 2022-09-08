@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("PMD.LawOfDemeter")
 public class NoPositionChangeCcdDataSourceTests {
 
     @Test

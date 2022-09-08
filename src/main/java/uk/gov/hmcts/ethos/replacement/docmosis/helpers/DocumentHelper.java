@@ -56,7 +56,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
     "PMD.InsufficientStringBufferDeclaration", "PMD.ConsecutiveLiteralAppends",
     "PMD.ConsecutiveAppendsShouldReuse", "PMD.ExcessiveMethodLength", "PMD.NcssCount",
     "PMD.UnnecessaryFullyQualifiedName", "PMD.AvoidLiteralsInIfCondition", "PMD.LiteralsFirstInComparisons",
-    "PMD.AppendCharacterWithChar"})
+    "PMD.AppendCharacterWithChar", "PMD.CyclomaticComplexity", "PMD.CyclomaticComplexity"})
 public class DocumentHelper {
     private DocumentHelper() {
     }

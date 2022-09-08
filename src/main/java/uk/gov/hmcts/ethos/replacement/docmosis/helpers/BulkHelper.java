@@ -52,7 +52,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
     "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
     "PMD.ExcessiveImports", "PMD.ConfusingTernary", "PDM.CyclomaticComplexity",
     "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.CognitiveComplexity", "PMD.NPathComplexity", "PMD.LinguisticNaming",
+    "PMD.CognitiveComplexity", "PMD.NPathComplexity", "PMD.LinguisticNaming", "PMD.CyclomaticComplexity",
     "PMD.InsufficientStringBufferDeclaration", "PMD.ConsecutiveLiteralAppends",
     "PMD.ConsecutiveAppendsShouldReuse"})
 public class BulkHelper {

@@ -11,27 +11,35 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 
+@SuppressWarnings({"PMD.SingularField", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 class ReferralHelperTest {
 
     private UserService userService;
@@ -41,22 +49,21 @@ class ReferralHelperTest {
     private static final String JUDGE_ROLE_SCOT = "caseworker-employment-etjudge-scotland";
     private static final String TRUE = "True";
     private static final String FALSE = "False";
+    private static final String INVALID_EMAIL_ERROR_MESSAGE = "The email address entered is invalid.";
 
-    private final String expectedSingleHearingDetails = "<hr>To help you complete this form, open the <a href=\"url\" "
-        + "target=\"_blank\">referral guidance documents</a><hr><h3>Hearing details </h3><pre>Date &nbsp;&#09&#09&#09&#"
+    private final String expectedSingleHearingDetails = "<hr><h3>Hearing details </h3><pre>Date &nbsp;&#09&#09&#09&#"
         + "09&#09&nbsp; 25 December 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#0"
         + "9&#09&#09 N/A</pre><hr>";
 
-    private final String expectedMultipleHearingDetails = "<hr>To help you complete this form, open the <a href=\"url\""
-        + " target=\"_blank\">referral guidance documents</a><hr><h3>Hearing details 1</h3><pre>Date &nbsp;&#09&#09&#0"
+    private final String expectedMultipleHearingDetails = "<hr><h3>Hearing details 1</h3><pre>Date &nbsp;&#09&#09&#0"
         + "9&#09&#09&nbsp; 25 December 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#0"
         + "9&#09&#09&#09 N/A</pre><hr><h3>Hearing details 2</h3><pre>Date &nbsp;&#09&#09&#09&#09&#09&nbsp; 26 December"
         + " 2021<br><br>Hearing &#09&#09&#09&#09&nbsp; test<br><br>Type &nbsp;&nbsp;&#09&#09&#09&#09&#09 N/A</pre><hr>";
 
-    private final String expectedHearingReferralDetailsSingleReply = "<hr>To help you complete this form, open the <a"
-        + " href=\"url\" target=\"_blank\">referral guidance documents</a><hr><h3>Hearing details </h3><pre>Date &nbs"
+    private final String expectedHearingReferralDetailsSingleReply = "<hr><h3>Hearing details </h3><pre>Date &nbs"
         + "p;&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&nbsp; null<br><br>Type &nbsp"
-        + ";&nbsp;&#09&#09&#09&#09&#09 N/A</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09&#09&#09&"
+        + ";&nbsp;&#09&#09&#09&#09&#09 No Track</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09&#09&"
+        + "#09&"
         + "#09&#09&#09&nbsp; null<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><"
         + "br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Urgent &nbsp;&#09&#09&#09&#09&#0"
         + "9&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referral date &#09&#09&#09&#09&#09&#09&#09&#09&#09 null<br><br"
@@ -73,10 +80,10 @@ class ReferralHelperTest {
         + "&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;<br><br>"
         + "General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr>";
 
-    private final String expectedHearingReferralDetailsMultipleReplies = "<hr>To help you complete this form, open the"
-        + " <a href=\"url\" target=\"_blank\">referral guidance documents</a><hr><h3>Hearing details </h3><pre>Date &"
+    private final String expectedHearingReferralDetailsMultipleReplies = "<hr><h3>Hearing details </h3><pre>Date &"
         + "nbsp;&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&nbsp; null<br><br>Type &n"
-        + "bsp;&nbsp;&#09&#09&#09&#09&#09 N/A</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09&#09&#"
+        + "bsp;&nbsp;&#09&#09&#09&#09&#09 Short track</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09"
+        + "&#09&#"
         + "09&#09&#09&#09&nbsp; null<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<b"
         + "r><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Urgent &nbsp;&#09&#09&#09&#09"
         + "&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referral date &#09&#09&#09&#09&#09&#09&#09&#09&#09 null<br>"
@@ -255,6 +262,7 @@ class ReferralHelperTest {
         referralTypeItem.setId("1");
         referralTypeItem.setValue(referral);
         caseData.setReferralCollection(List.of(referralTypeItem));
+        caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
 
         assertEquals(expectedHearingReferralDetailsSingleReply,
             ReferralHelper.populateHearingReferralDetails(caseData));
@@ -271,6 +279,7 @@ class ReferralHelperTest {
         referralTypeItem.setId("1");
         referralTypeItem.setValue(referral);
         caseData.setReferralCollection(List.of(referralTypeItem));
+        caseData.setConciliationTrack(CONCILIATION_TRACK_FAST_TRACK);
 
         assertEquals(expectedHearingReferralDetailsMultipleReplies,
             ReferralHelper.populateHearingReferralDetails(caseData));
@@ -332,6 +341,43 @@ class ReferralHelperTest {
 
         ReferralHelper.setReferralStatusToClosed(caseData);
         assertEquals(ReferralStatus.CLOSED, caseData.getReferralCollection().get(0).getValue().getReferralStatus());
+    }
+
+    @Test
+    void validateEmail() {
+        assertThat(ReferralHelper.validateEmail("valid.email@example.com").contains(null));
+        assertThat(ReferralHelper.validateEmail("invalid.email.example").contains(INVALID_EMAIL_ERROR_MESSAGE));
+    }
+
+    @Test
+    void buildPersonalisation() {
+        caseData.setReferralCollection(List.of(createReferralTypeItem()));
+        caseData.setEthosCaseReference("caseRef");
+        caseData.setClaimant("claimant");
+        caseData.setIsUrgent("Yes");
+        caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
+
+        assertEquals(getExpectedPersonalisation(), ReferralHelper.buildPersonalisation(caseData, false, true));
+    }
+
+    private Map<String, String> getExpectedPersonalisation() {
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
+        personalisation.put("caseNumber", "caseRef");
+        personalisation.put("emailFlag", "URGENT");
+        personalisation.put("claimant", "claimant");
+        personalisation.put("respondents", "Andrew Smith");
+        personalisation.put("date", "11 Nov 2030");
+        personalisation.put("body", "You have a new message about this employment tribunal case.");
+        return personalisation;
+    }
+
+    private RespondentSumTypeItem createRespondentType() {
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName("Andrew Smith");
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(respondentSumType);
+
+        return respondentSumTypeItem;
     }
     
     private void setReferralReplyData() {

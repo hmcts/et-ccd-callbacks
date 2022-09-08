@@ -58,7 +58,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
     "PMD.TooManyMethods", "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.LinguisticNaming", "PMD.DoNotUseThreads",
     "PMD.LiteralsFirstInComparisons", "PMD.ExcessiveImports", "PMD.LawOfDemeter", "PMD.PreserveStackTrace",
-    "PMD.ExcessiveMethodLength", "PMD.NPathComplexity", "PMD.NcssCount"})
+    "PMD.ExcessiveMethodLength", "PMD.NPathComplexity", "PMD.NcssCount", "PMD.CyclomaticComplexity"})
 public class BulkUpdateService {
 
     private static final String MESSAGE = "Failed to update case for case id : ";

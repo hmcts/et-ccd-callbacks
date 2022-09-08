@@ -31,12 +31,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeS
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeService.NO_JUDGE_FOUND_WITH_NAME_SPECIFIED_ERROR_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeService.SAVE_ERROR_MESSAGE;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.TooManyMethods"})
 class JudgeServiceTest {
     private JudgeRepository judgeRepository;
-    private final String judgeCode = "testCode";
-    private final String judgeName = "testName";
+    private static final String TEST_CODE = "testCode";
+    private static final String TEST_NAME = "testName";
+    private static final String SALARIED_EMPLOYMENT_STATUS = "SALARIED";
     private final String tribunalOffice = TribunalOffice.LEEDS.getOfficeName();
-    private final String employmentStatus = "SALARIED";
     private Judge judge;
     private AdminData adminData;
     private JudgeService judgeService;
@@ -44,7 +45,7 @@ class JudgeServiceTest {
     @BeforeEach
     void setup() {
         judgeRepository = mock(JudgeRepository.class);
-        adminData = createAdminData(judgeCode, judgeName, tribunalOffice, "SALARIED");
+        adminData = createAdminData(TEST_CODE, TEST_NAME, tribunalOffice, "SALARIED");
         judge = createJudge(adminData);
         judgeService = new JudgeService(judgeRepository);
     }
@@ -60,9 +61,9 @@ class JudgeServiceTest {
 
     @Test
     void saveJudge_shouldSaveJudge() {
-        when(judgeRepository.existsByCodeAndTribunalOffice(judgeCode, TribunalOffice.valueOfOfficeName(tribunalOffice)))
+        when(judgeRepository.existsByCodeAndTribunalOffice(TEST_CODE, TribunalOffice.valueOfOfficeName(tribunalOffice)))
                 .thenReturn(false);
-        when(judgeRepository.existsByNameAndTribunalOffice(judgeName,
+        when(judgeRepository.existsByNameAndTribunalOffice(TEST_NAME,
                 TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(false);
 
         assertDoesNotThrow(() -> judgeService.saveJudge(adminData));
@@ -71,7 +72,7 @@ class JudgeServiceTest {
 
     @Test
     void saveJudge_shouldReturnErrorIfJudgeWithSameCodeAndOfficeExists() {
-        when(judgeRepository.existsByCodeAndTribunalOffice(judgeCode, TribunalOffice.valueOfOfficeName(tribunalOffice)))
+        when(judgeRepository.existsByCodeAndTribunalOffice(TEST_CODE, TribunalOffice.valueOfOfficeName(tribunalOffice)))
                 .thenReturn(true);
         assertThrows(SaveJudgeException.class, () -> judgeService.saveJudge(adminData));
         verify(judgeRepository, never()).save(judge);
@@ -79,9 +80,9 @@ class JudgeServiceTest {
 
     @Test
     void saveJudge_shouldReturnErrorIfJudgeWithSameNameAndOfficeExists() {
-        when(judgeRepository.existsByCodeAndTribunalOffice(judgeCode, TribunalOffice.valueOfOfficeName(tribunalOffice)))
+        when(judgeRepository.existsByCodeAndTribunalOffice(TEST_CODE, TribunalOffice.valueOfOfficeName(tribunalOffice)))
                 .thenReturn(false);
-        when(judgeRepository.existsByNameAndTribunalOffice(judgeName,
+        when(judgeRepository.existsByNameAndTribunalOffice(TEST_NAME,
                 TribunalOffice.valueOfOfficeName(tribunalOffice))).thenReturn(true);
         assertThrows(SaveJudgeException.class, () -> judgeService.saveJudge(adminData));
         verify(judgeRepository, never()).save(judge);
@@ -91,7 +92,8 @@ class JudgeServiceTest {
     void updateJudgeMidEventSelectOffice_shouldReturnDynamicList() {
         adminData.setTribunalOffice(tribunalOffice);
 
-        List<Judge> listJudge = createListJudge(1, TribunalOffice.LEEDS, judgeCode, judgeName, employmentStatus);
+        List<Judge> listJudge = createListJudge(1, TribunalOffice.LEEDS, TEST_CODE, TEST_NAME,
+            SALARIED_EMPLOYMENT_STATUS);
         when(judgeRepository.findByTribunalOfficeOrderById(any(TribunalOffice.class))).thenReturn(listJudge);
 
         List<String> errors = judgeService.updateJudgeMidEventSelectOffice(adminData);
@@ -114,21 +116,22 @@ class JudgeServiceTest {
     @Test
     void updateJudgeMidEventSelectJudge_shouldReturnJudge() {
         adminData = createAdminDataWithDynamicList(
-                "1", TribunalOffice.LEEDS.getOfficeName(), judgeCode, judgeName, employmentStatus);
+                "1", TribunalOffice.LEEDS.getOfficeName(), TEST_CODE, TEST_NAME, SALARIED_EMPLOYMENT_STATUS);
 
-        List<Judge> listJudge = createListJudge(1, TribunalOffice.LEEDS, judgeCode, judgeName, employmentStatus);
+        List<Judge> listJudge = createListJudge(1, TribunalOffice.LEEDS, TEST_CODE, TEST_NAME,
+            SALARIED_EMPLOYMENT_STATUS);
         when(judgeRepository.findById(anyInt())).thenReturn(listJudge);
 
         List<String> errors = judgeService.updateJudgeMidEventSelectJudge(adminData);
         assertEquals(0, errors.size());
-        assertEquals(judgeCode, adminData.getJudgeCode());
-        assertEquals(judgeName, adminData.getJudgeName());
+        assertEquals(TEST_CODE, adminData.getJudgeCode());
+        assertEquals(TEST_NAME, adminData.getJudgeName());
     }
 
     @Test
     void updateJudgeMidEventSelectJudge_shouldGiveError() {
         adminData = createAdminDataWithDynamicList(
-                "1", TribunalOffice.LEEDS.getOfficeName(), judgeCode, judgeName, employmentStatus);
+                "1", TribunalOffice.LEEDS.getOfficeName(), TEST_CODE, TEST_NAME, SALARIED_EMPLOYMENT_STATUS);
 
         List<Judge> listJudge = new ArrayList<>();
         when(judgeRepository.findById(anyInt())).thenReturn(listJudge);
@@ -143,22 +146,23 @@ class JudgeServiceTest {
     void updateJudge_shouldSaveJudge() {
         String newJudgeName = "Name2";
         adminData = createAdminDataWithDynamicList(
-                "1", TribunalOffice.LEEDS.getOfficeName(), judgeCode, judgeName, employmentStatus);
+                "1", TribunalOffice.LEEDS.getOfficeName(), TEST_CODE, TEST_NAME, SALARIED_EMPLOYMENT_STATUS);
         adminData.setJudgeName(newJudgeName);
 
-        List<Judge> listJudge = createListJudge(1, TribunalOffice.LEEDS, judgeCode, judgeName, employmentStatus);
+        List<Judge> listJudge = createListJudge(1, TribunalOffice.LEEDS, TEST_CODE, TEST_NAME,
+            SALARIED_EMPLOYMENT_STATUS);
         when(judgeRepository.findById(anyInt())).thenReturn(listJudge);
 
         List<String> errors = judgeService.updateJudge(adminData);
         assertEquals(0, errors.size());
         verify(judgeRepository, times(1)).save(
-                createJudgeWithId(1, TribunalOffice.LEEDS, judgeCode, newJudgeName, employmentStatus));
+                createJudgeWithId(1, TribunalOffice.LEEDS, TEST_CODE, newJudgeName, SALARIED_EMPLOYMENT_STATUS));
     }
 
     @Test
     void updateJudge_shouldReturnError() {
         adminData = createAdminDataWithDynamicList(
-                "1", TribunalOffice.LEEDS.getOfficeName(), judgeCode, judgeName, employmentStatus);
+                "1", TribunalOffice.LEEDS.getOfficeName(), TEST_CODE, TEST_NAME, SALARIED_EMPLOYMENT_STATUS);
         adminData.setJudgeName("Name2");
 
         List<Judge> listJudge = new ArrayList<>();
@@ -172,9 +176,9 @@ class JudgeServiceTest {
     @Test
     void deleteJudge_shouldDeleteJudge() {
         adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(),
-            judgeCode, judgeName, employmentStatus);
-        List<Judge> listJudge = createListJudge(1, TribunalOffice.LEEDS, judgeCode, judgeName,
-            employmentStatus);
+            TEST_CODE, TEST_NAME, SALARIED_EMPLOYMENT_STATUS);
+        List<Judge> listJudge = createListJudge(1, TribunalOffice.LEEDS, TEST_CODE, TEST_NAME,
+            SALARIED_EMPLOYMENT_STATUS);
         when(judgeRepository.findById(anyInt())).thenReturn(listJudge);
         List<String> errors = judgeService.deleteJudge(adminData);
 
@@ -185,8 +189,8 @@ class JudgeServiceTest {
 
     @Test
     void deleteJudge_shouldReturnNoJudgeFoundError() {
-        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), judgeCode, judgeName,
-            employmentStatus);
+        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), TEST_CODE, TEST_NAME,
+            SALARIED_EMPLOYMENT_STATUS);
         List<Judge> emptyJudgeList = new ArrayList<>();
         when(judgeRepository.findById(anyInt())).thenReturn(emptyJudgeList);
         String expectedErrorMsg = String.format(NO_JUDGE_FOUND_WITH_NAME_SPECIFIED_ERROR_MESSAGE,
@@ -199,9 +203,9 @@ class JudgeServiceTest {
 
     @Test
     void deleteJudgeMidEventSelectOffice_shouldReturnJudgesListBySelectedOffice() {
-        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), judgeCode, judgeName,
-            employmentStatus);
-        List<Judge> judges = createListJudge(1, TribunalOffice.LEEDS, judgeCode, judgeName, employmentStatus);
+        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), TEST_CODE, TEST_NAME,
+            SALARIED_EMPLOYMENT_STATUS);
+        List<Judge> judges = createListJudge(1, TribunalOffice.LEEDS, TEST_CODE, TEST_NAME, SALARIED_EMPLOYMENT_STATUS);
         when(judgeRepository.findByTribunalOfficeOrderById(TribunalOffice.valueOfOfficeName(tribunalOffice)))
             .thenReturn(judges);
         List<String> errors = judgeService.deleteJudgeMidEventSelectOffice(adminData);
@@ -212,8 +216,8 @@ class JudgeServiceTest {
 
     @Test
     void deleteJudgeMidEventSelectOffice_shouldReturnNoJudgeFoundError() {
-        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), judgeCode, judgeName,
-            employmentStatus);
+        adminData = createAdminDataWithDynamicList("1", TribunalOffice.LEEDS.getOfficeName(), TEST_CODE, TEST_NAME,
+            SALARIED_EMPLOYMENT_STATUS);
         List<Judge> emptyJudgeList = new ArrayList<>();
         when(judgeRepository.findByTribunalOfficeOrderById(TribunalOffice.valueOfOfficeName(tribunalOffice)))
             .thenReturn(emptyJudgeList);
@@ -226,9 +230,10 @@ class JudgeServiceTest {
 
     @Test
     void deleteJudgeMidEventSelectJudge_shouldSetJudgeForSelectedCode() {
-        adminData = createAdminDataWithDynamicList("22", TribunalOffice.LEEDS.getOfficeName(), judgeCode, judgeName,
-            employmentStatus);
-        List<Judge> judges = createListJudge(22, TribunalOffice.LEEDS, judgeCode, judgeName, employmentStatus);
+        adminData = createAdminDataWithDynamicList("22", TribunalOffice.LEEDS.getOfficeName(), TEST_CODE, TEST_NAME,
+            SALARIED_EMPLOYMENT_STATUS);
+        List<Judge> judges = createListJudge(22, TribunalOffice.LEEDS, TEST_CODE, TEST_NAME,
+            SALARIED_EMPLOYMENT_STATUS);
         when(judgeRepository.findById(anyInt())).thenReturn(judges);
         List<String> errors = judgeService.deleteJudgeMidEventSelectJudge(adminData);
 
@@ -238,8 +243,8 @@ class JudgeServiceTest {
 
     @Test
     void deleteJudgeMidEventSelectJudge_shouldReturnNoJudgeFoundError() {
-        adminData = createAdminDataWithDynamicList("22", TribunalOffice.LEEDS.getOfficeName(), judgeCode, judgeName,
-            employmentStatus);
+        adminData = createAdminDataWithDynamicList("22", TribunalOffice.LEEDS.getOfficeName(), TEST_CODE, TEST_NAME,
+            SALARIED_EMPLOYMENT_STATUS);
         List<Judge> emptyJudgeList = new ArrayList<>();
         when(judgeRepository.findById(anyInt())).thenReturn(emptyJudgeList);
         String expectedErrorMsg = String.format(NO_JUDGE_FOUND_WITH_NAME_SPECIFIED_ERROR_MESSAGE,

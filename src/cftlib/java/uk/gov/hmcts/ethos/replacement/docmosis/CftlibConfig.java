@@ -76,6 +76,16 @@ import java.nio.file.Path;
  *             <td>caseworker, caseworker-employment, caseworker-employment-api</td>
  *             <td>Admin account</td>
  *         </tr>
+ *         <tr>
+ *             <td>superuser@etorganisation1.com</td>
+ *             <td>caseworker-caa, pui-case-manager, pui-organisation-manager, pui-user-manager, pui-caa</td>
+ *             <td>Solicitor Organisation Admin account</td>
+ *         </tr>
+ *         <tr>
+ *             <td>solicitor1@etorganisation1.com</td>
+ *             <td>caseworker-employment-legalrep-solicitor</td>
+ *             <td>Solicitor account</td>
+ *         </tr>
  *     </tbody>
  * </table>
  * </p>
@@ -117,10 +127,13 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-employment-legalrep-solicitor",
                 "caseworker-et-pcqextractor",
                 "caseworker-caa",
+                "et-acas-api",
                 "pui-case-manager",
                 "pui-finance-manager",
                 "pui-organisation-manager",
-                "pui-user-manager"
+                "pui-user-manager",
+                "pui-caa",
+                "manage-user"
         );
     }
 
@@ -149,7 +162,8 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-caa",
                 "pui-case-manager",
                 "pui-organisation-manager",
-                "pui-user-manager");
+                "pui-user-manager",
+                "pui-caa");
 
         lib.createIdamUser("solicitor1@etorganisation1.com",
                 "caseworker-employment-legalrep-solicitor");

@@ -25,6 +25,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_CLOSED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.UseProperClassLoader", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.TooManyMethods"})
 public class DefaultValuesReaderServiceTest {
 
     private CaseDefaultValuesConfiguration config;
@@ -59,7 +61,7 @@ public class DefaultValuesReaderServiceTest {
         when(tribunalOfficesService.getTribunalContactDetails(officeName)).thenReturn(contactDetails);
         var caseType = MULTIPLE_CASE_TYPE;
         when(config.getCaseType()).thenReturn(caseType);
-        var positionType = Constants.POSITION_TYPE_CASE_CLOSED;
+        var positionType = POSITION_TYPE_CASE_CLOSED;
         when(config.getPositionType()).thenReturn(positionType);
 
         // Act
@@ -90,7 +92,7 @@ public class DefaultValuesReaderServiceTest {
 
     @Test
     public void testGetPositionType() {
-        var positionType = Constants.POSITION_TYPE_CASE_CLOSED;
+        var positionType = POSITION_TYPE_CASE_CLOSED;
         when(config.getPositionType()).thenReturn(positionType);
 
         assertEquals(positionType, defaultValuesReaderService.getPositionType());

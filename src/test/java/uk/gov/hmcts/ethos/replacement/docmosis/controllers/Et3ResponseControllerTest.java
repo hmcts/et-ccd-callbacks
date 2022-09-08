@@ -34,6 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 @RunWith(SpringRunner.class)
 @WebMvcTest({Et3ResponseController.class, Et3ResponseService.class, JsonMapper.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
+@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.LawOfDemeter", "PMD.UnusedPrivateField"})
 class Et3ResponseControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_START_URL = "/et3Response/aboutToStart";

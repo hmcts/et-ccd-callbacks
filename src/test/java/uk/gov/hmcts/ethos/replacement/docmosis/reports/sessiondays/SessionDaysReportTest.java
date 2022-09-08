@@ -35,6 +35,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Judge
 import static uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JudgeEmploymentStatus.UNKNOWN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays.SessionDaysReport.FULL_DAY;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ExcessiveImports"})
 class SessionDaysReportTest {
 
     SessionDaysReportDataSource reportDataSource;
@@ -84,7 +85,7 @@ class SessionDaysReportTest {
 
         var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
-        var reportData = sessionDaysReport.generateReport(params);
+        SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);
         assertEquals("0", reportData.getReportSummary().getFtSessionDaysTotal());
         assertEquals("0", reportData.getReportSummary().getPtSessionDaysTotal());
@@ -106,7 +107,7 @@ class SessionDaysReportTest {
 
         var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
-        var reportData = sessionDaysReport.generateReport(params);
+        SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);
         assertEquals("0", reportData.getReportSummary().getFtSessionDaysTotal());
         assertEquals("0", reportData.getReportSummary().getPtSessionDaysTotal());
@@ -128,7 +129,7 @@ class SessionDaysReportTest {
 
         var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
-        var reportData = sessionDaysReport.generateReport(params);
+        SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);
         assertEquals("1", reportData.getReportSummary().getFtSessionDaysTotal());
         assertEquals("1", reportData.getReportSummary().getPtSessionDaysTotal());
@@ -156,7 +157,7 @@ class SessionDaysReportTest {
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
         var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
-        var reportData = sessionDaysReport.generateReport(params);
+        SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);
         var reportDetail = reportData.getReportDetails().get(index);
         assertEquals("111", reportDetail.getCaseReference());

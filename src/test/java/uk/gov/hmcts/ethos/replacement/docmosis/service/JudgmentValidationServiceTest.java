@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements.NO_HEARINGS;
 
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming"})
 class JudgmentValidationServiceTest {
 
     private JudgmentValidationService judgmentValidationService;

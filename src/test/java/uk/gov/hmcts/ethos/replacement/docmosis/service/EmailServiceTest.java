@@ -10,8 +10,8 @@ import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -69,7 +69,7 @@ class EmailServiceTest {
     }
 
     private Map<String, String> createPersonalisation() {
-        Map<String, String> personalisation = new HashMap<>();
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", "caseRef");
         personalisation.put("emailFlag", "URGENT");
         personalisation.put("claimant", "claimant");

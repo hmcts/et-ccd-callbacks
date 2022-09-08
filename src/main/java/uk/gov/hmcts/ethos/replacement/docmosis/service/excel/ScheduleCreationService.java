@@ -38,7 +38,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleH
 
 @Slf4j
 @Service("scheduleCreationService")
-@SuppressWarnings({"PMD.ConfusingTernary", "PMD.LawOfDemeter", "PMD.CloseResource", "PMD.PrematureDeclaration"})
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.LawOfDemeter", "PMD.CloseResource", "PMD.PrematureDeclaration",
+    "PMD.ExcessiveImports"})
 public class ScheduleCreationService {
 
     private final List<String> multipleHeaders = new ArrayList<>(Arrays.asList(HEADER_1, HEADER_2));

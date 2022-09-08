@@ -39,6 +39,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @RunWith(SpringRunner.class)
 @WebMvcTest(ReferenceDataController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
+@SuppressWarnings({"PMD.ExcessiveImports"})
 public class ReferenceDataControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";

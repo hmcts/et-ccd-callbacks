@@ -25,7 +25,7 @@ def secrets = [
                 secret('microservicekey-ccd-gw', 'MICROSERVICE_CCD_GW'),
                 secret('idam-client-secret', 'IDAM_CLIENT_SECRET')
         ],
-        "s2s-${params.ENVIRONMENT}"":  [
+        "s2s-${params.ENVIRONMENT}":  [
                  secret('microservicekey-ccd-gw', 'MICROSERVICE_CCD_GW')
         ]
 ]

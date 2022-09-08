@@ -58,9 +58,156 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: snakeyaml-1.30.jar
+   file name: commons-io-2.6.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-io/commons\-io@.*$</packageUrl>
+        <cve>CVE-2021-29425</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: groovy-all-2.4.15.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.codehaus\.groovy/groovy\-all@.*$</packageUrl>
+        <cve>CVE-2020-17521</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: junit-platform-commons-1.8.2.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.junit\.platform/junit\-platform\-commons@.*$</packageUrl>
+        <cve>CVE-2022-31514</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: ccd-data-store-api-lib-0.19.337.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.github\.hmcts\.rse\-cft\-lib/ccd\-data\-store\-api\-lib@.*$</packageUrl>
+        <cve>CVE-2019-15569</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: launchdarkly-java-server-sdk-5.10.0.jar (shaded: org.yaml:snakeyaml:1.26)
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
         <cve>CVE-2022-25857</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: postgresql-42.3.6.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.postgresql/postgresql@.*$</packageUrl>
+        <cve>CVE-2022-31197</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: maven-compat-3.3.9.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.maven/maven\-compat@.*$</packageUrl>
+        <vulnerabilityName>CVE-2021-26291</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-cloud-starter-openfeign-3.0.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.cloud/spring\-cloud\-starter\-openfeign@.*$</packageUrl>
+        <cve>CVE-2021-22044</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: snakeyaml-1.31.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <vulnerabilityName>CVE-2022-38752</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-boot-starter-oauth2-resource-server-2.7.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.boot/spring\-boot\-starter\-oauth2\-resource\-server@.*$</packageUrl>
+        <cve>CVE-2022-22978</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-boot-starter-oauth2-resource-server-2.7.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.boot/spring\-boot\-starter\-oauth2\-resource\-server@.*$</packageUrl>
+        <cve>CVE-2018-1258</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-boot-starter-oauth2-resource-server-2.7.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.boot/spring\-boot\-starter\-oauth2\-resource\-server@.*$</packageUrl>
+        <cve>CVE-2021-22112</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-boot-starter-oauth2-resource-server-2.7.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.boot/spring\-boot\-starter\-oauth2\-resource\-server@.*$</packageUrl>
+        <cve>CVE-2022-22976</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-boot-starter-oauth2-resource-server-2.7.3.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.boot/spring\-boot\-starter\-oauth2\-resource\-server@.*$</packageUrl>
+        <cve>CVE-2022-22978</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-cloud-openfeign-core-3.0.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.cloud/spring\-cloud\-openfeign\-core@.*$</packageUrl>
+        <vulnerabilityName>CVE-2021-22044</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: springfox-swagger-ui-3.0.0.jar: swagger-ui-bundle.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/DOMPurify@.*$</packageUrl>
+        <vulnerabilityName>Fix a possible XSS in Chrome that is hidden behind #enable-experimental-web-platform-features</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: springfox-swagger-ui-3.0.0.jar: swagger-ui-bundle.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/DOMPurify@.*$</packageUrl>
+        <vulnerabilityName>Fixed a new MathML-based bypass submitted by PewGrand. Fixed a new SVG-related bypass submitted by SecurityMB</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: springfox-swagger-ui-3.0.0.jar: swagger-ui-bundle.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/DOMPurify@.*$</packageUrl>
+        <vulnerabilityName>Fixed an mXSS bypass dropped on us publicly via</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: springfox-swagger-ui-3.0.0.jar: swagger-ui-bundle.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/DOMPurify@.*$</packageUrl>
+        <vulnerabilityName>Fixed an mXSS issue reported</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: springfox-swagger-ui-3.0.0.jar: swagger-ui-bundle.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/DOMPurify@.*$</packageUrl>
+        <vulnerabilityName>Fixed an mXSS-based bypass caused by nested forms inside MathML</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: springfox-swagger-ui-3.0.0.jar: swagger-ui-bundle.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/DOMPurify@.*$</packageUrl>
+        <vulnerabilityName>Fixed another bypass causing mXSS by using MathML</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: springfox-swagger-ui-3.0.0.jar: swagger-ui-bundle.js
+   ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/DOMPurify@.*$</packageUrl>
+        <vulnerabilityName>Fixed several possible mXSS patterns, thanks @hackvertor</vulnerabilityName>
     </suppress>
 </suppressions>

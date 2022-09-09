@@ -58,6 +58,8 @@ public class TornadoService {
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
 
+    private String dmStoreDocumentName = OUTPUT_FILE_NAME_PDF;
+
     public DocumentInfo documentGeneration(String authToken, CaseData caseData, String caseTypeId,
                                            CorrespondenceType correspondenceType,
                                            CorrespondenceScotType correspondenceScotType,
@@ -252,9 +254,10 @@ public class TornadoService {
         throws IOException {
         HttpURLConnection connection = null;
         try {
+            dmStoreDocumentName = documentName;
             connection = createConnection();
             buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
-            return checkResponseStatus(userToken, connection, documentName, caseTypeId);
+            return checkResponseStatus(userToken, connection, dmStoreDocumentName, caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
             throw exception;
@@ -286,6 +289,8 @@ public class TornadoService {
             case "ET3 Processing.pdf":
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             case "ET3 Response.pdf":
+                dmStoreDocumentName = String.format("%s - ET3 Response.pdf",
+                    caseData.getEt3ResponseRespondentLegalName());
                 return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             case "Initial Consideration.pdf" :
                 return InitialConsiderationHelper.getDocumentRequest(

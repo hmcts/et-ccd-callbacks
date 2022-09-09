@@ -23,13 +23,13 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class Et3ResponseHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final String TEMPLATE_NAME = "ET3_0922 (1).docx";
+    private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-00700.docx";
     private static final String OUTPUT_NAME = "ET3 Response.pdf";
     private static final String CLAIMANT_NAME_TABLE = "<pre> ET1 claimant name&#09&#09&#09&#09 %s</pre><hr>";
     public static final String START_DATE_MUST_BE_IN_THE_PAST = "Start date must be in the past";
     public static final String END_DATE_MUST_BE_AFTER_THE_START_DATE = "End date must be after the start date";
-    public static final String CHECKED = "■";
-    public static final String UNCHECKED = "□";
+    public static final String CHECKED = "■"; // U+25A0
+    public static final String UNCHECKED = "□"; // U+25A1
 
     private Et3ResponseHelper() {
         // Access through static methods
@@ -160,10 +160,12 @@ public class Et3ResponseHelper {
             .et3ResponseEmployerClaimDetails(caseData.getEt3ResponseEmployerClaimDetails())
             .et3ResponseRespondentSupportDetails(caseData.getEt3ResponseRespondentSupportDetails())
             .et3ResponsePensionCorrectDetails(caseData.getEt3ResponsePensionCorrectDetails())
-            .hearingPhone(caseData.getEt3ResponseHearingRespondent().contains("Phone hearings") ? "■" : "□")
-            .hearingVideo(caseData.getEt3ResponseHearingRespondent().contains("Video hearings") ? "■" : "□")
-            .repHearingPhone(caseData.getEt3ResponseHearingRepresentative().contains("Phone hearings") ? "■" : "□")
-            .repHearingVideo(caseData.getEt3ResponseHearingRepresentative().contains("Video hearings") ? "■" : "□")
+            .hearingPhone(caseData.getEt3ResponseHearingRespondent().contains("Phone hearings") ? CHECKED : UNCHECKED)
+            .hearingVideo(caseData.getEt3ResponseHearingRespondent().contains("Video hearings") ? CHECKED : UNCHECKED)
+            .repHearingPhone(caseData.getEt3ResponseHearingRepresentative().contains("Phone hearings") ? CHECKED :
+                UNCHECKED)
+            .repHearingVideo(caseData.getEt3ResponseHearingRepresentative().contains("Video hearings") ? CHECKED :
+                UNCHECKED)
             .build();
 
         setTitle(data, caseData.getEt3ResponseRespondentPreferredTitle());
@@ -184,14 +186,14 @@ public class Et3ResponseHelper {
         setCheck("Post".equals(caseData.getEt3ResponseContactPreference()) ? "Yes" : "No", data::setContactPost,
             data::setContactEmail, null);
 
-        data.setRepContactEmail("□");
-        data.setRepContactPost("□");
-        data.setBeforeWeekly("□");
-        data.setTakehomeWeekly("□");
-        data.setBeforeMonthly("□");
-        data.setTakehomeMonthly("□");
-        data.setBeforeAnnually("□");
-        data.setTakehomeAnnually("□");
+        data.setRepContactEmail(UNCHECKED);
+        data.setRepContactPost(UNCHECKED);
+        data.setBeforeWeekly(UNCHECKED);
+        data.setTakehomeWeekly(UNCHECKED);
+        data.setBeforeMonthly(UNCHECKED);
+        data.setTakehomeMonthly(UNCHECKED);
+        data.setBeforeAnnually(UNCHECKED);
+        data.setTakehomeAnnually(UNCHECKED);
 
         if ("Weekly".equals(caseData.getEt3ResponsePayFrequency())) {
             data.setBeforeWeekly(CHECKED);

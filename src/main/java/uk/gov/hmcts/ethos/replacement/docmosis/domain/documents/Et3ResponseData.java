@@ -5,9 +5,12 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
+/**
+ * Stores data to populate the ET3 Response form template.
+ */
 @Data
 @SuperBuilder
-@SuppressWarnings({"PMD.LinguisticNaming", "PDM.TooManyFields"})
+@SuppressWarnings({"PMD.LinguisticNaming", "PMD.TooManyFields"})
 public class Et3ResponseData {
     private String ethosCaseReference;
     private String et3ResponseClaimantName;

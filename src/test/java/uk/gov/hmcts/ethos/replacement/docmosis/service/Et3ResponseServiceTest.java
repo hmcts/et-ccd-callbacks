@@ -72,6 +72,6 @@ class Et3ResponseServiceTest {
     @Test
     void assertThatEt3DocumentIsSaved() {
         et3ResponseService.saveEt3ResponseDocument(caseData, documentInfo);
-        assertThat(caseData.getEt3ResponseDocument().getDocumentFilename(), is(documentInfo.getDescription()));
+        assertThat(caseData.getDocumentCollection().size(), is(1));
     }
 }

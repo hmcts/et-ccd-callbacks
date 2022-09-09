@@ -39,7 +39,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_
 
 @Service
 @Slf4j
-@SuppressWarnings({"PMD.ConfusingTernary"})
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.ExcessiveImports"})
 public class CasesCompletedReport {
     static final String ZERO = "0";
     static final String ZERO_DECIMAL = "0.00";

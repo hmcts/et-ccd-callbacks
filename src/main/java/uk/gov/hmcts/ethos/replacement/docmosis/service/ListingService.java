@@ -83,7 +83,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICS
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.UnnecessaryFullyQualifiedName",
     "PMD.ExcessiveImports", "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.PreserveStackTrace",
     "PMD.LinguisticNaming", "PMD.AvoidInstantiatingObjectsInLoops", "PMD.FieldNamingConventions",
-    "PMD.LawOfDemeter", "PMD.TooManyMethods"})
+    "PMD.LawOfDemeter", "PMD.TooManyMethods", "PMD.CyclomaticComplexity"})
 public class ListingService {
 
     private final TornadoService tornadoService;

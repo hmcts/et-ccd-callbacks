@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class ScotlandAllocatedHearingServiceTest {
 
     private ScotlandAllocateHearingService scotlandAllocateHearingService;

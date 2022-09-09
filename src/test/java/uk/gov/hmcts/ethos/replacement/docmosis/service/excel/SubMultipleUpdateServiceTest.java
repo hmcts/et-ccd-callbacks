@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.AMEND_ACTION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DELETE_ACTION;
 
+@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.LawOfDemeter"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SubMultipleUpdateServiceTest {
 

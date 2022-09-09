@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class UpdateDataModelBuilderTest {
     CaseData caseData;
 
@@ -209,7 +210,7 @@ public class UpdateDataModelBuilderTest {
                                             String respondentRepresentative) {
         MultipleData multipleData = new MultipleData();
         multipleData.setBatchUpdateClaimantRep(new DynamicFixedListType(claimantRepresentative));
-        multipleData.setBatchUpdateJurisdiction(new DynamicFixedListType((jurisdiction)));
+        multipleData.setBatchUpdateJurisdiction(new DynamicFixedListType(jurisdiction));
         multipleData.setBatchUpdateRespondent(new DynamicFixedListType(respondent));
         multipleData.setBatchUpdateJudgment(new DynamicFixedListType(judgement));
         multipleData.setBatchUpdateRespondentRep(new DynamicFixedListType(respondentRepresentative));

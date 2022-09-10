@@ -58,6 +58,15 @@ module.exports = () => {
         createJudgeReferrals:steps.referrals.createJudgeReferrals,
         createLegalRepReferrals:steps.referrals.createLegalOfficerReferrals,
         replyReferrals:steps.referrals.replyReferrals,
-        closeReferrals:steps.referrals.closeReferrals
+        closeReferrals:steps.referrals.closeReferrals,
+        caseListForCreateCase : steps.createCase.caseList,
+        caseJurisdictionForCreateCase : steps.createCase.caseJur,
+        caseDateOfReceiptForCreateCase : steps.createCase.caseDate,
+        caseTypeOfClaimantForCreateCase : steps.createCase.caseClaimantType,
+        caseRespondentsForCreateCase : steps.createCase.caseResp,
+        caseClaimantIsWAForCreateCase : steps.createCase.caseClaimantIsWA,
+        caseClaimantWAForCreateCase : steps.createCase.caseClaimantWA,
+        caseOtherDetailsForCreateCase : steps.createCase.caseOther,
+        caseClaimantRepresented : steps.createCase.caseRep,
     });
 };

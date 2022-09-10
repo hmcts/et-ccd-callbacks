@@ -216,6 +216,18 @@ async function createLegalRepReferral(emailAddress,details) {
     await I.wait(3);
 }
 
+async function clickCreateCase(I) {
+      await I.caseListForCreateCase();
+      await I.caseJurisdictionForCreateCase();
+      await I.caseDateOfReceiptForCreateCase();
+      await I.caseTypeOfClaimantForCreateCase();
+      await I.caseRespondentsForCreateCase();
+      await I.caseClaimantIsWAForCreateCase();
+      await I.caseClaimantWAForCreateCase();
+      await I.caseOtherDetailsForCreateCase();
+      await I.caseClaimantRepresented();
+}
+
 module.exports = {
     acceptCaseEvent,
     rejectCaseEvent,
@@ -248,5 +260,6 @@ module.exports = {
     et1Serving,
     et3ProcessingPage,
     et3Notification,
-    et3Response
+    et3Response,
+    clickCreateCase
 };

@@ -68,5 +68,6 @@ module.exports = () => {
         caseClaimantWAForCreateCase : steps.createCase.caseClaimantWA,
         caseOtherDetailsForCreateCase : steps.createCase.caseOther,
         caseClaimantRepresented : steps.createCase.caseRep,
+        caseClaimantHearingPreferences : steps.createCase.caseHearingPref,
     });
 };

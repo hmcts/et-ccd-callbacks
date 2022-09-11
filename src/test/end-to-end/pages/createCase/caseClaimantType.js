@@ -33,15 +33,20 @@ module.exports =  async function () {
     I.see('Email address (Optional)');
     I.see('Contact preference (Optional)');
 
-    const now = moment();
 
     I.checkOption(caseTypeOfClaimant.type_of_claimant_individual);
     I.selectOption(caseTypeOfClaimant.title,'1: Mr');
     I.fillField(caseTypeOfClaimant.first_name,'Joe');
     I.fillField(caseTypeOfClaimant.last_name,'Bloggs');
-    I.fillField(caseTypeOfClaimant.date_of_birth_day, now.day());
-    I.fillField(caseTypeOfClaimant.date_of_birth_month, now.month());
-    I.fillField(caseTypeOfClaimant.date_of_birth_year, now.year());
+
+    const currentDate = new Date();
+    const day = currentDate.getDate();
+    const month = currentDate.getMonth() + 1;
+    const year = currentDate.getFullYear();
+    I.fillField(caseTypeOfClaimant.date_of_birth_day, day);
+    I.fillField(caseTypeOfClaimant.date_of_birth_month, month);
+    I.fillField(caseTypeOfClaimant.date_of_birth_year, year);
+
     I.selectOption(caseTypeOfClaimant.sex, '1: Male');
     I.selectOption(caseTypeOfClaimant.gender_identity, '1: Yes');
     I.fillField(caseTypeOfClaimant.gender_identity_description,'Test Gender');

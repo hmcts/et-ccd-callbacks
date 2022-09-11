@@ -14,17 +14,22 @@ module.exports =  async function () {
     I.see('Is the employment continuing? (Optional)');
     I.see('Are there any disabilities or special requirements? (Optional)');
 
-    const now = moment();
     I.fillField(caseOtherDetails.other_details_claimant_occupation,'Test - Occupation');
-    I.fillField(caseOtherDetails.claimant_employed_from_day,now.day());
-    I.fillField(caseOtherDetails.claimant_employed_from_month,now.month());
-    I.fillField(caseOtherDetails.claimant_employed_from_year,now.year());
+
+    const currentDate = new Date();
+    const day = currentDate.getDate();
+    const month = currentDate.getMonth() + 1;
+    const year = currentDate.getFullYear();
+    I.fillField(caseOtherDetails.claimant_employed_from_day, day);
+    I.fillField(caseOtherDetails.claimant_employed_from_month, month);
+    I.fillField(caseOtherDetails.claimant_employed_from_year, year);
     I.checkOption(caseOtherDetails.currently_employed);
+
     I.wait(1);
     I.see('Notice Period End Date (Optional)');
-    I.fillField(caseOtherDetails.notice_period_end_date_day,now.day());
-    I.fillField(caseOtherDetails.notice_period_end_date_month,now.month());
-    I.fillField(caseOtherDetails.notice_period_end_date_year,now.year());
+    I.fillField(caseOtherDetails.notice_period_end_date_day,day);
+    I.fillField(caseOtherDetails.notice_period_end_date_month,month);
+    I.fillField(caseOtherDetails.notice_period_end_date_year,year);
     I.checkOption(caseOtherDetails.any_disabilities_or_special_needs);
     I.wait(1);
     I.see('Notice Period End Date (Optional)');

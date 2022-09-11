@@ -17,10 +17,13 @@ module.exports =  async function () {
     I.see('Submission Reference (12 digit number)');
     I.see('Tribunal Office');
 
-    const now = moment();
-    I.fillField(caseDateConfig.date_of_receipt_day, now.day());
-    I.fillField(caseDateConfig.date_of_receipt_month, now.month());
-    I.fillField(caseDateConfig.date_of_receipt_year, now.year());
+    const currentDate = new Date();
+    const day = currentDate.getDate();
+    const month = currentDate.getMonth() + 1;
+    const year = currentDate.getFullYear();
+    I.fillField(caseDateConfig.date_of_receipt_day, day);
+    I.fillField(caseDateConfig.date_of_receipt_month, month);
+    I.fillField(caseDateConfig.date_of_receipt_year, year);
 
     I.fillField(caseDateConfig.submission_reference,'123456789012');
     I.selectOption(caseDateConfig.tribunal_office,'3: London Central');

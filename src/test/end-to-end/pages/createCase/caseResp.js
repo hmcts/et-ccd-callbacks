@@ -17,8 +17,6 @@ module.exports =  async function () {
     I.see('Enter a UK postcode');
     I.see('I can\'t enter a UK postcode');
 
-    const now = moment();
-
     I.fillField(caseResp.name_of_respondent,'Respondent Name');
     I.checkOption(caseResp.is_there_an_acas_certificate_number_yes);
     I.fillField(caseResp.acas_certificate_number_input,'ACAS1234');

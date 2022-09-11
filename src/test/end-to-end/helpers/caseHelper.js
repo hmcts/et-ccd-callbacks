@@ -226,6 +226,7 @@ async function clickCreateCase(I) {
       await I.caseClaimantWAForCreateCase();
       await I.caseOtherDetailsForCreateCase();
       await I.caseClaimantRepresented();
+      await I.caseClaimantHearingPreferences();
 }
 
 module.exports = {

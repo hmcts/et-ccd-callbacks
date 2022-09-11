@@ -8,5 +8,6 @@ Scenario('Case Creation Test', async ({ I }) => {
    await I.authenticateWithIdam();
    I.wait(2);
    await clickCreateCase(I);
+   I.click('Submit');
 
 }).tag('@CreateCase') ;//.retry(testConfig.TestRetryScenarios)

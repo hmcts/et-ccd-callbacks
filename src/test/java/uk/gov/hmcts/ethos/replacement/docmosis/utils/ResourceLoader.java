@@ -22,35 +22,35 @@ public final class ResourceLoader {
 
     public static UploadResponse successfulDocumentManagementUploadResponse()
             throws URISyntaxException, IOException {
-        String response = getResourceJson("response.success.json");
+        String response = getResource("response.success.json");
         return JSON_MAPPER.fromJson(response, UploadResponse.class);
     }
 
     public static UploadResponse unsuccessfulDocumentManagementUploadResponse()
             throws URISyntaxException, IOException {
-        String response = getResourceJson("response.failure.json");
+        String response = getResource("response.failure.json");
         return JSON_MAPPER.fromJson(response, UploadResponse.class);
     }
 
     public static uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse successfulDocStoreUpload()
             throws URISyntaxException, IOException {
-        String response = getResourceJson("responseDocStore.success.json");
+        String response = getResource("responseDocStore.success.json");
         return JSON_MAPPER.fromJson(response, uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse.class);
     }
 
     public static ListingDetails generateListingDetails(String jsonFileName) throws URISyntaxException, IOException {
-        String json = getResourceJson(jsonFileName);
+        String json = getResource(jsonFileName);
         return JSON_MAPPER.fromJson(json, ListingDetails.class);
     }
 
     public static List<SubmitEvent> generateSubmitEventList(String jsonFileName)
             throws URISyntaxException, IOException {
 
-        String json = getResourceJson(jsonFileName);
+        String json = getResource(jsonFileName);
         return JSON_MAPPER.fromJson(json, new TypeReference<>() {});
     }
 
-    private static String getResourceJson(String resourceName) throws URISyntaxException, IOException {
+    public static String getResource(String resourceName) throws URISyntaxException, IOException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         URL resource = Objects.requireNonNull(classLoader.getResource(resourceName));
         Path path = Paths.get(resource.toURI());

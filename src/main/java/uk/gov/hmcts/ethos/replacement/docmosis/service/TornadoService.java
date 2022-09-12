@@ -23,6 +23,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelpe
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TornadoDocumentFilter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -234,7 +235,8 @@ public class TornadoService {
     }
 
     private void writeOutputStream(OutputStreamWriter outputStreamWriter, StringBuilder sb) throws IOException {
-        outputStreamWriter.write(sb.toString());
+        String reportJson = TornadoDocumentFilter.filterJson(sb.toString());
+        outputStreamWriter.write(reportJson);
         outputStreamWriter.flush();
     }
 

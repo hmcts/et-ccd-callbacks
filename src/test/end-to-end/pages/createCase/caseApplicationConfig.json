@@ -1,0 +1,8 @@
+{
+  "case_number": "//h1[starts-with('Case Number:')",
+  "case_tab_details" : "//div[contains(text(),'Case Details')]",
+  "claimant_tab_details" : "//div[contains(text(),'Claimant')]",
+  "respondent_tab_details" : "//div[contains(text(),'Respondent')]",
+  "referrals_tab_details" : "//div[contains(text(),'Referrals')]",
+  "history_tab_details" : "//div[contains(text(),'History')]"
+}

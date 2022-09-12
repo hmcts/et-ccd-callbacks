@@ -2,7 +2,6 @@
 
 const commonConfig = require('../../data/commonConfig.json');
 const caseOtherDetails = require('./caseOtherDetailsConfig.json');
-const moment = require('moment');
 
 module.exports =  async function () {
     const I = this;
@@ -25,13 +24,13 @@ module.exports =  async function () {
     I.fillField(caseOtherDetails.claimant_employed_from_year, year);
     I.checkOption(caseOtherDetails.currently_employed);
 
-    I.wait(1);
+    I.wait(commonConfig.time_interval_1_second);
     I.see('Notice Period End Date (Optional)');
     I.fillField(caseOtherDetails.notice_period_end_date_day,day);
     I.fillField(caseOtherDetails.notice_period_end_date_month,month);
     I.fillField(caseOtherDetails.notice_period_end_date_year,year);
     I.checkOption(caseOtherDetails.any_disabilities_or_special_needs);
-    I.wait(1);
+    I.wait(commonConfig.time_interval_1_second);
     I.see('Notice Period End Date (Optional)');
     I.fillField(caseOtherDetails.disabilities_please_provide_details, 'Has a condition');
 

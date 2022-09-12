@@ -2,13 +2,12 @@
 
 const commonConfig = require('../../data/commonConfig.json');
 const caseResp = require('./caseRespondents.json');
-const moment = require('moment');
 
 module.exports =  async function () {
     const I = this;
     I.see('Respondents');
     I.click('Add new');
-    I.wait(1);
+    I.wait(commonConfig.time_interval_1_second);
     I.see('Name of respondent');
     I.see('Is there an ACAS Certificate number?');
     I.see('Phone number (Optional)');

@@ -229,6 +229,10 @@ async function clickCreateCase(I) {
       await I.caseClaimantHearingPreferences();
 }
 
+async function verifyApplicationTabs(I) {
+    await I.caseApplicationTabs();
+}
+
 module.exports = {
     acceptCaseEvent,
     rejectCaseEvent,
@@ -262,5 +266,6 @@ module.exports = {
     et3ProcessingPage,
     et3Notification,
     et3Response,
-    clickCreateCase
+    clickCreateCase,
+    verifyApplicationTabs
 };

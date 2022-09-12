@@ -2,7 +2,6 @@
 
 const commonConfig = require('../../data/commonConfig.json');
 const caseRepConfig = require('./caseRepConfig.json');
-const moment = require('moment');
 
 module.exports =  async function () {
     const I = this;

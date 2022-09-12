@@ -2,7 +2,6 @@
 
 const commonConfig = require('../../data/commonConfig.json');
 const caseRepConfig = require('./caseRepConfig.json');
-const moment = require('moment');
 
 module.exports =  async function () {
     const I = this;
@@ -12,7 +11,7 @@ module.exports =  async function () {
     I.see('Video');I.see('Phone');I.see('Neither');
 
     I.checkOption(caseRepConfig.hearing_preferences_neither);
-    I.wait(1);
+    I.wait(commonConfig.time_interval_1_second);
     I.see('Why is the claimant unable to take part in video or phone hearings');
     I.fillField(caseRepConfig.why_cant_claimant_not_take_part, 'Because of a Learning Condition');
 

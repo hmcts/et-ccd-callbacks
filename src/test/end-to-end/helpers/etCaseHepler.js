@@ -5,23 +5,23 @@ const request = requestModule.defaults();
 const testConfig = require('../../config.js');
 const querystring = require('querystring');
 const logger = Logger.getLogger('helpers/idamApi.js');
+const totp = require("totp-generator");
 const { expect } = require('chai');
 const env = testConfig.TestEnv;
-//const axios = require('axios');
-const { eventNames } = require('../pages/common/constants.js');
-const {et1Vetting,acceptCaseEvent} = require("../helpers/caseHelper");
 const dataLocation = require('../data/et-ccd-basic-data.json')
 
 const { I } = inject()
 const location = 'ET_EnglandWales';
 const etDataLocation = dataLocation.data;
-const s2sBaseUrl = `http://rpe-service-auth-provider-${env}.service.core-compute-${env}.internal/testing-support/lease`;
-const oneTimepwd = testConfig.oneTimePassword;
+const s2sBaseUrl = `http://rpe-service-auth-provider-${env}.service.core-compute-${env}.internal/lease`;
+const token = totp(testConfig.TestCcdGwSecret, { digits: 6, period: 30 });
+const oneTimepwd = token;
 const username = testConfig.TestEnvCWUser;
 const password = testConfig.TestEnvCWPassword;
 const idamBaseUrl = 'https://idam-api.aat.platform.hmcts.net/loginUser';
 const getUserIdurl = 'https://idam-api.aat.platform.hmcts.net/details';
 const ccdApiUrl = `http://ccd-data-store-api-${env}.service.core-compute-${env}.internal`;
+
 
 async function processCaseToAcceptedState() {
 
@@ -41,11 +41,12 @@ async function processCaseToAcceptedState() {
     logger.debug(authToken);
 
     // get s2s token
+    console.log("checking OTP => :" +oneTimepwd);
     let s2sheaders = {
         'Content-Type': 'application/json'
     };
     let s2spayload = {
-        'microservice': 'xui_webapp',
+        'microservice': 'ccd_gw',
         'oneTimePassword': oneTimepwd
     }
 

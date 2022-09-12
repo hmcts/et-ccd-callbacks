@@ -9,5 +9,5 @@ Scenario('Verify Initial Consideration Journey', async ({I}) => {
     await processCaseToAcceptedState();
     await initialConsideration(I,eventNames.INITIAL_CONSIDERATION);
 
-}).tag('@RET-BAT')
-    .retry(testConfig.TestRetryScenarios)
+}).tag('@RET-WIP');
+    //.retry(testConfig.TestRetryScenarios)

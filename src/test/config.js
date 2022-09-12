@@ -20,5 +20,6 @@ module.exports = {
     TestForCrossBrowser: process.env.TESTS_FOR_CROSS_BROWSER === 'true',
     TestIdamClientSecret: process.env.IDAM_CLIENT_SECRET || 'ZSu8eMK9Woqc0Tm9',
     TestS2SAuthSecret: process.env.SERVICE_SECRET || '',
-    oneTimePassword: process.env.ONE_TIME_PASSWORD || '376564',
+    TestCcdGwSecret: process.env.MICROSERVICE_CCD_GW || '',
+    oneTimePassword: process.env.ONE_TIME_PASSWORD || '',
 };

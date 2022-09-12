@@ -2,7 +2,6 @@
 
 const commonConfig = require('../../data/commonConfig.json');
 const caseTypeOfClaimant = require('./caseTypeOfClaimant.json');
-const moment = require('moment');
 
 module.exports =  async function () {
     const I = this;
@@ -54,7 +53,7 @@ module.exports =  async function () {
     I.fillField(caseTypeOfClaimant.claimant_alternative_number, '07928621415');
     I.fillField(caseTypeOfClaimant.claimant_enter_uk_postcode, 'SS1 1AA');
     I.click(caseTypeOfClaimant.find_address_button);
-    I.wait(1);
+    I.wait(commonConfig.time_interval_1_second);
     I.see('Select an address');
     I.selectOption(caseTypeOfClaimant.claimant_select_an_address,'1: Object');
     I.fillField(caseTypeOfClaimant.email_address, 'xxxx@test.com');

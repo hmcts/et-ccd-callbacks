@@ -105,6 +105,11 @@ public class Et3ResponseHelper {
         data.setTitleMiss(UNCHECKED);
         data.setTitleMs(UNCHECKED);
         data.setTitleOther(UNCHECKED);
+
+        if (title == null) {
+            return;
+        }
+
         switch  (title) {
             case "Mr":
                 data.setTitleMr(CHECKED);

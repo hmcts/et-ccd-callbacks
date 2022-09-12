@@ -16,12 +16,14 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TornadoDocumentFilter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -56,6 +58,8 @@ public class TornadoService {
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
+
+    private String dmStoreDocumentName = OUTPUT_FILE_NAME_PDF;
 
     public DocumentInfo documentGeneration(String authToken, CaseData caseData, String caseTypeId,
                                            CorrespondenceType correspondenceType,
@@ -231,7 +235,8 @@ public class TornadoService {
     }
 
     private void writeOutputStream(OutputStreamWriter outputStreamWriter, StringBuilder sb) throws IOException {
-        outputStreamWriter.write(sb.toString());
+        String reportJson = TornadoDocumentFilter.filterJson(sb.toString());
+        outputStreamWriter.write(reportJson);
         outputStreamWriter.flush();
     }
 
@@ -251,9 +256,10 @@ public class TornadoService {
         throws IOException {
         HttpURLConnection connection = null;
         try {
+            dmStoreDocumentName = documentName;
             connection = createConnection();
             buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
-            return checkResponseStatus(userToken, connection, documentName, caseTypeId);
+            return checkResponseStatus(userToken, connection, dmStoreDocumentName, caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
             throw exception;
@@ -284,6 +290,10 @@ public class TornadoService {
                 return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             case "ET3 Processing.pdf":
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            case "ET3 Response.pdf":
+                dmStoreDocumentName = String.format("%s - ET3 Response.pdf",
+                    caseData.getEt3ResponseRespondentLegalName());
+                return Et3ResponseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             case "Initial Consideration.pdf" :
                 return InitialConsiderationHelper.getDocumentRequest(
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);

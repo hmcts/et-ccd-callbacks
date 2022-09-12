@@ -348,7 +348,10 @@ public class CaseDataBuilder {
         return this;
     }
 
-    private Address createAddress(String addressLine1, String addressLine2, String addressLine3,
+    /**
+     * Creates an Address object from its properties.
+     */
+    public Address createAddress(String addressLine1, String addressLine2, String addressLine3,
                                   String postTown, String county, String postCode, String country) {
         Address address = new Address();
         address.setAddressLine1(addressLine1);

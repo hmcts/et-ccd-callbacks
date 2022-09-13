@@ -38,6 +38,12 @@
         "com.github.hmcts.java-logging:"
       ],
       "allowedVersions": "<=5"
+    },
+    {
+      "matchPackageNames": [
+        "com.github.hmcts:ccd-case-document-am-client"
+      ],
+      "allowedVersions": "<1.59"
     }
   ],
   "ignoreDeps": [

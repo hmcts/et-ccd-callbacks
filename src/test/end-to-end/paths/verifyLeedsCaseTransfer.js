@@ -2,7 +2,6 @@ const testConfig = require('./../../config');
 const {createCaseInCcd} = require("../helpers/ccdDataStoreApi");
 const {eventNames} = require('../pages/common/constants.js');
 const {caseTransfer} = require("../helpers/caseHelper");
-const testConfig = require('../../config');
 let caseNumber;
 
 Feature('Create a Leeds Single Case & Execute Case Transfer');

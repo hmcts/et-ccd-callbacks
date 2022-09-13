@@ -11,9 +11,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3NotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.util.ArrayList;
@@ -29,18 +32,24 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest({ET3NotificationController.class, JsonMapper.class})
+@WebMvcTest({ET3NotificationController.class, Et3NotificationService.class, JsonMapper.class})
+@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.LawOfDemeter", "PMD.UnusedPrivateField", "PMD.TooManyMethods",
+    "PMD.ExcessiveImports"})
 class ET3NotificationControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String ET3_NOTIFICATION_ENDPOINT = "/et3Notification";
+    private static final String ET3_NOTIFICATION_MID_UPLOAD_DOCUMENTS = "/et3Notification/midUploadDocuments";
+    private static final String ET3_NOTIFICATION_SUBMITTED = "/et3Notification/submitted";
     private CCDRequest ccdRequest;
 
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
     private ServingService servingService;
+    @MockBean
+    private Et3NotificationService et3NotificationService;
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -48,7 +57,24 @@ class ET3NotificationControllerTest {
 
     @BeforeEach
     void setUp() {
-        CaseData caseData = new CaseData();
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+            .withEthosCaseReference("12345/6789")
+            .withClaimantType("claimant@unrepresented.com")
+            .withRepresentativeClaimantType("Claimant Rep", "claimant@represented.com")
+            .withClaimantIndType("Claimant", "LastName", "Mr", "Mr")
+            .withRespondentWithAddress("Respondent Unrepresented",
+                "32 Sweet Street", "14 House", null,
+                "Manchester", "M11 4ED", "United Kingdom",
+                null, "respondent@unrepresented.com")
+            .withRespondentWithAddress("Respondent Represented",
+                "32 Sweet Street", "14 House", null,
+                "Manchester", "M11 4ED", "United Kingdom",
+                null)
+            .withRespondentRepresentative("Respondent Represented", "Rep LastName", "res@rep.com")
+            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+
+        CaseData caseData = caseDetails.getCaseData();
+        caseData.setClaimant("Claimant LastName");
         caseData.setEt3NotificationDocCollection(new ArrayList<>());
         ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
     }
@@ -59,7 +85,7 @@ class ET3NotificationControllerTest {
         when(servingService.generateOtherTypeDocumentLink(anyList())).thenReturn("expectedDocumentName");
         when(servingService.generateEmailLinkToAcas(any(), anyBoolean())).thenReturn("expectedLink");
         when(servingService.generateClaimantAndRespondentAddress(any())).thenReturn("expectedAddresses");
-        mvc.perform(post(ET3_NOTIFICATION_ENDPOINT)
+        mvc.perform(post(ET3_NOTIFICATION_MID_UPLOAD_DOCUMENTS)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -77,10 +103,44 @@ class ET3NotificationControllerTest {
     @Test
     void et3NotificationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(ET3_NOTIFICATION_ENDPOINT)
+        mvc.perform(post(ET3_NOTIFICATION_MID_UPLOAD_DOCUMENTS)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void et3NotificationSubmitted_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(ET3_NOTIFICATION_SUBMITTED)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.confirmation_header", notNullValue()))
+            .andExpect(jsonPath("$.confirmation_body", notNullValue()))
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void et3NotificationSubmitted_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(ET3_NOTIFICATION_SUBMITTED)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void et3NotificationSubmitted_badRequest() throws Exception {
+        mvc.perform(post(ET3_NOTIFICATION_SUBMITTED)
+                .content("garbage content")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
     }
 }

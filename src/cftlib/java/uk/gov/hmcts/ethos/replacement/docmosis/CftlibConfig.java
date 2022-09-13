@@ -76,6 +76,16 @@ import java.nio.file.Path;
  *             <td>caseworker, caseworker-employment, caseworker-employment-api</td>
  *             <td>Admin account</td>
  *         </tr>
+ *         <tr>
+ *             <td>superuser@etorganisation1.com</td>
+ *             <td>caseworker-caa, pui-case-manager, pui-organisation-manager, pui-user-manager, pui-caa</td>
+ *             <td>Solicitor Organisation Admin account</td>
+ *         </tr>
+ *         <tr>
+ *             <td>solicitor1@etorganisation1.com</td>
+ *             <td>caseworker-employment-legalrep-solicitor</td>
+ *             <td>Solicitor account</td>
+ *         </tr>
  *     </tbody>
  * </table>
  * </p>
@@ -101,7 +111,7 @@ public class CftlibConfig implements CFTLibConfigurer {
         createRoles(lib);
         createUsers(lib);
         importCcdDefinitions(lib);
-        startDmStore();
+        startDockerCompose();
     }
 
     private void createRoles(CFTLib lib) {
@@ -115,7 +125,16 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-employment-etjudge-scotland",
                 "citizen",
                 "caseworker-employment-legalrep-solicitor",
-                "caseworker-et-pcqextractor");
+                "caseworker-et-pcqextractor",
+                "caseworker-caa",
+                "et-acas-api",
+                "pui-case-manager",
+                "pui-finance-manager",
+                "pui-organisation-manager",
+                "pui-user-manager",
+                "pui-caa",
+                "manage-user"
+        );
     }
 
     private void createUsers(CFTLib lib) {
@@ -138,6 +157,16 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker",
                 "caseworker-employment",
                 "caseworker-employment-api");
+
+        lib.createIdamUser("superuser@etorganisation1.com",
+                "caseworker-caa",
+                "pui-case-manager",
+                "pui-organisation-manager",
+                "pui-user-manager",
+                "pui-caa");
+
+        lib.createIdamUser("solicitor1@etorganisation1.com",
+                "caseworker-employment-legalrep-solicitor");
     }
 
     private void importCcdDefinitions(CFTLib lib) {
@@ -172,8 +201,8 @@ public class CftlibConfig implements CFTLibConfigurer {
         }
     }
 
-    private void startDmStore() {
+    private void startDockerCompose() {
         ControlPlane.waitForDB();
-        DmStore.start();
+        DockerComposeProcessRunner.start();
     }
 }

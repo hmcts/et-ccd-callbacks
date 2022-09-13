@@ -395,6 +395,10 @@ bootWithCCD {
     environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
     environment 'XUI_LD_ID', System.getenv('XUI_LD_ID')
 
+    // xui-manage-org
+    environment 'RD_PROFESSIONAL_API_URL', 'http://host.docker.internal:8765'
+    environment 'XUI_MANAGE_ORGANISATIONS_CASETYPES', 'ET_EnglandWales,ET_Scotland'
+
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'
 }

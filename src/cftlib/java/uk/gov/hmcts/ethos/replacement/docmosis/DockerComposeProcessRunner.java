@@ -21,7 +21,7 @@ final class DockerComposeProcessRunner {
     @SneakyThrows
     static void start()  {
         ProcessBuilder processBuilder = new ProcessBuilder("docker", "compose", "up", "-d");
-        URL dir = DockerComposeProcessRunner.class.getClassLoader().getResource("compose");
+        URL dir = Thread.currentThread().getContextClassLoader().getResource("compose");
         processBuilder.directory(new File(dir.toURI()))
                 .start();
     }

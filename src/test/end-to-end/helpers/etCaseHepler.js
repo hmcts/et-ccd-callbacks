@@ -14,8 +14,8 @@ const { I } = inject()
 const location = 'ET_EnglandWales';
 const etDataLocation = dataLocation.data;
 const s2sBaseUrl = `http://rpe-service-auth-provider-${env}.service.core-compute-${env}.internal/lease`;
-const token = totp(testConfig.TestCcdGwSecret, { digits: 6, period: 30 });
-const oneTimepwd = token;
+//const token = totp(testConfig.TestCcdGwSecret, { digits: 6, period: 30 });
+//const oneTimepwd = token;
 const username = testConfig.TestEnvCWUser;
 const password = testConfig.TestEnvCWPassword;
 const idamBaseUrl = 'https://idam-api.aat.platform.hmcts.net/loginUser';
@@ -40,11 +40,14 @@ async function processCaseToAcceptedState() {
     const authToken = authTokenResponse.data.access_token ;
     logger.debug(authToken);
 
-    // get s2s token
-    console.log("checking OTP => :" +oneTimepwd);
+
     let s2sheaders = {
         'Content-Type': 'application/json'
     };
+
+    let oneTimepwd = totp(testConfig.TestCcdGwSecret, { digits: 6, period: 30 });
+    // get s2s token
+    console.log("checking OTP => :" +oneTimepwd);
     let s2spayload = {
         'microservice': 'ccd_gw',
         'oneTimePassword': oneTimepwd

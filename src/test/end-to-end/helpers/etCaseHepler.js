@@ -195,7 +195,7 @@ async function processCaseToAcceptedState() {
     const nextEventExecutionResponse = await I.sendPostRequest(acceptUrl,acceptPayload,acceptHeaders);
     expect(nextEventExecutionResponse.status).to.eql(201);
     let caseNumber = case_id;
-    await I.authenticateWithIdam();
+    await I.authenticateWithIdam(username, password);
     await I.amOnPage('/case-details/' + caseNumber);
     return case_id;
 }

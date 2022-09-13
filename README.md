@@ -27,10 +27,10 @@ There are two options for achieving this:
 - Configure a fake connection client
 
 ### Docmosis Tornado
-[Docmosis Tornado](https://www.docmosis.com/products/tornado.html) is a third-party document generation engine used to
-generate reports. This is provided by one of the CCD Common Components environments.
+[Docmosis Tornado](https://www.docmosis.com/products/tornado.html) is a third-party product used by et-ccd-callbacks to
+generate documents and reports.
 
-A license is required to use this product.
+More information about using Docmosis Tornado in a local development environment can be found [here](docs/docmosis.md).
 
 ## Building
 The project uses [Gradle](https://gradle.org) as a build tool, but you don't have to install it locally since there is a

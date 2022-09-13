@@ -6,16 +6,14 @@ const testConfig = require('../../config.js');
 const querystring = require('querystring');
 const logger = Logger.getLogger('helpers/idamApi.js');
 const totp = require("totp-generator");
-const { expect } = require('chai');
+const {expect} = require('chai');
 const env = testConfig.TestEnv;
 const dataLocation = require('../data/et-ccd-basic-data.json')
 
-const { I } = inject()
+const {I} = inject()
 const location = 'ET_EnglandWales';
 const etDataLocation = dataLocation.data;
 const s2sBaseUrl = `http://rpe-service-auth-provider-${env}.service.core-compute-${env}.internal/lease`;
-const token = totp(testConfig.TestCcdGwSecret, { digits: 6, period: 30 });
-const oneTimepwd = token;
 const username = testConfig.TestEnvCWUser;
 const password = testConfig.TestEnvCWPassword;
 const idamBaseUrl = 'https://idam-api.aat.platform.hmcts.net/loginUser';
@@ -32,16 +30,18 @@ async function processCaseToAcceptedState() {
         // eslint-disable-next-line no-undef
         password: password,
     })
-    const headers =  {
+    const headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
-    const authTokenResponse = await I.sendPostRequest(idamBaseUrl,payload,headers);
+    const authTokenResponse = await I.sendPostRequest(idamBaseUrl, payload, headers);
     expect(authTokenResponse.status).to.eql(200);
-    const authToken = authTokenResponse.data.access_token ;
+    const authToken = authTokenResponse.data.access_token;
     logger.debug(authToken);
 
+    const oneTimepwd = totp(testConfig.TestCcdGwSecret, {digits: 6, period: 30});
     // get s2s token
-    console.log("checking OTP => :" +oneTimepwd);
+    console.log("checking OTP => :" + oneTimepwd);
+
     let s2sheaders = {
         'Content-Type': 'application/json'
     };
@@ -49,9 +49,8 @@ async function processCaseToAcceptedState() {
         'microservice': 'ccd_gw',
         'oneTimePassword': oneTimepwd
     }
-
-   const s2sResponse =  await I.sendPostRequest(s2sBaseUrl,s2spayload,s2sheaders);
-   let serviceToken = s2sResponse.data;
+    const s2sResponse = await I.sendPostRequest(s2sBaseUrl, s2spayload, s2sheaders);
+    let serviceToken = s2sResponse.data;
     expect(s2sResponse.status).to.eql(200)
     logger.debug(serviceToken);
 
@@ -59,20 +58,20 @@ async function processCaseToAcceptedState() {
         {
             'Authorization': `Bearer ${authToken}`
         };
-    const userDetails = await I.sendGetRequest(getUserIdurl,getIdheaders);
-    const userId =  userDetails.data.id
+    const userDetails = await I.sendGetRequest(getUserIdurl, getIdheaders);
+    const userId = userDetails.data.id
 
     console.log("checking userId =>" + userId)
 
     const ccdStartCasePath = `/caseworkers/${userId}/jurisdictions/EMPLOYMENT/case-types/${location}/event-triggers/initiateCase/token`;
     const ccdSaveCasePath = `/caseworkers/${userId}/jurisdictions/EMPLOYMENT/case-types/${location}/cases?ignore-warning=false`;
 
-   let initiateCaseUrl = ccdApiUrl + ccdStartCasePath
+    let initiateCaseUrl = ccdApiUrl + ccdStartCasePath
     let initiateCaseHeaders = {
-            'Authorization': `Bearer ${authToken}`,
-            'ServiceAuthorization': `Bearer ${serviceToken}`,
-            'Content-Type': 'application/json'
-        }
+        'Authorization': `Bearer ${authToken}`,
+        'ServiceAuthorization': `Bearer ${serviceToken}`,
+        'Content-Type': 'application/json'
+    }
 
     let initiateCaseResponse = await I.sendGetRequest(initiateCaseUrl, initiateCaseHeaders);
     expect(initiateCaseResponse.status).to.eql(200);
@@ -91,17 +90,17 @@ async function processCaseToAcceptedState() {
         'event_token': initiateEventToken
     };
     let createCaseUrl = ccdApiUrl + ccdSaveCasePath
-    const createCaseHeaders =  {
-            'Authorization': `Bearer ${authToken}`,
-            'ServiceAuthorization': `Bearer ${serviceToken}`,
-            'Content-Type': 'application/json'
-        };
+    const createCaseHeaders = {
+        'Authorization': `Bearer ${authToken}`,
+        'ServiceAuthorization': `Bearer ${serviceToken}`,
+        'Content-Type': 'application/json'
+    };
     let createCasebody = `${JSON.stringify(createCasetemp)}`
-    const createCaseResponse = await I.sendPostRequest(createCaseUrl,createCasebody,createCaseHeaders);
+    const createCaseResponse = await I.sendPostRequest(createCaseUrl, createCasebody, createCaseHeaders);
 
     expect(createCaseResponse.status).to.eql(201);
     const case_id = createCaseResponse.data.id
-    console.log("checking case_id" +case_id);
+    console.log("checking case_id" + case_id);
     // initiate et1 vetting
     const initiateEvent = `/cases/${case_id}/event-triggers/et1Vetting?ignore-warning=false`;
 
@@ -132,9 +131,9 @@ async function processCaseToAcceptedState() {
         data: case_data,
         data_classification: dataClassification,
         event: {
-        id: 'et1Vetting',
-        summary: '',
-        description: ''
+            id: 'et1Vetting',
+            summary: '',
+            description: ''
         },
         event_token: eventToken,
         ignore_warning: false,
@@ -142,9 +141,9 @@ async function processCaseToAcceptedState() {
     };
 
     console.log("... executing et1Vetting event ...")
-    let executeEt1payload =  JSON.stringify(executeEventBody);
-    console.log("vetiing body => " +executeEt1payload);
-    const eventExecutionResponse = await I.sendPostRequest(execuEt1teUrl,executeEt1payload,completeVettingHeader);
+    let executeEt1payload = JSON.stringify(executeEventBody);
+    console.log("vetiing body => " + executeEt1payload);
+    const eventExecutionResponse = await I.sendPostRequest(execuEt1teUrl, executeEt1payload, completeVettingHeader);
     expect(eventExecutionResponse.status).to.eql(201);
 
 
@@ -190,9 +189,9 @@ async function processCaseToAcceptedState() {
         'experimental': true,
         'Content-Type': 'application/json'
     };
-    let acceptPayload =  JSON.stringify(acceptBody)
+    let acceptPayload = JSON.stringify(acceptBody)
 
-    const nextEventExecutionResponse = await I.sendPostRequest(acceptUrl,acceptPayload,acceptHeaders);
+    const nextEventExecutionResponse = await I.sendPostRequest(acceptUrl, acceptPayload, acceptHeaders);
     expect(nextEventExecutionResponse.status).to.eql(201);
     let caseNumber = case_id;
     await I.authenticateWithIdam(username, password);

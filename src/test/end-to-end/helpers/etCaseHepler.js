@@ -50,7 +50,7 @@ async function processCaseToAcceptedState() {
         'oneTimePassword': oneTimepwd
     }
 
-   I.wait(10);
+   I.wait(31);
    const s2sResponse =  await I.sendPostRequest(s2sBaseUrl,s2spayload,s2sheaders);
    let serviceToken = s2sResponse.data;
     expect(s2sResponse.status).to.eql(200)

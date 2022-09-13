@@ -14,10 +14,10 @@ Details [here](https://tools.hmcts.net/confluence/display/DATS/Docmosis+template
 
 ### Setup
 
-#### Applicaiton properties tornado.url value
+#### Application properties tornado.url value
 In `application-dev.properties` or `application-cftlib.properties` you need to use
 ```bash
-tornado.url=https://console.dws3.docmosis.com/console/login.html#eu/templates
+tornado.url=https://eu.dws3.docmosis.com/api/render
 ```
 instead of 
 ```bash

@@ -1,17 +1,17 @@
 const testConfig = require('./../../config');
-const {createCaseInCcd} = require("../helpers/ccdDataStoreApi");
+const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 const {eventNames} = require('../pages/common/constants.js');
-const {acceptCaseEvent, fixCaseAPI} = require("../helpers/caseHelper");
-let caseNumber;
+const {fixCaseAPI} = require("../helpers/caseHelper");
+
 
 Feature('Create a Leeds Singles Case & Execute Fix Case API');
 
 Scenario('Verify Fix Case API', async ({I}) => {
+    let caseId = await processCaseToAcceptedState();
 
-    caseNumber = await createCaseInCcd('src/test/end-to-end/data/ccd-case-basic-data.json');
-    await acceptCaseEvent(I, caseNumber, eventNames.ACCEPT_CASE);
+    console.log("... case id =>" +caseId);
     await fixCaseAPI(I, eventNames.FIX_CASE_API);
 
 }).tag('@e2e')
-    .tag('@nightly')
-    .retry(testConfig.TestRetryScenarios);
+    .tag('@nightly');
+    //.retry(testConfig.TestRetryScenarios);

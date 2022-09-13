@@ -14,8 +14,7 @@ const { I } = inject()
 const location = 'ET_EnglandWales';
 const etDataLocation = dataLocation.data;
 const s2sBaseUrl = `http://rpe-service-auth-provider-${env}.service.core-compute-${env}.internal/lease`;
-const token = totp(testConfig.TestCcdGwSecret, { digits: 6, period: 30 });
-const oneTimepwd = token;
+
 const username = testConfig.TestEnvCWUser;
 const password = testConfig.TestEnvCWPassword;
 const idamBaseUrl = 'https://idam-api.aat.platform.hmcts.net/loginUser';
@@ -41,6 +40,7 @@ async function processCaseToAcceptedState() {
     logger.debug(authToken);
 
     // get s2s token
+    let oneTimepwd = totp(testConfig.TestCcdGwSecret, { digits: 6, period: 30 });
     console.log("checking OTP => :" +oneTimepwd);
     let s2sheaders = {
         'Content-Type': 'application/json'

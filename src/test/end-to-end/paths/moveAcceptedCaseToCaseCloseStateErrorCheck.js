@@ -1,17 +1,15 @@
 const testConfig = require('./../../config');
-const {createCaseInCcd} = require("../helpers/ccdDataStoreApi");
+const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 const {eventNames} = require('../pages/common/constants.js');
-const assert = require('assert');
-const {acceptCaseEvent, caseDetailsEvent} = require("../helpers/caseHelper");
-let caseNumber;
+const {caseDetailsEvent} = require("../helpers/caseHelper");
+
 
 Feature('Verify whether the user able to move accepted case to case closed state');
 
 Scenario('Move Accepted case to case closed state error check', async ({I}) => {
-
-    caseNumber = await createCaseInCcd('src/test/end-to-end/data/ccd-case-basic-data.json');
-    await acceptCaseEvent(I, caseNumber, eventNames.ACCEPT_CASE);
+    let caseNumber = await processCaseToAcceptedState();
+    console.log("... case id =>" +caseNumber);
     await caseDetailsEvent(I, caseNumber, eventNames.CASE_DETAILS, 'A Clerk', 'Case closed', 'Casework Table', 'Standard Track');
 
-}).tag('@nightly')
+}).tag('@wip')
     .retry(testConfig.TestRetryScenarios);

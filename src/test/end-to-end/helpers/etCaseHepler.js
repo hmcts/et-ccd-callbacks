@@ -23,12 +23,13 @@ const ccdApiUrl = `http://ccd-data-store-api-${env}.service.core-compute-${env}.
 
 async function processCaseToAcceptedState() {
 
+
     // login get auth token
     let payload = querystring.stringify({
         // eslint-disable-next-line no-undef
-        username: username,
+        username: `${username}`,
         // eslint-disable-next-line no-undef
-        password: password,
+        password: `${password}`,
     })
     const headers = {
         'Content-Type': 'application/x-www-form-urlencoded'

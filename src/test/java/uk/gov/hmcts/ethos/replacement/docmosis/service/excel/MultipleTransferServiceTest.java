@@ -47,6 +47,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOUR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.NullAssignment", "PMD.LawOfDemeter",
+    "PMD.ExcessiveImports"})
 @RequiredArgsConstructor
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleTransferServiceTest {
@@ -167,7 +169,7 @@ public class MultipleTransferServiceTest {
         var caseData = new CaseData();
         caseData.setEthosCaseReference("245004/2020");
 
-        // Un cleared BF Action
+        // Uncleared BF Action
         var bfActionType = new BFActionType();
         bfActionType.setDateEntered("2020-11-11");
         var bfActionTypeItem = new BFActionTypeItem();
@@ -188,7 +190,7 @@ public class MultipleTransferServiceTest {
         var submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(ACCEPTED_STATE);
-        submitEvent.setCaseId(1232121232);
+        submitEvent.setCaseId(1_232_121_232);
 
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
@@ -231,12 +233,12 @@ public class MultipleTransferServiceTest {
         var submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(ACCEPTED_STATE);
-        submitEvent.setCaseId(1232121232);
+        submitEvent.setCaseId(1_232_121_232);
 
         var submitEvent2 = new SubmitEvent();
         submitEvent2.setCaseData(caseData);
         submitEvent2.setState(ACCEPTED_STATE);
-        submitEvent2.setCaseId(1232121232);
+        submitEvent2.setCaseId(1_232_121_232);
 
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);

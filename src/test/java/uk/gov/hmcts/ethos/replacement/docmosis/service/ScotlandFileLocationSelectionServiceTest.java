@@ -12,6 +12,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.FileLocatio
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings({"PMD.LawOfDemeter"})
 public class ScotlandFileLocationSelectionServiceTest {
 
     @Test

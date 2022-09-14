@@ -49,7 +49,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
     "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
     "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
     "PMD.LawOfDemeter",  "PMD.ConsecutiveLiteralAppends", "PMD.ConsecutiveAppendsShouldReuse",
-    "PMD.LinguisticNaming", "PMD.NPathComplexity"})
+    "PMD.LinguisticNaming", "PMD.NPathComplexity", "PMD.ExcessiveImports", "PMD.CyclomaticComplexity"})
 public class LabelsHelper {
 
     public static final int MAX_NUMBER_LABELS = 2000;

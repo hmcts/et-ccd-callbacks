@@ -70,6 +70,8 @@ All logins use a password of `password`.
 | englandwales@hmcts.net | caseworker, caseworker-employment, caseworker-employment-englandwales | Caseworker access to England/Wales cases
 | scotland@hmcts.net     | caseworker, caseworker-employment, caseworker-employment-scotland     | Caseworker access to Scotland cases
 | admin@hmcts.net        | caseworker, caseworker-employment, caseworker-employment-api          | Admin account with access to all cases
+| solicitor1@etorganisation1.com | caseworker-employment-legalrep-solicitor | Solicitor account |
+| superuser@etorganisation1.com | caseworker-caa, pui-case-manager, pui-organisation-manager, pui-user-manager | Organisation admin account
 
 ## Importing CCD Definitions
 

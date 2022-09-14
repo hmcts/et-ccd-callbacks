@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ET1ServingControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL = "/midServingDocumentOtherTypeNames";
-    private static final String SERVING_DOCUMENT_RECIPIENT_URL = "/midServingDocumentRecipient";
+
     private CCDRequest ccdRequest;
 
     @MockBean

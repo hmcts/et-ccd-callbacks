@@ -9,8 +9,8 @@ import lombok.experimental.SuperBuilder;
  */
 @SuperBuilder
 @Data
+@SuppressWarnings({"PMD.LinguisticNaming", "PMD.TooManyFields"})
 public class InitialConsiderationDocument {
-
     @JsonProperty("accessKey")
     private String accessKey;
     @JsonProperty("templateName")

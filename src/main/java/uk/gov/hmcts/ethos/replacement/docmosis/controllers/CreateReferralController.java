@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,27 +18,45 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
+/**
+ * REST controller for the Create Referral event pages, formats data appropriately for rendering on the front end.
+ */
 @Slf4j
 @RequestMapping("/createReferral")
 @RestController
-@RequiredArgsConstructor
 @SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class CreateReferralController {
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
+    private final String referralTemplateId;
     private final VerifyTokenService verifyTokenService;
+    private final EmailService emailService;
+    private final UserService userService;
+
+    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String CREATE_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
         + "<p>Your referral has been sent. Replies and instructions will appear in the "
         + "<a href=\"/cases/case-details/%s#Referrals\" target=\"_blank\">Referrals tab (opens in new tab)</a>.</p>";
-    private final UserService userService;
+
+    public CreateReferralController(@Value("${referral.template.id}") String referralTemplateId,
+                                    VerifyTokenService verifyTokenService,
+                                    EmailService emailService, UserService userService) {
+        this.referralTemplateId = referralTemplateId;
+        this.emailService = emailService;
+        this.verifyTokenService = verifyTokenService;
+        this.userService = userService;
+    }
 
     /**
      * Called for the first page of the Create Referral event.
@@ -73,6 +91,36 @@ public class CreateReferralController {
     }
 
     /**
+     * Called for the email validation of the Create Referral event.
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data and errors attached.
+     */
+    @PostMapping(value = "/validateReferentEmail", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "initialize data for referral create")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> validateReferentEmail(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = ReferralHelper.validateEmail(caseData.getReferentEmail());
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    /**
      * Called at the end of creating a referral, takes the information saved in case data and stores it in the
      * referral collection.
      * @param ccdRequest holds the request and case data
@@ -101,6 +149,10 @@ public class CreateReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         UserDetails userDetails = userService.getUserDetails(userToken);
+
+        emailService.sendEmail(referralTemplateId, caseData.getReferentEmail(),
+            ReferralHelper.buildPersonalisation(caseData, false, true));
+
         ReferralHelper.createReferral(
             caseData,
             String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName())

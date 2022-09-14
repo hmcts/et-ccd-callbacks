@@ -36,6 +36,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CloseReferralController.class, JsonMapper.class})
+@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.ExcessiveImports"})
 class CloseReferralControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String START_CLOSE_REFERRAL_URL = "/closeReferral/aboutToStart";
@@ -68,6 +69,9 @@ class CloseReferralControllerTest {
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);
+        caseData.setEthosCaseReference("caseRef");
+        caseData.setClaimant("claimant");
+        caseData.setIsUrgent("Yes");
         ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
     }
 

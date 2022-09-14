@@ -13,8 +13,15 @@ def secrets = [
         'et-cos-${env}': [
                 secret('ccd-user-email', 'CCD_CASEWORKER_E2E_EMAIL'),
                 secret('ccd-user-password', 'CCD_CASEWORKER_E2E_PASSWORD'),
+                secret('et-caseworker-email', 'ET_CASEWORKER_EMAIL'),
+                secret('et-caseworker-pwd', 'ET_CASEWORKER_PASSWORD'),
+                secret('et-judge-email', 'ET_JUDGE_EMAIL'),
+                secret('et-judge-pwd', 'ET_JUDGE_PASSWORD'),
                 secret('et-cos-s2s-secret', 'SERVICE_SECRET'),
                 secret('idam-client-secret', 'IDAM_CLIENT_SECRET')
+        ],
+        's2s-${env}':  [
+                secret('microservicekey-ccd-gw', 'MICROSERVICE_CCD_GW')
         ]
 ]
 
@@ -60,8 +67,8 @@ withPipeline(type, product, component) {
             alwaysLinkToLastBuild: true,
             keepAll : true,
             reportDir : "functional-output",
-            reportFiles : "ecm-e2e-result.html",
-            reportName : "ECM E2E smoke tests result"
+            reportFiles : "et-e2e-result.html",
+            reportName : "ET E2E smoke tests result"
     ]
   }
 
@@ -73,8 +80,8 @@ withPipeline(type, product, component) {
             alwaysLinkToLastBuild: true,
             keepAll : true,
             reportDir : "functional-output",
-            reportFiles : "ecm-e2e-result.html",
-            reportName : "ECM E2E functional tests result"
+            reportFiles : "et-e2e-result.html",
+            reportName : "ET E2E functional tests result"
     ]
   }
 
@@ -86,8 +93,8 @@ withPipeline(type, product, component) {
             alwaysLinkToLastBuild: true,
             keepAll : true,
             reportDir : "functional-output",
-            reportFiles : "ecm-e2e-result.html",
-            reportName : "ECM E2E smoke tests result"
+            reportFiles : "et-e2e-result.html",
+            reportName : "ET E2E smoke tests result"
     ]
   }
 
@@ -99,8 +106,8 @@ withPipeline(type, product, component) {
             alwaysLinkToLastBuild: true,
             keepAll : true,
             reportDir : "functional-output",
-            reportFiles : "ecm-e2e-result.html",
-            reportName : "ECM E2E functional tests result"
+            reportFiles : "et-e2e-result.html",
+            reportName : "ET E2E functional tests result"
     ]
   }
 }

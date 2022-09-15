@@ -18,7 +18,7 @@ async function submittedState(I, caseId) {
 
 async function caseDetails(I, caseId, eventName, clerkResponsible, physicalLocation, conciliationTrack) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
+    await I.wait(3);
     await I.amendTheCaseDetails(clerkResponsible, physicalLocation, conciliationTrack);
 }
 
@@ -84,7 +84,7 @@ async function fixCaseAPI(I, eventName) {
 
 async function bfAction(I, eventName) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
+    await I.wait(3);
     await I.executeBFAction();
 }
 

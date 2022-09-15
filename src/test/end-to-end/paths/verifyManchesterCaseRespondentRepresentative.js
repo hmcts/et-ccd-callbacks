@@ -8,9 +8,11 @@ Feature('Manchester Office Individual Single Case & Execute Respondent Represent
 Scenario('Verify Respondent Representative', async ({I}) => {
 
     let caseId = await processCaseToAcceptedState();
+    console.log("... case id =>" +caseId);
+
     await respondentRepresentative(I, eventNames.RESPONDENT_REPRESENTATIVE);
 
 }).tag('@nightly')
     .tag('@e2e')
-    .tag('@wip')
-    .retry(testConfig.TestRetryScenarios);
+    .tag('@wip');
+    //.retry(testConfig.TestRetryScenarios);

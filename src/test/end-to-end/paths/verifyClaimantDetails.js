@@ -12,4 +12,5 @@ Scenario('Verify Claimant Details', async ({I}) => {
     await claimantDetails(I, eventNames.CLAIMANT_DETAILS);
 
 }).tag('@wip')
-    .tag('@nightly');//.retry(testConfig.TestRetryScenarios);
+    .tag('@nightly');
+    //.retry(testConfig.TestRetryScenarios);

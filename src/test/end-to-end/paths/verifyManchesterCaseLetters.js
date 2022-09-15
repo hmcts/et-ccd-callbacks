@@ -8,8 +8,10 @@ Feature('Create a Manchester Single Case & Execute Letters');
 Scenario('Verify Manchester case Letters', async ({I}) => {
 
     let caseId = await processCaseToAcceptedState();
+    console.log("... case id =>" +caseId);
+
     await letters(I, eventNames.LETTERS);
 
 }).tag('@nightly')
-    .tag('@e2e')
-    .retry(testConfig.TestRetryScenarios);
+    .tag('@e2e');
+    //.retry(testConfig.TestRetryScenarios);

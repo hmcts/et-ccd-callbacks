@@ -1,7 +1,7 @@
 const testConfig = require('./../../config');
 const {createCaseInCcd} = require("../helpers/ccdDataStoreApi");
 
-Feature('Verify CCD Case Creation...').retry(testConfig.TestRetryFeatures);
+Feature('Verify CCD Case Creation...');
 let caseNumber;
 
 Scenario('Check whether the user able to create a ccd case or not...', async () => {
@@ -10,5 +10,6 @@ Scenario('Check whether the user able to create a ccd case or not...', async () 
 
 }).retry(testConfig.TestRetryScenarios)
     .tag('@smoke')
-    .tag('@nightly')
+    .tag('@nightly');
+    //.retry(testConfig.TestRetryFeatures);
 

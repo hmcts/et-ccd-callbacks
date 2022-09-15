@@ -8,9 +8,11 @@ Feature('Manchester Office Single Case & Execute Jurisdiction Event');
 Scenario('Verify Jurisdiction', async ({I}) => {
 
     let caseId = await processCaseToAcceptedState();
+    console.log("... case id =>" +caseId);
+
     await jurisdiction(I, eventNames.JURISDICTION);
 
 }).tag('@nightly')
     .tag('@e2e')
-    .tag('@wip')
-    .retry(testConfig.TestRetryScenarios);
+    .tag('@wip');
+    //.retry(testConfig.TestRetryScenarios);

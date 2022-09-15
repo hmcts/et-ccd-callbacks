@@ -7,9 +7,11 @@ Feature('Create Manchester A Single Case And Execute Claimant Details...');
 
 Scenario('Verify Claimant Details', async ({I}) => {
     let caseId = await processCaseToAcceptedState();
+    console.log("... case id =>" +caseId);
+
     await claimantDetails(I, eventNames.CLAIMANT_DETAILS);
 
 }).tag('@nightly')
     .tag('@e2e')
-    .tag('@wip')
-    .retry(testConfig.TestRetryScenarios);
+    .tag('@wip');
+    //.retry(testConfig.TestRetryScenarios);

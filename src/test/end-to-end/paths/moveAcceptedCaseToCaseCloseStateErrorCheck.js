@@ -1,7 +1,5 @@
 const testConfig = require('./../../config');
-const {createCaseInCcd} = require("../helpers/ccdDataStoreApi");
 const {eventNames} = require('../pages/common/constants.js');
-const assert = require('assert');
 const {caseDetailsEvent} = require("../helpers/caseHelper");
 const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 
@@ -12,5 +10,5 @@ Scenario('Move Accepted case to case closed state error check', async ({I}) => {
     let caseId = await processCaseToAcceptedState();
     await caseDetailsEvent(I, caseId, eventNames.CASE_DETAILS, 'A Clerk', 'Case closed', 'Casework Table', 'Standard Track');
 
-}).tag('@nightly').tag('@wip')
-    .retry(testConfig.TestRetryScenarios);
+}).tag('@nightly').tag('@wip');
+    //.retry(testConfig.TestRetryScenarios);

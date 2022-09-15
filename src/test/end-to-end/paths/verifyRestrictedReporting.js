@@ -8,9 +8,11 @@ Feature('Create a Leeds Singles Case & Execute Restricted Reporting');
 Scenario('Verify Restricted Reporting', async ({I}) => {
 
     let caseId = await processCaseToAcceptedState();
+    console.log("... case id =>" +caseId);
+
     await restrictedReporting(I, eventNames.RESTRICTED_REPORTING);
 
 }).tag('@e2e')
     .tag('@nightly')
-    .tag('@wip')
-    .retry(testConfig.TestRetryScenarios);
+    .tag('@wip');
+    //.retry(testConfig.TestRetryScenarios);

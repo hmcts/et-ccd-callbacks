@@ -8,11 +8,13 @@ Feature('Create a Leeds Single Case & Execute Hearing details');
 Scenario('Verify Leeds case Hearing details', async ({I}) => {
 
     let caseId = await processCaseToAcceptedState();
+    console.log("... case id =>" +caseId);
+
     await listHearing(I, eventNames.LIST_HEARING, 'Leeds');
     await allocateHearing(I, eventNames.ALLOCATE_HEARING, 'Leeds');
     await hearingDetails(I, eventNames.HEARING_DETAILS);
 
 }).tag('@e2e')
     .tag('@nightly')
-    .tag('@wip')
-    .retry(testConfig.TestRetryScenarios);
+    .tag('@wip');
+    //.retry(testConfig.TestRetryScenarios);

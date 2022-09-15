@@ -8,10 +8,12 @@ Feature('Leeds Office Singles Case & Execute Judgment Event');
 Scenario('Verify Leeds Case Judgment', async ({I}) => {
 
     let caseId = await processCaseToAcceptedState();
+    console.log("... case id =>" +caseId);
+
     await jurisdiction(I, eventNames.JURISDICTION);
     await judgment(I, eventNames.JUDGMENT);
 
 }).tag('@e2e')
     .tag('@nightly')
-    .tag('@wip')
-    .retry(testConfig.TestRetryScenarios);
+    .tag('@wip');
+    //.retry(testConfig.TestRetryScenarios);

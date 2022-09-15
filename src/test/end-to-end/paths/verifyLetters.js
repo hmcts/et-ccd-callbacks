@@ -8,9 +8,11 @@ Feature('Create a Leeds Single Case & Execute Letters');
 Scenario('Verify Letters', async ({I}) => {
 
     let caseId = await processCaseToAcceptedState();
+    console.log("... case id =>" +caseId);
+
     await letters(I, eventNames.LETTERS);
 
 }).tag('@e2e')
     .tag('@nightly')
-    .tag('@wip')
-    .retry(testConfig.TestRetryScenarios);
+    .tag('@wip');
+    //.retry(testConfig.TestRetryScenarios);

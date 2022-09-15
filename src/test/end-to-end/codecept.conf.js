@@ -8,7 +8,7 @@ exports.config = {
             url: config.TestUrl,
             waitForTimeout: 40000,
             getPageTimeout: 40000,
-            // waitForAction: 1000,
+            waitForAction: 1000,
             show: config.TestShowBrowserWindow,
             waitForNavigation: ['domcontentloaded'],
             restart: true,
@@ -22,7 +22,7 @@ exports.config = {
                     'height': 960
                 },
                 args: [
-                    '--headless',
+                    //'--headless',
                     '--disable-gpu',
                     '--no-sandbox',
                     '--allow-running-insecure-content',

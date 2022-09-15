@@ -14,8 +14,6 @@ const { I } = inject()
 const location = 'ET_EnglandWales';
 const etDataLocation = dataLocation.data;
 const s2sBaseUrl = `http://rpe-service-auth-provider-${env}.service.core-compute-${env}.internal/lease`;
-const token = totp(testConfig.TestCcdGwSecret, { digits: 6, period: 30 });
-const oneTimepwd = token;
 const username = testConfig.TestEnvCWUser;
 const password = testConfig.TestEnvCWPassword;
 const idamBaseUrl = 'https://idam-api.aat.platform.hmcts.net/loginUser';
@@ -28,9 +26,9 @@ async function processCaseToAcceptedState() {
     // login get auth token
     let payload = querystring.stringify({
         // eslint-disable-next-line no-undef
-        username: username,
+        username: `${username}`,
         // eslint-disable-next-line no-undef
-        password: password,
+        password: `${password}`,
     })
     const headers =  {
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -40,6 +38,8 @@ async function processCaseToAcceptedState() {
     const authToken = authTokenResponse.data.access_token ;
     logger.debug(authToken);
 
+    const token = totp(testConfig.TestCcdGwSecret, { digits: 6, period: 30 });
+    const oneTimepwd = token;
     // get s2s token
     console.log("checking OTP => :" +oneTimepwd);
     let s2sheaders = {

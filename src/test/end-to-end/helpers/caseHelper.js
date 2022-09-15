@@ -16,15 +16,16 @@ async function submittedState(I, caseId) {
     await I.amOnPage('/case-details/' + caseId);
 }
 
-async function caseDetails(I, caseId, eventName, clerkResponcible, physicalLocation, conciliationTrack) {
+async function caseDetails(I, caseId, eventName, clerkResponsible, physicalLocation, conciliationTrack) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(2);
-    await I.amendTheCaseDetails(clerkResponcible, physicalLocation, conciliationTrack);
+    await I.amendTheCaseDetails(clerkResponsible, physicalLocation, conciliationTrack);
 }
 
-async function caseDetailsEvent(I, caseId, eventName, clerkResponcible, currentPosition, physicalLocation, conciliationTrack) {
+async function caseDetailsEvent(I, caseId, eventName, clerkResponsible, currentPosition, physicalLocation, conciliationTrack) {
     await I.chooseNextStep(eventName, 3);
-    await I.amendCaseDetailsWithCaseCurrentPosition(clerkResponcible, currentPosition, physicalLocation, conciliationTrack);
+    await I.wait(3);
+    await I.amendCaseDetailsWithCaseCurrentPosition(clerkResponsible, currentPosition, physicalLocation, conciliationTrack);
 }
 
 async function claimantDetails(I, eventName) {

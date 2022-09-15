@@ -10,5 +10,5 @@ Scenario('Move Accepted case to case closed state error check', async ({I}) => {
     let caseId = await processCaseToAcceptedState();
     await caseDetailsEvent(I, caseId, eventNames.CASE_DETAILS, 'A Clerk', 'Case closed', 'Casework Table', 'Standard Track');
 
-}).tag('@nightly').tag('@wip');
+}).tag('@nightly').tag('@wip').tag('@RET-BAT');
     //.retry(testConfig.TestRetryScenarios);

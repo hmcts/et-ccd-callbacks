@@ -14,5 +14,5 @@ Scenario('Verify Claimant Representative', async ({I}) => {
 
 }).tag('@e2e')
     .tag('@nightly')
-    .tag('@wip');
+    .tag('@wip').tag('@RET-BAT');
     //.retry(testConfig.TestRetryScenarios);

@@ -19,7 +19,7 @@ version = '0.0.1'
 
 pmd {
     toolVersion = "6.41.0"
-    sourceSets = [sourceSets.main, sourceSets.test]
+    sourceSets = [sourceSets.main, sourceSets.test, sourceSets.cftlib]
     reportsDir = file("$project.buildDir/reports/pmd")
     // https://github.com/pmd/pmd/issues/876
     ruleSets = []
@@ -378,7 +378,7 @@ bootWithCCD {
     // Simulates idam and s2s locally.
     // See rse-cft-lib/LibRunnerTask
     authMode = uk.gov.hmcts.rse.AuthMode.Local
-    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,evidence'
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence'
 
     // ccd-data-store-api
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,aac_manage_case_assignment,ccd_case_document_am_api,am_role_assignment_service,et_cos,et_msg_handler'

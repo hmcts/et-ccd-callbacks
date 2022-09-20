@@ -146,8 +146,8 @@ class Et3ResponseHelperTest {
         caseData.setEt3ResponseContactPreference("Post");
         caseData.setEt3ResponsePayFrequency("Weekly");
 
-        String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-            .getResource("et3ResponseDocument.json")).toURI())));
+        String expected = Files.readString(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+            .getResource("et3ResponseDocument.json")).toURI()));
 
         String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any");
         assertThat(actual).isEqualTo(expected);

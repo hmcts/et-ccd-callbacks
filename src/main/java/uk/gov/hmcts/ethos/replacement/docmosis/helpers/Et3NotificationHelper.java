@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -17,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 /**
  * ET3 Notification Helper provides methods to assist with the ET3 Notification event.
@@ -48,7 +50,7 @@ public class Et3NotificationHelper {
 
         String initialTitle;
 
-        if (representativeClaimantType == null) {
+        if (representativeClaimantType == null || NO.equals(caseData.getClaimantRepresentedQuestion())) {
             ClaimantType claimantType = caseData.getClaimantType();
 
             if (claimantType == null) {
@@ -107,7 +109,7 @@ public class Et3NotificationHelper {
     private static String getNameForClaimant(CaseData caseData) {
         RepresentedTypeC representativeClaimantType = caseData.getRepresentativeClaimantType();
 
-        if (representativeClaimantType == null) {
+        if (representativeClaimantType == null || representativeClaimantType.getNameOfRepresentative() == null) {
             return caseData.getClaimant();
         }
 
@@ -117,7 +119,7 @@ public class Et3NotificationHelper {
     private static String getEmailAddressForClaimant(CaseData caseData) {
         RepresentedTypeC representativeClaimantType = caseData.getRepresentativeClaimantType();
 
-        if (representativeClaimantType == null) {
+        if (representativeClaimantType == null || NO.equals(caseData.getClaimantRepresentedQuestion())) {
             ClaimantType claimantType = caseData.getClaimantType();
             if (claimantType == null) {
                 throw new NotFoundException("Could not find claimant");
@@ -130,8 +132,8 @@ public class Et3NotificationHelper {
 
     private static String getNameOfRespondents(CaseData caseData) {
         return caseData.getRespondentCollection().stream()
-            .map(o -> getNameForRespondent(caseData, o.getValue()))
-            .collect(Collectors.joining(", "));
+                .map(o -> getNameForRespondent(caseData, o.getValue()))
+                .collect(Collectors.joining(", "));
     }
 
     private static String getEmailAddressForRespondent(CaseData caseData, RespondentSumType respondent) {
@@ -153,9 +155,14 @@ public class Et3NotificationHelper {
 
     private static RepresentedTypeR getRespondentRepresentative(CaseData caseData, RespondentSumType respondent) {
         List<RepresentedTypeRItem> repCollection = caseData.getRepCollection();
+
+        if (CollectionUtils.isEmpty(repCollection)) {
+            return null;
+        }
+
         Optional<RepresentedTypeRItem> respondentRep = repCollection.stream()
-            .filter(o -> respondent.getRespondentName().equals(o.getValue().getRespRepName()))
-            .findFirst();
+                .filter(o -> respondent.getRespondentName().equals(o.getValue().getRespRepName()))
+                .findFirst();
 
         return respondentRep.map(RepresentedTypeRItem::getValue).orElse(null);
     }

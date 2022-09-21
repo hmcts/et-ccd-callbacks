@@ -1,0 +1,5 @@
+{
+  "videoHearingPreference": "claimantHearingPreference_hearing_preferences-Video",
+  "phoneHearingPreference": "claimantHearingPreference_hearing_preferences-Phone",
+  "selectNeitherPreference": "claimantHearingPreference_hearing_preferences-Neither"
+}

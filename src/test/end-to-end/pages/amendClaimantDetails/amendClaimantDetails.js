@@ -1,5 +1,6 @@
 'use strict';
 const commonConfig = require('../../data/commonConfig.json');
+const claimDetailConfig = require('./amendClaimantDetails.json')
 
 module.exports = async function () {
 
@@ -7,6 +8,8 @@ module.exports = async function () {
     await I.navByClick(commonConfig.continue);
     await I.navByClick(commonConfig.continue);
     await I.navByClick(commonConfig.continue);
+    await I.navByClick(commonConfig.continue);
+    await I.selectOption(claimDetailConfig.phoneHearingPreference);
     await I.navByClick(commonConfig.continue);
     await I.click(commonConfig.submit)
     await I.wait(2);

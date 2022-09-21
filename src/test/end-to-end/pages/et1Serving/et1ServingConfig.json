@@ -1,0 +1,8 @@
+{
+  "et1Add_new_button": "#servingDocumentCollection > div > button:nth-child(2)",
+  "et1Select_document_type": "#servingDocumentCollection_0_typeOfDocument",
+  "et1UploadET1ServingDocument": "#servingDocumentCollection_0_uploadedDocument",
+  "et1cancelDocumentUpload": "[aria-label='Cancel upload']",
+  "et1removeDocumentUpload": "[aria-label='Remove Upload document PDF']",
+  "et1ShortDescription": "#servingDocumentCollection_0_shortDescription"
+}

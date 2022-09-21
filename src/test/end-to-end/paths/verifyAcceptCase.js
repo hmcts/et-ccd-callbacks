@@ -11,7 +11,7 @@ Scenario('Verify Accept Case', async ({I}) => {
     caseNumber = await createCaseInCcd('src/test/end-to-end/data/ccd-case-basic-data.json');
     await acceptCaseEvent(I, caseNumber, eventNames.ACCEPT_CASE);
 
-}).tag('@e2e')
+}).tag('@wip')
     .tag('@nightly')
     .tag('@crossbrowser')
     .retry(testConfig.TestRetryScenarios);

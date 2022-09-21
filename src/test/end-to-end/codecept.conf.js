@@ -34,6 +34,9 @@ exports.config = {
         PuppeteerHelper: {
             require: './helpers/PuppeteerHelper.js'
         },
+        REST: {
+            endpoint: 'https://idam-api.aat.platform.hmcts.net/loginUser'
+        },
         JSWait: {require: './helpers/JSWait.js'},
     },
     include: {
@@ -63,12 +66,12 @@ exports.config = {
                 options: {mochaFile: './functional-output/result.xml'}
             },
             mochawesome: {
-                stdout: './functional-output/ecm-e2e-mochawesome-stdout.log',
+                stdout: './functional-output/et-e2e-mochawesome-stdout.log',
                 options: {
                     reportDir: config.TestOutputDir || './functional-output',
-                    reportFilename: 'ecm-e2e-result',
+                    reportFilename: 'et-xui-e2e-result',
                     inlineAssets: true,
-                    reportTitle: 'ECM CCD E2E Tests'
+                    reportTitle: 'ET XUI E2E Tests'
                 }
             }
         }
@@ -79,5 +82,5 @@ exports.config = {
             browsers: ['chrome']
         }
     },
-    'name': 'ecm-ccd-e2e-tests'
+    'name': 'et-xui-e2e-tests'
 };

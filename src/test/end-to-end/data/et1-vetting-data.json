@@ -1,0 +1,195 @@
+{
+  "case_data": {
+  "positionType": "Manually Created",
+  "claimantRepresentedQuestion": "No",
+  "respondentCollection": [
+    {
+      "value": {
+        "respondent_name": "Mrs Hellen Sharp",
+        "respondent_ACAS_question": "Yes",
+        "respondent_ACAS": "15678",
+        "respondent_address": {
+          "AddressLine1": "78 East Wonford Hill",
+          "PostTown": "Exeter",
+          "PostCode": "EX1 3DD",
+          "Country": "United Kingdom"
+        },
+        "responseStruckOut": "No",
+        "responseRespondentAddress": {},
+        "responseReceived": "Yes",
+        "responseContinue": "Yes",
+        "extensionRequested": "No"
+      },
+      "id": "e764f874-e937-4642-ac67-4af2e2fd05f6"
+    }
+  ],
+  "tribunalCorrespondenceDX": "DX 742940 Leeds 75",
+  "respondent": "Mrs Hellen Sharp",
+  "claimantOtherType": {},
+  "tribunalCorrespondenceFax": "01264 785136",
+  "et1VettingRespondentAcasDetails1": "<hr><h3>Respondent 1</h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Mrs Hellen Sharp<br><br>Contact address &#09&#09 78 East Wonford Hill<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Exeter<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 EX1 3DD</pre><h3>Acas certificate</h3>Certificate number 15678 has been provided.<br><br><br>",
+  "caseType": "Single",
+  "managingOffice": "Leeds",
+  "feeGroupReference": "946403697619",
+  "ethosCaseReference": "6000111/2022",
+  "claimantIndType": {
+    "claimant_title1": "Dr",
+    "claimant_first_names": "Grayson",
+    "claimant_last_name": "Becker",
+    "claimant_date_of_birth": "1998-12-15",
+    "claimant_gender": "Male"
+  },
+  "claimant_TypeOfClaimant": "Individual",
+  "tribunalCorrespondenceAddress": {
+    "AddressLine1": "4th Floor",
+    "AddressLine2": "City Exchange",
+    "AddressLine3": "11 Albion Street",
+    "PostTown": "Leeds",
+    "PostCode": "LS1 5ES"
+  },
+  "tribunalCorrespondenceEmail": "LeedsET@justice.gov.uk",
+  "representativeClaimantType": {},
+  "claimant": "Grayson Becker",
+  "claimantWorkAddress": {
+    "claimant_work_address": {
+      "AddressLine1": "78 East Wonford Hill",
+      "PostTown": "Exeter",
+      "PostCode": "EX1 3DD",
+      "Country": "United Kingdom"
+    }
+  },
+  "dateToPosition": "2022-08-12",
+  "et1VettingClaimantDetailsMarkUp": "<hr><h3>Claimant</h3><pre>First name &#09&#09&#09&#09&nbsp; Grayson<br><br>Last name &#09&#09&#09&#09&nbsp; Becker<br><br>Contact address &#09&#09 4 Little Meadows<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Bradley<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 LL11 4AR</pre>",
+  "multipleFlag": "No",
+  "currentPosition": "Manually Created",
+  "receiptDate": "2022-08-02",
+  "caseSource": "Manually Created",
+  "tribunalCorrespondenceTelephone": "0113 245 9741",
+  "claimantWorkAddressQuestion": "Yes",
+  "claimantType": {
+    "claimant_addressUK": {
+      "AddressLine1": "4 Little Meadows",
+      "PostTown": "Bradley",
+      "PostCode": "LL11 4AR",
+      "Country": "United Kingdom"
+    }
+  },
+  "et1VettingRespondentDetailsMarkUp": "<h3>Respondent </h3><pre>Name &#09&#09&#09&#09&#09&#09&nbsp; Mrs Hellen Sharp<br><br>Contact address &#09&#09 78 East Wonford Hill<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Exeter<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 EX1 3DD</pre><hr>",
+  "flagsImageFileName": "EMP-TRIB-0000000000.jpg",
+  "et1VettingBeforeYouStart": "Open these documents to help you complete this form: <br>Check the Documents tab for additional ET1 documents the claimant may have uploaded.",
+  "targetHearingDate": "2023-01-29"
+},
+  "data_classification": {
+    "positionType": "PUBLIC",
+    "claimantRepresentedQuestion": "PUBLIC",
+    "respondentCollection": {
+      "classification": "PUBLIC",
+      "value": [
+        {
+          "value": {
+            "respondent_name": "PUBLIC",
+            "respondent_ACAS_question": "PUBLIC",
+            "respondent_ACAS": "PUBLIC",
+            "respondent_address": {
+              "classification": "PUBLIC",
+              "value": {
+                "AddressLine1": "PUBLIC",
+                "PostTown": "PUBLIC",
+                "PostCode": "PUBLIC",
+                "Country": "PUBLIC"
+              }
+            },
+            "responseStruckOut": "PUBLIC",
+            "responseRespondentAddress": {
+              "classification": "PUBLIC",
+              "value": {}
+            },
+            "responseReceived": "PUBLIC",
+            "responseContinue": "PUBLIC",
+            "extensionRequested": "PUBLIC"
+          },
+          "id": "e764f874-e937-4642-ac67-4af2e2fd05f6"
+        }
+      ]
+    },
+    "tribunalCorrespondenceDX": "PUBLIC",
+    "respondent": "PUBLIC",
+    "claimantOtherType": {
+      "classification": "PUBLIC",
+      "value": {}
+    },
+    "tribunalCorrespondenceFax": "PUBLIC",
+    "et1VettingRespondentAcasDetails1": "PUBLIC",
+    "caseType": "PUBLIC",
+    "managingOffice": "PUBLIC",
+    "feeGroupReference": "PUBLIC",
+    "ethosCaseReference": "PUBLIC",
+    "claimantIndType": {
+      "classification": "PUBLIC",
+      "value": {
+        "claimant_title1": "PUBLIC",
+        "claimant_first_names": "PUBLIC",
+        "claimant_last_name": "PUBLIC",
+        "claimant_date_of_birth": "PUBLIC",
+        "claimant_gender": "PUBLIC"
+      }
+    },
+    "claimant_TypeOfClaimant": "PUBLIC",
+    "tribunalCorrespondenceAddress": {
+      "classification": "PUBLIC",
+      "value": {
+        "AddressLine1": "PUBLIC",
+        "AddressLine2": "PUBLIC",
+        "AddressLine3": "PUBLIC",
+        "PostTown": "PUBLIC",
+        "PostCode": "PUBLIC"
+      }
+    },
+    "tribunalCorrespondenceEmail": "PUBLIC",
+    "representativeClaimantType": {
+      "classification": "PUBLIC",
+      "value": {}
+    },
+    "claimant": "PUBLIC",
+    "claimantWorkAddress": {
+      "classification": "PUBLIC",
+      "value": {
+        "claimant_work_address": {
+          "classification": "PUBLIC",
+          "value": {
+            "AddressLine1": "PUBLIC",
+            "PostTown": "PUBLIC",
+            "PostCode": "PUBLIC",
+            "Country": "PUBLIC"
+          }
+        }
+      }
+    },
+    "dateToPosition": "PUBLIC",
+    "et1VettingClaimantDetailsMarkUp": "PUBLIC",
+    "multipleFlag": "PUBLIC",
+    "currentPosition": "PUBLIC",
+    "receiptDate": "PUBLIC",
+    "caseSource": "PUBLIC",
+    "tribunalCorrespondenceTelephone": "PUBLIC",
+    "claimantWorkAddressQuestion": "PUBLIC",
+    "claimantType": {
+      "classification": "PUBLIC",
+      "value": {
+        "claimant_addressUK": {
+          "classification": "PUBLIC",
+          "value": {
+            "AddressLine1": "PUBLIC",
+            "PostTown": "PUBLIC",
+            "PostCode": "PUBLIC",
+            "Country": "PUBLIC"
+          }
+        }
+      }
+    },
+    "et1VettingRespondentDetailsMarkUp": "PUBLIC",
+    "flagsImageFileName": "PUBLIC",
+    "et1VettingBeforeYouStart": "PUBLIC",
+    "targetHearingDate": "PUBLIC"
+  }
+}

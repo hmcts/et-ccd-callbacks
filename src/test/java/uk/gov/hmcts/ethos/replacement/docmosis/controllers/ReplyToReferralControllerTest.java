@@ -98,7 +98,10 @@ class ReplyToReferralControllerTest {
         caseData.setClaimant("claimant");
         caseData.setIsUrgent("Yes");
         caseData.setReplyToEmailAddress("test@gmail.com");
-        ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
+        ccdRequest = CCDRequestBuilder.builder()
+                .withCaseData(caseData)
+                .withCaseId("123")
+                .build();
 
         UserDetails userDetails = new UserDetails();
         userDetails.setRoles(Arrays.asList("role1"));

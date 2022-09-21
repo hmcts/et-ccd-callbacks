@@ -38,7 +38,6 @@ public class InitialConsiderationController {
     private final VerifyTokenService verifyTokenService;
     private final InitialConsiderationService initialConsiderationService;
     private final DocumentManagementService documentManagementService;
-
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String COMPLETE_IC_HDR = "<h1>Initial consideration complete</h1>";
     private static final String COMPLETE_IC_BODY = "<hr>"

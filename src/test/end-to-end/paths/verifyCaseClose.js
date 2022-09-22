@@ -13,5 +13,5 @@ Scenario('Verify Case Close', async ({I}) => {
     await closeCase(I, eventNames.CLOSE_CASE, commonConfig.clerkResponsible, commonConfig.physicalLocation)
 
 }).tag('@wip')
-    .tag('@nightly')
-    .retry(testConfig.TestRetryScenarios);
+    .tag('@nightly');
+    //.retry(testConfig.TestRetryScenarios);

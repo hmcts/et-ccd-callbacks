@@ -9,7 +9,7 @@ module.exports = () => {
         chooseNextStep: steps.nextStep.nextStep,
         acceptTheCase: steps.acceptanceCase.acceptCase,
         rejectTheCase: steps.acceptanceCase.rejectCase,
-        executeClaimantDetails: steps.amendClaimantDetails.amendClaimantDetails,
+        executeClaimantDetails: steps.amendClaimantDetails.amendClaimantDet,
         executeClaimantRepresentative: steps.amendClaimantRepresentative.amendClaimantRepresentative,
         executeRespondentDetails: steps.amendRespondentDetails.amendRespondentDetails,
         amendTheCaseDetails: steps.amendCaseDetails.amendCaseDetails,

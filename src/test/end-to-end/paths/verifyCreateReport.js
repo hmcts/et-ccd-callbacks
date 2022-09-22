@@ -8,5 +8,5 @@ Feature('Create Report... ');
 Scenario('Generate Report for ECM Case', async ({I}) => {
     await generateReport(I, commonConfig.jurisdictionType, commonConfig.caseType, eventNames.CREATE_REPORT);
 
-}).tag('@report')
-    .retry(testConfig.TestRetryScenarios);
+}).tag('@report');
+    //.retry(testConfig.TestRetryScenarios);

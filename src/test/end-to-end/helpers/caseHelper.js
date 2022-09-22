@@ -5,14 +5,14 @@ async function acceptCaseEvent(I, caseId, eventName) {
 }
 
 async function rejectCaseEvent(I, caseId, eventName) {
-    await I.authenticateWithIdam();
+    await I.authenticateWithIdam(username, password);
     await I.amOnPage('/case-details/' + caseId);
     await I.chooseNextStep(eventName, 3);
     await I.rejectTheCase();
 }
 
 async function submittedState(I, caseId) {
-    await I.authenticateWithIdam();
+    await I.authenticateWithIdam(username, password);
     await I.amOnPage('/case-details/' + caseId);
 }
 
@@ -136,7 +136,7 @@ async function judgment(I, eventName) {
 }
 
 async function generateReport(I, jurisdiction, caseType, eventName) {
-    await I.authenticateWithIdam();
+    await I.authenticateWithIdam(username, password);
     await I.wait(2);
     await I.executeCreateReport(jurisdiction, caseType, eventName);
 }
@@ -202,18 +202,18 @@ async function et1Vetting(I, eventName) {
     await I.checkYourAnswersET1Vetting();
 }
 
-async function createAdminReferral(emailAddress,details) {
-    await I.createAdminReferrals(emailAddress,details)
+async function createAdminReferral(emailAddress, details) {
+    await I.createAdminReferrals(emailAddress, details)
     await I.wait(3);
 }
 
-async function createJudgeReferral(emailAddress,details) {
-    await I.createJudgeReferrals(emailAddress,details)
+async function createJudgeReferral(emailAddress, details) {
+    await I.createJudgeReferrals(emailAddress, details)
     await I.wait(3);
 }
 
-async function createLegalRepReferral(emailAddress,details) {
-    await I.createLegalRepReferrals(emailAddress,details)
+async function createLegalRepReferral(emailAddress, details) {
+    await I.createLegalRepReferrals(emailAddress, details)
     await I.wait(3);
 }
 

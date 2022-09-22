@@ -8,7 +8,7 @@ Feature('Create a Manchester Single Case and move to Rejected state');
 Scenario('Verify Manchester Reject Case', async ({I}) => {
     caseNumber = await createCaseInCcd('src/test/end-to-end/data/ccd-case-manchester-data.json', 'Manchester');
     await I.wait(5);
-    await I.authenticateWithIdam();
+    await I.authenticateWithIdam(testConfig.TestEnvCWUser, testConfig.TestEnvCWPassword);
     await I.wait(5);
     await I.amOnPage('/case-details/' + caseNumber);
     await I.chooseNextStep(eventNames.REJECT_CASE, 3);

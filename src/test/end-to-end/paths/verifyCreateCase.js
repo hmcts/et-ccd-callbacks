@@ -7,7 +7,7 @@ Feature('ET Case Creation on the Manage Case Portal');
 
 Scenario('Case Creation Test', async ({ I }) => {
 
-   await I.authenticateWithIdam();
+   await I.authenticateWithIdam(testConfig.TestEnvCWUser, testConfig.TestEnvCWPassword);
    I.wait(commonConfig.time_interval_1_second);
    await clickCreateCase(I);
    I.wait(commonConfig.time_interval_2_seconds);

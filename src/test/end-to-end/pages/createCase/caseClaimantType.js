@@ -53,7 +53,7 @@ module.exports =  async function () {
     I.fillField(caseTypeOfClaimant.claimant_alternative_number, '07928621415');
     I.fillField(caseTypeOfClaimant.claimant_enter_uk_postcode, 'YO18 7LT');
     I.click(caseTypeOfClaimant.find_address_button);
-    I.wait(commonConfig.time_interval_1_second);
+    I.wait(commonConfig.time_interval_2_seconds);
     I.see('Select an address');
     I.selectOption(caseTypeOfClaimant.claimant_select_an_address,'1: Object');
     I.fillField(caseTypeOfClaimant.email_address, 'xxxx@test.com');

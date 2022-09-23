@@ -23,7 +23,7 @@ module.exports =  async function () {
     I.checkOption(caseResp.et3_form_received_option_no);
     I.fillField(caseResp.respondent_enter_uk_postcode,'YO18 7LT');
     I.click(caseResp.find_address_button);
-    I.wait(1);
+    I.wait(2);
     I.selectOption(caseResp.respondent_select_an_address,'1: Object');
 
     I.navByClick('Continue');

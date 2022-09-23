@@ -8,7 +8,7 @@ exports.config = {
             url: config.TestUrl,
             waitForTimeout: 40000,
             getPageTimeout: 40000,
-            waitForAction: 500,
+            waitForAction: 750,
             show: config.TestShowBrowserWindow,
             waitForNavigation: ['domcontentloaded'],
             restart: true,

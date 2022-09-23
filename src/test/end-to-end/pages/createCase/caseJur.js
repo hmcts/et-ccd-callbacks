@@ -10,7 +10,8 @@ module.exports =  async function () {
     I.see('Case type');
     I.see('Event');
 
-    I.selectOption(caseJurConfig.jurisdiction, 'EMPLOYMENT');
+    I.wait(2);//Wait Time for the Select to Load Respective values...
+    //I.selectOption(caseJurConfig.jurisdiction, 'EMPLOYMENT'); //This is selected by default when the page loads.
     I.selectOption(caseJurConfig.case_type, 'ET_EnglandWales');
     I.selectOption(caseJurConfig.event, 'initiateCase');
 

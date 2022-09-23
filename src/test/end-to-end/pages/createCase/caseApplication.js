@@ -51,11 +51,11 @@ module.exports =  async function () {
     I.see('Test Gender');
     I.see('Address');
     I.see('Building and Street');
-    I.see('ROyaL Mail, Southend-on-sea M l o');
-    I.see('Address Line 2');
-    I.see('Short Street');
+    I.see('1');
+    I.see('Address Line 3');
+    I.see('Low Dalby');
     I.see('Town or City');
-    I.see('Southend-on-sea');
+    I.see('Pickering');
     I.see('Postcode/Zipcode');
     I.see('YO18 7LT');
     I.see('Country');
@@ -83,11 +83,11 @@ module.exports =  async function () {
     //Claimant Work Address Section
     I.see('Claimant Work Address');
     I.see('Building and Street');
-    I.see('ROyaL Mail, Southend-on-sea M l o');
-    I.see('Address Line 2');
-    I.see('Short Street');
+    I.see('1');
+    I.see('Address Line 3');
+    I.see('Low Dalby');
     I.see('Town or City');
-    I.see('Southend-on-sea');
+    I.see('Pickering');
     I.see('Postcode/Zipcode');
     I.see('YO18 7LT');
     I.see('Country');

@@ -51,7 +51,7 @@ module.exports =  async function () {
     I.fillField(caseTypeOfClaimant.gender_identity_description,'Test Gender');
     I.fillField(caseTypeOfClaimant.claimant_phone_number, '07928621415');
     I.fillField(caseTypeOfClaimant.claimant_alternative_number, '07928621415');
-    I.fillField(caseTypeOfClaimant.claimant_enter_uk_postcode, 'SS1 1AA');
+    I.fillField(caseTypeOfClaimant.claimant_enter_uk_postcode, 'YO18 7LT');
     I.click(caseTypeOfClaimant.find_address_button);
     I.wait(commonConfig.time_interval_1_second);
     I.see('Select an address');

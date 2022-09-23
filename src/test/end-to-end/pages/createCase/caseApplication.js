@@ -57,7 +57,7 @@ module.exports =  async function () {
     I.see('Town or City');
     I.see('Southend-on-sea');
     I.see('Postcode/Zipcode');
-    I.see('SS1 1AA');
+    I.see('YO18 7LT');
     I.see('Country');
     I.see('United Kingdom');
     I.see('Phone number');
@@ -89,7 +89,7 @@ module.exports =  async function () {
     I.see('Town or City');
     I.see('Southend-on-sea');
     I.see('Postcode/Zipcode');
-    I.see('SS1 1AA');
+    I.see('YO18 7LT');
     I.see('Country');
     I.see('United Kingdom');
 

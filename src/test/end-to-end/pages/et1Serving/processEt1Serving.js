@@ -14,7 +14,7 @@ module.exports =  async function () {
     I.wait(5)
     await I.fillField(et1Config.et1ShortDescription, 'blah');
     await I.click(commonConfig.continueButton);
-    I.wait(2)
+    I.wait(2);
     I.waitForVisible(commonConfig.continueButton, 15)
     I.see('Send documents');
     await I.click(commonConfig.continueButton);

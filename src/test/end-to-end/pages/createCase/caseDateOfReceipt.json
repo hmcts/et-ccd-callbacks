@@ -1,0 +1,7 @@
+{
+  "date_of_receipt_day" : "//input[@id='receiptDate-day']",
+  "date_of_receipt_month" : "//input[@id='receiptDate-month']",
+  "date_of_receipt_year" : "//input[@id='receiptDate-year']",
+  "submission_reference" : "//input[@id='feeGroupReference']",
+  "tribunal_office" : "//select[@id='managingOffice']"
+}

@@ -1,0 +1,5 @@
+{
+  "is_the_claimant_represented" : "//input[@id='claimantRepresentedQuestion_No']",
+  "hearing_preferences_neither" : "//input[@id='claimantHearingPreference_hearing_preferences-Neither']",
+  "why_cant_claimant_not_take_part" : "//textarea[@id='claimantHearingPreference_hearing_assistance']"
+}

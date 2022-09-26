@@ -1,0 +1,12 @@
+{
+  "other_details_claimant_occupation" : "//input[@id='claimantOtherType_claimant_occupation']",
+  "claimant_employed_from_day" : "//input[@id='claimant_employed_from-day']",
+  "claimant_employed_from_month" : "//input[@id='claimant_employed_from-month']",
+  "claimant_employed_from_year" : "//input[@id='claimant_employed_from-year']",
+  "currently_employed" : "//input[@id='claimantOtherType_claimant_employed_currently_Yes']",
+  "notice_period_end_date_day" : "//input[@id='claimant_employed_notice_period-day']",
+  "notice_period_end_date_month" : "//input[@id='claimant_employed_notice_period-month']",
+  "notice_period_end_date_year" : "//input[@id='claimant_employed_notice_period-year']",
+  "any_disabilities_or_special_needs" : "//input[@id='claimantOtherType_claimant_disabled_Yes']",
+  "disabilities_please_provide_details" : "//textarea[@id='claimantOtherType_claimant_disabled_details']"
+}

@@ -1,0 +1,7 @@
+{
+  "claimants_work_address_question_no" : "//input[@id='claimantWorkAddressQuestion_No']",
+  "claimant_work_address_enter_a_postcode" : "//input[@id='claimantWorkAddress_claimant_work_address_claimant_work_address_postcodeInput']",
+  "claimant_work_address_select_an_address" : "//select[@id='claimantWorkAddress_claimant_work_address_claimant_work_address_addressList']",
+  "claimant_work_address_phone_number" : "//input[@id='claimantWorkAddress_claimant_work_phone_number']",
+  "find_address_button" : "//button[contains(text(),'Find address')]"
+}

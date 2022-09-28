@@ -1,5 +1,4 @@
 const testConfig = require('./../../config');
-const {createCaseInCcd} = require("../helpers/ccdDataStoreApi");
 const {eventNames} = require('../pages/common/constants.js');
 const {bfAction} = require("../helpers/caseHelper");
 const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
@@ -14,5 +13,5 @@ Scenario('Verify B/F Action', async ({I}) => {
     await bfAction(I, eventNames.BF_ACTION);
 
 }).tag('@RET-BAT')
-    .tag('@nightly')
-    .retry(testConfig.TestRetryScenarios);
+    .tag('@nightly');
+    //.retry(testConfig.TestRetryScenarios);

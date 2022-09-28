@@ -1,0 +1,11 @@
+{
+  "name_of_respondent" : "//textarea[@id='respondentCollection_0_respondent_name']",
+  "is_there_an_acas_certificate_number_yes" : "//input[@id='respondentCollection_0_respondent_ACAS_question_Yes']",
+  "is_there_an_acas_certificate_number_no" : "//input[@id='respondentCollection_0_respondent_ACAS_question_No']",
+  "acas_certificate_number_input" : "//input[@id='respondentCollection_0_respondent_ACAS']",
+  "respondent_phone_number" : "//input[@id='respondentCollection_0_respondent_phone1']",
+  "et3_form_received_option_no" : "//input[@id='respondentCollection_0_responseReceived_No']",
+  "respondent_enter_uk_postcode" : "//input[@id='respondentCollection_0_respondent_address_respondent_address_postcodeInput']",
+  "respondent_select_an_address" : "//select[@id='respondentCollection_0_respondent_address_respondent_address_addressList']",
+  "find_address_button" : "//button[contains(text(),'Find address')]"
+}

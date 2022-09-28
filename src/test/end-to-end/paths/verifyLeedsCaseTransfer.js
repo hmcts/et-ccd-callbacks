@@ -8,11 +8,11 @@ Feature('Create a Leeds Single Case & Execute Case Transfer');
 
 Scenario('Verify Leeds Case Transfer', async ({I}) => {
     caseNumber = await createCaseInCcd('src/test/end-to-end/data/ccd-case-basic-data.json');
-    await I.authenticateWithIdam();
+    await I.authenticateWithIdam(testConfig.TestEnvCWUser, testConfig.TestEnvCWPassword);
     await I.wait(5);
     await I.amOnPage('/case-details/' + caseNumber);
     await caseTransfer(I, eventNames.CASE_TRANSFER);
 
 }).tag('@e2e')
-    .tag('@nightly')
-    .retry(testConfig.TestRetryScenarios);
+    .tag('@nightly');
+    //.retry(testConfig.TestRetryScenarios);

@@ -1,17 +1,18 @@
 const testConfig = require('./../../config');
-const {createCaseInCcd} = require("../helpers/ccdDataStoreApi");
 const {eventNames} = require('../pages/common/constants.js');
-const {acceptCaseEvent, claimantRespondentDetails} = require("../helpers/caseHelper");
-let caseNumber;
+const {claimantRespondentDetails} = require("../helpers/caseHelper");
+const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 
 Feature('Create A Leeds Singles Case & Execute Claimant Respondent Details...');
 
 Scenario('Verify Respondent Details', async ({I}) => {
 
-    caseNumber = await createCaseInCcd('src/test/end-to-end/data/ccd-case-basic-data.json');
-    await acceptCaseEvent(I, caseNumber, eventNames.ACCEPT_CASE);
+    let caseId = await processCaseToAcceptedState();
+    console.log("... case id =>" +caseId);
+
     await claimantRespondentDetails(I, eventNames.CLAIMANT_RESPONDENT_DETAILS);
 
 }).tag('@e2e')
     .tag('@nightly')
-    .retry(testConfig.TestRetryScenarios);
+    .tag('@wip').tag('@RET-BAT');
+    //.retry(testConfig.TestRetryScenarios);

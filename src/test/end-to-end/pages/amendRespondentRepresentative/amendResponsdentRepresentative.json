@@ -1,0 +1,7 @@
+{
+  "does_the_representative_have_an_account_no": "//input[@id='repCollection_0_myHmctsYesNo_No']",
+  "representative_work_address_enter_a_postcode" : "//input[@id='repCollection_0_representative_address_representative_address_postcodeInput']",
+  "representative_work_address_select_an_address" : "//select[@id='repCollection_0_representative_address_representative_address_addressList']",
+  "find_address_button" : "//button[contains(text(),'Find address')]"
+
+}

@@ -9,7 +9,7 @@ module.exports = () => {
         chooseNextStep: steps.nextStep.nextStep,
         acceptTheCase: steps.acceptanceCase.acceptCase,
         rejectTheCase: steps.acceptanceCase.rejectCase,
-        executeClaimantDetails: steps.amendClaimantDetails.amendClaimantDetails,
+        executeClaimantDetails: steps.amendClaimantDetails.amendClaimantDet,
         executeClaimantRepresentative: steps.amendClaimantRepresentative.amendClaimantRepresentative,
         executeRespondentDetails: steps.amendRespondentDetails.amendRespondentDetails,
         amendTheCaseDetails: steps.amendCaseDetails.amendCaseDetails,
@@ -58,6 +58,17 @@ module.exports = () => {
         createJudgeReferrals:steps.referrals.createJudgeReferrals,
         createLegalRepReferrals:steps.referrals.createLegalOfficerReferrals,
         replyReferrals:steps.referrals.replyReferrals,
-        closeReferrals:steps.referrals.closeReferrals
+        closeReferrals:steps.referrals.closeReferrals,
+        caseListForCreateCase : steps.createCase.caseList,
+        caseJurisdictionForCreateCase : steps.createCase.caseJur,
+        caseDateOfReceiptForCreateCase : steps.createCase.caseDate,
+        caseTypeOfClaimantForCreateCase : steps.createCase.caseClaimantType,
+        caseRespondentsForCreateCase : steps.createCase.caseResp,
+        caseClaimantIsWAForCreateCase : steps.createCase.caseClaimantIsWA,
+        caseClaimantWAForCreateCase : steps.createCase.caseClaimantWA,
+        caseOtherDetailsForCreateCase : steps.createCase.caseOther,
+        caseClaimantRepresented : steps.createCase.caseRep,
+        caseClaimantHearingPreferences : steps.createCase.caseHearingPref,
+        caseApplicationTabs : steps.createCase.caseApplication,
     });
 };

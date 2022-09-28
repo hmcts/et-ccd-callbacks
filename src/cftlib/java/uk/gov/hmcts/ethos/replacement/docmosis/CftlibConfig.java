@@ -86,6 +86,11 @@ import java.nio.file.Path;
  *             <td>caseworker-employment-legalrep-solicitor</td>
  *             <td>Solicitor account</td>
  *         </tr>
+ *         <tr>
+ *             <td>citizen@gmail.com</td>
+ *             <td>citizen</td>
+ *             <td>Citizen account</td>
+ *         </tr>
  *     </tbody>
  * </table>
  * </p>
@@ -167,6 +172,11 @@ public class CftlibConfig implements CFTLibConfigurer {
 
         lib.createIdamUser("solicitor1@etorganisation1.com",
                 "caseworker-employment-legalrep-solicitor");
+
+        lib.createIdamUser("citizen@gmail.com", "citizen");
+
+        // Required by ccd-data-store-api
+        lib.createIdamUser("data.store.idam.system.user@gmail.com", "caseworker");
     }
 
     private void importCcdDefinitions(CFTLib lib) {

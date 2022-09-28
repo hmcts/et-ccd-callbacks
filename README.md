@@ -11,8 +11,8 @@ This application is responsible for handling all CCD callback requests for Emplo
 The application should be run locally in an environment that includes CCD common components.
 
 There are two options for achieving this:
-- [RSE CFT lib](docs/cftlib)
-- [ECM CCD Docker](docs/ecm-ccd-docker)
+- [RSE CFT lib](docs/cftlib.md)
+- [ECM CCD Docker](docs/ecm-ccd-docker.md)
 
 ### Postgres Database
 A local database is required. This is provided by one of the CCD common components environments.

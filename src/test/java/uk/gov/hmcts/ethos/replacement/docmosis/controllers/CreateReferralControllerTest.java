@@ -77,7 +77,10 @@ class CreateReferralControllerTest {
         caseData.setIsUrgent("Yes");
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setReferentEmail("test@gmail.com");
-        ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
+        ccdRequest = CCDRequestBuilder.builder()
+                .withCaseData(caseData)
+                .withCaseId("123")
+                .build();
     }
 
     @Test

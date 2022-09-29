@@ -63,4 +63,11 @@
         <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
         <vulnerabilityName>CVE-2022-38752</vulnerabilityName>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: vm2:3.9.10
+   ]]></notes>
+        <packageUrl regex="true">^pkg:npm/vm2@.*$</packageUrl>
+        <vulnerabilityName>1084591</vulnerabilityName>
+    </suppress>
 </suppressions>

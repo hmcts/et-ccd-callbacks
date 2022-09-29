@@ -16,7 +16,7 @@
   "claimantRepresentativeAddress": "Flat 13, Vermeer Court, 1 Rembrandt Close, London",
   "respondentPostCode": "E14 3XA",
   "respondentAddress": "Flat 27, Vermeer Court, 1 Rembrandt Close, London",
-  "respondentName": "Resp1",
+  "respondentName": "Mrs Test Auto",
   "respondentRepresentativeName": "ECMGita",
   "respondentRepPostCode": "E14 7FZ",
   "respondentRepAddress": "Flat 105, Carat House, 34 Ursula Gould Way, London",
@@ -79,5 +79,8 @@
   "bfActionsOutstandingErrorMsgCheck": "You cannot close this case as there is currently no jurisdiction and no jurisdiction outcome associated with it\nCaseID contains one or more outstanding BFs. To enable this case to be closed, please clear the outstanding BFs.",
   "shortDescription": "Upload Document Check",
   "documentsTab": "Documents",
-  "cancelProcess": "p.cancel"
+  "cancelProcess": "p.cancel",
+  "time_interval_1_second" : 1,
+  "time_interval_2_seconds" : 2,
+  "time_interval_4_seconds" : 4
 }

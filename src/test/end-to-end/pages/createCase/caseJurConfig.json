@@ -1,0 +1,5 @@
+{
+  "jurisdiction":"//select[@id='cc-jurisdiction']",
+  "case_type": "//select[@id='cc-case-type']",
+  "event":"//select[@id='cc-event']"
+}

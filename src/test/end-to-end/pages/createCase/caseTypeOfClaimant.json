@@ -1,0 +1,20 @@
+{
+  "type_of_claimant_individual" : "//input[@id='claimant_TypeOfClaimant-Individual']",
+  "type_of_claimant_company" : "//input[@id='claimant_TypeOfClaimant-Company']",
+  "title" : "//select[@id='claimantIndType_claimant_preferred_title']",
+  "first_name": "//input[@id='claimantIndType_claimant_first_names']",
+  "last_name" : "//input[@id='claimantIndType_claimant_last_name']",
+  "date_of_birth_day" : "//input[@id='claimant_date_of_birth-day']",
+  "date_of_birth_month" : "//input[@id='claimant_date_of_birth-month']",
+  "date_of_birth_year" : "//input[@id='claimant_date_of_birth-year']",
+  "sex" : "//select[@id='claimantIndType_claimant_sex']",
+  "gender_identity" : "//select[@id='claimantIndType_claimant_gender_identity_same']",
+  "gender_identity_description" : "//input[@id='claimantIndType_claimant_gender_identity']",
+  "claimant_phone_number" : "//input[@id='claimantType_claimant_phone_number']",
+  "claimant_alternative_number" : "//input[@id='claimantType_claimant_mobile_number']",
+  "claimant_enter_uk_postcode" : "//input[@id='claimantType_claimant_addressUK_claimant_addressUK_postcodeInput']",
+  "find_address_button" : "//button[contains(text(),'Find address')]",
+  "claimant_select_an_address" : "//select[@id='claimantType_claimant_addressUK_claimant_addressUK_addressList']",
+  "email_address" : "//input[@id='claimantType_claimant_email_address']",
+  "contact_preference" : "//select[@id='claimantType_claimant_contact_preference']"
+}

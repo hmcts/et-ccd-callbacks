@@ -1,9 +1,11 @@
 # RSE CFT lib
 
-[RSE CFT lib](https://github.com/hmcts/rse-cft-lib) is a Gradle plugin that delivers a local CCD/ExUI environment in which et-ccd-callbacks can be developed and tested.
-The key advantages of CFT lib over using [ECM CCD Docker]() as a development environment are:
+[RSE CFT lib](https://github.com/hmcts/rse-cft-lib) is a Gradle plugin that delivers a local CCD/ExUI environment in
+which et-ccd-callbacks can be developed and tested.
+The key advantages of CFT lib over using [ECM CCD Docker](https://github.com/hmcts/ecm-ccd-docker) as a development
+environment are:
 * a lower PC resource requirement through minimising the use of docker
-* version control which prevents problems with dependencies impacting local development
+* version control which prevents problems caused by updates to common components impacting local development
 
 The integration between the plugin and et-ccd-callbacks can be found in
 * build.gradle - see bootWithCCD
@@ -19,7 +21,8 @@ The integration will boot the environment with the following automatically creat
 **_Note the CFTLib plugin supports Spring Boot DevTools automatic restart._**
 
 ## Version Control
-The RSE CFT lib is integrated into this project as a plugin. The version used should be kept up-to-date. See `build.gradle`:
+The RSE CFT lib is integrated into this project as a plugin. The version used should be kept up-to-date.
+See `build.gradle`:
 
 ```
 plugins {

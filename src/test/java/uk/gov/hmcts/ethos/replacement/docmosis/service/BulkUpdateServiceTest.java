@@ -258,7 +258,7 @@ public class BulkUpdateServiceTest {
         assertNull(bulkData.getFeeGroupReferenceV2());
         assertNull(bulkData.getFlag1Update());
         assertNull(bulkData.getFlag2Update());
-        assertNull(bulkData.getEQPUpdate());
+        assertNull(bulkData.getEqpUpdate());
     }
 
     private BulkDetails getBulkDetailsWithValues() {
@@ -274,7 +274,7 @@ public class BulkUpdateServiceTest {
         bulkData.setRespondentRepV2("RespondentRep");
         bulkData.setFlag1Update("Flag1");
         bulkData.setFlag2Update("Flag2");
-        bulkData.setEQPUpdate("EQP");
+        bulkData.setEqpUpdate("EQP");
         bulkData.setFileLocationAberdeen(new DynamicFixedListType("Aberdeen"));
         bulkData.setFileLocationDundee(new DynamicFixedListType("Dundee"));
         bulkData.setFileLocationEdinburgh(new DynamicFixedListType("Edinburgh"));
@@ -349,7 +349,7 @@ public class BulkUpdateServiceTest {
                 "multipleReferenceM=null, clerkRespM=null, claimantSurnameM=null, respondentSurnameM=null, claimantRepM=null, respondentRepM=null, " +
                 "fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null, stateM=Accepted, " +
                 "subMultipleM=12, subMultipleTitleM=null, currentPositionM=null, claimantAddressLine1M=null, claimantPostCodeM=null, " +
-                "respondentAddressLine1M=null, respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, respondentRepOrgM=null, claimantRepOrgM=null))]";
+                "respondentAddressLine1M=null, respondentPostCodeM=null, flag1M=null, flag2M=null, eqpm=null, respondentRepOrgM=null, claimantRepOrgM=null))]";
         assertEquals(multipleCollection, bulkRequestPayload.getBulkDetails().getCaseData().getMultipleCollection().toString());
     }
 
@@ -363,7 +363,7 @@ public class BulkUpdateServiceTest {
                 "multipleReferenceM=null, clerkRespM=null, claimantSurnameM=null, respondentSurnameM=null, claimantRepM=null, respondentRepM=null, " +
                 "fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null, stateM=Accepted, " +
                 "subMultipleM=12, subMultipleTitleM=null, currentPositionM=null, claimantAddressLine1M=null, claimantPostCodeM=null, " +
-                "respondentAddressLine1M=null, respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, respondentRepOrgM=null, claimantRepOrgM=null))]";
+                "respondentAddressLine1M=null, respondentPostCodeM=null, flag1M=null, flag2M=null, eqpm=null, respondentRepOrgM=null, claimantRepOrgM=null))]";
         assertEquals(multipleCollection, bulkRequestPayload.getBulkDetails().getCaseData().getMultipleCollection().toString());
     }
 
@@ -378,7 +378,7 @@ public class BulkUpdateServiceTest {
                 "multipleReferenceM=null, clerkRespM=null, claimantSurnameM=null, respondentSurnameM=null, claimantRepM=null, respondentRepM=null, " +
                 "fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null, stateM=Accepted, " +
                 "subMultipleM=12, subMultipleTitleM=null, currentPositionM=null, claimantAddressLine1M=null, claimantPostCodeM=null, " +
-                "respondentAddressLine1M=null, respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, respondentRepOrgM=null, claimantRepOrgM=null))]";
+                "respondentAddressLine1M=null, respondentPostCodeM=null, flag1M=null, flag2M=null, eqpm=null, respondentRepOrgM=null, claimantRepOrgM=null))]";
         assertEquals(multipleCollection, bulkRequestPayload.getBulkDetails().getCaseData().getMultipleCollection().toString());
     }
 

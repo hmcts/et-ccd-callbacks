@@ -333,7 +333,7 @@ public class CaseDataBuilder {
                 createAddress(addressLine1, addressLine2, addressLine3, postTown, null, postCode, country));
 
         if (!Strings.isNullOrEmpty(responseAcas)) {
-            respondentSumType.setRespondentACAS(responseAcas);
+            respondentSumType.setRespondentAcas(responseAcas);
         }
 
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();

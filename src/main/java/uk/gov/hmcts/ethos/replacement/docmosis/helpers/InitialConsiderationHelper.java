@@ -8,8 +8,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtICSeekComments;
-import uk.gov.hmcts.et.common.model.ccd.EtICUDLHearing;
-
+import uk.gov.hmcts.et.common.model.ccd.EtIcudlHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule27;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule28;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsiderationData;
@@ -91,31 +90,31 @@ public class InitialConsiderationHelper {
                         .map(EtICListForFinalHearing::getEtICLengthOfFinalHearing).orElse(null))
                 //udl
                 .udlSitAlone(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtICUDLHearing::getEtICEJSitAlone).orElse(null))
+                        .map(EtIcudlHearing::getEtIcejSitAlone).orElse(null))
                 .udlReasons(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtICUDLHearing::getEtICUDLGiveReasons).orElse(null))
+                        .map(EtIcudlHearing::getEtIcudlGiveReasons).orElse(null))
                 .udlDisputeOnFacts(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtICUDLHearing::getEtICUDLDisputeOnFacts).orElse(null))
+                        .map(EtIcudlHearing::getEtIcudlDisputeOnFacts).orElse(null))
                 .udlLittleOrNoAgreement(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtICUDLHearing::getEtICUDLLittleOrNoAgreement).orElse(null))
+                        .map(EtIcudlHearing::getEtIcudlLittleOrNoAgreement).orElse(null))
                 .udlIssueOfLawArising(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtICUDLHearing::getEtICUDLIssueOfLawArising).orElse(null))
+                        .map(EtIcudlHearing::getEtIcudlIssueOfLawArising).orElse(null))
                 .udlViewsOfParties(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtICUDLHearing::getEtICUDLViewsOfParties).orElse(null))
+                        .map(EtIcudlHearing::getEtIcudlViewsOfParties).orElse(null))
                 .udlNoViewsExpressedByParties(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtICUDLHearing::getEtICUDLNoViewsExpressedByParties).orElse(null))
+                        .map(EtIcudlHearing::getEtIcudlNoViewsExpressedByParties).orElse(null))
                 .udlConcurrentProceedings(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtICUDLHearing::getEtICUDLConcurrentProceedings).orElse(null))
+                        .map(EtIcudlHearing::getEtIcudlConcurrentProceedings).orElse(null))
                 .udlOther(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtICUDLHearing::getEtICUDLOther).orElse(null))
+                        .map(EtIcudlHearing::getEtIcudlOther).orElse(null))
                 .udlHearingFormat(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtICUDLHearing::getEtICUDLHearFormat).orElse(null))
+                        .map(EtIcudlHearing::getEtIcudlHearFormat).orElse(null))
                 .udlCVPIssue(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtICUDLHearing::getEtICUDLCVPIssue).orElse(null))
+                        .map(EtIcudlHearing::getEtIcudlCvpIssue).orElse(null))
                 .udlFinalF2FIssue(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtICUDLHearing::getEtICUDLFinalF2FIssue).orElse(null))
+                        .map(EtIcudlHearing::getEtIcudlFinalF2FIssue).orElse(null))
                 .udlCheckComplianceOrders(Optional.ofNullable(caseData.getEtICHearingNotListedUDLHearing())
-                        .map(EtICUDLHearing::getEtICBUCheckComplianceOrders).orElse(null))
+                        .map(EtIcudlHearing::getEtIcbuCheckComplianceOrders).orElse(null))
                 .hearingNotListedOtherDirections(
                         defaultIfEmpty(caseData.getEtICHearingNotListedAnyOtherDirections(), null))
                 //further information

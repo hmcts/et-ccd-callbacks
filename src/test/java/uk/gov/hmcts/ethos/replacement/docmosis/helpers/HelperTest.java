@@ -12,8 +12,11 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class HelperTest {
 
@@ -87,5 +90,13 @@ public class HelperTest {
         List<RespondentSumTypeItem> activeRespondents = Helper.getActiveRespondents(caseDetailsScot2.getCaseData());
 
         assertEquals(activeRespondentsFound, activeRespondents.size());
+    }
+
+    @Test
+    public void getCurrentDate() {
+        String currentDate = Helper.getCurrentDate();
+        Pattern pattern = Pattern.compile("\\d{2} [A-Za-z]{3,4} \\d{4}");
+        Matcher matcher = pattern.matcher(currentDate);
+        assertTrue(matcher.matches());
     }
 }

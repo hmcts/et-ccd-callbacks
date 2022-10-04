@@ -13,7 +13,7 @@ module.exports =  async function () {
     I.see('Year');
 
     I.see('Submission Reference');
-    I.see('Submission Reference (12 digit number)');
+    I.see('Submission Reference (12 or 16 digit number)');
     I.see('Tribunal Office');
 
     const currentDate = new Date();

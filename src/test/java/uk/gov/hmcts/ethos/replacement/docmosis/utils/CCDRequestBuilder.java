@@ -9,6 +9,7 @@ public class CCDRequestBuilder {
     private CaseData caseData = new CaseData();
     private String state;
     private String caseTypeId;
+    private String caseId;
 
     public static CCDRequestBuilder builder() {
         return new CCDRequestBuilder();
@@ -24,6 +25,11 @@ public class CCDRequestBuilder {
         return this;
     }
 
+    public CCDRequestBuilder withCaseId(String id) {
+        this.caseId = id;
+        return this;
+    }
+
     public CCDRequestBuilder withCaseTypeId(String caseTypeId) {
         this.caseTypeId = caseTypeId;
         return this;
@@ -34,6 +40,7 @@ public class CCDRequestBuilder {
         caseDetails.setState(state);
         caseDetails.setCaseTypeId(caseTypeId);
         caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(caseId);
         var ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
         return ccdRequest;

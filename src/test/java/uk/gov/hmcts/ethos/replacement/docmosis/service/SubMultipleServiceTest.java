@@ -73,11 +73,11 @@ public class SubMultipleServiceTest {
                 "multipleReferenceM=null, clerkRespM=null, claimantSurnameM=null, respondentSurnameM=null, claimantRepM=null, respondentRepM=null, " +
                 "fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null, stateM=null, subMultipleM=null, " +
                 "subMultipleTitleM=SubMultipleNew, currentPositionM=null, claimantAddressLine1M=null, claimantPostCodeM=null, respondentAddressLine1M=null, " +
-                "respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, respondentRepOrgM=null, claimantRepOrgM=null))], " +
+                "respondentPostCodeM=null, flag1M=null, flag2M=null, eqpm=null, respondentRepOrgM=null, claimantRepOrgM=null))], " +
                 "subMultipleCollection=[SubMultipleTypeItem(id=null, value=SubMultipleType(subMultipleNameT=SubMultipleNew, subMultipleRefT=null))], " +
                 "subMultipleDynamicList=null, searchCollectionCount=null, multipleCollectionCount=null, correspondenceType=null, correspondenceScotType=null, " +
-                "selectAll=null, scheduleDocName=null, positionType=null, flag1=null, flag2=null, EQP=null, submissionRef=null, claimantOrg=null, " +
-                "respondentOrg=null, state=null, flag1Update=null, flag2Update=null, EQPUpdate=null, jurCodesDynamicList=null, outcomeUpdate=null, " +
+                "selectAll=null, scheduleDocName=null, positionType=null, flag1=null, flag2=null, eqp=null, submissionRef=null, claimantOrg=null, " +
+                "respondentOrg=null, state=null, flag1Update=null, flag2Update=null, eqpUpdate=null, jurCodesDynamicList=null, outcomeUpdate=null, " +
                 "filterCases=null, docMarkUp=null, multipleSource=null)";
         BulkRequestPayload bulkRequestPayload = subMultipleService.createSubMultipleLogic(bulkDetails);
         assertEquals(result, bulkRequestPayload.getBulkDetails().getCaseData().toString());
@@ -156,16 +156,16 @@ public class SubMultipleServiceTest {
                 "multipleReferenceM=null, clerkRespM=null, claimantSurnameM=null, respondentSurnameM=null, claimantRepM=null, respondentRepM=null, " +
                 "fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null, stateM=null, subMultipleM= , " +
                 "subMultipleTitleM=null, currentPositionM=null, claimantAddressLine1M=null, claimantPostCodeM=null, respondentAddressLine1M=null, " +
-                "respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, respondentRepOrgM=null, claimantRepOrgM=null)), " +
+                "respondentPostCodeM=null, flag1M=null, flag2M=null, eqpm=null, respondentRepOrgM=null, claimantRepOrgM=null)), " +
                 "MultipleTypeItem(id=3333, value=MultipleType(caseIDM=null, ethosCaseReferenceM=3333, leadClaimantM=null, multipleReferenceM=null, " +
                 "clerkRespM=null, claimantSurnameM=null, respondentSurnameM=null, claimantRepM=null, respondentRepM=null, fileLocM=null, receiptDateM=null, " +
                 "positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null, stateM=null, subMultipleM= , subMultipleTitleM= , " +
                 "currentPositionM=null, claimantAddressLine1M=null, claimantPostCodeM=null, respondentAddressLine1M=null, respondentPostCodeM=null, " +
-                "flag1M=null, flag2M=null, EQPM=null, respondentRepOrgM=null, claimantRepOrgM=null))], " +
+                "flag1M=null, flag2M=null, eqpm=null, respondentRepOrgM=null, claimantRepOrgM=null))], " +
                 "subMultipleCollection=[SubMultipleTypeItem(id=1234567, value=SubMultipleType(subMultipleNameT=SubMultiple1, subMultipleRefT=1234567))], " +
                 "subMultipleDynamicList=null, searchCollectionCount=null, multipleCollectionCount=null, correspondenceType=null, correspondenceScotType=null, " +
-                "selectAll=null, scheduleDocName=null, positionType=null, flag1=null, flag2=null, EQP=null, submissionRef=null, claimantOrg=null, " +
-                "respondentOrg=null, state=null, flag1Update=null, flag2Update=null, EQPUpdate=null, jurCodesDynamicList=null, outcomeUpdate=null, " +
+                "selectAll=null, scheduleDocName=null, positionType=null, flag1=null, flag2=null, eqp=null, submissionRef=null, claimantOrg=null, " +
+                "respondentOrg=null, state=null, flag1Update=null, flag2Update=null, eqpUpdate=null, jurCodesDynamicList=null, outcomeUpdate=null, " +
                 "filterCases=null, docMarkUp=null, multipleSource=null)";
         MultipleType multipleType = new MultipleType();
         multipleType.setEthosCaseReferenceM("3333");
@@ -224,17 +224,17 @@ public class SubMultipleServiceTest {
                 "multipleReferenceM=null, clerkRespM=null, claimantSurnameM=null, respondentSurnameM=null, claimantRepM=null, respondentRepM=null, " +
                 "fileLocM=null, receiptDateM=null, positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null, stateM=null, subMultipleM=1111, " +
                 "subMultipleTitleM=NewSubMultipleName, currentPositionM=null, claimantAddressLine1M=null, claimantPostCodeM=null, respondentAddressLine1M=null, " +
-                "respondentPostCodeM=null, flag1M=null, flag2M=null, EQPM=null, respondentRepOrgM=null, claimantRepOrgM=null)), " +
+                "respondentPostCodeM=null, flag1M=null, flag2M=null, eqpm=null, respondentRepOrgM=null, claimantRepOrgM=null)), " +
                 "MultipleTypeItem(id=123456, value=MultipleType(caseIDM=null, ethosCaseReferenceM=3333, leadClaimantM=null, multipleReferenceM=null, " +
                 "clerkRespM=null, claimantSurnameM=null, respondentSurnameM=null, claimantRepM=null, respondentRepM=null, fileLocM=null, receiptDateM=null, " +
                 "positionTypeM=null, feeGroupReferenceM=null, jurCodesCollectionM=null, stateM=null, subMultipleM= , subMultipleTitleM= , currentPositionM=null, " +
                 "claimantAddressLine1M=null, claimantPostCodeM=null, respondentAddressLine1M=null, respondentPostCodeM=null, flag1M=null, flag2M=null, " +
-                "EQPM=null, respondentRepOrgM=null, claimantRepOrgM=null))], " +
+                "eqpm=null, respondentRepOrgM=null, claimantRepOrgM=null))], " +
                 "subMultipleCollection=[SubMultipleTypeItem(id=1234567, value=SubMultipleType(subMultipleNameT=SubMultiple1, subMultipleRefT=1234567)), " +
                 "SubMultipleTypeItem(id=1111, value=SubMultipleType(subMultipleNameT=NewSubMultipleName, subMultipleRefT=1111))], subMultipleDynamicList=null, " +
                 "searchCollectionCount=null, multipleCollectionCount=null, correspondenceType=null, correspondenceScotType=null, selectAll=null, " +
-                "scheduleDocName=null, positionType=null, flag1=null, flag2=null, EQP=null, submissionRef=null, claimantOrg=null, respondentOrg=null, " +
-                "state=null, flag1Update=null, flag2Update=null, EQPUpdate=null, jurCodesDynamicList=null, outcomeUpdate=null, filterCases=null, docMarkUp=null, " +
+                "scheduleDocName=null, positionType=null, flag1=null, flag2=null, eqp=null, submissionRef=null, claimantOrg=null, respondentOrg=null, " +
+                "state=null, flag1Update=null, flag2Update=null, eqpUpdate=null, jurCodesDynamicList=null, outcomeUpdate=null, filterCases=null, docMarkUp=null, " +
                 "multipleSource=null)";
         bulkDetails.getCaseData().setSubMultipleRef("1111");
         bulkDetails.getCaseData().setSubMultipleName("NewSubMultipleName");

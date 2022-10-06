@@ -30,7 +30,7 @@ public class ET1ServingController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
     private final VerifyTokenService verifyTokenService;
-    private final ET1ServingService ET1ServingService;
+    private final ET1ServingService servingService;
 
     /**
      * This service Gets userToken as a parameter for security validation
@@ -65,9 +65,9 @@ public class ET1ServingController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setOtherTypeDocumentName(
-                ET1ServingService.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
-        caseData.setClaimantAndRespondentAddresses(ET1ServingService.generateClaimantAndRespondentAddress(caseData));
-        caseData.setEmailLinkToAcas(ET1ServingService.generateEmailLinkToAcas(caseData));
+                servingService.generateOtherTypeDocumentName(caseData.getServingDocumentCollection()));
+        caseData.setClaimantAndRespondentAddresses(servingService.generateClaimantAndRespondentAddress(caseData));
+        caseData.setEmailLinkToAcas(servingService.generateEmailLinkToAcas(caseData));
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }

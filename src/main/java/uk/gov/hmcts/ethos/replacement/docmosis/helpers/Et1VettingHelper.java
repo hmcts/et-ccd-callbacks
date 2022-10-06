@@ -98,8 +98,8 @@ public class Et1VettingHelper {
                 .referralToJudgeOrLOList(CollectionUtils.isEmpty(caseData.getReferralToJudgeOrLOList())
                         ? null
                         : caseData.getReferralToJudgeOrLOList().toString())
-                .claimOfInterimReliefTextArea(defaultIfEmpty(caseData.getAClaimOfInterimReliefTextArea(), null))
-                .statutoryAppealTextArea(defaultIfEmpty(caseData.getAStatutoryAppealTextArea(), null))
+                .claimOfInterimReliefTextArea(defaultIfEmpty(caseData.getAclaimOfInterimReliefTextArea(), null))
+                .statutoryAppealTextArea(defaultIfEmpty(caseData.getAstatutoryAppealTextArea(), null))
                 .anAllegationOfCommissionOfSexualOffenceTextArea(defaultIfEmpty(
                         caseData.getAnAllegationOfCommissionOfSexualOffenceTextArea(), null))
                 .insolvencyTextArea(defaultIfEmpty(caseData.getInsolvencyTextArea(), null))
@@ -115,12 +115,12 @@ public class Et1VettingHelper {
                         ? null
                         : caseData.getReferralToREJOrVPList().toString())
                 .vexatiousLitigantOrderTextArea(defaultIfEmpty(caseData.getVexatiousLitigantOrderTextArea(), null))
-                .nationalSecurityIssueTextArea(defaultIfEmpty(caseData.getANationalSecurityIssueTextArea(), null))
+                .nationalSecurityIssueTextArea(defaultIfEmpty(caseData.getAnationalSecurityIssueTextArea(), null))
                 .nationalMultipleOrPresidentialOrderTextArea(defaultIfEmpty(
                         caseData.getNationalMultipleOrPresidentialOrderTextArea(), null))
                 .transferToOtherRegionTextArea(defaultIfEmpty(caseData.getTransferToOtherRegionTextArea(), null))
                 .serviceAbroadTextArea(defaultIfEmpty(caseData.getServiceAbroadTextArea(), null))
-                .sensitiveIssueTextArea(defaultIfEmpty(caseData.getASensitiveIssueTextArea(), null))
+                .sensitiveIssueTextArea(defaultIfEmpty(caseData.getAsensitiveIssueTextArea(), null))
                 .anyPotentialConflictTextArea(defaultIfEmpty(caseData.getAnyPotentialConflictTextArea(), null))
                 .anotherReasonREJOrVPTextArea(defaultIfEmpty(caseData.getAnotherReasonREJOrVPTextArea(), null))
                 .et1REJOrVPReferralGeneralNotes(defaultIfEmpty(caseData.getEt1REJOrVPReferralGeneralNotes(), null))

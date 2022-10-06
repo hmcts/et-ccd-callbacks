@@ -12,7 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtICSeekComments;
 
-import uk.gov.hmcts.et.common.model.ccd.EtICUDLHearing;
+import uk.gov.hmcts.et.common.model.ccd.EtIcudlHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule27;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule28;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -231,7 +231,7 @@ class InitialConsiderationServiceTest {
         caseData.setEtICHearingNotListedSeekComments(new EtICSeekComments());
         caseData.setEtICHearingNotListedListForPrelimHearing(new EtICListForPreliminaryHearing());
         caseData.setEtICHearingNotListedListForFinalHearing(new EtICListForFinalHearing());
-        caseData.setEtICHearingNotListedUDLHearing(new EtICUDLHearing());
+        caseData.setEtICHearingNotListedUDLHearing(new EtIcudlHearing());
         caseData.setEtICHearingNotListedAnyOtherDirections("Test");
         caseData.setEtICHearingListed(new ArrayList<>());
         caseData.setEtICExtendDurationGiveDetails("Test");
@@ -273,7 +273,7 @@ class InitialConsiderationServiceTest {
         caseData.setEtICHearingNotListedSeekComments(new EtICSeekComments());
         caseData.setEtICHearingNotListedListForPrelimHearing(new EtICListForPreliminaryHearing());
         caseData.setEtICHearingNotListedListForFinalHearing(new EtICListForFinalHearing());
-        caseData.setEtICHearingNotListedUDLHearing(new EtICUDLHearing());
+        caseData.setEtICHearingNotListedUDLHearing(new EtIcudlHearing());
         caseData.setEtICHearingNotListedAnyOtherDirections("Test");
 
         initialConsiderationService.clearHiddenValue(caseData, SCOTLAND_CASE_TYPE_ID);

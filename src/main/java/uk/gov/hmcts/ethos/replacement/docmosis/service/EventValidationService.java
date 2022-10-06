@@ -255,9 +255,7 @@ public class EventValidationService {
         return hearingTypeItem.getValue()
                 .getHearingDateCollection()
                 .stream()
-                .anyMatch(
-                        i -> areDatesEqual(disposalDate,
-                                i.getValue().getListedDate()));
+                .anyMatch(i -> areDatesEqual(disposalDate, i.getValue().getListedDate()));
     }
 
     private boolean isDisposalDateInFuture(String disposalDate, List<String> errors, String jurCode) {
@@ -276,9 +274,9 @@ public class EventValidationService {
     }
 
     private boolean areDatesEqual(String disposalDate, String hearingDate)  {
-        LocalDate dDate = LocalDate.parse(disposalDate);
-        LocalDate hDate = LocalDateTime.parse(hearingDate).toLocalDate();
-        return dDate.compareTo(hDate) == 0;
+        LocalDate disposalLocalDate = LocalDate.parse(disposalDate);
+        LocalDate hearingLocalDate = LocalDateTime.parse(hearingDate).toLocalDate();
+        return disposalLocalDate.compareTo(hearingLocalDate) == 0;
     }
 
     private void validateJurisdictionCodesExistenceInJudgement(CaseData caseData, List<String> errors) {
@@ -347,9 +345,10 @@ public class EventValidationService {
 
     private void validateResponseReturnedFromJudgeDate(RespondentSumType respondentSumType, List<String> errors,
                                                        int index) {
-        if (respondentSumType.getResponse_ReferredToJudge() != null
+
+        if (respondentSumType.getResponseReferredToJudge() != null
                 && respondentSumType.getResponseReturnedFromJudge() != null) {
-            var responseReferredToJudge = LocalDate.parse(respondentSumType.getResponse_ReferredToJudge());
+            var responseReferredToJudge = LocalDate.parse(respondentSumType.getResponseReferredToJudge());
             var responseReturnedFromJudge = LocalDate.parse(respondentSumType.getResponseReturnedFromJudge());
             if (responseReturnedFromJudge.isBefore(responseReferredToJudge)) {
                 String respondentName = respondentSumType.getRespondentName() != null

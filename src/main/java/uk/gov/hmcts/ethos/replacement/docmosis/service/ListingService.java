@@ -226,7 +226,7 @@ public class ListingService {
                         ELASTICSEARCH_FIELD_HEARING_LISTED_DATE)
                         .gte(dateFrom).lte(dateTo));
         if (!venue.equals(ALL_VENUES)) {
-             boolQueryBuilder.must(new MatchQueryBuilder(key, venue));
+            boolQueryBuilder.must(new MatchQueryBuilder(key, venue));
         }
         return new SearchSourceBuilder()
                 .size(MAX_ES_SIZE)

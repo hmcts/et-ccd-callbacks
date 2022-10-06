@@ -224,8 +224,10 @@ public class ListingService {
         BoolQueryBuilder boolQueryBuilder = boolQuery()
                 .filter(new RangeQueryBuilder(
                         ELASTICSEARCH_FIELD_HEARING_LISTED_DATE)
-                        .gte(dateFrom).lte(dateTo))
-                .must(new MatchQueryBuilder(key, venue));
+                        .gte(dateFrom).lte(dateTo));
+        if (!venue.equals(ALL_VENUES)) {
+             boolQueryBuilder.must(new MatchQueryBuilder(key, venue));
+        }
         return new SearchSourceBuilder()
                 .size(MAX_ES_SIZE)
                 .query(boolQueryBuilder).toString();

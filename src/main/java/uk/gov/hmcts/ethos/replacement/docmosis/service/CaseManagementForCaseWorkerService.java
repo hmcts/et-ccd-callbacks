@@ -15,10 +15,12 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
@@ -112,6 +114,16 @@ public class CaseManagementForCaseWorkerService {
             }
         } else {
             caseData.setRespondent(MISSING_RESPONDENT);
+        }
+
+        //Add respondent rep collection to sort out bug where ccd adds an object instead of collection
+        //if not present when setting default case role for the respondent rep case role
+        if (CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            RepresentedTypeRItem dummy = new RepresentedTypeRItem();
+            dummy.setValue(new RepresentedTypeR());
+            List<RepresentedTypeRItem> dummyList = new ArrayList<>();
+            dummyList.add(dummy);
+            caseData.setRepCollection(dummyList);
         }
     }
 

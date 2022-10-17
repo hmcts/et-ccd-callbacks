@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -146,8 +147,9 @@ class Et3ResponseHelperTest {
         caseData.setEt3ResponseContactPreference("Post");
         caseData.setEt3ResponsePayFrequency("Weekly");
 
+        // UTF-8 is required here for special characters to resolve on Windows correctly
         String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-            .getResource("et3ResponseDocument.json")).toURI())));
+            .getResource("et3ResponseDocument.json")).toURI())), UTF_8);
 
         String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any");
         assertThat(actual).isEqualTo(expected);

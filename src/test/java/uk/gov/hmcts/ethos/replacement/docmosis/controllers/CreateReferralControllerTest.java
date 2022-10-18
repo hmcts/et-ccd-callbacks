@@ -30,7 +30,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -40,10 +39,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CreateReferralController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.MethodNamingConventions", "PMD.ExcessiveImports", "PMD.UnusedPrivateField"})
 class CreateReferralControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String START_CREAT_REFERRAL_URL = "/createReferral/aboutToStart";
+    private static final String START_CREATE_REFERRAL_URL = "/createReferral/aboutToStart";
     private static final String ABOUT_TO_SUBMIT_URL = "/createReferral/aboutToSubmit";
     private static final String SUBMITTED_REFERRAL_URL = "/createReferral/completeCreateReferral";
     private static final String VALIDATE_EMAIL_URL = "/createReferral/validateReferentEmail";
@@ -77,6 +76,7 @@ class CreateReferralControllerTest {
         caseData.setIsUrgent("Yes");
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setReferentEmail("test@gmail.com");
+        caseData.setReferralSubject("ET1");
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
                 .withCaseId("123")
@@ -86,7 +86,7 @@ class CreateReferralControllerTest {
     @Test
     void initReferralHearingDetails_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockMvc.perform(post(START_CREAT_REFERRAL_URL)
+        mockMvc.perform(post(START_CREATE_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
@@ -100,7 +100,7 @@ class CreateReferralControllerTest {
     @Test
     void initReferralHearingDetails_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(START_CREAT_REFERRAL_URL)
+        mockMvc.perform(post(START_CREATE_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))
@@ -110,8 +110,9 @@ class CreateReferralControllerTest {
     @Test
     void aboutToSubmit_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(userService.getUserDetails(any())).thenReturn(new UserDetails());
-        doNothing().when(emailService).sendEmail(any(), any(), any());
+        UserDetails details = new UserDetails();
+        details.setName("First Last");
+        when(userService.getUserDetails(any())).thenReturn(details);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

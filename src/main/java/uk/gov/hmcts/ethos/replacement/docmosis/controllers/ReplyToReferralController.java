@@ -44,7 +44,7 @@ public class ReplyToReferralController {
     private final EmailService emailService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
-    private static final String TRUE = "True";
+
     private static final String REPLY_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
         + "<p>We have recorded your reply. You can view it in the "
@@ -183,9 +183,16 @@ public class ReplyToReferralController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         UserDetails userDetails = userService.getUserDetails(userToken);
 
-        emailService.sendEmail(referralTemplateId, caseData.getReplyToEmailAddress(),
-            ReferralHelper.buildPersonalisation(ccdRequest.getCaseDetails(), TRUE.equals(caseData.getIsJudge()),
-                    false));
+        emailService.sendEmail(
+            referralTemplateId,
+            caseData.getReplyToEmailAddress(),
+            ReferralHelper.buildPersonalisation(
+                ccdRequest.getCaseDetails(),
+                caseData.getSelectReferral().getValue().getCode(),
+                false,
+                userDetails.getName()
+            )
+        );
 
         ReferralHelper.createReferralReply(
             caseData,

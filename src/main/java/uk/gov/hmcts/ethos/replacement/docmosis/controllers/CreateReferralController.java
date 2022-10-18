@@ -150,8 +150,16 @@ public class CreateReferralController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         UserDetails userDetails = userService.getUserDetails(userToken);
 
-        emailService.sendEmail(referralTemplateId, caseData.getReferentEmail(),
-            ReferralHelper.buildPersonalisation(ccdRequest.getCaseDetails(), false, true));
+        emailService.sendEmail(
+            referralTemplateId,
+            caseData.getReferentEmail(),
+            ReferralHelper.buildPersonalisation(
+                ccdRequest.getCaseDetails(),
+                String.valueOf(ReferralHelper.getNextReferralNumber(caseData)),
+                true,
+                userDetails.getName()
+            )
+        );
 
         ReferralHelper.createReferral(
             caseData,

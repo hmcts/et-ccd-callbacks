@@ -116,7 +116,7 @@ public class BfActionReportDocTest {
 
     private String getBfActionDocTestFileContent(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-            .getResource(jsonFileName)).toURI())));
+            .getResource(jsonFileName)).toURI()))).replace("\r\n", "\n");
         // returns the content by excluding the opening and closing curly brackets
         return json.substring(1, json.length() - 1);
     }

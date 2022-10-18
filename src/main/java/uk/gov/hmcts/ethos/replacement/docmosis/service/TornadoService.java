@@ -21,6 +21,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TornadoDocumentFilter;
@@ -297,6 +298,8 @@ public class TornadoService {
             case "Initial Consideration.pdf" :
                 return InitialConsiderationHelper.getDocumentRequest(
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
+            case "Referral Submission.pdf":
+                return ReferralHelper.getDocumentRequest(caseData);
             default:
                 throw new IllegalArgumentException("Unexpected document name " + documentName);
         }

@@ -18,7 +18,9 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -155,8 +157,8 @@ public class CreateReferralController {
 
         ReferralHelper.createReferral(
             caseData,
-            String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName())
-        );
+            String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
+            userToken);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

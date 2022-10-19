@@ -1,10 +1,10 @@
 'use strict';
 const commonConfig = require('../../data/commonConfig.json');
 
-module.exports = async function (clerkResponcible, casePosition, physicalLocation, conciliationTrack) {
+module.exports = async function (clerkResponsible, casePosition, physicalLocation, conciliationTrack) {
 
     const I = this;
-    await I.selectOption('#clerkResponsible', clerkResponcible);
+    await I.selectOption('#clerkResponsible', clerkResponsible);
     await I.selectOption('#positionType', casePosition);
     await I.selectOption('#fileLocation', physicalLocation);
     await I.selectOption('#conciliationTrack', conciliationTrack);

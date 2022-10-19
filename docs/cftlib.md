@@ -1,7 +1,11 @@
 # RSE CFT lib
 
-[RSE CFT lib](https://github.com/hmcts/rse-cft-lib) is a Gradle plugin that delivers a local CCD/ExUI environment in which et-ccd-callbacks can be developed and tested.
-The key advantage of CFT lib over using [ECM CCD Docker]() as a development environment is a lower RAM requirement.
+[RSE CFT lib](https://github.com/hmcts/rse-cft-lib) is a Gradle plugin that delivers a local CCD/ExUI environment in
+which et-ccd-callbacks can be developed and tested.
+The key advantages of CFT lib over using [ECM CCD Docker](https://github.com/hmcts/ecm-ccd-docker) as a development
+environment are:
+* a lower PC resource requirement through minimising the use of docker
+* version control which prevents problems caused by updates to common components impacting local development
 
 The integration between the plugin and et-ccd-callbacks can be found in
 * build.gradle - see bootWithCCD
@@ -15,6 +19,19 @@ The integration will boot the environment with the following automatically creat
 * Starts dm-store service for document management
 
 **_Note the CFTLib plugin supports Spring Boot DevTools automatic restart._**
+
+## Version Control
+The RSE CFT lib is integrated into this project as a plugin. The version used should be kept up-to-date.
+See `build.gradle`:
+
+```
+plugins {
+    ...
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.343'
+}
+```
+
+The latest version of the RSE CFT lib can be found [here](https://github.com/hmcts/rse-cft-lib/tags)
 
 ## Setup
 
@@ -65,13 +82,14 @@ http://localhost:3000
 
 All logins use a password of `password`.
 
-| Username               | Roles                                                                 | Purpose
-|------------------------|-----------------------------------------------------------------------| --- 
-| englandwales@hmcts.net | caseworker, caseworker-employment, caseworker-employment-englandwales | Caseworker access to England/Wales cases
-| scotland@hmcts.net     | caseworker, caseworker-employment, caseworker-employment-scotland     | Caseworker access to Scotland cases
-| admin@hmcts.net        | caseworker, caseworker-employment, caseworker-employment-api          | Admin account with access to all cases
-| solicitor1@etorganisation1.com | caseworker-employment-legalrep-solicitor | Solicitor account |
-| superuser@etorganisation1.com | caseworker-caa, pui-case-manager, pui-organisation-manager, pui-user-manager | Organisation admin account
+| Username                       | Roles                                                                        | Purpose
+|--------------------------------|------------------------------------------------------------------------------| --- 
+| englandwales@hmcts.net         | caseworker, caseworker-employment, caseworker-employment-englandwales        | Caseworker access to England/Wales cases
+| scotland@hmcts.net             | caseworker, caseworker-employment, caseworker-employment-scotland            | Caseworker access to Scotland cases
+| admin@hmcts.net                | caseworker, caseworker-employment, caseworker-employment-api                 | Admin account with access to all cases
+| solicitor1@etorganisation1.com | caseworker-employment-legalrep-solicitor                                     | Solicitor account |
+| superuser@etorganisation1.com  | caseworker-caa, pui-case-manager, pui-organisation-manager, pui-user-manager | Organisation admin account
+| citizen@gmail.com              | citizen                                                                      | Citizen account
 
 ## Importing CCD Definitions
 

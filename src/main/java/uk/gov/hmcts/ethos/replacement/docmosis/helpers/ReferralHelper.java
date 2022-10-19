@@ -7,6 +7,7 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
@@ -401,11 +402,12 @@ public final class ReferralHelper {
     /**
      * Generates a map of personalised information that will be used for the
      * placeholder fields in the Referral email template.
-     * @param caseData Contains all the case data.
+     * @param detail Contains all the case details.
      * @param isJudge Flag for checking if a judge is creating the referral.
      * @param isNewReferral Flag for checking is if it is a new referral.
      */
-    public static Map<String, String> buildPersonalisation(CaseData caseData, boolean isJudge, boolean isNewReferral) {
+    public static Map<String, String> buildPersonalisation(CaseDetails detail, boolean isJudge, boolean isNewReferral) {
+        CaseData caseData = detail.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
         personalisation.put("emailFlag", isNewReferral
@@ -416,6 +418,7 @@ public final class ReferralHelper {
                 .collect(Collectors.joining(", ")));
         personalisation.put("date", getNearestHearingToReferral(caseData, "Not set"));
         personalisation.put("body", isJudge ? JUDGE_DIRECTION_BODY : GENERIC_MESSAGE_BODY);
+        personalisation.put("ccdId", detail.getCaseId());
         return personalisation;
     }
 

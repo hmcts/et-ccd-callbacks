@@ -6,6 +6,7 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
@@ -357,7 +358,10 @@ class ReferralHelperTest {
         caseData.setIsUrgent("Yes");
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
 
-        assertEquals(getExpectedPersonalisation(), ReferralHelper.buildPersonalisation(caseData, false, true));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("123");
+        caseDetails.setCaseData(caseData);
+        assertEquals(getExpectedPersonalisation(), ReferralHelper.buildPersonalisation(caseDetails, false, true));
     }
 
     private Map<String, String> getExpectedPersonalisation() {
@@ -368,6 +372,7 @@ class ReferralHelperTest {
         personalisation.put("respondents", "Andrew Smith");
         personalisation.put("date", "11 Nov 2030");
         personalisation.put("body", "You have a new message about this employment tribunal case.");
+        personalisation.put("ccdId", "123");
         return personalisation;
     }
 

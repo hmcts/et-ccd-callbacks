@@ -299,7 +299,7 @@ public class TornadoService {
                 return InitialConsiderationHelper.getDocumentRequest(
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
             case "Referral Submission.pdf":
-                return ReferralHelper.getDocumentRequest(caseData);
+                return ReferralHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             default:
                 throw new IllegalArgumentException("Unexpected document name " + documentName);
         }

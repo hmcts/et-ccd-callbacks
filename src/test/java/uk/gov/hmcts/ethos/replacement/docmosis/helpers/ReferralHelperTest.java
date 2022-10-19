@@ -167,7 +167,7 @@ class ReferralHelperTest {
         caseData.setReferralDetails("This is an explanation");
         caseData.setReferralInstruction("Custom instructions for judge");
 
-        ReferralHelper.createReferral(caseData, "Judge Judy");
+        ReferralHelper.createReferral(caseData, "Judge Judy", null);
 
         String expected = "ReferralType(referralNumber=1, referralHearingDate=11 Nov 2030, referCaseTo=Judge Judy, re"
             + "ferentE"
@@ -189,15 +189,15 @@ class ReferralHelperTest {
 
     @Test
     void addNewReferralToReferralCollection() {
-        ReferralHelper.createReferral(caseData, "");
-        ReferralHelper.createReferral(caseData, "");
+        ReferralHelper.createReferral(caseData, "", null);
+        ReferralHelper.createReferral(caseData, "", null);
 
         assertEquals(2, caseData.getReferralCollection().size());
     }
 
     @Test
     void saveTheUserDetailsOfTheReferrerWithTheReferral() {
-        ReferralHelper.createReferral(caseData, "Judge Judy");
+        ReferralHelper.createReferral(caseData, "Judge Judy", null);
 
         String referredBy = caseData.getReferralCollection().get(0).getValue().getReferredBy();
 
@@ -213,7 +213,7 @@ class ReferralHelperTest {
         caseData.setReferralDetails("This is an explanation");
         caseData.setReferralInstruction("Custom instructions for judge");
 
-        ReferralHelper.createReferral(caseData, "");
+        ReferralHelper.createReferral(caseData, "", null);
 
         assertNull(caseData.getReferCaseTo());
         assertNull(caseData.getIsUrgent());

@@ -113,16 +113,6 @@ public class CaseManagementForCaseWorkerService {
         } else {
             caseData.setRespondent(MISSING_RESPONDENT);
         }
-
-        //Add respondent rep collection to sort out bug where ccd adds an object instead of collection
-        //if not present when setting default case role for the respondent rep case role
-        if (CollectionUtils.isEmpty(caseData.getRepCollection())) {
-            RepresentedTypeRItem dummy = new RepresentedTypeRItem();
-            dummy.setValue(new RepresentedTypeR());
-            List<RepresentedTypeRItem> dummyList = new ArrayList<>();
-            dummyList.add(dummy);
-            caseData.setRepCollection(dummyList);
-        }
     }
 
     private void checkResponseAddress(RespondentSumTypeItem respondentSumTypeItem) {

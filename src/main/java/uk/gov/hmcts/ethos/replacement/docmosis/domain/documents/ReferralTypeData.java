@@ -7,8 +7,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Data
 public class ReferralTypeData {
-    @JsonProperty("referralHearingDate")
-    private String referralHearingDate;
     @JsonProperty("referCaseTo")
     private String referCaseTo;
     @JsonProperty("referentEmail")
@@ -17,10 +15,6 @@ public class ReferralTypeData {
     private String isUrgent;
     @JsonProperty("referralSubject")
     private String referralSubject;
-    @JsonProperty("referralSubjectSpecify")
-    private String referralSubjectSpecify;
     @JsonProperty("referralDetails")
     private String referralDetails;
-    @JsonProperty("referralInstruction")
-    private String referralInstruction;
 }

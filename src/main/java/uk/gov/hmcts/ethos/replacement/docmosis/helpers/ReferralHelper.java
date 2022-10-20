@@ -282,13 +282,13 @@ public final class ReferralHelper {
     public static String getDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
         ReferralTypeData data =
             ReferralTypeData.builder()
-                .referralHearingDate(defaultIfEmpty(caseData.getReferralDate(), null))
                 .referCaseTo(defaultIfEmpty(caseData.getReferCaseTo(), null))
                 .referentEmail(defaultIfEmpty(caseData.getReferentEmail(), null))
                 .isUrgent(defaultIfEmpty(caseData.getIsUrgent(), null))
                 .referralSubject(defaultIfEmpty(caseData.getReferralSubject(), null))
-                .referralSubjectSpecify(defaultIfEmpty(caseData.getReferralSubjectSpecify(), null))
-                .referralInstruction(defaultIfEmpty(caseData.getReferralInstruction(), null)).build();
+                .referralDetails(defaultIfEmpty(caseData.getReferralInstruction(), null)).build();
+
+        log.info(data.toString());
 
         ReferralTypeDocument document = ReferralTypeDocument.builder()
             .accessKey(accessKey)

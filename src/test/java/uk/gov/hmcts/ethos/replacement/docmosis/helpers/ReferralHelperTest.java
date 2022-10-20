@@ -357,11 +357,15 @@ class ReferralHelperTest {
         caseData.setClaimant("claimant");
         caseData.setIsUrgent("Yes");
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
+        caseData.setReferralSubject("ET1");
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("123");
         caseDetails.setCaseData(caseData);
-        assertEquals(getExpectedPersonalisation(), ReferralHelper.buildPersonalisation(caseDetails, false, true));
+
+        Map<String, String> actual = ReferralHelper.buildPersonalisation(caseDetails, "1", true, "First Last");
+
+        assertEquals(getExpectedPersonalisation(), actual);
     }
 
     private Map<String, String> getExpectedPersonalisation() {
@@ -371,8 +375,10 @@ class ReferralHelperTest {
         personalisation.put("claimant", "claimant");
         personalisation.put("respondents", "Andrew Smith");
         personalisation.put("date", "11 Nov 2030");
-        personalisation.put("body", "You have a new message about this employment tribunal case.");
-        personalisation.put("ccdId", "123");
+        personalisation.put("body", "You have a new referral on this case.");
+        personalisation.put("refNumber", "1");
+        personalisation.put("subject", "ET1");
+        personalisation.put("username", "First Last");
         return personalisation;
     }
 

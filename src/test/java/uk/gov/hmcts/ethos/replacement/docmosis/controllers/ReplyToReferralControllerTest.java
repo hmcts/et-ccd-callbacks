@@ -38,7 +38,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -48,7 +47,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({ReplyToReferralController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.UnusedPrivateField"})
 class ReplyToReferralControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String START_REPLY_REFERRAL_URL = "/replyReferral/aboutToStart";
@@ -137,7 +136,9 @@ class ReplyToReferralControllerTest {
     @Test
     void aboutToSubmitReferralReply_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(emailService).sendEmail(any(), any(), any());
+        UserDetails details = new UserDetails();
+        details.setName("First Last");
+        when(userService.getUserDetails(any())).thenReturn(details);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

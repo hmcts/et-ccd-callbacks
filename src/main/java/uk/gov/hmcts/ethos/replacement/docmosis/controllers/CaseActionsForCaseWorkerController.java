@@ -42,6 +42,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
@@ -97,6 +98,7 @@ public class CaseActionsForCaseWorkerController {
     private final DepositOrderValidationService depositOrderValidationService;
     private final JudgmentValidationService judgmentValidationService;
     private final Et1VettingService et1VettingService;
+    private final RespondentRepresentativeService respondentRepresentativeService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a case for a caseWorker.")
@@ -433,7 +435,13 @@ public class CaseActionsForCaseWorkerController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        respondentRepresentativeService.getOrganisationPolicies(caseData).entrySet()
+            .forEach(entry -> respondentRepresentativeService.updateCaseWithOrganisationPolicyDetails(caseData, entry));
+
         List<String> errors = eventValidationService.validateRespRepNames(caseData);
+
+        eventValidationService.validateMaximumSize(caseData).ifPresent(errors::add);
 
         log.info(EVENT_FIELDS_VALIDATION + errors);
 

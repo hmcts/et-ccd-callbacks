@@ -16,15 +16,16 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  */
 @Slf4j
 @RequiredArgsConstructor
-@Service("et3NotificationService")
-public class Et3NotificationService {
+@Service("NotificationService")
+public class NotificationService {
     public static final String EMAIL_ADDRESS = "emailAddress";
     private final EmailService emailService;
-    @Value("${et3Notification.template.id}")
+    @Value("${notification.template.id}")
     private String templateId;
 
     /**
      * Sends notification emails to the claimant and respondent (or their reps if available).
+     * @param caseData object that holds case data.
      */
     public void sendNotifications(CaseData caseData) {
         Map<String, String> claimant = NotificationHelper.buildMapForClaimant(caseData);

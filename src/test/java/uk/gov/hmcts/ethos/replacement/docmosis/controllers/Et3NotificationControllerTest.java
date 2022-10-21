@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3NotificationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
@@ -48,7 +48,7 @@ class Et3NotificationControllerTest {
     @MockBean
     private ServingService servingService;
     @MockBean
-    private Et3NotificationService et3NotificationService;
+    private NotificationService notificationService;
     @Autowired
     private MockMvc mvc;
     @Autowired

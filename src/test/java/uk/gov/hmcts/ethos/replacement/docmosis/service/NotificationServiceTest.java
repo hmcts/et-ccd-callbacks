@@ -18,9 +18,9 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
-class Et3NotificationServiceTest {
+class NotificationServiceTest {
     @InjectMocks
-    private Et3NotificationService et3NotificationService;
+    private NotificationService notificationService;
     @Mock
     private EmailService emailService;
     private CaseData caseData;
@@ -49,7 +49,7 @@ class Et3NotificationServiceTest {
 
     @Test
     void sendNotifications_shouldSendThreeNotifications() {
-        et3NotificationService.sendNotifications(caseData);
+        notificationService.sendNotifications(caseData);
         verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), any());
         verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), any());
         verify(emailService, times(1)).sendEmail(any(), eq("res@rep.com"), any());
@@ -61,7 +61,7 @@ class Et3NotificationServiceTest {
         caseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(null);
         caseData.getRepCollection().get(0).getValue().setRepresentativeEmailAddress(null);
         caseData.getRespondentCollection().get(0).getValue().setRespondentEmail(null);
-        et3NotificationService.sendNotifications(caseData);
+        notificationService.sendNotifications(caseData);
         verify(emailService, times(0)).sendEmail(any(), any(), any());
     }
 }

@@ -4,12 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -18,46 +16,18 @@ import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @SuppressWarnings({"PMD.UseProperClassLoader"})
 @ExtendWith(SpringExtension.class)
 class ServingServiceTest {
     private static CaseDetails caseDetails;
-    private static CaseData notifyCaseData;
-
-    @MockBean
-    private static EmailService emailService;
 
     private static ServingService servingService;
 
     @BeforeEach
     void setUp() throws Exception {
         caseDetails = generateCaseDetails("midServingCaseDetailsTest.json");
-        servingService = new ServingService(emailService);
-        CaseDetails notifyCaseDetails = CaseDataBuilder.builder()
-            .withEthosCaseReference("12345/6789")
-            .withClaimantType("claimant@unrepresented.com")
-            .withRepresentativeClaimantType("Claimant Rep", "claimant@represented.com")
-            .withClaimantIndType("Claimant", "LastName", "Mr", "Mr")
-            .withRespondentWithAddress("Respondent Unrepresented",
-                "32 Sweet Street", "14 House", null,
-                "Manchester", "M11 4ED", "United Kingdom",
-                null, "respondent@unrepresented.com")
-            .withRespondentWithAddress("Respondent Represented",
-                "32 Sweet Street", "14 House", null,
-                "Manchester", "M11 4ED", "United Kingdom",
-                null)
-            .withRespondentRepresentative("Respondent Represented", "Rep LastName", "res@rep.com")
-            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
-
-        notifyCaseData = notifyCaseDetails.getCaseData();
-        notifyCaseData.setClaimant("Claimant LastName");
+        servingService = new ServingService();
     }
 
     private static CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
@@ -108,21 +78,4 @@ class ServingServiceTest {
         assertThat(servingService.generateEmailLinkToAcas(caseData, true), is(expectedEt3EmailLinkToAcas));
     }
 
-    @Test
-    void sendNotifications_shouldSendThreeNotifications() {
-        servingService.sendNotifications(notifyCaseData);
-        verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), any());
-        verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), any());
-        verify(emailService, times(1)).sendEmail(any(), eq("res@rep.com"), any());
-    }
-
-    @Test
-    void sendNotifications_shouldHandleMissingEmails() {
-        reset(emailService);
-        notifyCaseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(null);
-        notifyCaseData.getRepCollection().get(0).getValue().setRepresentativeEmailAddress(null);
-        notifyCaseData.getRespondentCollection().get(0).getValue().setRespondentEmail(null);
-        servingService.sendNotifications(notifyCaseData);
-        verify(emailService, times(0)).sendEmail(any(), any(), any());
-    }
 }

@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -35,6 +36,7 @@ public class ET1ServingController {
 
     private final VerifyTokenService verifyTokenService;
     private final ServingService servingService;
+    private final NotificationService notificationService;
 
     /**
      * This service Gets userToken as a parameter for security validation
@@ -105,8 +107,8 @@ public class ET1ServingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        
-        servingService.sendNotifications(caseData);
+
+        notificationService.sendNotifications(caseData);
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())

@@ -63,4 +63,11 @@
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
         <cve>CVE-2022-42003</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: minimatch:3.0.4
+   ]]></notes>
+        <packageUrl regex="true">^pkg:npm/minimatch@.*$</packageUrl>
+        <vulnerabilityName>1084765</vulnerabilityName>
+    </suppress>
 </suppressions>

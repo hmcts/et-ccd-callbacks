@@ -56,7 +56,6 @@
         <packageUrl regex="true">^pkg:maven/org\.apache\.poi/poi@.*$</packageUrl>
         <cve>CVE-2022-26336</cve>
     </suppress>
-
     <suppress>
         <notes><![CDATA[
    file name: poi-ooxml-lite-5.0.0.jar
@@ -70,5 +69,12 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.apache\.poi/poi\-ooxml@.*$</packageUrl>
         <cve>CVE-2022-26336</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: minimatch:3.0.4
+   ]]></notes>
+        <packageUrl regex="true">^pkg:npm/minimatch@.*$</packageUrl>
+        <vulnerabilityName>1084765</vulnerabilityName>
     </suppress>
 </suppressions>

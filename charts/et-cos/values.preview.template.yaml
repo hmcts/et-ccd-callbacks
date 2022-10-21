@@ -9,6 +9,7 @@ java:
     ET_COS_DB_CONN_OPTIONS: ""
     REFERRAL_TEMPLATE_ID: 6ad8c05b-5c0b-4d10-a5e3-f39fdea4647e
     REJECTED_TEMPLATE_ID: 3f932a27-3960-4135-9ef5-5f2b9ec35da0
+    ET1SERVING_TEMPLATE_ID: 2d839d00-88f0-4136-a65e-364da046c6f8
   keyVaults:
     et-cos:
       secrets:

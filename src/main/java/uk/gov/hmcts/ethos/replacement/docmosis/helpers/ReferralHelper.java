@@ -298,9 +298,9 @@ public final class ReferralHelper {
                 .referentEmail(defaultIfEmpty(caseData.getReferentEmail(), null))
                 .isUrgent(defaultIfEmpty(caseData.getIsUrgent(), null))
                 .referralSubject(defaultIfEmpty(caseData.getReferralSubject(), null))
-                .referralDetails(defaultIfEmpty(caseData.getReferralInstruction(), null)).build();
-
-        log.info(data.toString());
+                .referralDetails(defaultIfEmpty(caseData.getReferralDetails(), null))
+                .referralDocument(caseData.getReferralDocument())
+                .referralInstruction(defaultIfEmpty(caseData.getReferralInstruction(), null)).build();
 
         ReferralTypeDocument document = ReferralTypeDocument.builder()
             .accessKey(accessKey)

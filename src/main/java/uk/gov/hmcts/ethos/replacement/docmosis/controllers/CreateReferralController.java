@@ -159,7 +159,7 @@ public class CreateReferralController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         UserDetails userDetails = userService.getUserDetails(userToken);
 
-        /*emailService.sendEmail(
+        emailService.sendEmail(
             referralTemplateId,
             caseData.getReferentEmail(),
             ReferralHelper.buildPersonalisation(
@@ -168,7 +168,7 @@ public class CreateReferralController {
                 true,
                 userDetails.getName()
             )
-        );*/
+        );
 
         DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,
             userToken, caseData.getEcmCaseType());

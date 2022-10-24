@@ -7,6 +7,9 @@ import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 
+/**
+ * This object captures information related to the referral object during creation event for docmosis
+ */
 @SuperBuilder
 @Data
 public class ReferralTypeData {

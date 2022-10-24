@@ -1,17 +1,24 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 @Service
+@RequiredArgsConstructor
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.UnusedPrivateField",
     "PMD.LiteralsFirstInComparisons"})
 public class ServingService {
@@ -30,6 +37,12 @@ public class ServingService {
     private static final String ET1_SERVING = "ET1%20serving";
     private static final String ET3_RELEVANT_PARTIES = "relevant%20parties";
     private static final String ET1_RESPONDENT = "respondent";
+    public static final String EMAIL_ADDRESS = "emailAddress";
+
+    @Value("${et1Serving.template.id}")
+    private String templateId;
+
+    private final EmailService emailService;
 
     public String generateOtherTypeDocumentLink(List<DocumentTypeItem> docList) {
         String documentLinks = "";
@@ -88,6 +101,29 @@ public class ServingService {
                 claimantName.replaceAll("\\s+", "%20"),
                 respondentList, caseNumber, isET3 ? ET3_NOTIFICATION : ET1_SERVING,
                 isET3 ? ET3_RELEVANT_PARTIES : ET1_RESPONDENT);
+    }
+
+    /**
+     * Sends notifications to the relevant parties that their case has been updated.
+     * @param caseData object that holds the case data.
+     */
+    public void sendNotifications(CaseData caseData) {
+        Map<String, String> claimant = NotificationHelper.buildMapForClaimant(caseData);
+
+        caseData.getRespondentCollection()
+            .forEach(o -> {
+                Map<String, String> respondent = NotificationHelper.buildMapForRespondent(caseData, o.getValue());
+                if (isNullOrEmpty(respondent.get(EMAIL_ADDRESS))) {
+                    return;
+                }
+                emailService.sendEmail(templateId, respondent.get(EMAIL_ADDRESS), respondent);
+            });
+
+        if (isNullOrEmpty(claimant.get(EMAIL_ADDRESS))) {
+            return;
+        }
+
+        emailService.sendEmail(templateId, claimant.get(EMAIL_ADDRESS), claimant);
     }
 
 }

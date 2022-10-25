@@ -1,15 +1,16 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain.documents;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 
+import java.util.List;
+
 /**
- * This object captures information related to the referral object during creation event for docmosis
+ * This object captures information related to the referral object during creation event for docmosis.
  */
+@SuppressWarnings({"PMD.LinguisticNaming"})
 @SuperBuilder
 @Data
 public class ReferralTypeData {

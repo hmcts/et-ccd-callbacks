@@ -1,6 +1,16 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+
 import java.io.IOException;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -8,18 +18,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.webjars.NotFoundException;
-import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
-
 @ExtendWith(SpringExtension.class)
-public class CreateReferralServiceTest {
+class CreateReferralServiceTest {
     private CreateReferralService createReferralService;
 
     @MockBean
@@ -53,7 +53,7 @@ public class CreateReferralServiceTest {
         when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
             anyString(), anyString())).thenThrow(ioException);
         assertThrows(DocumentManagementException.class,
-        () -> createReferralService.generateCRDocument(new CaseData(), "",
+            () -> createReferralService.generateCRDocument(new CaseData(), "",
             ""));
     }
 }

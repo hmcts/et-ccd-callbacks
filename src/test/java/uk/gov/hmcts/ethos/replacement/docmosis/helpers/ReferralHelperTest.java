@@ -181,7 +181,7 @@ class ReferralHelperTest {
             + "ructions for judge, referredBy=Judge Judy, referralDate="
             + Helper.getCurrentDate()
             + ", referralStatus=Awaiting instructions, referralRep"
-            + "lyCollection=null)";
+            + "lyCollection=null, referralSummaryPdf=null)";
 
         String actual = caseData.getReferralCollection().get(0).getValue().toString();
         assertEquals(expected, actual);

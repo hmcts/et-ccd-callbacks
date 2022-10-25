@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,9 +16,9 @@ public class CreateReferralService {
 
     /**
      * Uses {@link TornadoService} to generate a pdf to display a summary of data for the created referral.
-     * @param caseData
-     * @param userToken
-     * @param caseTypeId
+     * @param caseData in which the referral type is extracted from
+     * @param userToken jwt used for authorization
+     * @param caseTypeId e.g. ET_EnglandWales
      * @return {@link DocumentInfo} object populated with pdf data
      */
     public DocumentInfo generateCRDocument(CaseData caseData, String userToken, String caseTypeId) {
@@ -31,6 +29,4 @@ public class CreateReferralService {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
     }
-
-
 }

@@ -41,7 +41,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.LinguisticNaming", "PMD.ConfusingTernary",
-    "PMD.SimpleDateFormatNeedsLocale", "PMD.GodClass"})
+    "PMD.SimpleDateFormatNeedsLocale", "PMD.GodClass", "PMD.ExcessiveImports"})
 public final class ReferralHelper {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String TRUE = "True";
@@ -287,8 +287,8 @@ public final class ReferralHelper {
     }
 
     /**
-     * Formats data needed for Referral PDF Document
-     * @param caseData
+     * Formats data needed for Referral PDF Document.
+     * @param caseData the case in which we extract the referral type
      * @return stringified json data for pdf document
      */
     public static String getDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {

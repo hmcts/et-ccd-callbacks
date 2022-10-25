@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -94,22 +95,22 @@ public class Et3NotificationController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> submitted(
+    public ResponseEntity<CCDCallbackResponse> et3NotificationSubmitted(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData data = ccdRequest.getCaseDetails().getCaseData();
 
-        notificationService.sendNotifications(caseData);
+        notificationService.sendNotifications(data);
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())
-            .confirmation_header(String.format(SUBMITTED_HEADER, NotificationHelper.getParties(caseData)))
+            .confirmation_header(String.format(SUBMITTED_HEADER, NotificationHelper.getParties(data)))
             .confirmation_body("<span></span>")
             .build());
     }

@@ -14,12 +14,24 @@ import java.util.List;
 @SuperBuilder
 @Data
 public class ReferralTypeData {
+
+    @JsonProperty("caseNumber")
+    private String caseNumber;
+
+    @JsonProperty("referralDate")
+    private String referralDate;
+
+    @JsonProperty("referredBy")
+    private String referredBy;
     @JsonProperty("referCaseTo")
     private String referCaseTo;
     @JsonProperty("referentEmail")
     private String referentEmail;
     @JsonProperty("isUrgent")
     private String isUrgent;
+
+    @JsonProperty("nextHearingDate")
+    private String nextHearingDate;
     @JsonProperty("referralSubject")
     private String referralSubject;
     @JsonProperty("referralDetails")

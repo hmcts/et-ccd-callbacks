@@ -298,7 +298,7 @@ public class TornadoService {
             case "Initial Consideration.pdf" :
                 return InitialConsiderationHelper.getDocumentRequest(
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
-            case "Referral Submission.pdf":
+            case "Referral Summary.pdf":
                 return ReferralHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             default:
                 throw new IllegalArgumentException("Unexpected document name " + documentName);

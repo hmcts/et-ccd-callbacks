@@ -159,7 +159,18 @@ public class CreateReferralController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         UserDetails userDetails = userService.getUserDetails(userToken);
 
-        caseData.setReferredBy(userDetails.getName());
+        emailService.sendEmail(
+            referralTemplateId,
+            caseData.getReferentEmail(),
+            ReferralHelper.buildPersonalisation(
+                ccdRequest.getCaseDetails(),
+                String.valueOf(ReferralHelper.getNextReferralNumber(caseData)),
+                true,
+                userDetails.getName()
+            )
+        );
+
+        caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
 
         DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,
             userToken, caseData.getEcmCaseType());

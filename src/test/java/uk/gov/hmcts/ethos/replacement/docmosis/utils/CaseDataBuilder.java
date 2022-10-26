@@ -416,10 +416,10 @@ public class CaseDataBuilder {
      * Add a respondent representative with names and an email.
      */
     public CaseDataBuilder withRespondentRepresentative(String respondentName, String repName, String email) {
-        RepresentedTypeR item = new RepresentedTypeR();
-        item.setRespRepName(respondentName);
-        item.setNameOfRepresentative(repName);
-        item.setRepresentativeEmailAddress(email);
+        RepresentedTypeR item = RepresentedTypeR.builder()
+            .respRepName(respondentName)
+            .nameOfRepresentative(repName)
+            .representativeEmailAddress(email).build();
         RepresentedTypeRItem itemType = new RepresentedTypeRItem();
         itemType.setValue(item);
         if (CollectionUtils.isEmpty(caseData.getRepCollection())) {

@@ -771,9 +771,9 @@ public class CaseManagementForCaseWorkerServiceTest {
     }
 
     private RepresentedTypeRItem createRepresentedTypeR(String respondentName, String representativeName) {
-        RepresentedTypeR representedTypeR = new RepresentedTypeR();
-        representedTypeR.setRespRepName(respondentName);
-        representedTypeR.setNameOfRepresentative(representativeName);
+        RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
+            .respRepName(respondentName)
+            .nameOfRepresentative(representativeName).build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId("111");
         representedTypeRItem.setValue(representedTypeR);

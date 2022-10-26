@@ -195,25 +195,19 @@ public final class ECCHelper {
     private static void populateRepCollectionDetails(CaseData caseData, CaseData originalCaseData) {
         RepresentedTypeC representativeClaimantType = originalCaseData.getRepresentativeClaimantType();
         if (representativeClaimantType != null && originalCaseData.getClaimantRepresentedQuestion().equals(YES)) {
-            RepresentedTypeR representedTypeR = new RepresentedTypeR();
-            representedTypeR.setRespRepName(caseData.getRespondentCollection().get(0).getValue().getRespondentName());
-            representedTypeR.setNameOfRepresentative(nullCheck(representativeClaimantType.getNameOfRepresentative()));
-            representedTypeR.setNameOfOrganisation(nullCheck(representativeClaimantType.getNameOfOrganisation()));
-            representedTypeR.setRepresentativeReference(
-                    nullCheck(representativeClaimantType.getRepresentativeReference()));
-            representedTypeR.setRepresentativeOccupation(
-                    nullCheck(representativeClaimantType.getRepresentativeOccupation()));
-            representedTypeR.setRepresentativeOccupationOther(
-                    nullCheck(representativeClaimantType.getRepresentativeOccupationOther()));
-            representedTypeR.setRepresentativeAddress(representativeClaimantType.getRepresentativeAddress());
-            representedTypeR.setRepresentativePhoneNumber(
-                    nullCheck(representativeClaimantType.getRepresentativePhoneNumber()));
-            representedTypeR.setRepresentativeMobileNumber(
-                    nullCheck(representativeClaimantType.getRepresentativeMobileNumber()));
-            representedTypeR.setRepresentativeEmailAddress(
-                    nullCheck(representativeClaimantType.getRepresentativeEmailAddress()));
-            representedTypeR.setRepresentativePreference(
-                    nullCheck(representativeClaimantType.getRepresentativePreference()));
+            RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
+                .respRepName(caseData.getRespondentCollection().get(0).getValue().getRespondentName())
+                .nameOfRepresentative(nullCheck(representativeClaimantType.getNameOfRepresentative()))
+                .nameOfOrganisation(nullCheck(representativeClaimantType.getNameOfOrganisation()))
+                .representativeReference(nullCheck(representativeClaimantType.getRepresentativeReference()))
+                .representativeOccupation(nullCheck(representativeClaimantType.getRepresentativeOccupation()))
+                .representativeOccupationOther(nullCheck(representativeClaimantType.getRepresentativeOccupationOther()))
+                .representativeAddress(representativeClaimantType.getRepresentativeAddress())
+                .representativePhoneNumber(nullCheck(representativeClaimantType.getRepresentativePhoneNumber()))
+                .representativeMobileNumber(nullCheck(representativeClaimantType.getRepresentativeMobileNumber()))
+                .representativeEmailAddress(nullCheck(representativeClaimantType.getRepresentativeEmailAddress()))
+                .representativePreference(nullCheck(representativeClaimantType.getRepresentativePreference()))
+                .build();
             RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
             representedTypeRItem.setValue(representedTypeR);
             caseData.setRepCollection(new ArrayList<>(Collections.singleton(representedTypeRItem)));

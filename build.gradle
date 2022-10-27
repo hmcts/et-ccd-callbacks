@@ -317,6 +317,8 @@ dependencies {
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.33'
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.17.3-RELEASE'
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.7'
+    // 1084765
+    implementation group: 'org.webjars.npm', name: 'minimatch', version: '3.0.5'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

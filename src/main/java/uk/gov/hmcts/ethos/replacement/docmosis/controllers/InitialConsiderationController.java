@@ -123,7 +123,8 @@ public class InitialConsiderationController {
         caseData.setEtInitialConsiderationHearing(
             initialConsiderationService.getHearingDetails(caseData.getHearingCollection()));
         caseData.setEtInitialConsiderationJurisdictionCodes(
-            initialConsiderationService.generateJurisdictionCodesHtml(caseData.getJurCodesCollection()));
+            initialConsiderationService.generateJurisdictionCodesHtml(caseData.getJurCodesCollection(),
+                ccdRequest.getCaseDetails().getCaseTypeId()));
 
         return getCallbackRespEntityNoErrors(caseData);
     }

@@ -173,7 +173,7 @@ public class CreateReferralController {
         caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
 
         DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,
-            userToken, caseData.getEcmCaseType());
+            userToken, ccdRequest.getCaseDetails().getCaseTypeId());
 
         ReferralHelper.createReferral(
             caseData,

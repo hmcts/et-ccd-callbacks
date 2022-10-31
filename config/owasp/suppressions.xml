@@ -78,4 +78,18 @@
         <packageUrl regex="true">^pkg:npm/minimatch@.*$</packageUrl>
         <vulnerabilityName>1084765</vulnerabilityName>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: batik-all-1.15.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.xmlgraphics/batik\-all@.*$</packageUrl>
+        <cve>CVE-2022-41704</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: batik-all-1.15.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.xmlgraphics/batik\-all@.*$</packageUrl>
+        <cve>CVE-2022-42890</cve>
+    </suppress>
 </suppressions>

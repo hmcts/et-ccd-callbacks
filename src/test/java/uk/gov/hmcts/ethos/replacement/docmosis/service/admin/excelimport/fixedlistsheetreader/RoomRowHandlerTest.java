@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SuppressWarnings({"PMD.TooManyMethods"})
 class RoomRowHandlerTest {
 
     private XSSFWorkbook workbook;
@@ -171,20 +170,20 @@ class RoomRowHandlerTest {
         return row;
     }
 
-    private Row createRow(String listId) {
-        var sheet = workbook.getSheet("Test");
-        var row = sheet.createRow(sheet.getLastRowNum() + 1);
-        row.createCell(0, CellType.STRING);
-        row.getCell(0).setCellValue(listId);
-
-        return row;
-    }
-
     private Row createInvalidRow() {
         var sheet = workbook.getSheet("Test");
         var row = sheet.createRow(sheet.getLastRowNum() + 1);
         row.createCell(0, CellType.BOOLEAN);
         row.getCell(0).setCellValue(true);
+
+        return row;
+    }
+
+    private Row createRow(String listId) {
+        var sheet = workbook.getSheet("Test");
+        var row = sheet.createRow(sheet.getLastRowNum() + 1);
+        row.createCell(0, CellType.STRING);
+        row.getCell(0).setCellValue(listId);
 
         return row;
     }

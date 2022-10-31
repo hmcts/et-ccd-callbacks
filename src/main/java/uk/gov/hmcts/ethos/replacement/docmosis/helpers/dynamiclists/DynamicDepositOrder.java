@@ -13,7 +13,7 @@ import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public final class DynamicDepositOrder {
+public class DynamicDepositOrder {
     private DynamicDepositOrder() {
     }
 

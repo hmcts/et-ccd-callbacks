@@ -25,7 +25,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BATCH_UPDATE_TYPE_3
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
 
-@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleUpdateServiceTest {
 
@@ -83,7 +82,6 @@ public class MultipleUpdateServiceTest {
                 multipleObjectsFlags);
         verifyNoMoreInteractions(multipleBatchUpdate2Service);
     }
-
     @Test
     public void bulkUpdate3Logic() {
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))

@@ -15,11 +15,11 @@ import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public final class DynamicJudgements {
-    public static final String NO_HEARINGS = "No Hearings";
-
+public class DynamicJudgements {
     private DynamicJudgements() {
     }
+
+    public static final String NO_HEARINGS = "No Hearings";
 
     public static void dynamicJudgements(CaseData caseData) {
         var listHearings = DynamicListHelper.createDynamicHearingList(caseData);

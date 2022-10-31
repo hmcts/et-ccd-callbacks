@@ -92,8 +92,8 @@
       "caseType": "PUBLIC"
     },
     "after_submit_callback_response": {
-      "confirmationHeader": "Please download the document from : <a target=\"_blank\" href=\"http://127.0.0.1:3453/documents/20d8a494-4232-480a-aac3-23ad0746c07b/binary\">Document</a>",
-      "confirmationBody": null
+      "confirmation_header": "Please download the document from : <a target=\"_blank\" href=\"http://127.0.0.1:3453/documents/20d8a494-4232-480a-aac3-23ad0746c07b/binary\">Document</a>",
+      "confirmation_body": null
     },
     "callback_response_status_code": 200,
     "callback_response_status": "CALLBACK_COMPLETED",

@@ -28,7 +28,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping("/admin/staff")
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.LawOfDemeter"})
 public class JudgeController {
 
     private final VerifyTokenService verifyTokenService;
@@ -45,23 +44,18 @@ public class JudgeController {
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
+        log.info("/initAddJudge");
+
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
-        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
+        var adminData = ccdRequest.getCaseDetails().getAdminData();
         judgeService.initAddJudge(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityNoErrors(adminData);
     }
 
-    /**
-     * Called when user selects "Add Judge" event and specifies tribunal office and judge details.
-     * Adds a new judge with the specified judge details into the ethos database.
-     * @param userToken token used for authorization
-     * @param ccdRequest holds the request and case data
-     * @return Callback response entity with case data and errors attached, if any.
-     */
     @PostMapping(value = "/addJudge", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add Judge")
     @ApiResponses(value = {
@@ -72,6 +66,8 @@ public class JudgeController {
     public ResponseEntity<CCDCallbackResponse> addJudge(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
+
+        log.info("/addJudge");
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
@@ -87,13 +83,6 @@ public class JudgeController {
         return CCDCallbackResponse.getCallbackRespEntityNoErrors(adminData);
     }
 
-    /**
-     * Called when the user select tribunal office and goes to the next step.
-     * Sets the list of judge names for the selected tribunal office.
-     * @param userToken token used for authorization
-     * @param ccdRequest holds the request and case data
-     * @return Callback response entity with case data and errors attached, if any.
-     */
     @PostMapping(value = "/updateJudgeMidEventSelectOffice", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates the dynamicList for judge when office and type selected")
     @ApiResponses(value = {
@@ -105,6 +94,8 @@ public class JudgeController {
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
+        log.info("/updateJudgeMidEventSelectOffice");
+
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
@@ -115,13 +106,6 @@ public class JudgeController {
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }
 
-    /**
-     * Called when the user selects judge name and goes to the next step.
-     * Populates the details of judge for the name selected.
-     * @param userToken token used for authorization
-     * @param ccdRequest holds the request and case data
-     * @return Callback response entity with case data and errors attached, if any.
-     */
     @PostMapping(value = "/updateJudgeMidEventSelectJudge", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates the judge code and name when dynamicList selected")
     @ApiResponses(value = {
@@ -145,13 +129,6 @@ public class JudgeController {
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }
 
-    /**
-     * Called when user selects "Update Judge" event and specifies tribunal office and judge details.
-     * Updates the specified judge details in the ethos database.
-     * @param userToken token used for authorization
-     * @param ccdRequest holds the request and case data
-     * @return Callback response entity with case data and errors attached, if any.
-     */
     @PostMapping(value = "/updateJudge", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update a judge")
     @ApiResponses(value = {
@@ -163,6 +140,8 @@ public class JudgeController {
             @RequestHeader("Authorization") String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
+        log.info("/updateJudge");
+
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
@@ -173,87 +152,4 @@ public class JudgeController {
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }
 
-    /**
-     * Called when the user select tribunal office and goes to the next step.
-     * Sets the list of judge names for the selected tribunal office.
-     * @param userToken token used for authorization
-     * @param ccdRequest holds the request and case data
-     * @return Callback response entity with case data and errors attached, if any.
-     */
-    @PostMapping(value = "/deleteJudgeMidEventSelectOffice", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Populates the dynamicList for judges when an office is selected")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> deleteJudgeMidEventSelectOffice(
-        @RequestHeader("Authorization") String userToken,
-        @RequestBody CCDRequest ccdRequest) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
-
-        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
-        List<String> errors = judgeService.deleteJudgeMidEventSelectOffice(adminData);
-
-        return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
-    }
-
-    /**
-     * Called when the user selects judge name and goes to the next step.
-     * Populates the details of judge for the name selected.
-     * @param userToken token used for authorization
-     * @param ccdRequest holds the request and case data
-     * @return Callback response entity with case data and errors attached, if any.
-     */
-    @PostMapping(value = "/deleteJudgeMidEventSelectJudge", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Populates the judge details when an item is selected from the judges dynamicList")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> deleteJudgeMidEventSelectJudge(
-        @RequestHeader("Authorization") String userToken,
-        @RequestBody CCDRequest ccdRequest) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
-
-        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
-        List<String> errors = judgeService.deleteJudgeMidEventSelectJudge(adminData);
-
-        return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
-    }
-
-    /**
-     * Called when user selects "Delete Judge" event and specifies tribunal office and judge name.
-     * Deletes the specified judge from database.
-     * @param userToken token used for authorization
-     * @param ccdRequest holds the request and case data
-     * @return Callback response entity with case data and errors attached, if any.
-     */
-    @PostMapping(value = "/deleteJudge", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Deletes a judge")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> deleteJudge(
-        @RequestHeader("Authorization") String userToken,
-        @RequestBody CCDRequest ccdRequest) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
-
-        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
-        List<String> errors = judgeService.deleteJudge(adminData);
-
-        return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
-    }
 }

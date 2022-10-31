@@ -15,7 +15,6 @@ public class UserService implements uk.gov.hmcts.ecm.common.service.UserService 
         this.idamApi = idamApi;
     }
 
-    @Override
     public UserDetails getUserDetails(String authorisation) {
         return idamApi.retrieveUserDetails(authorisation);
     }

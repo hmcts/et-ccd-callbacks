@@ -16,8 +16,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 
 @Slf4j
 @Service
-@SuppressWarnings({"PMD.ConfusingTernary", "PMD.PrematureDeclaration", "PMD.GodClass", "PMD.CognitiveComplexity",
-    "PMD.TooManyMethods"})
 public class VenueAddressReaderService {
     private final VenueAddressesService venueAddressesService;
 

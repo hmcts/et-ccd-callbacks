@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIST_CASES_CONFIG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleScheduleService.SCHEDULE_LIMIT_CASES;
 
-@SuppressWarnings({"PMD.LooseCoupling"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleScheduleServiceTest {
 
@@ -99,8 +98,7 @@ public class MultipleScheduleServiceTest {
     public void bulkScheduleLogicFlagsMultipleRespondents() {
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(new RespondentSumType());
-        schedulePayloadEvents.iterator().next()
-                .getSchedulePayloadES().getRespondentCollection().add(respondentSumTypeItem);
+        schedulePayloadEvents.iterator().next().getSchedulePayloadES().getRespondentCollection().add(respondentSumTypeItem);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsFlags);
         when(singleCasesReadingService.retrieveScheduleCases(userToken,
@@ -165,9 +163,9 @@ public class MultipleScheduleServiceTest {
 
     private TreeMap<String, Object> createBigTreeMap() {
 
-        TreeMap<String, Object> treeMap = new TreeMap<>();
+        TreeMap<String, Object> treeMap= new TreeMap<>();
 
-        for (int i = 0; i < SCHEDULE_LIMIT_CASES + 1; i++) {
+        for (int i = 0; i < SCHEDULE_LIMIT_CASES+1 ; i++) {
             treeMap.put(String.valueOf(i), "Dummy");
         }
 

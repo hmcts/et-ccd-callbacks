@@ -39,7 +39,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_
 
 @Service
 @Slf4j
-@SuppressWarnings({"PMD.ConfusingTernary", "PMD.ExcessiveImports"})
 public class CasesCompletedReport {
     static final String ZERO = "0";
     static final String ZERO_DECIMAL = "0.00";
@@ -120,10 +119,10 @@ public class CasesCompletedReport {
     }
 
     private boolean isValidCaseForCasesCompletedReport(SubmitEvent submitEvent) {
-        return CLOSED_STATE.equals(submitEvent.getState())
+        return (CLOSED_STATE.equals(submitEvent.getState())
                 && isCaseWithHearings(submitEvent.getCaseData())
                 && isValidPositionType(submitEvent.getCaseData())
-                && isValidJurisdictionOutcome(submitEvent.getCaseData());
+                && isValidJurisdictionOutcome(submitEvent.getCaseData()));
     }
 
     private boolean isValidPositionType(CaseData caseData) {

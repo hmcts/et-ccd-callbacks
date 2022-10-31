@@ -19,16 +19,15 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.TooManyMethods"})
 public class VenueSelectionServiceTest {
 
     @Test
     public void testInitHearingCollectionNoHearings() {
-        TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
-        VenueService venueService = mockVenueService(tribunalOffice);
-        CaseData caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
+        var tribunalOffice = TribunalOffice.ABERDEEN;
+        var venueService = mockVenueService(tribunalOffice);
+        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
 
-        VenueSelectionService venueSelectionService = new VenueSelectionService(venueService);
+        var venueSelectionService = new VenueSelectionService(venueService);
         venueSelectionService.initHearingCollection(caseData);
 
         assertEquals(1, caseData.getHearingCollection().size());
@@ -38,9 +37,9 @@ public class VenueSelectionServiceTest {
 
     @Test
     public void testInitHearingCollectionWithHearings() {
-        TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
-        VenueService venueService = mockVenueService(tribunalOffice);
-        CaseData caseData = createCaseDataWithHearings(tribunalOffice, null);
+        var tribunalOffice = TribunalOffice.ABERDEEN;
+        var venueService = mockVenueService(tribunalOffice);
+        var caseData = createCaseDataWithHearings(tribunalOffice, null);
 
         var venueSelectionService = new VenueSelectionService(venueService);
         venueSelectionService.initHearingCollection(caseData);
@@ -52,10 +51,10 @@ public class VenueSelectionServiceTest {
 
     @Test
     public void testInitHearingCollectionWithHearingsAndSelectedVenue() {
-        TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
-        VenueService venueService = mockVenueService(tribunalOffice);
-        DynamicValueType selectedVenue = DynamicValueType.create("venue2", "Venue 2");
-        CaseData caseData = createCaseDataWithHearings(tribunalOffice, selectedVenue);
+        var tribunalOffice = TribunalOffice.ABERDEEN;
+        var venueService = mockVenueService(tribunalOffice);
+        var selectedVenue = DynamicValueType.create("venue2", "Venue 2");
+        var caseData = createCaseDataWithHearings(tribunalOffice, selectedVenue);
 
         var venueSelectionService = new VenueSelectionService(venueService);
         venueSelectionService.initHearingCollection(caseData);
@@ -67,25 +66,25 @@ public class VenueSelectionServiceTest {
 
     @Test
     public void testCreateVenueSelectionNoSelectedVenue() {
-        TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
-        VenueService venueService = mockVenueService(tribunalOffice);
-        DateListedType selectedListing = createSelectedListing(null);
+        var tribunalOffice = TribunalOffice.ABERDEEN;
+        var venueService = mockVenueService(tribunalOffice);
+        var selectedListing = createSelectedListing(null);
 
-        VenueSelectionService venueSelectionService = new VenueSelectionService(venueService);
-        DynamicFixedListType actualResult = venueSelectionService.createVenueSelection(tribunalOffice, selectedListing);
+        var venueSelectionService = new VenueSelectionService(venueService);
+        var actualResult = venueSelectionService.createVenueSelection(tribunalOffice, selectedListing);
 
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(actualResult, "venue", "Venue ");
     }
 
     @Test
     public void testCreateVenueSelectionWithSelectedVenue() {
-        TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
-        VenueService venueService = mockVenueService(tribunalOffice);
-        DynamicValueType selectedVenue = DynamicValueType.create("venue2", "Venue 2");
-        DateListedType selectedListing = createSelectedListing(selectedVenue);
+        var tribunalOffice = TribunalOffice.ABERDEEN;
+        var venueService = mockVenueService(tribunalOffice);
+        var selectedVenue = DynamicValueType.create("venue2", "Venue 2");
+        var selectedListing = createSelectedListing(selectedVenue);
 
-        VenueSelectionService venueSelectionService = new VenueSelectionService(venueService);
-        DynamicFixedListType actualResult = venueSelectionService.createVenueSelection(tribunalOffice, selectedListing);
+        var venueSelectionService = new VenueSelectionService(venueService);
+        var actualResult = venueSelectionService.createVenueSelection(tribunalOffice, selectedListing);
 
         SelectionServiceTestUtils.verifyDynamicFixedListSelected(actualResult, "venue", "Venue ", selectedVenue);
     }

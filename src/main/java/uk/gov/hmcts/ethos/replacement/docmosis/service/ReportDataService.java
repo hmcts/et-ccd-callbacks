@@ -52,8 +52,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDE
 @RequiredArgsConstructor
 @Slf4j
 @Service
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.LinguisticNaming",
-    "PMD.LiteralsFirstInComparisons", "PMD.LawOfDemeter", "PMD.ExcessiveImports", "PMD.CyclomaticComplexity"})
 public class ReportDataService {
     private final CcdClient ccdClient;
     private final ListingService listingService;

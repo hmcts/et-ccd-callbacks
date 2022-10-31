@@ -20,7 +20,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
-import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.IOException;
@@ -46,7 +45,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 public class DocumentGenerationServiceTest {
 
     @InjectMocks
@@ -86,13 +84,13 @@ public class DocumentGenerationServiceTest {
         caseDetails.setCaseData(caseData);
         ccdRequest.setCaseDetails(caseDetails);
         bulkRequest = new BulkRequest();
+        BulkDetails bulkDetails = new BulkDetails();
         BulkData bulkData = new BulkData();
         SearchType searchType = new SearchType();
         searchType.setCaseIDS("1");
         SearchTypeItem searchTypeItem = new SearchTypeItem();
         searchTypeItem.setValue(searchType);
         bulkData.setSearchCollection(new ArrayList<>(Collections.singletonList(searchTypeItem)));
-        BulkDetails bulkDetails = new BulkDetails();
         bulkDetails.setCaseData(bulkData);
         bulkDetails.setCaseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID);
         bulkRequest.setCaseDetails(bulkDetails);
@@ -132,8 +130,7 @@ public class DocumentGenerationServiceTest {
         CaseData caseData = caseDetails12.getCaseData();
         documentGenerationService.midAddressLabels(caseData);
         assertEquals("Individual", caseData.getClaimantTypeOfClaimant());
-        assertEquals("CLAIMANT : Mr A J Rodriguez",
-                caseData.getAddressLabelCollection().get(0).getValue().getFullName());
+        assertEquals("CLAIMANT : Mr A J Rodriguez", caseData.getAddressLabelCollection().get(0).getValue().getFullName());
         assertEquals(6, caseData.getAddressLabelCollection().size());
     }
 
@@ -142,8 +139,7 @@ public class DocumentGenerationServiceTest {
         CaseData caseData = caseDetails13.getCaseData();
         documentGenerationService.midAddressLabels(caseData);
         assertEquals("Company", caseData.getClaimantTypeOfClaimant());
-        assertEquals("CLAIMANT : Orlando LTD",
-                caseData.getAddressLabelCollection().get(0).getValue().getFullName());
+        assertEquals("CLAIMANT : Orlando LTD", caseData.getAddressLabelCollection().get(0).getValue().getFullName());
         assertEquals(1, caseData.getAddressLabelCollection().size());
     }
 
@@ -154,40 +150,32 @@ public class DocumentGenerationServiceTest {
         documentGenerationService.updateBfActions(documentInfo, caseDetails13.getCaseData());
         assertEquals(1, caseDetails13.getCaseData().getBfActions().size());
         assertEquals(YES, caseDetails13.getCaseData().getBfActions().get(0).getValue().getLetters());
-        assertEquals(LocalDate.now().toString(),
-                caseDetails13.getCaseData().getBfActions().get(0).getValue().getDateEntered());
-        assertEquals(LocalDate.now().plusDays(29).toString(),
-                caseDetails13.getCaseData().getBfActions().get(0).getValue().getBfDate());
-        assertEquals("Claim served",
-                caseDetails13.getCaseData().getBfActions().get(0).getValue().getAllActions());
-        assertEquals("Other action",
-                caseDetails13.getCaseData().getBfActions().get(0).getValue().getCwActions());
+        assertEquals(LocalDate.now().toString(), caseDetails13.getCaseData().getBfActions().get(0).getValue().getDateEntered());
+        assertEquals(LocalDate.now().plusDays(29).toString(), caseDetails13.getCaseData().getBfActions().get(0).getValue().getBfDate());
+        assertEquals("Claim served", caseDetails13.getCaseData().getBfActions().get(0).getValue().getAllActions());
+        assertEquals("Other action", caseDetails13.getCaseData().getBfActions().get(0).getValue().getCwActions());
 
     }
 
     @Test
     public void setBfActionsScotland() {
         documentInfo.setDescription("TemplateName_72");
-        CorrespondenceScotType correspondenceScotType = new CorrespondenceScotType();
-        correspondenceScotType.setClaimantOrRespondent(CLAIMANT);
-        correspondenceScotType.setHearingNumber("1");
+        var c = new CorrespondenceScotType();
+        c.setClaimantOrRespondent(CLAIMANT);
+        c.setHearingNumber("1");
+        var backUp = caseDetails13.getCaseData().getCorrespondenceType();
         caseDetails13.getCaseData().setCorrespondenceType(null);
-        caseDetails13.getCaseData().setCorrespondenceScotType(correspondenceScotType);
+        caseDetails13.getCaseData().setCorrespondenceScotType(c);
         caseDetails13.getCaseData().setCorrespondenceScotType(new CorrespondenceScotType());
         assertNull(caseDetails13.getCaseData().getBfActions());
         documentGenerationService.updateBfActions(documentInfo, caseDetails13.getCaseData());
         assertEquals(1, caseDetails13.getCaseData().getBfActions().size());
         assertEquals(YES, caseDetails13.getCaseData().getBfActions().get(0).getValue().getLetters());
-        assertEquals(LocalDate.now().toString(),
-                caseDetails13.getCaseData().getBfActions().get(0).getValue().getDateEntered());
-        assertEquals(LocalDate.now().plusDays(29).toString(),
-                caseDetails13.getCaseData().getBfActions().get(0).getValue().getBfDate());
-        assertEquals("Other action",
-                caseDetails13.getCaseData().getBfActions().get(0).getValue().getCwActions());
-        assertEquals("Claim served",
-                caseDetails13.getCaseData().getBfActions().get(0).getValue().getAllActions());
+        assertEquals(LocalDate.now().toString(), caseDetails13.getCaseData().getBfActions().get(0).getValue().getDateEntered());
+        assertEquals(LocalDate.now().plusDays(29).toString(), caseDetails13.getCaseData().getBfActions().get(0).getValue().getBfDate());
+        assertEquals("Other action", caseDetails13.getCaseData().getBfActions().get(0).getValue().getCwActions());
+        assertEquals("Claim served", caseDetails13.getCaseData().getBfActions().get(0).getValue().getAllActions());
         caseDetails13.getCaseData().setCorrespondenceScotType(null);
-        CorrespondenceType backUp = caseDetails13.getCaseData().getCorrespondenceType();
         caseDetails13.getCaseData().setCorrespondenceType(backUp);
     }
 
@@ -196,8 +184,7 @@ public class DocumentGenerationServiceTest {
         CaseData caseData = caseDetails14.getCaseData();
         documentGenerationService.midAddressLabels(caseData);
         assertEquals("Individual", caseData.getClaimantTypeOfClaimant());
-        assertEquals("CLAIMANT : Mr A J Rodriguez",
-                caseData.getAddressLabelCollection().get(0).getValue().getFullName());
+        assertEquals("CLAIMANT : Mr A J Rodriguez", caseData.getAddressLabelCollection().get(0).getValue().getFullName());
         assertEquals(6, caseData.getAddressLabelCollection().size());
     }
 
@@ -206,8 +193,7 @@ public class DocumentGenerationServiceTest {
         CaseData caseData = caseDetails15.getCaseData();
         documentGenerationService.midAddressLabels(caseData);
         assertEquals("Individual", caseData.getClaimantTypeOfClaimant());
-        assertEquals("CLAIMANT : Mr A J Rodriguez",
-                caseData.getAddressLabelCollection().get(0).getValue().getFullName());
+        assertEquals("CLAIMANT : Mr A J Rodriguez", caseData.getAddressLabelCollection().get(0).getValue().getFullName());
         assertEquals(6, caseData.getAddressLabelCollection().size());
     }
 
@@ -372,18 +358,14 @@ public class DocumentGenerationServiceTest {
 
     @Test
     public void processDocumentRequest() throws IOException {
-        when(tornadoService.documentGeneration(
-                anyString(), any(), anyString(), any(), any(), any())).thenReturn(documentInfo);
-        DocumentInfo documentInfo1 = documentGenerationService.processDocumentRequest(
-                ccdRequest, "authToken");
+        when(tornadoService.documentGeneration(anyString(), any(), anyString(), any(), any(), any())).thenReturn(documentInfo);
+        DocumentInfo documentInfo1 = documentGenerationService.processDocumentRequest(ccdRequest, "authToken");
         assertEquals(documentInfo, documentInfo1);
     }
 
     @Test(expected = Exception.class)
     public void processDocumentRequestException() throws IOException {
-        when(tornadoService.documentGeneration(
-                anyString(), any(), anyString(), any(), any(), any()))
-                .thenThrow(new InternalException(ERROR_MESSAGE));
+        when(tornadoService.documentGeneration(anyString(), any(), anyString(), any(), any(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
         documentGenerationService.processDocumentRequest(ccdRequest, "authToken");
     }
 
@@ -393,11 +375,9 @@ public class DocumentGenerationServiceTest {
         submitEvent.setCaseId(1);
         submitEvent.setCaseData(new CaseData());
         List<SubmitEvent> submitEvents = Collections.singletonList(submitEvent);
-        when(tornadoService.documentGeneration(
-                anyString(), any(), anyString(), any(), any(), any())).thenReturn(documentInfo);
+        when(tornadoService.documentGeneration(anyString(), any(), anyString(), any(), any(), any())).thenReturn(documentInfo);
         when(ccdClient.retrieveCasesElasticSearch(anyString(), any(), any())).thenReturn(submitEvents);
-        BulkDocumentInfo bulkDocumentInfo1 = documentGenerationService.processBulkDocumentRequest(
-                bulkRequest, "authToken");
+        BulkDocumentInfo bulkDocumentInfo1 = documentGenerationService.processBulkDocumentRequest(bulkRequest, "authToken");
         assertEquals(bulkDocumentInfo.toString(), bulkDocumentInfo1.toString());
     }
 
@@ -408,14 +388,12 @@ public class DocumentGenerationServiceTest {
         submitEvent.setCaseData(new CaseData());
         bulkRequest.getCaseDetails().getCaseData().setSearchCollection(null);
         List<SubmitEvent> submitEvents = Collections.singletonList(submitEvent);
-        when(tornadoService.documentGeneration(
-                anyString(), any(), anyString(), any(), any(), any())).thenReturn(documentInfo);
+        when(tornadoService.documentGeneration(anyString(), any(), anyString(), any(), any(), any())).thenReturn(documentInfo);
         when(ccdClient.retrieveCasesElasticSearch(anyString(), any(), any())).thenReturn(submitEvents);
 
-        BulkDocumentInfo bulkDocumentInfo1 = documentGenerationService.processBulkDocumentRequest(
-                bulkRequest, "authToken");
-        assertEquals("BulkDocumentInfo(markUps=, errors=[There are not cases searched to "
-                + "generate letters], documentInfo=null)", bulkDocumentInfo1.toString());
+        BulkDocumentInfo bulkDocumentInfo1 = documentGenerationService.processBulkDocumentRequest(bulkRequest, "authToken");
+        assertEquals("BulkDocumentInfo(markUps=, errors=[There are not cases searched to " +
+                "generate letters], documentInfo=null)", bulkDocumentInfo1.toString());
     }
 
     @Test(expected = Exception.class)
@@ -424,9 +402,7 @@ public class DocumentGenerationServiceTest {
         submitEvent.setCaseId(1);
         submitEvent.setCaseData(new CaseData());
         List<SubmitEvent> submitEvents = Collections.singletonList(submitEvent);
-        when(tornadoService.documentGeneration(
-                anyString(), any(), anyString(), any(), any(), any()))
-                .thenThrow(new InternalException(ERROR_MESSAGE));
+        when(tornadoService.documentGeneration(anyString(), any(), anyString(), any(), any(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
         when(ccdClient.retrieveCasesElasticSearch(anyString(), any(), any())).thenReturn(submitEvents);
 
         documentGenerationService.processBulkDocumentRequest(bulkRequest, "authToken");
@@ -435,35 +411,28 @@ public class DocumentGenerationServiceTest {
     @Test
     public void processBulkScheduleRequest() throws IOException {
         when(tornadoService.scheduleGeneration(anyString(), any(), anyString())).thenReturn(documentInfo);
-        BulkDocumentInfo bulkDocumentInfo1 = documentGenerationService.processBulkScheduleRequest(
-                bulkRequest, "authToken");
-        assertEquals("BulkDocumentInfo(markUps=Markup, errors=[], documentInfo=DocumentInfo(type=Document, "
-                + "description=resources/exampleV1.json, url=http://google.com, markUp=Markup))",
-                bulkDocumentInfo1.toString());
+        BulkDocumentInfo bulkDocumentInfo1 = documentGenerationService.processBulkScheduleRequest(bulkRequest, "authToken");
+        assertEquals("BulkDocumentInfo(markUps=Markup, errors=[], documentInfo=DocumentInfo(type=Document, " +
+                "description=resources/exampleV1.json, url=http://google.com, markUp=Markup))", bulkDocumentInfo1.toString());
     }
 
     @Test
     public void processBulkScheduleRequestWithErrors() throws IOException {
         bulkRequest.getCaseDetails().getCaseData().setSearchCollection(null);
         when(tornadoService.scheduleGeneration(anyString(), any(), anyString())).thenReturn(documentInfo);
-        BulkDocumentInfo bulkDocumentInfo1 = documentGenerationService.processBulkScheduleRequest(
-                bulkRequest, "authToken");
-        assertEquals("BulkDocumentInfo(markUps= , errors=[There are not cases searched "
-                + "to generate schedules], "
-                + "documentInfo=DocumentInfo(type=null, description=null, url=null, markUp=null))",
-                bulkDocumentInfo1.toString());
+        BulkDocumentInfo bulkDocumentInfo1 = documentGenerationService.processBulkScheduleRequest(bulkRequest, "authToken");
+        assertEquals("BulkDocumentInfo(markUps= , errors=[There are not cases searched to generate schedules], " +
+                "documentInfo=DocumentInfo(type=null, description=null, url=null, markUp=null))", bulkDocumentInfo1.toString());
     }
 
     @Test(expected = Exception.class)
     public void processBulkScheduleRequestException() throws IOException {
-        when(tornadoService.scheduleGeneration(anyString(), any(), anyString()))
-                .thenThrow(new InternalException(ERROR_MESSAGE));
+        when(tornadoService.scheduleGeneration(anyString(), any(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
         documentGenerationService.processBulkScheduleRequest(bulkRequest, "authToken");
     }
 
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
-        String json = new String(Files.readAllBytes(Paths.get(Objects
-                .requireNonNull(getClass().getClassLoader()
+        String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);

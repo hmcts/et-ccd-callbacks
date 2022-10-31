@@ -36,10 +36,16 @@ public class CaseCreationForCaseWorkerServiceTest {
     private CCDRequest ccdRequest;
     private SubmitEvent submitEvent;
     private String authToken;
+    @Mock
+    private SingleReferenceService singleReferenceService;
+    @Mock
+    private MultipleReferenceService multipleReferenceService;
+
 
     @Before
     public void setUp() {
         ccdRequest = new CCDRequest();
+        CaseDetails caseDetails = new CaseDetails();
         CaseData caseData = MultipleUtil.getCaseData("2123456/2020");
         caseData.setCaseRefNumberCount("2");
         caseData.setPositionTypeCT("PositionTypeCT");
@@ -48,7 +54,6 @@ public class CaseCreationForCaseWorkerServiceTest {
         valueType.setCode(ENGLANDWALES_CASE_TYPE_ID);
         officeCT.setValue(valueType);
         caseData.setOfficeCT(officeCT);
-        CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseTypeId("Manchester");
         caseDetails.setJurisdiction("Employment");

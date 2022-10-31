@@ -22,7 +22,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.listing.ListingRequest;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
-
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -32,7 +31,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -65,8 +63,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TARGET_HEARING_DATE_INCREMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator.CLOSING_CASE_WITH_BF_OPEN_ERROR;
 
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming", "PMD.TooManyMethods", "PMD.TooManyFields",
-    "PMD.ExcessiveImports"})
 @ExtendWith(SpringExtension.class)
 class EventValidationServiceTest {
 
@@ -173,10 +169,10 @@ class EventValidationServiceTest {
 
     @ParameterizedTest
     @CsvSource({
-        MULTIPLE_CASE_TYPE + "," + SUBMITTED_STATE,
-        MULTIPLE_CASE_TYPE + "," + ACCEPTED_STATE,
-        SINGLE_CASE_TYPE + "," + SUBMITTED_STATE,
-        SINGLE_CASE_TYPE + "," + ACCEPTED_STATE
+            MULTIPLE_CASE_TYPE + "," + SUBMITTED_STATE,
+            MULTIPLE_CASE_TYPE + "," + ACCEPTED_STATE,
+            SINGLE_CASE_TYPE + "," + SUBMITTED_STATE,
+            SINGLE_CASE_TYPE + "," + ACCEPTED_STATE
     })
     void shouldValidateCaseState(String caseType, String caseState) {
         caseDetails1.getCaseData().setEcmCaseType(caseType);
@@ -384,8 +380,7 @@ class EventValidationServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({SUBMITTED_STATE + ",false", ACCEPTED_STATE + ",false", REJECTED_STATE
-            + ",false", CLOSED_STATE + ",true"})
+    @CsvSource({SUBMITTED_STATE + ",false", ACCEPTED_STATE + ",false", REJECTED_STATE + ",false", CLOSED_STATE + ",true"})
     void validateCurrentPositionCaseClosed(String state, boolean expected) {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setState(state);
@@ -408,8 +403,7 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateDisposalDateInFuture() {
         List<String> errors = new ArrayList<>();
-        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(
-                "2777-05-15"), errors);
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(FUTURE_RECEIPT_DATE.toString()), errors);
         assertThat(errors.get(0))
                 .isEqualTo(String.format(EventValidationService.DISPOSAL_DATE_IN_FUTURE, "blah blah"));
 
@@ -418,12 +412,12 @@ class EventValidationServiceTest {
     private HearingTypeItem setHearing(String hearingDate) {
         HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setId(UUID.randomUUID().toString());
+        HearingType hearingType = new HearingType();
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         DateListedType dateListedType = new DateListedType();
         dateListedType.setListedDate(hearingDate);
         dateListedTypeItem.setId(UUID.randomUUID().toString());
         dateListedTypeItem.setValue(dateListedType);
-        HearingType hearingType = new HearingType();
         hearingType.setHearingDateCollection(Collections.singletonList(dateListedTypeItem));
         hearingTypeItem.setValue(hearingType);
         return hearingTypeItem;
@@ -756,8 +750,8 @@ class EventValidationServiceTest {
         List<String> errors = new ArrayList<>();
         var invalidCase = invalidJudgeAllocationCaseDetails.getCaseData();
         eventValidationService.validateHearingJudgeAllocationForCaseCloseEvent(invalidCase, errors);
-        assertThat(errors)
-                .hasSize(1);
+        assertThat(errors.size())
+                .isEqualTo(1);
         assertThat(errors.get(0))
                 .isEqualTo(CLOSING_HEARD_CASE_WITH_NO_JUDGE_ERROR);
     }

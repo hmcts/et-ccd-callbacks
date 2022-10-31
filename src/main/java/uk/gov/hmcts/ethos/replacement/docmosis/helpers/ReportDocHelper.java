@@ -52,12 +52,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDE
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_CASES;
 
 @Slf4j
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
-    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
-    "PMD.LawOfDemeter", "PMD.ExcessiveImports", "PMD.ExcessiveMethodLength", "PMD.NcssCount",
-    "PMD.ConsecutiveAppendsShouldReuse", "PMD.ConsecutiveLiteralAppends", "PMD.AppendCharacterWithChar",
-    "PMD.CyclomaticComplexity", "PMD.CyclomaticComplexity"})
 public class ReportDocHelper {
     private static final String REPORT_LIST = "\"Report_List\":[\n";
     private static final String DAY_1_LIST = "\"Day_1_List\":[\n";
@@ -69,7 +63,6 @@ public class ReportDocHelper {
     private static final String CASE_REFERENCE = "{\"Case_Reference\":\"";
     private static final String CANNOT_CREATE_REPORT_DATA_EXCEPTION = "Unable to create report data";
     private static final String LISTING_DATA_STATE_EXCEPTION = "ListingData is not instanceof ";
-    private static final int FIFTH_DAY = 5;
 
     private ReportDocHelper() {
     }
@@ -193,7 +186,7 @@ public class ReportDocHelper {
 
     private static StringBuilder getHearingsToJudgmentsReport(ListingData listingData) {
         if (!(listingData instanceof HearingsToJudgmentsReportData)) {
-            throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "HearingsToJudgmentsReportData");
+            throw new IllegalStateException((LISTING_DATA_STATE_EXCEPTION + "HearingsToJudgmentsReportData"));
         }
 
         var sb = new StringBuilder();
@@ -208,7 +201,7 @@ public class ReportDocHelper {
 
     private static StringBuilder getNoPositionChangeReport(ListingData listingData) {
         if (!(listingData instanceof NoPositionChangeReportData)) {
-            throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "NoPositionChangeReportData");
+            throw new IllegalStateException((LISTING_DATA_STATE_EXCEPTION + "NoPositionChangeReportData"));
         }
 
         var sb = new StringBuilder();
@@ -224,7 +217,7 @@ public class ReportDocHelper {
     private static StringBuilder getCasesAwaitingJudgmentReport(ListingData listingData)
             throws JsonProcessingException {
         if (!(listingData instanceof CasesAwaitingJudgmentReportData)) {
-            throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "CasesAwaitingJudgmentReportData");
+            throw new IllegalStateException((LISTING_DATA_STATE_EXCEPTION + "CasesAwaitingJudgmentReportData"));
         }
         var reportData = (CasesAwaitingJudgmentReportData) listingData;
         var sb = new StringBuilder();
@@ -574,7 +567,7 @@ public class ReportDocHelper {
         int claimServedTypeItemsCount = claimServedTypeItems.size();
         var claimServedTypeItemsListSize = String.valueOf(claimServedTypeItems.size());
 
-        if (dayNumber >= FIFTH_DAY) {
+        if (dayNumber >= 5) {
             claimServedTypeItems.sort(Comparator.comparingInt(item ->
                 Integer.parseInt(item.getValue().getActualNumberOfDays())));
         }
@@ -583,7 +576,7 @@ public class ReportDocHelper {
 
         if (claimServedTypeItemsCount == 0) {
             reportContent.append(CASE_REFERENCE).append(claimServedTypeItemsListSize).append(NEW_LINE);
-            if (dayNumber >= FIFTH_DAY) {
+            if (dayNumber >= 5) {
                 reportContent.append("\"Actual_Number_Of_Days\":\"")
                         .append(claimServedTypeItemsListSize).append(NEW_LINE);
             }
@@ -674,7 +667,7 @@ public class ReportDocHelper {
     private static StringBuilder getRespondentsReport(ListingData listingData)
             throws JsonProcessingException {
         if (!(listingData instanceof RespondentsReportData)) {
-            throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "RespondentsReportData");
+            throw new IllegalStateException((LISTING_DATA_STATE_EXCEPTION + "RespondentsReportData"));
         }
         var reportData = (RespondentsReportData) listingData;
 
@@ -689,7 +682,7 @@ public class ReportDocHelper {
     private static StringBuilder getSessionDaysReport(ListingData listingData)
             throws JsonProcessingException {
         if (!(listingData instanceof SessionDaysReportData)) {
-            throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "SessionDaysReportData");
+            throw new IllegalStateException((LISTING_DATA_STATE_EXCEPTION + "SessionDaysReportData"));
         }
         var reportData = (SessionDaysReportData) listingData;
 
@@ -713,7 +706,7 @@ public class ReportDocHelper {
     private static StringBuilder getEccReport(ListingData listingData)
             throws JsonProcessingException {
         if (!(listingData instanceof EccReportData)) {
-            throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "EccReportData");
+            throw new IllegalStateException((LISTING_DATA_STATE_EXCEPTION + "EccReportData"));
         }
         var reportData = (EccReportData) listingData;
         var sb = new StringBuilder();
@@ -727,7 +720,7 @@ public class ReportDocHelper {
     private static StringBuilder getHearingsByHearingTypeReport(ListingData listingData)
             throws JsonProcessingException {
         if (!(listingData instanceof HearingsByHearingTypeReportData)) {
-            throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "HearingsByHearingTypeReportData");
+            throw new IllegalStateException((LISTING_DATA_STATE_EXCEPTION + "HearingsByHearingTypeReportData"));
         }
         var reportData = (HearingsByHearingTypeReportData) listingData;
         var sb = new StringBuilder();

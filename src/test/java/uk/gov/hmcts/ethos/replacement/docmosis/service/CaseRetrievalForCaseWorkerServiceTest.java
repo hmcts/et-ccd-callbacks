@@ -47,10 +47,8 @@ public class CaseRetrievalForCaseWorkerServiceTest {
 
     @Test(expected = Exception.class)
     public void caseRetrievalRequestException() throws IOException {
-        when(ccdClient.retrieveCase(anyString(), anyString(),
-                anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
-        caseRetrievalForCaseWorkerService.caseRetrievalRequest(
-                "authToken", ccdRequest.getCaseDetails().getCaseTypeId(),
+        when(ccdClient.retrieveCase(anyString(), anyString(), anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
+        caseRetrievalForCaseWorkerService.caseRetrievalRequest("authToken", ccdRequest.getCaseDetails().getCaseTypeId(),
                 ccdRequest.getCaseDetails().getJurisdiction(), "11111");
     }
 
@@ -72,15 +70,13 @@ public class CaseRetrievalForCaseWorkerServiceTest {
     public void casesRetrievalRequest() throws IOException {
         List<SubmitEvent> submitEventList = Collections.singletonList(submitEvent);
         when(ccdClient.retrieveCases(anyString(), any(), any())).thenReturn(submitEventList);
-        List<SubmitEvent> submitEventList1 = caseRetrievalForCaseWorkerService.casesRetrievalRequest(
-                ccdRequest, "authToken");
+        List<SubmitEvent> submitEventList1 = caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, "authToken");
         assertEquals(submitEventList, submitEventList1);
     }
 
     @Test(expected = Exception.class)
     public void casesRetrievalESRequestException() throws IOException {
-        when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), any()))
-                .thenThrow(new InternalException(ERROR_MESSAGE));
+        when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), any())).thenThrow(new InternalException(ERROR_MESSAGE));
         caseRetrievalForCaseWorkerService.casesRetrievalESRequest("1111", "authToken",
                 ccdRequest.getCaseDetails().getCaseTypeId(), new ArrayList<>(Collections.singleton("1")));
     }
@@ -89,10 +85,8 @@ public class CaseRetrievalForCaseWorkerServiceTest {
     public void casesRetrievalESRequest() throws IOException {
         List<SubmitEvent> submitEventList = Collections.singletonList(submitEvent);
         when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), any())).thenReturn(submitEventList);
-        List<SubmitEvent> submitEventList1 = caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
-                "1111", "authToken",
-                ccdRequest.getCaseDetails().getCaseTypeId(), new ArrayList<>(
-                        Collections.singleton("1")));
+        List<SubmitEvent> submitEventList1 = caseRetrievalForCaseWorkerService.casesRetrievalESRequest("1111", "authToken",
+                ccdRequest.getCaseDetails().getCaseTypeId(), new ArrayList<>(Collections.singleton("1")));
         assertEquals(submitEventList, submitEventList1);
     }
 

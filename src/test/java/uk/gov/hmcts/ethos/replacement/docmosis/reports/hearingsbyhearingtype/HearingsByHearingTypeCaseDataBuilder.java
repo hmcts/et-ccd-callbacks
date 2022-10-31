@@ -22,7 +22,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIM
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING_CM;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.ExcessiveImports", "PMD.CyclomaticComplexity"})
 public class HearingsByHearingTypeCaseDataBuilder {
 
     public HearingsByHearingTypeSubmitEvent withNoHearings() {
@@ -35,6 +34,7 @@ public class HearingsByHearingTypeCaseDataBuilder {
 
     private HearingsByHearingTypeSubmitEvent createSubmitEvent(List<HearingTypeItem> hearingCollection, String caseNo,
                                                                String lead, String mulRef, String mulName) {
+        HearingsByHearingTypeSubmitEvent submitEvent = new HearingsByHearingTypeSubmitEvent();
         HearingsByHearingTypeCaseData caseData = new HearingsByHearingTypeCaseData();
         caseData.setHearingCollection(hearingCollection);
         caseData.setEthosCaseReference(caseNo);
@@ -42,17 +42,16 @@ public class HearingsByHearingTypeCaseDataBuilder {
         caseData.setMultipleReference(mulRef);
         caseData.setSubMultipleName(mulName);
         caseData.setEthosCaseReference("111");
-        HearingsByHearingTypeSubmitEvent submitEvent = new HearingsByHearingTypeSubmitEvent();
         submitEvent.setCaseData(caseData);
         return submitEvent;
     }
 
     private DateListedTypeItem createHearingDateListed(String listedDate, String status) {
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         DateListedType dateListedType = new DateListedType();
         dateListedType.setListedDate(listedDate);
         dateListedType.setHearingStatus(status);
         dateListedType.setHearingClerk(DynamicFixedListType.of(DynamicValueType.create("clerk1", "clerk1")));
-        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setValue(dateListedType);
         dateListedType.setHearingTimingStart("2022-01-20T11:00:00.000");
         dateListedType.setHearingTimingFinish("2022-01-20T17:00:00.000");
@@ -64,6 +63,7 @@ public class HearingsByHearingTypeCaseDataBuilder {
 
     private HearingTypeItem createHearing(String type, String subSplitHeader,
                                           DateListedTypeItem... dateListedTypeItems) {
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         HearingType hearingType = new HearingType();
         hearingType.setHearingType(type);
         hearingType.setHearingNumber("1");
@@ -103,8 +103,8 @@ public class HearingsByHearingTypeCaseDataBuilder {
 
         List<DateListedTypeItem> hearingDateCollection = new ArrayList<>();
         Collections.addAll(hearingDateCollection, dateListedTypeItems);
+
         hearingType.setHearingDateCollection(hearingDateCollection);
-        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(hearingType);
         return hearingTypeItem;
     }
@@ -179,7 +179,6 @@ public class HearingsByHearingTypeCaseDataBuilder {
             case "Resume":
                 dateListedTypeItem.getValue().setHearingTimingResume(null);
                 break;
-            default:
         }
         var hearingTypeItem = createHearing(HEARING_TYPE_JUDICIAL_COSTS_HEARING, "Tel Con", dateListedTypeItem);
         hearings.add(hearingTypeItem);

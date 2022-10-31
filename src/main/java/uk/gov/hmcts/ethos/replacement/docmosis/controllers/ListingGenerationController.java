@@ -46,9 +46,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
-    "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
-    "PMD.ExcessiveImports", "PMD.ConfusingTernary", "PDM.UselessParentheses"})
 public class ListingGenerationController {
 
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
@@ -281,8 +278,9 @@ public class ListingGenerationController {
                                                                       String userToken) {
         List<String> errorsList = new ArrayList<>();
 
-        if (hasListings(listingData) || isAllowedReportType(listingData)
-                && hasServedClaims(listingData) || hasSummaryAndDetails(listingData)) {
+        if (hasListings(listingData)
+                || (isAllowedReportType(listingData)
+                && (hasServedClaims(listingData) || hasSummaryAndDetails(listingData)))) {
             var documentInfo = getDocumentInfo(listingData, caseTypeId, userToken);
             updateListingDocMarkUp(listingData, documentInfo);
             return ResponseEntity.ok(ListingCallbackResponse.builder()

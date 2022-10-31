@@ -10,7 +10,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.types.VenueImport;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@SuppressWarnings({"PMD.TooManyFields"})
 public class AdminData {
     @JsonProperty("name")
     private String name;
@@ -37,22 +36,23 @@ public class AdminData {
     @JsonProperty("fileLocationName")
     private String fileLocationName;
 
-    // For updating and deleting fileLocation
+    // For updating fileLocation
     @JsonProperty("fileLocationList")
     private DynamicFixedListType fileLocationList;
 
     @JsonProperty("adminCourtWorker")
     private AdminCourtWorker adminCourtWorker;
 
-    //updating and deleting court worker
-    @JsonProperty("courtWorkerOffice")
-    private String courtWorkerOffice;
-    @JsonProperty("courtWorkerType")
-    private String courtWorkerType;
-    @JsonProperty("courtWorkerCode")
-    private String courtWorkerCode;
-    @JsonProperty("courtWorkerName")
-    private String courtWorkerName;
-    @JsonProperty("courtWorkerSelectList")
-    private DynamicFixedListType courtWorkerSelectList;
+    //updateCourtWorker
+    @JsonProperty("updateCourtWorkerOffice")
+    private String updateCourtWorkerOffice;
+    @JsonProperty("updateCourtWorkerType")
+    private String updateCourtWorkerType;
+    @JsonProperty("updateCourtWorkerCode")
+    private String updateCourtWorkerCode;
+    @JsonProperty("updateCourtWorkerName")
+    private String updateCourtWorkerName;
+    @JsonProperty("updateCourtWorkerSelectList")
+    private DynamicFixedListType updateCourtWorkerSelectList;
+
 }

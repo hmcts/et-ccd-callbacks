@@ -16,7 +16,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 @Service("caseTransferService")
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings({"PMD.PrematureDeclaration"})
 public class CaseTransferSameCountryService {
 
     private final CaseTransferUtils caseTransferUtils;

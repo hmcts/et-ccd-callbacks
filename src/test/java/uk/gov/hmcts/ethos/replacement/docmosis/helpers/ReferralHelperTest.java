@@ -325,7 +325,7 @@ class ReferralHelperTest {
         caseData.setCloseReferralGeneralNotes("generalNotes");
 
         ReferralHelper.clearCloseReferralDataFromCaseData(caseData);
-
+        
         assertNull(caseData.getSelectReferral());
         assertNull(caseData.getCloseReferralHearingDetails());
         assertNull(caseData.getConfirmCloseReferral());
@@ -384,7 +384,7 @@ class ReferralHelperTest {
 
         return respondentSumTypeItem;
     }
-
+    
     private void setReferralReplyData() {
         caseData.setHearingAndReferralDetails("hearingDetails");
         caseData.setDirectionTo("directionTo");

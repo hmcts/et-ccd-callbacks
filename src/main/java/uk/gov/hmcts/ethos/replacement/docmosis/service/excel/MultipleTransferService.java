@@ -29,6 +29,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 @RequiredArgsConstructor
 @Service("multipleTransferService")
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.PreserveStackTrace", "PMD.LawOfDemeter"})
 public class MultipleTransferService {
 
     private final ExcelReadingService excelReadingService;
@@ -119,8 +120,8 @@ public class MultipleTransferService {
         var tribunalOffice = TribunalOffice.valueOfOfficeName(officeMultipleCT);
         boolean isScottishDestinationOffice = TribunalOffice.SCOTLAND_OFFICES.contains(tribunalOffice);
 
-        return ((isScottishDestinationOffice && SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId))
-                || (!isScottishDestinationOffice && ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId)));
+        return isScottishDestinationOffice && SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId)
+                || !isScottishDestinationOffice && ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId);
     }
 
     public void populateDataIfComingFromCT(String userToken, MultipleDetails multipleDetails, List<String> errors) {

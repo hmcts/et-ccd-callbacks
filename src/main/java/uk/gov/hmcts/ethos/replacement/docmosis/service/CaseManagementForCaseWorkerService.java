@@ -51,6 +51,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
 @Service("caseManagementForCaseWorkerService")
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.TooManyMethods",
+    "PMD.UnnecessaryFullyQualifiedName", "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.ExcessiveImports",
+    "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions", "PMD.ImplicitSwitchFallThrough",
+    "PMD.LawOfDemeter", "PMD.PreserveStackTrace", "PMD.CyclomaticComplexity"})
 public class CaseManagementForCaseWorkerService {
 
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
@@ -231,8 +235,8 @@ public class CaseManagementForCaseWorkerService {
     }
 
     private boolean positionChanged(CaseData caseData) {
-        return (isNullOrEmpty(caseData.getCurrentPosition())
-                || !caseData.getPositionType().equals(caseData.getCurrentPosition()));
+        return isNullOrEmpty(caseData.getCurrentPosition())
+                || !caseData.getPositionType().equals(caseData.getCurrentPosition());
     }
 
     public void amendHearing(CaseData caseData, String caseTypeId) {

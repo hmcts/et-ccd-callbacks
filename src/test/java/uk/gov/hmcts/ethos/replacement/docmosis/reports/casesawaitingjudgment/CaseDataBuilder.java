@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class CaseDataBuilder {
 
     private final CaseData caseData = new CaseData();
@@ -26,6 +27,34 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withHearing(String listedDate, String hearingStatus) {
         return withHearing(listedDate, hearingStatus, null, null, null);
+    }
+
+    public CaseDataBuilder withHearing(String listedDate, String hearingStatus,
+                                       String hearingNumber, String hearingType, String judge) {
+        var dateListedType = new DateListedType();
+        dateListedType.setListedDate(listedDate);
+        dateListedType.setHearingStatus(hearingStatus);
+        var dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setValue(dateListedType);
+
+        var hearingDates = new ArrayList<DateListedTypeItem>();
+        hearingDates.add(dateListedTypeItem);
+
+        var type = new HearingType();
+        type.setHearingNumber(hearingNumber);
+        type.setHearingType(hearingType);
+        type.setJudge(new DynamicFixedListType(judge));
+        type.setHearingDateCollection(hearingDates);
+
+        var hearingTypeItem = new HearingTypeItem();
+        hearingTypeItem.setValue(type);
+
+        if (caseData.getHearingCollection() == null) {
+            caseData.setHearingCollection(new ArrayList<>());
+        }
+        caseData.getHearingCollection().add(hearingTypeItem);
+
+        return this;
     }
 
     public CaseDataBuilder withSingleCaseType() {
@@ -51,33 +80,6 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withConciliationTrack(String conciliationTrack) {
         caseData.setConciliationTrack(conciliationTrack);
-        return this;
-    }
-
-    public CaseDataBuilder withHearing(String listedDate, String hearingStatus, String hearingNumber, String hearingType, String judge) {
-        var dateListedType = new DateListedType();
-        dateListedType.setListedDate(listedDate);
-        dateListedType.setHearingStatus(hearingStatus);
-        var dateListedTypeItem = new DateListedTypeItem();
-        dateListedTypeItem.setValue(dateListedType);
-
-        var hearingDates = new ArrayList<DateListedTypeItem>();
-        hearingDates.add(dateListedTypeItem);
-
-        var type = new HearingType();
-        type.setHearingNumber(hearingNumber);
-        type.setHearingType(hearingType);
-        type.setJudge(new DynamicFixedListType(judge));
-        type.setHearingDateCollection(hearingDates);
-
-        var hearingTypeItem = new HearingTypeItem();
-        hearingTypeItem.setValue(type);
-
-        if (caseData.getHearingCollection() == null) {
-            caseData.setHearingCollection(new ArrayList<>());
-        }
-        caseData.getHearingCollection().add(hearingTypeItem);
-
         return this;
     }
 

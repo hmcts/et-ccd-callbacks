@@ -30,6 +30,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
+@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.LawOfDemeter"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class SingleCasesReadingServiceTest {
 
@@ -108,9 +109,10 @@ public class SingleCasesReadingServiceTest {
                 anyString(),
                 anyList()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-        HashSet<SchedulePayloadEvent> schedulePayloadEventList = singleCasesReadingService.retrieveScheduleCases(userToken,
-                multipleDetails.getCaseTypeId(),
-                new ArrayList<>(Collections.singletonList("240001/2020")));
+        HashSet<SchedulePayloadEvent> schedulePayloadEventList = singleCasesReadingService
+                .retrieveScheduleCases(userToken,
+                    multipleDetails.getCaseTypeId(),
+                    new ArrayList<>(Collections.singletonList("240001/2020")));
         assertEquals(schedulePayloadEventList, new HashSet<>());
     }
 

@@ -32,6 +32,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Service
 @Slf4j
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.GodClass", "PMD.CognitiveComplexity",
+    "PMD.UnusedFormalParameter", "PMD.LiteralsFirstInComparisons", "PMD.LawOfDemeter", "PMD.CyclomaticComplexity",
+    "PMD.NPathComplexity", "PMD.CognitiveComplexity"})
 public class TimeToFirstHearingReport {
 
     static final String ZERO = "0";

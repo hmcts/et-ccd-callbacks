@@ -10,7 +10,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 
 public class MultipleDataBuilder {
 
-    private MultipleData multipleData = new MultipleData();
+    private final MultipleData multipleData = new MultipleData();
 
     public static MultipleDataBuilder builder() {
         return new MultipleDataBuilder();

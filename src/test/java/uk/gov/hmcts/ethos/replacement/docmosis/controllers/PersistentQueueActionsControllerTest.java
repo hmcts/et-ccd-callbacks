@@ -55,6 +55,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @RunWith(SpringRunner.class)
 @WebMvcTest(PersistentQueueActionsController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
 public class PersistentQueueActionsControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -93,10 +94,10 @@ public class PersistentQueueActionsControllerTest {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
         List<SubmitEvent> submitEvents;
-        List<MultipleTypeItem> multipleTypeItems = new ArrayList<>();
         bulkCasesPayload = new BulkCasesPayload();
         submitEvents = getSubmitEvents();
         bulkCasesPayload.setSubmitEvents(submitEvents);
+        List<MultipleTypeItem> multipleTypeItems = new ArrayList<>();
         bulkCasesPayload.setMultipleTypeItems(multipleTypeItems);
         BulkData bulkData = new BulkData();
         BulkDetails bulkDetails = new BulkDetails();
@@ -127,11 +128,14 @@ public class PersistentQueueActionsControllerTest {
 
     @Test
     public void afterSubmittedBulkPQ() throws Exception {
-        when(bulkSearchService.bulkCasesRetrievalRequestElasticSearch(isA(BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class), isA(Boolean.class)))
+        when(bulkSearchService.bulkCasesRetrievalRequestElasticSearch(
+                isA(BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class), isA(Boolean.class)))
                 .thenReturn(bulkCasesPayload);
-        when(bulkCreationService.bulkCreationLogic(isA(BulkDetails.class), isA(BulkCasesPayload.class), eq(AUTH_TOKEN), isA(String.class)))
+        when(bulkCreationService.bulkCreationLogic(
+                isA(BulkDetails.class), isA(BulkCasesPayload.class), eq(AUTH_TOKEN), isA(String.class)))
                 .thenReturn(bulkRequestPayload);
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
+        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN)))
+                .thenReturn(true);
         mvc.perform(post(AFTER_SUBMITTED_PQ_BULK_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -144,8 +148,12 @@ public class PersistentQueueActionsControllerTest {
 
     @Test
     public void preAcceptBulkPq() throws Exception {
-        when(bulkSearchService.retrievalCasesForPreAcceptRequest(isA(BulkDetails.class), eq(AUTH_TOKEN))).thenReturn(bulkCasesPayload.getSubmitEvents());
-        when(bulkUpdateService.bulkPreAcceptLogic(isA(BulkDetails.class), any(), eq(AUTH_TOKEN), eq(true))).thenReturn(bulkRequestPayload);
+        when(bulkSearchService.retrievalCasesForPreAcceptRequest(
+                isA(BulkDetails.class), eq(AUTH_TOKEN)))
+                .thenReturn(bulkCasesPayload.getSubmitEvents());
+        when(bulkUpdateService.bulkPreAcceptLogic(
+                isA(BulkDetails.class), any(), eq(AUTH_TOKEN), eq(true)))
+                .thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
         mvc.perform(post(PRE_ACCEPT_PQ_BULK_URL)
                 .content(requestContent.toString())
@@ -159,8 +167,11 @@ public class PersistentQueueActionsControllerTest {
 
     @Test
     public void updateBulkCasePq() throws Exception {
-        when(bulkCreationService.bulkUpdateCaseIdsLogic(isA(BulkRequest.class), eq(AUTH_TOKEN), isA(Boolean.class))).thenReturn(bulkRequestPayload);
-        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
+        when(bulkCreationService.bulkUpdateCaseIdsLogic(
+                isA(BulkRequest.class), eq(AUTH_TOKEN), isA(Boolean.class)))
+                .thenReturn(bulkRequestPayload);
+        when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN)))
+                .thenReturn(true);
         mvc.perform(post(UPDATE_BULK_CASE_PQ_URL)
                 .content(requestContent.toString())
                 .header("Authorization", AUTH_TOKEN)
@@ -191,7 +202,9 @@ public class PersistentQueueActionsControllerTest {
 
     @Test
     public void preAcceptBulkPqError500() throws Exception {
-        when(bulkSearchService.retrievalCasesForPreAcceptRequest(isA(BulkDetails.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(bulkSearchService.retrievalCasesForPreAcceptRequest(
+                isA(BulkDetails.class), eq(AUTH_TOKEN)))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
         mvc.perform(post(PRE_ACCEPT_PQ_BULK_URL)
                 .content(requestContent.toString())
@@ -202,7 +215,9 @@ public class PersistentQueueActionsControllerTest {
 
     @Test
     public void updateBulkCasePqError500() throws Exception {
-        when(bulkCreationService.bulkUpdateCaseIdsLogic(isA(BulkRequest.class), eq(AUTH_TOKEN), isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(bulkCreationService.bulkUpdateCaseIdsLogic(
+                isA(BulkRequest.class), eq(AUTH_TOKEN), isA(Boolean.class)))
+                .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(eq(AUTH_TOKEN))).thenReturn(true);
         mvc.perform(post(UPDATE_BULK_CASE_PQ_URL)
                 .content(requestContent.toString())

@@ -12,6 +12,7 @@ import java.util.List;
 
 @Slf4j
 @Service("CaseRetrievalForCaseWorkerService")
+@SuppressWarnings({"PMD.PreserveStackTrace"})
 public class CaseRetrievalForCaseWorkerService {
 
     private static final String MESSAGE = "Failed to retrieve case for : ";

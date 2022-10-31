@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.UnusedPrivateMethod"})
 class ClerkServiceTest {
 
     @Test
@@ -79,7 +80,8 @@ class ClerkServiceTest {
         var clerkService = new ClerkService(courtWorkerService);
         clerkService.initialiseClerkResponsible(SCOTLAND_LISTING_CASE_TYPE_ID, listingData);
 
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(listingData.getClerkResponsible(), "scotland", "Scotland ");
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
+                listingData.getClerkResponsible(), "scotland", "Scotland ");
     }
 
     @ParameterizedTest
@@ -92,7 +94,8 @@ class ClerkServiceTest {
         var clerkService = new ClerkService(courtWorkerService);
         clerkService.initialiseClerkResponsible(ENGLANDWALES_LISTING_CASE_TYPE_ID, listingData);
 
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(listingData.getClerkResponsible(), "clerk", "Clerk ");
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
+                listingData.getClerkResponsible(), "clerk", "Clerk ");
     }
 
     private static Stream<Arguments> testInitialiseClerkResponsibleListingDataEnglandWales() {

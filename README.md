@@ -1,105 +1,85 @@
 # Employment Tribunals CCD Callbacks Service
 
-This application is responsible for handling all CCD callback requests for employment tribunal cases that have a case type of either ET_EnglandWales or ET_Scotland.
+This application is responsible for handling all CCD callback requests for Employment Tribunal cases.
 
-## Getting started
+## Prerequisites
 
-### Prerequisites
-
+### Java
 - [JDK 11](https://www.oracle.com/java)
 
-### Building
+### CCD Common Components
+The application should be run locally in an environment that includes CCD common components.
 
-The project uses [Gradle](https://gradle.org) as a build tool but you don't have to install it locally since there is a
+There are two options for achieving this:
+- [RSE CFT lib](docs/cftlib.md)
+- [ECM CCD Docker](docs/ecm-ccd-docker.md)
+
+### Postgres Database
+A local database is required. This is provided by one of the CCD common components environments.
+
+[flyway](https://flywaydb.org/) migrations are automatically applied on startup.
+
+### Azure Service Bus
+The application requires a connection to an Azure Service Bus queue.
+
+There are two options for achieving this:
+- Provide a connection string for a development queue in Azure
+- Configure a fake connection client
+
+### Docmosis Tornado
+[Docmosis Tornado](https://www.docmosis.com/products/tornado.html) is a third-party product used by et-ccd-callbacks to
+generate documents and reports.
+
+More information about using Docmosis Tornado in a local development environment can be found [here](docs/docmosis.md).
+
+## Building
+The project uses [Gradle](https://gradle.org) as a build tool, but you don't have to install it locally since there is a
 `./gradlew` wrapper script.
 
-To build the project please execute the following command:
+To build the project execute the following command:
 
 ```bash
-    ./gradlew build
+./gradlew build
 ```
 
 To get the project to build in IntelliJ IDEA, you have to:
 
- - Install the Lombok plugin: Preferences -> Plugins
- - Enable Annotation Processing: Preferences -> Build, Execution, Deployment -> Compiler -> Annotation Processors
+- Install the Lombok plugin: Preferences -> Plugins
+- Enable Annotation Processing: Preferences -> Build, Execution, Deployment -> Compiler -> Annotation Processors
 
-### Running
+## Running
+To run the application locally you should follow the instructions above for one of the CCD environments.
 
-Running the application is best achieved by setting up an environment containing all dependencies. A local development
-environment can be created using the ecm-ccd-docker project.
-See [here](https://github.com/hmcts/ecm-ccd-docker)
+## API documentation
+API documentation is provided with Swagger
 
-#### Environment Variables
-Required:
-- ET_COS_DB_PASSWORD
-- CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING
-- DB_URL
-
-Optional:
-- TORNADO_ACCESS_KEY - only needed if you want to generate reports using Docmosis
-
-
-#### Setup
-There is a dependency on a postgres database to be running locally.
-
-To install the database schema required for et-ccd-callbacks execute the following command:
-```bash
-    ./bin/init-db.sh
-```
-
-There is also a dependency on Azure Service Bus.
-
-To run the project locally you should use the dev profile.
-You can run the application by executing following command:
-
-```bash
-    ./gradlew bootRun --args='--spring.profiles.active=dev'
-```
-
-The application will start locally on `http://localhost:8081`
-
-### API documentation
-
-API documentation is provided with Swagger:
-UI to interact with the API resources
-
-```bash
-    http://localhost:8081/swagger-ui.html
-```
+http://localhost:8081/swagger-ui.html
 
 ## Developing
 
 ### Database
 All database updates are applied using [flyway](https://flywaydb.org/). See src/main/resources/db
 
-### Unit tests
-
-To run all unit tests please execute following command:
+### Unit Tests
+To run all unit tests:
 
 ```bash
-    ./gradlew test
+./gradlew test
 ```
 
-### Integration tests
-Integration tests require docker to be running. They are executed as part of the `gradle check` task.
-
-### Coding style tests
-
-To run all checks (including unit tests) please execute following command:
+### Coding Style Tests
+To run all checks (including unit tests):
 
 ```bash
-    ./gradlew check
+./gradlew check
 ```
 
 ### OWASP Dependency Vulnerability Checks
-
 To run the OWASP checks for vulnerabilities in dependencies:
 
 ```bash
-    ./gradlew dependencyCheckAggregate
+./gradlew dependencyCheckAggregate
 ```
 
 ## License
-
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.

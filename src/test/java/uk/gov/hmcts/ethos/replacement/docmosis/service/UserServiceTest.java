@@ -14,6 +14,7 @@ import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
+@SuppressWarnings({"PMD.SingularField"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class UserServiceTest {
 

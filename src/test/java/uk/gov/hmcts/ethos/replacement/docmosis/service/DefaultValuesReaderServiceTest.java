@@ -25,6 +25,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_CLOSED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.UseProperClassLoader", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.TooManyMethods"})
 public class DefaultValuesReaderServiceTest {
 
     private CaseDefaultValuesConfiguration config;
@@ -59,7 +61,7 @@ public class DefaultValuesReaderServiceTest {
         when(tribunalOfficesService.getTribunalContactDetails(officeName)).thenReturn(contactDetails);
         var caseType = MULTIPLE_CASE_TYPE;
         when(config.getCaseType()).thenReturn(caseType);
-        var positionType = Constants.POSITION_TYPE_CASE_CLOSED;
+        var positionType = POSITION_TYPE_CASE_CLOSED;
         when(config.getPositionType()).thenReturn(positionType);
 
         // Act
@@ -90,7 +92,7 @@ public class DefaultValuesReaderServiceTest {
 
     @Test
     public void testGetPositionType() {
-        var positionType = Constants.POSITION_TYPE_CASE_CLOSED;
+        var positionType = POSITION_TYPE_CASE_CLOSED;
         when(config.getPositionType()).thenReturn(positionType);
 
         assertEquals(positionType, defaultValuesReaderService.getPositionType());
@@ -136,12 +138,11 @@ public class DefaultValuesReaderServiceTest {
 
     @Test
     public void testGetCaseDataWithClaimantWorkAddress() {
-        var defaultValues = createDefaultValues();
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setClaimantWorkAddressQuestion(YES);
         caseData.setClaimantWorkAddressQRespondent(new DynamicFixedListType("Respondent 2"));
         caseData.setRespondentCollection(createRespondents());
-
+        DefaultValues defaultValues = createDefaultValues();
         defaultValuesReaderService.getCaseData(caseData, defaultValues);
 
         assertEquals(POSITION_TYPE_CASE_CLOSED, caseData.getPositionType());
@@ -153,8 +154,7 @@ public class DefaultValuesReaderServiceTest {
         assertEquals("TestFax", caseData.getTribunalCorrespondenceFax());
         assertEquals("TestDX", caseData.getTribunalCorrespondenceDX());
         assertEquals("TestEmail", caseData.getTribunalCorrespondenceEmail());
-
-        var address = caseData.getClaimantWorkAddress().getClaimantWorkAddress();
+        Address address = caseData.getClaimantWorkAddress().getClaimantWorkAddress();
         assertEquals("Respondent 2 AddressLine1", address.getAddressLine1());
     }
 

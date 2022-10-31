@@ -34,7 +34,6 @@ class EmployerMemberRowHandlerTest {
     void testHandle() {
         var code = "ERCode";
         var name = "Employer Member";
-        var tribunalOffice = TribunalOffice.NEWCASTLE;
         var row = mock(Row.class);
         mockCell(row, 0, EMPLOYER_MEMBER_ROW_ID);
         mockCell(row, 1, code);
@@ -46,6 +45,7 @@ class EmployerMemberRowHandlerTest {
         var courtWorkerRepository = mock(CourtWorkerRepository.class);
 
         var employerMemberRowHandler = new EmployerMemberRowHandler(courtWorkerRepository);
+        var tribunalOffice = TribunalOffice.NEWCASTLE;
         employerMemberRowHandler.handle(tribunalOffice, row);
 
         var captor = ArgumentCaptor.forClass(CourtWorker.class);

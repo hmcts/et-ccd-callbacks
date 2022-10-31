@@ -24,8 +24,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LIST
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.PreserveStackTrace",
-    "PMD.UnnecessaryFullyQualifiedName"})
 public class CaseTransferUtils {
 
     public static final String BF_ACTIONS_ERROR_MSG = "There are one or more open Brought Forward actions that must be "

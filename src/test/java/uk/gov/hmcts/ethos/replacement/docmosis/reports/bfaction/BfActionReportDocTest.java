@@ -4,8 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReportData;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.ReportSummary;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -17,7 +15,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 
-@SuppressWarnings({"PMD.UseProperClassLoader"})
 public class BfActionReportDocTest {
     private BfActionReportDoc bfActionReportDoc;
     private String bfActionReportDocTestDateRangeResource;
@@ -41,24 +38,25 @@ public class BfActionReportDocTest {
         bfActionReportDataDateRange.setListingDateFrom("2019-12-08");
         bfActionReportDataDateRange.setListingDateTo("2019-12-20");
 
-        BFDateType bfDateType = new BFDateType();
-        bfDateType.setCaseReference("1800522/2020");
-        bfDateType.setBroughtForwardAction("Case papers prepared");
-        bfDateType.setBroughtForwardEnteredDate("2019-11-20");
-        bfDateType.setBroughtForwardDate("2019-12-09");
-        bfDateType.setBroughtForwardDateReason("test reason one");
-        BFDateTypeItem bfDateTypeItem = new BFDateTypeItem();
+        var bfDateTypeItem = new BFDateTypeItem();
+        var bFDateType = new BFDateType();
+        bFDateType.setCaseReference("1800522/2020");
+        bFDateType.setBroughtForwardAction("Case papers prepared");
+        bFDateType.setBroughtForwardEnteredDate("2019-11-20");
+        bFDateType.setBroughtForwardDate("2019-12-09");
+        bFDateType.setBroughtForwardDateReason("test reason one");
         bfDateTypeItem.setId("234");
-        bfDateTypeItem.setValue(bfDateType);
-        BFDateType bfDateType2 = new BFDateType();
-        bfDateType2.setCaseReference("1800876/2020");
-        bfDateType2.setBroughtForwardAction("Interlocutory order requested");
-        bfDateType2.setBroughtForwardEnteredDate("2019-11-20");
-        bfDateType2.setBroughtForwardDate("2019-12-15");
-        bfDateType2.setBroughtForwardDateReason("test reason two");
-        BFDateTypeItem bfDateTypeItem2 = new BFDateTypeItem();
+        bfDateTypeItem.setValue(bFDateType);
+
+        var bfDateTypeItem2 = new BFDateTypeItem();
+        var bFDateType2 = new BFDateType();
+        bFDateType2.setCaseReference("1800876/2020");
+        bFDateType2.setBroughtForwardAction("Interlocutory order requested");
+        bFDateType2.setBroughtForwardEnteredDate("2019-11-20");
+        bFDateType2.setBroughtForwardDate("2019-12-15");
+        bFDateType2.setBroughtForwardDateReason("test reason two");
         bfDateTypeItem2.setId("654");
-        bfDateTypeItem2.setValue(bfDateType2);
+        bfDateTypeItem2.setValue(bFDateType2);
 
         List<BFDateTypeItem> bfDateTypeItems = new ArrayList<>();
         bfDateTypeItems.add(bfDateTypeItem);
@@ -79,24 +77,25 @@ public class BfActionReportDocTest {
         bfActionReportDataSingleDate.setListingDateTo(null);
         bfActionReportDataSingleDate.setListingDate("2019-06-18");
 
-        BFDateType bfDateType = new BFDateType();
-        bfDateType.setCaseReference("1800909/2020");
-        bfDateType.setBroughtForwardAction("Application of letter to ACAS/RPO");
-        bfDateType.setBroughtForwardEnteredDate("2019-11-20");
-        bfDateType.setBroughtForwardDate("2019-06-18");
-        bfDateType.setBroughtForwardDateReason("test");
-        BFDateTypeItem bfDateTypeItem = new BFDateTypeItem();
+        var bfDateTypeItem = new BFDateTypeItem();
+        var bFDateType = new BFDateType();
+        bFDateType.setCaseReference("1800909/2020");
+        bFDateType.setBroughtForwardAction("Application of letter to ACAS/RPO");
+        bFDateType.setBroughtForwardEnteredDate("2019-11-20");
+        bFDateType.setBroughtForwardDate("2019-06-18");
+        bFDateType.setBroughtForwardDateReason("test");
         bfDateTypeItem.setId("7895");
-        bfDateTypeItem.setValue(bfDateType);
-        BFDateType bfDateType2 = new BFDateType();
-        bfDateType2.setCaseReference("1800888/2020");
-        bfDateType2.setBroughtForwardAction("Interlocutory order requested");
-        bfDateType2.setBroughtForwardEnteredDate("2019-11-20");
-        bfDateType2.setBroughtForwardDate("2019-06-18");
-        bfDateType2.setBroughtForwardDateReason("test reason two");
-        BFDateTypeItem bfDateTypeItem2 = new BFDateTypeItem();
+        bfDateTypeItem.setValue(bFDateType);
+
+        var bfDateTypeItem2 = new BFDateTypeItem();
+        var bFDateType2 = new BFDateType();
+        bFDateType2.setCaseReference("1800888/2020");
+        bFDateType2.setBroughtForwardAction("Interlocutory order requested");
+        bFDateType2.setBroughtForwardEnteredDate("2019-11-20");
+        bFDateType2.setBroughtForwardDate("2019-06-18");
+        bFDateType2.setBroughtForwardDateReason("test reason two");
         bfDateTypeItem2.setId("654");
-        bfDateTypeItem2.setValue(bfDateType2);
+        bfDateTypeItem2.setValue(bFDateType2);
 
         List<BFDateTypeItem> bfDateTypeItems = new ArrayList<>();
         bfDateTypeItems.add(bfDateTypeItem);
@@ -107,18 +106,10 @@ public class BfActionReportDocTest {
         assertEquals(bfActionReportDocTestSingleDateResource, resultListingData.toString());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void shouldThrowIllegalStateExceptionForListingDataNotABfActionReportDataType() throws Exception {
-        CasesAwaitingJudgmentReportData casesAwaitingJudgmentReportData = new CasesAwaitingJudgmentReportData(
-            new ReportSummary("Test Office"));
-        bfActionReportDoc.getReportDocPart(casesAwaitingJudgmentReportData);
-    }
-
     private String getBfActionDocTestFileContent(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
             .getResource(jsonFileName)).toURI())));
         // returns the content by excluding the opening and closing curly brackets
-        return json.substring(1, json.length() - 1);
+        return json.substring(1, (json.length() - 1));
     }
-
 }

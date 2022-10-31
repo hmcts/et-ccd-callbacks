@@ -74,9 +74,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @RunWith(SpringRunner.class)
 @WebMvcTest(CaseActionsForCaseWorkerController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.LawOfDemeter", "PMD.AvoidDuplicateLiterals",
-    "PMD.TooManyMethods", "PMD.TooManyFields", "PMD.ExcessiveImports", "PMD.ExcessivePublicCount",
-    "PMD.ExcessivePublicCount", "PMD.CyclomaticComplexity", "PMD.ExcessiveClassLength"})
 public class CaseActionsForCaseWorkerControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -115,9 +112,8 @@ public class CaseActionsForCaseWorkerControllerTest {
     private static final String DYNAMIC_DEPOSIT_ORDER_URL = "/dynamicDepositOrder";
     private static final String DYNAMIC_JUDGMENT_URL = "/dynamicJudgments";
     private static final String JUDGEMENT_SUBMITTED_URL = "/judgementSubmitted";
-    private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL =
-            "/reinstateClosedCaseMidEventValidation";
-    private static final String AUTHORIZATION = "Authorization";
+    private static final String REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL = "/reinstateClosedCaseMidEventValidation";
+
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -226,7 +222,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATION_CASE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -242,7 +238,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(RETRIEVE_CASE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -258,7 +254,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(RETRIEVE_CASES_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -273,7 +269,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_CASE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -287,7 +283,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRE_DEFAULT_VALUES_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -302,7 +298,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -317,7 +313,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -332,7 +328,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenReturn(true);
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -347,7 +343,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(eventValidationService.validateCaseState(isA(CaseDetails.class))).thenReturn(false);
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -360,7 +356,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -375,7 +371,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -390,7 +386,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -403,7 +399,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -416,7 +412,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_HEARING_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -429,7 +425,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(ALLOCATE_HEARING_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -442,7 +438,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(RESTRICTED_CASES_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -455,7 +451,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -468,7 +464,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_HEARING_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -481,7 +477,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_EVENT_AMEND_HEARING_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -494,7 +490,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_CASE_STATE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -509,7 +505,7 @@ public class CaseActionsForCaseWorkerControllerTest {
                 eq(false), eq(false), eq(new ArrayList<>()));
         mvc.perform(post(AMEND_CASE_STATE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -522,7 +518,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -535,7 +531,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(JURISDICTION_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -548,7 +544,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(JUDGEMENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -561,7 +557,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DEPOSIT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -574,7 +570,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -590,7 +586,7 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .thenReturn(new CaseData());
         mvc.perform(post(MID_RESPONDENT_ECC_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -606,7 +602,7 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .thenReturn(new CaseData());
         mvc.perform(post(CREATE_ECC_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -622,7 +618,7 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .thenReturn(new CaseData());
         mvc.perform(post(LINK_ORIGINAL_CASE_ECC_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -635,7 +631,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -648,7 +644,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(HEARING_MID_EVENT_VALIDATION_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -661,7 +657,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(BF_ACTIONS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -674,7 +670,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_LIST_BF_ACTIONS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -690,7 +686,7 @@ public class CaseActionsForCaseWorkerControllerTest {
 
         mvc.perform(post(ABOUT_TO_START_DISPOSAL_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -708,7 +704,7 @@ public class CaseActionsForCaseWorkerControllerTest {
 
         mvc.perform(post(ABOUT_TO_START_DISPOSAL_URL)
                 .content(requestContent3.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -721,7 +717,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -734,7 +730,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_DEPOSIT_ORDER_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -747,7 +743,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -760,7 +756,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(INITIALISE_AMEND_CASE_DETAILS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -777,7 +773,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(caseCloseValidator.validateReinstateClosedCaseMidEvent(isA(CaseData.class))).thenReturn(anyList());
         mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -792,7 +788,7 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .thenReturn(List.of("test error"));
         mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -804,7 +800,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void createCaseError400() throws Exception {
         mvc.perform(post(CREATION_CASE_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -813,7 +809,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void retrieveCaseError400() throws Exception {
         mvc.perform(post(RETRIEVE_CASE_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -822,7 +818,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void retrieveCasesError400() throws Exception {
         mvc.perform(post(RETRIEVE_CASES_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -831,7 +827,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void updateCaseError400() throws Exception {
         mvc.perform(post(UPDATE_CASE_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -840,7 +836,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void preDefaultValuesError400() throws Exception {
         mvc.perform(post(PRE_DEFAULT_VALUES_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -849,7 +845,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void postDefaultValuesError400() throws Exception {
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -858,7 +854,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void amendCaseDetailsError400() throws Exception {
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -867,7 +863,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void amendClaimantDetailsError400() throws Exception {
         mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -876,7 +872,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void amendRespondentDetailsError400() throws Exception {
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -885,7 +881,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void amendRespondentRepresentativeError400() throws Exception {
         mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -894,7 +890,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void updateHearingError400() throws Exception {
         mvc.perform(post(UPDATE_HEARING_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -903,7 +899,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void allocateHearingError400() throws Exception {
         mvc.perform(post(ALLOCATE_HEARING_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -912,7 +908,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void restrictedCasesError400() throws Exception {
         mvc.perform(post(RESTRICTED_CASES_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -921,7 +917,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void amendHearingError400() throws Exception {
         mvc.perform(post(AMEND_HEARING_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -930,7 +926,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void midEventAmendHearingError400() throws Exception {
         mvc.perform(post(MID_EVENT_AMEND_HEARING_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -939,7 +935,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void amendCaseStateError400() throws Exception {
         mvc.perform(post(AMEND_CASE_STATE_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -948,7 +944,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void midRespondentAddressError400() throws Exception {
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -957,7 +953,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void jurisdictionValidationError400() throws Exception {
         mvc.perform(post(JURISDICTION_VALIDATION_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -966,7 +962,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void judgementValidationError400() throws Exception {
         mvc.perform(post(JUDGEMENT_VALIDATION_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -975,7 +971,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void depositValidationError400() throws Exception {
         mvc.perform(post(DEPOSIT_VALIDATION_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -984,7 +980,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void midRespondentECCError400() throws Exception {
         mvc.perform(post(MID_RESPONDENT_ECC_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -993,7 +989,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void createECCError400() throws Exception {
         mvc.perform(post(CREATE_ECC_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -1002,7 +998,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void linkOriginalCaseECCError400() throws Exception {
         mvc.perform(post(LINK_ORIGINAL_CASE_ECC_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -1011,7 +1007,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void singleCaseMultipleMidEventValidationError400() throws Exception {
         mvc.perform(post(SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -1020,7 +1016,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void hearingMidEventValidationError400() throws Exception {
         mvc.perform(post(HEARING_MID_EVENT_VALIDATION_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -1029,7 +1025,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void bfActionsError400() throws Exception {
         mvc.perform(post(BF_ACTIONS_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -1038,7 +1034,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void dynamicListBfActionsError400() throws Exception {
         mvc.perform(post(DYNAMIC_LIST_BF_ACTIONS_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -1047,7 +1043,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void aboutToStartDisposalError400() throws Exception {
         mvc.perform(post(ABOUT_TO_START_DISPOSAL_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -1056,7 +1052,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void dynamicRespondentRepresentativeNamesUrlError400() throws Exception {
         mvc.perform(post(DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -1065,7 +1061,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void dynamicDepositOrderError400() throws Exception {
         mvc.perform(post(DYNAMIC_DEPOSIT_ORDER_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -1074,7 +1070,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void dynamicRestrictedReportingError400() throws Exception {
         mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -1083,7 +1079,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void dynamicJudgmentError400() throws Exception {
         mvc.perform(post(DYNAMIC_JUDGMENT_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -1092,7 +1088,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void judgmentSubmittedError400() throws Exception {
         mvc.perform(post(JUDGEMENT_SUBMITTED_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -1101,7 +1097,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void dynamicFixCaseAPIError400() throws Exception {
         mvc.perform(post(AMEND_FIX_CASE_API_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
         verify(fixCaseApiService, never()).checkUpdateMultipleReference(any(CaseDetails.class), anyString());
@@ -1111,7 +1107,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void reinstateClosedCaseError400() throws Exception {
         mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
                         .content("error")
-                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
         verify(caseCloseValidator, never()).validateReinstateClosedCaseMidEvent(any(CaseData.class));
@@ -1124,7 +1120,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATION_CASE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -1137,7 +1133,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(RETRIEVE_CASE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -1149,7 +1145,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(RETRIEVE_CASES_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -1161,7 +1157,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_CASE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -1172,7 +1168,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRE_DEFAULT_VALUES_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -1186,7 +1182,7 @@ public class CaseActionsForCaseWorkerControllerTest {
                 new InternalException(ERROR_MESSAGE));
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -1199,7 +1195,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(eventValidationService.validateCurrentPosition(isA(CaseDetails.class))).thenReturn(true);
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -1211,7 +1207,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -1223,7 +1219,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -1236,7 +1232,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -1246,7 +1242,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CREATION_CASE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1256,7 +1252,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(RETRIEVE_CASE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1266,7 +1262,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(RETRIEVE_CASES_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1276,7 +1272,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_CASE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1286,7 +1282,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(PRE_DEFAULT_VALUES_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1296,7 +1292,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1306,7 +1302,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_CASE_DETAILS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1316,7 +1312,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_CLAIMANT_DETAILS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1326,7 +1322,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1336,7 +1332,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1346,7 +1342,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_HEARING_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1356,7 +1352,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(ALLOCATE_HEARING_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1366,7 +1362,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(RESTRICTED_CASES_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1376,7 +1372,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_HEARING_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1386,7 +1382,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_EVENT_AMEND_HEARING_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1396,7 +1392,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_CASE_STATE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1406,7 +1402,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1416,7 +1412,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(JURISDICTION_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1426,7 +1422,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(JUDGEMENT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1436,7 +1432,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DEPOSIT_VALIDATION_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1446,7 +1442,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1456,7 +1452,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_RESPONDENT_ECC_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1466,7 +1462,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CREATE_ECC_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1476,7 +1472,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(LINK_ORIGINAL_CASE_ECC_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1486,7 +1482,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1496,7 +1492,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(HEARING_MID_EVENT_VALIDATION_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1506,7 +1502,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(BF_ACTIONS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1516,7 +1512,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_LIST_BF_ACTIONS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1526,7 +1522,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(ABOUT_TO_START_DISPOSAL_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
         verify(clerkService, never()).initialiseClerkResponsible(isA(CaseData.class));
@@ -1538,7 +1534,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1548,7 +1544,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_DEPOSIT_ORDER_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1558,7 +1554,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_RESTRICTED_REPORTING_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1568,7 +1564,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_JUDGMENT_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1578,7 +1574,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(JUDGEMENT_SUBMITTED_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1589,7 +1585,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_FIX_CASE_API_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
         verify(fixCaseApiService, never()).checkUpdateMultipleReference(caseDetails, AUTH_TOKEN);
@@ -1601,7 +1597,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(REINSTATE_CLOSED_CASE_MID_EVENT_VALIDATION_URL)
                         .content(requestContent2.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
         verify(caseCloseValidator, never()).validateReinstateClosedCaseMidEvent(caseData);
@@ -1612,7 +1608,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(INITIALISE_AMEND_CASE_DETAILS_URL)
                 .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
 

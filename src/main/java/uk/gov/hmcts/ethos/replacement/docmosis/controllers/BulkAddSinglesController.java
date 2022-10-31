@@ -23,7 +23,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 
 @RestController
 @Slf4j
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.UnnecessaryAnnotationValueElement"})
 public class BulkAddSinglesController {
     private final BulkAddSinglesValidator bulkAddSinglesValidator;
     private final BulkAddSinglesService bulkAddSinglesService;

@@ -32,7 +32,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.TooManyMethods"})
 public class CaseDataBuilder {
 
     private final CaseData caseData = new CaseData();
@@ -115,7 +114,6 @@ public class CaseDataBuilder {
                 break;
             case EDINBURGH:
                 hearing.setHearingEdinburgh(dynamicFixedListType);
-                break;
             case GLASGOW:
                 hearing.setHearingGlasgow(dynamicFixedListType);
                 break;
@@ -348,10 +346,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    /**
-     * Creates an Address object from its properties.
-     */
-    public Address createAddress(String addressLine1, String addressLine2, String addressLine3,
+    private Address createAddress(String addressLine1, String addressLine2, String addressLine3,
                                   String postTown, String county, String postCode, String country) {
         Address address = new Address();
         address.setAddressLine1(addressLine1);

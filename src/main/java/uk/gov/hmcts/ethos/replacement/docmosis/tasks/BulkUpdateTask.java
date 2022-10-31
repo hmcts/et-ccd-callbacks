@@ -10,13 +10,12 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import java.io.IOException;
 
 @Slf4j
-@SuppressWarnings({"PMD.ConfusingTernary"})
 public class BulkUpdateTask implements Runnable {
 
-    private final BulkDetails bulkDetails;
-    private final SubmitEvent submitEvent;
-    private final String authToken;
-    private final CcdClient ccdClient;
+    private BulkDetails bulkDetails;
+    private SubmitEvent submitEvent;
+    private String authToken;
+    private CcdClient ccdClient;
 
     public BulkUpdateTask(BulkDetails bulkDetails, SubmitEvent submitEvent, String authToken, CcdClient ccdClient) {
         this.bulkDetails = bulkDetails;

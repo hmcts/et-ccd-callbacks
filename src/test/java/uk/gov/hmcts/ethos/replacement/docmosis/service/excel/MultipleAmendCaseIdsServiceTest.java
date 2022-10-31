@@ -17,11 +17,9 @@ import java.util.TreeMap;
 
 import static org.junit.Assert.assertEquals;
 
-@SuppressWarnings({"PMD.LooseCoupling"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleAmendCaseIdsServiceTest {
 
-    @SuppressWarnings({"PMD.UnusedPrivateField"})
     @Mock
     private MultipleHelperService multipleHelperService;
     @InjectMocks

@@ -18,8 +18,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
-@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.LawOfDemeter", "PMD.UnusedPrivateMethod", "PMD.LinguisticNaming",
-    "PMD.MethodNamingConventions"})
 public class VenueAddressReaderServiceTest {
 
     private VenueAddressesService venueAddressesService;
@@ -43,8 +41,7 @@ public class VenueAddressReaderServiceTest {
         HearingType hearingType = getHearingTypeForVenue_EnglandWales("Manchester1");
 
         // Act
-        String resultAddress = venueAddressReaderService.getVenueAddress(
-                hearingType, ENGLANDWALES_CASE_TYPE_ID, officeName);
+        String resultAddress = venueAddressReaderService.getVenueAddress(hearingType, ENGLANDWALES_CASE_TYPE_ID, officeName);
 
         // Assert
         assertEquals("Test Address1", resultAddress);
@@ -62,8 +59,7 @@ public class VenueAddressReaderServiceTest {
         HearingType hearingType = getHearingTypeForVenue_EnglandWales("Wales1");
 
         // Act
-        String resultAddress = venueAddressReaderService.getVenueAddress(
-                hearingType, ENGLANDWALES_CASE_TYPE_ID, officeName);
+        String resultAddress = venueAddressReaderService.getVenueAddress(hearingType, ENGLANDWALES_CASE_TYPE_ID, officeName);
 
         // Assert
         assertEquals("Test Address2", resultAddress);
@@ -77,14 +73,11 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setAddress("Test Address3");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
         var officeName = TribunalOffice.GLASGOW.getOfficeName();
-        when(venueAddressesService.getTribunalVenueAddresses(officeName))
-                .thenReturn(venueAddressList);
-        HearingType hearingType = getHearingTypeForVenue_Scotland(
-                TribunalOffice.GLASGOW.getOfficeName(), "Glasgow1");
+        when(venueAddressesService.getTribunalVenueAddresses(officeName)).thenReturn(venueAddressList);
+        HearingType hearingType = getHearingTypeForVenue_Scotland(TribunalOffice.GLASGOW.getOfficeName(), "Glasgow1");
 
         // Act
-        String resultAddress = venueAddressReaderService.getVenueAddress(
-                hearingType, SCOTLAND_CASE_TYPE_ID, officeName);
+        String resultAddress = venueAddressReaderService.getVenueAddress(hearingType, SCOTLAND_CASE_TYPE_ID, officeName);
 
         // Assert
         assertEquals("Test Address3", resultAddress);
@@ -98,14 +91,11 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setAddress("Test Address4");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
         var officeName = TribunalOffice.ABERDEEN.getOfficeName();
-        when(venueAddressesService.getTribunalVenueAddresses(officeName))
-                .thenReturn(venueAddressList);
-        HearingType hearingType = getHearingTypeForVenue_Scotland(
-                TribunalOffice.ABERDEEN.getOfficeName(), "Aberdeen1");
+        when(venueAddressesService.getTribunalVenueAddresses(officeName)).thenReturn(venueAddressList);
+        HearingType hearingType = getHearingTypeForVenue_Scotland(TribunalOffice.ABERDEEN.getOfficeName(), "Aberdeen1");
 
         // Act
-        String resultAddress = venueAddressReaderService.getVenueAddress(
-                hearingType, SCOTLAND_CASE_TYPE_ID, officeName);
+        String resultAddress = venueAddressReaderService.getVenueAddress(hearingType, SCOTLAND_CASE_TYPE_ID, officeName);
 
         // Assert
         assertEquals("Test Address4", resultAddress);
@@ -120,12 +110,10 @@ public class VenueAddressReaderServiceTest {
         List<VenueAddress> venueAddressList = List.of(venueAddress);
         var officeName = TribunalOffice.DUNDEE.getOfficeName();
         when(venueAddressesService.getTribunalVenueAddresses(officeName)).thenReturn(venueAddressList);
-        HearingType hearingType = getHearingTypeForVenue_Scotland(
-                TribunalOffice.DUNDEE.getOfficeName(), "Dundee1");
+        HearingType hearingType = getHearingTypeForVenue_Scotland(TribunalOffice.DUNDEE.getOfficeName(), "Dundee1");
 
         // Act
-        String resultAddress = venueAddressReaderService.getVenueAddress(
-                hearingType, SCOTLAND_CASE_TYPE_ID, officeName);
+        String resultAddress = venueAddressReaderService.getVenueAddress(hearingType, SCOTLAND_CASE_TYPE_ID, officeName);
 
         // Assert
         assertEquals("Test Address5", resultAddress);
@@ -139,14 +127,11 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setAddress("Test Address6");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
         var officeName = TribunalOffice.EDINBURGH.getOfficeName();
-        when(venueAddressesService.getTribunalVenueAddresses(
-                officeName)).thenReturn(venueAddressList);
-        HearingType hearingType = getHearingTypeForVenue_Scotland(
-                TribunalOffice.EDINBURGH.getOfficeName(), "Edinburgh1");
+        when(venueAddressesService.getTribunalVenueAddresses(officeName)).thenReturn(venueAddressList);
+        HearingType hearingType = getHearingTypeForVenue_Scotland(TribunalOffice.EDINBURGH.getOfficeName(), "Edinburgh1");
 
         // Act
-        String resultAddress = venueAddressReaderService.getVenueAddress(
-                hearingType, SCOTLAND_CASE_TYPE_ID, officeName);
+        String resultAddress = venueAddressReaderService.getVenueAddress(hearingType, SCOTLAND_CASE_TYPE_ID, officeName);
 
         // Assert
         assertEquals("Test Address6", resultAddress);
@@ -160,14 +145,11 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setAddress("");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
         var officeName = TribunalOffice.GLASGOW.getOfficeName();
-        when(venueAddressesService.getTribunalVenueAddresses(officeName))
-                .thenReturn(venueAddressList);
-        HearingType hearingType = getHearingTypeForVenue_Scotland(
-                TribunalOffice.GLASGOW.getOfficeName(), "Glasgow2");
+        when(venueAddressesService.getTribunalVenueAddresses(officeName)).thenReturn(venueAddressList);
+        HearingType hearingType = getHearingTypeForVenue_Scotland(TribunalOffice.GLASGOW.getOfficeName(), "Glasgow2");
 
         // Act
-        String resultAddress = venueAddressReaderService.getVenueAddress(
-                hearingType, SCOTLAND_CASE_TYPE_ID, officeName);
+        String resultAddress = venueAddressReaderService.getVenueAddress(hearingType, SCOTLAND_CASE_TYPE_ID, officeName);
 
         // Assert
         assertEquals("Glasgow2", resultAddress);
@@ -185,8 +167,7 @@ public class VenueAddressReaderServiceTest {
         HearingType hearingType = getHearingTypeForVenue_EnglandWales("Manchester1");
 
         // Act
-        String resultAddress = venueAddressReaderService.getVenueAddress(
-                hearingType, ENGLANDWALES_CASE_TYPE_ID, officeName);
+        String resultAddress = venueAddressReaderService.getVenueAddress(hearingType, ENGLANDWALES_CASE_TYPE_ID, officeName);
 
         // Assert
         assertEquals("Manchester1", resultAddress);
@@ -200,8 +181,7 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setAddress("");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
         var officeName = TribunalOffice.GLASGOW.getOfficeName();
-        when(venueAddressesService.getTribunalVenueAddresses(officeName))
-                .thenReturn(venueAddressList);
+        when(venueAddressesService.getTribunalVenueAddresses(officeName)).thenReturn(venueAddressList);
         HearingType hearingType = getHearingTypeForVenue_ScotlandNotFound();
 
         // Act
@@ -216,8 +196,7 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setAddress("");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
         var officeName = TribunalOffice.GLASGOW.getOfficeName();
-        when(venueAddressesService.getTribunalVenueAddresses(officeName))
-                .thenReturn(venueAddressList);
+        when(venueAddressesService.getTribunalVenueAddresses(officeName)).thenReturn(venueAddressList);
         HearingType hearing = new HearingType();
         hearing.setHearingVenueScotland("");
 
@@ -230,13 +209,11 @@ public class VenueAddressReaderServiceTest {
         // Arrange
         List<VenueAddress> venueAddressList = new ArrayList<>();
         var officeName = TribunalOffice.MANCHESTER.getOfficeName();
-        when(venueAddressesService.getTribunalVenueAddresses(officeName))
-                .thenReturn(venueAddressList);
+        when(venueAddressesService.getTribunalVenueAddresses(officeName)).thenReturn(venueAddressList);
         HearingType hearing = getHearingTypeForVenue_EnglandWales(officeName);
 
         // Act
-        venueAddressReaderService.getVenueAddress(hearing,
-                ENGLANDWALES_CASE_TYPE_ID, officeName);
+        venueAddressReaderService.getVenueAddress(hearing, ENGLANDWALES_CASE_TYPE_ID, officeName);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -269,17 +246,12 @@ public class VenueAddressReaderServiceTest {
         switch (tribunalOffice) {
             case GLASGOW:
                 hearing.setHearingGlasgow(hearingVenue);
-                break;
             case ABERDEEN:
                 hearing.setHearingAberdeen(hearingVenue);
-                break;
             case DUNDEE:
                 hearing.setHearingDundee(hearingVenue);
-                break;
             case EDINBURGH:
                 hearing.setHearingEdinburgh(hearingVenue);
-                break;
-            default:
         }
 
         hearing.setHearingVenueScotland(venueOffice);

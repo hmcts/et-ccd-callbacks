@@ -8,7 +8,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
 
-final class EccReportElasticSearchQuery {
+class EccReportElasticSearchQuery {
 
     private EccReportElasticSearchQuery() {
         // Access through static methods

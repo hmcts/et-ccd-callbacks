@@ -35,7 +35,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationMidEventValidationService.CASE_BELONGS_DIFFERENT_OFFICE;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ExcessiveImports"})
 @RunWith(SpringJUnit4ClassRunner.class)
 @ExtendWith(SpringExtension.class)
 class MultipleCreationMidEventValidationServiceTest {
@@ -66,7 +65,7 @@ class MultipleCreationMidEventValidationServiceTest {
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(ACCEPTED_STATE);
-        submitEvent.setCaseId(1_232_121_232);
+        submitEvent.setCaseId(1232121232);
 
         multipleDetails.getCaseData().setLeadCase(null);
 
@@ -101,9 +100,9 @@ class MultipleCreationMidEventValidationServiceTest {
         assertEquals(3, errors.size());
         assertEquals("[21006/2020] lead case does not exist.", errors.get(0));
         assertEquals("There are 60 cases in the multiple. The limit is 50.", errors.get(1));
-        assertEquals("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,"
-                + " 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, "
-                + "48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59] cases do not exist.", errors.get(2));
+        assertEquals("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24," +
+                " 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50," +
+                " 51, 52, 53, 54, 55, 56, 57, 58, 59] cases do not exist.", errors.get(2));
 
     }
 
@@ -170,7 +169,7 @@ class MultipleCreationMidEventValidationServiceTest {
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(ACCEPTED_STATE);
-        submitEvent.setCaseId(1_232_121_232);
+        submitEvent.setCaseId(1232121232);
 
         multipleDetails.getCaseData().setLeadCase(null);
 
@@ -206,10 +205,8 @@ class MultipleCreationMidEventValidationServiceTest {
                 errors,
                 true);
 
-        assertTrue(errors.contains(String.format(CASE_BELONGS_DIFFERENT_OFFICE,
-                "245000/2020", TribunalOffice.MANCHESTER.getOfficeName())));
-        assertFalse(errors.contains(String.format(CASE_BELONGS_DIFFERENT_OFFICE,
-                "245001/2020", TribunalOffice.BRISTOL.getOfficeName())));
+        assertTrue(errors.contains(String.format(CASE_BELONGS_DIFFERENT_OFFICE, "245000/2020", TribunalOffice.MANCHESTER.getOfficeName())));
+        assertFalse(errors.contains(String.format(CASE_BELONGS_DIFFERENT_OFFICE, "245001/2020", TribunalOffice.BRISTOL.getOfficeName())));
     }
 
     @Test
@@ -230,17 +227,15 @@ class MultipleCreationMidEventValidationServiceTest {
                 errors,
                 true);
 
-        assertFalse(errors.contains(String.format(CASE_BELONGS_DIFFERENT_OFFICE,
-                "245000/2020", TribunalOffice.ABERDEEN.getOfficeName())));
-        assertFalse(errors.contains(String.format(CASE_BELONGS_DIFFERENT_OFFICE,
-                "245001/2020", TribunalOffice.DUNDEE.getOfficeName())));
+        assertFalse(errors.contains(String.format(CASE_BELONGS_DIFFERENT_OFFICE, "245000/2020", TribunalOffice.ABERDEEN.getOfficeName())));
+        assertFalse(errors.contains(String.format(CASE_BELONGS_DIFFERENT_OFFICE, "245001/2020", TribunalOffice.DUNDEE.getOfficeName())));
     }
 
     private void createCaseIdCollection(MultipleData multipleData, int numberCases) {
 
         List<CaseIdTypeItem> caseIdCollection = new ArrayList<>();
 
-        for (int i = 0; i < numberCases; i++) {
+        for (int i = 0 ; i < numberCases ; i++) {
 
             caseIdCollection.add(createCaseIdType(String.valueOf(i)));
 
@@ -273,7 +268,7 @@ class MultipleCreationMidEventValidationServiceTest {
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(SUBMITTED_STATE);
-        submitEvent.setCaseId(1_232_121_232);
+        submitEvent.setCaseId(1232121232);
 
         CaseData caseData1 = new CaseData();
         caseData1.setEthosCaseReference("245001/2020");
@@ -282,7 +277,7 @@ class MultipleCreationMidEventValidationServiceTest {
         SubmitEvent submitEvent1 = new SubmitEvent();
         submitEvent1.setCaseData(caseData1);
         submitEvent1.setState(SUBMITTED_STATE);
-        submitEvent1.setCaseId(1_232_121_233);
+        submitEvent1.setCaseId(1232121233);
 
         return new ArrayList<>(Arrays.asList(submitEvent, submitEvent1));
 

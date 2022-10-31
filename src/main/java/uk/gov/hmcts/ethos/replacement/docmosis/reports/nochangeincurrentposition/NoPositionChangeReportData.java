@@ -16,8 +16,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_O
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_CASES;
 
 @Getter
-@SuppressWarnings({ "PMD.AvoidInstantiatingObjectsInLoops", "PMD.InsufficientStringBufferDeclaration",
-    "PMD.ConsecutiveAppendsShouldReuse"})
 public class NoPositionChangeReportData extends ListingData {
     // JsonIgnore is required on properties so that the report data is not
     // returned to CCD in any callback response.
@@ -39,7 +37,6 @@ public class NoPositionChangeReportData extends ListingData {
 
     public NoPositionChangeReportData(NoPositionChangeReportSummary hearingsToJudgmentsReportSummary,
                                       String reportDate) {
-        super();
         this.reportSummary = hearingsToJudgmentsReportSummary;
         this.setReportDate(reportDate);
     }

@@ -49,8 +49,8 @@ public class ClaimsByHearingVenueExcelReportDocumentInfoServiceTest {
                         new byte[0]))
                 .thenReturn(docInfo);
 
-        DocumentInfo resultDocInfo = excelReportDocInfService.generateExcelReportDocumentInfo(
-                reportData, ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
+       var resultDocInfo = excelReportDocInfService.generateExcelReportDocumentInfo(reportData,
+               ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
         assertNotNull(resultDocInfo);
     }
 
@@ -64,7 +64,7 @@ public class ClaimsByHearingVenueExcelReportDocumentInfoServiceTest {
                         new byte[0]))
                 .thenReturn(docInfo);
 
-        excelReportDocInfService.generateExcelReportDocumentInfo(reportData,
+        var resultDocInfo = excelReportDocInfService.generateExcelReportDocumentInfo(reportData,
                 ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
 
         verify(reportCreationService, times(1)).getReportExcelFile(reportData);

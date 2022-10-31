@@ -33,6 +33,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.BulkCreationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BulkSearchService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BulkUpdateService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentGenerationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.MultipleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SubMultipleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
@@ -61,8 +62,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @RunWith(SpringRunner.class)
 @WebMvcTest(BulkActionsController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
-@SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.TooManyMethods", "PMD.ExcessiveImports",
-    "PMD.ExcessiveClassLength", "PMD.CyclomaticComplexity"})
 public class BulkActionsControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -87,8 +86,7 @@ public class BulkActionsControllerTest {
     private static final String GENERATE_BULK_SCHEDULE_CONFIRMATION_URL = "/generateBulkScheduleConfirmation";
     private static final String PRE_ACCEPT_BULK_URL = "/preAcceptBulk";
     private static final String AFTER_SUBMITTED_BULK_URL = "/afterSubmittedBulk";
-    private static final String AUTHORIZATION = "Authorization";
-    
+
     @Autowired
     private WebApplicationContext applicationContext;
 
@@ -103,6 +101,9 @@ public class BulkActionsControllerTest {
 
     @MockBean
     private DocumentGenerationService documentGenerationService;
+
+    @MockBean
+    private MultipleReferenceService multipleReferenceService;
 
     @MockBean
     private SubMultipleService subMultipleService;
@@ -127,10 +128,10 @@ public class BulkActionsControllerTest {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
         List<SubmitEvent> submitEvents;
+        List<MultipleTypeItem> multipleTypeItems = new ArrayList<>();
         bulkCasesPayload = new BulkCasesPayload();
         submitEvents = getSubmitEvents();
         bulkCasesPayload.setSubmitEvents(submitEvents);
-        List<MultipleTypeItem> multipleTypeItems = new ArrayList<>();
         bulkCasesPayload.setMultipleTypeItems(multipleTypeItems);
         BulkData bulkData = new BulkData();
         BulkDetails bulkDetails = new BulkDetails();
@@ -143,23 +144,19 @@ public class BulkActionsControllerTest {
         documentInfo2.setMarkUp("markup2");
         List<DocumentInfo> documentInfoList = new ArrayList<>(Arrays.asList(documentInfo1, documentInfo2));
         bulkDocumentInfo = new BulkDocumentInfo();
-        bulkDocumentInfo.setMarkUps(
-                documentInfoList.stream().map(DocumentInfo::getMarkUp).collect(Collectors.joining(", ")));
+        bulkDocumentInfo.setMarkUps(documentInfoList.stream().map(DocumentInfo::getMarkUp).collect(Collectors.joining(", ")));
         bulkDocumentInfo.setErrors(new ArrayList<>());
     }
 
     @Test
     public void createBulkCase() throws Exception {
-        when(bulkSearchService.bulkCasesRetrievalRequest(isA(
-                BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class))).thenReturn(bulkCasesPayload);
-        when(bulkCreationService.bulkCreationLogic(isA(
-                BulkDetails.class), isA(BulkCasesPayload.class), eq(AUTH_TOKEN), isA(String.class)))
-                .thenReturn(bulkRequestPayload);
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN))
-                .thenReturn(true);
+        when(bulkSearchService.bulkCasesRetrievalRequest(isA(BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class))).thenReturn(bulkCasesPayload);
+        when(bulkCreationService.bulkCreationLogic(isA(BulkDetails.class), isA(BulkCasesPayload.class), eq(AUTH_TOKEN), isA(String.class))).
+                thenReturn(bulkRequestPayload);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATION_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -169,17 +166,13 @@ public class BulkActionsControllerTest {
 
     @Test
     public void createBulkCaseES() throws Exception {
-        when(bulkSearchService.bulkCasesRetrievalRequestElasticSearch(
-                isA(BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class), isA(Boolean.class)))
-                .thenReturn(bulkCasesPayload);
-        when(bulkCreationService.bulkCreationLogic(
-                isA(BulkDetails.class), isA(BulkCasesPayload.class), eq(AUTH_TOKEN), isA(String.class)))
-                .thenReturn(bulkRequestPayload);
-
+        when(bulkSearchService.bulkCasesRetrievalRequestElasticSearch(isA(BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class), isA(Boolean.class))).thenReturn(bulkCasesPayload);
+        when(bulkCreationService.bulkCreationLogic(isA(BulkDetails.class), isA(BulkCasesPayload.class), eq(AUTH_TOKEN), isA(String.class))).
+                thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATION_BULK_ES_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -193,7 +186,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SEARCH_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -203,14 +196,11 @@ public class BulkActionsControllerTest {
 
     @Test
     public void midSearchBulkCase() throws Exception {
-        when(bulkSearchService.bulkMidSearchLogic(
-                isA(BulkDetails.class), isA(Boolean.class)))
-                .thenReturn(bulkRequestPayload);
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN))
-                .thenReturn(true);
+        when(bulkSearchService.bulkMidSearchLogic(isA(BulkDetails.class), isA(Boolean.class))).thenReturn(bulkRequestPayload);
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_SEARCH_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -220,14 +210,12 @@ public class BulkActionsControllerTest {
 
     @Test
     public void updateBulk() throws Exception {
-        when(bulkUpdateService.bulkUpdateLogic(
-                isA(BulkDetails.class), eq(AUTH_TOKEN))).thenReturn(bulkRequestPayload);
-        when(bulkUpdateService.clearUpFields(
-                isA(BulkRequestPayload.class))).thenReturn(bulkRequestPayload);
+        when(bulkUpdateService.bulkUpdateLogic(isA(BulkDetails.class), eq(AUTH_TOKEN))).thenReturn(bulkRequestPayload);
+        when(bulkUpdateService.clearUpFields(isA(BulkRequestPayload.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -237,12 +225,11 @@ public class BulkActionsControllerTest {
 
     @Test
     public void updateBulkCase() throws Exception {
-        when(bulkCreationService.bulkUpdateCaseIdsLogic(
-                isA(BulkRequest.class), eq(AUTH_TOKEN), isA(Boolean.class))).thenReturn(bulkRequestPayload);
+        when(bulkCreationService.bulkUpdateCaseIdsLogic(isA(BulkRequest.class), eq(AUTH_TOKEN), isA(Boolean.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_BULK_CASE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -272,12 +259,11 @@ public class BulkActionsControllerTest {
 
     @Test
     public void generateBulkLetter() throws Exception {
-        when(documentGenerationService.processBulkDocumentRequest(
-                isA(BulkRequest.class), eq(AUTH_TOKEN))).thenReturn(bulkDocumentInfo);
+        when(documentGenerationService.processBulkDocumentRequest(isA(BulkRequest.class), eq(AUTH_TOKEN))).thenReturn(bulkDocumentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_BULK_LETTER_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -290,7 +276,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_BULK_LETTER_CONFIRMATION_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -301,15 +287,13 @@ public class BulkActionsControllerTest {
     @Test
     public void generateBulkLetterWithErrors() throws Exception {
         BulkDocumentInfo bulkDocumentInfo1 = new BulkDocumentInfo();
-        bulkDocumentInfo1.setErrors(new ArrayList<>(Collections.singleton(
-                "There are not cases searched to generate letters")));
+        bulkDocumentInfo1.setErrors(new ArrayList<>(Collections.singleton("There are not cases searched to generate letters")));
         bulkDocumentInfo1.setMarkUps("");
-        when(documentGenerationService.processBulkDocumentRequest(
-                isA(BulkRequest.class), eq(AUTH_TOKEN))).thenReturn(bulkDocumentInfo1);
+        when(documentGenerationService.processBulkDocumentRequest(isA(BulkRequest.class), eq(AUTH_TOKEN))).thenReturn(bulkDocumentInfo1);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_BULK_LETTER_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -319,12 +303,11 @@ public class BulkActionsControllerTest {
 
     @Test
     public void midCreateSubMultiple() throws Exception {
-        when(bulkSearchService.bulkMidSearchLogic(
-                isA(BulkDetails.class), isA(Boolean.class))).thenReturn(bulkRequestPayload);
+        when(bulkSearchService.bulkMidSearchLogic(isA(BulkDetails.class), isA(Boolean.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_CREATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -334,12 +317,11 @@ public class BulkActionsControllerTest {
 
     @Test
     public void createSubMultiple() throws Exception {
-        when(subMultipleService.createSubMultipleLogic(
-                isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
+        when(subMultipleService.createSubMultipleLogic(isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -349,12 +331,11 @@ public class BulkActionsControllerTest {
 
     @Test
     public void subMultipleDynamicList() throws Exception {
-        when(subMultipleService.populateSubMultipleDynamicListLogic(
-                isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
+        when(subMultipleService.populateSubMultipleDynamicListLogic(isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SUB_MULTIPLE_DYNAMIC_LIST_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -364,12 +345,11 @@ public class BulkActionsControllerTest {
 
     @Test
     public void filterDefaultedAllDynamicList() throws Exception {
-        when(subMultipleService.populateFilterDefaultedDynamicListLogic(
-                isA(BulkDetails.class), isA(String.class))).thenReturn(bulkRequestPayload);
+        when(subMultipleService.populateFilterDefaultedDynamicListLogic(isA(BulkDetails.class), isA(String.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(FILTER_DEFAULTED_ALL_DYNAMIC_LIST_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -379,12 +359,11 @@ public class BulkActionsControllerTest {
 
     @Test
     public void filterDefaultedNoneDynamicList() throws Exception {
-        when(subMultipleService.populateFilterDefaultedDynamicListLogic(
-                isA(BulkDetails.class), isA(String.class))).thenReturn(bulkRequestPayload);
+        when(subMultipleService.populateFilterDefaultedDynamicListLogic(isA(BulkDetails.class), isA(String.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(FILTER_DEFAULTED_NONE_DYNAMIC_LIST_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -394,12 +373,11 @@ public class BulkActionsControllerTest {
 
     @Test
     public void midUpdateSubMultiple() throws Exception {
-        when(subMultipleService.bulkMidUpdateLogic(
-                isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
+        when(subMultipleService.bulkMidUpdateLogic(isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_UPDATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -409,12 +387,11 @@ public class BulkActionsControllerTest {
 
     @Test
     public void updateSubMultiple() throws Exception {
-        when(subMultipleService.updateSubMultipleLogic(
-                isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
+        when(subMultipleService.updateSubMultipleLogic(isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -424,12 +401,11 @@ public class BulkActionsControllerTest {
 
     @Test
     public void deleteSubMultiple() throws Exception {
-        when(subMultipleService.deleteSubMultipleLogic(
-                isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
+        when(subMultipleService.deleteSubMultipleLogic(isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DELETE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -439,12 +415,11 @@ public class BulkActionsControllerTest {
 
     @Test
     public void generateBulkSchedule() throws Exception {
-        when(documentGenerationService.processBulkScheduleRequest(
-                isA(BulkRequest.class), isA(String.class))).thenReturn(bulkDocumentInfo);
+        when(documentGenerationService.processBulkScheduleRequest(isA(BulkRequest.class), isA(String.class))).thenReturn(bulkDocumentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_BULK_SCHEDULE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -457,7 +432,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_BULK_SCHEDULE_CONFIRMATION_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -468,12 +443,11 @@ public class BulkActionsControllerTest {
     @Test
     public void generateBulkScheduleWithErrors() throws Exception {
         bulkDocumentInfo.setErrors(new ArrayList<>(Collections.singleton("Error")));
-        when(documentGenerationService.processBulkScheduleRequest(
-                isA(BulkRequest.class), isA(String.class))).thenReturn(bulkDocumentInfo);
+        when(documentGenerationService.processBulkScheduleRequest(isA(BulkRequest.class), isA(String.class))).thenReturn(bulkDocumentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_BULK_SCHEDULE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -484,12 +458,11 @@ public class BulkActionsControllerTest {
     @Test
     public void generateBulkScheduleWithBulkInfo() throws Exception {
         bulkDocumentInfo.setDocumentInfo(new DocumentInfo());
-        when(documentGenerationService.processBulkScheduleRequest(
-                isA(BulkRequest.class), isA(String.class))).thenReturn(bulkDocumentInfo);
+        when(documentGenerationService.processBulkScheduleRequest(isA(BulkRequest.class), isA(String.class))).thenReturn(bulkDocumentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_BULK_SCHEDULE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -499,14 +472,12 @@ public class BulkActionsControllerTest {
 
     @Test
     public void preAcceptBulk() throws Exception {
-        when(bulkSearchService.retrievalCasesForPreAcceptRequest(
-                isA(BulkDetails.class), eq(AUTH_TOKEN))).thenReturn(bulkCasesPayload.getSubmitEvents());
-        when(bulkUpdateService.bulkPreAcceptLogic(
-                isA(BulkDetails.class), any(), eq(AUTH_TOKEN), eq(false))).thenReturn(bulkRequestPayload);
+        when(bulkSearchService.retrievalCasesForPreAcceptRequest(isA(BulkDetails.class), eq(AUTH_TOKEN))).thenReturn(bulkCasesPayload.getSubmitEvents());
+        when(bulkUpdateService.bulkPreAcceptLogic(isA(BulkDetails.class), any(), eq(AUTH_TOKEN), eq(false))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRE_ACCEPT_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -519,7 +490,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AFTER_SUBMITTED_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
@@ -530,7 +501,7 @@ public class BulkActionsControllerTest {
     public void createBulkCaseError400() throws Exception {
         mvc.perform(post(CREATION_BULK_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -539,7 +510,7 @@ public class BulkActionsControllerTest {
     public void createBulkCaseESError400() throws Exception {
         mvc.perform(post(CREATION_BULK_ES_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -548,7 +519,7 @@ public class BulkActionsControllerTest {
     public void createSearchBulkCaseError400() throws Exception {
         mvc.perform(post(SEARCH_BULK_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -557,7 +528,7 @@ public class BulkActionsControllerTest {
     public void midSearchBulkCaseError400() throws Exception {
         mvc.perform(post(MID_SEARCH_BULK_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -566,7 +537,7 @@ public class BulkActionsControllerTest {
     public void updateBulkError400() throws Exception {
         mvc.perform(post(UPDATE_BULK_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -575,7 +546,7 @@ public class BulkActionsControllerTest {
     public void updateBulkCaseError400() throws Exception {
         mvc.perform(post(UPDATE_BULK_CASE_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -584,7 +555,7 @@ public class BulkActionsControllerTest {
     public void generateBulkLetterError400() throws Exception {
         mvc.perform(post(GENERATE_BULK_LETTER_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -593,7 +564,7 @@ public class BulkActionsControllerTest {
     public void midCreateSubMultipleError400() throws Exception {
         mvc.perform(post(MID_CREATE_SUB_MULTIPLE_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -602,7 +573,7 @@ public class BulkActionsControllerTest {
     public void subMultipleDynamicListError400() throws Exception {
         mvc.perform(post(SUB_MULTIPLE_DYNAMIC_LIST_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -611,7 +582,7 @@ public class BulkActionsControllerTest {
     public void createSubMultipleError400() throws Exception {
         mvc.perform(post(CREATE_SUB_MULTIPLE_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -620,7 +591,7 @@ public class BulkActionsControllerTest {
     public void filterDefaultedAllDynamicListError400() throws Exception {
         mvc.perform(post(FILTER_DEFAULTED_ALL_DYNAMIC_LIST_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -629,7 +600,7 @@ public class BulkActionsControllerTest {
     public void filterDefaultedNoneDynamicListError400() throws Exception {
         mvc.perform(post(FILTER_DEFAULTED_NONE_DYNAMIC_LIST_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -638,7 +609,7 @@ public class BulkActionsControllerTest {
     public void midUpdateSubMultipleError400() throws Exception {
         mvc.perform(post(MID_UPDATE_SUB_MULTIPLE_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -647,7 +618,7 @@ public class BulkActionsControllerTest {
     public void updateSubMultipleError400() throws Exception {
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -656,7 +627,7 @@ public class BulkActionsControllerTest {
     public void deleteSubMultipleError400() throws Exception {
         mvc.perform(post(DELETE_SUB_MULTIPLE_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -665,7 +636,7 @@ public class BulkActionsControllerTest {
     public void generateBulkScheduleError400() throws Exception {
         mvc.perform(post(GENERATE_BULK_SCHEDULE_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -674,214 +645,194 @@ public class BulkActionsControllerTest {
     public void preAcceptBulkError400() throws Exception {
         mvc.perform(post(PRE_ACCEPT_BULK_URL)
                 .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void createBulkCaseError500() throws Exception {
-        when(bulkSearchService.bulkCasesRetrievalRequest(
-                isA(BulkDetails.class), eq(AUTH_TOKEN),
-                isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(bulkSearchService.bulkCasesRetrievalRequest(isA(BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATION_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void createBulkCaseESError500() throws Exception {
-        when(bulkSearchService.bulkCasesRetrievalRequestElasticSearch(
-                isA(BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class),
-                isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(bulkSearchService.bulkCasesRetrievalRequestElasticSearch(isA(BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class), isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATION_BULK_ES_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void createSearchBulkCaseError500() throws Exception {
-        when(bulkSearchService.bulkSearchLogic(isA(BulkDetails.class)))
-                .thenThrow(new InternalException(ERROR_MESSAGE));
+        when(bulkSearchService.bulkSearchLogic(isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SEARCH_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void midSearchBulkCaseError500() throws Exception {
-        when(bulkSearchService.bulkMidSearchLogic(
-                isA(BulkDetails.class), isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(bulkSearchService.bulkMidSearchLogic(isA(BulkDetails.class), isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_SEARCH_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void updateBulkError500() throws Exception {
-        when(bulkUpdateService.bulkUpdateLogic(
-                isA(BulkDetails.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(bulkUpdateService.bulkUpdateLogic(isA(BulkDetails.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void updateBulkCaseError500() throws Exception {
-        when(bulkCreationService.bulkUpdateCaseIdsLogic(
-                isA(BulkRequest.class), eq(AUTH_TOKEN), isA(Boolean.class)))
-                .thenThrow(new InternalException(ERROR_MESSAGE));
+        when(bulkCreationService.bulkUpdateCaseIdsLogic(isA(BulkRequest.class), eq(AUTH_TOKEN), isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_BULK_CASE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void generateBulkLetterError500() throws Exception {
-        when(documentGenerationService.processBulkDocumentRequest(
-                isA(BulkRequest.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(documentGenerationService.processBulkDocumentRequest(isA(BulkRequest.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_BULK_LETTER_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void midCreateSubMultipleError500() throws Exception {
-        when(bulkSearchService.bulkMidSearchLogic(
-                isA(BulkDetails.class), isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(bulkSearchService.bulkMidSearchLogic(isA(BulkDetails.class), isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_CREATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void createSubMultipleError500() throws Exception {
-        when(subMultipleService.createSubMultipleLogic(
-                isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(subMultipleService.createSubMultipleLogic(isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void subMultipleDynamicListError500() throws Exception {
-        when(subMultipleService.populateSubMultipleDynamicListLogic(
-                isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(subMultipleService.populateSubMultipleDynamicListLogic(isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SUB_MULTIPLE_DYNAMIC_LIST_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void filterDefaultedAllDynamicListError500() throws Exception {
-        when(subMultipleService.populateFilterDefaultedDynamicListLogic(
-                isA(BulkDetails.class), isA(String.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(subMultipleService.populateFilterDefaultedDynamicListLogic(isA(BulkDetails.class), isA(String.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(FILTER_DEFAULTED_ALL_DYNAMIC_LIST_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void filterDefaultedNoneDynamicListError500() throws Exception {
-        when(subMultipleService.populateFilterDefaultedDynamicListLogic(
-                isA(BulkDetails.class), isA(String.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(subMultipleService.populateFilterDefaultedDynamicListLogic(isA(BulkDetails.class), isA(String.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(FILTER_DEFAULTED_NONE_DYNAMIC_LIST_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void midUpdateSubMultipleError500() throws Exception {
-        when(subMultipleService.bulkMidUpdateLogic(
-                isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(subMultipleService.bulkMidUpdateLogic(isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_UPDATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void updateSubMultipleError500() throws Exception {
-        when(subMultipleService.updateSubMultipleLogic(
-                isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(subMultipleService.updateSubMultipleLogic(isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void deleteSubMultipleError500() throws Exception {
-        when(subMultipleService.deleteSubMultipleLogic(
-                isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(subMultipleService.deleteSubMultipleLogic(isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DELETE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void generateBulkScheduleError500() throws Exception {
-        when(documentGenerationService.processBulkScheduleRequest(
-                isA(BulkRequest.class), isA(String.class))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(documentGenerationService.processBulkScheduleRequest(isA(BulkRequest.class), isA(String.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_BULK_SCHEDULE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
     @Test
     public void preAcceptBulkError500() throws Exception {
-        when(bulkSearchService.retrievalCasesForPreAcceptRequest(
-                isA(BulkDetails.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
+        when(bulkSearchService.retrievalCasesForPreAcceptRequest(isA(BulkDetails.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRE_ACCEPT_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
@@ -891,7 +842,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CREATION_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -901,7 +852,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CREATION_BULK_ES_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -911,7 +862,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SEARCH_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -921,7 +872,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_SEARCH_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -931,7 +882,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -941,7 +892,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_BULK_CASE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -951,7 +902,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_BULK_LETTER_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -961,7 +912,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_BULK_LETTER_CONFIRMATION_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -971,7 +922,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_CREATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -981,7 +932,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CREATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -991,7 +942,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SUB_MULTIPLE_DYNAMIC_LIST_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1001,7 +952,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(FILTER_DEFAULTED_ALL_DYNAMIC_LIST_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1011,7 +962,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(FILTER_DEFAULTED_NONE_DYNAMIC_LIST_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1021,7 +972,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_UPDATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1031,7 +982,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1041,7 +992,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DELETE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1051,7 +1002,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_BULK_SCHEDULE_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1061,7 +1012,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_BULK_SCHEDULE_CONFIRMATION_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1071,7 +1022,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(PRE_ACCEPT_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -1081,7 +1032,7 @@ public class BulkActionsControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AFTER_SUBMITTED_BULK_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
+                .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }

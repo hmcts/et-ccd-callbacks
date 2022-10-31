@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Provides methods to validate claimant hearing preferences.
  */
-public final class ClaimantHearingPreferencesValidator {
+public class ClaimantHearingPreferencesValidator {
 
     static final String VIDEO_PREFERENCE = "Video";
     static final String PHONE_PREFERENCE = "Phone";

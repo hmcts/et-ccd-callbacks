@@ -16,7 +16,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.MultipleReferenceService;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
@@ -29,10 +28,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 @RequiredArgsConstructor
 @Service("multipleCreationService")
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
-    "PMD.LinguisticNaming", "PMD.LiteralsFirstInComparisons", "PMD.LooseCoupling",
-    "PMD.LawOfDemeter"})
 public class MultipleCreationService {
 
     @Value("${ccd_gateway_base_url}")
@@ -155,7 +150,7 @@ public class MultipleCreationService {
 
         List<CaseMultipleTypeItem> caseMultipleTypeItemList = multipleDetails.getCaseData().getCaseMultipleCollection();
 
-        Set<SubMultipleTypeItem> subMultipleTypeItems = new HashSet<>();
+        HashSet<SubMultipleTypeItem> subMultipleTypeItems = new HashSet<>();
 
         if (caseMultipleTypeItemList != null) {
 

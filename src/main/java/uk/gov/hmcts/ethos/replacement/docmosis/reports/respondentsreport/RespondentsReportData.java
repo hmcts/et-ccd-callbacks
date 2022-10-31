@@ -14,7 +14,6 @@ public class RespondentsReportData extends ListingData {
     private final List<RespondentsReportDetail> reportDetails = new ArrayList<>();
 
     public RespondentsReportData(RespondentsReportSummary reportSummary) {
-        super();
         this.reportSummary = reportSummary;
     }
 

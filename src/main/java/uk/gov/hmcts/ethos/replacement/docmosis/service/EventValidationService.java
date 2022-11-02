@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
@@ -30,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -55,7 +57,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LIST
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INVALID_LISTING_DATE_RANGE_ERROR_MESSAGE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_CODES_DELETED_ERROR;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_CODES_EXISTENCE_ERROR;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_OUTCOME_DISMISSED_AT_HEARING;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_OUTCOME_INPUT_IN_ERROR;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_OUTCOME_NOT_ALLOCATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_OUTCOME_NOT_ALLOCATED_ERROR_MESSAGE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_OUTCOME_UNSUCCESSFUL_AT_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MISSING_JUDGEMENT_JURISDICTION_MESSAGE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MISSING_JURISDICTION_MESSAGE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MISSING_JURISDICTION_OUTCOME_ERROR_MESSAGE;
@@ -67,6 +74,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESP_REP_NAME_MISMATCH_ERROR_MESSAGE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TARGET_HEARING_DATE_INCREMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getActiveRespondents;
 
 @Slf4j
@@ -78,11 +86,16 @@ public class EventValidationService {
 
     private static final List<String> INVALID_STATES_FOR_CLOSED_CURRENT_POSITION = List.of(
             SUBMITTED_STATE, ACCEPTED_STATE, REJECTED_STATE);
-    public static final String DISPOSAL_DATE_IN_FUTURE = "Disposal Date can't be in the future for "
+    public static final String DISPOSAL_DATE_IN_FUTURE = "Disposal Date cannot be a date in the future for "
             + "jurisdiction code %s.";
-    public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "Disposal Date must match one of the "
-            + "hearing dates for jurisdiction code %s.";
+    public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "The date entered does not match any of the "
+        + "disposed hearing days on this case. Please check the hearing details"
+        + " for jurisdiction code %s.";
     private static final int THIRTY_DAYS = 30;
+    private static final List<String> HEARING_DISPOSALS = List.of(JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING,
+        JURISDICTION_OUTCOME_UNSUCCESSFUL_AT_HEARING, JURISDICTION_OUTCOME_DISMISSED_AT_HEARING);
+    private static final List<String> NO_DISPOSAL =
+        List.of(JURISDICTION_OUTCOME_NOT_ALLOCATED, JURISDICTION_OUTCOME_INPUT_IN_ERROR);
 
     public List<String> validateReceiptDate(CaseData caseData) {
         List<String> errors = new ArrayList<>();
@@ -232,25 +245,56 @@ public class EventValidationService {
                         .forEach(item -> addInvalidDisposalDateError(
                                 caseData.getHearingCollection(),
                                 item.getValue().getDisposalDate(),
-                                errors, item.getValue().getJuridictionCodesList()));
+                                errors, item.getValue().getJuridictionCodesList(),
+                                item.getValue().getJudgmentOutcome()));
     }
 
     private void addInvalidDisposalDateError(List<HearingTypeItem> hearingTypeItems,
-                                             String disposalDate, List<String> errors, String jurCode) {
+                                             String disposalDate, List<String> errors, String jurCode, String outcome) {
+
+        if (isNullOrEmpty(outcome) || NO_DISPOSAL.contains(outcome)) {
+            return;
+        }
 
         if (Strings.isNullOrEmpty(disposalDate) || isDisposalDateInFuture(disposalDate, errors, jurCode)) {
             return;
         }
 
-        if (CollectionUtils.isEmpty(hearingTypeItems)
-                 || !checkIfHearingDateMatchesWithDisposalDate(hearingTypeItems, disposalDate)) {
+        if (!HEARING_DISPOSALS.contains(outcome)) {
+            return;
+        }
+
+        Optional<DateListedTypeItem> hearingTypeItem = findHearingTypeItem(hearingTypeItems, disposalDate);
+
+        if (hearingTypeItem.isEmpty() || !YES.equals(hearingTypeItem.get().getValue().getHearingCaseDisposed())) {
             errors.add(String.format(DISPOSAL_DATE_HEARING_DATE_MATCH, jurCode));
         }
     }
 
-    private boolean checkIfHearingDateMatchesWithDisposalDate(List<HearingTypeItem> hearingTypeItems,
-                                                              String disposalDate) {
-        return hearingTypeItems.stream().anyMatch(i -> compareHearingDates(i, disposalDate));
+    private Optional<DateListedTypeItem> findHearingTypeItem(List<HearingTypeItem> hearingItems, String disposalDate) {
+        if (CollectionUtils.isEmpty(hearingItems)) {
+            return Optional.empty();
+        }
+
+        Optional<HearingTypeItem> first = hearingItems.stream()
+            .filter(o -> compareHearingDates(o, disposalDate))
+            .findFirst();
+
+        if (first.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return findHearingDateDate(first.get(), disposalDate);
+    }
+
+    private Optional<DateListedTypeItem> findHearingDateDate(HearingTypeItem hearingTypeItem, String disposalDate) {
+        if (hearingTypeItem.getValue().getHearingDateCollection() == null) {
+            return Optional.empty();
+        }
+
+        return hearingTypeItem.getValue().getHearingDateCollection().stream()
+            .filter(o -> areDatesEqual(disposalDate, o.getValue().getListedDate()))
+            .findFirst();
     }
 
     private boolean compareHearingDates(HearingTypeItem hearingTypeItem, String disposalDate) {

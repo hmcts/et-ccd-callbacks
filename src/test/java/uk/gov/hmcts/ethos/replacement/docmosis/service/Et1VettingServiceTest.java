@@ -39,6 +39,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.MANCHESTER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_OPEN;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 @ExtendWith(SpringExtension.class)
 class Et1VettingServiceTest {
 
@@ -132,13 +133,13 @@ class Et1VettingServiceTest {
         + "&#09&#09&nbsp; Juan Garcia<br><br>Contact address &#09&#09 32 Sweet Street<br>&#09&#09&#09&#09&#09&#09&#09&"
         + "#09&#09 14 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09"
         + " M11 4ED</pre><hr>";
-    private final String et1BinaryUrl1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
-    private final String acasBinaryUrl1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
-    private final String acasBinaryUrl2 = "/documents/acas2222-4ef8ca1e3-8c60-d3d78808dca1/binary";
-    private final String acasBinaryUrl3 = "/documents/acas3333-4ef8ca1e3-8c60-d3d78808dca1/binary";
-    private final String acasBinaryUrl4 = "/documents/acas4444-4ef8ca1e3-8c60-d3d78808dca1/binary";
-    private final String acasBinaryUrl5 = "/documents/acas5555-4ef8ca1e3-8c60-d3d78808dca1/binary";
-    private final String caseId = "1655312312192821";
+    private static final String ET1_BINARY_URL_1 = "/documents/et1o0c3e-4efd-8886-0dca-1e3876c3178c/binary";
+    private static final String ACAS_BINARY_URL_1 = "/documents/acas1111-4ef8ca1e3-8c60-d3d78808dca1/binary";
+    private static final String ACAS_BINARY_URL_2 = "/documents/acas2222-4ef8ca1e3-8c60-d3d78808dca1/binary";
+    private static final String ACAS_BINARY_URL_3 = "/documents/acas3333-4ef8ca1e3-8c60-d3d78808dca1/binary";
+    private static final String ACAS_BINARY_URL_4 = "/documents/acas4444-4ef8ca1e3-8c60-d3d78808dca1/binary";
+    private static final String ACAS_BINARY_URL_5 = "/documents/acas5555-4ef8ca1e3-8c60-d3d78808dca1/binary";
+    private static final String CASE_ID = "1655312312192821";
 
     private static final String CASE_NAME_AND_DESCRIPTION_HTML = "<h4>%s</h4>%s";
     private static final String ERROR_EXISTING_JUR_CODE = "Jurisdiction code %s already exists.";
@@ -153,14 +154,6 @@ class Et1VettingServiceTest {
         + "<a target=\"_blank\" href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
         + "View all jurisdiction codes and descriptors (opens in new tab)</a><hr>"
         + "<h3>Codes already added</h3>%s<hr>";
-    private static final String RESPONDENT_ACAS_DETAILS = "<hr><h3>Respondent %o</h3>"
-        + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
-        + "<br><br>Contact address &#09&#09 %s</pre><h3>Acas certificate</h3>"
-        + "Certificate number %s has been provided.<br><br><br>";
-    private static final String RESPONDENT_NO_ACAS_DETAILS = "<hr><h3>Respondent %o</h3>"
-        + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
-        + "<br><br>Contact address &#09&#09 %s</pre><h3>Acas certificate</h3>"
-        + "No certificate has been provided.<br><br><br>";
 
     @BeforeEach
     void setUp() {
@@ -196,17 +189,17 @@ class Et1VettingServiceTest {
                 "Manchester", "M11 4ED", "United Kingdom",
                 null)
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
-        caseDetails.setCaseId(caseId);
+        caseDetails.setCaseId(CASE_ID);
     }
 
     @Test
     void initialBeforeLinkLabel_ZeroAcas_shouldReturnEt1Only() {
         List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
-        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, et1BinaryUrl1));
+        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, ET1_BINARY_URL_1));
         caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
 
         et1VettingService.initialiseEt1Vetting(caseDetails);
-        String expected = String.format(BEFORE_LABEL_TEMPLATE, String.format(BEFORE_LABEL_ET1, et1BinaryUrl1), "");
+        String expected = String.format(BEFORE_LABEL_TEMPLATE, String.format(BEFORE_LABEL_ET1, ET1_BINARY_URL_1), "");
         assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart())
                 .isEqualTo(expected);
     }
@@ -214,22 +207,22 @@ class Et1VettingServiceTest {
     @Test
     void initialBeforeLinkLabel_FiveAcas_shouldReturnFiveAcas() {
         List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
-        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl1));
-        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, et1BinaryUrl1));
-        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl2));
-        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl3));
-        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl4));
-        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl5));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, ACAS_BINARY_URL_1));
+        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, ET1_BINARY_URL_1));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, ACAS_BINARY_URL_2));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, ACAS_BINARY_URL_3));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, ACAS_BINARY_URL_4));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, ACAS_BINARY_URL_5));
         caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
 
         et1VettingService.initialiseEt1Vetting(caseDetails);
         String expected = String.format(BEFORE_LABEL_TEMPLATE,
-                String.format(BEFORE_LABEL_ET1, et1BinaryUrl1),
-                String.format(BEFORE_LABEL_ACAS, acasBinaryUrl1, "1")
-                        + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl2, "2")
-                        + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl3, "3")
-                        + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl4, "4")
-                        + String.format(BEFORE_LABEL_ACAS, acasBinaryUrl5, "5"));
+                String.format(BEFORE_LABEL_ET1, ET1_BINARY_URL_1),
+                String.format(BEFORE_LABEL_ACAS, ACAS_BINARY_URL_1, "1")
+                        + String.format(BEFORE_LABEL_ACAS, ACAS_BINARY_URL_2, "2")
+                        + String.format(BEFORE_LABEL_ACAS, ACAS_BINARY_URL_3, "3")
+                        + String.format(BEFORE_LABEL_ACAS, ACAS_BINARY_URL_4, "4")
+                        + String.format(BEFORE_LABEL_ACAS, ACAS_BINARY_URL_5, "5"));
         assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart())
                 .isEqualTo(expected);
     }
@@ -237,20 +230,20 @@ class Et1VettingServiceTest {
     @Test
     void initialBeforeLinkLabel_SixAcas_shouldReturnDocTab() {
         List<DocumentTypeItem> documentTypeItemList = new ArrayList<>();
-        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, et1BinaryUrl1));
-        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl1));
-        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl2));
-        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl3));
-        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl4));
-        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, acasBinaryUrl5));
+        documentTypeItemList.add(createDocumentTypeItem(ET1_DOC_TYPE, ET1_BINARY_URL_1));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, ACAS_BINARY_URL_1));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, ACAS_BINARY_URL_2));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, ACAS_BINARY_URL_3));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, ACAS_BINARY_URL_4));
+        documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE, ACAS_BINARY_URL_5));
         documentTypeItemList.add(createDocumentTypeItem(ACAS_DOC_TYPE,
                 "/documents/acas6666-4ef8ca1e3-8c60-d3d78808dca1/binary"));
         caseDetails.getCaseData().setDocumentCollection(documentTypeItemList);
 
         et1VettingService.initialiseEt1Vetting(caseDetails);
         String expected = String.format(BEFORE_LABEL_TEMPLATE,
-                String.format(BEFORE_LABEL_ET1, et1BinaryUrl1),
-                String.format(BEFORE_LABEL_ACAS_OPEN_TAB, caseId));
+                String.format(BEFORE_LABEL_ET1, ET1_BINARY_URL_1),
+                String.format(BEFORE_LABEL_ACAS_OPEN_TAB, CASE_ID));
         assertThat(caseDetails.getCaseData().getEt1VettingBeforeYouStart())
                 .isEqualTo(expected);
     }
@@ -299,7 +292,7 @@ class Et1VettingServiceTest {
     }
 
     @Test
-    void initialBeforeYouStart_returnRespondentAcasDetailsMarkUp() {
+    void initialBeforeYouStart_returnRespondentSixAcasDetailsMarkUp() {
         et1VettingService.initialiseEt1Vetting(caseDetails);
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
             .isEqualTo(EXPECTED_RESPONDENT1_ACAS_DETAILS);
@@ -313,6 +306,76 @@ class Et1VettingServiceTest {
             .isEqualTo(EXPECTED_RESPONDENT5_ACAS_DETAILS);
         assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails6())
             .isEqualTo(EXPECTED_RESPONDENT6_ACAS_DETAILS);
+    }
+
+    @Test
+    void initialBeforeYouStart_returnFiveRespondentAcasDetailsMarkUp() {
+        caseDetails.getCaseData().getRespondentCollection().remove(5);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
+                .isEqualTo(EXPECTED_RESPONDENT1_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails2())
+                .isEqualTo(EXPECTED_RESPONDENT2_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails3())
+                .isEqualTo(EXPECTED_RESPONDENT3_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails4())
+                .isEqualTo(EXPECTED_RESPONDENT4_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails5())
+                .isEqualTo(EXPECTED_RESPONDENT5_ACAS_DETAILS);
+    }
+
+    @Test
+    void initialBeforeYouStart_returnFourRespondentAcasDetailsMarkUp() {
+        caseDetails.getCaseData().getRespondentCollection().remove(5);
+        caseDetails.getCaseData().getRespondentCollection().remove(4);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
+                .isEqualTo(EXPECTED_RESPONDENT1_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails2())
+                .isEqualTo(EXPECTED_RESPONDENT2_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails3())
+                .isEqualTo(EXPECTED_RESPONDENT3_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails4())
+                .isEqualTo(EXPECTED_RESPONDENT4_ACAS_DETAILS);
+    }
+
+    @Test
+    void initialBeforeYouStart_returnThreeRespondentAcasDetailsMarkUp() {
+        caseDetails.getCaseData().getRespondentCollection().remove(5);
+        caseDetails.getCaseData().getRespondentCollection().remove(4);
+        caseDetails.getCaseData().getRespondentCollection().remove(3);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
+                .isEqualTo(EXPECTED_RESPONDENT1_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails2())
+                .isEqualTo(EXPECTED_RESPONDENT2_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails3())
+                .isEqualTo(EXPECTED_RESPONDENT3_ACAS_DETAILS);
+    }
+
+    @Test
+    void initialBeforeYouStart_returnTwoRespondentAcasDetailsMarkUp() {
+        caseDetails.getCaseData().getRespondentCollection().remove(5);
+        caseDetails.getCaseData().getRespondentCollection().remove(4);
+        caseDetails.getCaseData().getRespondentCollection().remove(3);
+        caseDetails.getCaseData().getRespondentCollection().remove(2);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
+                .isEqualTo(EXPECTED_RESPONDENT1_ACAS_DETAILS);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails2())
+                .isEqualTo(EXPECTED_RESPONDENT2_ACAS_DETAILS);
+    }
+
+    @Test
+    void initialBeforeYouStart_returnOneRespondentAcasDetailsMarkUp() {
+        caseDetails.getCaseData().getRespondentCollection().remove(5);
+        caseDetails.getCaseData().getRespondentCollection().remove(4);
+        caseDetails.getCaseData().getRespondentCollection().remove(3);
+        caseDetails.getCaseData().getRespondentCollection().remove(2);
+        caseDetails.getCaseData().getRespondentCollection().remove(1);
+        et1VettingService.initialiseEt1Vetting(caseDetails);
+        assertThat(caseDetails.getCaseData().getEt1VettingRespondentAcasDetails1())
+                .isEqualTo(EXPECTED_RESPONDENT1_ACAS_DETAILS);
     }
 
     @Test
@@ -369,6 +432,8 @@ class Et1VettingServiceTest {
         String expected = String.format(TRACK_ALLOCATION_HTML, TRACK_OPEN);
         assertThat(et1VettingService.populateEt1TrackAllocationHtml(caseData))
             .isEqualTo(expected);
+        assertThat(caseData.getTrackType())
+            .isEqualTo(TRACK_OPEN);
     }
 
     @Test

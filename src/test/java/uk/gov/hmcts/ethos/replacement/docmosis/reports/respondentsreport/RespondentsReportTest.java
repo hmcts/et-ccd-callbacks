@@ -22,6 +22,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
+@SuppressWarnings("PMD.LawOfDemeter")
 class RespondentsReportTest {
 
     ReportParams params;
@@ -29,7 +30,7 @@ class RespondentsReportTest {
     RespondentsReport respondentsReport;
     RespondentsReportCaseDataBuilder caseDataBuilder = new RespondentsReportCaseDataBuilder();
     List<RespondentsReportSubmitEvent> submitEvents = new ArrayList<>();
-    static final LocalDateTime BASE_DATE = LocalDateTime.of(2022, 1, 1, 0, 0,0);
+    static final LocalDateTime BASE_DATE = LocalDateTime.of(2022, 1, 1, 0, 0, 0);
     static final String DATE_FROM = BASE_DATE.minusDays(1).format(OLD_DATE_TIME_PATTERN);
     static final String DATE_TO = BASE_DATE.plusDays(15).format(OLD_DATE_TIME_PATTERN);
     static final String MANAGING_OFFICE = TribunalOffice.MANCHESTER.getOfficeName();
@@ -55,7 +56,7 @@ class RespondentsReportTest {
         submitEvents.add(caseDataBuilder
                 .buildAsSubmitEvent());
 
-        var reportData = respondentsReport.generateReport(params);
+        RespondentsReportData reportData = respondentsReport.generateReport(params);
         assertCommonValues(reportData);
         assertEquals("0", reportData.getReportSummary().getTotalCasesWithMoreThanOneRespondent());
         assertEquals(0, reportData.getReportDetails().size());
@@ -71,7 +72,7 @@ class RespondentsReportTest {
         submitEvents.add(caseDataBuilder
                 .buildAsSubmitEvent());
 
-        var reportData = respondentsReport.generateReport(params);
+        RespondentsReportData reportData = respondentsReport.generateReport(params);
         assertCommonValues(reportData);
         assertEquals("0", reportData.getReportSummary().getTotalCasesWithMoreThanOneRespondent());
         assertTrue(reportData.getReportDetails().isEmpty());
@@ -86,7 +87,7 @@ class RespondentsReportTest {
         caseDataBuilder.withMoreThanOneRespondents();
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
 
-        var reportData = respondentsReport.generateReport(params);
+        RespondentsReportData reportData = respondentsReport.generateReport(params);
         assertCommonValues(reportData);
         assertEquals("1", reportData.getReportSummary().getTotalCasesWithMoreThanOneRespondent());
         assertFalse(reportData.getReportDetails().isEmpty());
@@ -101,7 +102,7 @@ class RespondentsReportTest {
         caseDataBuilder.withMoreThan1RespondentsRepresented();
         submitEvents.add(caseDataBuilder
                 .buildAsSubmitEvent());
-        var reportData = respondentsReport.generateReport(params);
+        RespondentsReportData reportData = respondentsReport.generateReport(params);
         assertCommonValues(reportData);
         assertEquals("111", reportData.getReportDetails().get(0).getCaseNumber());
         assertEquals("Resp1", reportData.getReportDetails().get(0).getRespondentName());

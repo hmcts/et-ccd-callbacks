@@ -19,6 +19,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LIST
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.TooManyMethods"})
 class HearingsByHearingTypeReportTest {
 
     HearingsByHearingTypeReportDataSource reportDataSource;
@@ -28,7 +29,7 @@ class HearingsByHearingTypeReportTest {
     static final LocalDateTime BASE_DATE = LocalDateTime.of(2022,  1, 1,  0,  0, 0);
     static final String DATE_FROM = BASE_DATE.minusDays(1).format(OLD_DATE_TIME_PATTERN);
     static final String DATE_TO = BASE_DATE.plusDays(24).format(OLD_DATE_TIME_PATTERN);
-    static final ReportParams reportParams = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+    static final ReportParams REPORT_PARAMS = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
             TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
 
     @BeforeEach
@@ -36,13 +37,13 @@ class HearingsByHearingTypeReportTest {
         submitEvents.clear();
         caseDataBuilder = new HearingsByHearingTypeCaseDataBuilder();
         reportDataSource = mock(HearingsByHearingTypeReportDataSource.class);
-        when(reportDataSource.getData(reportParams)).thenReturn(submitEvents);
+        when(reportDataSource.getData(REPORT_PARAMS)).thenReturn(submitEvents);
         hearingsByHearingTypeReport = new HearingsByHearingTypeReport(reportDataSource);
     }
 
     @Test
      void testReportHeaderAreZeroIfNoCasesExist() {
-        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParams);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
         verifyReportHeaderIsZeroWithNoHearings(reportData);
     }
 
@@ -50,7 +51,7 @@ class HearingsByHearingTypeReportTest {
      void testReportHeaderAreZeroIfNoHearingCollectionExist() {
         submitEvents.clear();
         submitEvents.add(caseDataBuilder.withNoHearings());
-        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParams);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
         verifyReportHeaderIsZeroWithNoHearings(reportData);
     }
 
@@ -58,7 +59,7 @@ class HearingsByHearingTypeReportTest {
      void testReportHeaderAreZeroIfNoDateCollectionExist() {
         submitEvents.clear();
         submitEvents.addAll(caseDataBuilder.createSubmitEventsWithoutDates());
-        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParams);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
         verifyReportHeaderIsZeroWithNoHearings(reportData);
     }
 
@@ -79,7 +80,7 @@ class HearingsByHearingTypeReportTest {
         submitEvents.clear();
         submitEvents.addAll(caseDataBuilder.createSubmitEvents(
                 HEARING_STATUS_LISTED, "multiRef", "subMulti"));
-        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParams);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
         verifyReportHeaderIsZeroWithNoHearings(reportData);
     }
 
@@ -87,7 +88,7 @@ class HearingsByHearingTypeReportTest {
      void testConsiderCaseIfValidHearingStatusReportHdr() {
         submitEvents.clear();
         submitEvents.addAll(caseDataBuilder.createSubmitEvents(HEARING_STATUS_HEARD, "multiRef", "subMulti"));
-        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParams);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
         HearingsByHearingTypeReportSummaryHdr reportSummaryHdr = reportData.getReportSummaryHdr();
         assertEquals("6", reportSummaryHdr.getFields().getTotal());
         assertEquals("1", reportSummaryHdr.getFields().getHearingCount());
@@ -102,7 +103,7 @@ class HearingsByHearingTypeReportTest {
      void testConsiderCaseIfValidHearingStatusReportSummary() {
         submitEvents.clear();
         submitEvents.addAll(caseDataBuilder.createSubmitEvents(HEARING_STATUS_HEARD, "multiRef", "subMulti"));
-        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParams);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
         List<HearingsByHearingTypeReportSummary> reportSummaryList = reportData.getReportSummaryList();
         HearingsByHearingTypeReportSummary reportSummary = reportSummaryList.get(0);
         assertEquals("1", reportSummary.getFields().getTotal());
@@ -119,7 +120,7 @@ class HearingsByHearingTypeReportTest {
      void testConsiderCaseIfValidHearingStatusReportSummaryHdr2() {
         submitEvents.clear();
         submitEvents.addAll(caseDataBuilder.createSubmitEvents(HEARING_STATUS_HEARD, "multiRef", "subMulti"));
-        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParams);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
         List<HearingsByHearingTypeReportSummary2Hdr> reportSummary2HdrList = reportData.getReportSummary2HdrList();
         HearingsByHearingTypeReportSummary2Hdr reportSummary2Hdr = reportSummary2HdrList.get(0);
         assertEquals("1", reportSummary2Hdr.getFields().getTotal());
@@ -137,7 +138,7 @@ class HearingsByHearingTypeReportTest {
         submitEvents.clear();
         submitEvents.addAll(caseDataBuilder.createSubmitEvents(
                 HEARING_STATUS_HEARD, "multiRef", "subMulti"));
-        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParams);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
         List<HearingsByHearingTypeReportSummary2> reportSummary2List = reportData.getReportSummary2List();
         HearingsByHearingTypeReportSummary2 reportSummary2 = reportSummary2List.get(0);
         assertEquals("1", reportSummary2.getFields().getTotal());
@@ -161,7 +162,7 @@ class HearingsByHearingTypeReportTest {
                 .get(0).getValue().setListedDate("2022-01-01T00:00:00.000");
         submitEvents.get(2).getCaseData().getHearingCollection().get(0).getValue().getHearingDateCollection()
                 .get(0).getValue().setListedDate("2022-01-03T00:00:00.000");
-        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParams);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
         List<HearingsByHearingTypeReportSummary> reportSummaryList = reportData.getReportSummaryList();
         assertEquals("2022-01-01", reportSummaryList.get(0).getFields().getDate());
         assertEquals("2022-01-02", reportSummaryList.get(1).getFields().getDate());
@@ -172,7 +173,7 @@ class HearingsByHearingTypeReportTest {
     void testShowSubSplits() {
         submitEvents.clear();
         submitEvents.addAll(caseDataBuilder.createSubmitEvents(HEARING_STATUS_HEARD, "multiRef", "subMulti"));
-        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParams);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
         List<HearingsByHearingTypeReportSummary2> reportSummary2List = reportData.getReportSummary2List();
         assertEquals("JM", reportSummary2List.get(0).getFields().getSubSplit());
         assertEquals("Hybrid", reportSummary2List.get(1).getFields().getSubSplit());
@@ -185,7 +186,7 @@ class HearingsByHearingTypeReportTest {
      void testConsiderCaseIfValidHearingStatusReportDetail() {
         submitEvents.clear();
         submitEvents.addAll(caseDataBuilder.createSubmitEvents(HEARING_STATUS_HEARD, "multiRef", "subMulti"));
-        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParams);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
         List<HearingsByHearingTypeReportDetail> reportDetailList = reportData.getReportDetails();
         HearingsByHearingTypeReportDetail reportDetail = reportDetailList.get(0);
         assertEquals("111", reportDetail.getCaseReference());
@@ -202,7 +203,7 @@ class HearingsByHearingTypeReportTest {
      void testConsiderCaseIfNullMultiSubInReportDetail() {
         submitEvents.clear();
         submitEvents.addAll(caseDataBuilder.createSubmitEvents(HEARING_STATUS_HEARD, null, null));
-        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParams);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
         List<HearingsByHearingTypeReportDetail> reportDetailList = reportData.getReportDetails();
         HearingsByHearingTypeReportDetail reportDetail = reportDetailList.get(0);
         assertEquals("0 -  Not Allocated, 0 -  Not Allocated", reportDetail.getMultiSub());
@@ -212,7 +213,7 @@ class HearingsByHearingTypeReportTest {
      void multipleHearingsWithOneInRangeAndOneOutOfRange() {
         submitEvents.clear();
         submitEvents.add(caseDataBuilder.createSubmitEventDateInOutRange());
-        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParams);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
         var reportSummaryHdr = reportData.getReportSummaryHdr();
         assertEquals("1", reportSummaryHdr.getFields().getTotal());
         assertEquals("1", reportSummaryHdr.getFields().getCostsCount());
@@ -244,7 +245,7 @@ class HearingsByHearingTypeReportTest {
      void nullTimeOnHearing(String time, String result) {
         submitEvents.clear();
         submitEvents.add(caseDataBuilder.createSubmitEventNullTime(time));
-        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(reportParams);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
         var reportDetail = reportData.getReportDetails().get(0);
         assertEquals(result, reportDetail.getDuration());
     }

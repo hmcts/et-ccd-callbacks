@@ -34,7 +34,6 @@ class JudgeRowHandlerTest {
     void testHandle(String statusCode, String expectedEmploymentStatus) {
         var code = "01_JudgeCode";
         var name = "Judge Fudge";
-        var tribunalOffice = TribunalOffice.NEWCASTLE;
         var row = mock(Row.class);
         mockCell(row, 0, JUDGE_ROW_ID);
         mockCell(row, 1, code);
@@ -44,6 +43,7 @@ class JudgeRowHandlerTest {
 
         var judgeRepository = mock(JudgeRepository.class);
         var judgeRowHandler = new JudgeRowHandler(judgeRepository);
+        var tribunalOffice = TribunalOffice.NEWCASTLE;
         judgeRowHandler.handle(tribunalOffice, row);
 
         var captor = ArgumentCaptor.forClass(Judge.class);

@@ -14,12 +14,13 @@ import java.time.LocalDate;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
+@SuppressWarnings({"PMD.MissingSerialVersionUID"})
 public class BulkPreAcceptTask implements Runnable {
 
-    private BulkDetails bulkDetails;
-    private SubmitEvent submitEvent;
-    private String authToken;
-    private CcdClient ccdClient;
+    private final BulkDetails bulkDetails;
+    private final SubmitEvent submitEvent;
+    private final String authToken;
+    private final CcdClient ccdClient;
 
     public BulkPreAcceptTask(BulkDetails bulkDetails, SubmitEvent submitEvent, String authToken, CcdClient ccdClient) {
         this.bulkDetails = bulkDetails;

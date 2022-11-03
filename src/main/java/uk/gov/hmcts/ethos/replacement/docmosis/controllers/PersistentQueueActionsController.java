@@ -32,6 +32,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.BulkCreationServic
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class PersistentQueueActionsController {
 
     private static final String LOG_MESSAGE = "received notification request for bulk reference :    ";

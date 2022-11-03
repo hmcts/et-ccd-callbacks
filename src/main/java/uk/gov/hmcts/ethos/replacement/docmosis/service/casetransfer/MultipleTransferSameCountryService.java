@@ -18,6 +18,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@SuppressWarnings({"PMD.PrematureDeclaration"})
 public class MultipleTransferSameCountryService {
 
     @Value("${ccd_gateway_base_url}")

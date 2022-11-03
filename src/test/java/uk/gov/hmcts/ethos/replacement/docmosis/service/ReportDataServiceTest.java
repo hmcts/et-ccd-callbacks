@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -85,6 +84,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ECC_REPO
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANGE_IN_CURRENT_POSITION_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ExcessiveImports", "PMD.ExcessiveImports", "PMD.NcssCount",
+    "PMD.ExcessiveMethodLength"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ReportDataServiceTest {
 
@@ -92,15 +93,12 @@ public class ReportDataServiceTest {
     private ReportDataService reportDataService;
     @Mock
     private CcdClient ccdClient;
-    @Spy
-    private CaseDetails caseDetails;
     private ListingDetails listingDetails;
     @Mock
     private UserService userService;
 
     @Before
     public void setUp() {
-        caseDetails = new CaseDetails();
         listingDetails = new ListingDetails();
         ListingData listingData = new ListingData();
         listingData.setListingDate("2019-12-12");
@@ -112,8 +110,6 @@ public class ReportDataServiceTest {
         listingDetails.setCaseData(listingData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.setJurisdiction("EMPLOYMENT");
-
-        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         DateListedType dateListedType = new DateListedType();
         dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType.setHearingClerk(new DynamicFixedListType("Clerk"));
@@ -121,10 +117,9 @@ public class ReportDataServiceTest {
         dateListedType.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue"));
         dateListedType.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
         dateListedType.setListedDate("2019-12-12T12:11:00.000");
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setId("123");
         dateListedTypeItem.setValue(dateListedType);
-
-        DateListedTypeItem dateListedTypeItem1 = new DateListedTypeItem();
         DateListedType dateListedType1 = new DateListedType();
         dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType1.setHearingClerk(new DynamicFixedListType("Clerk"));
@@ -132,10 +127,9 @@ public class ReportDataServiceTest {
         dateListedType1.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue"));
         dateListedType1.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
         dateListedType1.setListedDate("2019-12-10T12:11:00.000");
+        DateListedTypeItem dateListedTypeItem1 = new DateListedTypeItem();
         dateListedTypeItem1.setId("124");
         dateListedTypeItem1.setValue(dateListedType1);
-
-        DateListedTypeItem dateListedTypeItem2 = new DateListedTypeItem();
         DateListedType dateListedType2 = new DateListedType();
         dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType2.setHearingClerk(new DynamicFixedListType("Clerk1"));
@@ -144,10 +138,9 @@ public class ReportDataServiceTest {
         dateListedType2.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue2"));
         dateListedType2.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
         dateListedType2.setListedDate("2019-12-12T12:11:30.000");
+        DateListedTypeItem dateListedTypeItem2 = new DateListedTypeItem();
         dateListedTypeItem2.setId("124");
         dateListedTypeItem2.setValue(dateListedType2);
-
-        DateListedTypeItem dateListedTypeItem3 = new DateListedTypeItem();
         DateListedType dateListedType3 = new DateListedType();
         dateListedType3.setHearingStatus(HEARING_STATUS_HEARD);
         dateListedType3.setHearingClerk(new DynamicFixedListType("Clerk3"));
@@ -156,24 +149,24 @@ public class ReportDataServiceTest {
         dateListedType3.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue2"));
         dateListedType3.setHearingVenueDay(new DynamicFixedListType("Aberdeen"));
         dateListedType3.setListedDate("2019-12-12T12:11:55.000");
+        DateListedTypeItem dateListedTypeItem3 = new DateListedTypeItem();
         dateListedTypeItem3.setId("124");
         dateListedTypeItem3.setValue(dateListedType3);
-
-        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         HearingType hearingType = new HearingType();
-        hearingType.setHearingDateCollection(new ArrayList<>(Arrays.asList(dateListedTypeItem, dateListedTypeItem1, dateListedTypeItem2)));
+        hearingType.setHearingDateCollection(new ArrayList<>(
+                Arrays.asList(dateListedTypeItem, dateListedTypeItem1, dateListedTypeItem2)));
         hearingType.setHearingVenue(new DynamicFixedListType("Aberdeen"));
         hearingType.setHearingEstLengthNum("2");
         hearingType.setHearingEstLengthNumType("hours");
         hearingType.setHearingType(HEARING_TYPE_PERLIMINARY_HEARING);
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setId("12345");
         hearingTypeItem.setValue(hearingType);
-
-        BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
         BFActionType bfActionType = new BFActionType();
         bfActionType.setBfDate("2019-12-10");
         bfActionType.setCleared("020-12-30");
         bfActionType.setAction(BFHelperTest.getBfActionsDynamicFixedList());
+        BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
         bfActionTypeItem.setId("0000");
         bfActionTypeItem.setValue(bfActionType);
         HearingTypeItem hearingTypeItem1 = new HearingTypeItem();
@@ -182,43 +175,38 @@ public class ReportDataServiceTest {
         hearingType1.setHearingType(HEARING_TYPE_PERLIMINARY_HEARING);
         hearingTypeItem1.setId("12345");
         hearingTypeItem1.setValue(hearingType1);
-
-        BFActionTypeItem bfActionTypeItem1 = new BFActionTypeItem();
         BFActionType bfActionType1 = new BFActionType();
         bfActionType1.setBfDate("2019-12-11");
         bfActionType1.setCleared("");
         bfActionType1.setAction(BFHelperTest.getBfActionsDynamicFixedList());
+        BFActionTypeItem bfActionTypeItem1 = new BFActionTypeItem();
         bfActionTypeItem1.setId("111");
         bfActionTypeItem1.setValue(bfActionType1);
-
-        BFActionTypeItem bfActionTypeItem2 = new BFActionTypeItem();
         BFActionType bfActionType2 = new BFActionType();
         bfActionType2.setBfDate("2019-12-12");
         bfActionType2.setCleared("");
         bfActionType2.setAction(BFHelperTest.getBfActionsDynamicFixedList());
+        BFActionTypeItem bfActionTypeItem2 = new BFActionTypeItem();
         bfActionTypeItem2.setId("222");
         bfActionTypeItem2.setValue(bfActionType2);
-
-        BFActionTypeItem bfActionTypeItem3 = new BFActionTypeItem();
         BFActionType bfActionType3 = new BFActionType();
         bfActionType3.setBfDate("2019-12-13");
         bfActionType3.setCleared("");
         bfActionType3.setAction(BFHelperTest.getBfActionsDynamicFixedList());
+        BFActionTypeItem bfActionTypeItem3 = new BFActionTypeItem();
         bfActionTypeItem3.setId("333");
         bfActionTypeItem3.setValue(bfActionType3);
-
-        BFActionTypeItem bfActionTypeItem4 = new BFActionTypeItem();
         BFActionType bfActionType4 = new BFActionType();
         bfActionType4.setBfDate("2019-12-10");
         bfActionType4.setCleared("020-12-30");
         bfActionType4.setNotes("Test0");
+        BFActionTypeItem bfActionTypeItem4 = new BFActionTypeItem();
         bfActionTypeItem4.setId("0000");
         bfActionTypeItem4.setValue(bfActionType4);
-
-        JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
         JurCodesType jurCodesType = new JurCodesType();
         jurCodesType.setJuridictionCodesList("ABC");
         jurCodesType.setJudgmentOutcome(JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING);
+        JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
         jurCodesTypeItem.setId("000");
         jurCodesTypeItem.setValue(jurCodesType);
 
@@ -248,6 +236,7 @@ public class ReportDataServiceTest {
         address.setPostTown("Manchester");
         caseData.setTribunalCorrespondenceAddress(address);
         caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         caseDetails.setJurisdiction("EMPLOYMENT");

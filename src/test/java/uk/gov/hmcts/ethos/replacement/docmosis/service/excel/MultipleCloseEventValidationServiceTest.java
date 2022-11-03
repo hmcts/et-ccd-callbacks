@@ -177,7 +177,7 @@ public class MultipleCloseEventValidationServiceTest {
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(CLOSED_STATE);
-        submitEvent.setCaseId(1232121232);
+        submitEvent.setCaseId(1_232_121_232);
         return submitEvent;
     }
 }

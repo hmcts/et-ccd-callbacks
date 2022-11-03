@@ -15,6 +15,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("PMD.LawOfDemeter")
 class RespondentsReportCcdReportDataSourceTest {
 
     @Test
@@ -47,7 +48,8 @@ class RespondentsReportCcdReportDataSourceTest {
         when(ccdClient.respondentsReportSearch(anyString(), anyString(), anyString())).thenThrow(new IOException());
 
         var ccdReportDataSource = new RespondentsReportCcdDataSource(authToken, ccdClient);
-        assertThrows(ReportException.class, () -> ccdReportDataSource.getData(caseTypeId, managingOffice, fromDate, toDate));
+        assertThrows(ReportException.class, () -> ccdReportDataSource.getData(
+                caseTypeId, managingOffice, fromDate, toDate));
     }
 
 }

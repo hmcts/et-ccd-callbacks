@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.EmailServiceException;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -41,7 +42,7 @@ public class EmailService {
 
         } catch (NotificationClientException e) {
             log.warn("Failed to send email. Reference ID: {}. Reason:", referenceId, e);
-            throw new RuntimeException(e);
+            throw new EmailServiceException("Failed to send email", e);
         }
     }
 }

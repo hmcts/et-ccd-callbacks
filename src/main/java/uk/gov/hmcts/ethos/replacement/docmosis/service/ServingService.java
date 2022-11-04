@@ -50,7 +50,7 @@ public class ServingService {
             documentLinks = docList
                 .stream()
                 .filter(d -> d.getValue().getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE))
-                .map(d -> createDocLinkBinary(d))
+                .map(this::createDocLinkBinary)
                 .collect(Collectors.joining());
         }
 

@@ -27,7 +27,7 @@ then
   fi
   importFile="${SCOTLAND_CCD_CONFIG_PATH}/definitions/xlsx/et-scotland-ccd-config-cftlib.xlsx"
 else
-  echo "Import admin config"
+  echo "Importing admin config"
   if [[ -z "$ADMIN_CCD_CONFIG_PATH" ]]
   then
     echo "Please set ADMIN_CCD_CONFIG_PATH environment variable to your local GiHub repo for et-ccd-definitions-admin"

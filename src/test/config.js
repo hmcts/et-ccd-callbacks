@@ -1,5 +1,5 @@
 module.exports = {
-    TestUrl: process.env.TEST_E2E_URL || 'https://manage-case.aat.platform.hmcts.net',
+    TestUrl: process.env.TEST_URL || 'https://manage-case.aat.platform.hmcts.net',
     IdamBaseUrl: process.env.IDAM_URL || 'https://idam-api.aat.platform.hmcts.net',
     RedirectUri: process.env.REDIRECT_URI || `https://manage-case.aat.platform.hmcts.net/oauth2/callback`,
     TestEnv: process.env.RUNNING_ENV || 'aat',
@@ -20,6 +20,5 @@ module.exports = {
     TestForAccessibility: process.env.TESTS_FOR_ACCESSIBILITY === 'true',
     TestForCrossBrowser: process.env.TESTS_FOR_CROSS_BROWSER === 'true',
     TestIdamClientSecret: process.env.IDAM_CLIENT_SECRET || '',
-    TestCcdGwSecret: process.env.MICROSERVICE_CCD_GW || '',
-    oneTimePassword: process.env.ONE_TIME_PASSWORD || '',
+    TestCcdGwSecret: process.env.MICROSERVICE_CCD_GW || ''
 };

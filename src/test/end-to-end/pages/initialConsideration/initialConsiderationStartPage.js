@@ -8,6 +8,10 @@ module.exports = async function () {
        Could perform some assertion to check page title or open document on this page, for now keep simple.
     */
     const I = this;
+    I.seeElement('.govuk-heading-l');
+    I.seeElement('#caseEditForm');
+    I.seeElement('a[.="Cancel"]');
+    I.seeElement('button[@class="button"]');
     await I.navByClick(commonConfig.continue);
-    await I.wait(2);
+    I.wait(2);
 };

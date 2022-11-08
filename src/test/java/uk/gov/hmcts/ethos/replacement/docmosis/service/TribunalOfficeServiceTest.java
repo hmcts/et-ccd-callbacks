@@ -26,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 })
 @EnableConfigurationProperties({CaseDefaultValuesConfiguration.class, TribunalOfficesConfiguration.class})
 public class TribunalOfficeServiceTest {
-
+    private static final String UNASSIGNED_OFFICE = "Unassigned";
     @ClassRule public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
     @Rule public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
@@ -47,7 +47,7 @@ public class TribunalOfficeServiceTest {
             { TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB" },
             { TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB" },
             { TribunalOffice.EDINBURGH.getOfficeName(), "EH3 7HF" },
-            { "Unassigned", "" },
+            { UNASSIGNED_OFFICE, "" },
             { null, "" },
     };
 

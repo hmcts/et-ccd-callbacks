@@ -40,8 +40,8 @@ public final class DynamicRespondentRepresentative {
                     respRepCollection.getValue().getDynamicRespRepName().setValue(dynamicValueType);
                 }
             } else {
-                var representedTypeR = new RepresentedTypeR();
-                representedTypeR.setDynamicRespRepName(dynamicFixedListType);
+                var representedTypeR = RepresentedTypeR.builder()
+                    .dynamicRespRepName(dynamicFixedListType).build();
                 var representedTypeRItem = new RepresentedTypeRItem();
                 representedTypeRItem.setValue(representedTypeR);
                 var collection = List.of(representedTypeRItem);

@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -16,6 +19,9 @@ import uk.gov.hmcts.et.common.model.ccd.items.ReferralReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.ReferralTypeData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.ReferralTypeDocument;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,15 +33,17 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.LinguisticNaming", "PMD.ConfusingTernary",
-    "PMD.SimpleDateFormatNeedsLocale", "PMD.GodClass"})
+    "PMD.SimpleDateFormatNeedsLocale", "PMD.GodClass", "PMD.ExcessiveImports"})
 public final class ReferralHelper {
-
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String TRUE = "True";
     private static final String FALSE = "False";
     private static final String NO_TRACK_NAME = "No Track";
@@ -71,6 +79,9 @@ public final class ReferralHelper {
     private static final String DOCUMENT_LINK = "<br><br>Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09"
         + " <a href=\"%s\" download>%s</a>&nbsp;";
 
+    private static final String REF_OUTPUT_NAME = "Referral Summary.pdf";
+    private static final String REF_SUMMARY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-00067.docx";
+
     private static final String GENERAL_NOTES = "<br><br>General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 %s";
 
     private static final String INSTRUCTIONS = "<br><br>Recommended instructions &nbsp;&#09&#09&#09&nbsp; %s";
@@ -82,6 +93,7 @@ public final class ReferralHelper {
     private static final String EMAIL_BODY_REPLY = "You have a reply to a referral on this case.";
 
     private ReferralHelper() {
+        OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     /**
@@ -237,7 +249,8 @@ public final class ReferralHelper {
      * @param caseData contains all the case data
      * @param userFullName Full name of the logged-in user
      */
-    public static void createReferral(CaseData caseData, String userFullName) {
+    public static void createReferral(CaseData caseData, String userFullName,
+                                      UploadedDocumentType documentInfo) {
         if (CollectionUtils.isEmpty(caseData.getReferralCollection())) {
             caseData.setReferralCollection(new ArrayList<>());
         }
@@ -261,6 +274,7 @@ public final class ReferralHelper {
         referralType.setReferralStatus(ReferralStatus.AWAITING_INSTRUCTIONS);
 
         referralType.setReferralHearingDate(getNearestHearingToReferral(caseData, "None"));
+        referralType.setReferralSummaryPdf(documentInfo);
 
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId(UUID.randomUUID().toString());
@@ -270,6 +284,35 @@ public final class ReferralHelper {
         referralCollection.add(referralTypeItem);
         caseData.setReferralCollection(referralCollection);
         clearReferralDataFromCaseData(caseData);
+    }
+
+    /**
+     * Formats data needed for Referral PDF Document.
+     * @param caseData the case in which we extract the referral type
+     * @return stringified json data for pdf document
+     */
+    public static String getDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
+        ReferralTypeData data =
+            ReferralTypeData.builder()
+                .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+                .referralDate(Helper.getCurrentDate())
+                .referredBy(defaultIfEmpty(caseData.getReferredBy(), null))
+                .referCaseTo(defaultIfEmpty(caseData.getReferCaseTo(), null))
+                .referentEmail(defaultIfEmpty(caseData.getReferentEmail(), null))
+                .isUrgent(defaultIfEmpty(caseData.getIsUrgent(), null))
+                .nextHearingDate(getNearestHearingToReferral(caseData, "None"))
+                .referralSubject(defaultIfEmpty(caseData.getReferralSubject(), null))
+                .referralDetails(defaultIfEmpty(caseData.getReferralDetails(), null))
+                .referralDocument(caseData.getReferralDocument())
+                .referralInstruction(defaultIfEmpty(caseData.getReferralInstruction(), null)).build();
+
+        ReferralTypeDocument document = ReferralTypeDocument.builder()
+            .accessKey(accessKey)
+            .outputName(REF_OUTPUT_NAME)
+            .templateName(REF_SUMMARY_TEMPLATE_NAME)
+            .data(data).build();
+
+        return OBJECT_MAPPER.writeValueAsString(document);
     }
 
     /**

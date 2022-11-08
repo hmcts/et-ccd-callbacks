@@ -40,8 +40,8 @@ public class InvalidCharacterCheckTest {
         casedata.getRepresentativeClaimantType().setNameOfRepresentative("New\nLine");
         casedata.getRespondentCollection().get(0).getValue().setRespondentName("Double  Space and New\nLine");
 
-        var representedTypeR = new RepresentedTypeR();
-        representedTypeR.setNameOfRepresentative("No Errors In Name");
+        var representedTypeR = RepresentedTypeR.builder()
+            .nameOfRepresentative("No Errors In Name").build();
         var representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setValue(representedTypeR);
         casedata.setRepCollection(List.of(representedTypeRItem));

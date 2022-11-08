@@ -10,7 +10,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDeta
 @Slf4j
 public class TribunalOfficesService {
     private final TribunalOfficesConfiguration config;
-    private static final String UNASSIGNED_OFFICE = "Unassigned";
+    public static final String UNASSIGNED_OFFICE = "Unassigned";
 
     public TribunalOfficesService(TribunalOfficesConfiguration config) {
         this.config = config;

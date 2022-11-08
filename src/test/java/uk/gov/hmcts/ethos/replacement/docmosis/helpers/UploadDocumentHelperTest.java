@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
@@ -22,6 +23,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 public class UploadDocumentHelperTest {
     CCDRequest ccdRequest;
+    CaseDetails caseDetails;
     CaseData caseData;
 
     @Before
@@ -38,6 +40,8 @@ public class UploadDocumentHelperTest {
             .withCaseId("1234")
             .withCaseData(caseData)
             .build();
+
+        caseDetails = ccdRequest.getCaseDetails();
     }
 
     @Test
@@ -75,8 +79,8 @@ public class UploadDocumentHelperTest {
 
     @Test
     public void buildPersonalisationForCaseRejection_givenNoClaimantTitle_returnsWithInitialAndLastName() {
-        var expected = buildPersonalisation("1234", "F", "Last");
-        var actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseData);
+        var expected = buildPersonalisation("F");
+        var actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseDetails);
 
         assertThat(actual, is(expected));
     }
@@ -84,8 +88,8 @@ public class UploadDocumentHelperTest {
     @Test
     public void buildPersonalisationForCaseRejection_givenClaimantTitle_returnsWithTitleLastName() {
         caseData.getClaimantIndType().setClaimantTitle("Mr");
-        var expected = buildPersonalisation("1234", "Mr", "Last");
-        var actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseData);
+        var expected = buildPersonalisation("Mr");
+        var actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseDetails);
 
         assertThat(actual, is(expected));
     }
@@ -93,17 +97,18 @@ public class UploadDocumentHelperTest {
     @Test
     public void buildPersonalisationForCaseRejection_givenClaimantPreferredTitle_returnsWithTitleLastName() {
         caseData.getClaimantIndType().setClaimantPreferredTitle("Professor");
-        var expected = buildPersonalisation("1234", "Professor", "Last");
-        var actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseData);
+        var expected = buildPersonalisation("Professor");
+        var actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseDetails);
 
         assertThat(actual, is(expected));
     }
 
-    private Map<String, String> buildPersonalisation(String caseNumber, String initialTitle, String lastName) {
+    private Map<String, String> buildPersonalisation(String initialTitle) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", caseNumber);
+        personalisation.put("caseNumber", "1234");
         personalisation.put("initialTitle", initialTitle);
-        personalisation.put("lastName", lastName);
+        personalisation.put("lastName", "Last");
+        personalisation.put("ccdId", "1234");
         return personalisation;
     }
 

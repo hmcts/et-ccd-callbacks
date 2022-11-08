@@ -49,13 +49,15 @@ public final class UploadDocumentHelper {
     /**
      * Generates a map of personalised information that will be used for the
      * placeholder fields in the Case Rejected email template.
-     * @param caseData Contains data on the case.
+     * @param caseDetails Contains details about the case.
      */
-    public static Map<String, String> buildPersonalisationForCaseRejection(CaseData caseData) {
+    public static Map<String, String> buildPersonalisationForCaseRejection(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
         personalisation.put("initialTitle", getClaimantTitleOrInitial(caseData));
         personalisation.put("lastName", getLastName(caseData.getClaimant()));
+        personalisation.put("ccdId", caseDetails.getCaseId());
         return personalisation;
     }
 

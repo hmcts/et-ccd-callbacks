@@ -253,7 +253,7 @@ ext {
     pact_version = '4.3.10'
     reformLoggingVersion = '5.1.9'
     serenity = '3.3.4'
-    tomcatEmbedVersion = '9.0.67'
+    tomcatEmbedVersion = '9.0.68'
 }
 
 ext["rest-assured.version"] = '5.1.0'
@@ -299,6 +299,7 @@ dependencies {
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '3.0.1'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.5'
     //to remove CVEs
     implementation group: 'org.apache.xmlgraphics', name: 'batik-all', version: '1.15', ext: 'pom'
     //To Remove vulnerability CVE-2020-11988

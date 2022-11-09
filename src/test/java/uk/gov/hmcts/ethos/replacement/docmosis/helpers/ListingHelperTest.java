@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1072,14 +1073,16 @@ public class ListingHelperTest {
         hearingType.setHearingEstLengthNum("2");
         hearingType.setHearingEstLengthNumType("hours");
         hearingType.setHearingFormat(List.of("Telephone"));
+        hearingType.setHearingSitAlone("Sit Alone");
+        hearingType.setJudicialMediation(YES);
         String expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, "
                 + "causeListVenue=Edinburgh, elmoCaseReference=null, " +
                 "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
                 + "hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
                 "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , "
                 + "respondent=Juan Pedro, respondentTown= , " +
-                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 4, "
-                + "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
+                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel=Sit Alone, hearingRoom=Tribunal 4, "
+                + "respondentOthers= , hearingNotes= , judicialMediation=Yes, hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData,
                 hearingType, dateListedType, 1, 3).toString());
 
@@ -1093,8 +1096,8 @@ public class ListingHelperTest {
                 + "hearingERMember= , hearingClerk=Clerk, " +
                 "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , "
                 + "respondent=Juan Pedro, respondentTown= , " +
-                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 5, "
-                + "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
+                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel=Sit Alone, hearingRoom=Tribunal 5, "
+                + "respondentOthers= , hearingNotes= , judicialMediation=Yes, hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData,
                 hearingType, dateListedType, 1, 3).toString());
 
@@ -1107,7 +1110,7 @@ public class ListingHelperTest {
                 + "hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
                 "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , "
                 + "respondent=Juan Pedro, respondentTown= , respondentRepresentative= , estHearingLength=2 hours, "
-                + "hearingPanel= , hearingRoom=Tribunal 5, respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
+                + "hearingPanel=Sit Alone, hearingRoom=Tribunal 5, respondentOthers= , hearingNotes= , judicialMediation=Yes, hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData,
                 hearingType, dateListedType, 1, 3).toString());
 
@@ -1119,8 +1122,8 @@ public class ListingHelperTest {
                 + "elmoCaseReference=null, jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
                 + "hearingEEMember= , hearingERMember= , hearingClerk=Clerk, hearingDay=2 of 3, "
                 + "claimantName=Rodriguez, claimantTown= , claimantRepresentative= , respondent=Juan Pedro, "
-                + "respondentTown= , respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , "
-                + "hearingRoom=Tribunal 7, respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
+                + "respondentTown= , respondentRepresentative= , estHearingLength=2 hours, hearingPanel=Sit Alone, "
+                + "hearingRoom=Tribunal 7, respondentOthers= , hearingNotes= , judicialMediation=Yes, hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData,
                 hearingType, dateListedType, 1, 3).toString());
 
@@ -1135,8 +1138,8 @@ public class ListingHelperTest {
                 + "elmoCaseReference=null, jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
                 + "hearingEEMember= , hearingERMember= , hearingClerk=Clerk, hearingDay=2 of 3, claimantName= , "
                 + "claimantTown= , claimantRepresentative= , respondent= , respondentTown= , "
-                + "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom=Tribunal 7, "
-                + "respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
+                + "respondentRepresentative= , estHearingLength=2 hours, hearingPanel=Sit Alone, hearingRoom=Tribunal 7, "
+                + "respondentOthers= , hearingNotes= , judicialMediation=Yes, hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDataPublic, caseDataRule50,
                 hearingType, dateListedType, 1, 3).toString());
         ListingData listingDataPressList = listingDetails.getCaseData();
@@ -1147,7 +1150,7 @@ public class ListingHelperTest {
                 "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
                 "hearingDay=2 of 3, claimantName=Order made pursuant to Rule 50, claimantTown= , claimantRepresentative= , " +
                 "respondent=Order made pursuant to Rule 50, respondentTown= , respondentRepresentative= , estHearingLength=2 hours, " +
-                "hearingPanel= , hearingRoom=Tribunal 7, respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
+                "hearingPanel=Sit Alone, hearingRoom=Tribunal 7, respondentOthers= , hearingNotes= , judicialMediation=Yes, hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDataPressList, caseDataRule50, hearingType, dateListedType, 1, 3).toString());
 
         dateListedType.setHearingRoom(null);
@@ -1157,7 +1160,7 @@ public class ListingHelperTest {
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=EdinburghVenue, elmoCaseReference=null, " +
                 "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
                 "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , respondent=Juan Pedro, respondentTown= , " +
-                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom= , respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
+                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel=Sit Alone, hearingRoom= , respondentOthers= , hearingNotes= , judicialMediation=Yes, hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData, hearingType, dateListedType, 1, 3).toString());
 
         dateListedType.setHearingVenueDayScotland(GLASGOW.getOfficeName());
@@ -1166,7 +1169,7 @@ public class ListingHelperTest {
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=GlasgowVenue, elmoCaseReference=null, " +
                 "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
                 "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , respondent=Juan Pedro, respondentTown= , " +
-                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom= , respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
+                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel=Sit Alone, hearingRoom= , respondentOthers= , hearingNotes= , judicialMediation=Yes, hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData, hearingType, dateListedType, 1, 3).toString());
 
         dateListedType.setHearingVenueDayScotland(TribunalOffice.ABERDEEN.getOfficeName());
@@ -1175,7 +1178,7 @@ public class ListingHelperTest {
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=AberdeenVenue, elmoCaseReference=null, " +
                 "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
                 "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , respondent=Juan Pedro, respondentTown= , " +
-                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom= , respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
+                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel=Sit Alone, hearingRoom= , respondentOthers= , hearingNotes= , judicialMediation=Yes, hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData, hearingType, dateListedType, 1, 3).toString());
 
         dateListedType.setHearingVenueDayScotland(TribunalOffice.DUNDEE.getOfficeName());
@@ -1184,7 +1187,7 @@ public class ListingHelperTest {
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=DundeeVenue, elmoCaseReference=null, " +
                 "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , hearingEEMember= , hearingERMember= , hearingClerk=Clerk, " +
                 "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , respondent=Juan Pedro, respondentTown= , " +
-                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , hearingRoom= , respondentOthers= , hearingNotes= , judicialMediation= , hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
+                "respondentRepresentative= , estHearingLength=2 hours, hearingPanel=Sit Alone, hearingRoom= , respondentOthers= , hearingNotes= , judicialMediation=Yes, hearingFormat=Telephone, hearingReadingDeliberationMembersChambers=Reading Day)";
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData, hearingType, dateListedType, 1, 3).toString());
     }
 

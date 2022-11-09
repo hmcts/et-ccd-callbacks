@@ -45,9 +45,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_PUBLIC
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_STAFF;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.IT56_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.IT57_TEMPLATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LISTINGS;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LISTINGS_DEV;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LISTINGS_USER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIVE_CASELOAD_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
@@ -315,37 +312,6 @@ public class ListingHelper {
         sb.append("}\n");
         sb.append("}\n");
         return sb;
-    }
-
-    private static String getListingCaseTypeSingleOrListings(String caseType) {
-        if (caseType.endsWith(LISTINGS) || caseType.endsWith(LISTINGS_DEV) || caseType.endsWith(LISTINGS_USER)) {
-            return UtilHelper.getListingCaseTypeId(caseType);
-        } else {
-            return caseType;
-        }
-    }
-
-    private static String getOfficeName(String caseType) {
-        int index = findOfficeNameInUpperCase(caseType);
-        if (index != 0) {
-            var upperCaseLetter = Character.toString(caseType.charAt(index));
-            return caseType.replace(upperCaseLetter, " " + upperCaseLetter);
-        } else {
-            return caseType;
-        }
-    }
-
-    private static int findOfficeNameInUpperCase(String caseType) {
-        var count = 0;
-        for (var i = 0; i < caseType.length(); i++) {
-            if (Character.isUpperCase(caseType.charAt(i))) {
-                count++;
-            }
-            if (count == 2) {
-                return i;
-            }
-        }
-        return 0;
     }
 
     private static StringBuilder getLogo(String caseType) {

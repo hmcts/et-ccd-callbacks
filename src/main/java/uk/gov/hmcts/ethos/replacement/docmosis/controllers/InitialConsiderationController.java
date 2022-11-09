@@ -118,6 +118,7 @@ public class InitialConsiderationController {
         caseData.setEtInitialConsiderationJurisdictionCodes(
             initialConsiderationService.generateJurisdictionCodesHtml(caseData.getJurCodesCollection(),
                 ccdRequest.getCaseDetails().getCaseTypeId()));
+        initialConsiderationService.setIsHearingAlreadyListed(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

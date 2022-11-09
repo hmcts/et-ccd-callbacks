@@ -34,6 +34,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -351,6 +352,30 @@ class InitialConsiderationServiceTest {
         assertThat(caseData.getEtICPostponeGiveDetails()).isNull();
         assertThat(caseData.getEtICConvertPreliminaryGiveDetails()).isNull();
         assertThat(caseData.getEtICConvertF2fGiveDetails()).isNull();
+    }
+
+    @Test
+    void setIsHearingAlreadyListed_shouldBeSetToNo_whenNoHearings() {
+        caseData.setEtInitialConsiderationHearing("|Hearing details | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|Date | -|\r\n"
+            + "|Type | -|\r\n"
+            + "|Duration | -|");
+
+        initialConsiderationService.setIsHearingAlreadyListed(caseData);
+        assertThat(caseData.getEtICHearingAlreadyListed()).isEqualTo(NO);
+    }
+
+    @Test
+    void setIsHearingAlreadyListed_shouldBeSetToYes_whenThereAreHearings() {
+        caseData.setEtInitialConsiderationHearing("|Hearing details | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|Date | 16 May 2022|\r\n"
+            + "|Type | Hearing|\r\n"
+            + "|Duration | 60 Days|");
+
+        initialConsiderationService.setIsHearingAlreadyListed(caseData);
+        assertThat(caseData.getEtICHearingAlreadyListed()).isEqualTo(YES);
     }
 
     private List<JurCodesTypeItem> generateJurisdictionCodes() {

@@ -20,8 +20,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @Slf4j
-@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions", "PMD.PrematureDeclaration"})
-public final class InitialConsiderationHelper {
+public class InitialConsiderationHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
@@ -122,8 +121,8 @@ public final class InitialConsiderationHelper {
                 .furtherInformation(Optional.ofNullable(caseData.getEtICFurtherInformation()).orElse(null))
                 .furtherInfoGiveDetails(defaultIfEmpty(caseData.getEtICFurtherInformationGiveDetails(), null))
                 .furtherInfoTimeToComply(defaultIfEmpty(caseData.getEtICFurtherInformationTimeToComply(), null))
-                .r27ClaimToBe(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
-                        .map(EtInitialConsiderationRule27::getEtICRule27ClaimToBe).orElse(null))
+                .r27ClaimToBe(String.valueOf(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
+                        .map(EtInitialConsiderationRule27::getEtICRule27ClaimToBe).orElse(null)))
                 .r27WhichPart(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
                         .map(EtInitialConsiderationRule27::getEtICRule27WhichPart).orElse(null))
                 .r27Direction(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())

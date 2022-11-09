@@ -27,7 +27,6 @@ import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.SHEET_NAM
 
 @Slf4j
 @Service("excelCreationService")
-@SuppressWarnings({"PMD.ConfusingTernary", "PMD.CloseResource", "PMD.LawOfDemeter"})
 public class ExcelCreationService {
 
     public byte[] writeExcel(List<?> multipleCollection, List<String> subMultipleCollection, String leadCaseString) {

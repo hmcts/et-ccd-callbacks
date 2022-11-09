@@ -23,7 +23,7 @@ public class BulkAddSinglesServiceTest {
     private SingleCasesImporter singleCasesImporter;
     private MultipleAmendService multipleAmendService;
     private MultipleDetails multipleDetails;
-    private static final String AUTH_TOKEN = "some-token";
+    private final String authToken = "some-token";
 
     @Before
     public void setup() {
@@ -37,23 +37,21 @@ public class BulkAddSinglesServiceTest {
     @Test
     public void shouldSubmitCases() throws ImportException {
         var ethosCaseReferences = List.of("case1");
-        when(singleCasesImporter.importCases(multipleDetails.getCaseData(), AUTH_TOKEN))
-            .thenReturn(ethosCaseReferences);
+        when(singleCasesImporter.importCases(multipleDetails.getCaseData(), authToken)).thenReturn(ethosCaseReferences);
 
-        var errors = bulkAddSinglesService.execute(multipleDetails, AUTH_TOKEN);
+        var errors = bulkAddSinglesService.execute(multipleDetails, authToken);
 
         assertTrue(errors.isEmpty());
-        verify(multipleAmendService, times(1)).bulkAmendMultipleLogic(anyString(),
-            any(MultipleDetails.class),
+        verify(multipleAmendService, times(1)).bulkAmendMultipleLogic(anyString(), any(MultipleDetails.class),
                 anyList());
     }
 
     @Test
     public void shouldReturnErrorWhenImportCasesFails() throws ImportException {
-        when(singleCasesImporter.importCases(multipleDetails.getCaseData(), AUTH_TOKEN))
+        when(singleCasesImporter.importCases(multipleDetails.getCaseData(), authToken))
                 .thenThrow(ImportException.class);
 
-        var errors = bulkAddSinglesService.execute(multipleDetails, AUTH_TOKEN);
+        var errors = bulkAddSinglesService.execute(multipleDetails, authToken);
 
         assertEquals(1, errors.size());
         assertEquals("Unexpected error when importing single cases", errors.get(0));

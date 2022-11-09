@@ -18,7 +18,6 @@ public class SessionDaysReportData extends ListingData {
     private final List<SessionDaysReportDetail> reportDetails = new ArrayList<>();
 
     public SessionDaysReportData(SessionDaysReportSummary reportSummary) {
-        super();
         this.reportSummary = reportSummary;
     }
 

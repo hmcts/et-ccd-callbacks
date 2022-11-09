@@ -7,6 +7,6 @@ public final class ReferralStatus {
     static final String CLOSED = "Closed";
 
     private ReferralStatus() {
-        // Hidden constructor
+    // Hidden constructor
     }
 }

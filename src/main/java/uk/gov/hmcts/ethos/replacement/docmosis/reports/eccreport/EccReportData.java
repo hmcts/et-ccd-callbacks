@@ -6,16 +6,15 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class EccReportData extends ListingData {
+public class EccReportData extends ListingData {
 
     @JsonIgnore
     private final List<EccReportDetail> reportDetails = new ArrayList<>();
 
     @JsonIgnore
-    private final String office;
+    private String office;
 
     public EccReportData(String office) {
-        super();
         this.office = office;
     }
 

@@ -7,14 +7,14 @@ import org.springframework.context.annotation.PropertySource;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.VenueAddress;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Configuration
 @ConfigurationProperties("venue-addresses")
 @PropertySource(value = "classpath:venueAddressValues.yml", factory = YamlPropertySourceFactory.class)
 @Getter
 public class VenueAddressesConfiguration {
-    private Map<TribunalOffice, List<VenueAddress>> tribunalOffices = new ConcurrentHashMap<>();
+    private Map<TribunalOffice, List<VenueAddress>> tribunalOffices = new HashMap<>();
 }

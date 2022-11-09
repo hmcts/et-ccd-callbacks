@@ -19,15 +19,14 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.LawOfDemeter", "PMD.TooManyMethods"})
 public class ScotlandVenueSelectionServiceTest {
 
     @Test
     public void testInitHearingCollectionNoHearings() {
-        VenueService venueService = mockVenueService();
-        CaseData caseData = new CaseData();
+        var venueService = mockVenueService();
+        var caseData = new CaseData();
 
-        ScotlandVenueSelectionService venueSelectionService = new ScotlandVenueSelectionService(venueService);
+        var venueSelectionService = new ScotlandVenueSelectionService(venueService);
         venueSelectionService.initHearingCollection(caseData);
 
         assertEquals(1, caseData.getHearingCollection().size());
@@ -37,10 +36,10 @@ public class ScotlandVenueSelectionServiceTest {
 
     @Test
     public void testInitHearingCollectionWithHearings() {
-        VenueService venueService = mockVenueService();
-        CaseData caseData = createCaseDataWithHearings();
+        var venueService = mockVenueService();
+        var caseData = createCaseDataWithHearings();
 
-        ScotlandVenueSelectionService venueSelectionService = new ScotlandVenueSelectionService(venueService);
+        var venueSelectionService = new ScotlandVenueSelectionService(venueService);
         venueSelectionService.initHearingCollection(caseData);
 
         assertEquals(3, caseData.getHearingCollection().size());
@@ -50,15 +49,15 @@ public class ScotlandVenueSelectionServiceTest {
 
     @Test
     public void testInitHearingCollectionWithHearingsAndSelectedVenue() {
-        VenueService venueService = mockVenueService();
-        DynamicValueType selectedAberdeenVenue = createWithSelectedIndex(TribunalOffice.ABERDEEN, 1);
-        DynamicValueType selectedDundeeVenue = createWithSelectedIndex(TribunalOffice.DUNDEE, 2);
-        DynamicValueType selectedEdinburghVenue = createWithSelectedIndex(TribunalOffice.EDINBURGH, 3);
-        DynamicValueType selectedGlasgow = createWithSelectedIndex(TribunalOffice.GLASGOW, 3);
-        CaseData caseData = createCaseDataWithSelectedHearingsAndVenue(selectedAberdeenVenue, selectedDundeeVenue,
+        var venueService = mockVenueService();
+        var selectedAberdeenVenue = createWithSelectedIndex(TribunalOffice.ABERDEEN, 1);
+        var selectedDundeeVenue = createWithSelectedIndex(TribunalOffice.DUNDEE, 2);
+        var selectedEdinburghVenue = createWithSelectedIndex(TribunalOffice.EDINBURGH, 3);
+        var selectedGlasgow = createWithSelectedIndex(TribunalOffice.GLASGOW, 3);
+        var caseData = createCaseDataWithSelectedHearingsAndVenue(selectedAberdeenVenue, selectedDundeeVenue,
                 selectedEdinburghVenue, selectedGlasgow);
 
-        ScotlandVenueSelectionService venueSelectionService = new ScotlandVenueSelectionService(venueService);
+        var venueSelectionService = new ScotlandVenueSelectionService(venueService);
         venueSelectionService.initHearingCollection(caseData);
 
         assertEquals(3, caseData.getHearingCollection().size());
@@ -69,13 +68,12 @@ public class ScotlandVenueSelectionServiceTest {
 
     @Test
     public void testCreateVenueSelectionNoSelectedVenue() {
-        VenueService venueService = mockVenueService();
+        var venueService = mockVenueService();
 
         for (TribunalOffice tribunalOffice : TribunalOffice.SCOTLAND_OFFICES) {
-            DateListedType selectedListing = createSelectedListing(tribunalOffice, null);
-            ScotlandVenueSelectionService venueSelectionService = new ScotlandVenueSelectionService(venueService);
-            DynamicFixedListType actualResult = venueSelectionService.createVenueSelection(tribunalOffice,
-                    selectedListing);
+            var selectedListing = createSelectedListing(tribunalOffice, null);
+            var venueSelectionService = new ScotlandVenueSelectionService(venueService);
+            var actualResult = venueSelectionService.createVenueSelection(tribunalOffice, selectedListing);
 
             SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(actualResult, tribunalOffice.getOfficeName(),
                     tribunalOffice.getOfficeName() + " ");
@@ -84,15 +82,13 @@ public class ScotlandVenueSelectionServiceTest {
 
     @Test
     public void testCreateVenueSelectionWithSelectedVenue() {
-        VenueService venueService = mockVenueService();
+        var venueService = mockVenueService();
 
         for (TribunalOffice tribunalOffice : TribunalOffice.SCOTLAND_OFFICES) {
-            DynamicValueType selectedVenue = createWithSelectedIndex(tribunalOffice, 2);
-            DateListedType selectedListing = createSelectedListing(tribunalOffice,
-                    DynamicFixedListType.of(selectedVenue));
-            ScotlandVenueSelectionService venueSelectionService = new ScotlandVenueSelectionService(venueService);
-            DynamicFixedListType actualResult = venueSelectionService.createVenueSelection(tribunalOffice,
-                    selectedListing);
+            var selectedVenue = createWithSelectedIndex(tribunalOffice, 2);
+            var selectedListing = createSelectedListing(tribunalOffice, DynamicFixedListType.of(selectedVenue));
+            var venueSelectionService = new ScotlandVenueSelectionService(venueService);
+            var actualResult = venueSelectionService.createVenueSelection(tribunalOffice, selectedListing);
 
             SelectionServiceTestUtils.verifyDynamicFixedListSelected(actualResult, tribunalOffice.getOfficeName(),
                     tribunalOffice.getOfficeName() + " ", selectedVenue);
@@ -139,7 +135,7 @@ public class ScotlandVenueSelectionServiceTest {
     }
 
     private CaseData createCaseDataWithHearings() {
-        CaseData caseData = new CaseData();
+        var caseData = new CaseData();
         caseData.setHearingCollection(new ArrayList<>());
         for (var i = 0; i < 3; i++) {
             var hearingType = new HearingType();

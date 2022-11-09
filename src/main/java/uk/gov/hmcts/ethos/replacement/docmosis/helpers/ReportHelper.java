@@ -33,10 +33,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
 @Slf4j
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
-    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
-    "PMD.LawOfDemeter"})
 public class ReportHelper {
 
     public static final String CASES_SEARCHED = "Cases searched: ";
@@ -176,7 +172,7 @@ public class ReportHelper {
             if (matchingDateIsValid) {
                 var adhocReportType = new AdhocReportType();
                 adhocReportType.setCaseType(caseData.getEcmCaseType());
-                setCommonReportDetailFields(listingDetails, caseData, adhocReportType);
+                getCommonReportDetailFields(listingDetails, caseData, adhocReportType);
                 adhocReportTypeItem.setValue(adhocReportType);
             }
         }
@@ -194,14 +190,14 @@ public class ReportHelper {
                 var adhocReportType = new AdhocReportType();
                 adhocReportType.setReportOffice(getTribunalOffice(listingDetails, caseData));
                 // TODO : hearingCollection.Hearing_stage implementation
-                setCommonReportDetailFields(listingDetails, caseData, adhocReportType);
+                getCommonReportDetailFields(listingDetails, caseData, adhocReportType);
                 adhocReportTypeItem.setValue(adhocReportType);
             }
         }
         return adhocReportTypeItem;
     }
 
-    private static void setCommonReportDetailFields(ListingDetails listingDetails, CaseData caseData,
+    private static void getCommonReportDetailFields(ListingDetails listingDetails, CaseData caseData,
                                                     AdhocReportType adhocReportType) {
         adhocReportType.setCaseReference(caseData.getEthosCaseReference());
         adhocReportType.setDateOfAcceptance(caseData.getPreAcceptCase().getDateAccepted());

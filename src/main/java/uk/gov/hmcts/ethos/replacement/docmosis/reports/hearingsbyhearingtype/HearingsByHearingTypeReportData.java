@@ -22,7 +22,6 @@ public class HearingsByHearingTypeReportData extends ListingData {
     private final List<HearingsByHearingTypeReportDetail> reportDetails = new ArrayList<>();
 
     public HearingsByHearingTypeReportData(HearingsByHearingTypeReportSummaryHdr reportSummaryHdr) {
-        super();
         this.reportSummaryHdr = reportSummaryHdr;
     }
 

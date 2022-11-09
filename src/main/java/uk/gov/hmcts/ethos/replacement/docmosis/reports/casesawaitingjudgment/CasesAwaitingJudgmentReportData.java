@@ -20,7 +20,6 @@ public class CasesAwaitingJudgmentReportData extends ListingData {
     private final List<ReportDetail> reportDetails = new ArrayList<>();
 
     public CasesAwaitingJudgmentReportData(ReportSummary reportSummary) {
-        super();
         this.reportSummary = reportSummary;
     }
 

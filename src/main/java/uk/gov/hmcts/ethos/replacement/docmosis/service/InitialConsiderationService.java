@@ -29,7 +29,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.get
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Service
-@SuppressWarnings({"PMD.ConsecutiveLiteralAppends"})
 @RequiredArgsConstructor
 public class InitialConsiderationService {
 

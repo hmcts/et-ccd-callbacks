@@ -11,7 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ET1ServingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -35,13 +34,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ET1ServingControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL = "/midServingDocumentOtherTypeNames";
-
+    private static final String SERVING_DOCUMENT_RECIPIENT_URL = "/midServingDocumentRecipient";
     private CCDRequest ccdRequest;
 
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
-    private ServingService servingService;
+    private ET1ServingService et1ServingService;
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -57,9 +56,9 @@ class ET1ServingControllerTest {
     @Test
     void midServingDocumentOtherTypeNames() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(servingService.generateOtherTypeDocumentLink(anyList())).thenReturn("expectedDocumentName");
-        when(servingService.generateEmailLinkToAcas(any(), anyBoolean())).thenReturn("expectedLink");
-        when(servingService.generateClaimantAndRespondentAddress(any())).thenReturn("expectedAddresses");
+        when(et1ServingService.generateOtherTypeDocumentName(anyList())).thenReturn("expectedDocumentName");
+        when(et1ServingService.generateEmailLinkToAcas(any())).thenReturn("expectedLink");
+        when(et1ServingService.generateClaimantAndRespondentAddress(any())).thenReturn("expectedAddresses");
         mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
@@ -70,9 +69,9 @@ class ET1ServingControllerTest {
                 .andExpect(jsonPath("$.data.emailLinkToAcas", notNullValue()))
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(servingService, times(1)).generateOtherTypeDocumentLink(anyList());
-        verify(servingService, times(1)).generateEmailLinkToAcas(any(), anyBoolean());
-        verify(servingService, times(1)).generateClaimantAndRespondentAddress(any());
+        verify(et1ServingService, times(1)).generateOtherTypeDocumentName(anyList());
+        verify(et1ServingService, times(1)).generateEmailLinkToAcas(any());
+        verify(et1ServingService, times(1)).generateClaimantAndRespondentAddress(any());
     }
 
     @Test

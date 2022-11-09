@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutorService;
  * @Profile("dev")
  * }</pre>
  */
-@SuppressWarnings({"PMD.DoNotUseThreads", "PMD.TooManyMethods", "PMD.ExcessivePublicCount"})
+@SuppressWarnings("ALL")
 public class DevQueueClient implements IQueueClient {
 
     @Override
@@ -228,8 +228,7 @@ public class DevQueueClient implements IQueueClient {
 
     @Override
     public CompletableFuture<Void> deadLetterAsync(UUID lockToken, String deadLetterReason,
-                                                   String deadLetterErrorDescription,
-                                                   TransactionContext transaction) {
+                                                   String deadLetterErrorDescription, TransactionContext transaction) {
         return null;
     }
 

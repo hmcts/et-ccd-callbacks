@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ET1ServingService;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -16,33 +16,31 @@ import java.util.Objects;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-@SuppressWarnings({"PMD.UseProperClassLoader"})
-class ServingServiceTest {
+class ET1ServingServiceTest {
     private static CaseDetails caseDetails;
 
-    private static ServingService servingService;
+    private static uk.gov.hmcts.ethos.replacement.docmosis.service.ET1ServingService ET1ServingService;
 
     @BeforeAll
     static void setUp() throws Exception {
         caseDetails = generateCaseDetails("midServingCaseDetailsTest.json");
-        servingService = new ServingService();
+        ET1ServingService = new ET1ServingService();
     }
 
     private static CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(
-                ServingServiceTest.class.getClassLoader()
+                ET1ServingServiceTest.class.getClassLoader()
                 .getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
     }
 
     @Test
-    void generateOtherTypeDocumentLink() {
-        String expectedDocumentName = "**<big>test-filename.xlsx</big>**<br/><small><a target=\"_blank\" "
-            + "href=\"/documents/test-document/binary\">test-filename.xlsx</a></small><br/>";
+    void generateOtherTypeDocumentName() {
+        String expectedDocumentName = "**<big>test-filename.xlsx</big>**<br/><small>Test description</small><br/>";
         List<DocumentTypeItem> documentTypeItems = caseDetails.getCaseData().getServingDocumentCollection();
-        assertThat(servingService
-            .generateOtherTypeDocumentLink(documentTypeItems), is(expectedDocumentName));
+        assertThat(ET1ServingService
+            .generateOtherTypeDocumentName(documentTypeItems), is(expectedDocumentName));
     }
 
     @Test
@@ -55,24 +53,18 @@ class ServingServiceTest {
                 + "<br/>Manchester<br/>M12 4ED<br/><br/>";
 
         CaseData caseData = caseDetails.getCaseData();
-        assertThat(servingService.generateClaimantAndRespondentAddress(caseData),
+        assertThat(ET1ServingService.generateClaimantAndRespondentAddress(caseData),
                 is(expectedClaimantAndRespondentAddress));
     }
 
     @Test
     void generateEmailLinkToAcas() {
-        String expectedEt1EmailLinkToAcas = "mailto:ET3@acas.org.uk?subject=2120001/2019"
+        String expectedEmailLinkToAcas = "mailto:ET3@acas.org.uk?subject=2120001/2019"
             + "&body=Parties%20in%20claim%3A%20Doris%20Johnson%20vs%20Antonio%20Vazquez%2C%20Juan%20Garcia%0D%0A"
             + "Case%20reference%20number%3A%202120001/2019%0D%0A%0D%0ADear%20Acas%2C%0D%0A%0D%0AThe%20tribunal%20"
             + "has%20completed%20ET1%20serving%20to%20the%20respondent.%0D%0A%0D%0AThe%20documents%20we%20sent%20are"
             + "%20attached%20to%20this%20email.%0D%0A%0D%0A";
-        String expectedEt3EmailLinkToAcas = "mailto:ET3@acas.org.uk?subject=2120001/2019"
-            + "&body=Parties%20in%20claim%3A%20Doris%20Johnson%20vs%20Antonio%20Vazquez%2C%20Juan%20Garcia%0D%0A"
-            + "Case%20reference%20number%3A%202120001/2019%0D%0A%0D%0ADear%20Acas%2C%0D%0A%0D%0AThe%20tribunal%20"
-            + "has%20completed%20ET3%20notifications%20to%20the%20relevant%20parties.%0D%0A%0D%0AThe%20documents%20we"
-            + "%20sent%20are%20attached%20to%20this%20email.%0D%0A%0D%0A";
         CaseData caseData = caseDetails.getCaseData();
-        assertThat(servingService.generateEmailLinkToAcas(caseData, false), is(expectedEt1EmailLinkToAcas));
-        assertThat(servingService.generateEmailLinkToAcas(caseData, true), is(expectedEt3EmailLinkToAcas));
+        assertThat(ET1ServingService.generateEmailLinkToAcas(caseData), is(expectedEmailLinkToAcas));
     }
 }

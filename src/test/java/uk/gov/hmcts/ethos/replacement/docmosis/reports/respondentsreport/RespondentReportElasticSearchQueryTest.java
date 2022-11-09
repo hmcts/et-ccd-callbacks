@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.UnusedPrivateMethod"})
 class RespondentReportElasticSearchQueryTest {
 
     private static Stream<Arguments> queryShouldNotIncludeManagingOffice() {
@@ -24,13 +23,13 @@ class RespondentReportElasticSearchQueryTest {
         );
     }
 
+
     @ParameterizedTest
     @MethodSource
-    void queryShouldNotIncludeManagingOffice(String managingOffice) {
+    void queryShouldNotIncludeManagingOffice(String managingOffice){
         var dateToSearchFrom = "2020-02-02";
         var dateToSearchTo = "2020-02-20";
-        var elasticSearchQuery = RespondentsReportElasticSearchQuery.create(
-                managingOffice, dateToSearchFrom, dateToSearchTo);
+        var elasticSearchQuery = RespondentsReportElasticSearchQuery.create(managingOffice, dateToSearchFrom, dateToSearchTo);
         assertFalse(elasticSearchQuery.contains(ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD));
     }
 
@@ -56,8 +55,7 @@ class RespondentReportElasticSearchQueryTest {
     void queryShouldIncludeManagingOffice(String managingOffice) {
         var dateToSearchFrom = "2020-02-02";
         var dateToSearchTo = "2020-02-20";
-        var elasticSearchQuery = RespondentsReportElasticSearchQuery.create(
-                managingOffice, dateToSearchFrom, dateToSearchTo);
+        var elasticSearchQuery = RespondentsReportElasticSearchQuery.create(managingOffice, dateToSearchFrom, dateToSearchTo);
         assertTrue(elasticSearchQuery.contains(ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD));
     }
 

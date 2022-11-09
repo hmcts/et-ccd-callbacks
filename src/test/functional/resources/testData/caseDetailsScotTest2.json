@@ -128,8 +128,8 @@
       "tribunalCorrespondenceEmail": "PUBLIC"
     },
     "after_submit_callback_response": {
-      "confirmationHeader": "Please download the document from : <a target=\"_blank\" href=\"http://127.0.0.1:3453/documents/95d2d398-8da4-428a-bc68-41771631cc00/binary\">Document</a>",
-      "confirmationBody": null
+      "confirmation_header": "Please download the document from : <a target=\"_blank\" href=\"http://127.0.0.1:3453/documents/95d2d398-8da4-428a-bc68-41771631cc00/binary\">Document</a>",
+      "confirmation_body": null
     },
     "callback_response_status_code": 200,
     "callback_response_status": "CALLBACK_COMPLETED",

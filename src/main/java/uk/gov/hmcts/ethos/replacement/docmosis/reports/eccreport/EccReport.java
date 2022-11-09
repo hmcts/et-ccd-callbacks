@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-@SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-public final class EccReport {
+public class EccReport {
 
     private final EccReportDataSource reportDataSource;
 
@@ -21,9 +20,9 @@ public final class EccReport {
     }
 
     public EccReportData generateReport(ReportParams params) {
-        List<EccReportSubmitEvent> submitEvents = getCases(params);
-        String office = ReportHelper.getReportOffice(params.getCaseTypeId(), params.getManagingOffice());
-        EccReportData reportData = initReport(office);
+        var submitEvents = getCases(params);
+        var office = ReportHelper.getReportOffice(params.getCaseTypeId(), params.getManagingOffice());
+        var reportData = initReport(office);
 
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             executeReport(reportData, submitEvents);
@@ -47,12 +46,12 @@ public final class EccReport {
     }
 
     private List<EccReportDetail> getReportDetail(List<EccReportSubmitEvent> submitEvents) {
-        List<EccReportDetail> eccReportDetailList = new ArrayList<>();
+        var eccReportDetailList = new ArrayList<EccReportDetail>();
         for (EccReportSubmitEvent submitEvent : submitEvents) {
+            var eccReportDetail = new EccReportDetail();
             var caseData = submitEvent.getCaseData();
             if (CollectionUtils.isNotEmpty(caseData.getEccCases())
                     && CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
-                var eccReportDetail = new EccReportDetail();
                 eccReportDetail.setState(submitEvent.getState());
                 eccReportDetail.setDate(caseData.getReceiptDate());
                 eccReportDetail.setCaseNumber(caseData.getEthosCaseReference());
@@ -70,7 +69,7 @@ public final class EccReport {
     private String getEccCases(List<EccCounterClaimTypeItem> eccItems) {
         StringBuilder eccCasesList = new StringBuilder();
         for (EccCounterClaimTypeItem eccItem : eccItems) {
-            eccCasesList.append(eccItem.getValue().getCounterClaim()).append('\n');
+            eccCasesList.append(eccItem.getValue().getCounterClaim()).append("\n");
         }
         return eccCasesList.toString().trim();
     }

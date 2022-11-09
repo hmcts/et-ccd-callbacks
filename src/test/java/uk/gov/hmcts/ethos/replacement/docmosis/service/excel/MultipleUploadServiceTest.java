@@ -23,12 +23,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.TESTI
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.TESTING_FILE_NAME_WITH_TWO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.TESTING_FILE_NAME_WRONG_COLUMN_ROW;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.getDataTypeSheet;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.setDocumentCollection;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.getDocumentCollection;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadService.ERROR_SHEET_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadService.ERROR_SHEET_NUMBER_COLUMNS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadService.ERROR_SHEET_NUMBER_ROWS;
 
-@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.LawOfDemeter"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleUploadServiceTest {
 
@@ -94,7 +93,7 @@ public class MultipleUploadServiceTest {
     public void bulkUploadLogicEmptySheet() throws IOException {
         List<String> errors = new ArrayList<>();
 
-        setDocumentCollection(multipleDetails.getCaseData());
+        getDocumentCollection(multipleDetails.getCaseData());
         when(excelReadingService.checkExcelErrors(
                 userToken,
                 MultiplesHelper.getExcelBinaryUrl(multipleDetails.getCaseData()),

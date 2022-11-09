@@ -8,26 +8,26 @@ import java.net.URLStreamHandlerFactory;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-public final class MockHttpURLConnectionFactory {
+public class MockHttpURLConnectionFactory {
 
-    private static final HttpUrlStreamHandler HTTP_URL_STREAM_HANDLER;
+    private static final HttpUrlStreamHandler httpUrlStreamHandler;
 
     static {
         var urlStreamHandlerFactory = mock(URLStreamHandlerFactory.class);
         URL.setURLStreamHandlerFactory(urlStreamHandlerFactory);
 
-        HTTP_URL_STREAM_HANDLER = new HttpUrlStreamHandler();
-        given(urlStreamHandlerFactory.createURLStreamHandler("http")).willReturn(HTTP_URL_STREAM_HANDLER);
+        httpUrlStreamHandler = new HttpUrlStreamHandler();
+        given(urlStreamHandlerFactory.createURLStreamHandler("http")).willReturn(httpUrlStreamHandler);
     }
 
-    private MockHttpURLConnectionFactory() {
+    public MockHttpURLConnectionFactory() {
         // All access through static methods
     }
 
     public static HttpURLConnection create(String url) throws MalformedURLException {
         var urlConnection = mock(HttpURLConnection.class);
-        HTTP_URL_STREAM_HANDLER.reset();
-        HTTP_URL_STREAM_HANDLER.addConnection(new URL(url), urlConnection);
+        httpUrlStreamHandler.reset();
+        httpUrlStreamHandler.addConnection(new URL(url), urlConnection);
 
         return urlConnection;
     }

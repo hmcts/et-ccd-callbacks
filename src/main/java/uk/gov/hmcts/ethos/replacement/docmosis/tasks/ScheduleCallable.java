@@ -13,10 +13,10 @@ import java.util.concurrent.Callable;
 @Slf4j
 public class ScheduleCallable implements Callable<HashSet<SchedulePayload>> {
 
-    private final SingleCasesReadingService singleCasesReadingService;
-    private final String userToken;
-    private final String caseTypeId;
-    private final List<String> partitionCaseIds;
+    private SingleCasesReadingService singleCasesReadingService;
+    private String userToken;
+    private String caseTypeId;
+    private List<String> partitionCaseIds;
 
     public ScheduleCallable(SingleCasesReadingService singleCasesReadingService, String userToken, String caseTypeId,
                             List<String> partitionCaseIds) {
@@ -28,16 +28,21 @@ public class ScheduleCallable implements Callable<HashSet<SchedulePayload>> {
 
     @Override
     public HashSet<SchedulePayload> call() {
+
         HashSet<SchedulePayload> schedulePayloads = new HashSet<>();
+
         HashSet<SchedulePayloadEvent> schedulePayloadEvents = singleCasesReadingService.retrieveScheduleCases(userToken,
                 caseTypeId, partitionCaseIds);
 
         for (SchedulePayloadEvent schedulePayloadEvent : schedulePayloadEvents) {
+
             schedulePayloads.add(MultiplesScheduleHelper.getSchedulePayloadFromSchedulePayloadES(
                     schedulePayloadEvent.getSchedulePayloadES()));
+
         }
 
         return schedulePayloads;
+
     }
 
 }

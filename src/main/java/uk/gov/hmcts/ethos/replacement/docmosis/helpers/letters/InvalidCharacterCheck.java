@@ -14,7 +14,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-public final class InvalidCharacterCheck {
+public class InvalidCharacterCheck {
 
     public static final String NEW_LINE_ERROR = "%s is split over 2 lines for case %s. Please correct this before "
             + "generating a %s";

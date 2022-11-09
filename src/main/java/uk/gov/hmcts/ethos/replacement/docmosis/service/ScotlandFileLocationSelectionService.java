@@ -8,7 +8,6 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.FileLocationService;
 
 @Service
-@SuppressWarnings({"PMD.LawOfDemeter"})
 public class ScotlandFileLocationSelectionService {
     private final FileLocationService fileLocationService;
 

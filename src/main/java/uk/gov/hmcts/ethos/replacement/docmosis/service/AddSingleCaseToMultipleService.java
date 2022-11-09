@@ -59,8 +59,8 @@ public class AddSingleCaseToMultipleService {
             var multipleData = multipleEvent.getCaseData();
 
             if (!multipleData.getManagingOffice().equals(caseData.getManagingOffice())) {
-                errors.add(String.format("Multiple %s is managed by %s", multipleData.getMultipleReference(),
-                        multipleData.getManagingOffice()));
+                errors.add((String.format("Multiple %s is managed by %s", multipleData.getMultipleReference(),
+                        multipleData.getManagingOffice())));
             }
 
             if (errors.isEmpty()) {

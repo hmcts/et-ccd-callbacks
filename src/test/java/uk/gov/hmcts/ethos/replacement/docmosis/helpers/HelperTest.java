@@ -6,6 +6,7 @@ import org.junit.Test;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -17,8 +18,6 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LawOfDemeter", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.LinguisticNaming"})
 public class HelperTest {
 
     private CaseDetails caseDetails1;

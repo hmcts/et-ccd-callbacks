@@ -111,6 +111,9 @@ public class CftlibConfig implements CFTLibConfigurer {
     @Value("${cftlib.admin-ccd-config-path}")
     private String adminCcdConfigPath;
 
+    private static final String CASEWORKER = "caseworker";
+    private static final String CASEWORKER_EMPLOYMENT = "caseworker-employment";
+
     @Override
     public void configure(CFTLib lib) {
         createRoles(lib);
@@ -121,7 +124,7 @@ public class CftlibConfig implements CFTLibConfigurer {
 
     private void createRoles(CFTLib lib) {
         lib.createRoles(
-                "caseworker-employment",
+            CASEWORKER_EMPLOYMENT,
                 "caseworker-employment-api",
                 "caseworker-employment-englandwales",
                 "caseworker-employment-scotland",
@@ -149,18 +152,18 @@ public class CftlibConfig implements CFTLibConfigurer {
 
         // Create test users in the idam simulator.
         lib.createIdamUser("englandwales@hmcts.net",
-                "caseworker",
-                "caseworker-employment",
+            CASEWORKER,
+            CASEWORKER_EMPLOYMENT,
                 "caseworker-employment-englandwales");
 
         lib.createIdamUser("scotland@hmcts.net",
-                "caseworker",
-                "caseworker-employment",
+            CASEWORKER,
+            CASEWORKER_EMPLOYMENT,
                 "caseworker-employment-scotland");
 
         lib.createIdamUser("admin@hmcts.net",
-                "caseworker",
-                "caseworker-employment",
+            CASEWORKER,
+            CASEWORKER_EMPLOYMENT,
                 "caseworker-employment-api");
 
         lib.createIdamUser("superuser@etorganisation1.com",
@@ -176,7 +179,7 @@ public class CftlibConfig implements CFTLibConfigurer {
         lib.createIdamUser("citizen@gmail.com", "citizen");
 
         // Required by ccd-data-store-api
-        lib.createIdamUser("data.store.idam.system.user@gmail.com", "caseworker");
+        lib.createIdamUser("data.store.idam.system.user@gmail.com", CASEWORKER);
     }
 
     private void importCcdDefinitions(CFTLib lib) {

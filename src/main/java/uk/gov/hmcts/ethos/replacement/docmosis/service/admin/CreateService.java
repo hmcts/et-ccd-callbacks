@@ -4,6 +4,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.CreateServiceException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class CreateService {
             String query = boolQueryCreate();
             listSubmitEvents = ccdClient.executeElasticSearch(userToken, ECM_ADMIN_CASE_TYPE_ID, query);
         } catch (Exception ex) {
-            throw new RuntimeException("Error retrieving case for Create ECM Admin", ex);
+            throw new CreateServiceException("Error retrieving case for Create ECM Admin", ex);
         }
         return !listSubmitEvents.isEmpty();
     }

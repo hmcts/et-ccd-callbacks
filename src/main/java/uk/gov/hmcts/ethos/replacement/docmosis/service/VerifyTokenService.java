@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.VerifyTokenServiceException;
 
 import java.net.URL;
 import java.security.Key;
@@ -53,7 +54,7 @@ public class VerifyTokenService {
             return JWKSet.load(new URL(jwksUrl));
         } catch (Exception e) {
             log.error("JWKS key loading error", e);
-            throw new RuntimeException("JWKS error", e);
+            throw new VerifyTokenServiceException("JWKS error", e);
         }
     }
 
@@ -61,7 +62,7 @@ public class VerifyTokenService {
         try {
             JWK jsonWebKey = jsonWebKeySet.getKeyByKeyId(keyId);
             if (jsonWebKey == null) {
-                throw new RuntimeException("JWK does not exist in the key set");
+                throw new VerifyTokenServiceException("JWK does not exist in the key set");
             }
             if (jsonWebKey instanceof SecretJWK) {
                 return ((SecretJWK) jsonWebKey).toSecretKey();
@@ -69,10 +70,10 @@ public class VerifyTokenService {
             if (jsonWebKey instanceof AsymmetricJWK) {
                 return ((AsymmetricJWK) jsonWebKey).toPublicKey();
             }
-            throw new RuntimeException("Unsupported JWK " + jsonWebKey.getClass().getName());
+            throw new VerifyTokenServiceException("Unsupported JWK " + jsonWebKey.getClass().getName());
         } catch (JOSEException e) {
             log.error("Invalid JWK key", e);
-            throw new RuntimeException("Invalid JWK", e);
+            throw new VerifyTokenServiceException("Invalid JWK", e);
         }
     }
 

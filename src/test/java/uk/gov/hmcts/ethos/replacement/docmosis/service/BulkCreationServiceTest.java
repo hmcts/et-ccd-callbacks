@@ -223,8 +223,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
      void caseCreationRequestException() throws IOException {
         when(ccdClient.retrieveCases(anyString(), anyString(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
+        BulkDetails details = getBulkDetails(YES, "Single");
         assertThrows(CaseCreationException.class, () -> bulkSearchService.bulkCasesRetrievalRequest(
-                        getBulkDetails(YES, "Single"), "authToken", true));
+                        details, "authToken", true));
     }
 
     @Test
@@ -232,8 +233,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
         submitEvent.getCaseData().setMultipleReference("123345");
         List<SubmitEvent> submitEventList = new ArrayList<>(Collections.singletonList(submitEvent));
         when(ccdClient.retrieveCases(anyString(), anyString(), anyString())).thenReturn(submitEventList);
+        BulkDetails bulkDetails = getBulkDetails(YES, "Single");
         BulkCasesPayload bulkCasesPayload = bulkSearchService.bulkCasesRetrievalRequest(
-                getBulkDetails(YES, "Single"), "authToken", true);
+            bulkDetails, "authToken", true);
         assertEquals(submitEventList, bulkCasesPayload.getSubmitEvents());
     }
 
@@ -262,9 +264,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
      void caseCreationRequestExceptionElasticSearch() throws IOException {
         when(ccdClient.retrieveCasesElasticSearchForCreation(anyString(), anyString(), anyList(), anyString()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
+
+        BulkDetails bulkDetails = getBulkDetails(YES, "Single");
+
         assertThrows(CaseCreationException.class, () ->
-                bulkSearchService.bulkCasesRetrievalRequestElasticSearch(getBulkDetails(
-                        YES, "Single"), "authToken", true, true));
+                bulkSearchService.bulkCasesRetrievalRequestElasticSearch(bulkDetails,
+                    "authToken", true, true));
     }
 
     @Test
@@ -536,8 +541,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
      void retrievalCasesForPreAcceptRequestException() throws IOException {
         when(ccdClient.retrieveCasesElasticSearch(anyString(), anyString(), any()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
+        BulkDetails bulkDetails = getBulkDetails(YES, "Single");
         assertThrows(CaseCreationException.class, () -> bulkSearchService.retrievalCasesForPreAcceptRequest(
-                        getBulkDetails(YES, "Single"), "authToken"));
+            bulkDetails, "authToken"));
     }
 
     @Test

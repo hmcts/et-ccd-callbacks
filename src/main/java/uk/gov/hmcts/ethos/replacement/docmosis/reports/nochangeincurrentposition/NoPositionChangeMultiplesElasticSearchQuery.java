@@ -8,7 +8,7 @@ import java.util.List;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
 
-public final class NoPositionChangeMultiplesElasticSearchQuery {
+public class NoPositionChangeMultiplesElasticSearchQuery {
     private NoPositionChangeMultiplesElasticSearchQuery() {
         // Access through static methods
     }

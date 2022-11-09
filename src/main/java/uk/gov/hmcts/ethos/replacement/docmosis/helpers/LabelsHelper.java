@@ -45,11 +45,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getActiveRe
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
-    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
-    "PMD.LawOfDemeter",  "PMD.ConsecutiveLiteralAppends", "PMD.ConsecutiveAppendsShouldReuse",
-    "PMD.LinguisticNaming", "PMD.NPathComplexity", "PMD.ExcessiveImports", "PMD.CyclomaticComplexity"})
 public class LabelsHelper {
 
     public static final int MAX_NUMBER_LABELS = 2000;
@@ -102,7 +97,7 @@ public class LabelsHelper {
         } else {
             addressLabelType.setFullName(CLAIMANT + nullCheck(claimantCompany));
             addressLabelType.setLabelEntityName01("");
-            addressLabelType.setLabelEntityName02(nullCheck(claimantCompany));
+            addressLabelType.setLabelEntityName02((nullCheck(claimantCompany)));
         }
 
         if (claimantType != null) {

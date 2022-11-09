@@ -22,7 +22,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 
 @RestController
 @Slf4j
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class ListHearingController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";

@@ -32,10 +32,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals", "PMD.ExcessivePublicCount",
-    "PMD.ExcessiveImports", "PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.GodClass",
-    "PMD.AvoidInstantiatingObjectsInLoops"})
-public final class ECCHelper {
+public class ECCHelper {
 
     private static final String JURISDICTION_CODE_ECC = "BOC";
     private static final String EMPLOYER_CONTRACT_CLAIM_CODE = "ECC";
@@ -48,7 +45,7 @@ public final class ECCHelper {
     }
 
     public static void createECCLogic(CaseDetails caseDetails, CaseData originalCaseData) {
-        CaseData caseData = caseDetails.getCaseData();
+        var caseData = caseDetails.getCaseData();
         if (originalCaseData.getRespondentCollection() != null) {
             Optional<RespondentSumTypeItem> respondentChosen = originalCaseData.getRespondentCollection()
                     .stream()
@@ -70,7 +67,7 @@ public final class ECCHelper {
     }
 
     public static boolean validCaseForECC(SubmitEvent submitEvent, List<String> errors) {
-        Boolean validCaseForECC = true;
+        var validCaseForECC = true;
         if (!submitEvent.getState().equals(ACCEPTED_STATE)) {
             errors.add(WRONG_CASE_STATE_MESSAGE);
             validCaseForECC = false;
@@ -83,10 +80,10 @@ public final class ECCHelper {
     }
 
     private static boolean et3Received(SubmitEvent submitEvent) {
-        CaseData caseData = submitEvent.getCaseData();
+        var caseData = submitEvent.getCaseData();
         if (caseData.getRespondentCollection() != null && !caseData.getRespondentCollection().isEmpty()) {
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-                RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
+                var respondentSumType = respondentSumTypeItem.getValue();
                 if (respondentSumType.getResponseReceived() != null
                         && respondentSumType.getResponseReceived().equals(YES)) {
                     return true;
@@ -97,11 +94,11 @@ public final class ECCHelper {
     }
 
     private static void populateClaimantDetails(CaseData caseData, RespondentSumType respondentSumType) {
-        ClaimantType claimantType = new ClaimantType();
+        var claimantType = new ClaimantType();
         claimantType.setClaimantAddressUK(respondentSumType.getRespondentAddress());
         caseData.setClaimantType(claimantType);
 
-        ClaimantWorkAddressType claimantWorkAddressType = new ClaimantWorkAddressType();
+        var claimantWorkAddressType = new ClaimantWorkAddressType();
         claimantWorkAddressType.setClaimantWorkAddress(respondentSumType.getRespondentAddress());
         caseData.setClaimantWorkAddress(claimantWorkAddressType);
 
@@ -113,28 +110,28 @@ public final class ECCHelper {
 
     private static void populateRespondentCollectionDetails(CaseData caseData, ClaimantIndType originalClaimantIndType,
                                                             ClaimantType originalClaimantType) {
-        RespondentSumType respondentSumType = new RespondentSumType();
+        var respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName(originalClaimantIndType.claimantFullName());
         respondentSumType.setRespondentAcasNo(EMPLOYER_CONTRACT_CLAIM_CODE);
         respondentSumType.setRespondentAcasQuestion(NO);
         respondentSumType.setRespondentAddress(originalClaimantType.getClaimantAddressUK());
 
-        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        var respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(respondentSumType);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singleton(respondentSumTypeItem)));
     }
 
     private static void populateJurCodesCollection(CaseData caseData) {
-        JurCodesType jurCodesType = new JurCodesType();
+        var jurCodesType = new JurCodesType();
         jurCodesType.setJuridictionCodesList(JURISDICTION_CODE_ECC);
-        JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
+        var jurCodesTypeItem = new JurCodesTypeItem();
         jurCodesTypeItem.setId(UUID.randomUUID().toString());
         jurCodesTypeItem.setValue(jurCodesType);
         caseData.setJurCodesCollection(new ArrayList<>(Collections.singleton(jurCodesTypeItem)));
     }
 
     private static void populatePreAcceptCaseDetails(CaseData caseData) {
-        CasePreAcceptType casePreAcceptType = new CasePreAcceptType();
+        var casePreAcceptType = new CasePreAcceptType();
         casePreAcceptType.setCaseAccepted(YES);
         casePreAcceptType.setDateAccepted(UtilHelper.formatCurrentDate2(LocalDate.now()));
         caseData.setPreAcceptCase(casePreAcceptType);
@@ -163,10 +160,10 @@ public final class ECCHelper {
     private static void populateRepresentativeClaimantDetails(CaseData caseData, CaseData originalCaseData) {
         if (originalCaseData.getRepCollection() != null && !originalCaseData.getRepCollection().isEmpty()) {
             for (RepresentedTypeRItem representedTypeRItem : originalCaseData.getRepCollection()) {
-                RepresentedTypeR representedTypeR = representedTypeRItem.getValue();
+                var representedTypeR = representedTypeRItem.getValue();
                 if (representedTypeR.getRespRepName() != null
                         && representedTypeR.getRespRepName().equals(caseData.getClaimantCompany())) {
-                    RepresentedTypeC representedTypeC = new RepresentedTypeC();
+                    var representedTypeC = new RepresentedTypeC();
                     representedTypeC.setNameOfRepresentative(nullCheck(representedTypeR.getNameOfRepresentative()));
                     representedTypeC.setNameOfOrganisation(nullCheck(representedTypeR.getNameOfOrganisation()));
                     representedTypeC.setRepresentativeReference(
@@ -195,7 +192,7 @@ public final class ECCHelper {
     private static void populateRepCollectionDetails(CaseData caseData, CaseData originalCaseData) {
         RepresentedTypeC representativeClaimantType = originalCaseData.getRepresentativeClaimantType();
         if (representativeClaimantType != null && originalCaseData.getClaimantRepresentedQuestion().equals(YES)) {
-            RepresentedTypeR representedTypeR = new RepresentedTypeR();
+            var representedTypeR = new RepresentedTypeR();
             representedTypeR.setRespRepName(caseData.getRespondentCollection().get(0).getValue().getRespondentName());
             representedTypeR.setNameOfRepresentative(nullCheck(representativeClaimantType.getNameOfRepresentative()));
             representedTypeR.setNameOfOrganisation(nullCheck(representativeClaimantType.getNameOfOrganisation()));
@@ -214,7 +211,7 @@ public final class ECCHelper {
                     nullCheck(representativeClaimantType.getRepresentativeEmailAddress()));
             representedTypeR.setRepresentativePreference(
                     nullCheck(representativeClaimantType.getRepresentativePreference()));
-            RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
+            var representedTypeRItem = new RepresentedTypeRItem();
             representedTypeRItem.setValue(representedTypeR);
             caseData.setRepCollection(new ArrayList<>(Collections.singleton(representedTypeRItem)));
         }

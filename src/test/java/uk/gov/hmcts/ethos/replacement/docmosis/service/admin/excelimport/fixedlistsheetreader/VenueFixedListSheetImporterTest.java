@@ -43,15 +43,13 @@ class VenueFixedListSheetImporterTest {
     @MockBean
     private RoomRepository roomRepository;
 
-    @SuppressWarnings({"PMD.UnusedPrivateField"})
     @Autowired
     private FixedListMappings fixedListMappings;
 
     @BeforeAll
     static void setup() throws IOException, InvalidFormatException {
-        File file = new File(Thread.currentThread().getContextClassLoader()
-            .getResource("admin/VenuesImportFile.xlsx").getFile());
-
+        var file = new File(VenueFixedListSheetImporterTest.class.getClassLoader()
+                .getResource("admin/VenuesImportFile.xlsx").getFile());
         workbook = new XSSFWorkbook(file);
     }
 
@@ -76,7 +74,7 @@ class VenueFixedListSheetImporterTest {
         assertEquals(expectedRooms, roomsArgumentCaptor.getValue().size());
     }
 
-    private static Stream<Arguments> testImportSheet() { //NOPMD - parameterized tests
+    private static Stream<Arguments> testImportSheet() {
         return Stream.of(
                 Arguments.of(TribunalOffice.ABERDEEN, "Scotland Scrubbed", 9, 11),
                 Arguments.of(TribunalOffice.BRISTOL, "Bristol Scrubbed", 41, 141),

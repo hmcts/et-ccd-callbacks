@@ -16,7 +16,6 @@ import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.DOUBLE_SPACE_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.NEW_LINE_ERROR;
 
-@SuppressWarnings({"PMD.UseProperClassLoader"})
 public class InvalidCharacterCheckTest {
 
     private CaseDetails caseDetails1;

@@ -43,7 +43,7 @@ public class SimpleSheetHandler implements SheetHandler {
     static class OfficeSheetIterator implements Iterator<OfficeSheet> {
 
         private final List<OfficeSheet> sheets;
-        private int index;
+        private int index = 0;
 
         @Override
         public boolean hasNext() {

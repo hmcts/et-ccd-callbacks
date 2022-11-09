@@ -33,26 +33,26 @@ class ClerkRowHandlerTest {
 
     @Test
     void testHandle() {
-        String code = "ClerkCode";
-        String name = "Clerk Kent";
-        Row row = mock(Row.class);
+        var code = "ClerkCode";
+        var name = "Clerk Kent";
+        var tribunalOffice = TribunalOffice.NEWCASTLE;
+        var row = mock(Row.class);
         mockCell(row, 0, CLERK_ROW_ID);
         mockCell(row, 1, code);
         mockCell(row, 2, name);
         mockCell(row, 3, "1");
-        Row invalidRow = mock(Row.class);
+        var invalidRow = mock(Row.class);
         mockCell(invalidRow, 0, "fl_Judge");
 
-        CourtWorkerRepository courtWorkerRepository = mock(CourtWorkerRepository.class);
+        var courtWorkerRepository = mock(CourtWorkerRepository.class);
 
-        ClerkRowHandler clerkRowHandler = new ClerkRowHandler(courtWorkerRepository);
-        TribunalOffice tribunalOffice = TribunalOffice.NEWCASTLE;
+        var clerkRowHandler = new ClerkRowHandler(courtWorkerRepository);
         clerkRowHandler.handle(tribunalOffice, row);
 
-        ArgumentCaptor<CourtWorker> captor = ArgumentCaptor.forClass(CourtWorker.class);
+        var captor = ArgumentCaptor.forClass(CourtWorker.class);
         verify(courtWorkerRepository, times(1)).save(captor.capture());
 
-        CourtWorker actual = captor.getValue();
+        var actual = captor.getValue();
         assertEquals(CourtWorkerType.CLERK, actual.getType());
         assertEquals(code, actual.getCode());
         assertEquals(name, actual.getName());
@@ -60,7 +60,7 @@ class ClerkRowHandlerTest {
     }
 
     private void mockCell(Row row, int cellNum, String value) {
-        Cell cell = mock(Cell.class);
+        var cell = mock(Cell.class);
         when(row.getCell(cellNum)).thenReturn(cell);
         when(cell.getStringCellValue()).thenReturn(value);
     }

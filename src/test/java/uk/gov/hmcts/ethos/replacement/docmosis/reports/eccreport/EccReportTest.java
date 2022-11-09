@@ -18,10 +18,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
-@SuppressWarnings("PMD.LawOfDemeter")
 class EccReportTest {
 
-    static final LocalDateTime BASE_DATE = LocalDateTime.of(2022, 1, 1, 0, 0, 0);
+    static final LocalDateTime BASE_DATE = LocalDateTime.of(2022, 1, 1, 0, 0,0);
     static final String DATE_FROM = BASE_DATE.minusDays(1).format(OLD_DATE_TIME_PATTERN);
     static final String DATE_TO = BASE_DATE.plusDays(15).format(OLD_DATE_TIME_PATTERN);
 
@@ -84,19 +83,18 @@ class EccReportTest {
         // Given a case has respondents and ecc
         // and report data is requested
         // the cases should be in the report data
-        EccReportSubmitEvent submitEvent = EccReportCaseDataBuilder.builder()
+        var submitEvent = EccReportCaseDataBuilder.builder()
                 .withRespondents()
                 .withEccs()
                 .buildAsSubmitEvent();
-        List<EccReportSubmitEvent> submitEvents = List.of(submitEvent);
-        TribunalOffice managingOffice = TribunalOffice.MANCHESTER;
-        EccReportDataSource reportDataSource = mockDataSource(ENGLANDWALES_CASE_TYPE_ID, managingOffice.getOfficeName(),
-                submitEvents);
+        var submitEvents = List.of(submitEvent);
+        var managingOffice = TribunalOffice.MANCHESTER;
+        var reportDataSource = mockDataSource(ENGLANDWALES_CASE_TYPE_ID, managingOffice.getOfficeName(), submitEvents);
 
-        EccReport eccReport = new EccReport(reportDataSource);
-        ReportParams reportParams = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID, managingOffice.getOfficeName(),
+        var eccReport = new EccReport(reportDataSource);
+        var reportParams = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID, managingOffice.getOfficeName(),
                 DATE_FROM, DATE_TO);
-        EccReportData reportData = eccReport.generateReport(reportParams);
+        var reportData = eccReport.generateReport(reportParams);
 
         assertEquals(managingOffice.getOfficeName(), reportData.getOffice());
         assertEquals("2", reportData.getReportDetails().get(0).getRespondentsCount());
@@ -107,9 +105,9 @@ class EccReportTest {
 
     private EccReportDataSource mockDataSource(String caseTypeId, String managingOffice,
                                                List<EccReportSubmitEvent> submitEvents) {
-        EccReportDataSource reportDataSource = mock(EccReportDataSource.class);
+        var reportDataSource = mock(EccReportDataSource.class);
 
-        ReportParams reportParams = new ReportParams(caseTypeId, managingOffice, DATE_FROM, DATE_TO);
+        var reportParams = new ReportParams(caseTypeId, managingOffice, DATE_FROM, DATE_TO);
         when(reportDataSource.getData(reportParams)).thenReturn(submitEvents);
 
         return reportDataSource;

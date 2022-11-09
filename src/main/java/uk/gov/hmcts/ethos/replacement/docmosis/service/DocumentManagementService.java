@@ -33,7 +33,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 @Service
 @Slf4j
 @ComponentScan("uk.gov.hmcts.reform.ccd.document.am.feign")
-@SuppressWarnings({"PMD.LawOfDemeter"})
 public class DocumentManagementService {
 
     private static final String FILES_NAME = "files";

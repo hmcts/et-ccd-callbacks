@@ -13,7 +13,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 
 import java.util.List;
 
-public final class CallbackRespHelper {
+public class CallbackRespHelper {
 
     private CallbackRespHelper() {
     }

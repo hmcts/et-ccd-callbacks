@@ -11,7 +11,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition.NoPositionChangeReport.VALID_CASE_STATES;
 
-final class NoPositionChangeElasticSearchQuery {
+class NoPositionChangeElasticSearchQuery {
     private NoPositionChangeElasticSearchQuery() {
         // Access through static methods
     }

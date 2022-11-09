@@ -39,7 +39,7 @@ public class FixCaseApiServiceTest {
     @Before
     public void setUp() {
         userToken = "authToken";
-        ccdReference = 1_643_639_063_185_009L;
+        ccdReference = 1643639063185009L;
         String multipleReference = "246001";
 
         caseDetails = new CaseDetails();

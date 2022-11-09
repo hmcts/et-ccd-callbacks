@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtICSeekComments;
+
 import uk.gov.hmcts.et.common.model.ccd.EtIcudlHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule27;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule28;
@@ -42,7 +43,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 @ExtendWith(SpringExtension.class)
 class InitialConsiderationServiceTest {
     private static final String EXPECTED_RESPONDENT_NAME =
@@ -168,9 +168,9 @@ class InitialConsiderationServiceTest {
     @Test
     void missingJurisdictionCollectionTest() {
         String jurisdictionCodesHtml =
-            initialConsiderationService.generateJurisdictionCodesHtml(caseDataEmpty.getJurCodesCollection());
+                initialConsiderationService.generateJurisdictionCodesHtml(caseDataEmpty.getJurCodesCollection());
         assertThat(jurisdictionCodesHtml)
-            .isEmpty();
+                .isEmpty();
     }
 
     @Test
@@ -178,7 +178,7 @@ class InitialConsiderationServiceTest {
         String jurisdictionCodesHtml =
             initialConsiderationService.generateJurisdictionCodesHtml(generateInvalidJurisdictionCodes());
         assertThat(jurisdictionCodesHtml)
-            .isEmpty();
+                .isEmpty();
     }
 
     @Test
@@ -192,7 +192,7 @@ class InitialConsiderationServiceTest {
     @Test
     void missingRespondentCollectionTest() {
         String respondentName =
-            initialConsiderationService.getRespondentName(caseDataEmpty.getRespondentCollection());
+                initialConsiderationService.getRespondentName(caseDataEmpty.getRespondentCollection());
         assertThat(respondentName)
             .isEqualTo(EXPECTED_RESPONDENT_NAME_BLANK);
     }

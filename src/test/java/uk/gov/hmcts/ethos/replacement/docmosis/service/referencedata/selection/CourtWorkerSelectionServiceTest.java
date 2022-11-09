@@ -36,9 +36,10 @@ class CourtWorkerSelectionServiceTest {
         assertEquals(expectedLabel, selection.getListItems().get(0).getLabel());
         verify(courtWorkerService, times(1)).getCourtWorkerByTribunalOffice(expectedTribunalOffice,
                 CourtWorkerType.CLERK);
+
     }
 
-    private static Stream<Arguments> testCreateCourtWorkerSelection() { //NOPMD - parameterized tests source method
+    private static Stream<Arguments> testCreateCourtWorkerSelection() {
         return Stream.of(
                 Arguments.of(TribunalOffice.ABERDEEN, TribunalOffice.SCOTLAND),
                 Arguments.of(TribunalOffice.BRISTOL, TribunalOffice.BRISTOL),

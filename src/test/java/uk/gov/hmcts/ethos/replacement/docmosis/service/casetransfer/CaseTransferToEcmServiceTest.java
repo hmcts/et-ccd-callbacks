@@ -21,12 +21,11 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferToEcmService.NO_CASES_FOUND;
 
-@SuppressWarnings({"PMD.LawOfDemeter"})
 @ExtendWith(SpringExtension.class)
 class CaseTransferToEcmServiceTest {
 
-    private static final String CASE_TRANSFER_TO_ECM = " Transferring case to ECM";
-    private static final String AUTH_TOKEN = "Bearer some-random-token";
+    private final String CASE_TRANSFER_TO_ECM = " Transferring case to ECM";
+    private final String AUTH_TOKEN = "Bearer some-random-token";
 
     @InjectMocks
     private CaseTransferToEcmService caseTransferToEcmService;
@@ -59,6 +58,7 @@ class CaseTransferToEcmServiceTest {
         assertEquals(1, errors.size());
         assertEquals(String.format(NO_CASES_FOUND, "60000001/2022"), errors.get(0));
     }
+
 
     private CaseDetails createCaseDetails(String managingOffice, String ecmOfficeCT) {
         CaseDataBuilder builder = CaseDataBuilder.builder()

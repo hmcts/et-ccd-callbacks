@@ -41,7 +41,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/et3Vetting")
 @RestController
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class Et3VettingController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -260,8 +259,7 @@ public class Et3VettingController {
 
     /**
      * During processing the ET3 journey data is stored onto case data, this method saves that information onto the
-     * respondent selected at the start of vetting. The leftover information on case data will be deleted. This method
-     * will also generate a document for the Vetting process and save it onto a respondent
+     * respondent selected at the start of vetting. The leftover information on case data will be deleted.
      * @param ccdRequest generic request from CCD
      * @param userToken authentication token to verify the user
      * @return this will return and display a message to the user on the next steps.

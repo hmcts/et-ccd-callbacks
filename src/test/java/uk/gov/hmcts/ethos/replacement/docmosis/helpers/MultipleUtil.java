@@ -67,19 +67,13 @@ import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_4;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.SHEET_NAME;
 
-@SuppressWarnings({"PMD.LooseCoupling", "PMD.LawOfDemeter", "PMD.CloseResource", "PMD.ExcessiveImports",
-    "PMD.NPathComplexity"})
-public final class MultipleUtil {
+public class MultipleUtil {
 
     public static final String TESTING_FILE_NAME = "MyFirstExcel.xlsx";
     public static final String TESTING_FILE_NAME_ERROR = "MyFirstExcelError.xlsx";
     public static final String TESTING_FILE_NAME_WITH_TWO = "MyFirstExcel2.xlsx";
     public static final String TESTING_FILE_NAME_WRONG_COLUMN_ROW = "MyFirstExcelWrongColumnRow.xlsx";
     public static final String TESTING_FILE_NAME_EMPTY = "MyFirstExcelEmpty.xlsx";
-
-    private MultipleUtil() {
-        //Utility class can't have a public or default constructor
-    }
 
     public static TreeMap<String, Object> getMultipleObjectsAll() {
         TreeMap<String, Object> multipleObjectTreeMap = new TreeMap<>();
@@ -197,21 +191,21 @@ public final class MultipleUtil {
     }
 
     public static void addHearingToCaseData(CaseData caseData) {
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         HearingType hearingType = new HearingType();
+        DateListedType dateListedType = new DateListedType();
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         hearingType.setHearingNumber("1");
         hearingType.setHearingType("Hearing");
         hearingType.setHearingEstLengthNumType("1");
         hearingType.setHearingFormat(List.of("Video", "Hybrid"));
         hearingType.setHearingSitAlone("Sit Alone");
         hearingType.setHearingEstLengthNumType("Days");
-        DateListedType dateListedType = new DateListedType();
         dateListedType.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("Manchester", "Manchester")));
         dateListedType.setListedDate("2021-11-01T:00:00:00.000");
         dateListedType.setHearingStatus("Listed");
-        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setValue(dateListedType);
         hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
-        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(hearingType);
         caseData.setHearingCollection(List.of(hearingTypeItem));
     }
@@ -219,13 +213,13 @@ public final class MultipleUtil {
     public static SchedulePayloadEvent getSchedulePayloadEventData(String ethosCaseReference) {
         SchedulePayloadES schedulePayloadES = new SchedulePayloadES();
         schedulePayloadES.setClaimantCompany("JuanFran");
+        ScheduleClaimantType claimantType = new ScheduleClaimantType();
         Address address = new Address();
         address.setPostCode("M2 45GD");
         address.setAddressLine1("12 Sillavan Way");
         address.setAddressLine2("Address2");
         address.setAddressLine3("Address3");
         address.setPostTown("PostTown");
-        ScheduleClaimantType claimantType = new ScheduleClaimantType();
         claimantType.setClaimantAddressUK(address);
         schedulePayloadES.setClaimantType(claimantType);
         ScheduleClaimantIndType claimantIndType = new ScheduleClaimantIndType();
@@ -241,6 +235,7 @@ public final class MultipleUtil {
         respondentSumTypeItem.setValue(respondentSumType);
         schedulePayloadES.setRespondentCollection(new ArrayList<>(Collections.singletonList(respondentSumTypeItem)));
         schedulePayloadES.setEthosCaseReference(ethosCaseReference);
+
         SchedulePayloadEvent schedulePayloadEvent = new SchedulePayloadEvent();
         schedulePayloadEvent.setSchedulePayloadES(schedulePayloadES);
         return schedulePayloadEvent;
@@ -249,20 +244,20 @@ public final class MultipleUtil {
     public static List<SubmitEvent> getSubmitEvents() {
         SubmitEvent submitEvent1 = new SubmitEvent();
         submitEvent1.setCaseData(getCaseData("245000/2020"));
-        submitEvent1.setCaseId(1_232_121_232);
+        submitEvent1.setCaseId(1232121232);
         SubmitEvent submitEvent2 = new SubmitEvent();
         submitEvent2.setCaseData(getCaseData("245003/2020"));
-        submitEvent2.setCaseId(1_232_121_233);
+        submitEvent2.setCaseId(1232121233);
         return new ArrayList<>(Arrays.asList(submitEvent1, submitEvent2));
     }
 
     public static List<LabelPayloadEvent> getLabelPayloadEvents() {
         LabelPayloadEvent labelPayloadEvent1 = new LabelPayloadEvent();
         labelPayloadEvent1.setLabelPayloadES(getLabelPayloadES("245000/2020"));
-        labelPayloadEvent1.setCaseId(1_232_121_232);
+        labelPayloadEvent1.setCaseId(1232121232);
         LabelPayloadEvent labelPayloadEvent2 = new LabelPayloadEvent();
         labelPayloadEvent2.setLabelPayloadES(getLabelPayloadES("245003/2020"));
-        labelPayloadEvent2.setCaseId(1_232_121_233);
+        labelPayloadEvent2.setCaseId(1232121233);
         return new ArrayList<>(Arrays.asList(labelPayloadEvent1, labelPayloadEvent2));
     }
 
@@ -314,15 +309,12 @@ public final class MultipleUtil {
         return caseMultipleTypeItemList;
     }
 
-    private static CaseMultipleTypeItem generateMultipleObjectType(String id,
-                                                                   String ethosCaseRef,
-                                                                   String subMultiple,
-                                                                   String flag1) {
+    private static CaseMultipleTypeItem generateMultipleObjectType(String id, String ethosCaseRef, String subMultiple, String flag1) {
+        CaseMultipleTypeItem caseMultipleTypeItem = new CaseMultipleTypeItem();
         MultipleObjectType multipleObjectType = new MultipleObjectType();
         multipleObjectType.setEthosCaseRef(ethosCaseRef);
         multipleObjectType.setSubMultiple(subMultiple);
         multipleObjectType.setFlag1(flag1);
-        CaseMultipleTypeItem caseMultipleTypeItem = new CaseMultipleTypeItem();
         caseMultipleTypeItem.setId(id);
         caseMultipleTypeItem.setValue(multipleObjectType);
         return caseMultipleTypeItem;
@@ -348,20 +340,22 @@ public final class MultipleUtil {
     }
 
     public static MultipleData getMultipleData() {
+        MultipleData multipleData = new MultipleData();
+        List<CaseIdTypeItem> caseIdCollection = new ArrayList<>();
         CaseType caseType1 = new CaseType();
         caseType1.setEthosCaseReference("245000/2020");
         CaseIdTypeItem caseIdTypeItem1 = new CaseIdTypeItem();
         caseIdTypeItem1.setId("1");
         caseIdTypeItem1.setValue(caseType1);
-        List<CaseIdTypeItem> caseIdCollection = new ArrayList<>();
         caseIdCollection.add(caseIdTypeItem1);
+
         CaseType caseType2 = new CaseType();
         caseType2.setEthosCaseReference("245001/2020");
         CaseIdTypeItem caseIdTypeItem2 = new CaseIdTypeItem();
         caseIdTypeItem2.setId("2");
         caseIdTypeItem2.setValue(caseType2);
         caseIdCollection.add(caseIdTypeItem2);
-        MultipleData multipleData = new MultipleData();
+
         multipleData.setSubMultiple(generateDynamicList("All"));
         multipleData.setFlag1(generateDynamicList("AA"));
         multipleData.setFlag2(generateDynamicList(""));
@@ -370,7 +364,7 @@ public final class MultipleUtil {
         multipleData.setCaseIdCollection(caseIdCollection);
         multipleData.setScheduleDocName(MULTIPLE_SCHEDULE_CONFIG);
         multipleData.setBatchUpdateType(BATCH_UPDATE_TYPE_1);
-        setDocumentCollection(multipleData);
+        getDocumentCollection(multipleData);
         multipleData.setSubMultipleCollection(getSubMultipleCollection());
         multipleData.setSubMultipleAction(getSubMultipleActionType());
         multipleData.setLeadCase("21006/2020");
@@ -384,7 +378,7 @@ public final class MultipleUtil {
         return multipleData;
     }
 
-    public static void setDocumentCollection(MultipleData multipleData) {
+    public static void getDocumentCollection(MultipleData multipleData) {
         CaseImporterFile caseImporterFile = new CaseImporterFile();
         caseImporterFile.setUploadedDocument(getUploadedDocumentType());
         caseImporterFile.setUploadUser("Eric Cooper");
@@ -454,13 +448,15 @@ public final class MultipleUtil {
 
     public static List<AddressLabelTypeItem> getAddressLabelTypeItemList() {
 
+        AddressLabelTypeItem addressLabelTypeItem = new AddressLabelTypeItem();
         AddressLabelType addressLabelType = new AddressLabelType();
         addressLabelType.setFullAddress("Full Address");
         addressLabelType.setPrintLabel(YES);
         addressLabelType.setLabelEntityAddress(new Address());
-        AddressLabelTypeItem addressLabelTypeItem = new AddressLabelTypeItem();
         addressLabelTypeItem.setId("123");
         addressLabelTypeItem.setValue(addressLabelType);
+
+        AddressLabelTypeItem addressLabelTypeItem1 = new AddressLabelTypeItem();
         AddressLabelType addressLabelType1 = new AddressLabelType();
         addressLabelType1.setFullName("Full Name1");
         addressLabelType1.setFullAddress("Full Address1");
@@ -476,7 +472,6 @@ public final class MultipleUtil {
         address.setAddressLine2("Address Line2");
         address.setCountry("Country");
         addressLabelType1.setLabelEntityAddress(address);
-        AddressLabelTypeItem addressLabelTypeItem1 = new AddressLabelTypeItem();
         addressLabelTypeItem1.setId("1234");
         addressLabelTypeItem1.setValue(addressLabelType1);
 

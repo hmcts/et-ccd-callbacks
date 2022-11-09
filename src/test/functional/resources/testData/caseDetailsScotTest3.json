@@ -211,8 +211,8 @@
       }
     },
     "after_submit_callback_response": {
-      "confirmationHeader": "Please download the document from : <a target=\"_blank\" href=\"http://127.0.0.1:3453/documents/4137f5d9-ff77-44fb-942c-c9afbaf0f173/binary\">Document</a>",
-      "confirmationBody": null
+      "confirmation_header": "Please download the document from : <a target=\"_blank\" href=\"http://127.0.0.1:3453/documents/4137f5d9-ff77-44fb-942c-c9afbaf0f173/binary\">Document</a>",
+      "confirmation_body": null
     },
     "callback_response_status_code": 200,
     "callback_response_status": "CALLBACK_COMPLETED",

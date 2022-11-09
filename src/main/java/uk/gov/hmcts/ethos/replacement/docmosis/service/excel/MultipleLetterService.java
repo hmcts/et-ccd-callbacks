@@ -28,7 +28,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.LabelsHelper.MAX_N
 @Slf4j
 @RequiredArgsConstructor
 @Service("multipleLetterService")
-@SuppressWarnings({"PMD.ConfusingTernary", "PMD.PreserveStackTrace", "PMD.TooManyMethods"})
 public class MultipleLetterService {
 
     private static final String MESSAGE = "Failed to generate document for case id : ";

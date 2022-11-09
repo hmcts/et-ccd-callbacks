@@ -15,8 +15,7 @@ import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_VENUE_FIELD_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
 
 @Slf4j
-@SuppressWarnings({"PMD.ConfusingTernary"})
-public final class ListingVenueHelper {
+public class ListingVenueHelper {
 
     private ListingVenueHelper() {
         // All access through static methods

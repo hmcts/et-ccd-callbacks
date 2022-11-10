@@ -386,7 +386,7 @@ class InitialConsiderationServiceTest {
             + "|Duration | 60 Days|");
 
         initialConsiderationService.setIsHearingAlreadyListed(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        assertThat(caseData.getEtICHearingAlreadyListed()).isEqualTo(YES);
+        assertThat(caseData.getEtICHearingAlreadyListed()).isNull();
     }
 
     private List<JurCodesTypeItem> generateJurisdictionCodes() {

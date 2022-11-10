@@ -48,3 +48,23 @@ java:
     REJECTED_TEMPLATE_ID: 3f932a27-3960-4135-9ef5-5f2b9ec35da0
     ET1SERVING_TEMPLATE_ID: 2d839d00-88f0-4136-a65e-364da046c6f8
     ET3NOTIFICATION_TEMPLATE_ID: 5b801bd7-cfb3-4249-b99d-a3f5af96c253
+
+
+tags:
+  et-ccd-stack: false
+
+nodejs:
+  applicationPort: 3000
+  aadIdentityName: et
+
+xui-webapp:
+  enabled: false
+
+idam-pr:
+  enabled: false
+
+et-sya:
+  enabled: false
+
+et-sya-api:
+  enabled: false

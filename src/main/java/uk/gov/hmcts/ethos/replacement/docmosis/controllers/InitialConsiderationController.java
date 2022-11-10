@@ -115,10 +115,12 @@ public class InitialConsiderationController {
             initialConsiderationService.getRespondentName(caseData.getRespondentCollection()));
         caseData.setEtInitialConsiderationHearing(
             initialConsiderationService.getHearingDetails(caseData.getHearingCollection()));
+
+        String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
+
         caseData.setEtInitialConsiderationJurisdictionCodes(
-            initialConsiderationService.generateJurisdictionCodesHtml(caseData.getJurCodesCollection(),
-                ccdRequest.getCaseDetails().getCaseTypeId()));
-        initialConsiderationService.setIsHearingAlreadyListed(caseData);
+            initialConsiderationService.generateJurisdictionCodesHtml(caseData.getJurCodesCollection(), caseTypeId));
+        initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

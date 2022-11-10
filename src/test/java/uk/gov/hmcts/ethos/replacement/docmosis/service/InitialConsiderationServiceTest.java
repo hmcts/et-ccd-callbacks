@@ -361,7 +361,7 @@ class InitialConsiderationServiceTest {
             + "|Type | -|\r\n"
             + "|Duration | -|");
 
-        initialConsiderationService.setIsHearingAlreadyListed(caseData);
+        initialConsiderationService.setIsHearingAlreadyListed(caseData, SCOTLAND_CASE_TYPE_ID);
         assertThat(caseData.getEtICHearingAlreadyListed()).isEqualTo(NO);
     }
 
@@ -373,7 +373,19 @@ class InitialConsiderationServiceTest {
             + "|Type | Hearing|\r\n"
             + "|Duration | 60 Days|");
 
-        initialConsiderationService.setIsHearingAlreadyListed(caseData);
+        initialConsiderationService.setIsHearingAlreadyListed(caseData, SCOTLAND_CASE_TYPE_ID);
+        assertThat(caseData.getEtICHearingAlreadyListed()).isEqualTo(YES);
+    }
+
+    @Test
+    void setIsHearingAlreadyListed_shouldIgnoreEntirely_whenCaseTypeIsEnglandWales() {
+        caseData.setEtInitialConsiderationHearing("|Hearing details | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|Date | 16 May 2022|\r\n"
+            + "|Type | Hearing|\r\n"
+            + "|Duration | 60 Days|");
+
+        initialConsiderationService.setIsHearingAlreadyListed(caseData, ENGLANDWALES_CASE_TYPE_ID);
         assertThat(caseData.getEtICHearingAlreadyListed()).isEqualTo(YES);
     }
 

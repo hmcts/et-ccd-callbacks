@@ -200,7 +200,10 @@ public class InitialConsiderationService {
      * Sets etICHearingAlreadyListed if the case has a hearing listed.
      * @param caseData data about the current case
      */
-    public void setIsHearingAlreadyListed(CaseData caseData) {
+    public void setIsHearingAlreadyListed(CaseData caseData, String caseTypeId) {
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            return;
+        }
         caseData.setEtICHearingAlreadyListed(HEARING_MISSING.equals(caseData.getEtInitialConsiderationHearing())
             ? NO : YES
         );

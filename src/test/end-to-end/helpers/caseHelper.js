@@ -52,10 +52,10 @@ async function respondentRepresentative(I, eventName) {
     await I.executeRespondentRepresentative();
 }
 
-async function jurisdiction(I, eventName) {
+async function jurisdiction(I, eventName, jurisdictionOutcome) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(2);
-    await I.executeAddAmendJurisdiction();
+    await I.executeAddAmendJurisdiction(jurisdictionOutcome);
 }
 
 async function closeCase(I, eventName, clerkResponsible, physicalLocation) {

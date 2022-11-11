@@ -113,7 +113,7 @@ public class NotificationHelperTest {
         RespondentSumType unrepresentedRespondent = respondents.get(0).getValue();
         Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseData, unrepresentedRespondent);
 
-        assertThat(actual).containsEntry("emailAddress", "claimant@unrepresented.com")
+        assertThat(actual).containsEntry("emailAddress", "respondent@unrepresented.com")
             .containsEntry("name", "Respondent Unrepresented")
             .containsEntry("caseNumber", "12345/6789");
     }

@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
@@ -351,8 +352,13 @@ class ReferralHelperTest {
 
     @Test
     void validateEmail() {
-        assertThat(ReferralHelper.validateEmail("valid.email@example.com")).contains((String) null);
+        assertTrue(ReferralHelper.validateEmail("valid.email@example.com").isEmpty());
         assertThat(ReferralHelper.validateEmail("invalid.email.example")).contains(INVALID_EMAIL_ERROR_MESSAGE);
+        assertThat(ReferralHelper.validateEmail("invalid.email@")).contains(INVALID_EMAIL_ERROR_MESSAGE);
+        assertThat(ReferralHelper.validateEmail("@example")).contains(INVALID_EMAIL_ERROR_MESSAGE);
+        assertThat(ReferralHelper.validateEmail("invalid@example")).contains(INVALID_EMAIL_ERROR_MESSAGE);
+        assertThat(ReferralHelper.validateEmail("invalid @example")).contains(INVALID_EMAIL_ERROR_MESSAGE);
+        assertThat(ReferralHelper.validateEmail("invalid@example com")).contains(INVALID_EMAIL_ERROR_MESSAGE);
     }
 
     @Test

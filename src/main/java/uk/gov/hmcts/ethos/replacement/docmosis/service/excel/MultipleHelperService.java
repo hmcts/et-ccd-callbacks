@@ -31,6 +31,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 @RequiredArgsConstructor
 @Service("multipleHelperService")
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.LiteralsFirstInComparisons", "PMD.TooManyMethods"})
 public class MultipleHelperService {
 
     private final SingleCasesReadingService singleCasesReadingService;

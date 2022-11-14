@@ -69,8 +69,7 @@ class SessionDays {
     private boolean isOnOrEarlierDate(String date, String compareTo) {
         var localDate = LocalDate.parse(date.substring(0, 10), OLD_DATE_TIME_PATTERN2);
         var localDateCompareTo = LocalDate.parse(compareTo.substring(0, 10), OLD_DATE_TIME_PATTERN2);
-        var after = localDate.isAfter(localDateCompareTo);
-        return !after;
+        return !localDate.isAfter(localDateCompareTo);
     }
 
     private List<HearingSession> getHearingSessions() {

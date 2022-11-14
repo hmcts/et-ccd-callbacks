@@ -76,6 +76,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANG
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
 @Slf4j
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.LooseCoupling", "PDM.CyclomaticComplexity",
+    "PMD.AvoidInstantiatingObjectsInLoops", "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass",
+    "PMD.CognitiveComplexity", "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons",
+    "PMD.FieldNamingConventions", "PMD.LawOfDemeter",  "PMD.ConsecutiveLiteralAppends",
+    "PMD.ConsecutiveAppendsShouldReuse", "PMD.LinguisticNaming", "PMD.NPathComplexity", "PMD.ExcessiveImports",
+    "PMD.CyclomaticComplexity"})
 public class ListingHelper {
 
     private static final String ROOM_NOT_ALLOCATED = "* Not Allocated";
@@ -216,10 +222,10 @@ public class ListingHelper {
         boolean rule50b = caseData.getRestrictedReporting() != null
                 && caseData.getRestrictedReporting().getRule503b() != null
                 && caseData.getRestrictedReporting().getRule503b().equals(YES);
-        if ((rule50b && isPublicType) || (rule50d && isPublicType)) {
+        if (rule50b && isPublicType || rule50d && isPublicType) {
             listingType.setClaimantName(" ");
             listingType.setRespondent(" ");
-        } else if ((rule50b && isPressListType) || (rule50d && isPressListType)) {
+        } else if (rule50b && isPressListType || rule50d && isPressListType) {
             listingType.setClaimantName(RULE_50_APPLIES);
             listingType.setRespondent(RULE_50_APPLIES);
         } else {
@@ -344,7 +350,7 @@ public class ListingHelper {
 
     private static boolean isEmptyHearingDate(ListingType listingType) {
         if (listingType.getCauseListDate() != null) {
-            return listingType.getCauseListDate().trim().isEmpty();
+            return isNullOrEmpty(listingType.getCauseListDate());
         }
         return true;
     }
@@ -354,7 +360,7 @@ public class ListingHelper {
                 .stream()
                 .filter(listingTypeItem -> !isEmptyHearingDate(listingTypeItem.getValue()))
                 .collect(Collectors.groupingBy(listingTypeItem -> listingTypeItem.getValue().getCauseListDate(),
-                    () -> new TreeMap<>(getDateComparator()), Collectors.toList()));
+                    () -> new TreeMap<>(getDateComparator()), toList()));
     }
 
     private static Iterator<Map.Entry<String, List<ListingTypeItem>>> getEntriesByDate(StringBuilder sb,
@@ -420,7 +426,7 @@ public class ListingHelper {
 
     private static boolean isEmptyHearingRoom(ListingType listingType) {
         if (listingType.getHearingRoom() != null) {
-            return listingType.getHearingRoom().trim().isEmpty();
+            return isNullOrEmpty(listingType.getHearingRoom());
         }
         return true;
     }
@@ -431,7 +437,7 @@ public class ListingHelper {
                 .stream()
                 .filter(listingTypeItem -> !isEmptyHearingRoom(listingTypeItem.getValue()))
                 .collect(Collectors.groupingBy(listingTypeItem -> listingTypeItem.getValue().getHearingRoom(),
-                    () -> new TreeMap<>(getVenueComparator()), Collectors.toList()));
+                    () -> new TreeMap<>(getVenueComparator()), toList()));
         List<ListingTypeItem> notAllocated = listingSubCollection
                 .stream()
                 .filter(listingTypeItem -> isEmptyHearingRoom(listingTypeItem.getValue()))
@@ -445,7 +451,7 @@ public class ListingHelper {
 
     private static boolean isEmptyHearingVenue(ListingType listingType) {
         if (listingType.getCauseListVenue() != null) {
-            return listingType.getCauseListVenue().trim().isEmpty();
+            return isNullOrEmpty(listingType.getCauseListVenue());
         }
         return true;
     }
@@ -456,7 +462,7 @@ public class ListingHelper {
                 .stream()
                 .filter(listingTypeItem -> !isEmptyHearingVenue(listingTypeItem.getValue()))
                 .collect(Collectors.groupingBy(listingTypeItem -> listingTypeItem.getValue().getCauseListVenue(),
-                    () -> new TreeMap<>(getVenueComparator()), Collectors.toList()));
+                    () -> new TreeMap<>(getVenueComparator()), toList()));
         List<ListingTypeItem> notAllocated = listingData.getListingCollection()
                 .stream()
                 .filter(listingTypeItem -> isEmptyHearingVenue(listingTypeItem.getValue()))
@@ -715,7 +721,7 @@ public class ListingHelper {
             return localDateFrom.isEqual(localDate);
         } else {
             var localDateTo = LocalDate.parse(dateToSearchTo, OLD_DATE_TIME_PATTERN2);
-            return (!localDate.isBefore(localDateFrom)) && (!localDate.isAfter(localDateTo));
+            return !localDate.isBefore(localDateFrom) && !localDate.isAfter(localDateTo);
         }
     }
 
@@ -727,7 +733,7 @@ public class ListingHelper {
             return localDateFrom.isEqual(localDate);
         } else {
             var localDateTo = LocalDate.parse(dateToSearchTo, OLD_DATE_TIME_PATTERN2);
-            return (!localDate.isBefore(localDateFrom)) && (!localDate.isAfter(localDateTo));
+            return !localDate.isBefore(localDateFrom) && !localDate.isAfter(localDateTo);
         }
     }
 

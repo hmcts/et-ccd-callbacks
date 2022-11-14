@@ -12,6 +12,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.FileLocatio
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings({"PMD.LawOfDemeter"})
 public class ScotlandFileLocationSelectionServiceTest {
 
     @Test
@@ -115,6 +116,7 @@ public class ScotlandFileLocationSelectionServiceTest {
     }
 
     private DynamicValueType createSelectedListItemAtIndex(TribunalOffice tribunalOffice, int index) {
-        return DynamicValueType.create(tribunalOffice.getOfficeNumber() + index, tribunalOffice.getOfficeName() + index);
+        return DynamicValueType.create(tribunalOffice.getOfficeNumber() + index,
+                tribunalOffice.getOfficeName() + index);
     }
 }

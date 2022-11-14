@@ -33,7 +33,7 @@ class CaseTransferUtilsTest {
     @Mock
     CcdClient ccdClient;
 
-    private final String userToken = "my-test-token";
+    private static final String USER_TOKEN = "my-test-token";
 
     @Test
     void testGetsClaimantCase() {
@@ -41,7 +41,7 @@ class CaseTransferUtilsTest {
         var caseDetails = CaseDataBuilder.builder()
                 .withEthosCaseReference(ethosCaseReference)
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
-        var cases = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken);
+        var cases = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN);
         assertEquals(1, cases.size());
         assertEquals(ethosCaseReference, cases.get(0).getEthosCaseReference());
     }
@@ -58,10 +58,10 @@ class CaseTransferUtilsTest {
                 .withEthosCaseReference(eccCaseReference)
                 .withCounterClaim(ethosCaseReference)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
-        when(ccdClient.retrieveCasesElasticSearch(userToken, ENGLANDWALES_CASE_TYPE_ID, List.of(eccCaseReference)))
+        when(ccdClient.retrieveCasesElasticSearch(USER_TOKEN, ENGLANDWALES_CASE_TYPE_ID, List.of(eccCaseReference)))
                 .thenReturn(List.of(submitEvent));
 
-        var cases = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken);
+        var cases = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN);
         assertEquals(2, cases.size());
         assertEquals(ethosCaseReference, cases.get(0).getEthosCaseReference());
         assertEquals(eccCaseReference, cases.get(1).getEthosCaseReference());
@@ -80,16 +80,16 @@ class CaseTransferUtilsTest {
                 .withEthosCaseReference(eccCaseReferences.get(0))
                 .withCounterClaim(ethosCaseReference)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
-        when(ccdClient.retrieveCasesElasticSearch(userToken, ENGLANDWALES_CASE_TYPE_ID,
+        when(ccdClient.retrieveCasesElasticSearch(USER_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
                 List.of(eccCaseReferences.get(0)))).thenReturn(List.of(eccCase1SubmitEvent));
         var eccCase2SubmitEvent = CaseDataBuilder.builder()
                 .withEthosCaseReference(eccCaseReferences.get(1))
                 .withCounterClaim(ethosCaseReference)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
-        when(ccdClient.retrieveCasesElasticSearch(userToken, ENGLANDWALES_CASE_TYPE_ID,
+        when(ccdClient.retrieveCasesElasticSearch(USER_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
                 List.of(eccCaseReferences.get(1)))).thenReturn(List.of(eccCase2SubmitEvent));
 
-        var cases = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken);
+        var cases = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN);
         assertEquals(3, cases.size());
         assertEquals(ethosCaseReference, cases.get(0).getEthosCaseReference());
         assertEquals(eccCaseReferences.get(0), cases.get(1).getEthosCaseReference());
@@ -108,16 +108,16 @@ class CaseTransferUtilsTest {
                 .withEthosCaseReference(counterClaim)
                 .withEccCase(ethosCaseReference)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
-        when(ccdClient.retrieveCasesElasticSearch(userToken, ENGLANDWALES_CASE_TYPE_ID, List.of(counterClaim)))
+        when(ccdClient.retrieveCasesElasticSearch(USER_TOKEN, ENGLANDWALES_CASE_TYPE_ID, List.of(counterClaim)))
                 .thenReturn(List.of(submitEvent));
         var eccSubmitEvent = CaseDataBuilder.builder()
                 .withEthosCaseReference(ethosCaseReference)
                 .withCounterClaim(counterClaim)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
-        when(ccdClient.retrieveCasesElasticSearch(userToken, ENGLANDWALES_CASE_TYPE_ID, List.of(ethosCaseReference)))
+        when(ccdClient.retrieveCasesElasticSearch(USER_TOKEN, ENGLANDWALES_CASE_TYPE_ID, List.of(ethosCaseReference)))
                 .thenReturn(List.of(eccSubmitEvent));
 
-        var cases = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken);
+        var cases = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN);
         assertEquals(2, cases.size());
         assertEquals(counterClaim, cases.get(0).getEthosCaseReference());
         assertEquals(ethosCaseReference, cases.get(1).getEthosCaseReference());
@@ -126,7 +126,7 @@ class CaseTransferUtilsTest {
     @Test
     void testCounterClaimSearchException() throws IOException {
         var counterClaim = "120001/2021";
-        when(ccdClient.retrieveCasesElasticSearch(userToken, ENGLANDWALES_CASE_TYPE_ID, List.of(counterClaim)))
+        when(ccdClient.retrieveCasesElasticSearch(USER_TOKEN, ENGLANDWALES_CASE_TYPE_ID, List.of(counterClaim)))
                 .thenThrow(new IOException());
 
         var eccCase = CaseDataBuilder.builder()
@@ -134,8 +134,8 @@ class CaseTransferUtilsTest {
                 .withCounterClaim(counterClaim)
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
-        assertThrows(CaseCreationException.class,
-                () -> caseTransferUtils.getAllCasesToBeTransferred(eccCase, userToken));
+        assertThrows(CaseCreationException.class, () -> caseTransferUtils.getAllCasesToBeTransferred(
+                eccCase, USER_TOKEN));
     }
 
     @Test
@@ -146,10 +146,10 @@ class CaseTransferUtilsTest {
                 .withEthosCaseReference(counterClaim)
                 .withEccCase(eccCaseRef)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
-        when(ccdClient.retrieveCasesElasticSearch(userToken, ENGLANDWALES_CASE_TYPE_ID, List.of(counterClaim)))
+        when(ccdClient.retrieveCasesElasticSearch(USER_TOKEN, ENGLANDWALES_CASE_TYPE_ID, List.of(counterClaim)))
                 .thenReturn(List.of(submitEvent));
 
-        when(ccdClient.retrieveCasesElasticSearch(userToken, ENGLANDWALES_CASE_TYPE_ID, List.of(eccCaseRef)))
+        when(ccdClient.retrieveCasesElasticSearch(USER_TOKEN, ENGLANDWALES_CASE_TYPE_ID, List.of(eccCaseRef)))
                 .thenThrow(new IOException());
 
         var eccCase = CaseDataBuilder.builder()
@@ -157,8 +157,8 @@ class CaseTransferUtilsTest {
                 .withCounterClaim(counterClaim)
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
-        assertThrows(CaseCreationException.class,
-                () -> caseTransferUtils.getAllCasesToBeTransferred(eccCase, userToken));
+        assertThrows(CaseCreationException.class, () -> caseTransferUtils.getAllCasesToBeTransferred(
+                eccCase, USER_TOKEN));
     }
 
     @Test

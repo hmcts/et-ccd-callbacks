@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.common.Strings;
 import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeCaseData;
 import uk.gov.hmcts.ecm.common.model.reports.hearingsbyhearingtype.HearingsByHearingTypeSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -28,7 +27,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingDurationInMinutes;
 
-public class HearingsByHearingTypeReport {
+@SuppressWarnings({"PMD.GodClass", "PMD.LiteralsFirstInComparisons", "PMD.CyclomaticComplexity"})
+public final class HearingsByHearingTypeReport {
     private final HearingsByHearingTypeReportDataSource reportDataSource;
     private static final String COSTS_HEARING_TYPE = "Costs Hearing";
     private static final String VIDEO = "Video";
@@ -109,11 +109,10 @@ public class HearingsByHearingTypeReport {
         reportSummary2HdrList.add(new HearingsByHearingTypeReportSummary2Hdr(STAGE_1));
         reportSummary2HdrList.add(new HearingsByHearingTypeReportSummary2Hdr(STAGE_2));
         reportSummary2HdrList.add(new HearingsByHearingTypeReportSummary2Hdr(STAGE_3));
-
     }
 
     private String getSubSplitSitAlone(HearingTypeItem hearingTypeItem) {
-        if (!Strings.isNullOrEmpty(hearingTypeItem.getValue().getHearingSitAlone()))  {
+        if (!isNullOrEmpty(hearingTypeItem.getValue().getHearingSitAlone()))  {
             if (List.of(FULL_PANEL, "Full").contains(hearingTypeItem.getValue().getHearingSitAlone())) {
                 return FULL_PANEL;
             } else if (List.of(SIT_ALONE, YES).contains(hearingTypeItem.getValue().getHearingSitAlone())) {
@@ -366,7 +365,7 @@ public class HearingsByHearingTypeReport {
             }
 
             String subSplitStages = getSubSplitStages(hearingTypeItem);
-            if (!Strings.isNullOrEmpty(subSplitStages)) {
+            if (!isNullOrEmpty(subSplitStages)) {
                 var reportSummary2 = getSummaryRow2(
                         dateListedTypeItem.getValue().getListedDate(), subSplitStages,
                         reportSummaryList2);
@@ -376,7 +375,7 @@ public class HearingsByHearingTypeReport {
             }
 
             String subSplitSitAlone = getSubSplitSitAlone(hearingTypeItem);
-            if (!Strings.isNullOrEmpty(subSplitSitAlone)) {
+            if (!isNullOrEmpty(subSplitSitAlone)) {
                 var reportSummary2 = getSummaryRow2(
                         dateListedTypeItem.getValue().getListedDate(), subSplitSitAlone,
                         reportSummaryList2);
@@ -498,12 +497,12 @@ public class HearingsByHearingTypeReport {
         }
 
         String subSplitSitAlone = getSubSplitSitAlone(hearingTypeItem);
-        if (!Strings.isNullOrEmpty(subSplitSitAlone)) {
+        if (!isNullOrEmpty(subSplitSitAlone)) {
             setReportSummary2HdrFields(subSplitSitAlone, hearingTypeItem, reportSummary2HdrList);
         }
 
         String subSplitStages = getSubSplitStages(hearingTypeItem);
-        if (!Strings.isNullOrEmpty(subSplitStages)) {
+        if (!isNullOrEmpty(subSplitStages)) {
             setReportSummary2HdrFields(subSplitStages, hearingTypeItem, reportSummary2HdrList);
         }
     }

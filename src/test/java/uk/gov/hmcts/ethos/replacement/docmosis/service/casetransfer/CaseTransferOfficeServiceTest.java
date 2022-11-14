@@ -17,6 +17,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+@SuppressWarnings({"PMD.LawOfDemeter"})
 class CaseTransferOfficeServiceTest {
 
     @Test
@@ -134,11 +135,12 @@ class CaseTransferOfficeServiceTest {
             assertEquals(tribunalOffice.getOfficeName(), dynamicValueType.getLabel());
         }
 
-        if (expectedValue != null) {
+        if (expectedValue == null) {
+            assertNull(actual.getValue());
+        } else {
             assertEquals(expectedValue, actual.getValue().getCode());
             assertEquals(expectedValue, actual.getValue().getLabel());
-        } else {
-            assertNull(actual.getValue());
         }
+
     }
 }

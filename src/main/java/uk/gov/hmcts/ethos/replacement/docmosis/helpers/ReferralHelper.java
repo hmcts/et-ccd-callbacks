@@ -292,20 +292,17 @@ public final class ReferralHelper {
      * @return stringified json data for pdf document
      */
     public static String getDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
-        ReferralTypeData data = null;
-
-        if(caseData.getReplyToEmailAddress() != null) {
+        ReferralTypeData data;
+        if (caseData.getReplyToEmailAddress() != null) {
             data = newReferralRequest(caseData);
         } else {
             data = existingReferralRequest(caseData);
         }
-
         ReferralTypeDocument document = ReferralTypeDocument.builder()
             .accessKey(accessKey)
             .outputName(REF_OUTPUT_NAME)
             .templateName(REF_SUMMARY_TEMPLATE_NAME)
             .data(data).build();
-
         return OBJECT_MAPPER.writeValueAsString(document);
     }
 
@@ -327,7 +324,6 @@ public final class ReferralHelper {
             .referralDetails(defaultIfEmpty(caseData.getReferralDetails(), null))
             .referralDocument(caseData.getReferralDocument())
             .referralInstruction(defaultIfEmpty(caseData.getReferralInstruction(), null))
-            .referralReplyCollection(caseData.getReferralReplyCollection())
             .referralStatus(ReferralStatus.AWAITING_INSTRUCTIONS).build();
     }
 

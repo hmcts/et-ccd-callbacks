@@ -58,6 +58,12 @@ async function jurisdiction(I, eventName, jurisdictionOutcome) {
     await I.executeAddAmendJurisdiction(jurisdictionOutcome);
 }
 
+async function enterDisposalDateJurisdiction(I, eventName, hearingDisposalDate) {
+    await I.chooseNextStep(eventName, 3);
+    await I.wait(2);
+    await I.enterDisposalDate(hearingDisposalDate);
+}
+
 async function closeCase(I, eventName, clerkResponsible, physicalLocation) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(2);
@@ -96,7 +102,7 @@ async function bfActionsOutstanding(I, eventName) {
 async function listHearing(I, eventName, jurisdiction) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(2);
-    await I.executeAddAmendHearing(jurisdiction);
+    await I.executeListHearing(jurisdiction);
 }
 
 async function allocateHearing(I, eventName, jurisdiction) {
@@ -105,10 +111,10 @@ async function allocateHearing(I, eventName, jurisdiction) {
     await I.executeAllocateHearing(jurisdiction);
 }
 
-async function hearingDetails(I, eventName) {
+async function hearingDetails(I, eventName, caseDisposed) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(2);
-    await I.executeHearingDetails();
+    await I.executeHearingDetails(caseDisposed);
 }
 
 async function updateHearingDetails(I, eventName) {
@@ -268,5 +274,6 @@ module.exports = {
     et3Notification,
     et3Response,
     clickCreateCase,
-    verifyApplicationTabs
+    verifyApplicationTabs,
+    enterDisposalDateJurisdiction
 };

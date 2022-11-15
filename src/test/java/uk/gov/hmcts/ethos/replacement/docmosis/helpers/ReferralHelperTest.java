@@ -368,7 +368,7 @@ class ReferralHelperTest {
     }
 
     @Test
-    void getDocumentRequestNewReferral() throws JsonProcessingException {
+    void documentRequestNewReferral() throws JsonProcessingException {
         setReferralReplyData();
 
         String expectedDocumentSummaryNew = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-EGW-ENG-00067."
@@ -382,15 +382,15 @@ class ReferralHelperTest {
             + "\"creationDate\":null,\"shortDescription\":null}},{\"id\":\"2\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","
             + "\"document_filename\":\"testFileName\",\"document_url\":null},\"ownerDocument\":null,"
-            + "\"creationDate\":null,\"shortDescription\":null}}],\"referralInstruction\":null," +
-            "\"referralReplyCollection\":null}}";
+            + "\"creationDate\":null,\"shortDescription\":null}}],\"referralInstruction\":null,"
+            + "\"referralReplyCollection\":null}}";
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
         assertEquals(expectedDocumentSummaryNew, result);
     }
 
     @Test
-    void getDocumentRequestExistingReferral() throws JsonProcessingException {
+    void documentRequestExistingReferral() throws JsonProcessingException {
         ReferralType referralType =  createReferralTypeItem().getValue();
         referralType.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1")));
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();

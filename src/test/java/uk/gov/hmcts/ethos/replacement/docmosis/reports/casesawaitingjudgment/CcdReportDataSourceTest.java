@@ -20,30 +20,30 @@ public class CcdReportDataSourceTest {
 
     @Test
     public void shouldReturnSearchResults() throws IOException {
-        var authToken = "A test token";
-        var caseTypeId = "A test case type";
-        var owningOffice = TribunalOffice.LEEDS.getOfficeName();
-        var ccdClient = mock(CcdClient.class);
-        var submitEvent = new CasesAwaitingJudgmentSubmitEvent();
-        var submitEvents = List.of(submitEvent);
+        String authToken = "A test token";
+        String caseTypeId = "A test case type";
+        String owningOffice = TribunalOffice.LEEDS.getOfficeName();
+        CcdClient ccdClient = mock(CcdClient.class);
+        CasesAwaitingJudgmentSubmitEvent submitEvent = new CasesAwaitingJudgmentSubmitEvent();
+        List<CasesAwaitingJudgmentSubmitEvent> submitEvents = List.of(submitEvent);
         when(ccdClient.casesAwaitingJudgmentSearch(anyString(), anyString(), anyString())).thenReturn(submitEvents);
 
-        var ccdReportDataSource = new CcdReportDataSource(authToken, ccdClient);
+        CcdReportDataSource ccdReportDataSource = new CcdReportDataSource(authToken, ccdClient);
 
-        var results = ccdReportDataSource.getData(caseTypeId, owningOffice);
+        List<CasesAwaitingJudgmentSubmitEvent> results = ccdReportDataSource.getData(caseTypeId, owningOffice);
         assertEquals(1, results.size());
         assertEquals(submitEvent, results.get(0));
     }
 
     @Test(expected = ReportException.class)
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
-        var authToken = "A test token";
-        var caseTypeId = "A test case type";
-        var owningOffice = TribunalOffice.LEEDS.getOfficeName();
-        var ccdClient = mock(CcdClient.class);
+        String authToken = "A test token";
+        String caseTypeId = "A test case type";
+        String owningOffice = TribunalOffice.LEEDS.getOfficeName();
+        CcdClient ccdClient = mock(CcdClient.class);
         when(ccdClient.casesAwaitingJudgmentSearch(anyString(), anyString(), anyString())).thenThrow(new IOException());
 
-        var ccdReportDataSource = new CcdReportDataSource(authToken, ccdClient);
+        CcdReportDataSource ccdReportDataSource = new CcdReportDataSource(authToken, ccdClient);
         ccdReportDataSource.getData(caseTypeId, owningOffice);
         fail("Should throw exception instead");
     }

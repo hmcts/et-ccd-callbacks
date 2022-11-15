@@ -18,7 +18,7 @@ public class ClaimsByHearingVenueCcdReportDataSource implements ClaimsByHearingV
     public List<ClaimsByHearingVenueSubmitEvent> getData(String caseTypeId,
                                                          String listingDateFrom, String listingDateTo) {
         try {
-            var query = ClaimsByHearingVenueESQuery.create(listingDateFrom, listingDateTo);
+            String query = ClaimsByHearingVenueESQuery.create(listingDateFrom, listingDateTo);
             return ccdClient.claimsByHearingVenueSearch(authToken, caseTypeId, query);
         } catch (Exception e) {
             throw new ReportException(String.format(

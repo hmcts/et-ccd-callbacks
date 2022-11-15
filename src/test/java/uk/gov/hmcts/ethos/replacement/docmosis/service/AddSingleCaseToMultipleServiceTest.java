@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
@@ -280,7 +281,7 @@ class AddSingleCaseToMultipleServiceTest {
                 new ArrayList<>(Collections.singletonList(caseDetails.getCaseData().getEthosCaseReference())),
                 new ArrayList<>());
 
-        var multipleData = submitMultipleEvents.get(0).getCaseData();
+        MultipleData multipleData = submitMultipleEvents.get(0).getCaseData();
         assertEquals(1, errors.size());
         assertEquals(String.format("Multiple %s is managed by %s", multipleData.getMultipleReference(),
                 multipleData.getManagingOffice()), errors.get(0));

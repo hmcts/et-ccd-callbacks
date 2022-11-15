@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.factories.DefaultJWSVerifierFactory;
 import com.nimbusds.jose.jwk.AsymmetricJWK;
 import com.nimbusds.jose.jwk.JWK;
@@ -32,15 +34,15 @@ public class VerifyTokenService {
 
     public boolean verifyTokenSignature(String token) {
         try {
-            var tokenTocheck = StringUtils.replace(token, "Bearer ", "");
-            var signedJwt = SignedJWT.parse(tokenTocheck);
+            String tokenTocheck = StringUtils.replace(token, "Bearer ", "");
+            SignedJWT signedJwt = SignedJWT.parse(tokenTocheck);
 
             JWKSet jsonWebKeySet = loadJsonWebKeySet(idamJwkUrl);
 
-            var jwsHeader = signedJwt.getHeader();
-            var key = findKeyById(jsonWebKeySet, jwsHeader.getKeyID());
+            JWSHeader jwsHeader = signedJwt.getHeader();
+            Key key = findKeyById(jsonWebKeySet, jwsHeader.getKeyID());
 
-            var jwsVerifier = jwsVerifierFactory.createJWSVerifier(jwsHeader, key);
+            JWSVerifier jwsVerifier = jwsVerifierFactory.createJWSVerifier(jwsHeader, key);
 
             return signedJwt.verify(jwsVerifier);
         } catch (Exception e) {

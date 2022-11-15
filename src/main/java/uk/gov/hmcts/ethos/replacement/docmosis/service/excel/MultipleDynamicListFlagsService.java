@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.types.MoveCasesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DynamicListHelper;
@@ -39,7 +40,7 @@ public class MultipleDynamicListFlagsService {
 
         log.info("Read excel to populate dynamic list flags logic");
 
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
 
         SortedMap<String, Object> multipleObjects =
                 excelReadingService.readExcel(
@@ -92,7 +93,7 @@ public class MultipleDynamicListFlagsService {
             dynamicListFlag.setValue(DynamicListHelper.getDynamicValue(SELECT_ALL));
             return dynamicListFlag;
         } else {
-            var dynamicFixedListType = new DynamicFixedListType();
+            DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(listItems);
             dynamicFixedListType.setValue(DynamicListHelper.getDynamicValue(SELECT_ALL));
             return dynamicFixedListType;
@@ -102,7 +103,7 @@ public class MultipleDynamicListFlagsService {
 
     private MoveCasesType populateCurrentMultipleRef(String currentMultipleRef) {
 
-        var moveCasesType = new MoveCasesType();
+        MoveCasesType moveCasesType = new MoveCasesType();
 
         moveCasesType.setUpdatedMultipleRef(currentMultipleRef);
 

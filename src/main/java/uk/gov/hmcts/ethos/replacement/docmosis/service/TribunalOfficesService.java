@@ -20,7 +20,7 @@ public class TribunalOfficesService {
     }
 
     public ContactDetails getTribunalContactDetails(String officeName) {
-        var tribunalName = getTribunalOffice(officeName);
+        TribunalOffice tribunalName = getTribunalOffice(officeName);
         return config.getContactDetails().get(tribunalName);
     }
 }

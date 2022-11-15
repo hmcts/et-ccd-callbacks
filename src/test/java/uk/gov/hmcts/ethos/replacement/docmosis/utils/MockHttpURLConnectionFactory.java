@@ -13,7 +13,7 @@ public final class MockHttpURLConnectionFactory {
     private static final HttpUrlStreamHandler HTTP_URL_STREAM_HANDLER;
 
     static {
-        var urlStreamHandlerFactory = mock(URLStreamHandlerFactory.class);
+        URLStreamHandlerFactory urlStreamHandlerFactory = mock(URLStreamHandlerFactory.class);
         URL.setURLStreamHandlerFactory(urlStreamHandlerFactory);
 
         HTTP_URL_STREAM_HANDLER = new HttpUrlStreamHandler();
@@ -25,7 +25,7 @@ public final class MockHttpURLConnectionFactory {
     }
 
     public static HttpURLConnection create(String url) throws MalformedURLException {
-        var urlConnection = mock(HttpURLConnection.class);
+        HttpURLConnection urlConnection = mock(HttpURLConnection.class);
         HTTP_URL_STREAM_HANDLER.reset();
         HTTP_URL_STREAM_HANDLER.addConnection(new URL(url), urlConnection);
 

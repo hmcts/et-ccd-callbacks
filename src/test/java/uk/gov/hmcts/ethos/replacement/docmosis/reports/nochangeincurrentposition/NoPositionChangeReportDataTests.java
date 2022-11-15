@@ -21,10 +21,10 @@ class NoPositionChangeReportDataTests {
 
     @Test
     void shouldReturnValidJson() throws JsonProcessingException {
-        var reportData = setupValidReportData();
-        var resultJsonString = reportData.toReportObjectString();
+        NoPositionChangeReportData reportData = setupValidReportData();
+        StringBuilder resultJsonString = reportData.toReportObjectString();
 
-        var expectedJsonString = getExpectedJsonString(reportData);
+        StringBuilder expectedJsonString = getExpectedJsonString(reportData);
         assertEquals(expectedJsonString.toString(), resultJsonString.toString());
     }
 
@@ -70,7 +70,7 @@ class NoPositionChangeReportDataTests {
 
     private StringBuilder getExpectedJsonString(NoPositionChangeReportData reportData) {
         StringBuilder sb = new StringBuilder(180);
-        var reportSummary = reportData.getReportSummary();
+        NoPositionChangeReportSummary reportSummary = reportData.getReportSummary();
         sb.append(buildSummaryJsonString(
                 reportSummary.getOffice(), reportData.getReportDate(), reportSummary.getTotalCases(),
                 reportSummary.getTotalSingleCases(), reportSummary.getTotalMultipleCases()));
@@ -78,14 +78,14 @@ class NoPositionChangeReportDataTests {
         sb.append('\"').append(REPORT_DETAILS_SINGLE).append("\":[\n");
         if (CollectionUtils.isNotEmpty(reportData.getReportDetailsSingle())
                 && reportData.getReportDetailsSingle().get(0) != null) {
-            var rdSingle1 = reportData.getReportDetailsSingle().get(0);
+            NoPositionChangeReportDetailSingle rdSingle1 = reportData.getReportDetailsSingle().get(0);
             sb.append(buildDetailSingleJsonString(
                     rdSingle1.getCaseReference(), rdSingle1.getYear(), rdSingle1.getCurrentPosition(),
                     rdSingle1.getDateToPosition(), rdSingle1.getRespondent()));
         }
         if (CollectionUtils.isNotEmpty(reportData.getReportDetailsSingle())
                 && reportData.getReportDetailsSingle().get(1) != null) {
-            var rdSingle2 = reportData.getReportDetailsSingle().get(1);
+            NoPositionChangeReportDetailSingle rdSingle2 = reportData.getReportDetailsSingle().get(1);
             sb.append(",\n");
             sb.append(buildDetailSingleJsonString(
                     rdSingle2.getCaseReference(), rdSingle2.getYear(), rdSingle2.getCurrentPosition(),

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,41 +19,43 @@ import static org.mockito.Mockito.verify;
 class FixedListSheetReaderTest {
 
     @Test
-    void testHandleImportsFixedListSheet() throws FixedListSheetReaderException {
-        var fixedListSheetName = "Scotland Scrubbed";
-        var sheetImporter = mock(FixedListSheetImporter.class);
-        var sheetReader = FixedListSheetReader.create(List.of(sheetImporter));
-        var workbook = createWorkbook("Sheet1", fixedListSheetName, "Sheet3");
+    void testHandleImportsFixedListSheet() throws FixedListSheetReaderException, IOException {
+        String fixedListSheetName = "Scotland Scrubbed";
+        FixedListSheetImporter sheetImporter = mock(FixedListSheetImporter.class);
+        FixedListSheetReader sheetReader = FixedListSheetReader.create(List.of(sheetImporter));
+        try (XSSFWorkbook workbook = createWorkbook("Sheet1", fixedListSheetName, "Sheet3")) {
+            sheetReader.handle(TribunalOffice.SCOTLAND, workbook);
+        }
 
-        sheetReader.handle(TribunalOffice.SCOTLAND, workbook);
-
-        var captor = ArgumentCaptor.forClass(XSSFSheet.class);
+        ArgumentCaptor<XSSFSheet> captor = ArgumentCaptor.forClass(XSSFSheet.class);
         verify(sheetImporter, times(1)).importSheet(eq(TribunalOffice.SCOTLAND), captor.capture());
-        var sheet = captor.getValue();
+        XSSFSheet sheet = captor.getValue();
         assertEquals(fixedListSheetName, sheet.getSheetName());
     }
 
     @Test
-    void testHandleThrowsExceptionWhenFixedListSheetNotFound() {
-        var sheetImporter = mock(FixedListSheetImporter.class);
-        var sheetReader = FixedListSheetReader.create(List.of(sheetImporter));
-        var workbook = createWorkbook("Sheet1", "Sheet2", "Sheet3");
-
-        assertThrows(FixedListSheetReaderException.class, () -> sheetReader.handle(TribunalOffice.SCOTLAND, workbook));
+    void testHandleThrowsExceptionWhenFixedListSheetNotFound() throws IOException {
+        FixedListSheetImporter sheetImporter = mock(FixedListSheetImporter.class);
+        FixedListSheetReader sheetReader = FixedListSheetReader.create(List.of(sheetImporter));
+        try (XSSFWorkbook workbook = createWorkbook("Sheet1", "Sheet2", "Sheet3")) {
+            assertThrows(FixedListSheetReaderException.class,
+                () -> sheetReader.handle(TribunalOffice.SCOTLAND, workbook));
+        }
     }
 
     @Test
-    void testHandleThrowsExceptionWhenNoSheetsExistInWorkbook() {
-        var sheetImporter = mock(FixedListSheetImporter.class);
-        var sheetReader = FixedListSheetReader.create(List.of(sheetImporter));
-        var workbook = createWorkbook();
-
-        assertThrows(FixedListSheetReaderException.class, () -> sheetReader.handle(TribunalOffice.SCOTLAND, workbook));
+    void testHandleThrowsExceptionWhenNoSheetsExistInWorkbook() throws IOException {
+        FixedListSheetImporter sheetImporter = mock(FixedListSheetImporter.class);
+        FixedListSheetReader sheetReader = FixedListSheetReader.create(List.of(sheetImporter));
+        try (XSSFWorkbook workbook = createWorkbook()) {
+            assertThrows(FixedListSheetReaderException.class,
+                () -> sheetReader.handle(TribunalOffice.SCOTLAND, workbook));
+        }
     }
 
     private XSSFWorkbook createWorkbook(String... sheetNames) {
-        var workbook = new XSSFWorkbook();
-        for (var sheetName : sheetNames) {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        for (String sheetName : sheetNames) {
             workbook.createSheet(sheetName);
         }
         return workbook;

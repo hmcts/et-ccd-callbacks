@@ -20,32 +20,35 @@ public class HearingsToJudgmentsCcdDataSourceTest {
 
     @Test
     public void shouldReturnSearchResults() throws IOException {
-        var authToken = "A test token";
-        var caseTypeId = "A test case type";
-        var fromDate = "10-10-2021";
-        var toDate = "10-11-2021";
-        var ccdClient = mock(CcdClient.class);
-        var submitEvent = new HearingsToJudgmentsSubmitEvent();
-        var submitEvents = List.of(submitEvent);
+        String authToken = "A test token";
+        String caseTypeId = "A test case type";
+        String fromDate = "10-10-2021";
+        String toDate = "10-11-2021";
+        CcdClient ccdClient = mock(CcdClient.class);
+        HearingsToJudgmentsSubmitEvent submitEvent = new HearingsToJudgmentsSubmitEvent();
+        List<HearingsToJudgmentsSubmitEvent> submitEvents = List.of(submitEvent);
         when(ccdClient.hearingsToJudgementsSearch(anyString(), anyString(), anyString())).thenReturn(submitEvents);
 
-        var ccdReportDataSource = new HearingsToJudgmentsCcdReportDataSource(authToken, ccdClient);
+        HearingsToJudgmentsCcdReportDataSource ccdReportDataSource = new HearingsToJudgmentsCcdReportDataSource(
+            authToken, ccdClient);
 
-        var results = ccdReportDataSource.getData(caseTypeId, TribunalOffice.LEEDS.getOfficeName(), fromDate, toDate);
+        List<HearingsToJudgmentsSubmitEvent> results = ccdReportDataSource.getData(caseTypeId,
+            TribunalOffice.LEEDS.getOfficeName(), fromDate, toDate);
         assertEquals(1, results.size());
         assertEquals(submitEvent, results.get(0));
     }
 
     @Test(expected = ReportException.class)
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
-        var authToken = "A test token";
-        var caseTypeId = "A test case type";
-        var fromDate = "10-10-2021";
-        var toDate = "10-11-2021";
-        var ccdClient = mock(CcdClient.class);
+        String authToken = "A test token";
+        String caseTypeId = "A test case type";
+        String fromDate = "10-10-2021";
+        String toDate = "10-11-2021";
+        CcdClient ccdClient = mock(CcdClient.class);
         when(ccdClient.hearingsToJudgementsSearch(anyString(), anyString(), anyString())).thenThrow(new IOException());
 
-        var ccdReportDataSource = new HearingsToJudgmentsCcdReportDataSource(authToken, ccdClient);
+        HearingsToJudgmentsCcdReportDataSource ccdReportDataSource = new HearingsToJudgmentsCcdReportDataSource(
+            authToken, ccdClient);
         ccdReportDataSource.getData(caseTypeId, TribunalOffice.LEEDS.getOfficeName(), fromDate, toDate);
         fail("Should throw exception instead");
     }

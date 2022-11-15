@@ -29,7 +29,7 @@ public class EmailService {
      */
     public void sendEmail(String templateId, String emailAddress, Map<String, String> personalisation) {
 
-        var referenceId = UUID.randomUUID().toString();
+        String referenceId = UUID.randomUUID().toString();
 
         try {
             emailClient.sendEmail(

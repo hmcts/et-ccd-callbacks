@@ -7,7 +7,10 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CaseData;
 import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 
@@ -16,6 +19,7 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,7 +36,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgm
 
 @Slf4j
 @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.InsufficientStringBufferDeclaration",
-    "PMD.FieldNamingConventions", "PMD.LawOfDemeter"})
+    "PMD.FieldNamingConventions", "PMD.LawOfDemeter", "PMD.ExcessiveImports"})
 public final class CasesAwaitingJudgmentReport {
 
     static final Collection<String> VALID_POSITION_TYPES = List.of(
@@ -70,12 +74,12 @@ public final class CasesAwaitingJudgmentReport {
     }
 
     public CasesAwaitingJudgmentReportData runReport(ListingDetails listingDetails) {
-        var managingOffice = listingDetails.getCaseData().getManagingOffice();
-        var caseTypeId = listingDetails.getCaseTypeId();
-        var submitEvents = getCases(caseTypeId, managingOffice);
+        String managingOffice = listingDetails.getCaseData().getManagingOffice();
+        String caseTypeId = listingDetails.getCaseTypeId();
+        List<CasesAwaitingJudgmentSubmitEvent> submitEvents = getCases(caseTypeId, managingOffice);
 
-        var reportOffice = ReportHelper.getReportOffice(caseTypeId, managingOffice);
-        var reportData = initReport(reportOffice);
+        String reportOffice = ReportHelper.getReportOffice(caseTypeId, managingOffice);
+        CasesAwaitingJudgmentReportData reportData = initReport(reportOffice);
 
         populateData(reportData, submitEvents);
 
@@ -83,7 +87,7 @@ public final class CasesAwaitingJudgmentReport {
     }
 
     private CasesAwaitingJudgmentReportData initReport(String owningOffice) {
-        var reportSummary = new ReportSummary(owningOffice);
+        ReportSummary reportSummary = new ReportSummary(owningOffice);
         return new CasesAwaitingJudgmentReportData(reportSummary);
     }
 
@@ -98,13 +102,13 @@ public final class CasesAwaitingJudgmentReport {
                 continue;
             }
 
-            var reportDetail = new ReportDetail();
-            var caseData = submitEvent.getCaseData();
+            ReportDetail reportDetail = new ReportDetail();
+            CaseData caseData = submitEvent.getCaseData();
             log.info("Adding case {} to Cases Awaiting Judgment report", caseData.getEthosCaseReference());
 
-            var heardHearing = getLatestHeardHearing(caseData.getHearingCollection());
-            var today = LocalDate.now(clock);
-            var listedDate = LocalDate.parse(heardHearing.listedDate, OLD_DATE_TIME_PATTERN);
+            HeardHearing heardHearing = getLatestHeardHearing(caseData.getHearingCollection());
+            LocalDate today = LocalDate.now(clock);
+            LocalDate listedDate = LocalDate.parse(heardHearing.listedDate, OLD_DATE_TIME_PATTERN);
 
             reportDetail.setPositionType(caseData.getPositionType());
             reportDetail.setWeeksSinceHearing(getWeeksSinceHearing(listedDate, today));
@@ -136,7 +140,7 @@ public final class CasesAwaitingJudgmentReport {
             return false;
         }
 
-        var caseData = submitEvent.getCaseData();
+        CaseData caseData = submitEvent.getCaseData();
         if (!isValidPositionType(caseData.getPositionType())) {
             return false;
         }
@@ -157,7 +161,7 @@ public final class CasesAwaitingJudgmentReport {
             return false;
         }
 
-        for (var hearingTypeItem : caseData.getHearingCollection()) {
+        for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
             if (isValidHearing(hearingTypeItem)) {
                 return true;
             }
@@ -168,12 +172,12 @@ public final class CasesAwaitingJudgmentReport {
     }
 
     private boolean isValidHearing(HearingTypeItem hearingTypeItem) {
-        var hearingType = hearingTypeItem.getValue();
+        HearingType hearingType = hearingTypeItem.getValue();
         if (hearingType == null || CollectionUtils.isEmpty(hearingType.getHearingDateCollection())) {
             return false;
         }
 
-        for (var dateListedItemType : hearingType.getHearingDateCollection()) {
+        for (DateListedTypeItem dateListedItemType : hearingType.getHearingDateCollection()) {
             if (Constants.HEARING_STATUS_HEARD.equals(dateListedItemType.getValue().getHearingStatus())) {
                 return true;
             }
@@ -187,15 +191,16 @@ public final class CasesAwaitingJudgmentReport {
     }
 
     private void sortReportDetails(CasesAwaitingJudgmentReportData reportData) {
-        var comparator = Comparator.comparingLong(ReportDetail::getDaysSinceHearing).reversed();
+        Comparator<ReportDetail> comparator = Comparator.comparingLong(ReportDetail::getDaysSinceHearing).reversed();
         reportData.getReportDetails().sort(comparator);
     }
 
     private void addReportSummary(CasesAwaitingJudgmentReportData reportData) {
-        var positionTypeCounts = new HashMap<String, Integer>();
-        reportData.getReportDetails().forEach(rd -> positionTypeCounts.merge(rd.getPositionType(), 1, Integer::sum));
+        HashMap<String, Integer> positionTypeCounts = new HashMap<>();
+        reportData.getReportDetails().forEach(rd -> positionTypeCounts.merge(rd.getPositionType(), 1,
+            Integer::sum));
 
-        var positionTypes = reportData.getReportSummary().getPositionTypes();
+        List<PositionTypeSummary> positionTypes = reportData.getReportSummary().getPositionTypes();
         positionTypeCounts.forEach((k, v) -> positionTypes.add(new PositionTypeSummary(k, v)));
 
         Comparator<PositionTypeSummary> comparator = Comparator.comparingInt(PositionTypeSummary::getPositionTypeCount);
@@ -203,13 +208,13 @@ public final class CasesAwaitingJudgmentReport {
     }
 
     private HeardHearing getLatestHeardHearing(List<HearingTypeItem> hearings) {
-        var heardHearings = new ArrayList<HeardHearing>();
-        for (var hearingTypeItem : hearings) {
-            var hearingType = hearingTypeItem.getValue();
-            for (var dateListedTypeItem : hearingType.getHearingDateCollection()) {
-                var dateListedType = dateListedTypeItem.getValue();
+        ArrayList<HeardHearing> heardHearings = new ArrayList<>();
+        for (HearingTypeItem hearingTypeItem : hearings) {
+            HearingType hearingType = hearingTypeItem.getValue();
+            for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
+                DateListedType dateListedType = dateListedTypeItem.getValue();
                 if (HEARING_STATUS_HEARD.equals(dateListedType.getHearingStatus())) {
-                    var heardHearing = new HeardHearing();
+                    HeardHearing heardHearing = new HeardHearing();
                     heardHearing.listedDate = dateListedType.getListedDate();
                     heardHearing.hearingNumber = hearingType.getHearingNumber();
                     heardHearing.hearingType = hearingType.getHearingType();
@@ -238,8 +243,8 @@ public final class CasesAwaitingJudgmentReport {
             return sourceDate;
         }
         try {
-            var date = sourceFormatter.parse(sourceDate);
-            var targetFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            TemporalAccessor date = sourceFormatter.parse(sourceDate);
+            DateTimeFormatter targetFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             return targetFormatter.format(date);
         } catch (DateTimeException e) {
             log.warn(String.format("Unable to parse %s", sourceDate), e);

@@ -8,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.AllocateHearingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.ScotlandAllocateHearingService;
@@ -47,10 +48,10 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testInitialiseHearingDynamicList() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder()
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/allocatehearing/initialiseHearings")
@@ -67,10 +68,10 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testInitialiseHearingDynamicListInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder()
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
-        var token = "invalid-token";
+        String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/allocatehearing/initialiseHearings")
@@ -84,10 +85,10 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testHandleListingSelected() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder()
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/allocatehearing/handleListingSelected")
@@ -104,10 +105,10 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testHandleListingSelectedInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder()
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
-        var token = "invalid-token";
+        String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/allocatehearing/handleListingSelected")
@@ -121,10 +122,10 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testHandleListingSelectedInvalidCaseTypeId() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder()
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId("InvalidCaseTypeId")
                 .build();
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/allocatehearing/handleListingSelected")
@@ -137,10 +138,10 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testPopulateRoomsEnglandWales() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder()
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/allocatehearing/populateRooms")
@@ -158,10 +159,10 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testPopulateRoomsScotland() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder()
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(SCOTLAND_CASE_TYPE_ID)
                 .build();
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/allocatehearing/populateRooms")
@@ -179,10 +180,10 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testPopulateRoomsInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder()
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
-        var token = "invalid-token";
+        String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/allocatehearing/populateRooms")
@@ -196,10 +197,10 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testAboutToSubmit() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder()
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/allocatehearing/aboutToSubmit")
@@ -216,10 +217,10 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testAboutToSubmitInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder()
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
-        var token = "invalid-token";
+        String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/allocatehearing/aboutToSubmit")

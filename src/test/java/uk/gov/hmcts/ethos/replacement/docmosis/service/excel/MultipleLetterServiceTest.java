@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
@@ -226,7 +227,7 @@ public class MultipleLetterServiceTest {
                 multipleDetails.getCaseData().getMultipleSource());
         assertEquals(1, multipleDetails.getCaseData().getCorrespondenceType().getDynamicHearingNumber()
                 .getListItems().size());
-        var hearingFromCase = DynamicListHelper.createDynamicHearingList(
+        DynamicValueType hearingFromCase = DynamicListHelper.createDynamicHearingList(
                 submitEvents.get(0).getCaseData()).get(0);
         assertEquals(hearingFromCase, multipleDetails.getCaseData().getCorrespondenceType().getDynamicHearingNumber()
                 .getListItems().get(0));

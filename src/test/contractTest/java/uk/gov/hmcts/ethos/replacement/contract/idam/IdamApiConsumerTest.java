@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.HttpClientConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 
@@ -65,7 +66,7 @@ public class IdamApiConsumerTest {
     @Test
     @PactTestFor(pactMethod = "generatePactFragment")
     public void verifyPactResponse() {
-        var userDetails = idamApi.retrieveUserDetails(AUTH_TOKEN);
+        UserDetails userDetails = idamApi.retrieveUserDetails(AUTH_TOKEN);
         Assertions.assertEquals("ia-caseofficer@fake.hmcts.net", userDetails.getEmail());
     }
 }

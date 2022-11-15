@@ -75,8 +75,8 @@ public class UploadDocumentHelperTest {
 
     @Test
     public void buildPersonalisationForCaseRejection_givenNoClaimantTitle_returnsWithInitialAndLastName() {
-        var expected = buildPersonalisation("1234", "F", "Last");
-        var actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseData);
+        Map<String, String> expected = buildPersonalisation("1234", "F", "Last");
+        Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseData);
 
         assertThat(actual, is(expected));
     }
@@ -84,8 +84,8 @@ public class UploadDocumentHelperTest {
     @Test
     public void buildPersonalisationForCaseRejection_givenClaimantTitle_returnsWithTitleLastName() {
         caseData.getClaimantIndType().setClaimantTitle("Mr");
-        var expected = buildPersonalisation("1234", "Mr", "Last");
-        var actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseData);
+        Map<String, String> expected = buildPersonalisation("1234", "Mr", "Last");
+        Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseData);
 
         assertThat(actual, is(expected));
     }
@@ -93,8 +93,8 @@ public class UploadDocumentHelperTest {
     @Test
     public void buildPersonalisationForCaseRejection_givenClaimantPreferredTitle_returnsWithTitleLastName() {
         caseData.getClaimantIndType().setClaimantPreferredTitle("Professor");
-        var expected = buildPersonalisation("1234", "Professor", "Last");
-        var actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseData);
+        Map<String, String> expected = buildPersonalisation("1234", "Professor", "Last");
+        Map<String, String> actual = UploadDocumentHelper.buildPersonalisationForCaseRejection(caseData);
 
         assertThat(actual, is(expected));
     }

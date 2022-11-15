@@ -20,34 +20,35 @@ class RespondentsReportCcdReportDataSourceTest {
 
     @Test
     void shouldReturnSearchResults() throws IOException {
-        var authToken = "token";
-        var caseTypeId = "caseTypeId";
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var fromDate = "1-1-2022";
-        var toDate = "10-1-2022";
-        var ccdClient = mock(CcdClient.class);
-        var submitEvent = new RespondentsReportSubmitEvent();
-        var submitEvents = List.of(submitEvent);
+        String authToken = "token";
+        String caseTypeId = "caseTypeId";
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String fromDate = "1-1-2022";
+        String toDate = "10-1-2022";
+        CcdClient ccdClient = mock(CcdClient.class);
+        RespondentsReportSubmitEvent submitEvent = new RespondentsReportSubmitEvent();
+        List<RespondentsReportSubmitEvent> submitEvents = List.of(submitEvent);
         when(ccdClient.respondentsReportSearch(anyString(), anyString(), anyString())).thenReturn(submitEvents);
 
-        var ccdReportDataSource = new RespondentsReportCcdDataSource(authToken, ccdClient);
+        RespondentsReportCcdDataSource ccdReportDataSource = new RespondentsReportCcdDataSource(authToken, ccdClient);
 
-        var results = ccdReportDataSource.getData(caseTypeId, managingOffice, fromDate, toDate);
+        List<RespondentsReportSubmitEvent> results = ccdReportDataSource.getData(caseTypeId, managingOffice,
+            fromDate, toDate);
         assertEquals(1, results.size());
         assertEquals(submitEvent, results.get(0));
     }
 
     @Test
     void shouldThrowReportExceptionWhenSearchFails() throws IOException {
-        var authToken = "token";
-        var caseTypeId = "caseTypeId";
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var fromDate = "1-1-2022";
-        var toDate = "10-1-2022";
-        var ccdClient = mock(CcdClient.class);
+        String authToken = "token";
+        String caseTypeId = "caseTypeId";
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String fromDate = "1-1-2022";
+        String toDate = "10-1-2022";
+        CcdClient ccdClient = mock(CcdClient.class);
         when(ccdClient.respondentsReportSearch(anyString(), anyString(), anyString())).thenThrow(new IOException());
 
-        var ccdReportDataSource = new RespondentsReportCcdDataSource(authToken, ccdClient);
+        RespondentsReportCcdDataSource ccdReportDataSource = new RespondentsReportCcdDataSource(authToken, ccdClient);
         assertThrows(ReportException.class, () -> ccdReportDataSource.getData(
                 caseTypeId, managingOffice, fromDate, toDate));
     }

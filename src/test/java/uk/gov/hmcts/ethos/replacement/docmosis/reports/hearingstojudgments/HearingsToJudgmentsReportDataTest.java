@@ -55,7 +55,7 @@ class HearingsToJudgmentsReportDataTest {
         HearingsToJudgmentsReportData reportData = new HearingsToJudgmentsReportData(reportSummary);
         reportData.addReportDetail(reportDetail1);
 
-        var reportDetail2 = new HearingsToJudgmentsReportDetail();
+        HearingsToJudgmentsReportDetail reportDetail2 = new HearingsToJudgmentsReportDetail();
         reportDetail2.setCaseReference("caseRef1");
         reportDetail2.setHearingDate("2021-02-03");
         reportDetail2.setReportOffice("Office");
@@ -70,7 +70,7 @@ class HearingsToJudgmentsReportDataTest {
 
     private StringBuilder getExpectedJsonString(HearingsToJudgmentsReportData reportData) {
         StringBuilder sb = new StringBuilder(14);
-        var reportSummary = reportData.getReportSummary();
+        HearingsToJudgmentsReportSummary reportSummary = reportData.getReportSummary();
         sb.append(buildSummaryJsonString(
                 reportSummary.getOffice(), reportSummary.getTotalCases(), reportSummary.getTotal4Wk(),
                 reportSummary.getTotal4WkPercent(), reportSummary.getTotalX4Wk(), reportSummary.getTotalX4WkPercent()));
@@ -78,7 +78,7 @@ class HearingsToJudgmentsReportDataTest {
         sb.append('\"').append(REPORT_DETAILS).append("\":[\n");
         if (CollectionUtils.isNotEmpty(reportData.getReportDetails())
                 && reportData.getReportDetails().get(0) != null) {
-            var reportDetail1 = reportData.getReportDetails().get(0);
+            HearingsToJudgmentsReportDetail reportDetail1 = reportData.getReportDetails().get(0);
             sb.append(buildDetailJsonString(
                     reportDetail1.getCaseReference(), reportDetail1.getHearingDate(), reportDetail1.getReportOffice(),
                     reportDetail1.getReservedHearing(), reportDetail1.getHearingJudge(),
@@ -87,7 +87,7 @@ class HearingsToJudgmentsReportDataTest {
         }
         if (CollectionUtils.isNotEmpty(reportData.getReportDetails())
                 && reportData.getReportDetails().get(1) != null) {
-            var reportDetail2 = reportData.getReportDetails().get(1);
+            HearingsToJudgmentsReportDetail reportDetail2 = reportData.getReportDetails().get(1);
             sb.append(",\n");
             sb.append(buildDetailJsonString(
                     reportDetail2.getCaseReference(), reportDetail2.getHearingDate(), reportDetail2.getReportOffice(),

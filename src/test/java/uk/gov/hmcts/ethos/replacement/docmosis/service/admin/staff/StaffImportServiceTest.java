@@ -37,29 +37,30 @@ class StaffImportServiceTest {
 
     @Test
     void testImportStaff() throws IOException, InvalidFormatException {
-        var documentBinaryUrl = "http://dm-store/document/23232323";
-        var userToken = "test-token";
-        var userName = "Donald Duck";
-        var user = new UserDetails();
+        String documentBinaryUrl = "http://dm-store/document/23232323";
+        String userToken = "test-token";
+        String userName = "Donald Duck";
+        UserDetails user = new UserDetails();
         user.setName(userName);
-        var userService = mock(UserService.class);
+        UserService userService = mock(UserService.class);
         when(userService.getUserDetails(userToken)).thenReturn(user);
-        var excelReadingService = mockExcelReadingService(userToken, documentBinaryUrl);
-        var judgeRepository = mock(JudgeRepository.class);
-        var courtWorkerRepository = mock(CourtWorkerRepository.class);
+        ExcelReadingService excelReadingService = mockExcelReadingService(userToken, documentBinaryUrl);
+        JudgeRepository judgeRepository = mock(JudgeRepository.class);
+        CourtWorkerRepository courtWorkerRepository = mock(CourtWorkerRepository.class);
 
-        var sheetHandler = new SimpleSheetHandler();
-        var rowHandler = new StaffDataRowHandler(List.of(
+        SimpleSheetHandler sheetHandler = new SimpleSheetHandler();
+        StaffDataRowHandler rowHandler = new StaffDataRowHandler(List.of(
                 new JudgeRowHandler(judgeRepository),
                 new ClerkRowHandler(courtWorkerRepository),
                 new EmployerMemberRowHandler(courtWorkerRepository),
                 new EmployeeMemberRowHandler(courtWorkerRepository)));
-        var staffImportStrategy = new StaffImportStrategy(sheetHandler, rowHandler, judgeRepository,
+        StaffImportStrategy staffImportStrategy = new StaffImportStrategy(sheetHandler, rowHandler, judgeRepository,
                 courtWorkerRepository);
 
-        var adminData = createAdminData(documentBinaryUrl);
+        AdminData adminData = createAdminData(documentBinaryUrl);
 
-        var staffImportService = new StaffImportService(userService, excelReadingService, staffImportStrategy);
+        StaffImportService staffImportService = new StaffImportService(userService, excelReadingService,
+            staffImportStrategy);
         staffImportService.importStaff(adminData, userToken);
 
         verify(judgeRepository, times(1)).deleteAll();
@@ -73,18 +74,18 @@ class StaffImportServiceTest {
 
     private ExcelReadingService mockExcelReadingService(String userToken, String documentBinaryUrl)
             throws IOException, InvalidFormatException {
-        var excelReadingService = mock(ExcelReadingService.class);
-        var file = new File(StaffImportServiceTest.class.getClassLoader()
+        ExcelReadingService excelReadingService = mock(ExcelReadingService.class);
+        File file = new File(StaffImportServiceTest.class.getClassLoader()
                 .getResource("admin/StaffImportFile.xlsx").getFile());
-        var workbook = new XSSFWorkbook(file);
+        XSSFWorkbook workbook = new XSSFWorkbook(file);
         when(excelReadingService.readWorkbook(userToken, documentBinaryUrl)).thenReturn(workbook);
         return excelReadingService;
     }
 
     private AdminData createAdminData(String documentBinaryUrl) {
-        var adminData = new AdminData();
-        var importFile = new ImportFile();
-        var document = new Document();
+        AdminData adminData = new AdminData();
+        ImportFile importFile = new ImportFile();
+        Document document = new Document();
         document.setBinaryUrl(documentBinaryUrl);
         importFile.setFile(document);
         adminData.setStaffImportFile(importFile);

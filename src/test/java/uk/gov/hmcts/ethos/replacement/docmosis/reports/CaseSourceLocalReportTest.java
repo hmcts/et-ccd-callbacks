@@ -49,7 +49,7 @@ class CaseSourceLocalReportTest {
     }
 
     private void verifyReportHeaderIsZero(ListingData listingData) {
-        var adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
+        AdhocReportType adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
         assertEquals(0, Strings.isNullOrEmpty(
                 adhocReportType.getEt1OnlineTotalCases()) ? 0 : Integer.parseInt(
                         adhocReportType.getEt1OnlineTotalCases()));
@@ -134,7 +134,7 @@ class CaseSourceLocalReportTest {
         listingDetails.setCaseData(listingData);
 
         ListingData reportListingData = caseSourceLocalReport.generateReportData(listingDetails, submitEvents);
-        var adhocReportType = reportListingData.getLocalReportsSummary().get(0).getValue();
+        AdhocReportType adhocReportType = reportListingData.getLocalReportsSummary().get(0).getValue();
         assertNotNull(adhocReportType.getReportOffice());
         assertEquals(listingData.getManagingOffice(), adhocReportType.getReportOffice());
     }
@@ -147,7 +147,7 @@ class CaseSourceLocalReportTest {
         listingDetails.setCaseData(listingData);
 
         ListingData reportListingData = caseSourceLocalReport.generateReportData(listingDetails, submitEvents);
-        var adhocReportType = reportListingData.getLocalReportsSummary().get(0).getValue();
+        AdhocReportType adhocReportType = reportListingData.getLocalReportsSummary().get(0).getValue();
         assertNotNull(adhocReportType.getReportOffice());
         assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), adhocReportType.getReportOffice());
     }

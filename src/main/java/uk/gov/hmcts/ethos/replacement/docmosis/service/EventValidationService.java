@@ -15,7 +15,11 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
+import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -99,9 +103,9 @@ public class EventValidationService {
 
     public List<String> validateReceiptDate(CaseData caseData) {
         List<String> errors = new ArrayList<>();
-        var dateOfReceipt = LocalDate.parse(caseData.getReceiptDate());
+        LocalDate dateOfReceipt = LocalDate.parse(caseData.getReceiptDate());
         if (caseData.getPreAcceptCase() != null && !isNullOrEmpty(caseData.getPreAcceptCase().getDateAccepted())) {
-            var dateAccepted = LocalDate.parse(caseData.getPreAcceptCase().getDateAccepted());
+            LocalDate dateAccepted = LocalDate.parse(caseData.getPreAcceptCase().getDateAccepted());
             if (dateOfReceipt.isAfter(dateAccepted)) {
                 errors.add(RECEIPT_DATE_LATER_THAN_ACCEPTED_ERROR_MESSAGE);
                 return errors;
@@ -116,7 +120,7 @@ public class EventValidationService {
     }
 
     public boolean validateCaseState(CaseDetails caseDetails) {
-        var validated = true;
+        boolean validated = true;
         log.info("Checking whether the case " + caseDetails.getCaseData().getEthosCaseReference()
                 + " is in accepted state");
         if (caseDetails.getState().equals(SUBMITTED_STATE)
@@ -134,7 +138,7 @@ public class EventValidationService {
     public List<String> validateReceiptDateMultiple(MultipleData multipleData) {
         List<String> errors = new ArrayList<>();
         if (!isNullOrEmpty(multipleData.getReceiptDate())) {
-            var dateOfReceipt = LocalDate.parse(multipleData.getReceiptDate());
+            LocalDate dateOfReceipt = LocalDate.parse(multipleData.getReceiptDate());
             if (dateOfReceipt.isAfter(LocalDate.now())) {
                 errors.add(FUTURE_RECEIPT_DATE_ERROR_MESSAGE);
             }
@@ -156,7 +160,7 @@ public class EventValidationService {
             ListIterator<RespondentSumTypeItem> itr = caseData.getRespondentCollection().listIterator();
             while (itr.hasNext()) {
                 int index = itr.nextIndex() + 1;
-                var respondentSumType = itr.next().getValue();
+                RespondentSumType respondentSumType = itr.next().getValue();
                 validateResponseReceivedDateDate(respondentSumType, errors, index);
                 validateResponseReturnedFromJudgeDate(respondentSumType, errors, index);
             }
@@ -175,9 +179,9 @@ public class EventValidationService {
                 if (!isNullOrEmpty(respRepName)
                         && CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
                     ListIterator<RespondentSumTypeItem> respItr = caseData.getRespondentCollection().listIterator();
-                    var validLink = false;
+                    boolean validLink = false;
                     while (respItr.hasNext()) {
-                        var respondentSumType = respItr.next().getValue();
+                        RespondentSumType respondentSumType = respItr.next().getValue();
                         if (respRepName.equals(respondentSumType.getRespondentName())
                                 || respondentSumType.getResponseRespondentName() != null
                                 && respRepName.equals(respondentSumType.getResponseRespondentName())) {
@@ -202,7 +206,7 @@ public class EventValidationService {
                 correspondenceType, correspondenceScotType);
         if (correspondenceHearingNumber != null) {
             if (caseData.getHearingCollection() != null && !caseData.getHearingCollection().isEmpty()) {
-                var hearingType = DocumentHelper.getHearingByNumber(
+                HearingType hearingType = DocumentHelper.getHearingByNumber(
                         caseData.getHearingCollection(), correspondenceHearingNumber);
                 if (hearingType.getHearingNumber() == null
                         || !hearingType.getHearingNumber().equals(correspondenceHearingNumber)) {
@@ -354,7 +358,7 @@ public class EventValidationService {
 
     private void validateDuplicatedJurisdictionCodes(CaseData caseData, List<String> errors) {
         if (caseData.getJurCodesCollection() != null && !caseData.getJurCodesCollection().isEmpty()) {
-            var counter = 0;
+            int counter = 0;
             Set<String> uniqueCodes = new HashSet<>();
             List<String> duplicateCodes = new ArrayList<>();
             for (JurCodesTypeItem jurCodesTypeItem : caseData.getJurCodesCollection()) {
@@ -397,8 +401,8 @@ public class EventValidationService {
                                                        int index) {
         if (respondentSumType.getResponseReferredToJudge() != null
                 && respondentSumType.getResponseReturnedFromJudge() != null) {
-            var responseReferredToJudge = LocalDate.parse(respondentSumType.getResponseReferredToJudge());
-            var responseReturnedFromJudge = LocalDate.parse(respondentSumType.getResponseReturnedFromJudge());
+            LocalDate responseReferredToJudge = LocalDate.parse(respondentSumType.getResponseReferredToJudge());
+            LocalDate responseReturnedFromJudge = LocalDate.parse(respondentSumType.getResponseReturnedFromJudge());
             if (responseReturnedFromJudge.isBefore(responseReferredToJudge)) {
                 String respondentName = respondentSumType.getRespondentName() != null
                         ? respondentSumType.getRespondentName()
@@ -411,7 +415,7 @@ public class EventValidationService {
 
     private void validateResponseReceivedDateDate(RespondentSumType respondentSumType, List<String> errors, int index) {
         if (respondentSumType.getResponseReceivedDate() != null) {
-            var responseReceivedDate = LocalDate.parse(respondentSumType.getResponseReceivedDate());
+            LocalDate responseReceivedDate = LocalDate.parse(respondentSumType.getResponseReceivedDate());
             if (responseReceivedDate.isAfter(LocalDate.now())) {
                 String respondentName = respondentSumType.getRespondentName() != null
                         ? respondentSumType.getRespondentName()
@@ -460,7 +464,7 @@ public class EventValidationService {
             Map<String, List<String>> duplicatedJurCodesMap = new HashMap<>();
 
             for (JudgementTypeItem judgementTypeItem : caseData.getJudgementCollection()) {
-                var judgementType = judgementTypeItem.getValue();
+                JudgementType judgementType = judgementTypeItem.getValue();
                 List<String> jurCodesCollectionWithinJudgement =
                         Helper.getJurCodesCollection(judgementType.getJurisdictionCodes());
 
@@ -485,7 +489,7 @@ public class EventValidationService {
         log.info("Check if dates are not in future for case: " + caseData.getEthosCaseReference());
         if (CollectionUtils.isNotEmpty(caseData.getJudgementCollection())) {
             for (JudgementTypeItem judgementTypeItem : caseData.getJudgementCollection()) {
-                var judgementType = judgementTypeItem.getValue();
+                JudgementType judgementType = judgementTypeItem.getValue();
                 if (LocalDate.parse(judgementType.getDateJudgmentMade()).isAfter(LocalDate.now())) {
                     errors.add("Date of Judgement Made can't be in future");
                 }
@@ -503,7 +507,7 @@ public class EventValidationService {
         }
 
         for (JudgementTypeItem judgementTypeItem : caseData.getJudgementCollection()) {
-            var judgementType = judgementTypeItem.getValue();
+            JudgementType judgementType = judgementTypeItem.getValue();
             if (CollectionUtils.isEmpty(judgementType.getJurisdictionCodes())) {
                 if (partOfMMultiple) {
                     errors.add(caseData.getEthosCaseReference() + " - " + MISSING_JUDGEMENT_JURISDICTION_MESSAGE);
@@ -519,9 +523,9 @@ public class EventValidationService {
 
         List<String> errors = new ArrayList<>();
         if (listingFrom != null && listingTo != null) {
-            var startDate = LocalDate.parse(listingFrom);
-            var endDate = LocalDate.parse(listingTo);
-            var numberOfDays = DAYS.between(startDate, endDate);
+            LocalDate startDate = LocalDate.parse(listingFrom);
+            LocalDate endDate = LocalDate.parse(listingTo);
+            long numberOfDays = DAYS.between(startDate, endDate);
             if (numberOfDays > THIRTY_DAYS) {
                 errors.add(INVALID_LISTING_DATE_RANGE_ERROR_MESSAGE);
             }
@@ -534,8 +538,9 @@ public class EventValidationService {
             return;
         }
 
-        for (var currentHearingTypeItem : caseData.getHearingCollection()) {
-            for (var currentDateListedTypeItem : currentHearingTypeItem.getValue().getHearingDateCollection()) {
+        for (HearingTypeItem currentHearingTypeItem : caseData.getHearingCollection()) {
+            for (DateListedTypeItem currentDateListedTypeItem
+                : currentHearingTypeItem.getValue().getHearingDateCollection()) {
                 if (HEARING_STATUS_LISTED.equals(currentDateListedTypeItem.getValue().getHearingStatus())) {
                     errors.add(CLOSING_LISTED_CASE_ERROR);
                     return;
@@ -551,8 +556,9 @@ public class EventValidationService {
             return;
         }
 
-        for (var currentHearingTypeItem : caseData.getHearingCollection()) {
-            for (var currentDateListedTypeItem : currentHearingTypeItem.getValue().getHearingDateCollection()) {
+        for (HearingTypeItem currentHearingTypeItem : caseData.getHearingCollection()) {
+            for (DateListedTypeItem currentDateListedTypeItem
+                : currentHearingTypeItem.getValue().getHearingDateCollection()) {
                 if (HEARING_STATUS_HEARD.equals(currentDateListedTypeItem.getValue().getHearingStatus())
                         && currentHearingTypeItem.getValue().getJudge() == null) {
                     errors.add(CLOSING_HEARD_CASE_WITH_NO_JUDGE_ERROR);
@@ -577,7 +583,7 @@ public class EventValidationService {
                                             List<String> errors) {
         if (caseData.getJurCodesCollection() != null && !caseData.getJurCodesCollection().isEmpty()) {
             for (JurCodesTypeItem jurCodesTypeItem : caseData.getJurCodesCollection()) {
-                var jurCodesType = jurCodesTypeItem.getValue();
+                JurCodesType jurCodesType = jurCodesTypeItem.getValue();
                 if (jurCodesType.getJudgmentOutcome() == null) {
                     errors.add(getJurisdictionOutcomeErrorText(partOfMultiple, true,
                             caseData.getEthosCaseReference()));
@@ -595,8 +601,8 @@ public class EventValidationService {
 
     public void validateRestrictedReportingNames(CaseData caseData) {
         if (caseData.getRestrictedReporting() != null) {
-            var restrictedReportingType = caseData.getRestrictedReporting();
-            var dynamicListCode = restrictedReportingType.getDynamicRequestedBy().getValue().getCode();
+            RestrictedReportingType restrictedReportingType = caseData.getRestrictedReporting();
+            String dynamicListCode = restrictedReportingType.getDynamicRequestedBy().getValue().getCode();
             if (dynamicListCode.startsWith("R: ")) {
                 restrictedReportingType.setRequestedBy(RESPONDENT_TITLE);
             } else if (dynamicListCode.startsWith("C: ")) {

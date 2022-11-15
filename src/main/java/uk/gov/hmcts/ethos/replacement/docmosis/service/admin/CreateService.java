@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.admin;
 
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -44,7 +45,7 @@ public class CreateService {
     }
 
     private String boolQueryCreate() {
-        var boolQueryBuilder = boolQuery();
+        BoolQueryBuilder boolQueryBuilder = boolQuery();
         return new SearchSourceBuilder()
                 .size(MAX_ES_SIZE)
                 .query(boolQueryBuilder).toString();

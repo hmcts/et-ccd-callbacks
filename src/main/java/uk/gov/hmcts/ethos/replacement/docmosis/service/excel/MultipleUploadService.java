@@ -40,7 +40,7 @@ public class MultipleUploadService {
 
         try {
 
-            var multipleData = multipleDetails.getCaseData();
+            MultipleData multipleData = multipleDetails.getCaseData();
 
             XSSFSheet datatypeSheet = excelReadingService.checkExcelErrors(
                     userToken,
@@ -83,7 +83,7 @@ public class MultipleUploadService {
 
         if (datatypeSheet.getRow(0) != null) {
 
-            var collectionSize = Integer.parseInt(multipleData.getCaseCounter());
+            int collectionSize = Integer.parseInt(multipleData.getCaseCounter());
 
             log.info("Case Counter " + collectionSize);
 

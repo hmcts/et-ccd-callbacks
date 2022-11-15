@@ -7,6 +7,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"PMD.LawOfDemeter"})
@@ -17,51 +18,51 @@ public final class CaseTransferOfficeService {
     }
 
     public static void populateTransferToEnglandWalesOfficeOptions(CaseData caseData) {
-        var managingOffice = caseData.getManagingOffice();
+        String managingOffice = caseData.getManagingOffice();
         if (StringUtils.isBlank(managingOffice)) {
             return;
         }
 
-        var offices = getOffices(managingOffice);
+        DynamicFixedListType offices = getOffices(managingOffice);
         caseData.setOfficeCT(offices);
     }
 
     public static void populateTransferToEnglandWalesOfficeOptions(MultipleData multipleData) {
-        var managingOffice = multipleData.getManagingOffice();
+        String managingOffice = multipleData.getManagingOffice();
         if (StringUtils.isBlank(managingOffice)) {
             return;
         }
 
-        var offices = getOffices(managingOffice);
+        DynamicFixedListType offices = getOffices(managingOffice);
         multipleData.setOfficeMultipleCT(offices);
     }
 
     public static void populateTransferToScotlandOfficeOptions(CaseData caseData) {
-        var tribunalOffices = TribunalOffice.SCOTLAND_OFFICES.stream()
+        List<DynamicValueType> tribunalOffices = TribunalOffice.SCOTLAND_OFFICES.stream()
                 .map(tribunalOffice ->
                         DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
                 .collect(Collectors.toList());
 
-        var officeCT = DynamicFixedListType.from(tribunalOffices);
-        var defaultSelectedOffice = TribunalOffice.GLASGOW.getOfficeName();
+        DynamicFixedListType officeCT = DynamicFixedListType.from(tribunalOffices);
+        String defaultSelectedOffice = TribunalOffice.GLASGOW.getOfficeName();
         officeCT.setValue(DynamicValueType.create(defaultSelectedOffice, defaultSelectedOffice));
         caseData.setOfficeCT(officeCT);
     }
 
     public static void populateTransferToScotlandOfficeOptions(MultipleData multipleData) {
-        var tribunalOffices = TribunalOffice.SCOTLAND_OFFICES.stream()
+        List<DynamicValueType> tribunalOffices = TribunalOffice.SCOTLAND_OFFICES.stream()
                 .map(tribunalOffice ->
                         DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
                 .collect(Collectors.toList());
 
-        var officeCT = DynamicFixedListType.from(tribunalOffices);
-        var defaultSelectedOffice = TribunalOffice.GLASGOW.getOfficeName();
+        DynamicFixedListType officeCT = DynamicFixedListType.from(tribunalOffices);
+        String defaultSelectedOffice = TribunalOffice.GLASGOW.getOfficeName();
         officeCT.setValue(DynamicValueType.create(defaultSelectedOffice, defaultSelectedOffice));
         multipleData.setOfficeMultipleCT(officeCT);
     }
 
     private static DynamicFixedListType getOffices(String managingOffice) {
-        var tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
+        List<DynamicValueType> tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
                 .filter(tribunalOffice -> !tribunalOffice.getOfficeName().equals(managingOffice))
                 .map(tribunalOffice ->
                         DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))

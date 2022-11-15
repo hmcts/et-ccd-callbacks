@@ -116,7 +116,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var submitEvent = caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, userToken);
+        SubmitEvent submitEvent = caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, userToken);
         log.info("Case created correctly with case Id: " + submitEvent.getCaseId());
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
@@ -143,7 +143,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var submitEvent = caseRetrievalForCaseWorkerService.caseRetrievalRequest(userToken,
+        SubmitEvent submitEvent = caseRetrievalForCaseWorkerService.caseRetrievalRequest(userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId(),
                 ccdRequest.getCaseDetails().getJurisdiction(), "1550576532211563");
         log.info("Case received correctly with id: " + submitEvent.getCaseId());
@@ -198,7 +198,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var submitEvent = caseUpdateForCaseWorkerService.caseUpdateRequest(ccdRequest, userToken);
+        SubmitEvent submitEvent = caseUpdateForCaseWorkerService.caseUpdateRequest(ccdRequest, userToken);
         log.info("Case updated correctly with id: " + submitEvent.getCaseId());
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
@@ -250,12 +250,12 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         List<String> errors = eventValidationService.validateReceiptDate(caseData);
 
         if (errors.isEmpty()) {
-            var defaultValues = getPostDefaultValues(ccdRequest.getCaseDetails());
+            DefaultValues defaultValues = getPostDefaultValues(ccdRequest.getCaseDetails());
             defaultValuesReaderService.getCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.caseDataDefaults(caseData);
             generateEthosCaseReference(caseData, ccdRequest);
@@ -285,7 +285,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         clerkService.initialiseClerkResponsible(caseData);
 
         if (ENGLANDWALES_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
@@ -317,8 +317,8 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseDetails = ccdRequest.getCaseDetails();
-        var caseData = caseDetails.getCaseData();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
         List<String> errors = eventValidationService.validateReceiptDate(caseData);
 
         if (!eventValidationService.validateCaseState(caseDetails)) {
@@ -331,7 +331,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         if (errors.isEmpty()) {
-            var defaultValues = getPostDefaultValues(caseDetails);
+            DefaultValues defaultValues = getPostDefaultValues(caseDetails);
             log.info("Post Default values loaded: " + defaultValues);
             defaultValuesReaderService.getCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
@@ -366,7 +366,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.claimantDefaults(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -392,7 +392,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = eventValidationService.validateActiveRespondents(caseData);
         if (errors.isEmpty()) {
             errors = eventValidationService.validateET3ResponseFields(caseData);
@@ -427,7 +427,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = eventValidationService.validateRespRepNames(caseData);
 
         log.info(EVENT_FIELDS_VALIDATION + errors);
@@ -455,7 +455,7 @@ public class CaseActionsForCaseWorkerController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DynamicRespondentRepresentative.dynamicRespondentRepresentativeNames(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -481,7 +481,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseDetails = ccdRequest.getCaseDetails();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
         FlagsImageHelper.buildFlagsImageFileName(caseDetails);
 
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
@@ -507,7 +507,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         HearingsHelper.updatePostponedDate(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -533,7 +533,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
         eventValidationService.validateRestrictedReportingNames(caseData);
 
@@ -560,7 +560,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DynamicRestrictedReporting.dynamicRestrictedReporting(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -586,7 +586,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.amendHearing(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -612,7 +612,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         caseManagementForCaseWorkerService.midEventAmendHearing(
                 caseData, errors);
@@ -640,7 +640,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         List<String> errors = new ArrayList<>();
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         if (ccdRequest.getCaseDetails().getState().equals(CLOSED_STATE)) {
             eventValidationService.validateJurisdictionOutcome(caseData,
@@ -671,7 +671,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = Helper.midRespondentAddress(ccdRequest.getCaseDetails().getCaseData());
+        CaseData caseData = Helper.midRespondentAddress(ccdRequest.getCaseDetails().getCaseData());
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -697,7 +697,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         List<String> errors = new ArrayList<>();
-        var caseData =  ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData =  ccdRequest.getCaseDetails().getCaseData();
         eventValidationService.validateJurisdiction(caseData, errors);
         log.info(EVENT_FIELDS_VALIDATION + errors);
 
@@ -724,7 +724,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         conciliationTrackService.populateConciliationTrackForJurisdiction(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -749,7 +749,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
         List<String> errors = new ArrayList<>();
-        var caseData = caseManagementForCaseWorkerService.createECC(ccdRequest.getCaseDetails(),
+        CaseData caseData = caseManagementForCaseWorkerService.createECC(ccdRequest.getCaseDetails(),
                 userToken, errors, MID_EVENT_CALLBACK);
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -776,7 +776,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         List<String> errors = new ArrayList<>();
-        var caseData = caseManagementForCaseWorkerService.createECC(
+        CaseData caseData = caseManagementForCaseWorkerService.createECC(
                 ccdRequest.getCaseDetails(), userToken, errors, ABOUT_TO_SUBMIT_EVENT_CALLBACK);
         generateEthosCaseReference(caseData, ccdRequest);
 
@@ -803,7 +803,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
         List<String> errors = new ArrayList<>();
-        var caseData = caseManagementForCaseWorkerService.createECC(ccdRequest.getCaseDetails(),
+        CaseData caseData = caseManagementForCaseWorkerService.createECC(ccdRequest.getCaseDetails(),
                 userToken, errors, SUBMITTED_CALLBACK);
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -831,7 +831,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         List<String> errors = new ArrayList<>();
-        var caseDetails = ccdRequest.getCaseDetails();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
 
         singleCaseMultipleMidEventValidationService.singleCaseMultipleValidationLogic(
                 userToken, caseDetails, errors);
@@ -859,7 +859,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseDetails = ccdRequest.getCaseDetails();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
         List<String> errors = HearingsHelper.hearingMidEventValidation(caseDetails.getCaseData());
         return getCallbackRespEntity(errors, caseDetails);
     }
@@ -884,7 +884,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         BFHelper.populateDynamicListBfActions(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -910,7 +910,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         BFHelper.updateBfActionItems(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -936,7 +936,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DynamicJudgements.dynamicJudgements(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -961,7 +961,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         judgmentValidationService.validateJudgments(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -986,7 +986,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData =  ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData =  ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = eventValidationService.validateJurisdictionCodesWithinJudgement(caseData);
         errors.addAll(eventValidationService.validateJudgementDates(caseData));
         return getCallbackRespEntityErrors(errors, caseData);
@@ -1012,7 +1012,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData =  ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData =  ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = depositOrderValidationService.validateDepositOrder(caseData);
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -1038,7 +1038,7 @@ public class CaseActionsForCaseWorkerController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DynamicDepositOrder.dynamicDepositOrder(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -1064,13 +1064,13 @@ public class CaseActionsForCaseWorkerController {
         }
 
         List<String> errors = new ArrayList<>();
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         errors = eventValidationService.validateCaseBeforeCloseEvent(caseData,
                 ccdRequest.getCaseDetails().getState().equals(REJECTED_STATE), false, errors);
 
         if (errors.isEmpty()) {
-            var caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
+            String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
             if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
                 fileLocationSelectionService.initialiseFileLocation(caseData);
             } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
@@ -1132,7 +1132,7 @@ public class CaseActionsForCaseWorkerController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData =  ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData =  ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = caseCloseValidator.validateReinstateClosedCaseMidEvent(caseData);
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -1144,7 +1144,7 @@ public class CaseActionsForCaseWorkerController {
 
     private void generateEthosCaseReference(CaseData caseData, CCDRequest ccdRequest) {
         if (StringUtils.isBlank(caseData.getEthosCaseReference())) {
-            var reference = singleReferenceService.createReference(ccdRequest.getCaseDetails().getCaseTypeId());
+            String reference = singleReferenceService.createReference(ccdRequest.getCaseDetails().getCaseTypeId());
             log.info(String.format("Created reference %s for CCD case %s", reference,
                     ccdRequest.getCaseDetails().getCaseId()));
             caseData.setEthosCaseReference(reference);

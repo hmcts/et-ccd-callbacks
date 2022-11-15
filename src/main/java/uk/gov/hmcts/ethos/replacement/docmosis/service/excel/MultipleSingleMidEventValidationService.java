@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DynamicListHelper;
@@ -34,7 +37,7 @@ public class MultipleSingleMidEventValidationService {
 
     public void multipleSingleValidationLogic(String userToken, MultipleDetails multipleDetails, List<String> errors) {
 
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
 
         String caseToSearch = multipleData.getBatchUpdateCase();
 
@@ -101,7 +104,7 @@ public class MultipleSingleMidEventValidationService {
     private void populateDynamicLists(String userToken, String caseTypeId,
                                       MultipleData multipleData, String caseToSearch) {
 
-        var submitEvent = singleCasesReadingService.retrieveSingleCase(
+        SubmitEvent submitEvent = singleCasesReadingService.retrieveSingleCase(
                 userToken,
                 caseTypeId,
                 caseToSearch,
@@ -158,8 +161,8 @@ public class MultipleSingleMidEventValidationService {
         if (submitEvent.getCaseData().getJudgementCollection() != null
                 && !submitEvent.getCaseData().getJudgementCollection().isEmpty()) {
 
-            for (var i = 0; i < submitEvent.getCaseData().getJudgementCollection().size(); i++) {
-                var judgementTypeItem = submitEvent.getCaseData().getJudgementCollection().get(i);
+            for (int i = 0; i < submitEvent.getCaseData().getJudgementCollection().size(); i++) {
+                JudgementTypeItem judgementTypeItem = submitEvent.getCaseData().getJudgementCollection().get(i);
                 judgementCollection.add(DynamicListHelper.getDynamicCodeLabel(
                         judgementTypeItem.getId(), i
                                 + " - " + judgementTypeItem.getValue().getJudgementType()
@@ -191,7 +194,7 @@ public class MultipleSingleMidEventValidationService {
     }
 
     private boolean hasRepresentativeClaimant(CaseData caseData) {
-        var representativeClaimantType = caseData.getRepresentativeClaimantType();
+        RepresentedTypeC representativeClaimantType = caseData.getRepresentativeClaimantType();
         return representativeClaimantType != null && representativeClaimantType.getNameOfRepresentative() != null;
     }
 
@@ -199,7 +202,7 @@ public class MultipleSingleMidEventValidationService {
 
         listItems.add(0, DynamicListHelper.getDynamicValue(SELECT_NONE_VALUE));
 
-        var dynamicFixedListType = new DynamicFixedListType();
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
 
         dynamicFixedListType.setListItems(listItems);
 

@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
@@ -50,9 +51,9 @@ public final class HearingsByHearingTypeReport {
 
     public HearingsByHearingTypeReportData generateReport(ReportParams params) {
 
-        var submitEvents = getCases(params);
-        var office = ReportHelper.getReportOffice(params.getCaseTypeId(), params.getManagingOffice());
-        var reportData = initReport(office);
+        List<HearingsByHearingTypeSubmitEvent> submitEvents = getCases(params);
+        String office = ReportHelper.getReportOffice(params.getCaseTypeId(), params.getManagingOffice());
+        HearingsByHearingTypeReportData reportData = initReport(office);
         this.dateFrom = params.getDateFrom();
         this.dateTo = params.getDateTo();
         if (CollectionUtils.isNotEmpty(submitEvents)) {
@@ -62,8 +63,8 @@ public final class HearingsByHearingTypeReport {
     }
 
     private HearingsByHearingTypeReportData initReport(String managingOffice) {
-        var reportSummaryHdr = new HearingsByHearingTypeReportSummaryHdr();
-        var fields = new ReportFields();
+        HearingsByHearingTypeReportSummaryHdr reportSummaryHdr = new HearingsByHearingTypeReportSummaryHdr();
+        ReportFields fields = new ReportFields();
         initReportFields(fields);
         reportSummaryHdr.setOffice(managingOffice);
         reportSummaryHdr.setFields(fields);
@@ -89,8 +90,8 @@ public final class HearingsByHearingTypeReport {
             LocalDate listedDate;
             listedDate = LocalDate.parse(ReportHelper.getFormattedLocalDate(dateListedType.getListedDate()));
             if (HEARING_STATUS_HEARD.equals(dateListedType.getHearingStatus())) {
-                var startDate = LocalDate.parse(ReportHelper.getFormattedLocalDate(dateFrom));
-                var endDate = LocalDate.parse(ReportHelper.getFormattedLocalDate(dateTo));
+                LocalDate startDate = LocalDate.parse(ReportHelper.getFormattedLocalDate(dateFrom));
+                LocalDate endDate = LocalDate.parse(ReportHelper.getFormattedLocalDate(dateTo));
                 return !listedDate.isBefore(startDate) && !listedDate.isAfter(endDate);
             } else {
                 return false;
@@ -181,7 +182,7 @@ public final class HearingsByHearingTypeReport {
             List<HearingsByHearingTypeSubmitEvent> submitEvents,
             HearingsByHearingTypeReportData reportData) {
         for (HearingsByHearingTypeSubmitEvent submitEvent : submitEvents) {
-            var caseData = submitEvent.getCaseData();
+            HearingsByHearingTypeCaseData caseData = submitEvent.getCaseData();
             if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
                 for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                     if (CollectionUtils.isNotEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
@@ -234,14 +235,16 @@ public final class HearingsByHearingTypeReport {
 
     private HearingsByHearingTypeReportSummary getSummaryRow(
             String dateListed, List<HearingsByHearingTypeReportSummary> reportSummaryList) {
-        var date = LocalDateTime.parse(
+        String date = LocalDateTime.parse(
                 dateListed, OLD_DATE_TIME_PATTERN).toLocalDate().toString();
-        var reportSummary = reportSummaryList.stream().filter(a -> date.equals(a.getFields().getDate())).findFirst();
+        Optional<HearingsByHearingTypeReportSummary> reportSummary = reportSummaryList.stream()
+            .filter(a -> date.equals(a.getFields().getDate()))
+            .findFirst();
         if (reportSummary.isPresent()) {
             return reportSummary.get();
         } else {
-            var newReportSummary = new HearingsByHearingTypeReportSummary();
-            var fields = new ReportFields();
+            HearingsByHearingTypeReportSummary newReportSummary = new HearingsByHearingTypeReportSummary();
+            ReportFields fields = new ReportFields();
             initReportFields(fields);
             fields.setDate(date.replace("T", " "));
             newReportSummary.setFields(fields);
@@ -253,16 +256,16 @@ public final class HearingsByHearingTypeReport {
     private HearingsByHearingTypeReportSummary2 getSummaryRow2(
             String dateListed, String subSplit,
             List<HearingsByHearingTypeReportSummary2> reportSummaryList2) {
-        var date = LocalDateTime.parse(
+        String date = LocalDateTime.parse(
                 dateListed, OLD_DATE_TIME_PATTERN).toLocalDate().toString();
-        var reportSummary2 =
+        Optional<HearingsByHearingTypeReportSummary2> reportSummary2 =
                 reportSummaryList2.stream().filter(a -> date.equals(a.getFields().getDate())
                         && subSplit.equals(a.getFields().getSubSplit())).findFirst();
         if (reportSummary2.isPresent()) {
             return reportSummary2.get();
         } else {
-            var newReportSummary2 = new HearingsByHearingTypeReportSummary2();
-            var fields = new ReportFields();
+            HearingsByHearingTypeReportSummary2 newReportSummary2 = new HearingsByHearingTypeReportSummary2();
+            ReportFields fields = new ReportFields();
             initReportFields(fields);
             newReportSummary2.setFields(fields);
             newReportSummary2.getFields().setDate(date.replace("T", " "));
@@ -275,7 +278,7 @@ public final class HearingsByHearingTypeReport {
     private HearingsByHearingTypeReportSummary2Hdr getSummaryHdr2Row(
             String subSplit, List<HearingsByHearingTypeReportSummary2Hdr> reportSummaryHdr2List) {
 
-        var reportSummaryHdr2 = reportSummaryHdr2List
+        Optional<HearingsByHearingTypeReportSummary2Hdr> reportSummaryHdr2 = reportSummaryHdr2List
                 .stream().filter(a -> a.getFields() != null
                         && subSplit.equals(a.getFields().getSubSplit())).findFirst();
         return reportSummaryHdr2.orElse(null);
@@ -286,7 +289,7 @@ public final class HearingsByHearingTypeReport {
             HearingsByHearingTypeReportData reportData) {
         List<HearingsByHearingTypeReportSummary> reportSummaryList = new ArrayList<>();
         for (HearingsByHearingTypeSubmitEvent submitEvent : submitEvents) {
-            var caseData = submitEvent.getCaseData();
+            HearingsByHearingTypeCaseData caseData = submitEvent.getCaseData();
             if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
                 for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                     if (CollectionUtils.isNotEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
@@ -305,7 +308,7 @@ public final class HearingsByHearingTypeReport {
         for (DateListedTypeItem dateListedTypeItem :
                 hearingTypeItem.getValue().getHearingDateCollection()) {
             if (isValidHearing(dateListedTypeItem.getValue())) {
-                var reportSummary = getSummaryRow(
+                HearingsByHearingTypeReportSummary reportSummary = getSummaryRow(
                         dateListedTypeItem.getValue().getListedDate(), reportSummaryList);
                 setReportFields(hearingTypeItem.getValue().getHearingType(),
                         reportSummary.getFields());
@@ -318,7 +321,7 @@ public final class HearingsByHearingTypeReport {
             HearingsByHearingTypeReportData reportData) {
         List<HearingsByHearingTypeReportSummary2> reportSummaryList2 = new ArrayList<>();
         for (HearingsByHearingTypeSubmitEvent submitEvent : submitEvents) {
-            var caseData = submitEvent.getCaseData();
+            HearingsByHearingTypeCaseData caseData = submitEvent.getCaseData();
             if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
                 for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                     setSummary2FieldsForAllDates(hearingTypeItem, reportSummaryList2);
@@ -347,7 +350,7 @@ public final class HearingsByHearingTypeReport {
                     && CollectionUtils.isNotEmpty(hearingTypeItem.getValue().getHearingFormat())) {
                 for (String format : hearingTypeItem.getValue().getHearingFormat()) {
                     String subSplit = getSubSplitHearingFormat(format);
-                    var reportSummary2 = getSummaryRow2(
+                    HearingsByHearingTypeReportSummary2 reportSummary2 = getSummaryRow2(
                             dateListedTypeItem.getValue().getListedDate(),
                             subSplit, reportSummaryList2);
                     setReportFields(
@@ -356,7 +359,7 @@ public final class HearingsByHearingTypeReport {
                 }
             }
             if (isSubSplitJM(hearingTypeItem)) {
-                var reportSummary2 = getSummaryRow2(
+                HearingsByHearingTypeReportSummary2 reportSummary2 = getSummaryRow2(
                         dateListedTypeItem.getValue().getListedDate(), "JM",
                         reportSummaryList2);
                 setReportFields(
@@ -366,7 +369,7 @@ public final class HearingsByHearingTypeReport {
 
             String subSplitStages = getSubSplitStages(hearingTypeItem);
             if (!isNullOrEmpty(subSplitStages)) {
-                var reportSummary2 = getSummaryRow2(
+                HearingsByHearingTypeReportSummary2 reportSummary2 = getSummaryRow2(
                         dateListedTypeItem.getValue().getListedDate(), subSplitStages,
                         reportSummaryList2);
                 setReportFields(
@@ -376,7 +379,7 @@ public final class HearingsByHearingTypeReport {
 
             String subSplitSitAlone = getSubSplitSitAlone(hearingTypeItem);
             if (!isNullOrEmpty(subSplitSitAlone)) {
-                var reportSummary2 = getSummaryRow2(
+                HearingsByHearingTypeReportSummary2 reportSummary2 = getSummaryRow2(
                         dateListedTypeItem.getValue().getListedDate(), subSplitSitAlone,
                         reportSummaryList2);
                 setReportFields(
@@ -392,7 +395,7 @@ public final class HearingsByHearingTypeReport {
             HearingsByHearingTypeReportData reportData) {
         List<HearingsByHearingTypeReportDetail> reportSummaryDetailList = new ArrayList<>();
         for (HearingsByHearingTypeSubmitEvent submitEvent : submitEvents) {
-            var caseData = submitEvent.getCaseData();
+            HearingsByHearingTypeCaseData caseData = submitEvent.getCaseData();
             if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
                 for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                     setDetailFields(hearingTypeItem, caseData, reportSummaryDetailList);
@@ -411,7 +414,7 @@ public final class HearingsByHearingTypeReport {
             for (DateListedTypeItem dateListedTypeItem :
                     hearingTypeItem.getValue().getHearingDateCollection()) {
                 if (isValidHearing(dateListedTypeItem.getValue())) {
-                    var detail = getDetail(hearingTypeItem, dateListedTypeItem, caseData);
+                    HearingsByHearingTypeReportDetail detail = getDetail(hearingTypeItem, dateListedTypeItem, caseData);
                     reportSummaryDetailList.add(detail);
                 }
             }
@@ -423,13 +426,13 @@ public final class HearingsByHearingTypeReport {
             HearingTypeItem hearingTypeItem,
             DateListedTypeItem dateListedTypeItem,
             HearingsByHearingTypeCaseData caseData) {
-        var detail = new HearingsByHearingTypeReportDetail();
+        HearingsByHearingTypeReportDetail detail = new HearingsByHearingTypeReportDetail();
         detail.setDetailDate(LocalDateTime.parse(
                 dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate().toString());
         detail.setHearingType(hearingTypeItem.getValue().getHearingType());
         detail.setHearingNo(hearingTypeItem.getValue().getHearingNumber());
-        var mulRef = StringUtils.defaultString(caseData.getMultipleReference(), "0 -  Not Allocated");
-        var subMul = StringUtils.defaultString(caseData.getSubMultipleName(), "0 -  Not Allocated");
+        String mulRef = StringUtils.defaultString(caseData.getMultipleReference(), "0 -  Not Allocated");
+        String subMul = StringUtils.defaultString(caseData.getSubMultipleName(), "0 -  Not Allocated");
         detail.setMultiSub(mulRef + ", " + subMul);
         detail.setCaseReference(caseData.getEthosCaseReference());
         detail.setLead(YES.equals(caseData.getLeadClaimant()) ? "Y" : "N");
@@ -454,7 +457,7 @@ public final class HearingsByHearingTypeReport {
         List<HearingsByHearingTypeReportSummary2Hdr> reportSummary2HdrList = new ArrayList<>();
         initReportSummary2HdrList(reportSummary2HdrList);
         for (HearingsByHearingTypeSubmitEvent submitEvent : submitEvents) {
-            var caseData = submitEvent.getCaseData();
+            HearingsByHearingTypeCaseData caseData = submitEvent.getCaseData();
             if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
                 for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                     if (hearingTypeItem.getValue() != null
@@ -510,7 +513,7 @@ public final class HearingsByHearingTypeReport {
     private void setReportSummary2HdrFields(
             String subSplit, HearingTypeItem hearingTypeItem,
             List<HearingsByHearingTypeReportSummary2Hdr> reportSummary2HdrList) {
-        var reportSummary2Hdr = getSummaryHdr2Row(
+        HearingsByHearingTypeReportSummary2Hdr reportSummary2Hdr = getSummaryHdr2Row(
                 subSplit, reportSummary2HdrList);
         if (reportSummary2Hdr != null) {
             setReportFields(hearingTypeItem.getValue().getHearingType(), reportSummary2Hdr.getFields());

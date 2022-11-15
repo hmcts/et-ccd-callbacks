@@ -120,8 +120,8 @@ public class HearingsByHearingTypeCaseDataBuilder {
         List<HearingsByHearingTypeSubmitEvent> submitEvents = new ArrayList<>();
         DateListedTypeItem dateListedTypeItem = createHearingDateListed("2022-01-01T00:00:00.000",
                 hearingStatus);
-        List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_JUDICIAL_HEARING, "JM",
-                dateListedTypeItem));
+        List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_JUDICIAL_HEARING,
+            "JM", dateListedTypeItem));
         submitEvents.add(createSubmitEvent(hearings, "1", "Yes", mulRef, mulName));
         dateListedTypeItem = createHearingDateListed("2022-01-03T00:00:00.000",
                 hearingStatus);
@@ -153,19 +153,22 @@ public class HearingsByHearingTypeCaseDataBuilder {
 
     public HearingsByHearingTypeSubmitEvent createSubmitEventDateInOutRange() {
         // Hearing outside of range
-        var dateListedTypeItem = createHearingDateListed("2021-05-30T00:00:00.000", HEARING_STATUS_HEARD);
-        List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_JUDICIAL_HEARING, "Video",
-                dateListedTypeItem));
+        DateListedTypeItem dateListedTypeItem = createHearingDateListed("2021-05-30T00:00:00.000",
+            HEARING_STATUS_HEARD);
+        List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_JUDICIAL_HEARING,
+            "Video", dateListedTypeItem));
         // Hearing inside of search range
         dateListedTypeItem = createHearingDateListed("2022-01-14T00:00:00.000", HEARING_STATUS_HEARD);
-        var hearingTypeItem = createHearing(HEARING_TYPE_JUDICIAL_COSTS_HEARING, "Video", dateListedTypeItem);
+        HearingTypeItem hearingTypeItem = createHearing(HEARING_TYPE_JUDICIAL_COSTS_HEARING, "Video",
+            dateListedTypeItem);
         hearings.add(hearingTypeItem);
         return createSubmitEvent(hearings, "123456", "No", "", "");
     }
 
     public HearingsByHearingTypeSubmitEvent createSubmitEventNullTime(String propertyToBeNull) {
         List<HearingTypeItem> hearings = new ArrayList<>();
-        var dateListedTypeItem = createHearingDateListed("2022-01-17T00:00:00.000", HEARING_STATUS_HEARD);
+        DateListedTypeItem dateListedTypeItem = createHearingDateListed("2022-01-17T00:00:00.000",
+            HEARING_STATUS_HEARD);
         switch (propertyToBeNull) {
             case "Start":
                 dateListedTypeItem.getValue().setHearingTimingStart(null);
@@ -181,7 +184,8 @@ public class HearingsByHearingTypeCaseDataBuilder {
                 break;
             default:
         }
-        var hearingTypeItem = createHearing(HEARING_TYPE_JUDICIAL_COSTS_HEARING, "Tel Con", dateListedTypeItem);
+        HearingTypeItem hearingTypeItem = createHearing(HEARING_TYPE_JUDICIAL_COSTS_HEARING, "Tel Con",
+            dateListedTypeItem);
         hearings.add(hearingTypeItem);
         return createSubmitEvent(hearings, "123456", "No", "", "");
     }
@@ -191,12 +195,15 @@ public class HearingsByHearingTypeCaseDataBuilder {
         List<HearingsByHearingTypeSubmitEvent> submitEventsWithoutDates = new ArrayList<>();
         DateListedType type = new DateListedType();
         dateListedTypeItem.setValue(type);
-        List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_JUDICIAL_HEARING, "JM",
+        List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_JUDICIAL_HEARING,
+            "JM",
                 dateListedTypeItem));
-        submitEventsWithoutDates.add(createSubmitEvent(hearings, "1", "lead1", "multiRef", "subMulti"));
+        submitEventsWithoutDates.add(createSubmitEvent(hearings, "1", "lead1", "multiRef",
+            "subMulti"));
         hearings = createHearingCollection(createHearing(HEARING_TYPE_JUDICIAL_REMEDY, "Hybrid",
                 dateListedTypeItem));
-        submitEventsWithoutDates.add(createSubmitEvent(hearings, "2", "lead2", "multiRef", "subMulti"));
+        submitEventsWithoutDates.add(createSubmitEvent(hearings, "2", "lead2", "multiRef",
+            "subMulti"));
         return submitEventsWithoutDates;
     }
 }

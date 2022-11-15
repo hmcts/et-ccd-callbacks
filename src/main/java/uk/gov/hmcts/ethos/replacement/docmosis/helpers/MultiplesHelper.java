@@ -149,7 +149,7 @@ public final class MultiplesHelper {
 
     public static void addLeadToCaseIds(MultipleData multipleData, String leadCase) {
 
-        var caseIdTypeItem = createCaseIdTypeItem(leadCase);
+        CaseIdTypeItem caseIdTypeItem = createCaseIdTypeItem(leadCase);
 
         if (multipleData.getCaseIdCollection() == null) {
 
@@ -165,9 +165,9 @@ public final class MultiplesHelper {
 
     public static CaseIdTypeItem createCaseIdTypeItem(String ethosCaseReference) {
 
-        var caseType = new CaseType();
+        CaseType caseType = new CaseType();
         caseType.setEthosCaseReference(ethosCaseReference);
-        var caseIdTypeItem = new CaseIdTypeItem();
+        CaseIdTypeItem caseIdTypeItem = new CaseIdTypeItem();
         caseIdTypeItem.setId(UUID.randomUUID().toString());
         caseIdTypeItem.setValue(caseType);
 
@@ -235,11 +235,11 @@ public final class MultiplesHelper {
 
     public static SubMultipleTypeItem createSubMultipleTypeItem(String subMultipleReference, String subMultipleName) {
 
-        var subMultipleType = new SubMultipleType();
+        SubMultipleType subMultipleType = new SubMultipleType();
         subMultipleType.setSubMultipleName(subMultipleName);
         subMultipleType.setSubMultipleRef(subMultipleReference);
 
-        var subMultipleTypeItem = new SubMultipleTypeItem();
+        SubMultipleTypeItem subMultipleTypeItem = new SubMultipleTypeItem();
         subMultipleTypeItem.setId(subMultipleReference);
         subMultipleTypeItem.setValue(subMultipleType);
 
@@ -341,7 +341,7 @@ public final class MultiplesHelper {
 
     public static void addObjectToCollectionOrderedByCaseRef(SortedMap<String, SortedMap<String, Object>> collection,
                                                              Object item, String ethosCaseRef) {
-        var caseRefParts = ethosCaseRef.split("/");
+        String[] caseRefParts = ethosCaseRef.split("/");
 
         if (collection.containsKey(caseRefParts[1])) {
             collection.get(caseRefParts[1]).put(caseRefParts[0], item);
@@ -351,7 +351,7 @@ public final class MultiplesHelper {
     }
 
     public static byte[] writeExcelFileToByteArray(XSSFWorkbook workbook) {
-        var bos = new ByteArrayOutputStream();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
         try {
             workbook.write(bos);

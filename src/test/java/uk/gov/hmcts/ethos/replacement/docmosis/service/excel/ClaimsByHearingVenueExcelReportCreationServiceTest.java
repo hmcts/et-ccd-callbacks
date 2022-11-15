@@ -17,7 +17,7 @@ public class ClaimsByHearingVenueExcelReportCreationServiceTest {
     public void setUp() {
         service = new ClaimsByHearingVenueExcelReportCreationService();
         reportData = new ClaimsByHearingVenueReportData();
-        var detailEntry = new ClaimsByHearingVenueReportDetail();
+        ClaimsByHearingVenueReportDetail detailEntry = new ClaimsByHearingVenueReportDetail();
         detailEntry.setCaseReference("245000/2021");
         detailEntry.setRespondentET3Postcode("TE5 TE1");
         reportData.getReportDetails().add(detailEntry);

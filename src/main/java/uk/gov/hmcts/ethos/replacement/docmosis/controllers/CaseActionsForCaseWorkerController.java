@@ -37,6 +37,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
@@ -95,6 +96,7 @@ public class CaseActionsForCaseWorkerController {
     private final ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
     private final DepositOrderValidationService depositOrderValidationService;
     private final JudgmentValidationService judgmentValidationService;
+    private final Et1VettingService et1VettingService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a case for a caseWorker.")
@@ -292,6 +294,9 @@ public class CaseActionsForCaseWorkerController {
         } else if (SCOTLAND_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
             scotlandFileLocationSelectionService.initialiseFileLocation(caseData);
         }
+
+        et1VettingService.populateHearingVenue(caseData);
+        et1VettingService.populateSuggestedHearingVenues(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -831,6 +836,8 @@ public class CaseActionsForCaseWorkerController {
 
         List<String> errors = new ArrayList<>();
         var caseDetails = ccdRequest.getCaseDetails();
+
+        et1VettingService.populateSuggestedHearingVenues(caseDetails.getCaseData());
 
         singleCaseMultipleMidEventValidationService.singleCaseMultipleValidationLogic(
                 userToken, caseDetails, errors);

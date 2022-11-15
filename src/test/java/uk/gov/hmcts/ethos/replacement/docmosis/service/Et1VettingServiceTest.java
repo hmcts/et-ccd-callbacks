@@ -35,6 +35,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.LEEDS;
+import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.LONDON_CENTRAL;
 import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.MANCHESTER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_OPEN;
@@ -470,12 +471,12 @@ class Et1VettingServiceTest {
     @Test
     void givenChangeOfRegion_shouldSetEt1TribunalRegionToNewOffice() {
         CaseData caseData = new CaseDataBuilder()
-                .withManagingOffice(TribunalOffice.LEEDS.getOfficeName())
-                .build();
+            .withManagingOffice(TribunalOffice.LEEDS.getOfficeName())
+            .build();
         caseData.setRegionalOfficeList(DynamicFixedListType.of(
-                DynamicValueType.create(MANCHESTER.getOfficeName(), MANCHESTER.getOfficeName())));
+            DynamicValueType.create(MANCHESTER.getOfficeName(), MANCHESTER.getOfficeName())));
         caseData.getRegionalOfficeList().setValue(
-                DynamicValueType.create(MANCHESTER.getOfficeName(), MANCHESTER.getOfficeName()));
+            DynamicValueType.create(MANCHESTER.getOfficeName(), MANCHESTER.getOfficeName()));
         et1VettingService.populateHearingVenue(caseData);
         assertThat(caseData.getEt1TribunalRegion()).isEqualTo(MANCHESTER.getOfficeName());
     }
@@ -488,6 +489,21 @@ class Et1VettingServiceTest {
         caseData.setRegionalOfficeList(null);
         et1VettingService.populateHearingVenue(caseData);
         assertThat(caseData.getEt1TribunalRegion()).isEqualTo(LEEDS.getOfficeName());
+    }
+
+    @Test
+    void populateSuggestedHearingVenue_keepsSelectedValue() {
+        CaseData caseData = new CaseDataBuilder()
+            .withManagingOffice(LONDON_CENTRAL.getOfficeName())
+            .build();
+        caseData.setRegionalOfficeList(null);
+        DynamicFixedListType dynamicFixedListType = DynamicFixedListType.from(List.of());
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel("RCJ");
+        dynamicFixedListType.setValue(dynamicValueType);
+        caseData.setSuggestedHearingVenues(dynamicFixedListType);
+        et1VettingService.populateSuggestedHearingVenues(caseData);
+        assertThat(caseData.getSuggestedHearingVenues().getSelectedLabel()).isEqualTo("RCJ");
     }
 
     private DocumentTypeItem createDocumentTypeItem(String typeOfDocument, String binaryLink) {

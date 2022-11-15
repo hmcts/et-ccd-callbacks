@@ -384,15 +384,15 @@ public class BulkUpdateService {
                         representedTypeR.setNameOfRepresentative(respondentRepNewValue);
                     } else {
                         representedTypeRItem = new RepresentedTypeRItem();
-                        representedTypeR = new RepresentedTypeR();
-                        representedTypeR.setNameOfRepresentative(respondentRepNewValue);
+                        representedTypeR = RepresentedTypeR.builder()
+                            .nameOfRepresentative(respondentRepNewValue).build();
                     }
                     representedTypeRItem.setValue(representedTypeR);
                     submitEvent.getCaseData().getRepCollection().set(0, representedTypeRItem);
                 } else {
                     RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
-                    RepresentedTypeR representedTypeR = new RepresentedTypeR();
-                    representedTypeR.setNameOfRepresentative(respondentRepNewValue);
+                    RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
+                        .nameOfRepresentative(respondentRepNewValue).build();
                     representedTypeRItem.setValue(representedTypeR);
                     List<RepresentedTypeRItem> repCollection =
                             new ArrayList<>(Collections.singletonList(representedTypeRItem));

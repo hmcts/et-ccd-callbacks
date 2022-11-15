@@ -1112,8 +1112,8 @@ public class ListingServiceTest {
                 .setRespondentCollection(new ArrayList<>(Arrays
                         .asList(respondentSumTypeItem, respondentSumTypeItem1)));
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
-        RepresentedTypeR representedTypeR = new RepresentedTypeR();
-        representedTypeR.setNameOfOrganisation("ITV");
+        RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
+            .nameOfOrganisation("ITV").build();
         representedTypeRItem.setId("222");
         representedTypeRItem.setValue(representedTypeR);
         submitEvents.get(0).getCaseData()

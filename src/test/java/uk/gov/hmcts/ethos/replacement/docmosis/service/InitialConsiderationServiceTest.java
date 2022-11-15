@@ -353,6 +353,42 @@ class InitialConsiderationServiceTest {
         assertThat(caseData.getEtICConvertF2fGiveDetails()).isNull();
     }
 
+    @Test
+    void setIsHearingAlreadyListed_shouldBeSetToNo_whenNoHearings() {
+        caseData.setEtInitialConsiderationHearing("|Hearing details | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|Date | -|\r\n"
+            + "|Type | -|\r\n"
+            + "|Duration | -|");
+
+        initialConsiderationService.setIsHearingAlreadyListed(caseData, SCOTLAND_CASE_TYPE_ID);
+        assertThat(caseData.getEtICHearingAlreadyListed()).isEqualTo(NO);
+    }
+
+    @Test
+    void setIsHearingAlreadyListed_shouldBeSetToYes_whenThereAreHearings() {
+        caseData.setEtInitialConsiderationHearing("|Hearing details | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|Date | 16 May 2022|\r\n"
+            + "|Type | Hearing|\r\n"
+            + "|Duration | 60 Days|");
+
+        initialConsiderationService.setIsHearingAlreadyListed(caseData, SCOTLAND_CASE_TYPE_ID);
+        assertThat(caseData.getEtICHearingAlreadyListed()).isEqualTo(YES);
+    }
+
+    @Test
+    void setIsHearingAlreadyListed_shouldIgnoreEntirely_whenCaseTypeIsEnglandWales() {
+        caseData.setEtInitialConsiderationHearing("|Hearing details | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|Date | 16 May 2022|\r\n"
+            + "|Type | Hearing|\r\n"
+            + "|Duration | 60 Days|");
+
+        initialConsiderationService.setIsHearingAlreadyListed(caseData, ENGLANDWALES_CASE_TYPE_ID);
+        assertThat(caseData.getEtICHearingAlreadyListed()).isNull();
+    }
+
     private List<JurCodesTypeItem> generateJurisdictionCodes() {
         return List.of(generateJurisdictionCode("DAG"),
             generateJurisdictionCode("SXD"));

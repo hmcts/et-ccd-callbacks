@@ -292,27 +292,63 @@ public final class ReferralHelper {
      * @return stringified json data for pdf document
      */
     public static String getDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
-        ReferralTypeData data =
-            ReferralTypeData.builder()
-                .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
-                .referralDate(Helper.getCurrentDate())
-                .referredBy(defaultIfEmpty(caseData.getReferredBy(), null))
-                .referCaseTo(defaultIfEmpty(caseData.getReferCaseTo(), null))
-                .referentEmail(defaultIfEmpty(caseData.getReferentEmail(), null))
-                .isUrgent(defaultIfEmpty(caseData.getIsUrgent(), null))
-                .nextHearingDate(getNearestHearingToReferral(caseData, "None"))
-                .referralSubject(defaultIfEmpty(caseData.getReferralSubject(), null))
-                .referralDetails(defaultIfEmpty(caseData.getReferralDetails(), null))
-                .referralDocument(caseData.getReferralDocument())
-                .referralInstruction(defaultIfEmpty(caseData.getReferralInstruction(), null)).build();
-
+        ReferralTypeData data;
+        if (caseData.getReferentEmail() != null) {
+            data = newReferralRequest(caseData);
+        } else {
+            data = existingReferralRequest(caseData);
+        }
         ReferralTypeDocument document = ReferralTypeDocument.builder()
             .accessKey(accessKey)
             .outputName(REF_OUTPUT_NAME)
             .templateName(REF_SUMMARY_TEMPLATE_NAME)
             .data(data).build();
-
         return OBJECT_MAPPER.writeValueAsString(document);
+    }
+
+    /**
+     * Creates a new referral using the caseData temporary variables.
+     * @param caseData contains the temporary variables
+     * @return a referral object which can then be mapped into the pdf doc
+     */
+    private static ReferralTypeData newReferralRequest(CaseData caseData) {
+        return ReferralTypeData.builder()
+            .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+            .referralDate(Helper.getCurrentDate())
+            .referredBy(defaultIfEmpty(caseData.getReferredBy(), null))
+            .referCaseTo(defaultIfEmpty(caseData.getReferCaseTo(), null))
+            .referentEmail(defaultIfEmpty(caseData.getReferentEmail(), null))
+            .isUrgent(defaultIfEmpty(caseData.getIsUrgent(), null))
+            .nextHearingDate(getNearestHearingToReferral(caseData, "None"))
+            .referralSubject(defaultIfEmpty(caseData.getReferralSubject(), null))
+            .referralDetails(defaultIfEmpty(caseData.getReferralDetails(), null))
+            .referralDocument(caseData.getReferralDocument())
+            .referralInstruction(defaultIfEmpty(caseData.getReferralInstruction(), null))
+            .referralStatus(ReferralStatus.AWAITING_INSTRUCTIONS).build();
+    }
+
+    /**
+     * Creates a referral using the existing selected Referral.
+     * @param caseData contains selected referral
+     * @return a referral object which can then be mapped into the pdf doc
+     */
+    private static ReferralTypeData existingReferralRequest(CaseData caseData) {
+        ReferralType referral = getSelectedReferral(caseData);
+        return ReferralTypeData.builder()
+            .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+            .referralDate(Helper.getCurrentDate())
+            .referredBy(defaultIfEmpty(referral.getReferredBy(), null))
+            .referCaseTo(defaultIfEmpty(referral.getReferCaseTo(), null))
+            .referentEmail(defaultIfEmpty(referral.getReferentEmail(), null))
+            .isUrgent(defaultIfEmpty(referral.getIsUrgent(), null))
+            .nextHearingDate(getNearestHearingToReferral(caseData, "None"))
+            .referralSubject(defaultIfEmpty(referral.getReferralSubject(), null))
+            .referralDetails(defaultIfEmpty(referral.getReferralDetails(), null))
+            .referralDocument(referral.getReferralDocument())
+            .referralInstruction(defaultIfEmpty(referral.getReferralInstruction(), null))
+            .referralReplyCollection(referral.getReferralReplyCollection())
+            .referralStatus(referral.getReferralStatus())
+            .referralReplyCollection(referral.getReferralReplyCollection()).build();
     }
 
     /**

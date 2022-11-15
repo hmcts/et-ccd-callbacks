@@ -40,12 +40,6 @@ public class InitialConsiderationController {
     private final DocumentManagementService documentManagementService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String COMPLETE_IC_HDR = "<h1>Initial consideration complete</h1>";
-    private static final String COMPLETE_IC_BODY = "<hr>"
-        + "<h3>What happens next</h3>"
-        + "<p>A tribunal caseworker will act on any instructions set out in your initial consideration to progress "
-        + "the case. "
-        + "You can <a href=\"/cases/case-details/%s#Documents\" target=\"_blank\">view the initial "
-        + "consideration document in the Documents tab (opens in new tab).</a></p>";
 
     @PostMapping(value = "/completeInitialConsideration", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "completes the Initial Consideration flow")
@@ -66,7 +60,6 @@ public class InitialConsiderationController {
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .confirmation_header(COMPLETE_IC_HDR)
-            .confirmation_body(String.format(COMPLETE_IC_BODY, ccdRequest.getCaseDetails().getCaseId()))
             .build());
     }
 
@@ -122,9 +115,12 @@ public class InitialConsiderationController {
             initialConsiderationService.getRespondentName(caseData.getRespondentCollection()));
         caseData.setEtInitialConsiderationHearing(
             initialConsiderationService.getHearingDetails(caseData.getHearingCollection()));
+
+        String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
+
         caseData.setEtInitialConsiderationJurisdictionCodes(
-            initialConsiderationService.generateJurisdictionCodesHtml(caseData.getJurCodesCollection(),
-                ccdRequest.getCaseDetails().getCaseTypeId()));
+            initialConsiderationService.generateJurisdictionCodesHtml(caseData.getJurCodesCollection(), caseTypeId));
+        initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

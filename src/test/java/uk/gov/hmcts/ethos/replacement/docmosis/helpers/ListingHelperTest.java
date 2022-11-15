@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1074,6 +1075,8 @@ class ListingHelperTest {
         hearingType.setHearingEstLengthNum("2");
         hearingType.setHearingEstLengthNumType("hours");
         hearingType.setHearingFormat(List.of("Telephone"));
+        hearingType.setHearingSitAlone("Sit Alone");
+        hearingType.setJudicialMediation(YES);
         String expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, "
                 + "causeListVenue=Edinburgh, elmoCaseReference=null, "
                 + "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
@@ -1128,6 +1131,7 @@ class ListingHelperTest {
                 + "respondentTown= , respondentRepresentative= , estHearingLength=2 hours, hearingPanel= , "
                 + "hearingRoom=Tribunal 7, respondentOthers= , hearingNotes= , judicialMediation= , "
                 + "hearingFormat=Telephone, hearingReadingDeliberationMembersChambers= )";
+
         assertEquals(expected, ListingHelper.getListingTypeFromCaseData(listingDetails.getCaseData(), caseData,
                 hearingType, dateListedType, 1, 3).toString());
 
@@ -1181,6 +1185,7 @@ class ListingHelperTest {
         dateListedType.setHearingVenueDayScotland(GLASGOW.getOfficeName());
         dateListedType.setHearingEdinburgh(null);
         dateListedType.setHearingGlasgow(new DynamicFixedListType("GlasgowVenue"));
+
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11,"
                 + " causeListVenue=GlasgowVenue, elmoCaseReference=null, "
                 + "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
@@ -1196,6 +1201,7 @@ class ListingHelperTest {
         dateListedType.setHearingVenueDayScotland(TribunalOffice.ABERDEEN.getOfficeName());
         dateListedType.setHearingGlasgow(null);
         dateListedType.setHearingAberdeen(new DynamicFixedListType("AberdeenVenue"));
+
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=AberdeenVenue,"
                 + " elmoCaseReference=null, " + "jurisdictionCodesList= , hearingType= , positionType= , "
                 + "hearingJudgeName= , hearingEEMember= , " + "hearingERMember= , hearingClerk=Clerk, "
@@ -1218,6 +1224,7 @@ class ListingHelperTest {
         dateListedType.setHearingVenueDayScotland(TribunalOffice.DUNDEE.getOfficeName());
         dateListedType.setHearingAberdeen(null);
         dateListedType.setHearingDundee(new DynamicFixedListType("DundeeVenue"));
+
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=DundeeVenue,"
                 + " elmoCaseReference=null, " + "jurisdictionCodesList= , hearingType= ,"
                 + " positionType= , hearingJudgeName= , "

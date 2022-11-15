@@ -16,8 +16,8 @@ const etDataLocation = dataLocation.data;
 const s2sBaseUrl = `http://rpe-service-auth-provider-${env}.service.core-compute-${env}.internal/lease`;
 const username = testConfig.TestEnvCWUser;
 const password = testConfig.TestEnvCWPassword;
-const idamBaseUrl = 'https://idam-api.aat.platform.hmcts.net/loginUser';
-const getUserIdurl = 'https://idam-api.aat.platform.hmcts.net/details';
+const idamBaseUrl = `https://idam-api.${env}.platform.hmcts.net/loginUser`;
+const getUserIdurl = `https://idam-api.${env}.platform.hmcts.net/details`;
 const ccdApiUrl = `http://ccd-data-store-api-${env}.service.core-compute-${env}.internal`;
 
 

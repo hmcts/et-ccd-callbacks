@@ -78,7 +78,7 @@ public class UploadDocumentController {
 
         if (UploadDocumentHelper.shouldSendRejectionEmail(ccdRequest.getCaseDetails())) {
             emailService.sendEmail(templateId, caseData.getClaimantType().getClaimantEmailAddress(),
-                UploadDocumentHelper.buildPersonalisationForCaseRejection(caseData));
+                UploadDocumentHelper.buildPersonalisationForCaseRejection(ccdRequest.getCaseDetails()));
             caseData.setCaseRejectedEmailSent(YES);
         }
 

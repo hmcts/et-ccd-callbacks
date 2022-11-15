@@ -370,11 +370,12 @@ class ReferralHelperTest {
     @Test
     void documentRequestNewReferral() throws JsonProcessingException {
         setReferralReplyData();
+        caseData.setReferentEmail("info@test.com");
 
         String expectedDocumentSummaryNew = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-EGW-ENG-00067."
             + "docx\",\"outputName\":\"Referral Summary.pdf\",\"data\":{\"referralStatus\":\"Awaiting instructions\","
             + "\"caseNumber\":null,\"referralDate\":\"15 Nov 2022\",\"referredBy\":null,\"referCaseTo\":null,"
-            + "\"referentEmail\":null,\"isUrgent\":null,\"nextHearingDate\":\"11 Nov 2030\","
+            + "\"referentEmail\":\"info@test.com\",\"isUrgent\":null,\"nextHearingDate\":\"11 Nov 2030\","
             + "\"referralSubject\":null,\"referralDetails\":null,"
             + "\"referralDocument\":[{\"id\":\"1\",\"value\":{\"typeOfDocument\":null,"
             + "\"uploadedDocument\":{\"document_binary_url\":\"binaryUrl/documents/\","

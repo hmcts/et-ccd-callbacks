@@ -11,6 +11,32 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ADMIN_CONFIG_FILE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ADMIN_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_CCA;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_API;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_ENGLANDWALES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_EMPLOYMENT_SCOTLAND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_ROLES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CCD_DOCKER_DEFAULT_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CCD_IMPORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CITIZEN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CITIZEN_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ENGLANDWALES_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ENGLANGWALES_CONFIG_FILE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.IDAM_SYSTEM_USER_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_CAA;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_CASE_MANAGER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_ORGANISATION_MANAGER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_USER_MANAGER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SCOTLAND_CONFIG_FILE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SCOTLAND_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SOLICITOR_1_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SUPERUSER_EMAIL;
+
 /**
  * Configures the cftlib plugin so that the environment is ready for use with this et-ccd-callbacks service. To start
  * the cftlib environment see the bootWithCCD Gradle task.
@@ -97,6 +123,7 @@ import java.nio.file.Path;
  */
 @Component
 @Slf4j
+@SuppressWarnings({"PMD.ExcessiveImports"})
 public class CftlibConfig implements CFTLibConfigurer {
 
     @Value("${cftlib.import-ccd-defs-on-boot}")
@@ -111,9 +138,6 @@ public class CftlibConfig implements CFTLibConfigurer {
     @Value("${cftlib.admin-ccd-config-path}")
     private String adminCcdConfigPath;
 
-    private static final String CASEWORKER = "caseworker";
-    private static final String CASEWORKER_EMPLOYMENT = "caseworker-employment";
-
     @Override
     public void configure(CFTLib lib) {
         createRoles(lib);
@@ -123,63 +147,44 @@ public class CftlibConfig implements CFTLibConfigurer {
     }
 
     private void createRoles(CFTLib lib) {
-        lib.createRoles(
-            CASEWORKER_EMPLOYMENT,
-                "caseworker-employment-api",
-                "caseworker-employment-englandwales",
-                "caseworker-employment-scotland",
-                "caseworker-employment-etjudge",
-                "caseworker-employment-etjudge-englandwales",
-                "caseworker-employment-etjudge-scotland",
-                "citizen",
-                "caseworker-employment-legalrep-solicitor",
-                "caseworker-et-pcqextractor",
-                "caseworker-caa",
-                "et-acas-api",
-                "pui-case-manager",
-                "pui-finance-manager",
-                "pui-organisation-manager",
-                "pui-user-manager",
-                "pui-caa",
-                "manage-user"
-        );
+        lib.createRoles(CASEWORKER_ROLES);
     }
 
     private void createUsers(CFTLib lib) {
         // Create importer user
-        lib.createIdamUser("ccd.docker.default@hmcts.net",
-                "ccd-import");
+        lib.createIdamUser(CCD_DOCKER_DEFAULT_EMAIL,
+            CCD_IMPORT);
 
         // Create test users in the idam simulator.
-        lib.createIdamUser("englandwales@hmcts.net",
+        lib.createIdamUser(ENGLANDWALES_EMAIL,
             CASEWORKER,
             CASEWORKER_EMPLOYMENT,
-                "caseworker-employment-englandwales");
+            CASEWORKER_EMPLOYMENT_ENGLANDWALES);
 
-        lib.createIdamUser("scotland@hmcts.net",
+        lib.createIdamUser(SCOTLAND_EMAIL,
             CASEWORKER,
             CASEWORKER_EMPLOYMENT,
-                "caseworker-employment-scotland");
+            CASEWORKER_EMPLOYMENT_SCOTLAND);
 
-        lib.createIdamUser("admin@hmcts.net",
+        lib.createIdamUser(ADMIN_EMAIL,
             CASEWORKER,
             CASEWORKER_EMPLOYMENT,
-                "caseworker-employment-api");
+            CASEWORKER_EMPLOYMENT_API);
 
-        lib.createIdamUser("superuser@etorganisation1.com",
-                "caseworker-caa",
-                "pui-case-manager",
-                "pui-organisation-manager",
-                "pui-user-manager",
-                "pui-caa");
+        lib.createIdamUser(SUPERUSER_EMAIL,
+            CASEWORKER_CCA,
+            PUI_CASE_MANAGER,
+            PUI_ORGANISATION_MANAGER,
+            PUI_USER_MANAGER,
+            PUI_CAA);
 
-        lib.createIdamUser("solicitor1@etorganisation1.com",
-                "caseworker-employment-legalrep-solicitor");
+        lib.createIdamUser(SOLICITOR_1_EMAIL,
+            CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR);
 
-        lib.createIdamUser("citizen@gmail.com", "citizen");
+        lib.createIdamUser(CITIZEN_EMAIL, CITIZEN);
 
         // Required by ccd-data-store-api
-        lib.createIdamUser("data.store.idam.system.user@gmail.com", CASEWORKER);
+        lib.createIdamUser(IDAM_SYSTEM_USER_EMAIL, CASEWORKER);
     }
 
     private void importCcdDefinitions(CFTLib lib) {
@@ -191,17 +196,17 @@ public class CftlibConfig implements CFTLibConfigurer {
     }
 
     private void importEnglandWales(CFTLib lib) {
-        String file = englandWalesCcdConfigPath + "/definitions/xlsx/et-englandwales-ccd-config-cftlib.xlsx";
+        String file = englandWalesCcdConfigPath + ENGLANGWALES_CONFIG_FILE;
         importCcdDefinition(lib, file);
     }
 
     private void importScotland(CFTLib lib) {
-        String file = scotlandCcdConfigPath + "/definitions/xlsx/et-scotland-ccd-config-cftlib.xlsx";
+        String file = scotlandCcdConfigPath + SCOTLAND_CONFIG_FILE;
         importCcdDefinition(lib, file);
     }
 
     private void importAdmin(CFTLib lib) {
-        String file = adminCcdConfigPath + "/definitions/xlsx/et-admin-ccd-config-cftlib.xlsx";
+        String file = adminCcdConfigPath + ADMIN_CONFIG_FILE;
         importCcdDefinition(lib, file);
     }
 

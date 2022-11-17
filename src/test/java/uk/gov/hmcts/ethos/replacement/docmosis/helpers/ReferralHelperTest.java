@@ -374,7 +374,8 @@ class ReferralHelperTest {
 
         String expectedDocumentSummaryNew = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-EGW-ENG-00067."
             + "docx\",\"outputName\":\"Referral Summary.pdf\",\"data\":{\"referralStatus\":\"Awaiting instructions\","
-            + "\"caseNumber\":null,\"referralDate\":\"15 Nov 2022\",\"referredBy\":null,\"referCaseTo\":null,"
+            + "\"caseNumber\":null,\"referralDate\":\"" + Helper.getCurrentDate() + "\",\"referredBy\":null,"
+            + "\"referCaseTo\":null,"
             + "\"referentEmail\":\"info@test.com\",\"isUrgent\":null,\"nextHearingDate\":\"11 Nov 2030\","
             + "\"referralSubject\":null,\"referralDetails\":null,"
             + "\"referralDocument\":[{\"id\":\"1\",\"value\":{\"typeOfDocument\":null,"
@@ -405,7 +406,8 @@ class ReferralHelperTest {
 
         String expectedDocumentSummaryExisting = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-EGW-ENG-00067."
             + "docx\",\"outputName\":\"Referral Summary.pdf\",\"data\":{\"referralStatus\":\"Awaiting instructions\","
-            + "\"caseNumber\":null,\"referralDate\":\"15 Nov 2022\",\"referredBy\":null,\"referCaseTo\":null,"
+            + "\"caseNumber\":null,\"referralDate\":\"" + Helper.getCurrentDate() + "\",\"referredBy\":null,"
+            + "\"referCaseTo\":null,"
             + "\"referentEmail\":null,\"isUrgent\":null,\"nextHearingDate\":\"11 Nov 2030\","
             + "\"referralSubject\":\"Other\",\"referralDetails\":null,"
             + "\"referralDocument\":null,\"referralInstruction\":null,\"referralReplyCollection\":[{\"id\":\"1\","

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 
 import java.util.Map;
@@ -28,12 +29,13 @@ public class Et3NotificationService {
     /**
      * Sends notification emails to the claimant and respondent (or their reps if applicable).
      */
-    public void sendNotifications(CaseData caseData) {
-        Map<String, String> claimantPersonalisation = NotificationHelper.buildMapForClaimant(caseData);
+    public void sendNotifications(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        Map<String, String> claimantPersonalisation = NotificationHelper.buildMapForClaimant(caseDetails);
 
         caseData.getRespondentCollection()
             .forEach(obj -> {
-                Map<String, String> respondent = NotificationHelper.buildMapForRespondent(caseData, obj.getValue());
+                Map<String, String> respondent = NotificationHelper.buildMapForRespondent(caseDetails, obj.getValue());
                 String respondentEmail = respondent.get(EMAIL_ADDRESS);
                 if (isNullOrEmpty(respondentEmail)) {
                     return;

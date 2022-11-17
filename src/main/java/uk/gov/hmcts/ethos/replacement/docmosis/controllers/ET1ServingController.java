@@ -106,7 +106,7 @@ public class ET1ServingController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         
-        servingService.sendNotifications(caseData);
+        servingService.sendNotifications(ccdRequest.getCaseDetails());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())

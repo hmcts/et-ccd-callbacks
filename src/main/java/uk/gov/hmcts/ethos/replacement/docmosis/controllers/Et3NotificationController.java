@@ -106,7 +106,7 @@ public class Et3NotificationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        et3NotificationService.sendNotifications(caseData);
+        et3NotificationService.sendNotifications(ccdRequest.getCaseDetails());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())

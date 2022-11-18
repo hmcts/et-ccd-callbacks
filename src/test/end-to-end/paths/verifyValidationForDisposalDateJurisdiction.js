@@ -13,7 +13,7 @@ Scenario('Ensure disposal date is not present for jurisdiction outcomes allocate
 
 }).tag('@e2e')
     .tag('@nightly')
-    .tag('@wip')
+    .tag('@RET-BAT')
 //.retry(testConfig.TestRetryScenarios);
 
 Scenario('Ensure disposal date is present for jurisdiction outcomes successful hearings', async ({I}) => {

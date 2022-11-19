@@ -28,8 +28,11 @@ module.exports = async function (jurisdictionOutcome) {
         case "Withdrawn or private settlement":
             I.waitForText(commonConfig.jurisdictionRule2, testConfig.TestTimeToWaitForText);
             await I.selectOption('#jurCodesCollection_0_judgmentOutcome', commonConfig.jurisdictionRule3);
-            I.dontSeeElement('#dateNotified-day');
-            I.dontSee('Date notified');
+            //I.dontSeeElement('#dateNotified-day');
+            //I.dontSee('Date notified');
+            I.fillField('#dateNotified-day','10');
+            I.fillField('#dateNotified-month','06');
+            I.fillField('#dateNotified-year','2022');
             I.seeElement('#disposalDate-day');
             break;
         default:

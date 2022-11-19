@@ -13,7 +13,7 @@ Scenario('Ensure disposal date is not present for jurisdiction outcomes allocate
 
 }).tag('@e2e')
     .tag('@nightly')
-    .tag('@RET-BAT')
+    .tag('@RET-BAT');
 //.retry(testConfig.TestRetryScenarios);
 
 Scenario('Ensure disposal date is present for jurisdiction outcomes successful hearings', async ({I}) => {
@@ -24,7 +24,8 @@ Scenario('Ensure disposal date is present for jurisdiction outcomes successful h
 
 }).tag('@e2e')
     .tag('@nightly')
-    .tag('@wip')
+    .tag('@RET-BAT');
+
 
 Scenario('Ensure date notified field is not present for "withdrawn or private settlement" outcome', async ({I}) => {
 
@@ -34,7 +35,7 @@ Scenario('Ensure date notified field is not present for "withdrawn or private se
 
 }).tag('@e2e')
     .tag('@nightly')
-    .tag('@wip')
+    .tag('@wip').tag('RET-BAT')
 
 
 Scenario('User enters a disposal date outside of hearing collection - error message displayed', async ({I}) => {
@@ -63,4 +64,4 @@ Scenario('User successfully enters a disposal date matching a date within hearin
 
 }).tag('@e2e')
     .tag('@nightly')
-    .tag('@wip')
+    .tag('@pats')

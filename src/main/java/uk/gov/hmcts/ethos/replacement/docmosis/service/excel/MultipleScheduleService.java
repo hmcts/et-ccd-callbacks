@@ -44,7 +44,7 @@ public class MultipleScheduleService {
 
         log.info("Read excel for schedule logic");
 
-        var filterExcelType =
+        FilterExcelType filterExcelType =
                 MultiplesScheduleHelper.getFilterExcelTypeByScheduleDoc(multipleDetails.getCaseData());
 
         SortedMap<String, Object> multipleObjects =
@@ -55,7 +55,7 @@ public class MultipleScheduleService {
                         multipleDetails.getCaseData(),
                         filterExcelType);
 
-        var documentInfo = new DocumentInfo();
+        DocumentInfo documentInfo = new DocumentInfo();
 
         log.info("Validate limit of cases to generate schedules");
 
@@ -124,7 +124,7 @@ public class MultipleScheduleService {
 
         for (List<String> partitionCaseIds : Lists.partition(caseIdCollection, ES_PARTITION_SIZE)) {
 
-            var scheduleCallable =
+            ScheduleCallable scheduleCallable =
                     new ScheduleCallable(singleCasesReadingService, userToken, caseTypeId, partitionCaseIds);
 
             resultList.add(executor.submit(scheduleCallable));
@@ -167,7 +167,7 @@ public class MultipleScheduleService {
                                           MultipleDetails multipleDetails, List<SchedulePayload> schedulePayloads,
                                           List<String> errors) {
 
-        var documentInfo = new DocumentInfo();
+        DocumentInfo documentInfo = new DocumentInfo();
 
         if (!multipleObjectsFiltered.keySet().isEmpty()) {
 

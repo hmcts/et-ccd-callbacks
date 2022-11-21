@@ -248,12 +248,12 @@ public class ReportDataServiceTest {
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName());
         listingDetails.getCaseData().setReportType(CASES_AWAITING_JUDGMENT_REPORT);
         listingDetails.getCaseData().setDocumentName("name");
-        var caseDataBuilder = new CaseDataBuilder();
+        CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
         when(ccdClient.casesAwaitingJudgmentSearch(anyString(), anyString(), anyString())).thenReturn(
                 List.of(caseDataBuilder.withPositionType("Draft with members")
                         .withHearing("1970-01-01T00:00:00.000", HEARING_STATUS_HEARD)
                         .buildAsSubmitEvent(ACCEPTED_STATE)));
-        var listingDataResult = (CasesAwaitingJudgmentReportData) reportDataService
+        CasesAwaitingJudgmentReportData listingDataResult = (CasesAwaitingJudgmentReportData) reportDataService
                 .generateReportData(listingDetails, "authToken");
         assertEquals("name", listingDataResult.getDocumentName());
         assertEquals(CASES_AWAITING_JUDGMENT_REPORT, listingDataResult.getReportType());
@@ -265,8 +265,8 @@ public class ReportDataServiceTest {
         listingDetails.getCaseData().setReportType(NO_CHANGE_IN_CURRENT_POSITION_REPORT);
         listingDetails.getCaseData().setDocumentName("name");
         listingDetails.getCaseData().setReportDate("2021-12-12");
-        var caseDataBuilder = new NoPositionChangeCaseDataBuilder();
-        var result =  new NoPositionChangeSearchResult();
+        NoPositionChangeCaseDataBuilder caseDataBuilder = new NoPositionChangeCaseDataBuilder();
+        NoPositionChangeSearchResult result =  new NoPositionChangeSearchResult();
         result.setCases(List.of(caseDataBuilder.withCaseType("SINGLE")
                 .withCurrentPosition("Position")
                 .withDateToPosition("2021-04-03")
@@ -276,7 +276,7 @@ public class ReportDataServiceTest {
                 .thenReturn(result);
         when(ccdClient.buildAndGetElasticSearchRequestWithRetriesMultiples(anyString(), anyString(), anyString()))
                 .thenReturn(new ArrayList<>());
-        var listingDataResult = (NoPositionChangeReportData) reportDataService
+        NoPositionChangeReportData listingDataResult = (NoPositionChangeReportData) reportDataService
                 .generateReportData(listingDetails, "authToken");
         assertEquals("name", listingDataResult.getDocumentName());
         assertEquals(NO_CHANGE_IN_CURRENT_POSITION_REPORT, listingDataResult.getReportType());
@@ -290,24 +290,24 @@ public class ReportDataServiceTest {
         listingDetails.getCaseData().setReportType(NO_CHANGE_IN_CURRENT_POSITION_REPORT);
         listingDetails.getCaseData().setDocumentName("name");
         listingDetails.getCaseData().setReportDate("2021-12-12");
-        var caseDataBuilder = new NoPositionChangeCaseDataBuilder();
-        var result =  new NoPositionChangeSearchResult();
+        NoPositionChangeCaseDataBuilder caseDataBuilder = new NoPositionChangeCaseDataBuilder();
+        NoPositionChangeSearchResult result =  new NoPositionChangeSearchResult();
         result.setCases(List.of(caseDataBuilder.withCaseType(MULTIPLE_CASE_TYPE)
                 .withCurrentPosition("Position")
                 .withDateToPosition("2021-04-03")
                 .withMultipleReference("multipleRef")
                 .withReceiptDate("2021-03-03")
                 .buildAsSubmitEvent(ACCEPTED_STATE)));
-        var multipleData = new MultipleData();
+        MultipleData multipleData = new MultipleData();
         multipleData.setMultipleReference("multipleRef");
         multipleData.setMultipleName("Multiple Name");
-        var submitMultipleData = new SubmitMultipleEvent();
+        SubmitMultipleEvent submitMultipleData = new SubmitMultipleEvent();
         submitMultipleData.setCaseData(multipleData);
         when(ccdClient.runElasticSearch(anyString(), anyString(), anyString(), eq(NoPositionChangeSearchResult.class)))
                 .thenReturn(result);
         when(ccdClient.buildAndGetElasticSearchRequestWithRetriesMultiples(anyString(), anyString(), anyString()))
                 .thenReturn(List.of(submitMultipleData));
-        var listingDataResult = (NoPositionChangeReportData) reportDataService
+        NoPositionChangeReportData listingDataResult = (NoPositionChangeReportData) reportDataService
                 .generateReportData(listingDetails, "authToken");
         assertEquals("name", listingDataResult.getDocumentName());
         assertEquals(NO_CHANGE_IN_CURRENT_POSITION_REPORT, listingDataResult.getReportType());
@@ -326,7 +326,7 @@ public class ReportDataServiceTest {
         listingDetails.getCaseData().setListingDateTo("2021-07-14");
         when(ccdClient.hearingsToJudgementsSearch(anyString(), anyString(), anyString()))
                 .thenReturn(List.of(new HearingsToJudgmentsSubmitEvent()));
-        var listingDataResult = (HearingsToJudgmentsReportData)reportDataService
+        HearingsToJudgmentsReportData listingDataResult = (HearingsToJudgmentsReportData)reportDataService
                 .generateReportData(listingDetails, "authToken");
         assertEquals("name", listingDataResult.getDocumentName());
         assertEquals(HEARINGS_TO_JUDGEMENTS_REPORT, listingDataResult.getReportType());
@@ -346,10 +346,10 @@ public class ReportDataServiceTest {
         listingDetails.getCaseData().setListingDate("2022-01-13");
         listingDetails.getCaseData().setListingDateFrom("2022-01-31");
         listingDetails.getCaseData().setListingDateTo("2022-02-08");
-        var submitEvent = new RespondentsReportSubmitEvent();
+        RespondentsReportSubmitEvent submitEvent = new RespondentsReportSubmitEvent();
         submitEvent.setCaseData(new RespondentsReportCaseData());
         when(ccdClient.respondentsReportSearch(anyString(), anyString(), anyString())).thenReturn(List.of(submitEvent));
-        var listingDataResult = (RespondentsReportData) reportDataService
+        RespondentsReportData listingDataResult = (RespondentsReportData) reportDataService
                 .generateReportData(listingDetails, "authToken");
         assertEquals("name", listingDataResult.getDocumentName());
         assertEquals(RESPONDENTS_REPORT, listingDataResult.getReportType());
@@ -371,16 +371,16 @@ public class ReportDataServiceTest {
         listingDetails.getCaseData().setListingDateFrom("2021-12-03");
         listingDetails.getCaseData().setListingDateTo("2021-12-18");
 
-        var submitEvent = new ClaimsByHearingVenueSubmitEvent();
+        ClaimsByHearingVenueSubmitEvent submitEvent = new ClaimsByHearingVenueSubmitEvent();
         submitEvent.setCaseData(new ClaimsByHearingVenueCaseData());
 
         when(ccdClient.claimsByHearingVenueSearch(anyString(), anyString(), anyString()))
                 .thenReturn(List.of(submitEvent));
-        var userDetails = new UserDetails();
+        UserDetails userDetails = new UserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);
 
-        var listingDataResult = (ClaimsByHearingVenueReportData) reportDataService.generateReportData(listingDetails,
-                "authToken");
+        ClaimsByHearingVenueReportData listingDataResult =
+            (ClaimsByHearingVenueReportData) reportDataService.generateReportData(listingDetails, "authToken");
         assertEquals(CLAIMS_BY_HEARING_VENUE_REPORT, listingDataResult.getDocumentName());
         assertEquals(CLAIMS_BY_HEARING_VENUE_REPORT, listingDataResult.getReportType());
         assertEquals(RANGE_HEARING_DATE_TYPE, listingDataResult.getHearingDateType());
@@ -400,10 +400,10 @@ public class ReportDataServiceTest {
         listingDetails.getCaseData().setListingDate("2021-07-13");
         listingDetails.getCaseData().setListingDateFrom("2021-07-12");
         listingDetails.getCaseData().setListingDateTo("2021-07-14");
-        var submitEvent = new SessionDaysSubmitEvent();
+        SessionDaysSubmitEvent submitEvent = new SessionDaysSubmitEvent();
         submitEvent.setCaseData(new SessionDaysCaseData());
         when(ccdClient.sessionDaysSearch(anyString(), anyString(), anyString())).thenReturn(List.of(submitEvent));
-        var listingDataResult = (SessionDaysReportData)reportDataService
+        SessionDaysReportData listingDataResult = (SessionDaysReportData)reportDataService
                 .generateReportData(listingDetails, "authToken");
         assertEquals("name", listingDataResult.getDocumentName());
         assertEquals(SESSION_DAYS_REPORT, listingDataResult.getReportType());
@@ -424,10 +424,11 @@ public class ReportDataServiceTest {
         listingDetails.getCaseData().setListingDate("2021-07-13");
         listingDetails.getCaseData().setListingDateFrom("2021-07-12");
         listingDetails.getCaseData().setListingDateTo("2021-07-14");
-        var submitEvent = new EccReportSubmitEvent();
+        EccReportSubmitEvent submitEvent = new EccReportSubmitEvent();
         submitEvent.setCaseData(new EccReportCaseData());
         when(ccdClient.eccReportSearch(anyString(), anyString(), anyString())).thenReturn(List.of(submitEvent));
-        var listingDataResult = (EccReportData) reportDataService.generateReportData(listingDetails, "authToken");
+        EccReportData listingDataResult = (EccReportData) reportDataService.generateReportData(listingDetails,
+            "authToken");
         assertEquals("name", listingDataResult.getDocumentName());
         assertEquals(ECC_REPORT, listingDataResult.getReportType());
         assertEquals("Ranged", listingDataResult.getHearingDateType());
@@ -447,11 +448,11 @@ public class ReportDataServiceTest {
         listingDetails.getCaseData().setListingDate("2021-07-13");
         listingDetails.getCaseData().setListingDateFrom("2021-07-12");
         listingDetails.getCaseData().setListingDateTo("2021-07-14");
-        var submitEvent = new HearingsByHearingTypeSubmitEvent();
+        HearingsByHearingTypeSubmitEvent submitEvent = new HearingsByHearingTypeSubmitEvent();
         submitEvent.setCaseData(new HearingsByHearingTypeCaseData());
         when(ccdClient.hearingsByHearingTypeSearch(anyString(), anyString(), anyString()))
                 .thenReturn(List.of(submitEvent));
-        var listingDataResult = (HearingsByHearingTypeReportData)reportDataService
+        HearingsByHearingTypeReportData listingDataResult = (HearingsByHearingTypeReportData)reportDataService
                 .generateReportData(listingDetails, "authToken");
         assertEquals("name", listingDataResult.getDocumentName());
         assertEquals(HEARINGS_BY_HEARING_TYPE_REPORT, listingDataResult.getReportType());

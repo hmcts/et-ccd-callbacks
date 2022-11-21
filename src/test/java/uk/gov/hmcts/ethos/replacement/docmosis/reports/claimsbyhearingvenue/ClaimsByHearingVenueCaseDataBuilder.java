@@ -45,7 +45,7 @@ public class ClaimsByHearingVenueCaseDataBuilder {
     }
 
     public ClaimsByHearingVenueSubmitEvent buildAsSubmitEvent(String state) {
-        var submitEvent = new ClaimsByHearingVenueSubmitEvent();
+        ClaimsByHearingVenueSubmitEvent submitEvent = new ClaimsByHearingVenueSubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(state);
         return submitEvent;

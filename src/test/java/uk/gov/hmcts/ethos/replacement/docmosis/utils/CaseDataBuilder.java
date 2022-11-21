@@ -174,8 +174,8 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withJudgment() {
-        var judgementType = new JudgementType();
-        var judgementTypeItem = new JudgementTypeItem();
+        JudgementType judgementType = new JudgementType();
+        JudgementTypeItem judgementTypeItem = new JudgementTypeItem();
         judgementTypeItem.setValue(judgementType);
 
         if (caseData.getJudgementCollection() == null) {
@@ -200,10 +200,10 @@ public class CaseDataBuilder {
         if (caseData.getEccCases() == null) {
             caseData.setEccCases(new ArrayList<>());
         }
-        var eccCases = caseData.getEccCases();
-        var eccCase = new EccCounterClaimType();
+        List<EccCounterClaimTypeItem> eccCases = caseData.getEccCases();
+        EccCounterClaimType eccCase = new EccCounterClaimType();
         eccCase.setCounterClaim(ethosCaseReference);
-        var eccCaseItem = new EccCounterClaimTypeItem();
+        EccCounterClaimTypeItem eccCaseItem = new EccCounterClaimTypeItem();
         eccCaseItem.setValue(eccCase);
         eccCases.add(eccCaseItem);
 
@@ -223,9 +223,9 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withBfAction(String cleared) {
-        var bfAction = new BFActionType();
+        BFActionType bfAction = new BFActionType();
         bfAction.setCleared(cleared);
-        var bfActionItem = new BFActionTypeItem();
+        BFActionTypeItem bfActionItem = new BFActionTypeItem();
         bfActionItem.setValue(bfAction);
 
         caseData.setBfActions(List.of(bfActionItem));
@@ -237,7 +237,7 @@ public class CaseDataBuilder {
     }
 
     public SubmitEvent buildAsSubmitEvent(String state) {
-        var submitEvent = new SubmitEvent();
+        SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(state);
 
@@ -249,7 +249,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDetails buildAsCaseDetails(String caseTypeId, String jurisdiction) {
-        var caseDetails = new CaseDetails();
+        CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(caseTypeId);
         caseDetails.setJurisdiction(jurisdiction);
         caseDetails.setCaseData(caseData);

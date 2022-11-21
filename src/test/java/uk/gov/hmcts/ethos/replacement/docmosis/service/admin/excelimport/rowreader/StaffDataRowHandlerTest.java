@@ -19,10 +19,10 @@ class StaffDataRowHandlerTest {
 
     @Test
     void testAcceptRowFirstHandlerAccepts() {
-        var handler1 = mockRowHandler(true);
-        var handler2 = mockRowHandler(false);
-        var staffDataRowHandler = new StaffDataRowHandler(List.of(handler1, handler2));
-        var row = mock(Row.class);
+        RowHandler handler1 = mockRowHandler(true);
+        RowHandler handler2 = mockRowHandler(false);
+        StaffDataRowHandler staffDataRowHandler = new StaffDataRowHandler(List.of(handler1, handler2));
+        Row row = mock(Row.class);
 
         assertTrue(staffDataRowHandler.accept(row));
 
@@ -32,10 +32,10 @@ class StaffDataRowHandlerTest {
 
     @Test
     void testAcceptRowSecondHandlerAccepts() {
-        var handler1 = mockRowHandler(false);
-        var handler2 = mockRowHandler(true);
-        var staffDataRowHandler = new StaffDataRowHandler(List.of(handler1, handler2));
-        var row = mock(Row.class);
+        RowHandler handler1 = mockRowHandler(false);
+        RowHandler handler2 = mockRowHandler(true);
+        StaffDataRowHandler staffDataRowHandler = new StaffDataRowHandler(List.of(handler1, handler2));
+        Row row = mock(Row.class);
 
         assertTrue(staffDataRowHandler.accept(row));
 
@@ -45,10 +45,10 @@ class StaffDataRowHandlerTest {
 
     @Test
     void testAcceptRowNoneAccepts() {
-        var handler1 = mockRowHandler(false);
-        var handler2 = mockRowHandler(false);
-        var staffDataRowHandler = new StaffDataRowHandler(List.of(handler1, handler2));
-        var row = mock(Row.class);
+        RowHandler handler1 = mockRowHandler(false);
+        RowHandler handler2 = mockRowHandler(false);
+        StaffDataRowHandler staffDataRowHandler = new StaffDataRowHandler(List.of(handler1, handler2));
+        Row row = mock(Row.class);
 
         assertFalse(staffDataRowHandler.accept(row));
 
@@ -58,10 +58,10 @@ class StaffDataRowHandlerTest {
 
     @Test
     void testHandleFirstHandlerAccepts() {
-        var handler1 = mockRowHandler(true);
-        var handler2 = mockRowHandler(false);
-        var staffDataRowHandler = new StaffDataRowHandler(List.of(handler1, handler2));
-        var row = mock(Row.class);
+        RowHandler handler1 = mockRowHandler(true);
+        RowHandler handler2 = mockRowHandler(false);
+        StaffDataRowHandler staffDataRowHandler = new StaffDataRowHandler(List.of(handler1, handler2));
+        Row row = mock(Row.class);
 
         staffDataRowHandler.handle(TribunalOffice.ABERDEEN, row);
 
@@ -71,10 +71,10 @@ class StaffDataRowHandlerTest {
 
     @Test
     void testHandleSecondHandlerAccepts() {
-        var handler1 = mockRowHandler(false);
-        var handler2 = mockRowHandler(true);
-        var staffDataRowHandler = new StaffDataRowHandler(List.of(handler1, handler2));
-        var row = mock(Row.class);
+        RowHandler handler1 = mockRowHandler(false);
+        RowHandler handler2 = mockRowHandler(true);
+        StaffDataRowHandler staffDataRowHandler = new StaffDataRowHandler(List.of(handler1, handler2));
+        Row row = mock(Row.class);
 
         staffDataRowHandler.handle(TribunalOffice.ABERDEEN, row);
 
@@ -84,10 +84,10 @@ class StaffDataRowHandlerTest {
 
     @Test
     void testHandleNoneAccepts() {
-        var handler1 = mockRowHandler(false);
-        var handler2 = mockRowHandler(false);
-        var staffDataRowHandler = new StaffDataRowHandler(List.of(handler1, handler2));
-        var row = mock(Row.class);
+        RowHandler handler1 = mockRowHandler(false);
+        RowHandler handler2 = mockRowHandler(false);
+        StaffDataRowHandler staffDataRowHandler = new StaffDataRowHandler(List.of(handler1, handler2));
+        Row row = mock(Row.class);
 
         staffDataRowHandler.handle(TribunalOffice.ABERDEEN, row);
 
@@ -96,7 +96,7 @@ class StaffDataRowHandlerTest {
     }
 
     private RowHandler mockRowHandler(boolean accept) {
-        var handler = mock(RowHandler.class);
+        RowHandler handler = mock(RowHandler.class);
         when(handler.accept(isA(Row.class))).thenReturn(accept);
         return handler;
     }

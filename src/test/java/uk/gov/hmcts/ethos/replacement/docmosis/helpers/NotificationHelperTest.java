@@ -61,9 +61,9 @@ public class NotificationHelperTest {
     public void buildMapForClaimant_withRepresentedClaimant_shouldReturnClaimantRepDetails() {
         Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
 
-        assertThat(actual.get("emailAddress")).isEqualTo("claimant@represented.com");
-        assertThat(actual.get("name")).isEqualTo("C Rep");
-        assertThat(actual.get("caseNumber")).isEqualTo("12345/6789");
+        assertThat(actual).containsEntry("emailAddress", "claimant@represented.com")
+            .containsEntry("name", "C Rep")
+            .containsEntry("caseNumber", "12345/6789");
     }
 
     @Test
@@ -71,9 +71,9 @@ public class NotificationHelperTest {
         caseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(null);
         Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
 
-        assertThat(actual.get("emailAddress")).isEqualTo("");
-        assertThat(actual.get("name")).isEqualTo("C Rep");
-        assertThat(actual.get("caseNumber")).isEqualTo("12345/6789");
+        assertThat(actual).containsEntry("emailAddress", "")
+            .containsEntry("name", "C Rep")
+            .containsEntry("caseNumber", "12345/6789");
     }
 
     @Test
@@ -81,9 +81,9 @@ public class NotificationHelperTest {
         caseData.setRepresentativeClaimantType(null);
         Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
 
-        assertThat(actual.get("emailAddress")).isEqualTo("claimant@unrepresented.com");
-        assertThat(actual.get("name")).isEqualTo("Mr LastName");
-        assertThat(actual.get("caseNumber")).isEqualTo("12345/6789");
+        assertThat(actual).containsEntry("emailAddress", "claimant@unrepresented.com")
+            .containsEntry("name", "Mr LastName")
+            .containsEntry("caseNumber", "12345/6789");
     }
 
     @Test
@@ -92,9 +92,9 @@ public class NotificationHelperTest {
         caseData.getClaimantIndType().setClaimantTitle(null);
         Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
 
-        assertThat(actual.get("emailAddress")).isEqualTo("claimant@unrepresented.com");
-        assertThat(actual.get("name")).isEqualTo("Mr LastName");
-        assertThat(actual.get("caseNumber")).isEqualTo("12345/6789");
+        assertThat(actual).containsEntry("emailAddress", "claimant@unrepresented.com")
+            .containsEntry("name", "Mr LastName")
+            .containsEntry("caseNumber", "12345/6789");
     }
 
     @Test
@@ -104,9 +104,9 @@ public class NotificationHelperTest {
         caseData.getClaimantIndType().setClaimantPreferredTitle(null);
         Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
 
-        assertThat(actual.get("emailAddress")).isEqualTo("claimant@unrepresented.com");
-        assertThat(actual.get("name")).isEqualTo("C LastName");
-        assertThat(actual.get("caseNumber")).isEqualTo("12345/6789");
+        assertThat(actual).containsEntry("emailAddress", "claimant@unrepresented.com")
+            .containsEntry("name", "C LastName")
+            .containsEntry("caseNumber", "12345/6789");
     }
 
     @Test
@@ -115,9 +115,9 @@ public class NotificationHelperTest {
         RespondentSumType unrepresentedRespondent = respondents.get(0).getValue();
         Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseDetails, unrepresentedRespondent);
 
-        assertThat(actual.get("emailAddress")).isEqualTo("respondent@unrepresented.com");
-        assertThat(actual.get("name")).isEqualTo("Respondent Unrepresented");
-        assertThat(actual.get("caseNumber")).isEqualTo("12345/6789");
+        assertThat(actual).containsEntry("emailAddress", "respondent@unrepresented.com")
+            .containsEntry("name", "Respondent Unrepresented")
+            .containsEntry("caseNumber", "12345/6789");
     }
 
     @Test
@@ -126,9 +126,9 @@ public class NotificationHelperTest {
         RespondentSumType representedRespondent = respondents.get(1).getValue();
         Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseDetails, representedRespondent);
 
-        assertThat(actual.get("emailAddress")).isEqualTo("res@rep.com");
-        assertThat(actual.get("name")).isEqualTo("R LastName");
-        assertThat(actual.get("caseNumber")).isEqualTo("12345/6789");
+        assertThat(actual).containsEntry("emailAddress", "res@rep.com")
+            .containsEntry("name", "R LastName")
+            .containsEntry("caseNumber", "12345/6789");
     }
 
     @Test
@@ -138,9 +138,9 @@ public class NotificationHelperTest {
         caseData.getRepCollection().get(0).getValue().setRepresentativeEmailAddress(null);
         Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseDetails, representedRespondent);
 
-        assertThat(actual.get("emailAddress")).isEqualTo("");
-        assertThat(actual.get("name")).isEqualTo("R LastName");
-        assertThat(actual.get("caseNumber")).isEqualTo("12345/6789");
+        assertThat(actual).containsEntry("emailAddress", "")
+            .containsEntry("name", "R LastName")
+            .containsEntry("caseNumber", "12345/6789");
     }
 
     @Test
@@ -150,8 +150,8 @@ public class NotificationHelperTest {
         unrepresentedRespondent.setRespondentEmail(null);
         Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseDetails, unrepresentedRespondent);
 
-        assertThat(actual.get("emailAddress")).isEqualTo("");
-        assertThat(actual.get("name")).isEqualTo("Respondent Unrepresented");
-        assertThat(actual.get("caseNumber")).isEqualTo("12345/6789");
+        assertThat(actual).containsEntry("emailAddress", "")
+            .containsEntry("name", "Respondent Unrepresented")
+            .containsEntry("caseNumber", "12345/6789");
     }
 }

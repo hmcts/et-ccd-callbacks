@@ -38,7 +38,7 @@ class TimeToFirstHearingReportTest {
     void setup() {
         listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        var caseData = new ListingData();
+        ListingData caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName());
         listingDetails.setCaseData(caseData);
 
@@ -140,7 +140,7 @@ class TimeToFirstHearingReportTest {
     @Test
     void checkReportOffice_EngWales() {
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
-        var reportData = timeToFirstHearingReport.generateReportData(listingDetails, submitEvents);
+        ListingData reportData = timeToFirstHearingReport.generateReportData(listingDetails, submitEvents);
         assertEquals(reportData.getLocalReportsDetailHdr().getReportOffice(), TribunalOffice.LEEDS.getOfficeName());
     }
 
@@ -148,7 +148,7 @@ class TimeToFirstHearingReportTest {
     void checkReportOffice_Scotland() {
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
-        var reportData = timeToFirstHearingReport.generateReportData(listingDetails, submitEvents);
+        ListingData reportData = timeToFirstHearingReport.generateReportData(listingDetails, submitEvents);
         assertEquals(reportData.getLocalReportsDetailHdr().getReportOffice(), TribunalOffice.SCOTLAND.getOfficeName());
     }
 

@@ -58,7 +58,7 @@ public class RespondentsReportCaseDataBuilder {
     }
 
     public RespondentsReportSubmitEvent buildAsSubmitEvent() {
-        var submitEvent = new RespondentsReportSubmitEvent();
+        RespondentsReportSubmitEvent submitEvent = new RespondentsReportSubmitEvent();
         caseData.setEthosCaseReference("111");
         submitEvent.setCaseData(caseData);
         return submitEvent;

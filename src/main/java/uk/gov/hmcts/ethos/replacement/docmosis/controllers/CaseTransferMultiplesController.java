@@ -13,11 +13,15 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferOfficeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.MultipleTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.MultipleTransferSameCountryService;
+
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -64,7 +68,7 @@ public class CaseTransferMultiplesController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var multipleData = multipleRequest.getCaseDetails().getCaseData();
+        MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();
         CaseTransferOfficeService.populateTransferToEnglandWalesOfficeOptions(multipleData);
 
         return ResponseEntity.ok(MultipleCallbackResponse.builder()
@@ -91,7 +95,7 @@ public class CaseTransferMultiplesController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var multipleData = multipleRequest.getCaseDetails().getCaseData();
+        MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();
         CaseTransferOfficeService.populateTransferToScotlandOfficeOptions(multipleData);
 
         return ResponseEntity.ok(MultipleCallbackResponse.builder()
@@ -120,8 +124,8 @@ public class CaseTransferMultiplesController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var multipleDetails = multipleRequest.getCaseDetails();
-        var errors = multipleTransferSameCountryService.transferMultiple(multipleDetails, userToken);
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
+        List<String> errors = multipleTransferSameCountryService.transferMultiple(multipleDetails, userToken);
 
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
@@ -148,8 +152,8 @@ public class CaseTransferMultiplesController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var multipleDetails = multipleRequest.getCaseDetails();
-        var errors = multipleTransferDifferentCountryService.transferMultiple(multipleDetails, userToken);
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
+        List<String> errors = multipleTransferDifferentCountryService.transferMultiple(multipleDetails, userToken);
 
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }

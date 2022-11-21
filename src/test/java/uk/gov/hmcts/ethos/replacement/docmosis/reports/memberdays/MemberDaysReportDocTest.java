@@ -30,7 +30,7 @@ public class MemberDaysReportDocTest {
 
     @Test(expected = IllegalStateException.class)
     public void shouldThrowException() {
-        var nonMemberDaysReportDocListingData = new ListingData();
+        ListingData nonMemberDaysReportDocListingData = new ListingData();
         memberDaysReportDoc.getReportDocPart(nonMemberDaysReportDocListingData);
     }
 
@@ -74,7 +74,7 @@ public class MemberDaysReportDocTest {
             .append(nullCheck(detailItem.getHearingType())).append(NEW_LINE);
         expectedDetailRowContent.append("\"Hearing_Clerk\":\"")
             .append(nullCheck(detailItem.getHearingClerk())).append(NEW_LINE);
-        var durationInMinutes = Double.parseDouble(detailItem.getHearingDuration());
+        double durationInMinutes = Double.parseDouble(detailItem.getHearingDuration());
         expectedDetailRowContent.append("\"Hearing_Duration\":\"")
             .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))))
             .append("\"\n");
@@ -107,7 +107,7 @@ public class MemberDaysReportDocTest {
         expectedDetailRowContent.append("\"Total_Half_Days\":\"").append(NEW_LINE);
         expectedDetailRowContent.append("\"Total_Days\":\"").append(NEW_LINE);
 
-        var memberDaySummaryItem = new MemberDaySummaryItem();
+        MemberDaySummaryItem memberDaySummaryItem = new MemberDaySummaryItem();
         memberDaySummaryItem.setHearingDate("15 September 2021");
         memberDaySummaryItem.setFullDays("2");
         memberDaySummaryItem.setHalfDays("0");
@@ -138,7 +138,7 @@ public class MemberDaysReportDocTest {
             .append(nullCheck(detailItem.getHearingType())).append(NEW_LINE);
         expectedDetailRowContent.append("\"Hearing_Clerk\":\"")
             .append(nullCheck(detailItem.getHearingClerk())).append(NEW_LINE);
-        var durationInMinutes = Double.parseDouble(detailItem.getHearingDuration());
+        double durationInMinutes = Double.parseDouble(detailItem.getHearingDuration());
         expectedDetailRowContent.append("\"Hearing_Duration\":\"")
             .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))))
             .append("\"\n");
@@ -160,7 +160,7 @@ public class MemberDaysReportDocTest {
         detailItem.setHearingClerk("Tester Clerk");
         detailItem.setHearingDuration("420");
 
-        var memberDaySummaryItem = new MemberDaySummaryItem();
+        MemberDaySummaryItem memberDaySummaryItem = new MemberDaySummaryItem();
         memberDaySummaryItem.setHearingDate("15 September 2021");
         memberDaySummaryItem.setFullDays("2");
         memberDaySummaryItem.setHalfDays("0");
@@ -205,7 +205,7 @@ public class MemberDaysReportDocTest {
             .append(nullCheck(detailItem.getHearingType())).append(NEW_LINE);
         expectedDetailRowContent.append("\"Hearing_Clerk\":\"")
             .append(nullCheck(detailItem.getHearingClerk())).append(NEW_LINE);
-        var durationInMinutes = Double.parseDouble(detailItem.getHearingDuration());
+        double durationInMinutes = Double.parseDouble(detailItem.getHearingDuration());
         expectedDetailRowContent.append("\"Hearing_Duration\":\"")
             .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))))
             .append("\"\n");

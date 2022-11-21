@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
+import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingRequest;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
@@ -637,14 +638,14 @@ class EventValidationServiceTest {
 
     @Test
     void shouldCreateErrorMessageWithDatesInFutureWithinJudgement() {
-        var judgementTypeItem = new JudgementTypeItem();
-        var judgementType = new JudgementType();
+        JudgementTypeItem judgementTypeItem = new JudgementTypeItem();
+        JudgementType judgementType = new JudgementType();
         judgementTypeItem.setId(UUID.randomUUID().toString());
         judgementType.setDateJudgmentMade("2777-01-01");
         judgementType.setDateJudgmentSent("2777-01-01");
         judgementTypeItem.setValue(judgementType);
 
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setJudgementCollection(List.of(judgementTypeItem));
         List<String> errors = eventValidationService.validateJudgementDates(caseData);
         assertEquals("Date of Judgement Made can't be in future", errors.get(0));
@@ -653,14 +654,14 @@ class EventValidationServiceTest {
 
     @Test
     void shouldNotCreateErrorMessageWithDatesBeforeTodayWithinJudgement() {
-        var judgementTypeItem = new JudgementTypeItem();
-        var judgementType = new JudgementType();
+        JudgementTypeItem judgementTypeItem = new JudgementTypeItem();
+        JudgementType judgementType = new JudgementType();
         judgementTypeItem.setId(UUID.randomUUID().toString());
         judgementType.setDateJudgmentMade("2020-01-01");
         judgementType.setDateJudgmentSent("2021-12-01");
         judgementTypeItem.setValue(judgementType);
 
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setJudgementCollection(List.of(judgementTypeItem));
         List<String> errors = eventValidationService.validateJudgementDates(caseData);
         assertEquals(0, errors.size());
@@ -678,8 +679,8 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateReportDateRangeValidDates() {
 
-        var listingsCase = listingRequestValidDateRange.getCaseDetails().getCaseData();
-        var errors = eventValidationService.validateListingDateRange(
+        ListingData listingsCase = listingRequestValidDateRange.getCaseDetails().getCaseData();
+        List<String> errors = eventValidationService.validateListingDateRange(
                 listingsCase.getListingDateFrom(),
                 listingsCase.getListingDateTo()
         );
@@ -689,8 +690,8 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateReportDateRangeValidDates_30Days() {
 
-        var listingsCase = listingRequest30DaysValidRange.getCaseDetails().getCaseData();
-        var errors = eventValidationService.validateListingDateRange(
+        ListingData listingsCase = listingRequest30DaysValidRange.getCaseDetails().getCaseData();
+        List<String> errors = eventValidationService.validateListingDateRange(
                 listingsCase.getListingDateFrom(),
                 listingsCase.getListingDateTo()
         );
@@ -700,8 +701,8 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateReportDateRangeInvalidDates() {
 
-        var listingsCase = listingRequestInvalidDateRange.getCaseDetails().getCaseData();
-        var errors = eventValidationService.validateListingDateRange(
+        ListingData listingsCase = listingRequestInvalidDateRange.getCaseDetails().getCaseData();
+        List<String> errors = eventValidationService.validateListingDateRange(
                 listingsCase.getListingDateFrom(),
                 listingsCase.getListingDateTo()
         );
@@ -712,8 +713,8 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateReportDateRangeInvalidDates_31Days() {
 
-        var listingsCase = listingRequest31DaysInvalidRange.getCaseDetails().getCaseData();
-        var errors = eventValidationService.validateListingDateRange(
+        ListingData listingsCase = listingRequest31DaysInvalidRange.getCaseDetails().getCaseData();
+        List<String> errors = eventValidationService.validateListingDateRange(
                 listingsCase.getListingDateFrom(),
                 listingsCase.getListingDateTo()
         );
@@ -748,7 +749,7 @@ class EventValidationServiceTest {
     @Test
     void shouldReturnsNoErrorsForHearingHearingStatusValidationWithNoHearings() {
         List<String> errors = new ArrayList<>();
-        var caseWithNoHearings = validHearingStatusCaseCloseEventCaseDetails.getCaseData();
+        CaseData caseWithNoHearings = validHearingStatusCaseCloseEventCaseDetails.getCaseData();
         caseWithNoHearings.getHearingCollection().clear();
         eventValidationService.validateHearingStatusForCaseCloseEvent(caseWithNoHearings, errors);
         assertEquals(0, errors.size());
@@ -757,7 +758,7 @@ class EventValidationServiceTest {
     @Test
     void shouldPassCaseCloseEventValidationCaseWithNoListedHearingStatus() {
         List<String> errors = new ArrayList<>();
-        var validCase = validHearingStatusCaseCloseEventCaseDetails.getCaseData();
+        CaseData validCase = validHearingStatusCaseCloseEventCaseDetails.getCaseData();
         eventValidationService.validateHearingStatusForCaseCloseEvent(validCase, errors);
         assertEquals(0, errors.size());
     }
@@ -765,7 +766,7 @@ class EventValidationServiceTest {
     @Test
     void shouldFailCaseCloseEventValidationCaseWithListedHearingStatus() {
         List<String> errors = new ArrayList<>();
-        var invalidCase = invalidHearingStatusCaseCloseEventCaseDetails.getCaseData();
+        CaseData invalidCase = invalidHearingStatusCaseCloseEventCaseDetails.getCaseData();
         eventValidationService.validateHearingStatusForCaseCloseEvent(invalidCase, errors);
         assertEquals(1, errors.size());
         assertEquals(CLOSING_LISTED_CASE_ERROR, errors.get(0));
@@ -774,7 +775,7 @@ class EventValidationServiceTest {
     @Test
     void shouldPassHearingJudgeAllocationValidationForCaseCloseEventHearingWithJudge() {
         List<String> errors = new ArrayList<>();
-        var validCase = validJudgeAllocationCaseDetails.getCaseData();
+        CaseData validCase = validJudgeAllocationCaseDetails.getCaseData();
         eventValidationService.validateHearingJudgeAllocationForCaseCloseEvent(validCase, errors);
         assertEquals(0, errors.size());
     }
@@ -782,7 +783,7 @@ class EventValidationServiceTest {
     @Test
     void shouldFailHearingJudgeAllocationValidationForCaseCloseEventHearingWithNoJudge() {
         List<String> errors = new ArrayList<>();
-        var invalidCase = invalidJudgeAllocationCaseDetails.getCaseData();
+        CaseData invalidCase = invalidJudgeAllocationCaseDetails.getCaseData();
         eventValidationService.validateHearingJudgeAllocationForCaseCloseEvent(invalidCase, errors);
         assertThat(errors)
                 .hasSize(1);
@@ -793,7 +794,7 @@ class EventValidationServiceTest {
     @Test
     void shouldReturnsNoErrorsForHearingJudgeAllocationValidationWithNoHearings() {
         List<String> errors = new ArrayList<>();
-        var caseWithNoHearings = invalidJudgeAllocationCaseDetails.getCaseData();
+        CaseData caseWithNoHearings = invalidJudgeAllocationCaseDetails.getCaseData();
         caseWithNoHearings.getHearingCollection().clear();
         eventValidationService.validateHearingJudgeAllocationForCaseCloseEvent(caseWithNoHearings, errors);
         assertThat(errors)

@@ -139,7 +139,7 @@ public class DocumentManagementServiceTest {
 
     @Test
     public void getDocumentUUID() {
-        var urlString = "http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary";
+        String urlString = "http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary";
         assertEquals("85d97996-22a5-40d7-882e-3a382c8ae1b4", documentManagementService.getDocumentUUID(urlString));
     }
 

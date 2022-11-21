@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays;
 
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
@@ -19,7 +20,7 @@ public final class SessionDaysElasticSearchQuery {
     }
 
     static String create(String dateToSearchFrom, String dateToSearchTo, String managingOffice) {
-        var boolQueryBuilder = boolQuery()
+        BoolQueryBuilder boolQueryBuilder = boolQuery()
                 .must(new ExistsQueryBuilder(ELASTICSEARCH_FIELD_HEARING_COLLECTION))
                 .filter(new RangeQueryBuilder(ELASTICSEARCH_FIELD_HEARING_LISTED_DATE
                 ).gte(dateToSearchFrom).lte(dateToSearchTo));

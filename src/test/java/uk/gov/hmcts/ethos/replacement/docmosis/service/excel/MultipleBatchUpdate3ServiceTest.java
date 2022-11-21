@@ -144,10 +144,10 @@ public class MultipleBatchUpdate3ServiceTest {
                 .generateDynamicList("Respondent Rep"));
         multipleDetails.getCaseData().setBatchRemoveRespondentRep(YES);
         multipleDetails.getCaseData().setBatchUpdateCase("245000/2020");
-        var representedTypeR = RepresentedTypeR.builder()
+        RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
             .respRepName("Andrew Smith")
             .nameOfRepresentative("Respondent Rep").build();
-        var representedTypeRItem = new RepresentedTypeRItem();
+        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId("Respondent Rep");
         representedTypeRItem.setValue(representedTypeR);
         submitEvents.get(0).getCaseData().setRepCollection(

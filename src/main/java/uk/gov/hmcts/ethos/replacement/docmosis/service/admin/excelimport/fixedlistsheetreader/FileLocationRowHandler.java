@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedl
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -18,17 +19,17 @@ public class FileLocationRowHandler {
     private final FileLocationRepository fileLocationRepository;
 
     public boolean accept(TribunalOffice tribunalOffice, Row row) {
-        var cell = row.getCell(0);
+        Cell cell = row.getCell(0);
         if (cell == null) {
             return false;
         }
 
-        var expectedRowId = getRowId(tribunalOffice);
+        String expectedRowId = getRowId(tribunalOffice);
         return expectedRowId.equals(cell.getStringCellValue());
     }
 
     public void handle(TribunalOffice tribunalOffice, Row row) {
-        var fileLocation = rowToFileLocation(tribunalOffice, row);
+        FileLocation fileLocation = rowToFileLocation(tribunalOffice, row);
         log.info("File location " + fileLocation.getCode());
         fileLocationRepository.save(fileLocation);
     }
@@ -42,10 +43,10 @@ public class FileLocationRowHandler {
     }
 
     private FileLocation rowToFileLocation(TribunalOffice tribunalOffice, Row row) {
-        var code = row.getCell(1).getStringCellValue();
-        var name = row.getCell(2).getStringCellValue();
+        String code = row.getCell(1).getStringCellValue();
+        String name = row.getCell(2).getStringCellValue();
 
-        var fileLocation = new FileLocation();
+        FileLocation fileLocation = new FileLocation();
         fileLocation.setCode(code);
         fileLocation.setName(name);
         fileLocation.setTribunalOffice(tribunalOffice);

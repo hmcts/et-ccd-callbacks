@@ -120,7 +120,7 @@ public class ReferenceServiceTest {
         referenceSubmitEventsNoJudges.add(referenceSubmitEvent4);
         referenceSubmitEventsNoJudges.add(referenceSubmitEvent5);
 
-        var referenceDetails = new ReferenceDetails();
+        ReferenceDetails referenceDetails = new ReferenceDetails();
         referenceDetails.setCaseData(referenceData6);
         referenceDetails.setJurisdiction("EMPLOYMENT");
     }

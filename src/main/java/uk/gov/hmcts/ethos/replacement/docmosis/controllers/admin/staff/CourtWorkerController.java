@@ -179,7 +179,7 @@ public class CourtWorkerController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
-        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = courtWorkerService.deleteCourtWorker(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);

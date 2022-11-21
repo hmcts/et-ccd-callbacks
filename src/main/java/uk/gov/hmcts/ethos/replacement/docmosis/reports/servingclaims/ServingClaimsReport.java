@@ -35,10 +35,10 @@ public class ServingClaimsReport {
     }
 
     private void initReport(ListingDetails listingDetails) {
-        var listingData = listingDetails.getCaseData();
-        var managingOffice = listingDetails.getCaseData().getManagingOffice();
-        var reportOffice = ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), managingOffice);
-        var adhocReportType = new AdhocReportType();
+        ListingData listingData = listingDetails.getCaseData();
+        String managingOffice = listingDetails.getCaseData().getManagingOffice();
+        String reportOffice = ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), managingOffice);
+        AdhocReportType adhocReportType = new AdhocReportType();
         adhocReportType.setReportOffice(reportOffice);
         listingData.setLocalReportsDetailHdr(adhocReportType);
         listingData.setLocalReportsDetail(new ArrayList<>());
@@ -50,23 +50,23 @@ public class ServingClaimsReport {
     }
 
     private void populateLocalReportDetail(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
-        var adhocReportTypeItem = new AdhocReportTypeItem();
-        var adhocReportType = new AdhocReportType();
+        AdhocReportTypeItem adhocReportTypeItem = new AdhocReportTypeItem();
+        AdhocReportType adhocReportType = new AdhocReportType();
         adhocReportType.setClaimServedItems(new ArrayList<>());
 
         if (CollectionUtils.isNotEmpty(submitEvents)) {
-            for (var submitEvent : submitEvents) {
+            for (SubmitEvent submitEvent : submitEvents) {
                 setLocalReportsDetail(adhocReportType, submitEvent.getCaseData());
             }
         }
 
         adhocReportTypeItem.setValue(adhocReportType);
 
-        var servedClaimItemsCount = adhocReportType.getClaimServedItems().size();
+        int servedClaimItemsCount = adhocReportType.getClaimServedItems().size();
         adhocReportType.setClaimServedTotal(String.valueOf(servedClaimItemsCount));
 
-        var listingData = listingDetails.getCaseData();
-        var reportsDetails = listingData.getLocalReportsDetail();
+        ListingData listingData = listingDetails.getCaseData();
+        List<AdhocReportTypeItem> reportsDetails = listingData.getLocalReportsDetail();
         reportsDetails.add(adhocReportTypeItem);
         listingDetails.getCaseData().setLocalReportsDetail(reportsDetails);
     }
@@ -77,17 +77,17 @@ public class ServingClaimsReport {
                 && !Strings.isNullOrEmpty(caseData.getClaimServedDate())) {
             LocalDate caseReceiptDate = LocalDate.parse(caseData.getReceiptDate(), OLD_DATE_TIME_PATTERN2);
             LocalDate caseClaimServedDate = LocalDate.parse(caseData.getClaimServedDate(), OLD_DATE_TIME_PATTERN2);
-            var actualNumberOfDaysToServingClaim = getNumberOfDays(caseReceiptDate, caseClaimServedDate) + 1;
-            var reportedNumberOfDaysToServingClaim = getReportedNumberOfDays(caseReceiptDate, caseClaimServedDate);
+            long actualNumberOfDaysToServingClaim = getNumberOfDays(caseReceiptDate, caseClaimServedDate) + 1;
+            long reportedNumberOfDaysToServingClaim = getReportedNumberOfDays(caseReceiptDate, caseClaimServedDate);
 
-            var claimServedType = new ClaimServedType();
+            ClaimServedType claimServedType = new ClaimServedType();
             claimServedType.setReportedNumberOfDays(String.valueOf(reportedNumberOfDaysToServingClaim));
             claimServedType.setActualNumberOfDays(String.valueOf(actualNumberOfDaysToServingClaim));
             claimServedType.setCaseReceiptDate(caseReceiptDate.toString());
             claimServedType.setClaimServedDate(caseClaimServedDate.toString());
             claimServedType.setClaimServedCaseNumber(caseData.getEthosCaseReference());
 
-            var claimServedTypeItem = new ClaimServedTypeItem();
+            ClaimServedTypeItem claimServedTypeItem = new ClaimServedTypeItem();
             claimServedTypeItem.setId(String.valueOf(UUID.randomUUID()));
             claimServedTypeItem.setValue(claimServedType);
 
@@ -103,7 +103,7 @@ public class ServingClaimsReport {
     }
 
     private long getReportedNumberOfDays(LocalDate caseReceiptDate, LocalDate caseClaimServedDate) {
-        var period = getNumberOfDays(caseReceiptDate, caseClaimServedDate);
+        long period = getNumberOfDays(caseReceiptDate, caseClaimServedDate);
         return period >= 5 ? 5 : period;
     }
 
@@ -118,10 +118,10 @@ public class ServingClaimsReport {
     }
 
     private void populateLocalReportSummary(ListingData caseData) {
-        var adhocReportTypeItemsList = caseData.getLocalReportsDetail();
+        List<AdhocReportTypeItem> adhocReportTypeItemsList = caseData.getLocalReportsDetail();
 
         if (CollectionUtils.isNotEmpty(adhocReportTypeItemsList)) {
-            var adhocReportType = adhocReportTypeItemsList.get(0).getValue();
+            AdhocReportType adhocReportType = adhocReportTypeItemsList.get(0).getValue();
 
             for (int dayNumber = 0; dayNumber < 6; dayNumber++) {
                 setServedClaimsDetailsByDay(adhocReportType, dayNumber);
@@ -130,7 +130,7 @@ public class ServingClaimsReport {
     }
 
     private void setServedClaimsDetailsByDay(AdhocReportType adhocReportType, int dayNumber) {
-        var totalServedClaims = getTotalServedClaims(adhocReportType);
+        String totalServedClaims = getTotalServedClaims(adhocReportType);
         setServedClaimsSummary(adhocReportType, totalServedClaims, dayNumber);
     }
 
@@ -142,13 +142,13 @@ public class ServingClaimsReport {
 
     private void setServedClaimsSummary(AdhocReportType adhocReportType, String totalServedClaims,
                                         int dayNumber) {
-        var acceptedClaimItems = getServedClaimItemsByDayNumber(adhocReportType, dayNumber);
-        var acceptedClaimItemsCount = String.valueOf(acceptedClaimItems.size());
+        List<ClaimServedTypeItem> acceptedClaimItems = getServedClaimItemsByDayNumber(adhocReportType, dayNumber);
+        String acceptedClaimItemsCount = String.valueOf(acceptedClaimItems.size());
 
-        var percentage = "0";
+        String percentage = "0";
         if (Integer.parseInt(totalServedClaims) > 0) {
-            var decimalFormatter = new DecimalFormat("#.##");
-            var result = 100.0 * (acceptedClaimItems.size() / Double.parseDouble(totalServedClaims));
+            DecimalFormat decimalFormatter = new DecimalFormat("#.##");
+            double result = 100.0 * (acceptedClaimItems.size() / Double.parseDouble(totalServedClaims));
             percentage = String.valueOf(decimalFormatter.format(result));
         }
 

@@ -1,6 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -20,12 +23,8 @@ class ExcelFileSingleCasesImporter implements SingleCasesImporter {
 
     @Override
     public List<String> importCases(MultipleData multipleData, String authToken) throws ImportException {
-        try {
-            var workbook = getWorkbook(multipleData, authToken);
-            var ethosCaseReferences = getEthosCasesReferences(workbook);
-            workbook.close();
-
-            return ethosCaseReferences;
+        try (XSSFWorkbook workbook = getWorkbook(multipleData, authToken)) {
+            return getEthosCasesReferences(workbook);
         } catch (IOException e) {
             throw new ImportException(String.format("Unexpected error when importing Excel file for multiple %s",
                     multipleData.getMultipleReference()), e);
@@ -33,23 +32,23 @@ class ExcelFileSingleCasesImporter implements SingleCasesImporter {
     }
 
     private XSSFWorkbook getWorkbook(MultipleData multipleData, String authToken) throws IOException {
-        var downloadBinaryUrl = multipleData
+        String downloadBinaryUrl = multipleData
                 .getBulkAddSingleCasesImportFile().getUploadedDocument().getDocumentBinaryUrl();
         return excelReadingService.readWorkbook(authToken, downloadBinaryUrl);
     }
 
     private List<String> getEthosCasesReferences(XSSFWorkbook workbook) {
-        var sheet = workbook.getSheetAt(0);
+        XSSFSheet sheet = workbook.getSheetAt(0);
 
-        var ethosCaseReferences = new ArrayList<String>();
+        List<String> ethosCaseReferences = new ArrayList<>();
 
-        for (var row : sheet) {
+        for (Row row : sheet) {
             // Skip header row
             if (row.getRowNum() == 0) {
                 continue;
             }
-            var cell = row.getCell(0);
-            var ethosReference = cell.getStringCellValue();
+            Cell cell = row.getCell(0);
+            String ethosReference = cell.getStringCellValue();
             if (StringUtils.isNotBlank(ethosReference)) {
                 ethosCaseReferences.add(ethosReference);
             }

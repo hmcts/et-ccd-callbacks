@@ -60,16 +60,17 @@ class CaseTransferDifferentCountryServiceTest {
 
     @Test
     void testCaseTransfer() {
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
-        var caseDetails = createCaseDetails(managingOffice, officeCT, null);
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        CaseDetails caseDetails = createCaseDetails(managingOffice, officeCT, null);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN))
                 .thenReturn(List.of(caseDetails.getCaseData()));
 
-        var errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
+        List<String> errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
 
         assertTrue(errors.isEmpty());
-        verify(caseTransferEventService, times(1)).transfer(caseTransferEventParamsArgumentCaptor.capture());
+        verify(caseTransferEventService, times(1)).transfer(
+            caseTransferEventParamsArgumentCaptor.capture());
 
         verifyCaseTransferEventParams(CLAIMANT_ETHOS_CASE_REFERENCE, CLAIMANT_ETHOS_CASE_REFERENCE, officeCT,
                 caseTransferEventParamsArgumentCaptor.getValue());
@@ -79,17 +80,18 @@ class CaseTransferDifferentCountryServiceTest {
 
     @Test
     void caseTransferSuccessWithBfActionClearedAndHearingHeard() {
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
-        var caseDetails = createCaseDetails(managingOffice, officeCT, HEARING_STATUS_HEARD);
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        CaseDetails caseDetails = createCaseDetails(managingOffice, officeCT, HEARING_STATUS_HEARD);
         addBfAction(caseDetails.getCaseData(), YES);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN))
                 .thenReturn(List.of(caseDetails.getCaseData()));
 
-        var errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
+        List<String> errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
 
         assertTrue(errors.isEmpty());
-        verify(caseTransferEventService, times(1)).transfer(caseTransferEventParamsArgumentCaptor.capture());
+        verify(caseTransferEventService, times(1)).transfer(
+            caseTransferEventParamsArgumentCaptor.capture());
         verifyCaseTransferEventParams(CLAIMANT_ETHOS_CASE_REFERENCE, CLAIMANT_ETHOS_CASE_REFERENCE, officeCT,
                 caseTransferEventParamsArgumentCaptor.getValue());
 
@@ -98,16 +100,16 @@ class CaseTransferDifferentCountryServiceTest {
 
     @Test
     void caseTransferFailsWithBfAction() {
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
-        var caseDetails = createCaseDetails(managingOffice, officeCT, null);
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        CaseDetails caseDetails = createCaseDetails(managingOffice, officeCT, null);
         addBfAction(caseDetails.getCaseData(), null);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN))
                 .thenReturn(List.of(caseDetails.getCaseData()));
-        var expectedError = String.format(BF_ACTIONS_ERROR_MSG, CLAIMANT_ETHOS_CASE_REFERENCE);
+        String expectedError = String.format(BF_ACTIONS_ERROR_MSG, CLAIMANT_ETHOS_CASE_REFERENCE);
         when(caseTransferUtils.validateCase(caseDetails.getCaseData())).thenReturn(List.of(expectedError));
 
-        var errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
+        List<String> errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
 
         assertEquals(1, errors.size());
         assertEquals(expectedError, errors.get(0));
@@ -118,15 +120,15 @@ class CaseTransferDifferentCountryServiceTest {
 
     @Test
     void caseTransferFailsWithHearingListed() {
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
-        var caseDetails = createCaseDetails(managingOffice, officeCT, HEARING_STATUS_LISTED);
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        CaseDetails caseDetails = createCaseDetails(managingOffice, officeCT, HEARING_STATUS_LISTED);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN))
                 .thenReturn(List.of(caseDetails.getCaseData()));
-        var expectedError = String.format(HEARINGS_ERROR_MSG, CLAIMANT_ETHOS_CASE_REFERENCE);
+        String expectedError = String.format(HEARINGS_ERROR_MSG, CLAIMANT_ETHOS_CASE_REFERENCE);
         when(caseTransferUtils.validateCase(caseDetails.getCaseData())).thenReturn(List.of(expectedError));
 
-        var errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
+        List<String> errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
 
         assertEquals(1, errors.size());
         assertEquals(expectedError, errors.get(0));
@@ -137,17 +139,17 @@ class CaseTransferDifferentCountryServiceTest {
 
     @Test
     void caseTransferFailsWithBfActionAndHearingListed() {
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
-        var caseDetails = createCaseDetails(managingOffice, officeCT, HEARING_STATUS_LISTED);
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        CaseDetails caseDetails = createCaseDetails(managingOffice, officeCT, HEARING_STATUS_LISTED);
         addBfAction(caseDetails.getCaseData(), null);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN))
                 .thenReturn(List.of(caseDetails.getCaseData()));
-        var expectedErrors = List.of(String.format(BF_ACTIONS_ERROR_MSG, CLAIMANT_ETHOS_CASE_REFERENCE),
+        List<String> expectedErrors = List.of(String.format(BF_ACTIONS_ERROR_MSG, CLAIMANT_ETHOS_CASE_REFERENCE),
                 String.format(HEARINGS_ERROR_MSG, CLAIMANT_ETHOS_CASE_REFERENCE));
         when(caseTransferUtils.validateCase(caseDetails.getCaseData())).thenReturn(expectedErrors);
 
-        var errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
+        List<String> errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
 
         assertEquals(2, errors.size());
         assertEquals(expectedErrors.get(0), errors.get(0));
@@ -159,16 +161,16 @@ class CaseTransferDifferentCountryServiceTest {
 
     @Test
     void caseTransferWithEccCase() {
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
-        var eccCaseReference = "120002/2021";
-        var eccCases = List.of(eccCaseReference);
-        var caseDetails = createCaseDetails(managingOffice, eccCases, officeCT, null);
-        var eccCaseData = createEccCaseSearchResult(eccCaseReference, managingOffice);
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        String eccCaseReference = "120002/2021";
+        List<String> eccCases = List.of(eccCaseReference);
+        CaseDetails caseDetails = createCaseDetails(managingOffice, eccCases, officeCT, null);
+        CaseData eccCaseData = createEccCaseSearchResult(eccCaseReference, managingOffice);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN))
                 .thenReturn(List.of(caseDetails.getCaseData(), eccCaseData));
 
-        var errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
+        List<String> errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
 
         assertTrue(errors.isEmpty());
 
@@ -176,7 +178,7 @@ class CaseTransferDifferentCountryServiceTest {
 
         verify(caseTransferEventService, times(2))
             .transfer(caseTransferEventParamsArgumentCaptor.capture());
-        var params = caseTransferEventParamsArgumentCaptor.getAllValues();
+        List<CaseTransferEventParams> params = caseTransferEventParamsArgumentCaptor.getAllValues();
         verifyCaseTransferEventParams(CLAIMANT_ETHOS_CASE_REFERENCE, CLAIMANT_ETHOS_CASE_REFERENCE, officeCT,
             params.get(0));
         verifyCaseTransferEventParams(eccCaseReference, CLAIMANT_ETHOS_CASE_REFERENCE, officeCT, params.get(1));
@@ -184,16 +186,16 @@ class CaseTransferDifferentCountryServiceTest {
 
     @Test
     void caseTransferWithEccCases() {
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
-        var eccCases = List.of("120002/2021", "120003/2021");
-        var caseDetails = createCaseDetails(managingOffice, eccCases, officeCT, null);
-        var eccCaseData1 = createEccCaseSearchResult(eccCases.get(0), managingOffice);
-        var eccCaseData2 = createEccCaseSearchResult(eccCases.get(1), managingOffice);
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        List<String> eccCases = List.of("120002/2021", "120003/2021");
+        CaseDetails caseDetails = createCaseDetails(managingOffice, eccCases, officeCT, null);
+        CaseData eccCaseData1 = createEccCaseSearchResult(eccCases.get(0), managingOffice);
+        CaseData eccCaseData2 = createEccCaseSearchResult(eccCases.get(1), managingOffice);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN))
                 .thenReturn(List.of(caseDetails.getCaseData(), eccCaseData1, eccCaseData2));
 
-        var errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
+        List<String> errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
 
         assertTrue(errors.isEmpty());
 
@@ -201,7 +203,7 @@ class CaseTransferDifferentCountryServiceTest {
 
         verify(caseTransferEventService, times(3))
             .transfer(caseTransferEventParamsArgumentCaptor.capture());
-        var params = caseTransferEventParamsArgumentCaptor.getAllValues();
+        List<CaseTransferEventParams> params = caseTransferEventParamsArgumentCaptor.getAllValues();
         verifyCaseTransferEventParams(CLAIMANT_ETHOS_CASE_REFERENCE, CLAIMANT_ETHOS_CASE_REFERENCE, officeCT,
             params.get(0));
         verifyCaseTransferEventParams(eccCases.get(0), CLAIMANT_ETHOS_CASE_REFERENCE, officeCT, params.get(1));
@@ -210,41 +212,43 @@ class CaseTransferDifferentCountryServiceTest {
 
     @Test
     void caseTransferWithEccCaseAsSource() {
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
-        var eccCaseReference = "120009/2021";
-        var eccCaseDetails = createEccCaseDetails(eccCaseReference, managingOffice, officeCT);
-        var claimantCaseDeta = createCaseDetails(managingOffice, List.of(eccCaseReference), null, null).getCaseData();
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        String eccCaseReference = "120009/2021";
+        CaseDetails eccCaseDetails = createEccCaseDetails(eccCaseReference, managingOffice, officeCT);
+        CaseData claimantCaseDeta = createCaseDetails(managingOffice, List.of(eccCaseReference), null,
+            null).getCaseData();
         when(caseTransferUtils.getAllCasesToBeTransferred(eccCaseDetails, USER_TOKEN))
                 .thenReturn(List.of(claimantCaseDeta, eccCaseDetails.getCaseData()));
 
-        var errors = caseTransferDifferentCountryService.transferCase(eccCaseDetails, USER_TOKEN);
+        List<String> errors = caseTransferDifferentCountryService.transferCase(eccCaseDetails, USER_TOKEN);
 
         assertTrue(errors.isEmpty());
 
         verifyCaseDataAfterTransfer(eccCaseDetails, managingOffice, officeCT);
 
-        verify(caseTransferEventService, times(2)).transfer(caseTransferEventParamsArgumentCaptor.capture());
-        var params = caseTransferEventParamsArgumentCaptor.getAllValues();
+        verify(caseTransferEventService, times(2)).transfer(
+            caseTransferEventParamsArgumentCaptor.capture());
+        List<CaseTransferEventParams> params = caseTransferEventParamsArgumentCaptor.getAllValues();
         verifyCaseTransferEventParams(CLAIMANT_ETHOS_CASE_REFERENCE, eccCaseReference, officeCT, params.get(0));
         verifyCaseTransferEventParams(eccCaseReference, eccCaseReference, officeCT, params.get(1));
     }
 
     @Test
     void caseTransferWithEccCaseReturnsTransferError() {
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
-        var eccCases = List.of("120002/2021");
-        var caseDetails = createCaseDetails(managingOffice, eccCases, officeCT, null);
-        var eccCaseData = createEccCaseSearchResult(eccCases.get(0), managingOffice);
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
+        List<String> eccCases = List.of("120002/2021");
+        CaseDetails caseDetails = createCaseDetails(managingOffice, eccCases, officeCT, null);
+        CaseData eccCaseData = createEccCaseSearchResult(eccCases.get(0), managingOffice);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN))
                 .thenReturn(List.of(caseDetails.getCaseData(), eccCaseData));
 
-        var caseTransferError = "A transfer error";
+        String caseTransferError = "A transfer error";
         when(caseTransferEventService.transfer(isA(CaseTransferEventParams.class))).thenReturn(
                 List.of(caseTransferError));
 
-        var errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
+        List<String> errors = caseTransferDifferentCountryService.transferCase(caseDetails, USER_TOKEN);
 
         assertEquals(2, errors.size());
         assertEquals(caseTransferError, errors.get(0));
@@ -257,7 +261,7 @@ class CaseTransferDifferentCountryServiceTest {
 
     @Test
     void transferCaseNoCasesFoundThrowsException() {
-        var caseDetails = CaseDataBuilder.builder()
+        CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withEthosCaseReference(CLAIMANT_ETHOS_CASE_REFERENCE)
                 .buildAsCaseDetails(caseTypeId, JURISDICTION);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN)).thenReturn(Collections.emptyList());
@@ -299,7 +303,8 @@ class CaseTransferDifferentCountryServiceTest {
         }
 
         if (hearingStatus != null) {
-            builder.withHearing("1", null, null, null, null, null, null)
+            builder.withHearing("1", null, null, null, null,
+                    null, null)
                     .withHearingSession(0, "1", "2021-12-25", hearingStatus, false);
         }
 
@@ -315,9 +320,9 @@ class CaseTransferDifferentCountryServiceTest {
     }
 
     private void addBfAction(CaseData caseData, String cleared) {
-        var bfAction = new BFActionType();
+        BFActionType bfAction = new BFActionType();
         bfAction.setCleared(cleared);
-        var bfActionItem = new BFActionTypeItem();
+        BFActionTypeItem bfActionItem = new BFActionTypeItem();
         bfActionItem.setValue(bfAction);
 
         caseData.setBfActions(List.of(bfActionItem));

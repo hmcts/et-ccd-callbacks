@@ -70,7 +70,7 @@ public class BFHelper {
             log.info("BF Actions for case reference {} is empty. Creating a dummy one",
                     caseData.getEthosCaseReference());
 
-            var dynamicFixedListType = new DynamicFixedListType();
+            DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(Helper.getDefaultBfListItems());
             dynamicFixedListType.setValue(DynamicListHelper.getDynamicValue(BF_ACTION_ACAS));
 

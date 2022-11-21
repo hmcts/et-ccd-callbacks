@@ -13,6 +13,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -21,6 +22,8 @@ import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClient;
 import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
+import uk.gov.hmcts.reform.document.domain.Document;
+import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 
 import java.net.URI;
@@ -33,7 +36,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 @Service
 @Slf4j
 @ComponentScan("uk.gov.hmcts.reform.ccd.document.am.feign")
-@SuppressWarnings({"PMD.LawOfDemeter"})
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ExcessiveImports"})
 public class DocumentManagementService {
 
     private static final String FILES_NAME = "files";
@@ -72,7 +75,7 @@ public class DocumentManagementService {
             MultipartFile file = new InMemoryMultipartFile(FILES_NAME, outputFileName, type, byteArray);
             if (secureDocStoreEnabled) {
                 log.info("Using Case Document Client");
-                var response = caseDocumentClient.uploadDocuments(
+                uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse response = caseDocumentClient.uploadDocuments(
                         authToken,
                         authTokenGenerator.generate(),
                         caseTypeID,
@@ -81,7 +84,7 @@ public class DocumentManagementService {
                         Classification.PUBLIC
                 );
 
-                var document = response.getDocuments().stream()
+                uk.gov.hmcts.reform.ccd.document.am.model.Document document = response.getDocuments().stream()
                         .findFirst()
                         .orElseThrow(() ->
                                 new DocumentManagementException("Document management failed uploading file"
@@ -90,8 +93,8 @@ public class DocumentManagementService {
                 return URI.create(document.links.self.href);
             } else {
                 log.info("Using Document Upload Client");
-                var user = userService.getUserDetails(authToken);
-                var response = documentUploadClient.upload(
+                UserDetails user = userService.getUserDetails(authToken);
+                UploadResponse response = documentUploadClient.upload(
                        authToken,
                        authTokenGenerator.generate(),
                         user.getUid(),
@@ -99,7 +102,7 @@ public class DocumentManagementService {
                         uk.gov.hmcts.reform.document.domain.Classification.PUBLIC,
                         singletonList(file)
                 );
-                var document = response.getEmbedded().getDocuments().stream()
+                Document document = response.getEmbedded().getDocuments().stream()
                     .findFirst()
                     .orElseThrow(() ->
                             new DocumentManagementException("Document management failed uploading file"
@@ -123,7 +126,7 @@ public class DocumentManagementService {
     }
 
     public UploadedDocument downloadFile(String authToken, String urlString) {
-        var user = userService.getUserDetails(authToken);
+        UserDetails user = userService.getUserDetails(authToken);
         ResponseEntity<Resource> response;
         if (secureDocStoreEnabled) {
             response = caseDocumentClient.getDocumentBinary(
@@ -154,7 +157,7 @@ public class DocumentManagementService {
     }
 
     private String getDownloadUrl(String urlString) {
-        var path = urlString.replace(ccdDMStoreBaseUrl, "");
+        String path = urlString.replace(ccdDMStoreBaseUrl, "");
         if (path.startsWith("/")) {
             return path;
         }
@@ -163,7 +166,7 @@ public class DocumentManagementService {
     }
 
     public String getDocumentUUID(String urlString) {
-        var documentUUID = urlString.replace(ccdDMStoreBaseUrl + "/documents/", "");
+        String documentUUID = urlString.replace(ccdDMStoreBaseUrl + "/documents/", "");
         documentUUID = documentUUID.replace("/binary", "");
         return documentUUID;
     }

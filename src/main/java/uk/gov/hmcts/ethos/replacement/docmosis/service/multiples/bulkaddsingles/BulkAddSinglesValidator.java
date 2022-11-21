@@ -22,7 +22,7 @@ public class BulkAddSinglesValidator {
     }
 
     public List<String> validate(MultipleDetails multipleDetails, String authToken)  {
-        var multipleEthosReference = multipleDetails.getCaseData().getMultipleReference();
+        String multipleEthosReference = multipleDetails.getCaseData().getMultipleReference();
         List<String> ethosCaseReferences;
         try {
             ethosCaseReferences = singleCasesImporter.importCases(multipleDetails.getCaseData(), authToken);
@@ -39,8 +39,8 @@ public class BulkAddSinglesValidator {
         }
 
         try {
-            var validatedSingleCases = singleCasesValidator.getValidatedCases(ethosCaseReferences, multipleDetails,
-                    authToken);
+            List<ValidatedSingleCase> validatedSingleCases = singleCasesValidator.getValidatedCases(ethosCaseReferences,
+                multipleDetails, authToken);
 
             return validatedSingleCases.stream()
                     .filter(Predicate.not(ValidatedSingleCase::isValid))

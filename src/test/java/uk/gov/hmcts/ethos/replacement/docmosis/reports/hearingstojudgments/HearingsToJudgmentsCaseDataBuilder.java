@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HearingsToJudgmentsCaseDataBuilder {
 
@@ -38,24 +39,24 @@ public class HearingsToJudgmentsCaseDataBuilder {
     public HearingsToJudgmentsCaseDataBuilder withHearing(String listedDate, String hearingStatus, String hearingType,
                                                           String disposed, String hearingNumber, String judge,
                                                           String hearingReserved) {
-        var dateListedType = new DateListedType();
+        DateListedType dateListedType = new DateListedType();
         dateListedType.setListedDate(listedDate);
         dateListedType.setHearingStatus(hearingStatus);
         dateListedType.setHearingReservedJudgement(hearingReserved);
         dateListedType.setHearingCaseDisposed(disposed);
-        var dateListedTypeItem = new DateListedTypeItem();
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setValue(dateListedType);
 
-        var hearingDates = new ArrayList<DateListedTypeItem>();
+        List<DateListedTypeItem> hearingDates = new ArrayList<>();
         hearingDates.add(dateListedTypeItem);
 
-        var type = new HearingType();
+        HearingType type = new HearingType();
         type.setHearingNumber(hearingNumber);
         type.setHearingType(hearingType);
         type.setJudge(DynamicFixedListType.of(DynamicValueType.create(judge, judge)));
         type.setHearingDateCollection(hearingDates);
 
-        var hearingTypeItem = new HearingTypeItem();
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(type);
 
         if (caseData.getHearingCollection() == null) {
@@ -68,11 +69,11 @@ public class HearingsToJudgmentsCaseDataBuilder {
 
     public HearingsToJudgmentsCaseDataBuilder withJudgment(String judgmentHearingDate, String dateJudgmentMade,
                                                            String dateJudgmentSent) {
-        var judgementType = new JudgementType();
+        JudgementType judgementType = new JudgementType();
         judgementType.setJudgmentHearingDate(judgmentHearingDate);
         judgementType.setDateJudgmentSent(dateJudgmentSent);
         judgementType.setDateJudgmentMade(dateJudgmentMade);
-        var judgementTypeItem = new JudgementTypeItem();
+        JudgementTypeItem judgementTypeItem = new JudgementTypeItem();
         judgementTypeItem.setValue(judgementType);
 
         if (caseData.getJudgementCollection() == null) {
@@ -88,7 +89,7 @@ public class HearingsToJudgmentsCaseDataBuilder {
     }
 
     public HearingsToJudgmentsSubmitEvent buildAsSubmitEvent(String state) {
-        var submitEvent = new HearingsToJudgmentsSubmitEvent();
+        HearingsToJudgmentsSubmitEvent submitEvent = new HearingsToJudgmentsSubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(state);
 

@@ -36,17 +36,17 @@ public class AllocateHearingService {
     }
 
     public void initialiseAllocateHearing(CaseData caseData) {
-        var dynamicFixedListType = new DynamicFixedListType();
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(hearingSelectionService.getHearingSelection(caseData));
         caseData.setAllocateHearingHearing(dynamicFixedListType);
     }
 
     public void handleListingSelected(CaseData caseData) {
-        var selectedHearing = getSelectedHearing(caseData);
-        var managingOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
+        HearingType selectedHearing = getSelectedHearing(caseData);
+        TribunalOffice managingOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
         caseData.setAllocateHearingJudge(judgeSelectionService.createJudgeSelection(managingOffice, selectedHearing));
 
-        var selectedListing = getSelectedListing(caseData);
+        DateListedType selectedListing = getSelectedListing(caseData);
         caseData.setAllocateHearingVenue(venueSelectionService.createVenueSelection(managingOffice, selectedListing));
         caseData.setAllocateHearingSitAlone(selectedHearing.getHearingSitAlone());
         caseData.setAllocateHearingStatus(selectedListing.getHearingStatus());
@@ -58,21 +58,21 @@ public class AllocateHearingService {
     }
 
     public void populateRooms(CaseData caseData) {
-        var selectedListing = getSelectedListing(caseData);
-        var venueChanged = isVenueChanged(selectedListing.getHearingVenueDay(), caseData.getAllocateHearingVenue());
+        DateListedType selectedListing = getSelectedListing(caseData);
+        boolean venueChanged = isVenueChanged(selectedListing.getHearingVenueDay(), caseData.getAllocateHearingVenue());
 
         caseData.setAllocateHearingRoom(roomSelectionService.createRoomSelection(caseData, selectedListing,
                 venueChanged));
     }
 
     public void updateCase(CaseData caseData) {
-        var selectedHearing = getSelectedHearing(caseData);
+        HearingType selectedHearing = getSelectedHearing(caseData);
         selectedHearing.setHearingSitAlone(caseData.getAllocateHearingSitAlone());
         selectedHearing.setJudge(caseData.getAllocateHearingJudge());
         selectedHearing.setHearingERMember(caseData.getAllocateHearingEmployerMember());
         selectedHearing.setHearingEEMember(caseData.getAllocateHearingEmployeeMember());
 
-        var selectedListing = getSelectedListing(caseData);
+        DateListedType selectedListing = getSelectedListing(caseData);
         selectedListing.setHearingStatus(caseData.getAllocateHearingStatus());
         selectedListing.setPostponedBy(caseData.getAllocateHearingPostponedBy());
         selectedListing.setHearingVenueDay(caseData.getAllocateHearingVenue());
@@ -91,15 +91,15 @@ public class AllocateHearingService {
     }
 
     private boolean isVenueChanged(DynamicFixedListType currentVenue, DynamicFixedListType newVenue) {
-        var currentVenueCode = currentVenue != null ? currentVenue.getSelectedCode() : null;
-        var newVenueCode = newVenue != null ? newVenue.getSelectedCode() : null;
+        String currentVenueCode = currentVenue != null ? currentVenue.getSelectedCode() : null;
+        String newVenueCode = newVenue != null ? newVenue.getSelectedCode() : null;
         return !StringUtils.equals(currentVenueCode, newVenueCode);
     }
 
     private void addEmployerMembers(CaseData caseData, HearingType selectedHearing) {
-        var tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
-        var dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(tribunalOffice,
-                CourtWorkerType.EMPLOYER_MEMBER);
+        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
+        DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
+            tribunalOffice, CourtWorkerType.EMPLOYER_MEMBER);
 
         if (selectedHearing.hasHearingEmployerMember()) {
             dynamicFixedListType.setValue(selectedHearing.getHearingERMember().getValue());
@@ -108,9 +108,9 @@ public class AllocateHearingService {
     }
 
     private void addEmployeeMembers(CaseData caseData, HearingType selectedHearing) {
-        var tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
-        var dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(tribunalOffice,
-                CourtWorkerType.EMPLOYEE_MEMBER);
+        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
+        DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
+            tribunalOffice, CourtWorkerType.EMPLOYEE_MEMBER);
 
         if (selectedHearing.hasHearingEmployeeMember()) {
             dynamicFixedListType.setValue(selectedHearing.getHearingEEMember().getValue());
@@ -119,9 +119,9 @@ public class AllocateHearingService {
     }
 
     private void addClerk(CaseData caseData, DateListedType selectedListing) {
-        var tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
-        var dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(tribunalOffice,
-                CourtWorkerType.CLERK);
+        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
+        DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
+            tribunalOffice, CourtWorkerType.CLERK);
 
         if (selectedListing.hasHearingClerk()) {
             dynamicFixedListType.setValue(selectedListing.getHearingClerk().getValue());

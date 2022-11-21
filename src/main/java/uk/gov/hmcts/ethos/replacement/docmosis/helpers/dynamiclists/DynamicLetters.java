@@ -23,7 +23,7 @@ public final class DynamicLetters {
     public static void dynamicLetters(CaseData caseData, String caseTypeId) {
         List<DynamicValueType> listItems = DynamicListHelper.createDynamicHearingList(caseData);
         if (CollectionUtils.isNotEmpty(listItems)) {
-            var dynamicFixedListType = new DynamicFixedListType();
+            DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(listItems);
             if (!caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
                 CorrespondenceType correspondenceType = new CorrespondenceType();
@@ -40,7 +40,7 @@ public final class DynamicLetters {
     public static void dynamicMultipleLetters(SubmitEvent submitEvent, MultipleData multipleData, String caseTypeId) {
         List<DynamicValueType> listItems = DynamicListHelper.createDynamicHearingList(submitEvent.getCaseData());
         if (CollectionUtils.isNotEmpty(listItems)) {
-            var dynamicFixedListType = new DynamicFixedListType();
+            DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(listItems);
             if (!caseTypeId.equals(SCOTLAND_BULK_CASE_TYPE_ID)) {
                 CorrespondenceType correspondenceType = new CorrespondenceType();

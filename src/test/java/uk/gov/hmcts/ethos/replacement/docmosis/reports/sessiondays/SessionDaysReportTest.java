@@ -83,7 +83,7 @@ class SessionDaysReportTest {
         submitEvents.add(caseDataBuilder
                 .buildAsSubmitEvent());
 
-        var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        ReportParams params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
         SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);
@@ -105,7 +105,7 @@ class SessionDaysReportTest {
         caseDataBuilder.withHearingData(hearingStatus);
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
 
-        var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        ReportParams params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
         SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);
@@ -127,7 +127,7 @@ class SessionDaysReportTest {
         caseDataBuilder.withHearingData(HEARING_STATUS_HEARD);
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
 
-        var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        ReportParams params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
         SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);
@@ -142,7 +142,7 @@ class SessionDaysReportTest {
     }
 
     private void assertReportSummary2Values(SessionDaysReportData reportData) {
-        var reportSummary2 = reportData.getReportSummary2List().get(0);
+        SessionDaysReportSummary2 reportSummary2 = reportData.getReportSummary2List().get(0);
         assertEquals("1", reportSummary2.getFtSessionDays());
         assertEquals("1", reportSummary2.getPtSessionDays());
         assertEquals("1", reportSummary2.getOtherSessionDays());
@@ -155,11 +155,11 @@ class SessionDaysReportTest {
     void assertReportDetailsValues(String judge, String judgeType, int index) {
         caseDataBuilder.withHearingData(HEARING_STATUS_HEARD);
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
-        var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        ReportParams params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
         SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);
-        var reportDetail = reportData.getReportDetails().get(index);
+        SessionDaysReportDetail reportDetail = reportData.getReportDetails().get(index);
         assertEquals("111", reportDetail.getCaseReference());
         assertEquals("Clerk A", reportDetail.getHearingClerk());
         assertEquals("2022-01-20", reportDetail.getHearingDate());
@@ -184,9 +184,9 @@ class SessionDaysReportTest {
 
         caseDataBuilder.withHearingData(HEARING_STATUS_HEARD);
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
-        var params = new ReportParams(SCOTLAND_LISTING_CASE_TYPE_ID, null,
+        ReportParams params = new ReportParams(SCOTLAND_LISTING_CASE_TYPE_ID, null,
                 DATE_FROM, DATE_TO);
-        var reportData = sessionDaysReport.generateReport(params);
+        SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
         assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportData.getReportSummary().getOffice());
     }
 }

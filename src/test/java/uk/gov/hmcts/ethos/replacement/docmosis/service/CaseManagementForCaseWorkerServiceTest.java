@@ -399,7 +399,7 @@ public class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     public void buildFlagsImageFileNameForNullFlagsTypes() {
-        var caseDetails = ccdRequest11.getCaseDetails();
+        CaseDetails caseDetails = ccdRequest11.getCaseDetails();
         FlagsImageHelper.buildFlagsImageFileName(caseDetails);
         assertEquals("", caseDetails.getCaseData().getFlagsImageAltText());
         assertEquals("EMP-TRIB-0000000000.jpg", caseDetails.getCaseData().getFlagsImageFileName());
@@ -407,7 +407,7 @@ public class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     public void buildFlagsImageFileNameForNullFlagsFields() {
-        var caseDetails = ccdRequest12.getCaseDetails();
+        CaseDetails caseDetails = ccdRequest12.getCaseDetails();
         FlagsImageHelper.buildFlagsImageFileName(caseDetails);
         assertEquals("", caseDetails.getCaseData().getFlagsImageAltText());
         assertEquals("EMP-TRIB-0000000000.jpg", caseDetails.getCaseData().getFlagsImageFileName());
@@ -415,7 +415,7 @@ public class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     public void buildFlagsImageFileNameForEmptyFlagsFields() {
-        var caseDetails = ccdRequest13.getCaseDetails();
+        CaseDetails caseDetails = ccdRequest13.getCaseDetails();
         FlagsImageHelper.buildFlagsImageFileName(caseDetails);
         assertEquals("", caseDetails.getCaseData().getFlagsImageAltText());
         assertEquals("EMP-TRIB-0000000000.jpg", caseDetails.getCaseData().getFlagsImageFileName());
@@ -423,7 +423,7 @@ public class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     public void buildFlagsImageFileNameForFalseFlagsFields() {
-        var caseDetails = ccdRequest14.getCaseDetails();
+        CaseDetails caseDetails = ccdRequest14.getCaseDetails();
         FlagsImageHelper.buildFlagsImageFileName(caseDetails);
         assertEquals("", caseDetails.getCaseData().getFlagsImageAltText());
         assertEquals("EMP-TRIB-0000000000.jpg", caseDetails.getCaseData().getFlagsImageFileName());
@@ -456,7 +456,7 @@ public class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     public void buildFlagsImageFileNameForTrueFlagsFieldsScotland() {
-        var caseDetails = scotlandCcdRequest3.getCaseDetails();
+        CaseDetails caseDetails = scotlandCcdRequest3.getCaseDetails();
         FlagsImageHelper.buildFlagsImageFileName(caseDetails);
         String expected = "<font color='DeepPink' size='5'> WITH OUTSTATION </font>";
         assertEquals(expected, caseDetails.getCaseData().getFlagsImageAltText());
@@ -493,11 +493,11 @@ public class CaseManagementForCaseWorkerServiceTest {
     @Test
     public void midEventAmendHearingDateOnWeekend() {
         CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
-        var errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         caseData.getHearingCollection().get(0)
                 .getValue().getHearingDateCollection()
                 .get(0).getValue().setListedDate("2022-03-19T12:11:00.000");
-        var hearingNumber = caseData.getHearingCollection().get(0).getValue().getHearingNumber();
+        String hearingNumber = caseData.getHearingCollection().get(0).getValue().getHearingNumber();
         caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
         assertFalse(errors.isEmpty());
         assertEquals(LISTED_DATE_ON_WEEKEND_MESSAGE + hearingNumber, errors.get(0));
@@ -506,7 +506,7 @@ public class CaseManagementForCaseWorkerServiceTest {
     @Test
     public void amendMidEventHearingDateFridayNight() {
         CaseData caseData = createCaseWithHearingDate("2022-03-18T23:59:00.000");
-        var errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
         assertTrue(errors.isEmpty());
     }
@@ -514,7 +514,7 @@ public class CaseManagementForCaseWorkerServiceTest {
     @Test
     public void amendMidEventHearingDateMondayMorning() {
         CaseData caseData = createCaseWithHearingDate("2022-03-21T00:00:00.000");
-        var errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
         assertTrue(errors.isEmpty());
     }
@@ -532,7 +532,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         hearing.setValue(hearingType);
         List<HearingTypeItem> hearings = new ArrayList<>();
         hearings.add(hearing);
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setHearingCollection(hearings);
         return caseData;
     }
@@ -616,7 +616,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
                 .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
-        var casedata = caseManagementForCaseWorkerService.createECC(
+        CaseData casedata = caseManagementForCaseWorkerService.createECC(
                 manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                 new ArrayList<>(), ABOUT_TO_SUBMIT_EVENT_CALLBACK);
         assertEquals("11111", casedata.getCaseRefECC());

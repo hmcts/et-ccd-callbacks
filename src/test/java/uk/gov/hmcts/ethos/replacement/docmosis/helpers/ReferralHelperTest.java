@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
@@ -247,9 +248,9 @@ class ReferralHelperTest {
 
     @Test
     void isJudge() {
-        assertEquals(TRUE, ReferralHelper.isJudge(Arrays.asList(JUDGE_ROLE_ENG)));
-        assertEquals(TRUE, ReferralHelper.isJudge(Arrays.asList(JUDGE_ROLE_SCOT)));
-        assertEquals(FALSE, ReferralHelper.isJudge(Arrays.asList()));
+        assertEquals(TRUE, ReferralHelper.isJudge(List.of(JUDGE_ROLE_ENG)));
+        assertEquals(TRUE, ReferralHelper.isJudge(List.of(JUDGE_ROLE_SCOT)));
+        assertEquals(FALSE, ReferralHelper.isJudge(List.of()));
     }
 
     @Test
@@ -345,8 +346,13 @@ class ReferralHelperTest {
 
     @Test
     void validateEmail() {
-        assertThat(ReferralHelper.validateEmail("valid.email@example.com").contains(null));
-        assertThat(ReferralHelper.validateEmail("invalid.email.example").contains(INVALID_EMAIL_ERROR_MESSAGE));
+        assertTrue(ReferralHelper.validateEmail("valid.email@example.com").isEmpty());
+        assertThat(ReferralHelper.validateEmail("invalid.email.example")).contains(INVALID_EMAIL_ERROR_MESSAGE);
+        assertThat(ReferralHelper.validateEmail("invalid.email@")).contains(INVALID_EMAIL_ERROR_MESSAGE);
+        assertThat(ReferralHelper.validateEmail("@example")).contains(INVALID_EMAIL_ERROR_MESSAGE);
+        assertThat(ReferralHelper.validateEmail("invalid@example")).contains(INVALID_EMAIL_ERROR_MESSAGE);
+        assertThat(ReferralHelper.validateEmail("invalid @example")).contains(INVALID_EMAIL_ERROR_MESSAGE);
+        assertThat(ReferralHelper.validateEmail("invalid@example com")).contains(INVALID_EMAIL_ERROR_MESSAGE);
     }
 
     @Test

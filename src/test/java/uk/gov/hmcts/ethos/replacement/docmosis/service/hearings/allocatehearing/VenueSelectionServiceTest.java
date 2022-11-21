@@ -42,7 +42,7 @@ public class VenueSelectionServiceTest {
         VenueService venueService = mockVenueService(tribunalOffice);
         CaseData caseData = createCaseDataWithHearings(tribunalOffice, null);
 
-        var venueSelectionService = new VenueSelectionService(venueService);
+        VenueSelectionService venueSelectionService = new VenueSelectionService(venueService);
         venueSelectionService.initHearingCollection(caseData);
 
         assertEquals(3, caseData.getHearingCollection().size());
@@ -57,7 +57,7 @@ public class VenueSelectionServiceTest {
         DynamicValueType selectedVenue = DynamicValueType.create("venue2", "Venue 2");
         CaseData caseData = createCaseDataWithHearings(tribunalOffice, selectedVenue);
 
-        var venueSelectionService = new VenueSelectionService(venueService);
+        VenueSelectionService venueSelectionService = new VenueSelectionService(venueService);
         venueSelectionService.initHearingCollection(caseData);
 
         assertEquals(3, caseData.getHearingCollection().size());
@@ -91,33 +91,33 @@ public class VenueSelectionServiceTest {
     }
 
     private VenueService mockVenueService(TribunalOffice tribunalOffice) {
-        var venueService = mock(VenueService.class);
-        var venues = SelectionServiceTestUtils.createListItems("venue", "Venue ");
+        VenueService venueService = mock(VenueService.class);
+        List<DynamicValueType> venues = SelectionServiceTestUtils.createListItems("venue", "Venue ");
         when(venueService.getVenues(tribunalOffice)).thenReturn(venues);
 
         return venueService;
     }
 
     private DateListedType createSelectedListing(DynamicValueType selectedVenue) {
-        var dynamicFixedListType = new DynamicFixedListType();
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setValue(selectedVenue);
 
-        var dateListedType = new DateListedType();
+        DateListedType dateListedType = new DateListedType();
         dateListedType.setHearingVenueDay(dynamicFixedListType);
         return dateListedType;
     }
 
     private CaseData createCaseDataWithHearings(TribunalOffice tribunalOffice, DynamicValueType selectedVenue) {
-        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
+        CaseData caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         caseData.setHearingCollection(new ArrayList<>());
-        for (var i = 0; i < 3; i++) {
-            var hearingType = new HearingType();
+        for (int i = 0; i < 3; i++) {
+            HearingType hearingType = new HearingType();
             if (selectedVenue != null) {
-                var dynamicFixedListType = new DynamicFixedListType();
+                DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
                 dynamicFixedListType.setValue(selectedVenue);
                 hearingType.setHearingVenue(dynamicFixedListType);
             }
-            var hearingTypeItem = new HearingTypeItem();
+            HearingTypeItem hearingTypeItem = new HearingTypeItem();
             hearingTypeItem.setValue(hearingType);
             caseData.getHearingCollection().add(hearingTypeItem);
         }
@@ -126,7 +126,7 @@ public class VenueSelectionServiceTest {
     }
 
     private void verifyNoSelectedVenue(List<HearingTypeItem> hearings) {
-        for (var hearingTypeItem : hearings) {
+        for (HearingTypeItem hearingTypeItem : hearings) {
             assertNull(hearingTypeItem.getValue().getHearingVenue().getValue());
             assertNull(hearingTypeItem.getValue().getHearingVenue().getSelectedCode());
             assertNull(hearingTypeItem.getValue().getHearingVenue().getSelectedLabel());
@@ -134,7 +134,7 @@ public class VenueSelectionServiceTest {
     }
 
     private void verifySelectedVenue(List<HearingTypeItem> hearings, DynamicValueType selectedVenue) {
-        for (var hearingTypeItem : hearings) {
+        for (HearingTypeItem hearingTypeItem : hearings) {
             assertEquals(selectedVenue.getCode(), hearingTypeItem.getValue().getHearingVenue().getValue().getCode());
             assertEquals(selectedVenue.getLabel(), hearingTypeItem.getValue().getHearingVenue().getValue().getLabel());
             assertEquals(selectedVenue.getCode(), hearingTypeItem.getValue().getHearingVenue().getSelectedCode());
@@ -143,9 +143,9 @@ public class VenueSelectionServiceTest {
     }
 
     private void verifyVenueListItems(List<HearingTypeItem> hearings) {
-        for (var hearing : hearings) {
-            var hearingType = hearing.getValue();
-            var venues = hearingType.getHearingVenue();
+        for (HearingTypeItem hearing : hearings) {
+            HearingType hearingType = hearing.getValue();
+            DynamicFixedListType venues = hearingType.getHearingVenue();
             SelectionServiceTestUtils.verifyListItems(venues.getListItems(), "venue", "Venue ");
         }
     }

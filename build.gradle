@@ -136,7 +136,7 @@ task codeceptFunctionalSauce(type: Exec, dependsOn: ':yarnInstall') {
     //IGNORE_SESSION_VALIDATION=true NODE_ENV=testing LOG_LEVEL=OFF NODE_PATH=. node_modules/.bin/codeceptjs run-multiple  ${BROWSER_GROUP:-'--all'} -c src/test/end-to-end/saucelabs.conf.js --grep @RET-XB --steps --reporter mocha-multi
     workingDir '.'
     commandLine './bin/run-crossbrowser-tests.sh'
-    commandLine 'IGNORE_SESSION_VALIDATION=true', 'NODE_ENV=testing', 'LOG_LEVEL=OFF', 'NODE_PATH=.', 'node_modules/.bin/codeceptjs', 'run-multiple', '${BROWSER_GROUP:-\'--all\'}', '-c', 'src/test/end-to-end/saucelabs.conf.js', '--grep', '@crossbrowser', '--reporter', 'mocha-multi'
+    commandLine 'node_modules/.bin/codeceptjs', 'run-multiple', '${BROWSER_GROUP:-\'--all\'}', '-c', 'src/test/end-to-end/saucelabs.conf.js', '--grep', '@crossbrowser', '--reporter', 'mocha-multi'
 }
 
 task codeceptFunctionalNightly(type: Exec, dependsOn :'yarnInstall') {

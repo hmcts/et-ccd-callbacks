@@ -6,6 +6,9 @@ export E2E_FRONTEND_URL=${TEST_URL}
 export FEATURE_IDAM=true
 export IDAM_API_URL=${IDAM_API_URL:-"https://idam-api.aat.platform.hmcts.net"}
 export IGNORE_SESSION_VALIDATION=true
+export NODE_ENV=testing
+export LOG_LEVEL=OFF
+export NODE_PATH=.
 
 EXIT_STATUS=0
 #BROWSER_GROUP=microsoftIE11 yarn test-crossbrowser-e2e || EXIT_STATUS=$?

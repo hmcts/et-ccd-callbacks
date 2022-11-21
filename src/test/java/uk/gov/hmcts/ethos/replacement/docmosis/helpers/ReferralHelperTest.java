@@ -44,6 +44,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POST
 
 @SuppressWarnings({"PMD.SingularField", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 class ReferralHelperTest {
+    private UserService userService;
     private CaseData caseData;
     private static final String JUDGE_ROLE_ENG = "caseworker-employment-etjudge-englandwales";
     private static final String JUDGE_ROLE_SCOT = "caseworker-employment-etjudge-scotland";
@@ -114,7 +115,7 @@ class ReferralHelperTest {
 
     @BeforeEach
     void setUp() {
-        final UserService userService = mock(UserService.class);
+        userService = mock(UserService.class);
         UserDetails userDetails = new UserDetails();
         userDetails.setFirstName("Judge");
         userDetails.setLastName("Judy");
@@ -304,7 +305,6 @@ class ReferralHelperTest {
     void createReferralReply() {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
         DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData);
-        assert selectReferralList != null;
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);
@@ -336,7 +336,6 @@ class ReferralHelperTest {
     void setReferralStatusToClosed() {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
         DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData);
-        assert selectReferralList != null;
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);
@@ -381,7 +380,8 @@ class ReferralHelperTest {
 
         String expectedDocumentSummaryNew = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-EGW-ENG-00067."
             + "docx\",\"outputName\":\"Referral Summary.pdf\",\"data\":{\"referralStatus\":\"Awaiting instructions\","
-            + "\"caseNumber\":null,\"referralDate\":\"16 Nov 2022\",\"referredBy\":null,\"referCaseTo\":null,"
+            + "\"caseNumber\":null,\"referralDate\":\"" + Helper.getCurrentDate()
+            + "\",\"referredBy\":null,\"referCaseTo\":null,"
             + "\"referentEmail\":\"info@test.com\",\"isUrgent\":null,\"nextHearingDate\":\"11 Nov 2030\","
             + "\"referralSubject\":null,\"referralDetails\":null,"
             + "\"referralDocument\":[{\"id\":\"1\",\"value\":{\"typeOfDocument\":null,"
@@ -412,7 +412,8 @@ class ReferralHelperTest {
 
         String expectedDocumentSummaryExisting = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-EGW-ENG-00067."
             + "docx\",\"outputName\":\"Referral Summary.pdf\",\"data\":{\"referralStatus\":\"Awaiting instructions\","
-            + "\"caseNumber\":null,\"referralDate\":\"16 Nov 2022\",\"referredBy\":null,\"referCaseTo\":null,"
+            + "\"caseNumber\":null,\"referralDate\":\"" + Helper.getCurrentDate()
+            + "\",\"referredBy\":null,\"referCaseTo\":null,"
             + "\"referentEmail\":null,\"isUrgent\":null,\"nextHearingDate\":\"11 Nov 2030\","
             + "\"referralSubject\":\"Other\",\"referralDetails\":null,"
             + "\"referralDocument\":null,\"referralInstruction\":null,\"referralReplyCollection\":[{\"id\":\"1\","

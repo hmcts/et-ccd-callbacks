@@ -5,6 +5,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
@@ -105,14 +106,15 @@ public class ServingService {
 
     /**
      * Sends notifications to the relevant parties that their case has been updated.
-     * @param caseData object that holds the case data.
+     * @param caseDetails object that holds the case data.
      */
-    public void sendNotifications(CaseData caseData) {
-        Map<String, String> claimant = NotificationHelper.buildMapForClaimant(caseData);
+    public void sendNotifications(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        Map<String, String> claimant = NotificationHelper.buildMapForClaimant(caseDetails);
 
         caseData.getRespondentCollection()
             .forEach(o -> {
-                Map<String, String> respondent = NotificationHelper.buildMapForRespondent(caseData, o.getValue());
+                Map<String, String> respondent = NotificationHelper.buildMapForRespondent(caseDetails, o.getValue());
                 if (isNullOrEmpty(respondent.get(EMAIL_ADDRESS))) {
                     return;
                 }

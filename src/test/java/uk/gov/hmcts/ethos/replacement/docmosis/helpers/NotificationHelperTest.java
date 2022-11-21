@@ -17,10 +17,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 @SuppressWarnings({"PMD.LinguisticNaming"})
 public class NotificationHelperTest {
     private CaseData caseData;
+    private CaseDetails caseDetails;
 
     @Before
     public void setUp() {
-        CaseDetails caseDetails = CaseDataBuilder.builder()
+        caseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")
             .withClaimantType("claimant@unrepresented.com")
             .withRepresentativeClaimantType("Claimant Rep", "claimant@represented.com")
@@ -36,6 +37,7 @@ public class NotificationHelperTest {
             .withRespondentRepresentative("Respondent Represented", "Rep LastName", "res@rep.com")
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
+        caseDetails.setCaseId("1234");
         caseData = caseDetails.getCaseData();
         caseData.setClaimant("Claimant LastName");
     }
@@ -57,7 +59,7 @@ public class NotificationHelperTest {
 
     @Test
     public void buildMapForClaimant_withRepresentedClaimant_shouldReturnClaimantRepDetails() {
-        Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseData);
+        Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
 
         assertThat(actual).containsEntry("emailAddress", "claimant@represented.com")
             .containsEntry("name", "C Rep")
@@ -67,7 +69,7 @@ public class NotificationHelperTest {
     @Test
     public void buildMapForClaimant_withRepresentedClaimantWithNoEmail_shouldReturnClaimantRepDetails() {
         caseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(null);
-        Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseData);
+        Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
 
         assertThat(actual).containsEntry("emailAddress", "")
             .containsEntry("name", "C Rep")
@@ -77,7 +79,7 @@ public class NotificationHelperTest {
     @Test
     public void buildMapForClaimant_withUnrepresentedClaimant_shouldReturnClaimantDetailsWithTitle() {
         caseData.setRepresentativeClaimantType(null);
-        Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseData);
+        Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
 
         assertThat(actual).containsEntry("emailAddress", "claimant@unrepresented.com")
             .containsEntry("name", "Mr LastName")
@@ -88,7 +90,7 @@ public class NotificationHelperTest {
     public void buildMapForClaimant_withUnrepresentedClaimant_shouldReturnClaimantDetailsWithPreferredTitle() {
         caseData.setRepresentativeClaimantType(null);
         caseData.getClaimantIndType().setClaimantTitle(null);
-        Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseData);
+        Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
 
         assertThat(actual).containsEntry("emailAddress", "claimant@unrepresented.com")
             .containsEntry("name", "Mr LastName")
@@ -100,7 +102,7 @@ public class NotificationHelperTest {
         caseData.setRepresentativeClaimantType(null);
         caseData.getClaimantIndType().setClaimantTitle(null);
         caseData.getClaimantIndType().setClaimantPreferredTitle(null);
-        Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseData);
+        Map<String, String> actual = NotificationHelper.buildMapForClaimant(caseDetails);
 
         assertThat(actual).containsEntry("emailAddress", "claimant@unrepresented.com")
             .containsEntry("name", "C LastName")
@@ -111,7 +113,7 @@ public class NotificationHelperTest {
     public void buildMapForRespondent_withUnrepresentedRespondent_shouldReturnRespondentDetails() {
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
         RespondentSumType unrepresentedRespondent = respondents.get(0).getValue();
-        Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseData, unrepresentedRespondent);
+        Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseDetails, unrepresentedRespondent);
 
         assertThat(actual).containsEntry("emailAddress", "respondent@unrepresented.com")
             .containsEntry("name", "Respondent Unrepresented")
@@ -122,7 +124,7 @@ public class NotificationHelperTest {
     public void buildMapForRespondent_withRespondentRepresentative_shouldReturnRepresentativeDetails() {
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
         RespondentSumType representedRespondent = respondents.get(1).getValue();
-        Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseData, representedRespondent);
+        Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseDetails, representedRespondent);
 
         assertThat(actual).containsEntry("emailAddress", "res@rep.com")
             .containsEntry("name", "R LastName")
@@ -134,7 +136,7 @@ public class NotificationHelperTest {
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
         RespondentSumType representedRespondent = respondents.get(1).getValue();
         caseData.getRepCollection().get(0).getValue().setRepresentativeEmailAddress(null);
-        Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseData, representedRespondent);
+        Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseDetails, representedRespondent);
 
         assertThat(actual).containsEntry("emailAddress", "")
             .containsEntry("name", "R LastName")
@@ -146,7 +148,7 @@ public class NotificationHelperTest {
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
         RespondentSumType unrepresentedRespondent = respondents.get(0).getValue();
         unrepresentedRespondent.setRespondentEmail(null);
-        Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseData, unrepresentedRespondent);
+        Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseDetails, unrepresentedRespondent);
 
         assertThat(actual).containsEntry("emailAddress", "")
             .containsEntry("name", "Respondent Unrepresented")

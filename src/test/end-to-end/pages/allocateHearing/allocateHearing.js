@@ -7,12 +7,20 @@ module.exports = async function (jurisdiction) {
     const I = this;
     I.waitForText(commonConfig.allocateHearing, testConfig.TestTimeToWaitForText);
     const date = new Date();
+    switch(date.getDay()){
+        case 0: //Sunday
+            date.setDate(date.getDate() + 1);
+            break;
+        case 6: //Saturday
+            date.setDate(date.getDate() + 2);
+            break;
+        default:
+    }
     const formattedDate = date.toLocaleString('en-GB', {
         day: 'numeric',
         month: 'long',
         year: 'numeric',
     });
-    //I.see(formattedDate);
     I.selectOption('#allocateHearingHearing', 'Hearing 1, '+ formattedDate + ' 00:00');
     await I.navByClick(commonConfig.continue);
     if (jurisdiction === 'Leeds')

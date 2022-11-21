@@ -64,4 +64,4 @@ Scenario('User successfully enters a disposal date matching a date within hearin
 
 }).tag('@e2e')
     .tag('@nightly')
-    .tag('@pats')
+    .tag('@wip')

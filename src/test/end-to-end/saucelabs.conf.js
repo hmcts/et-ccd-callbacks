@@ -41,7 +41,7 @@ function getBrowserConfig(browserGroup) {
 }
 
 const setupConfig = {
-    tests: config.TestPathToRun,
+    tests: testUrl,
     output: `${process.cwd()}/${config.TestOutputDir}`,
     helpers: {
         WebDriver: {

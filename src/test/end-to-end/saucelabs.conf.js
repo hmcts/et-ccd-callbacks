@@ -55,14 +55,9 @@ const setupConfig = {
             region: 'eu',
             capabilities: {}
         },
-        SauceLabsReportingHelper: {
-            require: './helpers/SauceLabsReportingHelper.js'
-        },
-        WebDriverHelper: {
-            require: './helpers/WebDriverHelper.js'
-        },
-        JSWait: {
-            require: './helpers/JSWait.js'
+        MyHelper: {
+            require: './saucelabsHelper.js',
+            url: testUrl,
         },
         Mochawesome: {
             uniqueScreenshotNames: 'true'

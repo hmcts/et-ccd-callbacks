@@ -45,7 +45,7 @@ const setupConfig = {
     output: `${process.cwd()}/${config.TestOutputDir}`,
     helpers: {
         WebDriver: {
-            url: config.TestUrl,
+            url: config.TestPathToRun,
             browser,
             smartWait,
             waitForTimeout,

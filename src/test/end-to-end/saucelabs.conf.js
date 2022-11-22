@@ -41,11 +41,11 @@ function getBrowserConfig(browserGroup) {
 }
 
 const setupConfig = {
-    tests: testUrl,
+    tests: config.TestPathToRun,
     output: `${process.cwd()}/${config.TestOutputDir}`,
     helpers: {
         WebDriver: {
-            url: config.TestPathToRun,
+            url: testUrl,
             browser,
             smartWait,
             waitForTimeout,

@@ -56,25 +56,28 @@ exports.config = {
         }
     },
     mocha: {
+        reporterEnabled: 'codeceptjs-cli-reporter, mochawesome',
         reporterOptions: {
             'codeceptjs-cli-reporter': {
                 stdout: '-',
-                options: {steps: true}
-            },
-            'mocha-junit-reporter': {
-                stdout: '-',
-                options: {mochaFile: './functional-output/result.xml'}
+                options: {
+                    verbose: false,
+                    steps: true,
+                },
             },
             mochawesome: {
-                stdout: './functional-output/et-e2e-mochawesome-stdout.log',
+                stdout: './functional-output/console.log',
                 options: {
+                    includeScreenshots: true,
                     reportDir: config.TestOutputDir || './functional-output',
-                    reportFilename: 'et-xui-e2e-result',
-                    inlineAssets: true,
-                    reportTitle: 'ET XUI E2E Tests'
-                }
-            }
-        }
+                    reportFilename: 'ET-CCD-Callbacks-tests',
+                    reportTitle: 'ET CCD Callbacks Tests',
+                    inline: true,
+                    html: true,
+                    json: true,
+                },
+            },
+        },
     },
     multiple: {
         parallel: {
@@ -82,5 +85,5 @@ exports.config = {
             browsers: ['chrome']
         }
     },
-    'name': 'et-xui-e2e-tests'
+    'name': 'et-ccd-callbacks-tests'
 };

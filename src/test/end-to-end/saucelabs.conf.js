@@ -105,10 +105,10 @@ const setupConfig = {
         // },
         chrome: {
             browsers: getBrowserConfig('chrome')
-        },
-        firefox: {
-            browsers: getBrowserConfig('firefox')
         }
+        /*firefox: {
+            browsers: getBrowserConfig('firefox')
+        }*/
     },
     name: 'ET Cross Browser Tests'
 };

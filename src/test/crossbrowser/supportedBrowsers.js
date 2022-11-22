@@ -32,17 +32,17 @@ const supportedBrowsers = {
       'sauce:options': {
         name: 'Win_Chrome_latest'
       }
-    },
-    chrome_mac_latest: {
+    }
+    /*chrome_mac_latest: {
       browserName: 'chrome',
       platformName: LATEST_MAC,
       browserVersion: 'latest',
       'sauce:options': {
         name: 'Mac_Chrome_latest'
       }
-    }
-  },
-  firefox: {
+    }*/
+  }
+  /*firefox: {
     firefox_win_latest: {
       browserName: 'firefox',
       platformName: LATEST_WINDOWS,
@@ -59,7 +59,7 @@ const supportedBrowsers = {
         name: 'Mac_Firefox_latest'
       }
     }
-  }
+  }*/
 };
 
 module.exports = supportedBrowsers;

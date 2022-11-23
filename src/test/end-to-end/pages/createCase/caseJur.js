@@ -15,5 +15,5 @@ module.exports =  async function () {
     I.selectOption(caseJurConfig.case_type, 'ET_EnglandWales');
     I.selectOption(caseJurConfig.event, 'initiateCase');
 
-    I.navByClick(commonConfig.start);
+    I.click(commonConfig.start);
 }

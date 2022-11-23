@@ -61,7 +61,7 @@ withNightlyPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     enableFullFunctionalTest()
     enableCrossBrowserTest()
-    enableFortifyScan()
+    //enableFortifyScan()
 
     after('fullFunctionalTest') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
@@ -71,7 +71,7 @@ withNightlyPipeline(type, product, component) {
                 alwaysLinkToLastBuild: true,
                 keepAll : true,
                 reportDir : "functional-output",
-                reportFiles : "et-e2e-result.html",
+                reportFiles : "ET-CCD-Callbacks-tests.html",
                 reportName : "ET E2E functional tests result"
         ]
     }

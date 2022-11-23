@@ -32,7 +32,7 @@ const supportedBrowsers = {
       'sauce:options': {
         name: 'Win_Chrome_latest'
       }
-    }
+    },
     chrome_mac_latest: {
       browserName: 'chrome',
       platformName: LATEST_MAC,

@@ -42,7 +42,7 @@ const supportedBrowsers = {
       }
     }
   }
-  /*firefox: {
+  firefox: {
     firefox_win_latest: {
       browserName: 'firefox',
       platformName: LATEST_WINDOWS,
@@ -59,7 +59,7 @@ const supportedBrowsers = {
         name: 'Mac_Firefox_latest'
       }
     }
-  }*/
+  }
 };
 
 module.exports = supportedBrowsers;

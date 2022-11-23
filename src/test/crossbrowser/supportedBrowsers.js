@@ -41,7 +41,7 @@ const supportedBrowsers = {
         name: 'Mac_Chrome_latest'
       }
     }
-  }
+  },
   firefox: {
     firefox_win_latest: {
       browserName: 'firefox',

@@ -18,5 +18,6 @@ Scenario('Verify Case Details ', async ({I}) => {
 
 }).tag('@tester')
     .tag('@nightly')
+    .tag('@crossbrowser')
     .tag('@RET-BAT');
     //.retry(testConfig.TestRetryScenarios);

@@ -50,15 +50,15 @@ const supportedBrowsers = {
       'sauce:options': {
         name: 'Win_Firefox_latest'
       }
-    }
-    /*firefox_mac_latest: {
+    },
+    firefox_mac_latest: {
       browserName: 'firefox',
       platformName: LATEST_MAC,
       browserVersion: 'latest',
       'sauce:options': {
         name: 'Mac_Firefox_latest'
       }
-    }*/
+    }
   }
 };
 

@@ -218,6 +218,7 @@ async function createLegalRepReferral(emailAddress, details) {
 }
 
 async function clickCreateCase(I) {
+    I.wait(3);
     await I.caseListForCreateCase();
     I.wait(2);
     await I.caseJurisdictionForCreateCase();

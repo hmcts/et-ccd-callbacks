@@ -34,7 +34,7 @@ async function processCaseToAcceptedState() {
     const headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
-    const authTokenResponse = I.sendPostRequest(idamBaseUrl, payload, headers);
+    const authTokenResponse = await I.sendPostRequest(idamBaseUrl, payload, headers);
     expect(authTokenResponse.status).to.eql(200);
     const authToken = authTokenResponse.data.access_token;
     logger.debug(authToken);
@@ -50,7 +50,7 @@ async function processCaseToAcceptedState() {
         'microservice': 'ccd_gw',
         'oneTimePassword': oneTimepwd
     }
-    const s2sResponse = I.sendPostRequest(s2sBaseUrl, s2spayload, s2sheaders);
+    const s2sResponse = await I.sendPostRequest(s2sBaseUrl, s2spayload, s2sheaders);
     let serviceToken = s2sResponse.data;
     expect(s2sResponse.status).to.eql(200)
     logger.debug(serviceToken);
@@ -59,7 +59,7 @@ async function processCaseToAcceptedState() {
         {
             'Authorization': `Bearer ${authToken}`
         };
-    const userDetails = I.sendGetRequest(getUserIdurl, getIdheaders);
+    const userDetails = await I.sendGetRequest(getUserIdurl, getIdheaders);
     const userId = userDetails.data.id
 
     console.log("checking userId =>" + userId)
@@ -74,7 +74,7 @@ async function processCaseToAcceptedState() {
         'Content-Type': 'application/json'
     }
 
-    let initiateCaseResponse = I.sendGetRequest(initiateCaseUrl, initiateCaseHeaders);
+    let initiateCaseResponse = await I.sendGetRequest(initiateCaseUrl, initiateCaseHeaders);
     expect(initiateCaseResponse.status).to.eql(200);
 
     const initiateEventToken = initiateCaseResponse.data.token;
@@ -97,7 +97,7 @@ async function processCaseToAcceptedState() {
         'Content-Type': 'application/json'
     };
     let createCasebody = `${JSON.stringify(createCasetemp)}`
-    const createCaseResponse = I.sendPostRequest(createCaseUrl, createCasebody, createCaseHeaders);
+    const createCaseResponse = await I.sendPostRequest(createCaseUrl, createCasebody, createCaseHeaders);
 
     expect(createCaseResponse.status).to.eql(201);
     const case_id = createCaseResponse.data.id
@@ -112,7 +112,7 @@ async function processCaseToAcceptedState() {
         'Content-Type': 'application/json'
     };
 
-    let startVettingResponse = I.sendGetRequest(et1VettingUrl, et1VettingHeaders);
+    let startVettingResponse = await I.sendGetRequest(et1VettingUrl, et1VettingHeaders);
     let case_data = startVettingResponse.data.case_details.case_data;
     let dataClassification = startVettingResponse.data.case_details.data_classification;
     let eventToken = startVettingResponse.data.token
@@ -144,7 +144,7 @@ async function processCaseToAcceptedState() {
     console.log("... executing et1Vetting event ...")
     let executeEt1payload = JSON.stringify(executeEventBody);
     console.log("vetiing body => " + executeEt1payload);
-    const eventExecutionResponse = I.sendPostRequest(execuEt1teUrl, executeEt1payload, completeVettingHeader);
+    const eventExecutionResponse = await I.sendPostRequest(execuEt1teUrl, executeEt1payload, completeVettingHeader);
     expect(eventExecutionResponse.status).to.eql(201);
 
 
@@ -161,7 +161,7 @@ async function processCaseToAcceptedState() {
         'Content-Type': 'application/json'
     };
 
-    let startAcceptanceResponse = I.sendGetRequest(initiateAcceptUrl, startAcceptanceHeaders);
+    let startAcceptanceResponse = await I.sendGetRequest(initiateAcceptUrl, startAcceptanceHeaders);
     expect(startAcceptanceResponse.status).to.eql(200);
     let acceptEventToken = startAcceptanceResponse.data.token
 
@@ -192,7 +192,7 @@ async function processCaseToAcceptedState() {
     };
     let acceptPayload = JSON.stringify(acceptBody)
 
-    const nextEventExecutionResponse = I.sendPostRequest(acceptUrl, acceptPayload, acceptHeaders);
+    const nextEventExecutionResponse = await I.sendPostRequest(acceptUrl, acceptPayload, acceptHeaders);
     expect(nextEventExecutionResponse.status).to.eql(201);
     let caseNumber = case_id;
     await I.authenticateWithIdam(username, password);

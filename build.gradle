@@ -126,6 +126,11 @@ task yarnInstall(type: Exec) {
     commandLine 'yarn', 'install'
 }
 
+task yarnAudit(type: Exec,  dependsOn: ':yarnInstall') {
+    workingDir '.'
+    commandLine 'yarn', 'audit', '--groups', 'dependencies', '--json', '|', 'grep', 'auditAdvisory', '>', 'yarn-audit-known-issues'
+}
+
 task codeceptSmoke(type: Exec, dependsOn: ':yarnInstall') {
     commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@smoke', '--steps', '--reporter', 'mocha-multi'
 }

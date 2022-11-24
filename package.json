@@ -7,6 +7,11 @@
         "node": ">=14.0.0"
     },
     "dependencies": {
+        "@wdio/cli": "7.25.4",
+        "@wdio/sauce-service": "7.25.4",
+        "@wdio/selenium-standalone-service": "7.25.4",
+        "@wdio/types": "7.25.4",
+        "codeceptjs-saucehelper": "1.4.0",
         "@hmcts/nodejs-logging": "3.0.4",
         "axios": "0.27.2",
         "cross-env": "7.0.3",

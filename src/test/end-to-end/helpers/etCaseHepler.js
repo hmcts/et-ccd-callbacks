@@ -34,7 +34,7 @@ async function processCaseToAcceptedState() {
     const headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
-    const authTokenResponse = await I.sendPostRequest(idamBaseUrl, payload, headers);
+    const authTokenResponse = I.sendPostRequest(idamBaseUrl, payload, headers);
     expect(authTokenResponse.status).to.eql(200);
     const authToken = authTokenResponse.data.access_token;
     logger.debug(authToken);

@@ -1,32 +1,29 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
+import java.io.IOException;
+import java.util.*;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_5;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
-import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_5;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.TESTING_FILE_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.TESTING_FILE_NAME_ERROR;
 
@@ -35,6 +32,8 @@ public class ExcelReadingServiceTest {
 
     @Mock
     private ExcelDocManagementService excelDocManagementService;
+    @Mock
+    private CcdClient ccdClient;
     @InjectMocks
     private ExcelReadingService excelReadingService;
 
@@ -101,6 +100,25 @@ public class ExcelReadingServiceTest {
         assertEquals("1820004/2019", listSub.get(0));
         assertEquals("1820005/2019", listSub.get(1));
         assertEquals(0, errors.size());
+    }
+
+    @Test
+    public void setSubMultipleFieldInSingleCaseDataTest() throws IOException {
+        SubmitEvent submitEvent = new SubmitEvent();
+        CaseData caseData = new CaseData();
+        caseData.setEthosCaseReference("1234");
+        submitEvent.setCaseData(caseData);
+        MultipleDetails multipleDetails = new MultipleDetails();
+        multipleDetails.setJurisdiction("EMPLOYMENT");
+        multipleDetails.setCaseTypeId("Leeds_Multiple");
+        when(ccdClient.retrieveCasesElasticSearch(anyString(),
+                anyString(), anyList()))
+                .thenReturn(List.of(submitEvent));
+        excelReadingService.setSubMultipleFieldInSingleCaseData(userToken,
+                multipleDetails,
+                "1234",
+                "subMultiple");
+        assertEquals("subMultiple", caseData.getSubMultipleName());
     }
 
     @Test

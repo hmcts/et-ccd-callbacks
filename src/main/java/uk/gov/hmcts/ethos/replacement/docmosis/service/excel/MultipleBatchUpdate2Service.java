@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,7 +80,7 @@ public class MultipleBatchUpdate2Service {
 
                 if (isNullOrEmpty(updatedSubMultipleRef)) {
 
-                    log.info("Keep cases in the same multiple");
+                    log.info("Keep cases in the same sub-multiple");
 
                 } else {
 
@@ -219,7 +220,7 @@ public class MultipleBatchUpdate2Service {
                         FilterExcelType.ALL);
 
         List<MultipleObject> newMultipleObjectsUpdated = addSubMultipleRefToMultipleObjects(multipleObjectsFiltered,
-                multipleObjects, updatedSubMultipleRef);
+                multipleObjects, updatedSubMultipleRef, userToken, multipleDetails);
 
         excelDocManagementService.generateAndUploadExcel(newMultipleObjectsUpdated, userToken, multipleDetails);
 
@@ -227,14 +228,23 @@ public class MultipleBatchUpdate2Service {
 
     private List<MultipleObject> addSubMultipleRefToMultipleObjects(List<String> multipleObjectsFiltered,
                                                                     SortedMap<String, Object> multipleObjects,
-                                                                    String updatedSubMultipleRef) {
+                                                                    String updatedSubMultipleRef,
+                                                                    String userToken,
+                                                                    MultipleDetails multipleDetails) {
 
         List<MultipleObject> newMultipleObjectsUpdated = new ArrayList<>();
-
         multipleObjects.forEach((key, value) -> {
-            MultipleObject multipleObject = (MultipleObject) value;
+            var multipleObject = (MultipleObject) value;
             if (multipleObjectsFiltered.contains(key)) {
                 multipleObject.setSubMultiple(updatedSubMultipleRef);
+                try {
+                    excelReadingService.setSubMultipleFieldInSingleCaseData(userToken,
+                            multipleDetails,
+                            multipleObject.getEthosCaseRef(),
+                            updatedSubMultipleRef);
+                } catch (IOException e) {
+                    log.error(e.toString());
+                }
             }
             newMultipleObjectsUpdated.add(multipleObject);
         });

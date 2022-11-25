@@ -43,7 +43,7 @@ public class BulkAddSinglesValidatorTest {
 
     @Test
     public void shouldReturnImportError() {
-        var errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
+        List<String> errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
 
         assertEquals(1, errors.size());
         assertEquals("No cases found", errors.get(0));
@@ -54,7 +54,7 @@ public class BulkAddSinglesValidatorTest {
         ethosCaseReferences.add("case1");
         validatedSingleCases.add(ValidatedSingleCase.createInvalidCase("case1", "Case not found"));
 
-        var errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
+        List<String> errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
 
         assertEquals(1, errors.size());
         assertEquals("case1: Case not found", errors.get(0));
@@ -65,7 +65,7 @@ public class BulkAddSinglesValidatorTest {
         ethosCaseReferences.add("case1");
         validatedSingleCases.add(ValidatedSingleCase.createValidCase("case1"));
 
-        var errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
+        List<String> errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
 
         assertTrue(errors.isEmpty());
     }
@@ -75,7 +75,7 @@ public class BulkAddSinglesValidatorTest {
         when(singleCasesImporter.importCases(multipleDetails.getCaseData(), AUTH_TOKEN))
                 .thenThrow(ImportException.class);
 
-        var errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
+        List<String> errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
 
         assertEquals(1, errors.size());
         assertEquals("Unexpected error when importing single cases", errors.get(0));
@@ -88,17 +88,17 @@ public class BulkAddSinglesValidatorTest {
         when(singleCasesValidator.getValidatedCases(ethosCaseReferences, multipleDetails, AUTH_TOKEN))
                 .thenThrow(IOException.class);
 
-        var errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
+        List<String> errors = bulkAddSinglesValidator.validate(multipleDetails, AUTH_TOKEN);
 
         assertEquals(1, errors.size());
         assertEquals("Unexpected error when validating single cases", errors.get(0));
     }
 
     private MultipleDetails createMultipleDetails() {
-        var multipleReference = "2500001/2021";
-        var multipleData = new MultipleData();
+        String multipleReference = "2500001/2021";
+        MultipleData multipleData = new MultipleData();
         multipleData.setMultipleReference(multipleReference);
-        var multipleDetails = new MultipleDetails();
+        MultipleDetails multipleDetails = new MultipleDetails();
         multipleDetails.setCaseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID);
         multipleDetails.setCaseData(multipleData);
         return multipleDetails;

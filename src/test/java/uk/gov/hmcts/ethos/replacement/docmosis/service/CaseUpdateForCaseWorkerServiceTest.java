@@ -48,7 +48,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
         submitEvent = new SubmitEvent();
 
         englandWalesCcdRequest = new CCDRequest();
-        var englandWalesCaseDetails = new CaseDetails();
+        CaseDetails englandWalesCaseDetails = new CaseDetails();
         englandWalesCaseDetails.setCaseData(new CaseData());
         englandWalesCaseDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         englandWalesCaseDetails.setCaseId("123456");
@@ -57,7 +57,7 @@ public class CaseUpdateForCaseWorkerServiceTest {
         englandWalesCcdRequest.setCaseDetails(englandWalesCaseDetails);
 
         scotlandCcdRequest = new CCDRequest();
-        var scotlandCaseDetails = new CaseDetails();
+        CaseDetails scotlandCaseDetails = new CaseDetails();
         scotlandCaseDetails.setCaseData(new CaseData());
         scotlandCaseDetails.getCaseData().setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
         scotlandCaseDetails.setCaseId("123456");

@@ -17,7 +17,11 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CreateReferralService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -35,13 +39,15 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequestMapping("/replyReferral")
 @RestController
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports"})
 public class ReplyToReferralController {
 
     private final String referralTemplateId;
     private final VerifyTokenService verifyTokenService;
     private final UserService userService;
     private final EmailService emailService;
+    private final CreateReferralService createReferralService;
+    private final DocumentManagementService documentManagementService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
@@ -52,9 +58,13 @@ public class ReplyToReferralController {
 
     public ReplyToReferralController(@Value("${referral.template.id}") String referralTemplateId,
                                     VerifyTokenService verifyTokenService,
+                                    CreateReferralService createReferralService,
+                                    DocumentManagementService documentManagementService,
                                     EmailService emailService, UserService userService) {
         this.referralTemplateId = referralTemplateId;
         this.emailService = emailService;
+        this.createReferralService = createReferralService;
+        this.documentManagementService = documentManagementService;
         this.verifyTokenService = verifyTokenService;
         this.userService = userService;
     }
@@ -198,6 +208,14 @@ public class ReplyToReferralController {
             caseData,
             String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName())
         );
+
+        DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,
+            userToken, ccdRequest.getCaseDetails().getCaseTypeId());
+
+        ReferralType referral = caseData.getReferralCollection()
+            .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
+
+        referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));
 
         return getCallbackRespEntityNoErrors(caseData);
     }

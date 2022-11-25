@@ -48,8 +48,8 @@ public class ScheduleCreationService {
 
     public byte[] writeSchedule(MultipleData multipleData, List<SchedulePayload> schedulePayloads,
                                 SortedMap<String, Object> multipleObjectsFiltered) {
-        var workbook = new XSSFWorkbook();
-        var sheet = workbook.createSheet(SCHEDULE_SHEET_NAME);
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet(SCHEDULE_SHEET_NAME);
 
         initializeHeaders(workbook, sheet, multipleData);
 
@@ -70,11 +70,11 @@ public class ScheduleCreationService {
         XSSFRow rowHead1 = sheet.createRow(0);
 
         if (multipleData.getScheduleDocName().equals(LIST_CASES_CONFIG)) {
-            var header1CellStyle = MultiplesSchedulePrinter.getHeader1CellStyle(workbook);
+            CellStyle header1CellStyle = MultiplesSchedulePrinter.getHeader1CellStyle(workbook);
             createCell(rowHead1, 0, "List of cases for ", header1CellStyle);
             createCell(rowHead1, 1, multipleTitle, header1CellStyle);
         } else {
-            var header2CellStyle = MultiplesSchedulePrinter.getHeader2CellStyle(workbook);
+            CellStyle header2CellStyle = MultiplesSchedulePrinter.getHeader2CellStyle(workbook);
             createCell(rowHead1, 1, HEADER_SCHEDULE, MultiplesSchedulePrinter.getHeader1CellStyle(workbook));
             XSSFRow rowHead2 = sheet.createRow(1);
             createCell(rowHead2, 0, "Multiple: ", header2CellStyle);
@@ -95,19 +95,20 @@ public class ScheduleCreationService {
     private void initializeData(XSSFWorkbook workbook, XSSFSheet sheet,
                                 List<SchedulePayload> schedulePayloads, String scheduleTemplate) {
 
-        var cellStyle = MultiplesSchedulePrinter.getRowCellStyle(workbook);
-        var startingRow = 4;
+        CellStyle cellStyle = MultiplesSchedulePrinter.getRowCellStyle(workbook);
+        int startingRow = 4;
         XSSFRow tableTitleRow = sheet.createRow(3);
 
         if (schedulePayloads.isEmpty()) {
             return;
         }
 
-        var orderedScheduleCollection = MultiplesHelper.createCollectionOrderedByCaseRef(schedulePayloads);
+        SortedMap<String, SortedMap<String, Object>> orderedScheduleCollection =
+            MultiplesHelper.createCollectionOrderedByCaseRef(schedulePayloads);
 
         if (scheduleTemplate.equals(MULTIPLE_SCHEDULE_CONFIG)) {
             log.info("Multiple schedule");
-            for (var j = 0; j < multipleHeaders.size(); j++) {
+            for (int j = 0; j < multipleHeaders.size(); j++) {
                 createCell(tableTitleRow, j, multipleHeaders.get(j),
                         MultiplesSchedulePrinter.getHeader3CellStyle(workbook));
             }
@@ -115,8 +116,8 @@ public class ScheduleCreationService {
             final int[] rowIndex = {0};
             orderedScheduleCollection.forEach((String caseYear, Map<String, Object> scheduleYearList) ->
                     scheduleYearList.forEach((String caseNum, Object item) -> {
-                        var columnIndex = 0;
-                        var schedulePayload = (SchedulePayload) item;
+                        int columnIndex = 0;
+                        SchedulePayload schedulePayload = (SchedulePayload) item;
                         XSSFRow row = sheet.createRow(rowIndex[0] + startingRow);
                         createCell(row, columnIndex, schedulePayload.getEthosCaseRef(), cellStyle);
                         columnIndex++;
@@ -127,7 +128,7 @@ public class ScheduleCreationService {
         } else if (scheduleTemplate.equals(MULTIPLE_SCHEDULE_DETAILED_CONFIG)) {
 
             log.info("Multiple schedule detailed");
-            for (var j = 0; j < multipleDetailedHeaders.size(); j++) {
+            for (int j = 0; j < multipleDetailedHeaders.size(); j++) {
                 createCell(tableTitleRow, j, multipleDetailedHeaders.get(j),
                         MultiplesSchedulePrinter.getHeader3CellStyle(workbook));
             }
@@ -135,8 +136,8 @@ public class ScheduleCreationService {
             final int[] rowIndex = {0};
             orderedScheduleCollection.forEach((String caseYear, Map<String, Object> scheduleYearList) ->
                     scheduleYearList.forEach((String caseNum, Object item) -> {
-                        var columnIndex = 0;
-                        var schedulePayload = (SchedulePayload) item;
+                        int columnIndex = 0;
+                        SchedulePayload schedulePayload = (SchedulePayload) item;
                         XSSFRow row = sheet.createRow(rowIndex[0] + startingRow);
                         row.setHeightInPoints((float) 4.5 * sheet.getDefaultRowHeightInPoints());
                         createCell(row, columnIndex, schedulePayload.getEthosCaseRef(), cellStyle);
@@ -151,7 +152,7 @@ public class ScheduleCreationService {
     }
 
     private String getClaimantAddress(SchedulePayload schedulePayload) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(schedulePayload.getClaimantName());
         if (!isNullOrEmpty(schedulePayload.getClaimantAddressLine1())) {
             sb.append(NEW_LINE_CELL).append(schedulePayload.getClaimantAddressLine1());
@@ -172,7 +173,7 @@ public class ScheduleCreationService {
     }
 
     private String getRespondentAddress(SchedulePayload schedulePayload) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(schedulePayload.getRespondentName());
         if (!isNullOrEmpty(schedulePayload.getRespondentAddressLine1())) {
             sb.append(NEW_LINE_CELL).append(schedulePayload.getRespondentAddressLine1());
@@ -217,8 +218,8 @@ public class ScheduleCreationService {
                                            SortedMap<String, SortedMap<String, SortedMap<String,
                                            Object>>> schedulePayloadTreeMap) {
 
-        var cellStyle = MultiplesSchedulePrinter.getRowCellStyle(workbook);
-        var startingRow = 2;
+        CellStyle cellStyle = MultiplesSchedulePrinter.getRowCellStyle(workbook);
+        int startingRow = 2;
 
         if (!schedulePayloadTreeMap.isEmpty()) {
             log.info("Sub Multiple schedule");
@@ -232,7 +233,7 @@ public class ScheduleCreationService {
                         MultiplesSchedulePrinter.getHeader3CellStyle(workbook));
                 //SUBTITLE ROW
                 XSSFRow tableTitleRow = sheet.createRow(startingRow + 1);
-                for (var j = 0; j < subMultipleHeaders.size(); j++) {
+                for (int j = 0; j < subMultipleHeaders.size(); j++) {
                     createCell(tableTitleRow, j, subMultipleHeaders.get(j),
                             MultiplesSchedulePrinter.getHeader3CellStyle(workbook));
                 }
@@ -241,8 +242,8 @@ public class ScheduleCreationService {
                 int entryStartingRow = startingRow;
                 schedulePayloads.forEach((String caseYear, Map<String, Object> scheduleYearList) ->
                         scheduleYearList.forEach((String caseNum, Object caseItem) -> {
-                            var columnIndex = 0;
-                            var schedulePayload = (SchedulePayload) caseItem;
+                            int columnIndex = 0;
+                            SchedulePayload schedulePayload = (SchedulePayload) caseItem;
                             XSSFRow row = sheet.createRow(entryStartingRow + 2 + rowIndex[0]);
                             createCell(row, columnIndex, schedulePayload.getEthosCaseRef(), cellStyle);
                             columnIndex++;

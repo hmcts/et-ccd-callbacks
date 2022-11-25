@@ -50,7 +50,7 @@ class ET1ServingControllerTest {
 
     @BeforeEach
     void setUp() {
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setServingDocumentCollection(new ArrayList<>());
         caseData.setRespondentCollection(new ArrayList<>());
         ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();

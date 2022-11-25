@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
@@ -28,18 +29,18 @@ public class MultipleTransferSameCountryService {
     private final CaseTransferEventService caseTransferEventService;
 
     public List<String> transferMultiple(MultipleDetails multipleDetails, String userToken) {
-        var multipleData = multipleDetails.getCaseData();
-        var errors = new ArrayList<String>();
+        MultipleData multipleData = multipleDetails.getCaseData();
+        List<String> errors = new ArrayList<>();
 
-        var excelUrl = MultiplesHelper.getExcelBinaryUrl(multipleData);
-        var multipleObjects = excelReadingService.readExcel(userToken, excelUrl, errors, multipleData,
-                FilterExcelType.ALL);
+        String excelUrl = MultiplesHelper.getExcelBinaryUrl(multipleData);
+        SortedMap<String, Object> multipleObjects = excelReadingService.readExcel(userToken, excelUrl, errors,
+            multipleData, FilterExcelType.ALL);
 
         if (!errors.isEmpty()) {
             return errors;
         }
 
-        var multipleReference = multipleData.getMultipleReference();
+        String multipleReference = multipleData.getMultipleReference();
         if (multipleObjects.keySet().isEmpty()) {
             log.info("No cases in the multiple {}", multipleReference);
             errors.add("No cases in the multiple");
@@ -52,7 +53,7 @@ public class MultipleTransferSameCountryService {
 
     private void transferCases(MultipleDetails multipleDetails, String userToken, SortedMap<String,
             Object> multipleObjects, List<String> errors) {
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
         multipleData.setState(UPDATING_STATE);
         transferSingleCases(userToken, multipleDetails, errors, multipleObjects);
 
@@ -62,12 +63,12 @@ public class MultipleTransferSameCountryService {
 
     private void transferSingleCases(String userToken, MultipleDetails multipleDetails,
                                         List<String> errors, SortedMap<String, Object> multipleObjects) {
-        var ethosCaseReferences = new ArrayList<>(multipleObjects.keySet());
-        var multipleData = multipleDetails.getCaseData();
-        var newManagingOffice = multipleData.getOfficeMultipleCT().getSelectedCode();
-        var multipleReferenceLink = MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl, multipleDetails.getCaseId(),
+        ArrayList<String> ethosCaseReferences = new ArrayList<>(multipleObjects.keySet());
+        MultipleData multipleData = multipleDetails.getCaseData();
+        String newManagingOffice = multipleData.getOfficeMultipleCT().getSelectedCode();
+        String multipleReferenceLink = MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl, multipleDetails.getCaseId(),
                 multipleData.getMultipleReference());
-        var params = CaseTransferEventParams.builder()
+        CaseTransferEventParams params = CaseTransferEventParams.builder()
                 .userToken(userToken)
                 .caseTypeId(multipleDetails.getCaseTypeId())
                 .jurisdiction(multipleDetails.getJurisdiction())
@@ -82,7 +83,7 @@ public class MultipleTransferSameCountryService {
                 .build();
 
         log.info("Creating Case Transfer Same Country event for {}", multipleData.getMultipleReference());
-        var transferErrors = caseTransferEventService.transfer(params);
+        List<String> transferErrors = caseTransferEventService.transfer(params);
         if (!transferErrors.isEmpty()) {
             errors.addAll(transferErrors);
         }

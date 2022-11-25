@@ -25,7 +25,7 @@ public class BulkAddSinglesService {
 
     public List<String> execute(MultipleDetails multipleDetails, String authToken) {
         try {
-            var ethosCaseReferences = singleCasesImporter.importCases(multipleDetails.getCaseData(),
+            List<String> ethosCaseReferences = singleCasesImporter.importCases(multipleDetails.getCaseData(),
                     authToken);
             return submitSingleCases(multipleDetails, ethosCaseReferences, authToken);
         } catch (ImportException e) {
@@ -37,11 +37,11 @@ public class BulkAddSinglesService {
 
     private List<String> submitSingleCases(MultipleDetails multipleDetails, List<String> ethosCaseReferences,
                                            String authToken) {
-        var caseIds = convert(ethosCaseReferences);
+        List<CaseIdTypeItem> caseIds = convert(ethosCaseReferences);
         multipleDetails.getCaseData().setTypeOfAmendmentMSL(List.of(ADD_CASES_TO_MULTIPLE_AMENDMENT));
         multipleDetails.getCaseData().setCaseIdCollection(caseIds);
 
-        var errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         multipleAmendService.bulkAmendMultipleLogic(authToken, multipleDetails, errors);
 
         return errors;

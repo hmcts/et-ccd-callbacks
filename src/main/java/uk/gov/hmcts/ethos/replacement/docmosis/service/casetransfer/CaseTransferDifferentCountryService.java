@@ -22,13 +22,13 @@ public class CaseTransferDifferentCountryService {
     private final CaseTransferEventService caseTransferEventService;
 
     public List<String> transferCase(CaseDetails caseDetails, String userToken) {
-        var caseDataList = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken);
+        List<CaseData> caseDataList = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken);
         if (caseDataList.isEmpty()) {
             throw new IllegalStateException("No cases found for Case Transfer for "
                     + caseDetails.getCaseData().getEthosCaseReference());
         }
 
-        var errors = validate(caseDataList);
+        List<String> errors = validate(caseDataList);
         if (!errors.isEmpty()) {
             return errors;
         }
@@ -37,10 +37,10 @@ public class CaseTransferDifferentCountryService {
     }
 
     private List<String> validate(List<CaseData> cases) {
-        var errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
 
-        for (var caseData : cases) {
-            var validationErrors = caseTransferUtils.validateCase(caseData);
+        for (CaseData caseData : cases) {
+            List<String> validationErrors = caseTransferUtils.validateCase(caseData);
             if (!validationErrors.isEmpty()) {
                 errors.addAll(validationErrors);
             }
@@ -50,12 +50,12 @@ public class CaseTransferDifferentCountryService {
     }
 
     private List<String> transferCases(CaseDetails caseDetails, List<CaseData> caseDataList, String userToken) {
-        var errors = new ArrayList<String>();
-        var sourceCaseData = caseDetails.getCaseData();
-        var newManagingOffice = caseDetails.getCaseData().getOfficeCT().getSelectedCode();
+        List<String> errors = new ArrayList<>();
+        CaseData sourceCaseData = caseDetails.getCaseData();
+        String newManagingOffice = caseDetails.getCaseData().getOfficeCT().getSelectedCode();
 
         for (CaseData caseData : caseDataList) {
-            var params = CaseTransferEventParams.builder()
+            CaseTransferEventParams params = CaseTransferEventParams.builder()
                     .userToken(userToken)
                     .caseTypeId(caseDetails.getCaseTypeId())
                     .jurisdiction(caseDetails.getJurisdiction())
@@ -70,7 +70,7 @@ public class CaseTransferDifferentCountryService {
                     .build();
 
             log.info("Creating Case Transfer event for {}", caseData.getEthosCaseReference());
-            var transferErrors = caseTransferEventService.transfer(params);
+            List<String> transferErrors = caseTransferEventService.transfer(params);
             if (!transferErrors.isEmpty()) {
                 errors.addAll(transferErrors);
             }

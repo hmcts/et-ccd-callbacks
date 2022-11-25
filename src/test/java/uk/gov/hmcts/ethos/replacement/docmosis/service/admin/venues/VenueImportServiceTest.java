@@ -51,16 +51,16 @@ class VenueImportServiceTest {
         fileLocationFixedListSheetImporter = mock(FileLocationFixedListSheetImporter.class);
 
         userService = mock(UserService.class);
-        var userDetails = mock(UserDetails.class);
+        UserDetails userDetails = mock(UserDetails.class);
         when(userDetails.getName()).thenReturn(USER_NAME);
         when(userService.getUserDetails(TEST_TOKEN)).thenReturn(userDetails);
     }
 
     @Test
     void testInitImport() {
-        var adminData = createAdminData(TribunalOffice.MANCHESTER);
+        AdminData adminData = createAdminData(TribunalOffice.MANCHESTER);
 
-        var venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
+        VenueImportService venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
                 fileLocationFixedListSheetImporter, userService);
         venueImportService.initImport(adminData);
 
@@ -71,11 +71,12 @@ class VenueImportServiceTest {
     @ParameterizedTest
     @MethodSource
     void testImportVenuesEnglandWales(TribunalOffice tribunalOffice) throws FixedListSheetReaderException, IOException {
-        var adminData = createAdminData(tribunalOffice);
-        var workbook = createWorkbook(tribunalOffice);
-        when(excelReadingService.readWorkbook(TEST_TOKEN, DOCUMENT_URL)).thenReturn(workbook);
+        AdminData adminData = createAdminData(tribunalOffice);
+        try (XSSFWorkbook workbook = createWorkbook(tribunalOffice)) {
+            when(excelReadingService.readWorkbook(TEST_TOKEN, DOCUMENT_URL)).thenReturn(workbook);
+        }
 
-        var venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
+        VenueImportService venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
                 fileLocationFixedListSheetImporter, userService);
         venueImportService.importVenues(adminData, TEST_TOKEN);
 
@@ -91,12 +92,13 @@ class VenueImportServiceTest {
 
     @Test
     void testImportVenuesScotland() throws FixedListSheetReaderException, IOException {
-        var venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
+        VenueImportService venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
                 fileLocationFixedListSheetImporter, userService);
 
-        var adminData = createAdminData(TribunalOffice.SCOTLAND);
-        var workbook = createWorkbook(TribunalOffice.SCOTLAND);
-        when(excelReadingService.readWorkbook(TEST_TOKEN, DOCUMENT_URL)).thenReturn(workbook);
+        AdminData adminData = createAdminData(TribunalOffice.SCOTLAND);
+        try (XSSFWorkbook workbook = createWorkbook(TribunalOffice.SCOTLAND)) {
+            when(excelReadingService.readWorkbook(TEST_TOKEN, DOCUMENT_URL)).thenReturn(workbook);
+        }
 
         venueImportService.importVenues(adminData, TEST_TOKEN);
 
@@ -113,7 +115,7 @@ class VenueImportServiceTest {
     }
 
     private XSSFWorkbook createWorkbook(TribunalOffice tribunalOffice) {
-        var workbook = new XSSFWorkbook();
+        XSSFWorkbook workbook = new XSSFWorkbook();
         workbook.createSheet("CaseField");
         workbook.createSheet(tribunalOffice.getOfficeName() + " Scrubbed");
         workbook.createSheet("ComplexTypes");
@@ -122,14 +124,14 @@ class VenueImportServiceTest {
     }
 
     private AdminData createAdminData(TribunalOffice tribunalOffice) {
-        var document = new Document();
+        Document document = new Document();
         document.setBinaryUrl(DOCUMENT_URL);
-        var importFile = new ImportFile();
+        ImportFile importFile = new ImportFile();
         importFile.setFile(document);
-        var venueImport = new VenueImport();
+        VenueImport venueImport = new VenueImport();
         venueImport.setVenueImportOffice(tribunalOffice.getOfficeName());
         venueImport.setVenueImportFile(importFile);
-        var adminData = new AdminData();
+        AdminData adminData = new AdminData();
         adminData.setVenueImport(venueImport);
 
         return adminData;

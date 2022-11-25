@@ -22,7 +22,7 @@ public class VenueAddressesService {
     }
 
     public List<VenueAddress> getTribunalVenueAddresses(String officeName) {
-        var tribunalName = getTribunalOffice(officeName);
+        TribunalOffice tribunalName = getTribunalOffice(officeName);
         return config.getTribunalOffices().get(tribunalName);
     }
 }

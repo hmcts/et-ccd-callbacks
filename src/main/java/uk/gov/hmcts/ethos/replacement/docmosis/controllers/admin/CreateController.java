@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -49,7 +50,7 @@ public class CreateController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         adminData.setName(ADMIN_CASE_NAME);
         List<String> errors = createService.initCreateAdmin(userToken);
 

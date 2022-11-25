@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class CaseCloseValidator {
         if (CollectionUtils.isEmpty(caseData.getBfActions())) {
             return errors;
         }
-        for (var currentBFActionTypeItem : caseData.getBfActions()) {
+        for (BFActionTypeItem currentBFActionTypeItem : caseData.getBfActions()) {
             if (isNullOrEmpty(currentBFActionTypeItem.getValue().getCleared())) {
                 errors.add(String.format(CLOSING_CASE_WITH_BF_OPEN_ERROR, caseData.getEthosCaseReference()));
                 return errors;

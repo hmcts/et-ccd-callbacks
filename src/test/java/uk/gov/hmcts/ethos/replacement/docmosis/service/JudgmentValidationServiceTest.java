@@ -3,6 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DynamicListHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
@@ -49,10 +51,10 @@ class JudgmentValidationServiceTest {
 
     @Test
     void populateJudgmentZeroHearings() throws ParseException {
-        var caseData = caseDetails1.getCaseData();
+        CaseData caseData = caseDetails1.getCaseData();
         caseData.setHearingCollection(null);
         DynamicJudgements.dynamicJudgements(caseData);
-        var dynamicValue = DynamicListHelper.getDynamicValue(NO_HEARINGS);
+        DynamicValueType dynamicValue = DynamicListHelper.getDynamicValue(NO_HEARINGS);
         assertEquals(dynamicValue, caseData.getJudgementCollection()
                 .get(0).getValue().getDynamicJudgementHearing().getListItems().get(0));
 

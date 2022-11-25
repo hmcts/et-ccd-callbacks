@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ecm.common.model.helper.BulkCasesPayload;
 import uk.gov.hmcts.ecm.common.model.helper.BulkRequestPayload;
 import uk.gov.hmcts.et.common.model.bulk.BulkCallbackResponse;
 import uk.gov.hmcts.et.common.model.bulk.BulkRequest;
@@ -63,11 +64,11 @@ public class PersistentQueueActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkRequestPayload = new BulkRequestPayload();
+        BulkRequestPayload bulkRequestPayload = new BulkRequestPayload();
 
         if (bulkRequest.getCaseDetails().getCaseData().getMultipleSource() != null
                 && !bulkRequest.getCaseDetails().getCaseData().getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE)) {
-            var bulkCasesPayload = bulkSearchService.bulkCasesRetrievalRequestElasticSearch(
+            BulkCasesPayload bulkCasesPayload = bulkSearchService.bulkCasesRetrievalRequestElasticSearch(
                     bulkRequest.getCaseDetails(), userToken, true, false);
             bulkRequestPayload = bulkCreationService.bulkCreationLogic(bulkRequest.getCaseDetails(),
                     bulkCasesPayload, userToken, UPDATE_SINGLES_PQ_STEP);
@@ -103,7 +104,7 @@ public class PersistentQueueActionsController {
         List<SubmitEvent> submitEvents = bulkSearchService.retrievalCasesForPreAcceptRequest(
                 bulkRequest.getCaseDetails(), userToken);
 
-        var bulkRequestPayload = bulkUpdateService.bulkPreAcceptLogic(bulkRequest.getCaseDetails(),
+        BulkRequestPayload bulkRequestPayload = bulkUpdateService.bulkPreAcceptLogic(bulkRequest.getCaseDetails(),
                 submitEvents, userToken, true);
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
@@ -132,7 +133,7 @@ public class PersistentQueueActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkRequestPayload = bulkCreationService.bulkUpdateCaseIdsLogic(
+        BulkRequestPayload bulkRequestPayload = bulkCreationService.bulkUpdateCaseIdsLogic(
                 bulkRequest, userToken, true);
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()

@@ -32,19 +32,19 @@ class SingleCasesValidator {
 
     List<ValidatedSingleCase> getValidatedCases(List<String> ethosCaseReferences, MultipleDetails multipleDetails,
                                                 String authToken) throws IOException {
-        var partitionedCaseReferences = Lists.partition(ethosCaseReferences, ELASTICSEARCH_TERMS_SIZE);
-        var isScotland = SCOTLAND_BULK_CASE_TYPE_ID.equals(multipleDetails.getCaseTypeId());
-        var validatedSingleCases = new ArrayList<ValidatedSingleCase>();
-        for (var caseReferences : partitionedCaseReferences) {
-            var submitEvents = ccdClient.retrieveCasesElasticSearchForCreation(authToken,
+        List<List<String>> partitionedCaseReferences = Lists.partition(ethosCaseReferences, ELASTICSEARCH_TERMS_SIZE);
+        boolean isScotland = SCOTLAND_BULK_CASE_TYPE_ID.equals(multipleDetails.getCaseTypeId());
+        List<ValidatedSingleCase> validatedSingleCases = new ArrayList<>();
+        for (List<String> caseReferences : partitionedCaseReferences) {
+            List<SubmitEvent> submitEvents = ccdClient.retrieveCasesElasticSearchForCreation(authToken,
                     UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()),
                     caseReferences,
                     MANUALLY_CREATED_POSITION);
             log.info("Search returned {} results", submitEvents.size());
 
-            for (var ethosCaseReference : caseReferences) {
+            for (String ethosCaseReference : caseReferences) {
                 log.info(ethosCaseReference);
-                var searchResult = submitEvents.stream()
+                Optional<SubmitEvent> searchResult = submitEvents.stream()
                         .filter(se -> se.getCaseData().getEthosCaseReference().equals(ethosCaseReference))
                         .findFirst();
 
@@ -58,7 +58,7 @@ class SingleCasesValidator {
     private ValidatedSingleCase create(String ethosCaseReference, Optional<SubmitEvent> submitEventOptional,
                                        boolean isScotland, String multipleManagingOffice) {
         if (submitEventOptional.isPresent()) {
-            var submitEvent = submitEventOptional.get();
+            SubmitEvent submitEvent = submitEventOptional.get();
 
             if (!isAccepted(submitEvent)) {
                 return ValidatedSingleCase.createInvalidCase(ethosCaseReference,

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferOfficeService;
@@ -72,7 +73,7 @@ public class CaseTransferController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         CaseTransferOfficeService.populateTransferToScotlandOfficeOptions(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -99,7 +100,7 @@ public class CaseTransferController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         CaseTransferOfficeService.populateTransferToEnglandWalesOfficeOptions(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -126,6 +127,7 @@ public class CaseTransferController {
         }
 
         List<String> errors = caseTransferSameCountryService.transferCase(ccdRequest.getCaseDetails(), userToken);
+        ccdRequest.getCaseDetails().getCaseData().setSuggestedHearingVenues(null);
 
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
@@ -151,7 +153,9 @@ public class CaseTransferController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var errors = caseTransferSameCountryService.updateEccLinkedCase(ccdRequest.getCaseDetails(), userToken);
+        List<String> errors = caseTransferSameCountryService.updateEccLinkedCase(ccdRequest.getCaseDetails(),
+            userToken);
+        ccdRequest.getCaseDetails().getCaseData().setSuggestedHearingVenues(null);
 
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
@@ -177,6 +181,7 @@ public class CaseTransferController {
         }
 
         List<String> errors = caseTransferDifferentCountryService.transferCase(ccdRequest.getCaseDetails(), userToken);
+        ccdRequest.getCaseDetails().getCaseData().setSuggestedHearingVenues(null);
 
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }

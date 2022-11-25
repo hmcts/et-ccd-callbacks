@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
+import io.micrometer.core.instrument.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -83,7 +84,7 @@ public class MultipleCreationService {
 
     private void multipleCreationUI(String userToken, MultipleDetails multipleDetails, List<String> errors) {
 
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
 
         multipleData.setPreAcceptDone(YES);
 
@@ -161,10 +162,9 @@ public class MultipleCreationService {
 
             for (CaseMultipleTypeItem caseMultipleTypeItem : caseMultipleTypeItemList) {
 
-                var multipleObjectType = caseMultipleTypeItem.getValue();
+                MultipleObjectType multipleObjectType = caseMultipleTypeItem.getValue();
 
-                if (multipleObjectType.getSubMultiple() != null
-                        && !multipleObjectType.getSubMultiple().trim().isEmpty()
+                if (StringUtils.isNotBlank(multipleObjectType.getSubMultiple())
                         && !subMultipleNames.contains(multipleObjectType.getSubMultiple())) {
 
                     subMultipleNames.add(multipleObjectType.getSubMultiple());
@@ -204,7 +204,7 @@ public class MultipleCreationService {
 
     private String generateMultipleRef(MultipleDetails multipleDetails) {
 
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
 
         if (multipleData.getMultipleReference() == null
                 || multipleData.getMultipleReference().trim().equals("")) {
@@ -233,7 +233,7 @@ public class MultipleCreationService {
 
     private void getLeadMarkUpAndAddLeadToCaseIds(String userToken, MultipleDetails multipleDetails) {
 
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
 
         String leadCase;
 
@@ -273,7 +273,7 @@ public class MultipleCreationService {
 
         log.info("Ethos case ref collection: " + ethosCaseRefCollection);
 
-        var refMarkup = MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl, multipleDetails.getCaseId(),
+        String refMarkup = MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl, multipleDetails.getCaseId(),
                 multipleDetails.getCaseData().getMultipleReference());
 
         if (!ethosCaseRefCollection.isEmpty()) {

@@ -39,23 +39,23 @@ class CaseTransferToEcmServiceTest {
 
     @Test
     void transferToEcm() {
-        var ecmOfficeCT = TribunalOffice.BRISTOL.getOfficeName();
-        var caseDetails = createCaseDetails(TribunalOffice.LEEDS.getOfficeName(), ecmOfficeCT);
+        String ecmOfficeCT = TribunalOffice.BRISTOL.getOfficeName();
+        CaseDetails caseDetails = createCaseDetails(TribunalOffice.LEEDS.getOfficeName(), ecmOfficeCT);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, AUTH_TOKEN))
                 .thenReturn(List.of(caseDetails.getCaseData()));
 
-        var errors = caseTransferToEcmService.createCaseTransferToEcm(caseDetails, AUTH_TOKEN);
+        List<String> errors = caseTransferToEcmService.createCaseTransferToEcm(caseDetails, AUTH_TOKEN);
         assertTrue(errors.isEmpty());
         verify(caseTransferEventService, times(1)).transferToEcm(isA(CaseTransferToEcmParams.class));
     }
 
     @Test
     void noCasesFound() {
-        var ecmOfficeCT = TribunalOffice.BRISTOL.getOfficeName();
-        var caseDetails = createCaseDetails(TribunalOffice.LEEDS.getOfficeName(), ecmOfficeCT);
+        String ecmOfficeCT = TribunalOffice.BRISTOL.getOfficeName();
+        CaseDetails caseDetails = createCaseDetails(TribunalOffice.LEEDS.getOfficeName(), ecmOfficeCT);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, AUTH_TOKEN))
                 .thenReturn(Collections.emptyList());
-        var errors = caseTransferToEcmService.createCaseTransferToEcm(caseDetails, AUTH_TOKEN);
+        List<String> errors = caseTransferToEcmService.createCaseTransferToEcm(caseDetails, AUTH_TOKEN);
         assertEquals(1, errors.size());
         assertEquals(String.format(NO_CASES_FOUND, "60000001/2022"), errors.get(0));
     }

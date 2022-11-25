@@ -185,9 +185,9 @@ public final class MultipleUtil {
         judgementTypeItem.setId("1");
         caseData.setJudgementCollection(new ArrayList<>(Collections.singletonList(judgementTypeItem)));
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
-        RepresentedTypeR representedTypeR = new RepresentedTypeR();
-        representedTypeR.setRespRepName("Respondent");
-        representedTypeR.setNameOfRepresentative("Representative");
+        RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
+            .respRepName("Respondent")
+            .nameOfRepresentative("Representative").build();
         representedTypeRItem.setValue(representedTypeR);
         representedTypeRItem.setId("1");
         caseData.setRepCollection(new ArrayList<>(Collections.singletonList(representedTypeRItem)));

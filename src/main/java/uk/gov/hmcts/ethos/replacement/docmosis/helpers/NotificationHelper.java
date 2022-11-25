@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
@@ -36,10 +37,12 @@ public final class NotificationHelper {
     /**
      * Builds personalisation object for sending an email to the claimant or claimant rep.
      */
-    public static Map<String, String> buildMapForClaimant(CaseData caseData) {
+    public static Map<String, String> buildMapForClaimant(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
         personalisation.put("emailAddress", getEmailAddressForClaimant(caseData));
+        personalisation.put("ccdId", caseDetails.getCaseId());
         RepresentedTypeC representativeClaimantType = caseData.getRepresentativeClaimantType();
 
         String initialTitle;
@@ -72,10 +75,12 @@ public final class NotificationHelper {
     /**
      * Builds personalisation object for sending an email to the respondent or their rep.
      */
-    public static Map<String, String> buildMapForRespondent(CaseData caseData, RespondentSumType respondent) {
+    public static Map<String, String> buildMapForRespondent(CaseDetails caseDetails, RespondentSumType respondent) {
+        CaseData caseData = caseDetails.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
         personalisation.put("emailAddress", getEmailAddressForRespondent(caseData, respondent));
+        personalisation.put("ccdId", caseDetails.getCaseId());
         RepresentedTypeR respondentRepresentative = getRespondentRepresentative(caseData, respondent);
 
         if (respondentRepresentative == null) {

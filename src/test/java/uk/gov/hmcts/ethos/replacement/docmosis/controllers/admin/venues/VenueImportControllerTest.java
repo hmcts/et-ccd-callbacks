@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.venues.VenueImportService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AdminDataBuilder;
@@ -44,12 +45,12 @@ class VenueImportControllerTest {
 
     @Test
     void testInitImportSuccess() throws Exception {
-        var documentBinaryUrl = "http://dm-store:8888/documents/12131212";
-        var ccdRequest = AdminDataBuilder
+        String documentBinaryUrl = "http://dm-store:8888/documents/12131212";
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withVenueImport(TribunalOffice.LEEDS, documentBinaryUrl)
                 .buildAsCCDRequest();
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/admin/venue/initImport")
@@ -66,12 +67,12 @@ class VenueImportControllerTest {
 
     @Test
     void testInitImportForbidden() throws Exception {
-        var documentBinaryUrl = "http://dm-store:8888/documents/12131212";
-        var ccdRequest = AdminDataBuilder
+        String documentBinaryUrl = "http://dm-store:8888/documents/12131212";
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withVenueImport(TribunalOffice.LEEDS, documentBinaryUrl)
                 .buildAsCCDRequest();
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/admin/venue/initImport")
@@ -96,12 +97,12 @@ class VenueImportControllerTest {
 
     @Test
     void testImportSuccess() throws Exception {
-        var documentBinaryUrl = "http://dm-store:8888/documents/12131212";
-        var ccdRequest = AdminDataBuilder
+        String documentBinaryUrl = "http://dm-store:8888/documents/12131212";
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withVenueImport(TribunalOffice.LEEDS, documentBinaryUrl)
                 .buildAsCCDRequest();
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/admin/venue/import")
@@ -118,12 +119,12 @@ class VenueImportControllerTest {
 
     @Test
     void testImportForbidden() throws Exception {
-        var documentBinaryUrl = "http://dm-store:8888/documents/12131212";
-        var ccdRequest = AdminDataBuilder
+        String documentBinaryUrl = "http://dm-store:8888/documents/12131212";
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withVenueImport(TribunalOffice.LEEDS, documentBinaryUrl)
                 .buildAsCCDRequest();
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/admin/venue/import")

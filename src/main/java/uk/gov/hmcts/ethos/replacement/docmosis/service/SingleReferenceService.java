@@ -21,7 +21,7 @@ public class SingleReferenceService {
     private final SingleRefEnglandWalesRepository singleRefEnglandWalesRepository;
 
     public synchronized String createReference(String caseTypeId) {
-        var currentYear = LocalDate.now().getYear();
+        int currentYear = LocalDate.now().getYear();
         switch (caseTypeId) {
             case ENGLANDWALES_CASE_TYPE_ID:
                 return singleRefEnglandWalesRepository.ethosCaseRefGen(currentYear);

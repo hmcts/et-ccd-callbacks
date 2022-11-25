@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
@@ -193,6 +194,19 @@ public class InitialConsiderationService {
                 removeEtICHearingAlreadyListedNoValue(caseData);
             }
         }
+    }
+
+    /**
+     * Sets etICHearingAlreadyListed if the case has a hearing listed.
+     * @param caseData data about the current case
+     */
+    public void setIsHearingAlreadyListed(CaseData caseData, String caseTypeId) {
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            return;
+        }
+        caseData.setEtICHearingAlreadyListed(HEARING_MISSING.equals(caseData.getEtInitialConsiderationHearing())
+            ? NO : YES
+        );
     }
 
     private void removeEtIcCanProceedYesValue(CaseData caseData) {

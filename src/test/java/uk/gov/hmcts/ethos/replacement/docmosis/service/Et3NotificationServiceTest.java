@@ -24,10 +24,11 @@ class Et3NotificationServiceTest {
     @Mock
     private EmailService emailService;
     private CaseData caseData;
+    private CaseDetails caseDetails;
 
     @BeforeEach
     void setUp() {
-        CaseDetails caseDetails = CaseDataBuilder.builder()
+        caseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")
             .withClaimantType("claimant@unrepresented.com")
             .withRepresentativeClaimantType("Claimant Rep", "claimant@represented.com")
@@ -43,13 +44,14 @@ class Et3NotificationServiceTest {
             .withRespondentRepresentative("Respondent Represented", "Rep LastName", "res@rep.com")
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
+        caseDetails.setCaseId("1234");
         caseData = caseDetails.getCaseData();
         caseData.setClaimant("Claimant LastName");
     }
 
     @Test
     void sendNotifications_shouldSendThreeNotifications() {
-        et3NotificationService.sendNotifications(caseData);
+        et3NotificationService.sendNotifications(caseDetails);
         verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), any());
         verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), any());
         verify(emailService, times(1)).sendEmail(any(), eq("res@rep.com"), any());
@@ -61,7 +63,7 @@ class Et3NotificationServiceTest {
         caseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(null);
         caseData.getRepCollection().get(0).getValue().setRepresentativeEmailAddress(null);
         caseData.getRespondentCollection().get(0).getValue().setRespondentEmail(null);
-        et3NotificationService.sendNotifications(caseData);
+        et3NotificationService.sendNotifications(caseDetails);
         verify(emailService, times(0)).sendEmail(any(), any(), any());
     }
 }

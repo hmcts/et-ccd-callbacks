@@ -4,6 +4,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.CourtWorkerService;
@@ -23,19 +24,20 @@ class CourtWorkerSelectionServiceTest {
     @ParameterizedTest
     @MethodSource
     void testCreateCourtWorkerSelection(TribunalOffice tribunalOffice, TribunalOffice expectedTribunalOffice) {
-        var expectedCode = "TestCode";
-        var expectedLabel = "TestLabel";
-        var courtWorkerService = mock(CourtWorkerService.class);
+        String expectedCode = "TestCode";
+        String expectedLabel = "TestLabel";
+        CourtWorkerService courtWorkerService = mock(CourtWorkerService.class);
         when(courtWorkerService.getCourtWorkerByTribunalOffice(any(TribunalOffice.class), any(CourtWorkerType.class)))
                 .thenReturn(List.of(DynamicValueType.create(expectedCode, expectedLabel)));
 
-        var courtWorkerSelectionService = new CourtWorkerSelectionService(courtWorkerService);
-        var selection = courtWorkerSelectionService.createCourtWorkerSelection(tribunalOffice, CourtWorkerType.CLERK);
+        CourtWorkerSelectionService courtWorkerSelectionService = new CourtWorkerSelectionService(courtWorkerService);
+        DynamicFixedListType selection = courtWorkerSelectionService.createCourtWorkerSelection(tribunalOffice,
+            CourtWorkerType.CLERK);
         assertEquals(1, selection.getListItems().size());
         assertEquals(expectedCode, selection.getListItems().get(0).getCode());
         assertEquals(expectedLabel, selection.getListItems().get(0).getLabel());
-        verify(courtWorkerService, times(1)).getCourtWorkerByTribunalOffice(expectedTribunalOffice,
-                CourtWorkerType.CLERK);
+        verify(courtWorkerService, times(1)).getCourtWorkerByTribunalOffice(
+            expectedTribunalOffice, CourtWorkerType.CLERK);
     }
 
     private static Stream<Arguments> testCreateCourtWorkerSelection() { //NOPMD - parameterized tests source method

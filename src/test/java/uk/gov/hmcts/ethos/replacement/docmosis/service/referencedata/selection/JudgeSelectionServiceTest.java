@@ -8,6 +8,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.SelectionServiceTestUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.JudgeService;
 
+import java.util.List;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -17,12 +19,12 @@ public class JudgeSelectionServiceTest {
 
     @Test
     public void testCreateJudgeSelectionNoSelectedJudgeEnglandWales() {
-        var tribunalOffice = TribunalOffice.MANCHESTER;
-        var judgeService = mockJudgeService(tribunalOffice);
-        var selectedHearing = mockHearing(null);
+        TribunalOffice tribunalOffice = TribunalOffice.MANCHESTER;
+        JudgeService judgeService = mockJudgeService(tribunalOffice);
+        HearingType selectedHearing = mockHearing(null);
 
-        var judgeSelectionService = new JudgeSelectionService(judgeService);
-        var actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice, selectedHearing);
+        JudgeSelectionService judgeSelectionService = new JudgeSelectionService(judgeService);
+        DynamicFixedListType actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice, selectedHearing);
 
         verify(judgeService, times(1)).getJudgesDynamicList(tribunalOffice);
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(actualResult, "judge", "Judge ");
@@ -30,13 +32,13 @@ public class JudgeSelectionServiceTest {
 
     @Test
     public void testCreateJudgeSelectionWithSelectedJudgeEnglandWales() {
-        var tribunalOffice = TribunalOffice.MANCHESTER;
-        var judgeService = mockJudgeService(tribunalOffice);
-        var selectedJudge = DynamicValueType.create("judge2", "Judge 2");
-        var selectedHearing = mockHearing(selectedJudge);
+        TribunalOffice tribunalOffice = TribunalOffice.MANCHESTER;
+        JudgeService judgeService = mockJudgeService(tribunalOffice);
+        DynamicValueType selectedJudge = DynamicValueType.create("judge2", "Judge 2");
+        HearingType selectedHearing = mockHearing(selectedJudge);
 
-        var judgeSelectionService = new JudgeSelectionService(judgeService);
-        var actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice, selectedHearing);
+        JudgeSelectionService judgeSelectionService = new JudgeSelectionService(judgeService);
+        DynamicFixedListType actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice, selectedHearing);
 
         verify(judgeService, times(1)).getJudgesDynamicList(tribunalOffice);
         SelectionServiceTestUtils.verifyDynamicFixedListSelected(actualResult, "judge", "Judge ", selectedJudge);
@@ -44,12 +46,12 @@ public class JudgeSelectionServiceTest {
 
     @Test
     public void testCreateJudgeSelectionNoSelectedJudgeScotland() {
-        var tribunalOffice = TribunalOffice.ABERDEEN;
-        var judgeService = mockJudgeService(TribunalOffice.SCOTLAND);
-        var selectedHearing = mockHearing(null);
+        TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
+        JudgeService judgeService = mockJudgeService(TribunalOffice.SCOTLAND);
+        HearingType selectedHearing = mockHearing(null);
 
-        var judgeSelectionService = new JudgeSelectionService(judgeService);
-        var actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice, selectedHearing);
+        JudgeSelectionService judgeSelectionService = new JudgeSelectionService(judgeService);
+        DynamicFixedListType actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice, selectedHearing);
 
         verify(judgeService, times(1)).getJudgesDynamicList(TribunalOffice.SCOTLAND);
 
@@ -58,13 +60,13 @@ public class JudgeSelectionServiceTest {
 
     @Test
     public void testCreateJudgeSelectionWithSelectedJudgeScotland() {
-        var tribunalOffice = TribunalOffice.ABERDEEN;
-        var judgeService = mockJudgeService(TribunalOffice.SCOTLAND);
-        var selectedJudge = DynamicValueType.create("judge2", "Judge 2");
-        var selectedHearing = mockHearing(selectedJudge);
+        TribunalOffice tribunalOffice = TribunalOffice.ABERDEEN;
+        JudgeService judgeService = mockJudgeService(TribunalOffice.SCOTLAND);
+        DynamicValueType selectedJudge = DynamicValueType.create("judge2", "Judge 2");
+        HearingType selectedHearing = mockHearing(selectedJudge);
 
-        var judgeSelectionService = new JudgeSelectionService(judgeService);
-        var actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice, selectedHearing);
+        JudgeSelectionService judgeSelectionService = new JudgeSelectionService(judgeService);
+        DynamicFixedListType actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice, selectedHearing);
 
         verify(judgeService, times(1)).getJudgesDynamicList(TribunalOffice.SCOTLAND);
 
@@ -72,18 +74,18 @@ public class JudgeSelectionServiceTest {
     }
 
     private JudgeService mockJudgeService(TribunalOffice tribunalOffice) {
-        var dynamicValues = SelectionServiceTestUtils.createListItems("judge", "Judge ");
+        List<DynamicValueType> dynamicValues = SelectionServiceTestUtils.createListItems("judge", "Judge ");
 
-        var judgeService = mock(JudgeService.class);
+        JudgeService judgeService = mock(JudgeService.class);
         when(judgeService.getJudgesDynamicList(tribunalOffice)).thenReturn(dynamicValues);
         return judgeService;
     }
 
     private HearingType mockHearing(DynamicValueType selectedValue) {
-        var hearing = mock(HearingType.class);
+        HearingType hearing = mock(HearingType.class);
         when(hearing.hasHearingJudge()).thenReturn(selectedValue != null);
         if (selectedValue != null) {
-            var dynamicFixedListType = mock(DynamicFixedListType.class);
+            DynamicFixedListType dynamicFixedListType = mock(DynamicFixedListType.class);
             when(dynamicFixedListType.getValue()).thenReturn(selectedValue);
             when(hearing.getJudge()).thenReturn(dynamicFixedListType);
         }

@@ -30,6 +30,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 class ServingServiceTest {
     private static CaseDetails caseDetails;
     private static CaseData notifyCaseData;
+    private static CaseDetails notifyCaseDetails;
 
     @MockBean
     private static EmailService emailService;
@@ -40,7 +41,7 @@ class ServingServiceTest {
     void setUp() throws Exception {
         caseDetails = generateCaseDetails("midServingCaseDetailsTest.json");
         servingService = new ServingService(emailService);
-        CaseDetails notifyCaseDetails = CaseDataBuilder.builder()
+        notifyCaseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")
             .withClaimantType("claimant@unrepresented.com")
             .withRepresentativeClaimantType("Claimant Rep", "claimant@represented.com")
@@ -56,6 +57,7 @@ class ServingServiceTest {
             .withRespondentRepresentative("Respondent Represented", "Rep LastName", "res@rep.com")
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
+        notifyCaseDetails.setCaseId("1234");
         notifyCaseData = notifyCaseDetails.getCaseData();
         notifyCaseData.setClaimant("Claimant LastName");
     }
@@ -110,7 +112,7 @@ class ServingServiceTest {
 
     @Test
     void sendNotifications_shouldSendThreeNotifications() {
-        servingService.sendNotifications(notifyCaseData);
+        servingService.sendNotifications(notifyCaseDetails);
         verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), any());
         verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), any());
         verify(emailService, times(1)).sendEmail(any(), eq("res@rep.com"), any());
@@ -122,7 +124,7 @@ class ServingServiceTest {
         notifyCaseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(null);
         notifyCaseData.getRepCollection().get(0).getValue().setRepresentativeEmailAddress(null);
         notifyCaseData.getRespondentCollection().get(0).getValue().setRespondentEmail(null);
-        servingService.sendNotifications(notifyCaseData);
+        servingService.sendNotifications(notifyCaseDetails);
         verify(emailService, times(0)).sendEmail(any(), any(), any());
     }
 }

@@ -104,9 +104,9 @@ public class LabelsHelperTest {
 
     @Test
     public void customiseSelectedAddressesMultiplesRespondentRep() {
-        RepresentedTypeR representedTypeR = new RepresentedTypeR();
-        representedTypeR.setNameOfRepresentative("Name");
-        representedTypeR.setRepresentativeReference("1234");
+        RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
+            .nameOfRepresentative("Name")
+            .representativeReference("1234").build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId("12345");
         representedTypeRItem.setValue(representedTypeR);

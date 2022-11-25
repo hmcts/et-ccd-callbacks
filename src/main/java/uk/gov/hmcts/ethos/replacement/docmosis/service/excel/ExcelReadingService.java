@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.Cell;
@@ -19,11 +16,25 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
-import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.*;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.CONSTRAINT_KEY;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_2;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_3;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_4;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_5;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HEADER_6;
+import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.SHEET_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.SELECT_ALL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleHelper.NOT_ALLOCATED;
 
@@ -71,13 +82,19 @@ public class ExcelReadingService {
 
     }
 
-    public void setSubMultipleFieldInSingleCaseData(String userToken, MultipleDetails multipleDetails, String ethosRef, String subMultiple) throws IOException {
+    public void setSubMultipleFieldInSingleCaseData(String userToken,
+                                                    MultipleDetails multipleDetails,
+                                                    String ethosRef,
+                                                    String subMultiple) throws IOException {
         List<SubmitEvent> submitEvents = ccdClient.retrieveCasesElasticSearch(userToken,
                 UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()), List.of(ethosRef));
         submitEvents.get(0).getCaseData().setSubMultipleName(Strings.isNullOrEmpty(subMultiple) ? " " : subMultiple);
-        CCDRequest returnedRequest = ccdClient.startEventForCase(userToken, UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()),
+        CCDRequest returnedRequest = ccdClient.startEventForCase(userToken,
+                UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()),
                 multipleDetails.getJurisdiction(), String.valueOf(submitEvents.get(0).getCaseId()));
-        ccdClient.submitEventForCase(userToken, submitEvents.get(0).getCaseData(), UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()),
+        ccdClient.submitEventForCase(userToken,
+                submitEvents.get(0).getCaseData(),
+                UtilHelper.getCaseTypeId(multipleDetails.getCaseTypeId()),
                 multipleDetails.getJurisdiction(), returnedRequest, String.valueOf(submitEvents.get(0).getCaseId()));
     }
 
@@ -120,7 +137,9 @@ public class ExcelReadingService {
 
     }
 
-    private void populateTreeMapWithSet(SortedMap<String, Object> multipleObjects, String key, String value) {
+    private void populateTreeMapWithSet(SortedMap<String, Object> multipleObjects,
+                                        String key,
+                                        String value) {
 
         if (multipleObjects.containsKey(key)) {
             HashSet<String> set = (HashSet<String>) multipleObjects.get(key);
@@ -148,8 +167,10 @@ public class ExcelReadingService {
         }
     }
 
-    private void populateMultipleObjects(SortedMap<String, Object> multipleObjects, XSSFSheet datatypeSheet,
-                                         MultipleData multipleData, FilterExcelType filter) {
+    private void populateMultipleObjects(SortedMap<String, Object> multipleObjects,
+                                         XSSFSheet datatypeSheet,
+                                         MultipleData multipleData,
+                                         FilterExcelType filter) {
 
         for (Row currentRow : datatypeSheet) {
 

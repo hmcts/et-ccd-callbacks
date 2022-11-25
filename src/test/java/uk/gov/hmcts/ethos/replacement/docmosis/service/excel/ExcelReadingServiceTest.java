@@ -35,6 +35,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.TESTI
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.TESTING_FILE_NAME_ERROR;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+@SuppressWarnings({"PMD.ExcessiveImports"})
 public class ExcelReadingServiceTest {
 
     @Mock

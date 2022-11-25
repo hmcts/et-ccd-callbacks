@@ -232,7 +232,7 @@ public class MultipleBatchUpdate2Service {
 
         List<MultipleObject> newMultipleObjectsUpdated = new ArrayList<>();
         multipleObjects.forEach((key, value) -> {
-            var multipleObject = (MultipleObject) value;
+            MultipleObject multipleObject = (MultipleObject) value;
             if (multipleObjectsFiltered.contains(key)) {
                 multipleObject.setSubMultiple(updatedSubMultipleRef);
                 try {

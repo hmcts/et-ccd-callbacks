@@ -91,7 +91,7 @@ public class MultipleUploadService {
                 multipleDetails.getCaseData(),
                 FilterExcelType.ALL);
         multipleObjects.forEach((key, value) -> {
-            var multipleObject = (MultipleObject) value;
+            MultipleObject multipleObject = (MultipleObject) value;
             try {
                 excelReadingService.setSubMultipleFieldInSingleCaseData(userToken,
                         multipleDetails,

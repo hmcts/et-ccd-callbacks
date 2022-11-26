@@ -25,6 +25,7 @@
         "codeceptjs:headless": "HEADLESS=true codeceptjs run --steps"
     },
     "devDependencies": {
+        "@babel/eslint-parser": "^7.17.0",
         "@types/chai-as-promised": "^7.1.5",
         "@types/git-rev-sync": "2.0.0",
         "@types/jest": "^29.0.0",
@@ -38,8 +39,6 @@
         "chai-as-promised": "7.1.1",
         "chai-http": "4.3.0",
         "codeceptjs": "3.3.3",
-        "eslint": "8.13.0",
-        "eslint-plugin-mocha": "10.0.4",
         "istanbul": "1.1.0-alpha.1",
         "mocha": "9.2.2",
         "mocha-jenkins-reporter": "0.4.7",
@@ -66,7 +65,7 @@
         "unirest": "0.6.0",
         "uuid": "8.3.2",
         "watch": "1.0.2",
-        "webdriverio": "7.19.4",
+        "webdriverio": "^7.27.0",
         "when": "3.7.8"
     },
     "resolutions": {

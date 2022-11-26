@@ -1,10 +1,20 @@
-const config = require('../config.js');
+const testConfig = require('../config.js');
 
 exports.config = {
-    tests: config.TestPathToRun,
-    output: `${process.cwd()}/${config.TestOutputDir}`,
+    tests: testConfig.TestPathToRun,
+    output: `${process.cwd()}/${testConfig.TestOutputDir}`,
     helpers: {
-        Puppeteer: {
+        Playwright: {
+            url: testConfig.TestUrl,
+            show: testConfig.TestShowBrowserWindow,
+            restart: false,
+            timeout: 5000,
+            waitForNavigation: 'domcontentloaded',
+            waitForTimeout: 10000,
+            ignoreHTTPSErrors: true,
+            windowSize: '1920x1080',
+        },
+        /*Puppeteer: {
             url: config.TestUrl,
             waitForTimeout: 40000,
             getPageTimeout: 40000,
@@ -30,10 +40,10 @@ exports.config = {
                     '--window-size=1440,1400'
                 ]
             },
-        },
-        PuppeteerHelper: {
+        },*/
+        /*PuppeteerHelper: {
             require: './helpers/PuppeteerHelper.js'
-        },
+        },*/
         REST: {
             endpoint: 'https://idam-api.aat.platform.hmcts.net/loginUser'
         },
@@ -69,7 +79,7 @@ exports.config = {
                 stdout: './functional-output/console.log',
                 options: {
                     includeScreenshots: true,
-                    reportDir: config.TestOutputDir || './functional-output',
+                    reportDir: testConfig.TestOutputDir || './functional-output',
                     reportFilename: 'ET-CCD-Callbacks-tests',
                     reportTitle: 'ET CCD Callbacks Tests',
                     inline: true,

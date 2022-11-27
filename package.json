@@ -8,6 +8,11 @@
     },
     "dependencies": {
         "@hmcts/nodejs-logging": "4.0.2",
+        "@wdio/crossbrowsertesting-service": "7.25.4",
+        "@wdio/sauce-service": "7.25.4",
+        "@wdio/selenium-standalone-service": "7.25.4",
+        "@wdio/types": "7.25.4",
+        "codeceptjs-saucehelper": "1.4.0",
         "axios": "0.27.2",
         "cross-env": "7.0.3",
         "html_codesniffer": "2.5.1",

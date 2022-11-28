@@ -436,10 +436,10 @@ public class CaseActionsForCaseWorkerController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        respondentRepresentativeService.getOrganisationPolicies(caseData).entrySet()
-            .forEach(entry -> respondentRepresentativeService.updateCaseWithOrganisationPolicyDetails(caseData, entry));
-
         List<String> errors = eventValidationService.validateRespRepNames(caseData);
+
+        //add org policy and NOC elements
+        caseData = respondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
 
         eventValidationService.validateMaximumSize(caseData).ifPresent(errors::add);
 

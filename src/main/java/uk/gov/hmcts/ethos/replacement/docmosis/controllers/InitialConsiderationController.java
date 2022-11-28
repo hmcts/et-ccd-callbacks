@@ -32,6 +32,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class InitialConsiderationController {
 
     private final VerifyTokenService verifyTokenService;
@@ -69,6 +70,36 @@ public class InitialConsiderationController {
             .build());
     }
 
+    /**
+     * About to Submit callback which handle the submission of data from the event into CCD and generates a PDF.
+     * @param ccdRequest Holds the request and case data
+     * @param userToken Used for authorisation
+     * @return caseData in ccdRequest
+     */
+    @PostMapping(value = "/submitInitialConsideration", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Handles Initial Consideration Submission")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
+        @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")})
+    public ResponseEntity<CCDCallbackResponse> submitInitialConsideration(@RequestBody CCDRequest ccdRequest,
+                                                                          @RequestHeader(value = "Authorization")
+                                                                                  String userToken) {
+        log.info("INITIAL CONSIDERATION ABOUT TO SUBMIT ---> {}", ccdRequest.getCaseDetails().getCaseId());
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        initialConsiderationService.clearHiddenValue(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
+        DocumentInfo documentInfo = initialConsiderationService.generateDocument(caseData, userToken,
+                ccdRequest.getCaseDetails().getCaseTypeId());
+        caseData.setEtInitialConsiderationDocument(documentManagementService.addDocumentToDocumentField(documentInfo));
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
     @PostMapping(value = "/startInitialConsideration", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "start the Initial Consideration flow")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
@@ -94,36 +125,6 @@ public class InitialConsiderationController {
         caseData.setEtInitialConsiderationJurisdictionCodes(
             initialConsiderationService.generateJurisdictionCodesHtml(caseData.getJurCodesCollection()));
 
-        return getCallbackRespEntityNoErrors(caseData);
-    }
-
-    /**
-     * About to Submit callback which handle the submission of data from the event into CCD and generates a PDF.
-     * @param ccdRequest Holds the request and case data
-     * @param userToken Used for authorisation
-     * @return caseData in ccdRequest
-     */
-    @PostMapping(value = "/submitInitialConsideration", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Handles Initial Consideration Submission")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
-        @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> submitInitialConsideration(@RequestBody CCDRequest ccdRequest,
-                                                                          @RequestHeader(value = "Authorization")
-                                                                          String userToken) {
-        log.info("INITIAL CONSIDERATION ABOUT TO SUBMIT ---> {}", ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        initialConsiderationService.clearHiddenValue(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
-        DocumentInfo documentInfo = initialConsiderationService.generateDocument(caseData, userToken,
-                ccdRequest.getCaseDetails().getCaseTypeId());
-        caseData.setEtInitialConsiderationDocument(documentManagementService.addDocumentToDocumentField(documentInfo));
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

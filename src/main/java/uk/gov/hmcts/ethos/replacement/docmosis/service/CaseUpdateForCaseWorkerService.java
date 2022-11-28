@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 
 @Slf4j
 @Service("CaseUpdateForCaseWorkerService")
+@SuppressWarnings({"PMD.PreserveStackTrace"})
 public class CaseUpdateForCaseWorkerService {
 
     private static final String MESSAGE = "Failed to update case for case id : ";

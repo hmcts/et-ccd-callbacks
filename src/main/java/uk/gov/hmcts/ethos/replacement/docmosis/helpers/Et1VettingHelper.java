@@ -18,7 +18,8 @@ import static uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType.getSe
 /**
  * ET1 Vetting Helper provides methods to assist with the ET1 vetting event.
  */
-public class Et1VettingHelper {
+@SuppressWarnings({"PMD.LinguisticNaming", "PDM.TooManyFields", "PMD.ConfusingTernary", "PMD.ExcessiveMethodLength"})
+public final class Et1VettingHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-01140.docx";
@@ -95,6 +96,7 @@ public class Et1VettingHelper {
                 .et1ReasonableAdjustmentsTextArea(defaultIfEmpty(caseData.getEt1ReasonableAdjustmentsTextArea(), null))
                 .et1VideoHearingQuestion(defaultIfEmpty(caseData.getEt1VideoHearingQuestion(), null))
                 .et1VideoHearingTextArea(defaultIfEmpty(caseData.getEt1VideoHearingTextArea(), null))
+                .et1FurtherQuestionsGeneralNotes(defaultIfEmpty(caseData.getEt1FurtherQuestionsGeneralNotes(), null))
                 .referralToJudgeOrLOList(CollectionUtils.isEmpty(caseData.getReferralToJudgeOrLOList())
                         ? null
                         : caseData.getReferralToJudgeOrLOList().toString())

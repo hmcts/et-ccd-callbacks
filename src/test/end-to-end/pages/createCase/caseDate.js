@@ -27,5 +27,5 @@ module.exports =  async function () {
     I.fillField(caseDateConfig.submission_reference,'123456789012');
     I.selectOption(caseDateConfig.tribunal_office,'3: London Central');
 
-    I.navByClick(commonConfig.continueButton);
+    I.click(commonConfig.continueButton);
 }

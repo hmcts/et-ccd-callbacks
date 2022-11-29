@@ -12,7 +12,7 @@ Scenario('Case Creation Test', async ({ I }) => {
    await clickCreateCase(I);
    I.wait(commonConfig.time_interval_2_seconds);
    I.click('Submit');
-   I.wait(commonConfig.time_interval_1_second);
+   I.wait(4);
    await verifyApplicationTabs(I);
 
-}).tag('@RET-BAT').tag('@nightly').tag('@pats').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT').tag('@nightly').tag('@crossbrowser').retry(testConfig.TestRetryScenarios);

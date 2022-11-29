@@ -2,7 +2,7 @@ const LATEST_MAC = 'macOS 10.15';
 const LATEST_WINDOWS = 'Windows 10';
 
 const supportedBrowsers = {
-  microsoft: {
+  /*microsoft: {
     edge: {
       browserName: 'MicrosoftEdge',
       platformName: LATEST_WINDOWS,
@@ -23,7 +23,7 @@ const supportedBrowsers = {
         screenResolution: '1400x1050'
       }
     }
-  },
+  },*/
   chrome: {
     chrome_win_latest: {
       browserName: 'chrome',

@@ -13,14 +13,14 @@ import java.util.Optional;
 public enum SolicitorRole {
     SOLICITORA("[SOLICITORA]", 0),
     SOLICITORB("[SOLICITORB]", 1),
-    SOLICITORC("[SOLICITORC]", 1),
-    SOLICITORD("[SOLICITORD]", 1),
-    SOLICITORE("[SOLICITORE]", 1),
-    SOLICITORF("[SOLICITORF]", 1),
-    SOLICITORG("[SOLICITORG]", 1),
-    SOLICITORH("[SOLICITORH]", 1),
-    SOLICITORI("[SOLICITORI]", 1),
-    SOLICITORJ("[SOLICITORJ]", 1);
+    SOLICITORC("[SOLICITORC]", 2),
+    SOLICITORD("[SOLICITORD]", 3),
+    SOLICITORE("[SOLICITORE]", 4),
+    SOLICITORF("[SOLICITORF]", 5),
+    SOLICITORG("[SOLICITORG]", 6),
+    SOLICITORH("[SOLICITORH]", 7),
+    SOLICITORI("[SOLICITORI]", 8),
+    SOLICITORJ("[SOLICITORJ]", 9);
 
     private final String caseRoleLabel;
     private final int index;

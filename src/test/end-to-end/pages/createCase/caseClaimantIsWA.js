@@ -9,5 +9,5 @@ module.exports =  async function () {
     I.see('Is this the same as the claimant\'s work address?');
     I.checkOption(caseClaimantWorkAddress.claimants_work_address_question_no);
 
-    I.navByClick('Continue');
+    I.click('Continue');
 }

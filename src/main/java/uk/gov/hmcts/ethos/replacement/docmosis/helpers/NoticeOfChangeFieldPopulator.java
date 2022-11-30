@@ -19,8 +19,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFiel
 @Component
 @RequiredArgsConstructor
 public class NoticeOfChangeFieldPopulator {
-    public final RespondentPolicyConverter policyConverter;
-    public final NoticeOfChangeAnswersConverter answersConverter;
+    private final RespondentPolicyConverter policyConverter;
+    private final NoticeOfChangeAnswersConverter answersConverter;
 
     public Map<String, Object> generate(CaseData caseData) {
         return generate(caseData, POPULATE);

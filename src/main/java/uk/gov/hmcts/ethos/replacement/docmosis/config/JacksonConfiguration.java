@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class JacksonConfiguration {
-
     @Bean
     @Primary
     public ObjectMapper objectMapper() {

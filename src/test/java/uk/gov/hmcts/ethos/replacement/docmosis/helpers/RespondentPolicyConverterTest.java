@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -40,6 +41,12 @@ class RespondentPolicyConverterTest {
     private static final String RESPONDENT_REP_NAME_THREE = "Legal Three";
     @Autowired
     private RespondentPolicyConverter respondentPolicyConverter;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private CaseConverter caseConverter;
 
     @BeforeEach
     void setUp() {

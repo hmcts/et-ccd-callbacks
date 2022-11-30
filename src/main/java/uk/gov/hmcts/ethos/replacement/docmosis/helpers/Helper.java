@@ -274,4 +274,10 @@ public final class Helper {
     public static String getCurrentDate() {
         return new SimpleDateFormat("dd MMM yyyy").format(new Date());
     }
+
+    public static String getRespondentNames(CaseData caseData) {
+        return caseData.getRespondentCollection().stream()
+            .map(o -> o.getValue().getRespondentName())
+            .collect(Collectors.joining(", "));
+    }
 }

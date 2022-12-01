@@ -38,6 +38,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
 @Slf4j
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.LinguisticNaming", "PMD.ConfusingTernary",
@@ -512,12 +513,6 @@ public final class ReferralHelper {
         personalisation.put("subject", getReferralSubject(caseData, isNew));
         personalisation.put("username", username);
         return personalisation;
-    }
-
-    private static String getRespondentNames(CaseData caseData) {
-        return caseData.getRespondentCollection().stream()
-            .map(o -> o.getValue().getRespondentName())
-            .collect(Collectors.joining(", "));
     }
 
     private static String getReferralSubject(CaseData caseData, boolean isNew) {

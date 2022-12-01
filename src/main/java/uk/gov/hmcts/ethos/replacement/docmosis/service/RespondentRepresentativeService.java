@@ -24,6 +24,11 @@ public class RespondentRepresentativeService {
 
     private final CaseConverter caseConverter;
 
+    /**
+     * Add respondent organisation policy and notice of change answer fields to the case data.
+     * @param caseData case data
+     * @return modified case data
+     */
     public CaseData prepopulateOrgPolicyAndNoc(CaseData caseData) {
         Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
         Map<String, Object> generatedContent =
@@ -32,6 +37,13 @@ public class RespondentRepresentativeService {
         return  caseConverter.convert(caseDataAsMap, CaseData.class);
     }
 
+    /**
+     * Replace the organisation policy and relevant respondent representative mapping with
+     * new respondent representative details.
+     * @param caseData case data
+     * @param userToken of new solicitor
+     * @return updated case
+     */
     public CaseData updateRepresentation(CaseData caseData, String userToken) {
         Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
         Map<String, Object> repCollection = updateRepresentationMap(caseData, userToken);

@@ -26,6 +26,13 @@ public class NoticeOfChangeFieldPopulator {
         return generate(caseData, POPULATE);
     }
 
+    /**
+     * Generates a map of all respondent organisation policy and notice of change elements that
+     * need to be added to the case.
+     * @param caseData case data
+     * @param strategy determines whether to build blank notice of change answers or not
+     * @return map of organisation policy and notice of change case elements
+     */
     public Map<String, Object> generate(CaseData caseData,
                                         NoticeOfChangeAnswersPopulationStrategy strategy) {
         Map<String, Object> data = new HashMap<>();

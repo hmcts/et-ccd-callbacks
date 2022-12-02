@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.apitest;
 
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -30,11 +32,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SubMultipleRefS
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.VenueRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 
-import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 
 @RunWith(SpringRunner.class)
@@ -76,15 +78,16 @@ class BaseFunctionalTest {
     protected String baseUrl;
     @Value("${idam.url}")
     private String idamApiUrl;
+    protected RequestSpecification spec;
 
     @BeforeAll
-    public void setup() throws Exception {
+    public void setup() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException, IOException {
         client = buildClient();
         idamTestApiRequests = new IdamTestApiRequests(client, idamApiUrl);
         CreateUser user = idamTestApiRequests.createUser(createRandomEmail());
         userToken = idamTestApiRequests.getAccessToken(user.getEmail());
-        baseURI = baseUrl;
         useRelaxedHTTPSValidation();
+        spec = new RequestSpecBuilder().setBaseUri(baseUrl).build();
     }
 
     private String createRandomEmail() {

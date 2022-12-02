@@ -8,6 +8,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 
 public final class RespondentTellSomethingElseHelper {
 
+    private RespondentTellSomethingElseHelper() {}
+
     public static Map<String, String> buildPersonalisation(CaseDetails detail,
                                                            String customisedText,
                                                            String applicationType) {

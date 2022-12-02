@@ -1,22 +1,20 @@
-package uk.gov.hmcts.ethos.replacement.apiTest.BaseFunctionalTest;
+package uk.gov.hmcts.ethos.replacement.apitest;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.apiTest.BaseFunctionalTest.utils.CCDRequestBuilder;
+import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 @Slf4j
 class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctionalTest {

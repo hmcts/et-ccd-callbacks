@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.apiTest.BaseFunctionalTest.utils;
+package uk.gov.hmcts.ethos.replacement.apitest.utils;
 
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.apiTest.BaseFunctionalTest;
+package uk.gov.hmcts.ethos.replacement.apitest;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -15,19 +15,14 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Profile;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.gov.hmcts.ethos.replacement.apiTest.BaseFunctionalTest.model.CreateUser;
+import uk.gov.hmcts.ethos.replacement.apitest.model.CreateUser;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.FileLocationRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.MultipleRefEnglandWalesRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.MultipleRefScotlandRepository;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.RoomRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SingleRefEnglandWalesRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SingleRefScotlandRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SubMultipleRefEnglandWalesRepository;
@@ -42,11 +37,9 @@ import java.security.NoSuchAlgorithmException;
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 
-
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {DocmosisApplication.class})
 @Slf4j
-//@TestPropertySource(locations="classpath:application.properties")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
 class BaseFunctionalTest {
@@ -59,7 +52,7 @@ class BaseFunctionalTest {
     @MockBean
     private VenueRepository venueRepository;
     @MockBean
-    private uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.RoomRepository RoomRepository;
+    private uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.RoomRepository roomRepository;
     @MockBean
     private CourtWorkerRepository courtWorkerRepository;
     @MockBean

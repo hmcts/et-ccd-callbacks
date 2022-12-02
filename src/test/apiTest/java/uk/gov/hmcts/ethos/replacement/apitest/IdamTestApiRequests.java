@@ -1,16 +1,5 @@
-package uk.gov.hmcts.ethos.replacement.apiTest.BaseFunctionalTest;
+package uk.gov.hmcts.ethos.replacement.apitest;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import static org.apache.http.client.methods.RequestBuilder.post;
-import static org.apache.http.entity.ContentType.APPLICATION_JSON;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Consts;
@@ -23,8 +12,20 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-import uk.gov.hmcts.ethos.replacement.apiTest.BaseFunctionalTest.model.CreateUser;
-import uk.gov.hmcts.ethos.replacement.apiTest.BaseFunctionalTest.model.Role;
+import uk.gov.hmcts.ethos.replacement.apitest.model.CreateUser;
+import uk.gov.hmcts.ethos.replacement.apitest.model.Role;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.apache.http.client.methods.RequestBuilder.post;
+import static org.apache.http.entity.ContentType.APPLICATION_JSON;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 
 @Slf4j
 public class IdamTestApiRequests {

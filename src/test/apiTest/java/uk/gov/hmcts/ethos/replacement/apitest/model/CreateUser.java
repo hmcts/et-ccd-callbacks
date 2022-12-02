@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.apiTest.BaseFunctionalTest.model;
+package uk.gov.hmcts.ethos.replacement.apitest.model;
 
 import java.util.List;
 import lombok.Data;

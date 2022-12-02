@@ -19,15 +19,14 @@ public class RespondentTellSomethingElseService {
     private String emailTemplateId;
 
     private static final String NO = "I do not want to copy";
-    private static final String rule92AnsweredNoText = "You have said that you do not want to copy this correspondence to "
-        + "the other party. \n \n"
+    private static final String rule92AnsweredNoText = "You have said that you do not want to copy this correspondence "
+        + "to the other party. \n \n"
         + "The tribunal will consider all correspondence and let you know what happens next.";
-    private static final String rule92AnsweredYesGroupA = "The other party will be notified that any objections to your "
-        + "%s application should be sent to the tribunal as soon as possible, and in any event "
+    private static final String rule92AnsweredYesGroupA = "The other party will be notified that any objections to "
+        + "your %s application should be sent to the tribunal as soon as possible, and in any event "
         + "within 7 days.";
-    private static final String rule92AnsweredYesGroupB = "The other party is not expected to respond to this application.\n"
-        + " \n"
-        + "However, they have been notified that any objections to your %s application should be "
+    private static final String rule92AnsweredYesGroupB = "The other party is not expected to respond to this "
+        + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
 
     /**

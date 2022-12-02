@@ -18,6 +18,7 @@ public final class RespondentTellSomethingElseHelper {
         personalisation.put("respondents", getRespondentNames(caseData));
         personalisation.put("customisedText", customisedText);
         personalisation.put("shortText", applicationType);
+        personalisation.put("caseId", detail.getCaseId());
         return personalisation;
     }
 }

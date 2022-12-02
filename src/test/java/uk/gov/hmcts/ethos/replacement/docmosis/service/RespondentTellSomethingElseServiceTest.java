@@ -43,6 +43,7 @@ public class RespondentTellSomethingElseServiceTest {
     private static final String NO = "I do not want to copy";
     private static final String TEMPLATE_ID = "someTemplateId";
     private static final String LEGAL_REP_EMAIL = "mail@mail.com";
+    private static final String CASE_ID = "669718251103419";
 
     private static final String rule92AnsweredNoText = "You have said that you do not want to copy this " +
         "correspondence to "
@@ -72,6 +73,7 @@ public class RespondentTellSomethingElseServiceTest {
         CaseData caseData = createCaseData(selectedApplication, rule92Selection);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
 
         Map<String, String> expectedPersonalisation = createPersonalisation(caseData, expectedAnswer,
             selectedApplication);
@@ -143,6 +145,7 @@ public class RespondentTellSomethingElseServiceTest {
         personalisation.put("claimant", caseData.getClaimant());
         personalisation.put("respondents", getRespondentNames(caseData));
         personalisation.put("shortText", selectedApplication);
+        personalisation.put("caseId", CASE_ID);
         if (expectedAnswer != null) {
             personalisation.put("customisedText", String.format(expectedAnswer, selectedApplication));
         }

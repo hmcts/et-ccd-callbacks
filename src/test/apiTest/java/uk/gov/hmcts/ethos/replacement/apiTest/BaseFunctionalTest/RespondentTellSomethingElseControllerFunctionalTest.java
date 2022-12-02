@@ -1,0 +1,63 @@
+package uk.gov.hmcts.ethos.replacement.apiTest.BaseFunctionalTest;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.http.Header;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpStatus;
+import org.junit.Before;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.apiTest.BaseFunctionalTest.utils.CCDRequestBuilder;
+
+@Slf4j
+class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctionalTest {
+    private static final String AUTHORIZATION = "Authorization";
+
+    private CCDRequest ccdRequest;
+
+    @BeforeAll
+    public void setUp() {
+        CaseData caseData = new CaseData();
+        caseData.setEthosCaseReference("testCaseReference");
+        caseData.setResTseSelectApplication("Amend response");
+        caseData.setResTseCopyToOtherPartyYesOrNo("I do not want to copy");
+        caseData.setClaimant("claimant");
+        caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
+
+        ccdRequest = CCDRequestBuilder.builder()
+            .withCaseData(caseData)
+            .withCaseId("123")
+            .build();
+        
+    }
+
+    @Test
+    void shouldReceiveSuccessResponseWhenAboutToSubmitRespondentTseInvoked() {
+        RestAssured.given()
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(ccdRequest)
+            .post("/respondentTSE/aboutToSubmit")
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log().all(true);
+    }
+
+    private RespondentSumTypeItem createRespondentType() {
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName("Boris Johnson");
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(respondentSumType);
+
+        return respondentSumTypeItem;
+    }
+}

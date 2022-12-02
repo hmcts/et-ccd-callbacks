@@ -83,6 +83,14 @@ sourceSets {
         }
         resources.srcDir file('src/test/integration/resources')
     }
+    apiTest {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+            srcDir file('src/test/apiTest/java')
+        }
+        resources.srcDir file('src/test/apiTest/resources')
+    }
 }
 
 configurations {
@@ -92,6 +100,8 @@ configurations {
     contractTestRuntimeOnly.extendsFrom testRuntimeOnly
     integrationTestImplementation.extendsFrom testImplementation
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+    apiTestImplementation.extendsFrom testImplementation
+    apiTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 test {
@@ -161,6 +171,14 @@ task integration(type: Test) {
     failFast = true
 }
 
+task apiTest(type: Test) {
+    description = "Runs API tests"
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.apiTest.output.classesDirs
+    classpath = sourceSets.apiTest.runtimeClasspath
+    failFast = true
+}
+
 project.tasks['check'].dependsOn integration
 
 project.ext {
@@ -191,6 +209,10 @@ task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test 
 }
 
 rootProject.tasks.named("processContractTestResources") {
+    duplicatesStrategy = 'include'
+}
+
+rootProject.tasks.named("processApiTestResources") {
     duplicatesStrategy = 'include'
 }
 
@@ -364,6 +386,10 @@ dependencies {
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '4.7.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
+    
+    apiTestImplementation sourceSets.main.runtimeClasspath
+    apiTestImplementation sourceSets.test.runtimeClasspath
+
 }
 
 bootJar {

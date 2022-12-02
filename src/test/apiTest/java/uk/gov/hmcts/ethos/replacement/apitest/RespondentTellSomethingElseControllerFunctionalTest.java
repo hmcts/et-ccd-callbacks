@@ -23,7 +23,7 @@ class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctional
     private CCDRequest ccdRequest;
 
     @BeforeAll
-    public void setUp() {
+    public void setUpCaseData() {
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("testCaseReference");
         caseData.setResTseSelectApplication("Amend response");
@@ -41,6 +41,7 @@ class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctional
     @Test
     void shouldReceiveSuccessResponseWhenAboutToSubmitRespondentTseInvoked() {
         RestAssured.given()
+            .spec(spec)
             .contentType(ContentType.JSON)
             .header(new Header(AUTHORIZATION, userToken))
             .body(ccdRequest)

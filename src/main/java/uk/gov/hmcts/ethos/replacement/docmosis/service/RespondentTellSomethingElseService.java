@@ -19,13 +19,13 @@ public class RespondentTellSomethingElseService {
     private String emailTemplateId;
 
     private static final String NO = "I do not want to copy";
-    private static final String rule92AnsweredNoText = "You have said that you do not want to copy this correspondence "
+    private static final String RULE92_ANSWERED_NO = "You have said that you do not want to copy this correspondence "
         + "to the other party. \n \n"
         + "The tribunal will consider all correspondence and let you know what happens next.";
-    private static final String rule92AnsweredYesGroupA = "The other party will be notified that any objections to "
+    private static final String RULE92_ANSWERED_YES_GROUP_A = "The other party will be notified that any objections to "
         + "your %s application should be sent to the tribunal as soon as possible, and in any event "
         + "within 7 days.";
-    private static final String rule92AnsweredYesGroupB = "The other party is not expected to respond to this "
+    private static final String RULE92_ANSWERED_YES_GROUP_B = "The other party is not expected to respond to this "
         + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
 
@@ -42,7 +42,7 @@ public class RespondentTellSomethingElseService {
         String customisedText = null;
 
         if (NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())) {
-            customisedText = rule92AnsweredNoText;
+            customisedText = RULE92_ANSWERED_NO;
         } else {
             switch (caseData.getResTseSelectApplication()) {
                 case "Amend response":
@@ -53,12 +53,12 @@ public class RespondentTellSomethingElseService {
                 case "Order other party":
                 case "Claimant not complied":
                 case "Restrict publicity":
-                    customisedText = String.format(rule92AnsweredYesGroupA, caseData.getResTseSelectApplication());
+                    customisedText = String.format(RULE92_ANSWERED_YES_GROUP_A, caseData.getResTseSelectApplication());
                     break;
                 case "Change personal details":
                 case "Consider a decision afresh":
                 case "Reconsider judgement":
-                    customisedText = String.format(rule92AnsweredYesGroupB, caseData.getResTseSelectApplication());
+                    customisedText = String.format(RULE92_ANSWERED_YES_GROUP_B, caseData.getResTseSelectApplication());
                     break;
                 case "Order a witness to attend to give evidence":
                     // No need to send email for Group C

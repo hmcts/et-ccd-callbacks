@@ -1,17 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,6 +16,18 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
+
 @ExtendWith(SpringExtension.class)
 public class RespondentTellSomethingElseServiceTest {
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
@@ -43,17 +43,17 @@ public class RespondentTellSomethingElseServiceTest {
     private static final String NO = "I do not want to copy";
     private static final String TEMPLATE_ID = "someTemplateId";
     private static final String LEGAL_REP_EMAIL = "mail@mail.com";
+    private static final String CASE_ID = "669718251103419";
 
-    private static final String rule92AnsweredNoText = "You have said that you do not want to copy this " +
-        "correspondence to "
+    private static final String rule92AnsweredNoText = "You have said that you do not want to copy this "
+        + "correspondence to "
         + "the other party. \n \n"
         + "The tribunal will consider all correspondence and let you know what happens next.";
-    private static final String rule92AnsweredYesGroupA = "The other party will be notified that any objections to your "
-        + "%s application should be sent to the tribunal as soon as possible, and in any event "
+    private static final String rule92AnsweredYesGroupA = "The other party will be notified that any objections "
+        + "to your %s application should be sent to the tribunal as soon as possible, and in any event "
         + "within 7 days.";
-    private static final String rule92AnsweredYesGroupB = "The other party is not expected to respond to this application.\n"
-        + " \n"
-        + "However, they have been notified that any objections to your %s application should be "
+    private static final String rule92AnsweredYesGroupB = "The other party is not expected to respond to this "
+        + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
 
     @BeforeEach
@@ -72,6 +72,7 @@ public class RespondentTellSomethingElseServiceTest {
         CaseData caseData = createCaseData(selectedApplication, rule92Selection);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
 
         Map<String, String> expectedPersonalisation = createPersonalisation(caseData, expectedAnswer,
             selectedApplication);
@@ -143,6 +144,7 @@ public class RespondentTellSomethingElseServiceTest {
         personalisation.put("claimant", caseData.getClaimant());
         personalisation.put("respondents", getRespondentNames(caseData));
         personalisation.put("shortText", selectedApplication);
+        personalisation.put("caseId", CASE_ID);
         if (expectedAnswer != null) {
             personalisation.put("customisedText", String.format(expectedAnswer, selectedApplication));
         }

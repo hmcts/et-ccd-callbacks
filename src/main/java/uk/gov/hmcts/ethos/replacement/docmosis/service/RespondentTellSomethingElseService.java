@@ -58,7 +58,8 @@ public class RespondentTellSomethingElseService {
         + "<li>telephone number</li>"
         + "<li>email address</li></ul>";
     private static final String VARIABLE_CONTENT_CLAIMANT_NOT_COMPLIED =
-        "<hr>Use this form to tell us that the claimant has not complied with all or part of an order from the tribunal."
+        "<hr>"
+        + "Use this form to tell us that the claimant has not complied with all or part of an order from the tribunal."
         + "<br><br>You should try to resolve your complaint with the claimant. "
             + "Only use this form if that is not possible."
         + "<h3>Details to include in your application:</h3>"
@@ -67,7 +68,8 @@ public class RespondentTellSomethingElseService {
         + "<li>what the claimant has not done</li>"
         + "<li>what you want the tribunal to do next</li></ul>";
     private static final String VARIABLE_CONTENT_CONSIDER_A_DECISION_AFRESH =
-        "<hr>Use this form to have a judgment or order made by a legal officer considered afresh by an Employment Judge."
+        "<hr>"
+        + "Use this form to have a judgment or order made by a legal officer considered afresh by an Employment Judge."
         + "<br><br>Considered afresh means that if you disagree with a judgment or order made by a legal officer "
             + "in this case, you can ask an Employment Judge to look at that decision again."
         + "<br><br>The judge will take the decision afresh on the basis of the same information as was before the "
@@ -256,22 +258,22 @@ public class RespondentTellSomethingElseService {
             customisedText = RULE92_ANSWERED_NO;
         } else {
             switch (caseData.getResTseSelectApplication()) {
-                case "Amend response":
-                case "Strike out all or part of a claim":
-                case "Contact the tribunal":
-                case "Postpone a hearing":
-                case "Vary or revoke an order":
-                case "Order other party":
-                case "Claimant not complied":
-                case "Restrict publicity":
+                case SELECTED_APP_AMEND_RESPONSE:
+                case SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
+                case SELECTED_APP_CONTACT_THE_TRIBUNAL:
+                case SELECTED_APP_POSTPONE_A_HEARING:
+                case SELECTED_APP_VARY_OR_REVOKE_AN_ORDER:
+                case SELECTED_APP_ORDER_OTHER_PARTY:
+                case SELECTED_APP_CLAIMANT_NOT_COMPLIED:
+                case SELECTED_APP_RESTRICT_PUBLICITY:
                     customisedText = String.format(RULE92_ANSWERED_YES_GROUP_A, caseData.getResTseSelectApplication());
                     break;
-                case "Change personal details":
-                case "Consider a decision afresh":
-                case "Reconsider judgement":
+                case SELECTED_APP_CHANGE_PERSONAL_DETAILS:
+                case SELECTED_APP_CONSIDER_A_DECISION_AFRESH:
+                case SELECTED_APP_RECONSIDER_JUDGEMENT:
                     customisedText = String.format(RULE92_ANSWERED_YES_GROUP_B, caseData.getResTseSelectApplication());
                     break;
-                case "Order a witness to attend to give evidence":
+                case SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
                     // No need to send email for Group C
                     break;
                 default:

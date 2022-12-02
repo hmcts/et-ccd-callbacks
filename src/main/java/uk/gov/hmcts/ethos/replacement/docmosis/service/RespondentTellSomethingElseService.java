@@ -211,6 +211,11 @@ public class RespondentTellSomethingElseService {
         + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
 
+    /**
+     * This service return Variable Content according to selected application.
+     * @param caseData CaseData with selected application value
+     * @return Variable Content according to selected application
+     */
     public String resTseSetVariableContent(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
             case SELECTED_APP_AMEND_RESPONSE:

@@ -42,8 +42,7 @@ public class RespondentTellSomethingElseController {
     }
 
     /**
-     * This service Gets userToken as a parameter for security validation
-     * and ccdRequest data which has caseData as an object.
+     * This service is for update Variable Content after user selected application.
      * @param ccdRequest        CaseData which is a generic data type for most of the
      *                          methods which holds ET1 case data
      * @param  userToken        Used for authorisation

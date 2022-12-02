@@ -42,6 +42,8 @@ public class ServingService {
 
     @Value("${et1Serving.template.id}")
     private String templateId;
+    @Value("${et1Serving.respondent.template.id}")
+    private String respondentTemplateId;
 
     private final EmailService emailService;
 
@@ -118,7 +120,7 @@ public class ServingService {
                 if (isNullOrEmpty(respondent.get(EMAIL_ADDRESS))) {
                     return;
                 }
-                emailService.sendEmail(templateId, respondent.get(EMAIL_ADDRESS), respondent);
+                emailService.sendEmail(respondentTemplateId, respondent.get(EMAIL_ADDRESS), respondent);
             });
 
         if (isNullOrEmpty(claimant.get(EMAIL_ADDRESS))) {

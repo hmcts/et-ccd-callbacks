@@ -10,6 +10,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDeta
 @Slf4j
 public class TribunalOfficesService {
     private final TribunalOfficesConfiguration config;
+    public static final String UNASSIGNED_OFFICE = "Unassigned";
 
     public TribunalOfficesService(TribunalOfficesConfiguration config) {
         this.config = config;
@@ -20,8 +21,26 @@ public class TribunalOfficesService {
     }
 
     public ContactDetails getTribunalContactDetails(String officeName) {
-        TribunalOffice tribunalName = getTribunalOffice(officeName);
+        if (officeName == null || UNASSIGNED_OFFICE.equals(officeName)) {
+            return createUnassignedContactDetails();
+        }
+        var tribunalName = getTribunalOffice(officeName);
         return config.getContactDetails().get(tribunalName);
+    }
+
+    private ContactDetails createUnassignedContactDetails() {
+        ContactDetails contactDetails = new ContactDetails();
+        contactDetails.setManagingOffice(UNASSIGNED_OFFICE);
+        contactDetails.setAddress1("");
+        contactDetails.setAddress2("");
+        contactDetails.setAddress3("");
+        contactDetails.setDx("");
+        contactDetails.setFax("");
+        contactDetails.setEmail("");
+        contactDetails.setPostcode("");
+        contactDetails.setTown("");
+        contactDetails.setTelephone("");
+        return contactDetails;
     }
 }
 

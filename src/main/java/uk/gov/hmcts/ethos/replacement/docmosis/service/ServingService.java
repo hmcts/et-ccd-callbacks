@@ -42,6 +42,7 @@ public class ServingService {
 
     @Value("${et1Serving.template.id}")
     private String templateId;
+
     @Value("${et1Serving.respondent.template.id}")
     private String respondentTemplateId;
 

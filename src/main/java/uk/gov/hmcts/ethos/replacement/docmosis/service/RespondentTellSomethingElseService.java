@@ -252,7 +252,7 @@ public class RespondentTellSomethingElseService {
         }
     }
 
-    public List<String> validateGiveDetail(CaseData caseData) {
+    public List<String> validateGiveDetails(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         if (caseData.getResTseGiveDetails().isEmpty()) {
             errors.add(GIVE_DETAIL_MISSING);

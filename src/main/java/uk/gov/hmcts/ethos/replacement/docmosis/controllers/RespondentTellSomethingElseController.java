@@ -80,7 +80,7 @@ public class RespondentTellSomethingElseController {
     }
 
     /**
-     * This service is for update Variable Content after user selected application.
+     * This service is for validate Give Details are not all blank.
      * @param ccdRequest        CaseData which is a generic data type for most of the
      *                          methods which holds ET1 case data
      * @param  userToken        Used for authorisation
@@ -88,18 +88,18 @@ public class RespondentTellSomethingElseController {
      *                          includes caseData which contains the upload document names of
      *                          type "Another type of document" in a html string format.
      */
-    @PostMapping(value = "/validateGiveDetail", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/validateGiveDetails", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Respondent Tell Something Else About To Start Event")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> validateGiveDetail(
+    public ResponseEntity<CCDCallbackResponse> validateGiveDetails(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
 
@@ -109,7 +109,7 @@ public class RespondentTellSomethingElseController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = resTseService.validateGiveDetail(caseData);
+        List<String> errors = resTseService.validateGiveDetails(caseData);
 
         return getCallbackRespEntity(errors, ccdRequest.getCaseDetails());
     }

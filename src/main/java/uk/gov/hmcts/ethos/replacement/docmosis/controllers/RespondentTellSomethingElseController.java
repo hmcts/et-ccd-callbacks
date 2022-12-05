@@ -19,8 +19,11 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -74,6 +77,41 @@ public class RespondentTellSomethingElseController {
         caseData.setResTseVariableContent(resTseService.resTseSetVariableContent(caseData));
 
         return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    /**
+     * This service is for update Variable Content after user selected application.
+     * @param ccdRequest        CaseData which is a generic data type for most of the
+     *                          methods which holds ET1 case data
+     * @param  userToken        Used for authorisation
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse that
+     *                          includes caseData which contains the upload document names of
+     *                          type "Another type of document" in a html string format.
+     */
+    @PostMapping(value = "/validateGiveDetail", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Respondent Tell Something Else About To Start Event")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> validateGiveDetail(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = resTseService.validateGiveDetail(caseData);
+
+        return getCallbackRespEntity(errors, ccdRequest.getCaseDetails());
     }
 
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)

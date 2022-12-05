@@ -8,6 +8,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -17,6 +20,8 @@ public class RespondentTellSomethingElseService {
 
     @Value("${respondent.tse.template.id}")
     private String emailTemplateId;
+
+    private static final String GIVE_DETAIL_MISSING = "Give Detail missing";
 
     private static final String SELECTED_APP_AMEND_RESPONSE = "Amend response";
     private static final String SELECTED_APP_CHANGE_PERSONAL_DETAILS = "Change personal details";
@@ -247,6 +252,14 @@ public class RespondentTellSomethingElseService {
         }
     }
 
+    public List<String> validateGiveDetail(CaseData caseData) {
+        List<String> errors = new ArrayList<>();
+        if (caseData.getResTseGiveDetails().isEmpty()) {
+            errors.add(GIVE_DETAIL_MISSING);
+        }
+        return errors;
+    }
+
     /**
      * Uses {@link EmailService} to generate an email to Respondent.
      * Uses {@link UserService} to get Respondents email address.
@@ -297,4 +310,5 @@ public class RespondentTellSomethingElseService {
                 ));
         }
     }
+
 }

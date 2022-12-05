@@ -35,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest({RespondentTellSomethingElseController.class, JsonMapper.class})
 class RespondentTellSomethingElseControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+    private static final String MID_VARIABLE_CONTENT = "/respondentTSE/midVariableContent";
     private static final String ABOUT_TO_SUBMIT_URL = "/respondentTSE/aboutToSubmit";
 
     @MockBean
@@ -64,6 +65,30 @@ class RespondentTellSomethingElseControllerTest {
             .withCaseData(caseData)
             .withCaseId("123")
             .build();
+    }
+
+    @Test
+    void midVariableContent_Success() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(MID_VARIABLE_CONTENT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(resTseService).resTseSetVariableContent(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    void midVariableContent_invalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(MID_VARIABLE_CONTENT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
     }
 
     @Test

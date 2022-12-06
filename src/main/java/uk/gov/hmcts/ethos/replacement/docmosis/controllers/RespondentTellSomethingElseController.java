@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -74,7 +75,6 @@ public class RespondentTellSomethingElseController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setResTseVariableContent(resTseService.resTseSetVariableContent(caseData));
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -138,6 +138,8 @@ public class RespondentTellSomethingElseController {
         resTseService.sendRespondentApplicationEmail(caseDetails, userToken);
 
         // send Claimant copy of Application Email
+
+        RespondentTellSomethingElseHelper.createRespondentApplication(caseDetails.getCaseData());
 
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }

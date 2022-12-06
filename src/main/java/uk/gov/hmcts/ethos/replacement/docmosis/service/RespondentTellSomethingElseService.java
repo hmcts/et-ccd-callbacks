@@ -249,14 +249,14 @@ public class RespondentTellSomethingElseService {
                 return VARIABLE_CONTENT_VARY_OR_REVOKE_AN_ORDER;
             default:
                 return "";
-        }
+        } 
     }
 
     public List<String> validateGiveDetails(CaseData caseData) {
         List<String> errors = new ArrayList<>();
-        if (caseData.getResTseGiveDetails().isEmpty()) {
-            errors.add(GIVE_DETAIL_MISSING);
-        }
+//        if (caseData.getResTseTextBox1().isEmpty()) {
+//            errors.add(GIVE_DETAIL_MISSING);
+//        }
         return errors;
     }
 

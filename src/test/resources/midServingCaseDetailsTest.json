@@ -10,7 +10,7 @@
           "uploadedDocument": {
             "document_url": "test-document-url",
             "document_filename": "test-filename.xlsx",
-            "document_binary_url": "test-document-binary-url"
+            "document_binary_url": "/documents/test-document/binary"
           }
         }
       }

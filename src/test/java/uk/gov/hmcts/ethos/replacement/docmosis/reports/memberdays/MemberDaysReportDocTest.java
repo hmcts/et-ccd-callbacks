@@ -12,6 +12,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
+@SuppressWarnings({"PMD.ConsecutiveAppendsShouldReuse", "PMD.ConsecutiveLiteralAppends"})
 public class MemberDaysReportDocTest {
 
     MemberDaysReportDoc memberDaysReportDoc;
@@ -28,9 +29,9 @@ public class MemberDaysReportDocTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void shouldThrowException() throws IllegalStateException {
+    public void shouldThrowException() {
         var nonMemberDaysReportDocListingData = new ListingData();
-        var resultListingData = memberDaysReportDoc.getReportDocPart(nonMemberDaysReportDocListingData);
+        memberDaysReportDoc.getReportDocPart(nonMemberDaysReportDocListingData);
     }
 
     @Test
@@ -47,20 +48,18 @@ public class MemberDaysReportDocTest {
         detailItem.setHearingDuration("420");
         listingData.getReportDetails().add(detailItem);
 
-        var resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
-        var expectedDetailRowContent = new StringBuilder();
-
+        StringBuilder expectedDetailRowContent = new StringBuilder(339);
         expectedDetailRowContent.append("\"Listed_date\":\"").append(NEW_LINE);
         expectedDetailRowContent.append("\"Report_Office\":\"").append(NEW_LINE);
         expectedDetailRowContent.append("\"Total_Full_Days\":\"").append(NEW_LINE);
         expectedDetailRowContent.append("\"Total_Half_Days\":\"").append(NEW_LINE);
         expectedDetailRowContent.append("\"Total_Days\":\"").append(NEW_LINE);
 
-        expectedDetailRowContent.append("\"memberDaySummaryItems\":[").append("\n");
-        expectedDetailRowContent.append("],").append("\n");
+        expectedDetailRowContent.append("\"memberDaySummaryItems\":[").append('\n');
+        expectedDetailRowContent.append("],").append('\n');
 
-        expectedDetailRowContent.append("\"reportDetails\":[").append("\n");
-        expectedDetailRowContent.append("{").append("\n");
+        expectedDetailRowContent.append("\"reportDetails\":[").append('\n');
+        expectedDetailRowContent.append('{').append('\n');
         expectedDetailRowContent.append("\"Detail_Hearing_Date\":\"")
             .append(nullCheck(detailItem.getHearingDate())).append(NEW_LINE);
         expectedDetailRowContent.append("\"Employee_Member\":\"")
@@ -80,8 +79,8 @@ public class MemberDaysReportDocTest {
             .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))))
             .append("\"\n");
         expectedDetailRowContent.append("}]").append(",\n");
-
-        assertEquals(false, resultListingData.toString().isEmpty());
+        StringBuilder resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
+        assertFalse(resultListingData.toString().isEmpty());
         assertEquals(expectedDetailRowContent.toString(), resultListingData.toString());
     }
 
@@ -101,7 +100,7 @@ public class MemberDaysReportDocTest {
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingData.setListingDate("2021-09-15");
 
-        var expectedDetailRowContent = new StringBuilder();
+        StringBuilder expectedDetailRowContent = new StringBuilder(448);
         expectedDetailRowContent.append("\"Listed_date\":\"15 September 2021").append(NEW_LINE);
         expectedDetailRowContent.append("\"Report_Office\":\"").append(NEW_LINE);
         expectedDetailRowContent.append("\"Total_Full_Days\":\"").append(NEW_LINE);
@@ -115,19 +114,16 @@ public class MemberDaysReportDocTest {
         memberDaySummaryItem.setTotalDays("2");
 
         listingData.getMemberDaySummaryItems().add(memberDaySummaryItem);
-
-        var resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
-
-        expectedDetailRowContent.append("\"memberDaySummaryItems\":[").append("\n");
-        expectedDetailRowContent.append("{").append("\n");
+        expectedDetailRowContent.append("\"memberDaySummaryItems\":[").append('\n');
+        expectedDetailRowContent.append('{').append('\n');
         expectedDetailRowContent.append("\"Hearing_Date\":\"15 September 2021").append(NEW_LINE);
         expectedDetailRowContent.append("\"Full_Days\":\"2").append(NEW_LINE);
         expectedDetailRowContent.append("\"Half_Days\":\"0").append(NEW_LINE);
         expectedDetailRowContent.append("\"Total_Days\":\"2").append("\"\n");
         expectedDetailRowContent.append("}]").append(",\n");
 
-        expectedDetailRowContent.append("\"reportDetails\":[").append("\n");
-        expectedDetailRowContent.append("{").append("\n");
+        expectedDetailRowContent.append("\"reportDetails\":[").append('\n');
+        expectedDetailRowContent.append('{').append('\n');
         expectedDetailRowContent.append("\"Detail_Hearing_Date\":\"")
             .append(nullCheck(detailItem.getHearingDate())).append(NEW_LINE);
         expectedDetailRowContent.append("\"Employee_Member\":\"")
@@ -147,7 +143,7 @@ public class MemberDaysReportDocTest {
             .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))))
             .append("\"\n");
         expectedDetailRowContent.append("}]").append(",\n");
-
+        StringBuilder resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
         assertFalse(resultListingData.toString().isEmpty());
         assertEquals(expectedDetailRowContent.toString(), resultListingData.toString());
     }
@@ -178,25 +174,23 @@ public class MemberDaysReportDocTest {
         listingData.setFullDaysTotal("2");
         listingData.setTotalDays("2.0");
         listingData.getMemberDaySummaryItems().add(memberDaySummaryItem);
-
-        var resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
-        var expectedDetailRowContent = new StringBuilder();
+        StringBuilder expectedDetailRowContent = new StringBuilder(467);
         expectedDetailRowContent.append("\"Listed_date\":\"18 September 2021").append(NEW_LINE);
         expectedDetailRowContent.append("\"Report_Office\":\"MukeraCity").append(NEW_LINE);
         expectedDetailRowContent.append("\"Total_Full_Days\":\"2").append(NEW_LINE);
         expectedDetailRowContent.append("\"Total_Half_Days\":\"0").append(NEW_LINE);
         expectedDetailRowContent.append("\"Total_Days\":\"2.0").append(NEW_LINE);
 
-        expectedDetailRowContent.append("\"memberDaySummaryItems\":[").append("\n");
-        expectedDetailRowContent.append("{").append("\n");
+        expectedDetailRowContent.append("\"memberDaySummaryItems\":[").append('\n');
+        expectedDetailRowContent.append('{').append('\n');
         expectedDetailRowContent.append("\"Hearing_Date\":\"15 September 2021").append(NEW_LINE);
         expectedDetailRowContent.append("\"Full_Days\":\"2").append(NEW_LINE);
         expectedDetailRowContent.append("\"Half_Days\":\"0").append(NEW_LINE);
         expectedDetailRowContent.append("\"Total_Days\":\"2").append("\"\n");
         expectedDetailRowContent.append("}]").append(",\n");
 
-        expectedDetailRowContent.append("\"reportDetails\":[").append("\n");
-        expectedDetailRowContent.append("{").append("\n");
+        expectedDetailRowContent.append("\"reportDetails\":[").append('\n');
+        expectedDetailRowContent.append('{').append('\n');
         expectedDetailRowContent.append("\"Detail_Hearing_Date\":\"")
             .append(nullCheck(detailItem.getHearingDate())).append(NEW_LINE);
         expectedDetailRowContent.append("\"Employee_Member\":\"")
@@ -216,7 +210,7 @@ public class MemberDaysReportDocTest {
             .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))))
             .append("\"\n");
         expectedDetailRowContent.append("}]").append(",\n");
-
+        StringBuilder resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
         assertFalse(resultListingData.toString().isEmpty());
         assertEquals(expectedDetailRowContent.toString(), resultListingData.toString());
     }

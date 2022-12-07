@@ -15,6 +15,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UNABLE_TO_FIND_PARTY;
 
 @Service("depositOrderValidationService")
+@SuppressWarnings({"PMD.LiteralsFirstInComparisons"})
 public class DepositOrderValidationService {
 
     public List<String> validateDepositOrder(CaseData caseData) {

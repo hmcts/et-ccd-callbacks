@@ -41,6 +41,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRANSFERRED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.LinguisticNaming", "PMD.TooManyMethods",
+    "PMD.ExcessiveImports"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleHelperServiceTest {
 
@@ -96,13 +98,13 @@ public class MultipleHelperServiceTest {
                 multipleDetails.getCaseData(),
                 multipleDetails.getCaseData().getLeadCase(),
                 "");
-        assertEquals("<a target=\"_blank\" href=\""+ gatewayURL + "/cases/case-details/1232121232\">21006/2020</a>",
+        assertEquals("<a target=\"_blank\" href=\"" + gatewayURL + "/cases/case-details/1232121232\">21006/2020</a>",
                 multipleDetails.getCaseData().getLeadCase());
     }
 
     @Test
     public void addLeadMarkUpWithCaseId() {
-        submitEventList.get(0).setCaseId(12345L);
+        submitEventList.get(0).setCaseId(12_345L);
         when(singleCasesReadingService.retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getLeadCase(),
@@ -113,7 +115,7 @@ public class MultipleHelperServiceTest {
                 multipleDetails.getCaseData(),
                 multipleDetails.getCaseData().getLeadCase(),
                 "12345");
-        assertEquals("<a target=\"_blank\" href=\""+ gatewayURL + "/cases/case-details/12345\">21006/2020</a>",
+        assertEquals("<a target=\"_blank\" href=\"" + gatewayURL + "/cases/case-details/12345\">21006/2020</a>",
                 multipleDetails.getCaseData().getLeadCase());
     }
 
@@ -398,7 +400,8 @@ public class MultipleHelperServiceTest {
         JurCodesType jurCodesType = new JurCodesType();
         jurCodesType.setJuridictionCodesList("AA");
         jurCodesTypeItem.setValue(jurCodesType);
-        submitEventList.get(0).getCaseData().setJurCodesCollection(new ArrayList<>(Collections.singletonList(jurCodesTypeItem)));
+        submitEventList.get(0).getCaseData().setJurCodesCollection(
+                new ArrayList<>(Collections.singletonList(jurCodesTypeItem)));
 
         JudgementTypeItem judgementTypeItem = new JudgementTypeItem();
         JudgementType judgementType = new JudgementType();
@@ -406,7 +409,8 @@ public class MultipleHelperServiceTest {
         judgementType.setDateJudgmentMade("25/01/2021");
         judgementTypeItem.setValue(judgementType);
         judgementTypeItem.setId("JD");
-        submitEventList.get(0).getCaseData().setJudgementCollection(new ArrayList<>(Collections.singletonList(judgementTypeItem)));
+        submitEventList.get(0).getCaseData().setJudgementCollection(
+                new ArrayList<>(Collections.singletonList(judgementTypeItem)));
 
         multipleDetails.getCaseData().setBatchUpdateClaimantRep(MultipleUtil.generateDynamicList("Rep"));
         multipleDetails.getCaseData().setBatchUpdateJurisdiction(MultipleUtil.generateDynamicList("AA"));
@@ -511,11 +515,12 @@ public class MultipleHelperServiceTest {
     @Test
     public void sendUpdatesToSinglesLogicCheckingLead() {
 
-        String leadLink = "<a target=\"_blank\" href=\"https://www-ccd.perftest.platform.hmcts.net/v2/case/1604313560561842\">245007/2020</a>";
+        String leadLink = "<a target=\"_blank\" "
+                + "href=\"https://www-ccd.perftest.platform.hmcts.net/v2/case/1604313560561842\">245007/2020</a>";
         multipleDetails.getCaseData().setLeadCase(leadLink);
         String newLeadCase = "245000/2020";
         SubmitEvent submitEvent = new SubmitEvent();
-        submitEvent.setCaseId(10561843);
+        submitEvent.setCaseId(10_561_843);
         when(singleCasesReadingService.retrieveSingleCase(userToken, multipleDetails.getCaseTypeId(),
                 newLeadCase, multipleDetails.getCaseData().getMultipleSource()))
                 .thenReturn(submitEvent);
@@ -528,7 +533,7 @@ public class MultipleHelperServiceTest {
                 multipleObjects,
                 new ArrayList<>(Arrays.asList("245008/2020", "245009/2020")));
 
-        assertEquals("<a target=\"_blank\" href=\""+ gatewayURL + "/cases/case-details/10561843\">245000/2020</a>",
+        assertEquals("<a target=\"_blank\" href=\"" + gatewayURL + "/cases/case-details/10561843\">245000/2020</a>",
                 multipleDetails.getCaseData().getLeadCase());
 
     }

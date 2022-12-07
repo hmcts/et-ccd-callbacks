@@ -6,6 +6,7 @@ import com.microsoft.azure.servicebus.ReceiveMode;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
 import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -13,7 +14,7 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 @Profile("!test")
 public class QueueClientConfiguration {
-
+    @ConditionalOnProperty(name = "servicebus.fake", havingValue = "false", matchIfMissing = true)
     @Bean("create-updates-send-client")
     public IQueueClient createUpdatesSendClient(
         @Value("${queue.create-updates.send.connection-string}") String connectionString,

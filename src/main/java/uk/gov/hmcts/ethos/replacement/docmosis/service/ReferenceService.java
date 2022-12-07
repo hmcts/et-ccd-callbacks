@@ -16,6 +16,8 @@ import java.util.List;
 
 @Slf4j
 @Service("referenceService")
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.CognitiveComplexity", "PMD.LiteralsFirstInComparisons", "PMD.PreserveStackTrace", "PMD.LawOfDemeter"})
 public class ReferenceService {
 
     private static final String CASES_SEARCHED = "Cases searched: ";

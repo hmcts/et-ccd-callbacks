@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class ScotlandAllocatedHearingServiceTest {
 
     private ScotlandAllocateHearingService scotlandAllocateHearingService;
@@ -45,7 +46,8 @@ public class ScotlandAllocatedHearingServiceTest {
         var courtWorkerSelectionService = mockCourtWorkerSelectionService();
         var roomSelectionService = mockRoomSelectionService();
         scotlandAllocateHearingService = new ScotlandAllocateHearingService(hearingSelectionService,
-                judgeSelectionService, scotlandVenueSelectionService, courtWorkerSelectionService, roomSelectionService);
+                judgeSelectionService, scotlandVenueSelectionService,
+                courtWorkerSelectionService, roomSelectionService);
     }
 
     @Test

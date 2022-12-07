@@ -46,40 +46,6 @@ public class RespondentTellSomethingElseController {
     }
 
     /**
-     * This service is for update Variable Content after user selected application.
-     * @param ccdRequest        CaseData which is a generic data type for most of the
-     *                          methods which holds ET1 case data
-     * @param  userToken        Used for authorisation
-     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse that
-     *                          includes caseData which contains the upload document names of
-     *                          type "Another type of document" in a html string format.
-     */
-    @PostMapping(value = "/midVariableContent", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Respondent Tell Something Else About To Start Event")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> midVariableContent(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
-        return getCallbackRespEntityNoErrors(caseData);
-    }
-
-    /**
      * This service is for validate Give Details are not all blank.
      * @param ccdRequest        CaseData which is a generic data type for most of the
      *                          methods which holds ET1 case data

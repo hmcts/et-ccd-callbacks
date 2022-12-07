@@ -6,10 +6,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Slf4j
 @Service
@@ -252,12 +255,52 @@ public class RespondentTellSomethingElseService {
         } 
     }
 
+    /**
+     * Validate Give Details (free text box) or file upload is mandatory.
+     * @param caseData in which the case details are extracted from
+     * @return errors Error message
+     */
     public List<String> validateGiveDetails(CaseData caseData) {
         List<String> errors = new ArrayList<>();
-//        if (caseData.getResTseTextBox1().isEmpty()) {
-//            errors.add(GIVE_DETAIL_MISSING);
-//        }
+        if (Boolean.TRUE.equals(checkSelectedAppGiveDetailsIsBlank(caseData))) {
+            errors.add(GIVE_DETAIL_MISSING);
+        }
         return errors;
+    }
+
+    private Boolean checkSelectedAppGiveDetailsIsBlank(CaseData caseData) {
+        switch (caseData.getResTseSelectApplication()) {
+            case SELECTED_APP_AMEND_RESPONSE:
+                return checkGiveDetailsIsBlank(caseData.getResTseDocument1(), caseData.getResTseTextBox1());
+            case SELECTED_APP_CHANGE_PERSONAL_DETAILS:
+                return checkGiveDetailsIsBlank(caseData.getResTseDocument2(), caseData.getResTseTextBox2());
+            case SELECTED_APP_CLAIMANT_NOT_COMPLIED:
+                return checkGiveDetailsIsBlank(caseData.getResTseDocument3(), caseData.getResTseTextBox3());
+            case SELECTED_APP_CONSIDER_A_DECISION_AFRESH:
+                return checkGiveDetailsIsBlank(caseData.getResTseDocument4(), caseData.getResTseTextBox4());
+            case SELECTED_APP_CONTACT_THE_TRIBUNAL:
+                return checkGiveDetailsIsBlank(caseData.getResTseDocument5(), caseData.getResTseTextBox5());
+            case SELECTED_APP_ORDER_OTHER_PARTY:
+                return checkGiveDetailsIsBlank(caseData.getResTseDocument6(), caseData.getResTseTextBox6());
+            case SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
+                return checkGiveDetailsIsBlank(caseData.getResTseDocument7(), caseData.getResTseTextBox7());
+            case SELECTED_APP_POSTPONE_A_HEARING:
+                return checkGiveDetailsIsBlank(caseData.getResTseDocument8(), caseData.getResTseTextBox8());
+            case SELECTED_APP_RECONSIDER_JUDGEMENT:
+                return checkGiveDetailsIsBlank(caseData.getResTseDocument9(), caseData.getResTseTextBox9());
+            case SELECTED_APP_RESTRICT_PUBLICITY:
+                return checkGiveDetailsIsBlank(caseData.getResTseDocument10(), caseData.getResTseTextBox10());
+            case SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
+                return checkGiveDetailsIsBlank(caseData.getResTseDocument11(), caseData.getResTseTextBox11());
+            case SELECTED_APP_VARY_OR_REVOKE_AN_ORDER:
+                return checkGiveDetailsIsBlank(caseData.getResTseDocument12(), caseData.getResTseTextBox12());
+            default:
+                return true;
+        }
+    }
+
+    private Boolean checkGiveDetailsIsBlank(UploadedDocumentType document, String textBox) {
+        return document == null && isNullOrEmpty(textBox);
     }
 
     /**

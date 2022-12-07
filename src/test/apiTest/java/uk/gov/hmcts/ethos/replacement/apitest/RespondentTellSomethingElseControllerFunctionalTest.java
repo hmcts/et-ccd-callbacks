@@ -39,6 +39,19 @@ class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctional
     }
 
     @Test
+    void shouldReceiveSuccessResponseWhenValidateGiveDetailsInvoked() {
+        RestAssured.given()
+            .spec(spec)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(ccdRequest)
+            .post("/respondentTSE/validateGiveDetails")
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log().all(true);
+    }
+
+    @Test
     void shouldReceiveSuccessResponseWhenAboutToSubmitRespondentTseInvoked() {
         RestAssured.given()
             .spec(spec)

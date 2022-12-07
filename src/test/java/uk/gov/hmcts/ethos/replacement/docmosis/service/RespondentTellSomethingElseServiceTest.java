@@ -13,16 +13,19 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -82,7 +85,147 @@ class RespondentTellSomethingElseServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("selectedApplicationList")
+    void validateGiveDetails_Blank_ReturnErrorMsg(String selectedApplication) {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setResTseSelectApplication(selectedApplication);
+        List<String> errors = respondentTellSomethingElseService.validateGiveDetails(caseData);
+        assertThat(errors.size(), is(1));
+        assertThat(errors.get(0), is(GIVE_DETAIL_MISSING));
+    }
+
+    @ParameterizedTest
+    @MethodSource("selectedApplicationList")
+    void validateGiveDetails_HasDoc_NoErrorMsg(String selectedApplication) {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setResTseSelectApplication(selectedApplication);
+        setDocForSelectedApplication(caseData);
+        List<String> errors = respondentTellSomethingElseService.validateGiveDetails(caseData);
+        assertThat(errors.size(), is(0));
+    }
+
+    @ParameterizedTest
+    @MethodSource("selectedApplicationList")
+    void validateGiveDetails_HasTextBox_NoErrorMsg(String selectedApplication) {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setResTseSelectApplication(selectedApplication);
+        setTextBoxForSelectedApplication(caseData);
+        List<String> errors = respondentTellSomethingElseService.validateGiveDetails(caseData);
+        assertThat(errors.size(), is(0));
+    }
+
+    private static Stream<Arguments> selectedApplicationList() {
+        return Stream.of(
+                Arguments.of(SELECTED_APP_AMEND_RESPONSE),
+                Arguments.of(SELECTED_APP_CHANGE_PERSONAL_DETAILS),
+                Arguments.of(SELECTED_APP_CLAIMANT_NOT_COMPLIED),
+                Arguments.of(SELECTED_APP_CONSIDER_A_DECISION_AFRESH),
+                Arguments.of(SELECTED_APP_CONTACT_THE_TRIBUNAL),
+                Arguments.of(SELECTED_APP_ORDER_OTHER_PARTY),
+                Arguments.of(SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE),
+                Arguments.of(SELECTED_APP_POSTPONE_A_HEARING),
+                Arguments.of(SELECTED_APP_RECONSIDER_JUDGEMENT),
+                Arguments.of(SELECTED_APP_RESTRICT_PUBLICITY),
+                Arguments.of(SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM),
+                Arguments.of(SELECTED_APP_VARY_OR_REVOKE_AN_ORDER));
+    }
+
+    private void setDocForSelectedApplication(CaseData caseData) {
+        switch (caseData.getResTseSelectApplication()) {
+            case SELECTED_APP_AMEND_RESPONSE:
+                caseData.setResTseDocument1(createDocumentType());
+                break;
+            case SELECTED_APP_CHANGE_PERSONAL_DETAILS:
+                caseData.setResTseDocument2(createDocumentType());
+                break;
+            case SELECTED_APP_CLAIMANT_NOT_COMPLIED:
+                caseData.setResTseDocument3(createDocumentType());
+                break;
+            case SELECTED_APP_CONSIDER_A_DECISION_AFRESH:
+                caseData.setResTseDocument4(createDocumentType());
+                break;
+            case SELECTED_APP_CONTACT_THE_TRIBUNAL:
+                caseData.setResTseDocument5(createDocumentType());
+                break;
+            case SELECTED_APP_ORDER_OTHER_PARTY:
+                caseData.setResTseDocument6(createDocumentType());
+                break;
+            case SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
+                caseData.setResTseDocument7(createDocumentType());
+                break;
+            case SELECTED_APP_POSTPONE_A_HEARING:
+                caseData.setResTseDocument8(createDocumentType());
+                break;
+            case SELECTED_APP_RECONSIDER_JUDGEMENT:
+                caseData.setResTseDocument9(createDocumentType());
+                break;
+            case SELECTED_APP_RESTRICT_PUBLICITY:
+                caseData.setResTseDocument10(createDocumentType());
+                break;
+            case SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
+                caseData.setResTseDocument11(createDocumentType());
+                break;
+            case SELECTED_APP_VARY_OR_REVOKE_AN_ORDER:
+                caseData.setResTseDocument12(createDocumentType());
+                break;
+            default:
+                break;
+        }
+    }
+
+    private UploadedDocumentType createDocumentType() {
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentBinaryUrl("binaryUrl/documents/");
+        uploadedDocumentType.setDocumentFilename("testFileName");
+        uploadedDocumentType.setDocumentUrl("documentUrl");
+        return uploadedDocumentType;
+    }
+
+    private void setTextBoxForSelectedApplication(CaseData caseData) {
+        switch (caseData.getResTseSelectApplication()) {
+            case SELECTED_APP_AMEND_RESPONSE:
+                caseData.setResTseTextBox1("Not Blank");
+                break;
+            case SELECTED_APP_CHANGE_PERSONAL_DETAILS:
+                caseData.setResTseTextBox2("Not Blank");
+                break;
+            case SELECTED_APP_CLAIMANT_NOT_COMPLIED:
+                caseData.setResTseTextBox3("Not Blank");
+                break;
+            case SELECTED_APP_CONSIDER_A_DECISION_AFRESH:
+                caseData.setResTseTextBox4("Not Blank");
+                break;
+            case SELECTED_APP_CONTACT_THE_TRIBUNAL:
+                caseData.setResTseTextBox5("Not Blank");
+                break;
+            case SELECTED_APP_ORDER_OTHER_PARTY:
+                caseData.setResTseTextBox6("Not Blank");
+                break;
+            case SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
+                caseData.setResTseTextBox7("Not Blank");
+                break;
+            case SELECTED_APP_POSTPONE_A_HEARING:
+                caseData.setResTseTextBox8("Not Blank");
+                break;
+            case SELECTED_APP_RECONSIDER_JUDGEMENT:
+                caseData.setResTseTextBox9("Not Blank");
+                break;
+            case SELECTED_APP_RESTRICT_PUBLICITY:
+                caseData.setResTseTextBox10("Not Blank");
+                break;
+            case SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
+                caseData.setResTseTextBox11("Not Blank");
+                break;
+            case SELECTED_APP_VARY_OR_REVOKE_AN_ORDER:
+                caseData.setResTseTextBox12("Not Blank");
+                break;
+            default:
+                break;
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("sendRespondentApplicationEmail")
     void sendRespondentApplicationEmail(String selectedApplication, String rule92Selection, String expectedAnswer,
                                         Boolean emailSent) {
         CaseData caseData = createCaseData(selectedApplication, rule92Selection);

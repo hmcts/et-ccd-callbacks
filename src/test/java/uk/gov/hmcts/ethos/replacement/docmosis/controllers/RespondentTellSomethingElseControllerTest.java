@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest({RespondentTellSomethingElseController.class, JsonMapper.class})
 class RespondentTellSomethingElseControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String MID_VARIABLE_CONTENT = "/respondentTSE/midVariableContent";
+    private static final String VALIDATE_GIVE_DETAILS = "/respondentTSE/validateGiveDetails";
     private static final String ABOUT_TO_SUBMIT_URL = "/respondentTSE/aboutToSubmit";
 
     @MockBean
@@ -68,23 +68,23 @@ class RespondentTellSomethingElseControllerTest {
     }
 
     @Test
-    void midVariableContent_Success() throws Exception {
+    void validateGiveDetails_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockMvc.perform(post(MID_VARIABLE_CONTENT)
+        mockMvc.perform(post(VALIDATE_GIVE_DETAILS)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.errors", notNullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(resTseService).resTseSetVariableContent(ccdRequest.getCaseDetails().getCaseData());
+        verify(resTseService).validateGiveDetails(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
-    void midVariableContent_invalidToken() throws Exception {
+    void validateGiveDetails_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(MID_VARIABLE_CONTENT)
+        mockMvc.perform(post(VALIDATE_GIVE_DETAILS)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                         .content(jsonMapper.toJson(ccdRequest)))

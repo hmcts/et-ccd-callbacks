@@ -24,7 +24,7 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -77,7 +77,7 @@ public class RespondentTellSomethingElseController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = resTseService.validateGiveDetails(caseData);
 
-        return getCallbackRespEntity(errors, ccdRequest.getCaseDetails());
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)

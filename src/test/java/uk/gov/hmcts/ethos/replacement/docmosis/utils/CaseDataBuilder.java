@@ -345,10 +345,19 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withRespondent(String respondent, String responseReceived, String receivedDate,
+
+    public CaseDataBuilder withRespondent(String respondentName, String responseReceived, String receivedDate,
+                                          String respondentEmail, boolean extension) {
+        withRespondent(respondentName, responseReceived, receivedDate, extension);
+        RespondentSumTypeItem respondentSumTypeItem = caseData.getRespondentCollection().get(caseData.getRespondentCollection().size() - 1);
+        respondentSumTypeItem.getValue().setRespondentEmail(respondentEmail);
+        return this;
+
+    }
+    public CaseDataBuilder withRespondent(String respondentName, String responseReceived, String receivedDate,
                                           boolean extension) {
         RespondentSumType respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentName(respondent);
+        respondentSumType.setRespondentName(respondentName);
         respondentSumType.setResponseReceived(responseReceived);
         respondentSumType.setResponseReceivedDate(receivedDate);
         if (extension) {
@@ -471,8 +480,10 @@ public class CaseDataBuilder {
                                                               LocalDateTime requestTimestamp,
                                                               ChangeOrganisationApprovalStatus approvalStatus) {
         DynamicValueType caseRoleIDValue = DynamicValueType.create("[RESPONDENTSOLICITORONE]", "Respondent Solicitor");
+
         DynamicFixedListType caseRoleIDList = new DynamicFixedListType();
-        caseRoleIDList.setListItems();
+        caseRoleIDList.setValue(caseRoleIDValue);
+        caseRoleIDList.setListItems(List.of(caseRoleIDValue));
 
         ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()
             .organisationToAdd(organisationToAdd)

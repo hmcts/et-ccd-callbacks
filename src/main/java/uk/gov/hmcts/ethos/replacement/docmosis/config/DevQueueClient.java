@@ -32,7 +32,6 @@ public class DevQueueClient implements IQueueClient {
     public ReceiveMode getReceiveMode() {
         return null;
     }
-
     @Override
     public String getQueueName() {
         return null;

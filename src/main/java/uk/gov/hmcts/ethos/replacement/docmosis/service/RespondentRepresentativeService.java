@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -12,7 +14,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 @Service
@@ -23,6 +27,14 @@ public class RespondentRepresentativeService {
     private final UserService userService;
 
     private final CaseConverter caseConverter;
+
+    private final AuditEventService auditEventService;
+
+    @Value("${aac.system.username}")
+    private String systemUserName;
+
+    @Value("${aac.system.password}")
+    private String systemUserPassword;
 
     /**
      * Add respondent organisation policy and notice of change answer fields to the case data.
@@ -41,18 +53,25 @@ public class RespondentRepresentativeService {
      * Replace the organisation policy and relevant respondent representative mapping with
      * new respondent representative details.
      * @param caseData case data
-     * @param userToken of new solicitor
      * @return updated case
      */
-    public CaseData updateRepresentation(CaseData caseData, String userToken) {
+    public CaseData updateRepresentation(CaseData caseData) throws IOException {
         Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
-        Map<String, Object> repCollection = updateRepresentationMap(caseData, userToken);
+        Map<String, Object> repCollection = updateRepresentationMap(caseData);
         caseDataAsMap.putAll(repCollection);
         return  caseConverter.convert(caseDataAsMap, CaseData.class);
     }
 
-    private Map<String, Object> updateRepresentationMap(CaseData caseData, String userToken) {
-        UserDetails userDetails = userService.getUserDetails(userToken);
+    private Map<String, Object> updateRepresentationMap(CaseData caseData) throws IOException {
+
+        String accessToken = "";
+            //idamApi.getAccessToken(systemUserName, systemUserPassword);
+
+        Optional<AuditEvent>  auditEvent =
+                auditEventService.getLatestAuditEventByName(accessToken, caseData.getCcdID(), "nocRequest");
+
+        Optional<UserDetails> userDetails = auditEvent
+            .map(event -> userService.getUserDetailsById(accessToken, event.getUserId()));
 
         final ChangeOrganisationRequest change = caseData.getChangeOrganisationRequestField();
 
@@ -64,9 +83,17 @@ public class RespondentRepresentativeService {
 
         RepresentedTypeR container = caseData.getRepCollection().get(role.getIndex()).getValue();
 
+        String userName = null;
+        String userEmail = null;
+
+        if (userDetails.isPresent()) {
+            userName = String.join(" ", userDetails.get().getFirstName(), userDetails.get().getLastName());
+            userEmail = userDetails.get().getEmail();
+        }
+
         RepresentedTypeR addedSolicitor = RepresentedTypeR.builder()
-            .nameOfRepresentative(String.join(" ", userDetails.getFirstName(), userDetails.getLastName()))
-            .representativeEmailAddress(userDetails.getEmail())
+            .nameOfRepresentative(userName)
+            .representativeEmailAddress(userEmail)
             .respondentOrganisation(change.getOrganisationToAdd())
             .respRepName(container.getRespRepName())
             .myHmctsYesNo("Yes")

@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 
+
 @Component
 public class UserService implements uk.gov.hmcts.ecm.common.service.UserService {
-
     private final IdamApi idamApi;
 
     @Autowired
@@ -18,5 +18,10 @@ public class UserService implements uk.gov.hmcts.ecm.common.service.UserService 
     @Override
     public UserDetails getUserDetails(String authorisation) {
         return idamApi.retrieveUserDetails(authorisation);
+    }
+
+    @Override
+    public UserDetails getUserDetailsById(String authToken, String userId) {
+        return idamApi.getUserByUserId(authToken, userId);
     }
 }

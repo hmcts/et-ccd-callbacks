@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
+import java.io.IOException;
 import java.util.ArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,6 +68,10 @@ class RespondentRepresentativeServiceTest {
     private NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private AuditEventService auditEventService;
+
     private CaseData caseData;
 
     @BeforeEach
@@ -74,7 +79,7 @@ class RespondentRepresentativeServiceTest {
         caseData = new CaseData();
         CaseConverter converter = new CaseConverter(objectMapper);
         respondentRepresentativeService = new RespondentRepresentativeService(noticeOfChangeFieldPopulator, userService,
-            converter);
+            converter, auditEventService);
 
         // Respondent
         caseData.setRespondentCollection(new ArrayList<>());
@@ -168,7 +173,7 @@ class RespondentRepresentativeServiceTest {
     }
 
     @Test
-    void shouldUpdateRespondentRepresentationDetails() {
+    void shouldUpdateRespondentRepresentationDetails() throws IOException {
         Organisation oldOrganisation =
             Organisation.builder().organisationID(ORGANISATION_ID_TWO).organisationName(ET_ORG_2).build();
 
@@ -182,7 +187,7 @@ class RespondentRepresentativeServiceTest {
 
         UserDetails mockUser = getMockUser();
         when(userService.getUserDetails(any())).thenReturn(mockUser);
-        respondentRepresentativeService.updateRepresentation(caseData, USER_TOKEN);
+        respondentRepresentativeService.updateRepresentation(caseData);
 
         assertThat(
             caseData.getRepCollection().get(1).getValue().getRespondentOrganisation().getOrganisationID()).isEqualTo(

@@ -232,8 +232,18 @@ public class TornadoServiceTest {
     }
 
     private void createUserService() {
-        UserDetails userDetails = HelperTest.getUserDetails();
-        IdamApi idamApi = authorisation -> userDetails;
+        IdamApi idamApi = new IdamApi() {
+            @Override
+            public UserDetails retrieveUserDetails(String authorisation) {
+                return HelperTest.getUserDetails();
+            }
+
+            @Override
+            public UserDetails getUserByUserId(String authorisation, String userId) {
+                return HelperTest.getUserDetails();
+            }
+        };
+
         userService = new UserService(idamApi);
     }
 

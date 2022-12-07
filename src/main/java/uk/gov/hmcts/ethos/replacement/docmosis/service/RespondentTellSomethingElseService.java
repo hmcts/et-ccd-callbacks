@@ -2,17 +2,23 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentTseTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentTseType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
 @Slf4j
 @Service
@@ -141,7 +147,7 @@ public class RespondentTellSomethingElseService {
             emailService.sendEmail(
                 emailTemplateId,
                 legalRepEmail,
-                RespondentTellSomethingElseHelper.buildPersonalisation(
+                buildPersonalisation(
                     caseDetails,
                     customisedText,
                     caseData.getResTseSelectApplication()
@@ -149,4 +155,130 @@ public class RespondentTellSomethingElseService {
         }
     }
 
+    public Map<String, String> buildPersonalisation(CaseDetails detail,
+                                                           String customisedText,
+                                                           String applicationType) {
+        CaseData caseData = detail.getCaseData();
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
+        personalisation.put("caseNumber", caseData.getEthosCaseReference());
+        personalisation.put("claimant", caseData.getClaimant());
+        personalisation.put("respondents", getRespondentNames(caseData));
+        personalisation.put("customisedText", customisedText);
+        personalisation.put("shortText", applicationType);
+        personalisation.put("caseId", detail.getCaseId());
+        return personalisation;
+    }
+
+    /**
+     * Creates a new Respondent TSE collection if it doesn't exist.
+     * Create a new element in the list and assign the TSE data from CaseData to it.
+     * At last, clears the existing TSE data from CaseData to ensure fields will be empty when user
+     * starts a new application in the same case.
+     * @param caseData contains all the case data
+     */
+    public void createRespondentApplication(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getResTseCollection())) {
+            caseData.setResTseCollection(new ArrayList<>());
+        }
+
+        RespondentTseType respondentTseType = new RespondentTseType();
+
+        assignDataToFieldsFromApplicationType(respondentTseType, caseData);
+        respondentTseType.setResTseSelectApplication(caseData.getResTseSelectApplication());
+        respondentTseType.setResTseCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
+        respondentTseType.setResTseCopyToOtherPartyTextArea(caseData.getResTseCopyToOtherPartyTextArea());
+
+        RespondentTseTypeItem respondentTseTypeItem = new RespondentTseTypeItem();
+        respondentTseTypeItem.setId(UUID.randomUUID().toString());
+        respondentTseTypeItem.setValue(respondentTseType);
+
+        List<RespondentTseTypeItem> respondentTseCollection = caseData.getResTseCollection();
+        respondentTseCollection.add(respondentTseTypeItem);
+        caseData.setResTseCollection(respondentTseCollection);
+
+        clearRespondentTseDataFromCaseData(caseData);
+    }
+
+    private void assignDataToFieldsFromApplicationType(RespondentTseType respondentTseType, CaseData caseData) {
+        switch (caseData.getResTseSelectApplication()) {
+            case SELECTED_APP_AMEND_RESPONSE:
+                respondentTseType.setResTseTextBox(caseData.getResTseTextBox1());
+                respondentTseType.setResTseDocument(caseData.getResTseDocument1());
+                break;
+            case SELECTED_APP_CHANGE_PERSONAL_DETAILS:
+                respondentTseType.setResTseTextBox(caseData.getResTseTextBox2());
+                respondentTseType.setResTseDocument(caseData.getResTseDocument2());
+                caseData.setResTseTextBox2(null);
+                caseData.setResTseDocument2(null);
+                break;
+            case SELECTED_APP_CLAIMANT_NOT_COMPLIED:
+                respondentTseType.setResTseTextBox(caseData.getResTseTextBox3());
+                respondentTseType.setResTseDocument(caseData.getResTseDocument3());
+                caseData.setResTseTextBox3(null);
+                caseData.setResTseDocument3(null);
+                break;
+            case SELECTED_APP_CONSIDER_A_DECISION_AFRESH:
+                respondentTseType.setResTseTextBox(caseData.getResTseTextBox4());
+                respondentTseType.setResTseDocument(caseData.getResTseDocument4());
+                caseData.setResTseTextBox4(null);
+                caseData.setResTseDocument4(null);
+                break;
+            case SELECTED_APP_CONTACT_THE_TRIBUNAL:
+                respondentTseType.setResTseTextBox(caseData.getResTseTextBox5());
+                respondentTseType.setResTseDocument(caseData.getResTseDocument5());
+                caseData.setResTseTextBox5(null);
+                caseData.setResTseDocument5(null);
+                break;
+            case SELECTED_APP_ORDER_OTHER_PARTY:
+                respondentTseType.setResTseTextBox(caseData.getResTseTextBox6());
+                respondentTseType.setResTseDocument(caseData.getResTseDocument6());
+                caseData.setResTseTextBox6(null);
+                caseData.setResTseDocument6(null);
+                break;
+            case SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
+                respondentTseType.setResTseTextBox(caseData.getResTseTextBox7());
+                respondentTseType.setResTseDocument(caseData.getResTseDocument7());
+                caseData.setResTseTextBox7(null);
+                caseData.setResTseDocument7(null);
+                break;
+            case SELECTED_APP_POSTPONE_A_HEARING:
+                respondentTseType.setResTseTextBox(caseData.getResTseTextBox8());
+                respondentTseType.setResTseDocument(caseData.getResTseDocument8());
+                caseData.setResTseTextBox8(null);
+                caseData.setResTseDocument8(null);
+                break;
+            case SELECTED_APP_RECONSIDER_JUDGEMENT:
+                respondentTseType.setResTseTextBox(caseData.getResTseTextBox9());
+                respondentTseType.setResTseDocument(caseData.getResTseDocument9());
+                caseData.setResTseTextBox9(null);
+                caseData.setResTseDocument9(null);
+                break;
+            case SELECTED_APP_RESTRICT_PUBLICITY:
+                respondentTseType.setResTseTextBox(caseData.getResTseTextBox10());
+                respondentTseType.setResTseDocument(caseData.getResTseDocument10());
+                caseData.setResTseTextBox10(null);
+                caseData.setResTseDocument10(null);
+                break;
+            case SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
+                respondentTseType.setResTseTextBox(caseData.getResTseTextBox11());
+                respondentTseType.setResTseDocument(caseData.getResTseDocument11());
+                caseData.setResTseTextBox11(null);
+                caseData.setResTseDocument11(null);
+                break;
+            case SELECTED_APP_VARY_OR_REVOKE_AN_ORDER:
+                respondentTseType.setResTseTextBox(caseData.getResTseTextBox12());
+                respondentTseType.setResTseDocument(caseData.getResTseDocument12());
+                caseData.setResTseTextBox12(null);
+                caseData.setResTseDocument12(null);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void clearRespondentTseDataFromCaseData(CaseData caseData) {
+        caseData.setResTseSelectApplication(null);
+        caseData.setResTseCopyToOtherPartyYesOrNo(null);
+        caseData.setResTseCopyToOtherPartyTextArea(null);
+    }
 }

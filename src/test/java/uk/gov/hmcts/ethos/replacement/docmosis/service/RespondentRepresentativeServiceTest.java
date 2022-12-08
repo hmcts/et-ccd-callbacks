@@ -12,6 +12,7 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -174,6 +175,7 @@ class RespondentRepresentativeServiceTest {
 
     @Test
     void shouldUpdateRespondentRepresentationDetails() throws IOException {
+        CaseDetails caseDetails = new CaseDetails();
         Organisation oldOrganisation =
             Organisation.builder().organisationID(ORGANISATION_ID_TWO).organisationName(ET_ORG_2).build();
 
@@ -187,7 +189,9 @@ class RespondentRepresentativeServiceTest {
 
         UserDetails mockUser = getMockUser();
         when(userService.getUserDetails(any())).thenReturn(mockUser);
-        respondentRepresentativeService.updateRepresentation(caseData);
+        caseDetails.setCaseId("111-222-111-333");
+        caseDetails.setCaseData(caseData);
+        respondentRepresentativeService.updateRepresentation(caseDetails);
 
         assertThat(
             caseData.getRepCollection().get(1).getValue().getRespondentOrganisation().getOrganisationID()).isEqualTo(

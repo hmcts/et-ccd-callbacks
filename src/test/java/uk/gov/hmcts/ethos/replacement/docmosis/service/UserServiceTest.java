@@ -7,12 +7,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.OAuth2Configuration;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @SuppressWarnings({"PMD.SingularField"})
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -24,10 +29,12 @@ public class UserServiceTest {
     private IdamApi idamApi;
 
     private UserDetails userDetails;
+    private OAuth2Configuration oauth2Configuration;
 
     @Before
     public void setUp() {
         userDetails = HelperTest.getUserDetails();
+
         idamApi = new IdamApi() {
             @Override
             public UserDetails retrieveUserDetails(String authorisation) {
@@ -38,8 +45,16 @@ public class UserServiceTest {
             public UserDetails getUserByUserId(String authorisation, String userId) {
                 return HelperTest.getUserDetails();
             }
+
+            @Override
+            public TokenResponse generateOpenIdToken(TokenRequest tokenRequest) {
+                return null;
+            }
         };
-        userService = new UserService(idamApi);
+
+        mockOauth2Configuration();
+
+        userService = new UserService(idamApi, oauth2Configuration);
     }
 
     @Test
@@ -55,5 +70,13 @@ public class UserServiceTest {
         assertEquals("Jordan", userService.getUserDetails("TOKEN").getLastName());
         assertEquals(Collections.singletonList("role"), userService.getUserDetails("TOKEN").getRoles());
         assertEquals(userDetails.toString(), userService.getUserDetails("TOKEN").toString());
+    }
+
+    private void mockOauth2Configuration() {
+        oauth2Configuration = mock(OAuth2Configuration.class);
+        when(oauth2Configuration.getClientId()).thenReturn("111");
+        when(oauth2Configuration.getClientSecret()).thenReturn("AAAAA");
+        when(oauth2Configuration.getRedirectUri()).thenReturn("http://localhost:8080/test");
+        when(oauth2Configuration.getClientScope()).thenReturn("roles");
     }
 }

@@ -127,12 +127,12 @@ class SolicitorRoleTest {
             .flatMap(solicitorRole -> solicitorRole.getRepresentationItem(caseData))
             .map(representedTypeRItem -> representedTypeRItem.getValue().getRespRepName()))
             .isPresent().hasValue(
-            RESPONDENT_NAME_TWO);
+                RESPONDENT_NAME_TWO);
 
         assertThat(SolicitorRole.from("[SOLICITORC]")
             .flatMap(solicitorRole -> solicitorRole.getRepresentationItem(caseData))
             .map(representedTypeRItem -> representedTypeRItem.getValue().getRespRepName()))
             .isPresent().hasValue(
-            RESPONDENT_NAME_THREE);
+                RESPONDENT_NAME_THREE);
     }
 }

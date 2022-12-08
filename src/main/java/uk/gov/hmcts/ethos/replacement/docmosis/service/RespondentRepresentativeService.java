@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
@@ -21,7 +23,10 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RespondentRepresentativeService {
+    public static final String BEARER = "Bearer ";
+    public static final String NOC_REQUEST = "nocRequest";
     private final NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
 
     private final UserService userService;
@@ -52,23 +57,23 @@ public class RespondentRepresentativeService {
     /**
      * Replace the organisation policy and relevant respondent representative mapping with
      * new respondent representative details.
-     * @param caseData case data
+     * @param caseDetails containing case data with change organisation request field
      * @return updated case
      */
-    public CaseData updateRepresentation(CaseData caseData) throws IOException {
+    public CaseData updateRepresentation(CaseDetails caseDetails) throws IOException {
+        CaseData caseData = caseDetails.getCaseData();
         Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
-        Map<String, Object> repCollection = updateRepresentationMap(caseData);
+        Map<String, Object> repCollection = updateRepresentationMap(caseData, caseDetails.getCaseId());
         caseDataAsMap.putAll(repCollection);
         return  caseConverter.convert(caseDataAsMap, CaseData.class);
     }
 
-    private Map<String, Object> updateRepresentationMap(CaseData caseData) throws IOException {
+    private Map<String, Object> updateRepresentationMap(CaseData caseData, String caseId) throws IOException {
 
-        String accessToken = "";
-            //idamApi.getAccessToken(systemUserName, systemUserPassword);
+        String accessToken = String.join(" ", BEARER, userService.getAccessToken(systemUserName, systemUserPassword));
 
-        Optional<AuditEvent>  auditEvent =
-                auditEventService.getLatestAuditEventByName(accessToken, caseData.getCcdID(), "nocRequest");
+        Optional<AuditEvent> auditEvent =
+            auditEventService.getLatestAuditEventByName(accessToken, caseId, NOC_REQUEST);
 
         Optional<UserDetails> userDetails = auditEvent
             .map(event -> userService.getUserDetailsById(accessToken, event.getUserId()));
@@ -83,17 +88,11 @@ public class RespondentRepresentativeService {
 
         RepresentedTypeR container = caseData.getRepCollection().get(role.getIndex()).getValue();
 
-        String userName = null;
-        String userEmail = null;
-
-        if (userDetails.isPresent()) {
-            userName = String.join(" ", userDetails.get().getFirstName(), userDetails.get().getLastName());
-            userEmail = userDetails.get().getEmail();
-        }
-
         RepresentedTypeR addedSolicitor = RepresentedTypeR.builder()
-            .nameOfRepresentative(userName)
-            .representativeEmailAddress(userEmail)
+            .nameOfRepresentative(userDetails
+                .map(user -> String.join(" ", user.getFirstName(), user.getLastName()))
+                .orElse(null))
+            .representativeEmailAddress(userDetails.map(UserDetails::getEmail).orElse(null))
             .respondentOrganisation(change.getOrganisationToAdd())
             .respRepName(container.getRespRepName())
             .myHmctsYesNo("Yes")

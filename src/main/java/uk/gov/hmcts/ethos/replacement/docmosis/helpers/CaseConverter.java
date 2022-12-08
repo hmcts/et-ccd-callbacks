@@ -12,22 +12,22 @@ import static java.util.Objects.isNull;
 @RequiredArgsConstructor
 public class CaseConverter {
 
-    public static TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<>() {};
+    private static TypeReference<Map<String, Object>> MAPTYPE = new TypeReference<>() {};
 
     private final ObjectMapper objectMapper;
 
-    public <T> T convert(Object o, Class<T> clazz) {
-        if (isNull(o)) {
+    public <T> T convert(Object object, Class<T> clazz) {
+        if (isNull(object)) {
             return null;
         }
-        return objectMapper.convertValue(o, clazz);
+        return objectMapper.convertValue(object, clazz);
     }
 
     public <T> Map<String, Object> toMap(T object) {
         if (isNull(object)) {
             return null;
         }
-        return objectMapper.convertValue(object, MAP_TYPE);
+        return objectMapper.convertValue(object, MAPTYPE);
     }
 }
 

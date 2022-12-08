@@ -18,9 +18,12 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAssignmentException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+
+import java.io.IOException;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -39,15 +42,15 @@ public class NoticeOfChangeController {
 
     @PostMapping("/about-to-submit")
     public CCDCallbackResponse handleAboutToSubmit(@RequestBody CallbackRequest callbackRequest,
-                                                      @RequestHeader(value = "Authorization")
-                                                      String userToken) throws Exception {
+                                                      @RequestHeader("Authorization")
+                                                      String userToken) throws IOException, CaseAssignmentException {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
         }
 
         CaseData caseData =
             respondentRepresentativeService
-                .updateRepresentation(callbackRequest.getCaseDetails().getCaseData());
+                .updateRepresentation(callbackRequest.getCaseDetails());
 
         callbackRequest.getCaseDetails().setCaseData(caseData);
 
@@ -62,7 +65,7 @@ public class NoticeOfChangeController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<CCDCallbackResponse> updateNocRespondents(@RequestBody CCDRequest callbackRequest,
-                                                                    @RequestHeader(value = "Authorization")
+                                                                    @RequestHeader("Authorization")
                                                                     String userToken) {
         log.info("START OF INITIAL CONSIDERATION FOR CASE ---> {}", callbackRequest.getCaseDetails().getCaseId());
 
@@ -85,7 +88,7 @@ public class NoticeOfChangeController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public GenericCallbackResponse nocSubmitted(@RequestBody CallbackRequest callbackRequest,
-                                                @RequestHeader(value = "Authorization")
+                                                @RequestHeader("Authorization")
                                                 String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -94,7 +97,7 @@ public class NoticeOfChangeController {
 
         GenericCallbackResponse callbackResponse = new GenericCallbackResponse();
 
-        if (callbackRequest.getEventId().equals(APPLY_NOC_DECISION)) {
+        if (APPLY_NOC_DECISION.equals(callbackRequest.getEventId())) {
             //sendNotification(callback);
             String caseReference = callbackRequest.getCaseDetails().getCaseData().getEthosCaseReference();
 

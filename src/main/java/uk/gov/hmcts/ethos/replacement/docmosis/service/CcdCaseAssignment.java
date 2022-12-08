@@ -53,7 +53,7 @@ public class CcdCaseAssignment {
 
     public CCDCallbackResponse applyNoc(
         final CallbackRequest callback, String userToken
-    ) throws Exception {
+    ) throws CaseAssignmentException {
         requireNonNull(callback, "callback must not be null");
 
         final String serviceAuthorizationToken = serviceAuthTokenGenerator.generate();
@@ -76,7 +76,7 @@ public class CcdCaseAssignment {
 
         } catch (RestClientResponseException e) {
             log.info("Error form ccd - {}", e.getMessage());
-            throw new Exception("CCD error");
+            throw new  CaseAssignmentException("CCD error");
         }
 
         log.info("Apply NoC. Http status received from AAC API; {} for case {}",

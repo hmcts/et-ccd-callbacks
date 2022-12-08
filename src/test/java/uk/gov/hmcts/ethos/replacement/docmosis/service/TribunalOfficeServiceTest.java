@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
 
 @RunWith(Parameterized.class)
 @SpringBootTest(classes = {
@@ -26,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 })
 @EnableConfigurationProperties({CaseDefaultValuesConfiguration.class, TribunalOfficesConfiguration.class})
 public class TribunalOfficeServiceTest {
-
     @ClassRule public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
     @Rule public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
@@ -47,8 +47,8 @@ public class TribunalOfficeServiceTest {
             { TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB" },
             { TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB" },
             { TribunalOffice.EDINBURGH.getOfficeName(), "EH3 7HF" },
-            { TribunalOffice.EDINBURGH.getOfficeName(), "EH3 7HF" },
-            { TribunalOffice.EDINBURGH.getOfficeName(), "EH3 7HF" }
+            { UNASSIGNED_OFFICE, "" },
+            { null, "" },
     };
 
     private final String managingOffice;

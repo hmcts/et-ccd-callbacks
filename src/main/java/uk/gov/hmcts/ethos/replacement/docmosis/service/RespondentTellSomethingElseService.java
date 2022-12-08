@@ -280,5 +280,31 @@ public class RespondentTellSomethingElseService {
         caseData.setResTseSelectApplication(null);
         caseData.setResTseCopyToOtherPartyYesOrNo(null);
         caseData.setResTseCopyToOtherPartyTextArea(null);
+
+        caseData.setResTseTextBox1(null);
+        caseData.setResTseTextBox2(null);
+        caseData.setResTseTextBox3(null);
+        caseData.setResTseTextBox4(null);
+        caseData.setResTseTextBox5(null);
+        caseData.setResTseTextBox6(null);
+        caseData.setResTseTextBox7(null);
+        caseData.setResTseTextBox8(null);
+        caseData.setResTseTextBox9(null);
+        caseData.setResTseTextBox10(null);
+        caseData.setResTseTextBox11(null);
+        caseData.setResTseTextBox12(null);
+
+        caseData.setResTseDocument1(null);
+        caseData.setResTseDocument2(null);
+        caseData.setResTseDocument3(null);
+        caseData.setResTseDocument4(null);
+        caseData.setResTseDocument5(null);
+        caseData.setResTseDocument6(null);
+        caseData.setResTseDocument7(null);
+        caseData.setResTseDocument8(null);
+        caseData.setResTseDocument9(null);
+        caseData.setResTseDocument10(null);
+        caseData.setResTseDocument11(null);
+        caseData.setResTseDocument12(null);
     }
 }

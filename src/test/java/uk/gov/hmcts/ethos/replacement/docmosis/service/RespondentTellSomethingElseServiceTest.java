@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
 @ExtendWith(SpringExtension.class)
+@SuppressWarnings("squid:S5961")
 class RespondentTellSomethingElseServiceTest {
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
 
@@ -133,51 +135,51 @@ class RespondentTellSomethingElseServiceTest {
     private void setDocForSelectedApplication(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
             case SELECTED_APP_AMEND_RESPONSE:
-                caseData.setResTseDocument1(createDocumentType());
+                caseData.setResTseDocument1(createDocumentType("documentUrl"));
                 break;
             case SELECTED_APP_CHANGE_PERSONAL_DETAILS:
-                caseData.setResTseDocument2(createDocumentType());
+                caseData.setResTseDocument2(createDocumentType("documentUrl"));
                 break;
             case SELECTED_APP_CLAIMANT_NOT_COMPLIED:
-                caseData.setResTseDocument3(createDocumentType());
+                caseData.setResTseDocument3(createDocumentType("documentUrl"));
                 break;
             case SELECTED_APP_CONSIDER_A_DECISION_AFRESH:
-                caseData.setResTseDocument4(createDocumentType());
+                caseData.setResTseDocument4(createDocumentType("documentUrl"));
                 break;
             case SELECTED_APP_CONTACT_THE_TRIBUNAL:
-                caseData.setResTseDocument5(createDocumentType());
+                caseData.setResTseDocument5(createDocumentType("documentUrl"));
                 break;
             case SELECTED_APP_ORDER_OTHER_PARTY:
-                caseData.setResTseDocument6(createDocumentType());
+                caseData.setResTseDocument6(createDocumentType("documentUrl"));
                 break;
             case SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
-                caseData.setResTseDocument7(createDocumentType());
+                caseData.setResTseDocument7(createDocumentType("documentUrl"));
                 break;
             case SELECTED_APP_POSTPONE_A_HEARING:
-                caseData.setResTseDocument8(createDocumentType());
+                caseData.setResTseDocument8(createDocumentType("documentUrl"));
                 break;
             case SELECTED_APP_RECONSIDER_JUDGEMENT:
-                caseData.setResTseDocument9(createDocumentType());
+                caseData.setResTseDocument9(createDocumentType("documentUrl"));
                 break;
             case SELECTED_APP_RESTRICT_PUBLICITY:
-                caseData.setResTseDocument10(createDocumentType());
+                caseData.setResTseDocument10(createDocumentType("documentUrl"));
                 break;
             case SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
-                caseData.setResTseDocument11(createDocumentType());
+                caseData.setResTseDocument11(createDocumentType("documentUrl"));
                 break;
             case SELECTED_APP_VARY_OR_REVOKE_AN_ORDER:
-                caseData.setResTseDocument12(createDocumentType());
+                caseData.setResTseDocument12(createDocumentType("documentUrl"));
                 break;
             default:
                 break;
         }
     }
 
-    private UploadedDocumentType createDocumentType() {
+    private UploadedDocumentType createDocumentType(String documentUrl) {
         UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
         uploadedDocumentType.setDocumentBinaryUrl("binaryUrl/documents/");
         uploadedDocumentType.setDocumentFilename("testFileName");
-        uploadedDocumentType.setDocumentUrl("documentUrl");
+        uploadedDocumentType.setDocumentUrl(documentUrl);
         return uploadedDocumentType;
     }
 
@@ -273,6 +275,140 @@ class RespondentTellSomethingElseServiceTest {
 
             Arguments.of("Order a witness to attend to give evidence", null, null, false)
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource("createRespondentApplication")
+    void createApplication_withRespondentTseData_shouldPersistDataAndEmptyFields(String selectedApplication,
+                                                                                 String textBoxData,
+                                                                                 String documentUrl) {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setResTseSelectApplication(selectedApplication);
+        setDocAndTextForSelectedApplication(caseData, textBoxData, documentUrl);
+        caseData.setResTseCopyToOtherPartyYesOrNo("copyToOtherPartyYesOrNo");
+        caseData.setResTseCopyToOtherPartyTextArea("copyToOtherPartyTextArea");
+
+        respondentTellSomethingElseService.createRespondentApplication(caseData);
+
+        assertThat(caseData.getResTseCollection().get(0).getValue().getResTseTextBox(), is(textBoxData));
+        assertThat(caseData.getResTseCollection().get(0).getValue()
+            .getResTseCopyToOtherPartyTextArea(), is("copyToOtherPartyTextArea"));
+
+        assertThat(caseData.getResTseCollection().get(0).getValue()
+            .getResTseCopyToOtherPartyYesOrNo(), is("copyToOtherPartyYesOrNo"));
+
+        assertThat(caseData.getResTseCollection().get(0).getValue()
+            .getResTseDocument().getDocumentUrl(), is(documentUrl));
+
+        assertThat(caseData.getResTseSelectApplication(), is(nullValue()));
+        assertThat(caseData.getResTseCopyToOtherPartyYesOrNo(), is(nullValue()));
+        assertThat(caseData.getResTseCopyToOtherPartyTextArea(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox1(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox2(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox3(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox4(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox5(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox6(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox7(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox8(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox9(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox10(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox11(), is(nullValue()));
+        assertThat(caseData.getResTseTextBox12(), is(nullValue()));
+        assertThat(caseData.getResTseDocument1(), is(nullValue()));
+        assertThat(caseData.getResTseDocument2(), is(nullValue()));
+        assertThat(caseData.getResTseDocument3(), is(nullValue()));
+        assertThat(caseData.getResTseDocument4(), is(nullValue()));
+        assertThat(caseData.getResTseDocument5(), is(nullValue()));
+        assertThat(caseData.getResTseDocument6(), is(nullValue()));
+        assertThat(caseData.getResTseDocument7(), is(nullValue()));
+        assertThat(caseData.getResTseDocument8(), is(nullValue()));
+        assertThat(caseData.getResTseDocument9(), is(nullValue()));
+        assertThat(caseData.getResTseDocument10(), is(nullValue()));
+        assertThat(caseData.getResTseDocument11(), is(nullValue()));
+        assertThat(caseData.getResTseDocument12(), is(nullValue()));
+    }
+
+    private void setDocAndTextForSelectedApplication(CaseData caseData,
+                                                     String textBoxData,
+                                                     String documentUrl) {
+        switch (caseData.getResTseSelectApplication()) {
+            case SELECTED_APP_AMEND_RESPONSE:
+                caseData.setResTseTextBox1(textBoxData);
+                caseData.setResTseDocument1(createDocumentType(documentUrl));
+                break;
+            case SELECTED_APP_CHANGE_PERSONAL_DETAILS:
+                caseData.setResTseTextBox2(textBoxData);
+                caseData.setResTseDocument2(createDocumentType(documentUrl));
+                break;
+            case SELECTED_APP_CLAIMANT_NOT_COMPLIED:
+                caseData.setResTseTextBox3(textBoxData);
+                caseData.setResTseDocument3(createDocumentType(documentUrl));
+                break;
+            case SELECTED_APP_CONSIDER_A_DECISION_AFRESH:
+                caseData.setResTseTextBox4(textBoxData);
+                caseData.setResTseDocument4(createDocumentType(documentUrl));
+                break;
+            case SELECTED_APP_CONTACT_THE_TRIBUNAL:
+                caseData.setResTseTextBox5(textBoxData);
+                caseData.setResTseDocument5(createDocumentType(documentUrl));
+                break;
+            case SELECTED_APP_ORDER_OTHER_PARTY:
+                caseData.setResTseTextBox6(textBoxData);
+                caseData.setResTseDocument6(createDocumentType(documentUrl));
+                break;
+            case SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
+                caseData.setResTseTextBox7(textBoxData);
+                caseData.setResTseDocument7(createDocumentType(documentUrl));
+                break;
+            case SELECTED_APP_POSTPONE_A_HEARING:
+                caseData.setResTseTextBox8(textBoxData);
+                caseData.setResTseDocument8(createDocumentType(documentUrl));
+                break;
+            case SELECTED_APP_RECONSIDER_JUDGEMENT:
+                caseData.setResTseTextBox9(textBoxData);
+                caseData.setResTseDocument9(createDocumentType(documentUrl));
+                break;
+            case SELECTED_APP_RESTRICT_PUBLICITY:
+                caseData.setResTseTextBox10(textBoxData);
+                caseData.setResTseDocument10(createDocumentType(documentUrl));
+                break;
+            case SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
+                caseData.setResTseTextBox11(textBoxData);
+                caseData.setResTseDocument11(createDocumentType(documentUrl));
+                break;
+            case SELECTED_APP_VARY_OR_REVOKE_AN_ORDER:
+                caseData.setResTseTextBox12(textBoxData);
+                caseData.setResTseDocument12(createDocumentType(documentUrl));
+                break;
+            default:
+                break;
+        }
+    }
+
+    private static Stream<Arguments> createRespondentApplication() {
+        return Stream.of(
+            Arguments.of(SELECTED_APP_AMEND_RESPONSE, "textBox1", "document1"),
+            Arguments.of(SELECTED_APP_CHANGE_PERSONAL_DETAILS, "textBox2", "document2"),
+            Arguments.of(SELECTED_APP_CLAIMANT_NOT_COMPLIED, "textBox3", "document3"),
+            Arguments.of(SELECTED_APP_CONSIDER_A_DECISION_AFRESH, "textBox4", "document4"),
+            Arguments.of(SELECTED_APP_CONTACT_THE_TRIBUNAL, "textBox5", "document5"),
+            Arguments.of(SELECTED_APP_ORDER_OTHER_PARTY, "textBox6", "document6"),
+            Arguments.of(SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE, "textBox7", "document7"),
+            Arguments.of(SELECTED_APP_POSTPONE_A_HEARING, "textBox8", "document8"),
+            Arguments.of(SELECTED_APP_RECONSIDER_JUDGEMENT, "textBox9", "document9"),
+            Arguments.of(SELECTED_APP_RESTRICT_PUBLICITY, "textBox10", "document10"),
+            Arguments.of(SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, "textBox11", "document11"),
+            Arguments.of(SELECTED_APP_VARY_OR_REVOKE_AN_ORDER, "textBox12", "document12")
+        );
+    }
+
+    private UploadedDocumentType createDocumentTypeWithUrl(String url) {
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentBinaryUrl("binaryUrl/documents/");
+        uploadedDocumentType.setDocumentFilename("testFileName");
+        uploadedDocumentType.setDocumentUrl(url);
+        return uploadedDocumentType;
     }
 
     private CaseData createCaseData(String selectedApplication, String selectedRule92Answer) {

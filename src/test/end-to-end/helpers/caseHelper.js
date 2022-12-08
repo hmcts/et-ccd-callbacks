@@ -218,16 +218,27 @@ async function createLegalRepReferral(emailAddress, details) {
 }
 
 async function clickCreateCase(I) {
-      await I.caseListForCreateCase();
-      await I.caseJurisdictionForCreateCase();
-      await I.caseDateOfReceiptForCreateCase();
-      await I.caseTypeOfClaimantForCreateCase();
-      await I.caseRespondentsForCreateCase();
-      await I.caseClaimantIsWAForCreateCase();
-      await I.caseClaimantWAForCreateCase();
-      await I.caseOtherDetailsForCreateCase();
-      await I.caseClaimantRepresented();
-      await I.caseClaimantHearingPreferences();
+    I.wait(3);
+    await I.caseListForCreateCase();
+    I.wait(2);
+    await I.caseJurisdictionForCreateCase();
+    I.wait(2);
+    await I.caseDateOfReceiptForCreateCase();
+    I.wait(2);
+    await I.caseTypeOfClaimantForCreateCase();
+    I.wait(2);
+    await I.caseRespondentsForCreateCase();
+    I.wait(2);
+    await I.caseClaimantIsWAForCreateCase();
+    I.wait(2);
+    await I.caseClaimantWAForCreateCase();
+    I.wait(2);
+    await I.caseOtherDetailsForCreateCase();
+    I.wait(2);
+    await I.caseClaimantRepresented();
+    I.wait(2);
+    await I.caseClaimantHearingPreferences();
+    I.wait(2);
 }
 
 async function verifyApplicationTabs(I) {

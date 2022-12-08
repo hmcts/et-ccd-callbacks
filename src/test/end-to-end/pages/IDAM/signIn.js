@@ -1,7 +1,5 @@
 'use strict';
 
-const testConfig = require('../../../config');
-
 module.exports = async function (userName, password) {
 
     const I = this;
@@ -9,6 +7,7 @@ module.exports = async function (userName, password) {
     I.waitForText('Sign in');
     I.fillField('username', userName);
     I.fillField('password', password);
-    I.click('input[value="Sign in"]');
-    I.waitForText('Case list');
+    I.click('[name="save"]');
+    I.waitForText('Case list', 30);
+    I.waitForClickable('.hmcts-button--secondary');
 };

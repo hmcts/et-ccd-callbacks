@@ -95,12 +95,12 @@ class ServingServiceTest {
 
     @Test
     void generateEmailLinkToAcas() {
-        String expectedEt1EmailLinkToAcas = "mailto:ET3@acas.org.uk?subject=2120001/2019"
+        String expectedEt1EmailLinkToAcas = "mailto:etsmail@acas.org.uk?subject=2120001/2019"
             + "&body=Parties%20in%20claim%3A%20Doris%20Johnson%20vs%20Antonio%20Vazquez%2C%20Juan%20Garcia%0D%0A"
             + "Case%20reference%20number%3A%202120001/2019%0D%0A%0D%0ADear%20Acas%2C%0D%0A%0D%0AThe%20tribunal%20"
             + "has%20completed%20ET1%20serving%20to%20the%20respondent.%0D%0A%0D%0AThe%20documents%20we%20sent%20are"
             + "%20attached%20to%20this%20email.%0D%0A%0D%0A";
-        String expectedEt3EmailLinkToAcas = "mailto:ET3@acas.org.uk?subject=2120001/2019"
+        String expectedEt3EmailLinkToAcas = "mailto:etsmail@acas.org.uk?subject=2120001/2019"
             + "&body=Parties%20in%20claim%3A%20Doris%20Johnson%20vs%20Antonio%20Vazquez%2C%20Juan%20Garcia%0D%0A"
             + "Case%20reference%20number%3A%202120001/2019%0D%0A%0D%0ADear%20Acas%2C%0D%0A%0D%0AThe%20tribunal%20"
             + "has%20completed%20ET3%20notifications%20to%20the%20relevant%20parties.%0D%0A%0D%0AThe%20documents%20we"

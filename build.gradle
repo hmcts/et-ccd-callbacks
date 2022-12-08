@@ -126,8 +126,13 @@ task yarnInstall(type: Exec) {
     commandLine 'yarn', 'install'
 }
 
+task yarnAudit(type: Exec,  dependsOn: ':yarnInstall') {
+    workingDir '.'
+    commandLine 'yarn', 'audit', '--groups', 'dependencies', '--json', '|', 'grep', 'auditAdvisory', '>', 'yarn-audit-known-issues'
+}
+
 task codeceptSmoke(type: Exec, dependsOn: ':yarnInstall') {
-    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@RET-BAT', '--steps', '--reporter', 'mocha-multi'
+    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@smoke', '--steps', '--reporter', 'mocha-multi'
 }
 
 task codeceptFunctional(type: Exec, dependsOn :'yarnInstall') {
@@ -145,8 +150,10 @@ task nightlyFunctional(dependsOn: ':codeceptFunctionalNightly') {
 }
 
 task codeceptFunctionalSauce(type: Exec, dependsOn: ':yarnInstall') {
+    //IGNORE_SESSION_VALIDATION=true NODE_ENV=testing LOG_LEVEL=OFF NODE_PATH=. node_modules/.bin/codeceptjs run-multiple  ${BROWSER_GROUP:-'--all'} -c src/test/end-to-end/saucelabs.conf.js --grep @RET-XB --steps --reporter mocha-multi
     workingDir '.'
-    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run-multiple', '--all', '--config', './src/test/end-to-end/saucelabs.conf.js', '--grep', '@crossbrowser', '--verbose', '--debug', '--steps', '--reporter', 'mocha-multi'
+    commandLine './bin/run-crossbrowser-tests.sh'
+    commandLine 'node_modules/.bin/codeceptjs', 'run-multiple', '--all', '-c', './src/test/end-to-end/saucelabs.conf.js', '--grep', '@crossbrowser', '--reporter', 'mocha-multi'
 }
 
 task codeceptFunctionalNightly(type: Exec, dependsOn :'yarnInstall') {
@@ -307,7 +314,7 @@ dependencies {
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.7'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.4.0'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.5.0'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.5.1'
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.3'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.11'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'

@@ -25,7 +25,7 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 @RequiredArgsConstructor
 @Slf4j
 public class RespondentRepresentativeService {
-    public static final String BEARER = "Bearer ";
+    public static final String BEARER = "Bearer";
     public static final String NOC_REQUEST = "nocRequest";
     private final NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
 

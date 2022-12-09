@@ -52,7 +52,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 public class TornadoService {
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
-    private static final String RES_TSE_DOC_OUTPUT_NAME = "resTse.pdf";
+    private static final String RES_TSE_FILE_NAME = "resTse.pdf";
 
     private final TornadoConnection tornadoConnection;
     private final DocumentManagementService documentManagementService;
@@ -303,7 +303,7 @@ public class TornadoService {
             case "Initial Consideration.pdf" :
                 return InitialConsiderationHelper.getDocumentRequest(
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
-            case RES_TSE_DOC_OUTPUT_NAME:
+            case RES_TSE_FILE_NAME:
                 return RespondentTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             case "Referral Summary.pdf":
                 return ReferralHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());

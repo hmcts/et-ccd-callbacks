@@ -62,7 +62,7 @@ public class RespondentTellSomethingElseService {
         + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
     private static final String DOC_GEN_ERROR = "Failed to generate document for case id: %s";
-    private static final String DOC_OUTPUT_NAME = "resTse.pdf";
+    private static final String RES_TSE_FILE_NAME = "resTse.pdf";
 
     /**
      * Validate Give Details (free text box) or file upload is mandatory.
@@ -310,7 +310,7 @@ public class RespondentTellSomethingElseService {
 
     public DocumentInfo generateDocument(CaseData caseData, String userToken, String caseTypeId) {
         try {
-            return tornadoService.generateEventDocument(caseData, userToken, caseTypeId, DOC_OUTPUT_NAME);
+            return tornadoService.generateEventDocument(caseData, userToken, caseTypeId, RES_TSE_FILE_NAME);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOC_GEN_ERROR, caseData.getEthosCaseReference()), e);
         }

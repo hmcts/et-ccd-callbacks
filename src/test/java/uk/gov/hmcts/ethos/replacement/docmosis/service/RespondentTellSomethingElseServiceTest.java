@@ -50,6 +50,7 @@ class RespondentTellSomethingElseServiceTest {
     private static final String TEMPLATE_ID = "someTemplateId";
     private static final String LEGAL_REP_EMAIL = "mail@mail.com";
     private static final String CASE_ID = "669718251103419";
+    private static final String APPLICANT_CLAIMANT = "Claimant";
 
     private static final String SELECTED_APP_AMEND_RESPONSE = "Amend response";
     private static final String SELECTED_APP_CHANGE_PERSONAL_DETAILS = "Change personal details";
@@ -290,15 +291,21 @@ class RespondentTellSomethingElseServiceTest {
 
         respondentTellSomethingElseService.createRespondentApplication(caseData);
 
-        assertThat(caseData.getResTseCollection().get(0).getValue().getResTseTextBox(), is(textBoxData));
-        assertThat(caseData.getResTseCollection().get(0).getValue()
-            .getResTseCopyToOtherPartyTextArea(), is("copyToOtherPartyTextArea"));
+        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue().getDetails(), is(textBoxData));
+        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
+            .getCopyToOtherPartyText(), is("copyToOtherPartyTextArea"));
 
-        assertThat(caseData.getResTseCollection().get(0).getValue()
-            .getResTseCopyToOtherPartyYesOrNo(), is("copyToOtherPartyYesOrNo"));
+        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
+            .getCopyToOtherPartyYesOrNo(), is("copyToOtherPartyYesOrNo"));
 
-        assertThat(caseData.getResTseCollection().get(0).getValue()
-            .getResTseDocument().getDocumentUrl(), is(documentUrl));
+        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
+            .getDocumentUpload().getDocumentUrl(), is(documentUrl));
+
+        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
+            .getApplicant(), is(APPLICANT_CLAIMANT));
+
+        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
+            .getType(), is(selectedApplication));
 
         assertThat(caseData.getResTseSelectApplication(), is(nullValue()));
         assertThat(caseData.getResTseCopyToOtherPartyYesOrNo(), is(nullValue()));

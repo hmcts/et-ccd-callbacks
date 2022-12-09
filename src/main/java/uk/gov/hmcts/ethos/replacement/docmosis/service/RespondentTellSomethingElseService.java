@@ -7,9 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentTseTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentTseType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,8 @@ public class RespondentTellSomethingElseService {
 
     @Value("${respondent.tse.template.id}")
     private String emailTemplateId;
+
+    private static final String APPLICANT_CLAIMANT = "Claimant";
 
     private static final String SELECTED_APP_AMEND_RESPONSE = "Amend response";
     private static final String SELECTED_APP_CHANGE_PERSONAL_DETAILS = "Change personal details";
@@ -177,99 +180,80 @@ public class RespondentTellSomethingElseService {
      * @param caseData contains all the case data
      */
     public void createRespondentApplication(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getResTseCollection())) {
-            caseData.setResTseCollection(new ArrayList<>());
+        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+            caseData.setGenericTseApplicationCollection(new ArrayList<>());
         }
 
-        RespondentTseType respondentTseType = new RespondentTseType();
+        GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
 
+        respondentTseType.setDate(Helper.getCurrentDate());
+        respondentTseType.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
+        respondentTseType.setApplicant(APPLICANT_CLAIMANT);
         assignDataToFieldsFromApplicationType(respondentTseType, caseData);
-        respondentTseType.setResTseSelectApplication(caseData.getResTseSelectApplication());
-        respondentTseType.setResTseCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
-        respondentTseType.setResTseCopyToOtherPartyTextArea(caseData.getResTseCopyToOtherPartyTextArea());
+        respondentTseType.setType(caseData.getResTseSelectApplication());
+        respondentTseType.setCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
+        respondentTseType.setCopyToOtherPartyText(caseData.getResTseCopyToOtherPartyTextArea());
 
-        RespondentTseTypeItem respondentTseTypeItem = new RespondentTseTypeItem();
-        respondentTseTypeItem.setId(UUID.randomUUID().toString());
-        respondentTseTypeItem.setValue(respondentTseType);
+        GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        tseApplicationTypeItem.setId(UUID.randomUUID().toString());
+        tseApplicationTypeItem.setValue(respondentTseType);
 
-        List<RespondentTseTypeItem> respondentTseCollection = caseData.getResTseCollection();
-        respondentTseCollection.add(respondentTseTypeItem);
-        caseData.setResTseCollection(respondentTseCollection);
+        List<GenericTseApplicationTypeItem> tseApplicationCollection = caseData.getGenericTseApplicationCollection();
+        tseApplicationCollection.add(tseApplicationTypeItem);
+        caseData.setGenericTseApplicationCollection(tseApplicationCollection);
 
         clearRespondentTseDataFromCaseData(caseData);
     }
 
-    private void assignDataToFieldsFromApplicationType(RespondentTseType respondentTseType, CaseData caseData) {
+    private void assignDataToFieldsFromApplicationType(GenericTseApplicationType respondentTseType, CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
             case SELECTED_APP_AMEND_RESPONSE:
-                respondentTseType.setResTseTextBox(caseData.getResTseTextBox1());
-                respondentTseType.setResTseDocument(caseData.getResTseDocument1());
+                respondentTseType.setDetails(caseData.getResTseTextBox1());
+                respondentTseType.setDocumentUpload(caseData.getResTseDocument1());
                 break;
             case SELECTED_APP_CHANGE_PERSONAL_DETAILS:
-                respondentTseType.setResTseTextBox(caseData.getResTseTextBox2());
-                respondentTseType.setResTseDocument(caseData.getResTseDocument2());
-                caseData.setResTseTextBox2(null);
-                caseData.setResTseDocument2(null);
+                respondentTseType.setDetails(caseData.getResTseTextBox2());
+                respondentTseType.setDocumentUpload(caseData.getResTseDocument2());
                 break;
             case SELECTED_APP_CLAIMANT_NOT_COMPLIED:
-                respondentTseType.setResTseTextBox(caseData.getResTseTextBox3());
-                respondentTseType.setResTseDocument(caseData.getResTseDocument3());
-                caseData.setResTseTextBox3(null);
-                caseData.setResTseDocument3(null);
+                respondentTseType.setDetails(caseData.getResTseTextBox3());
+                respondentTseType.setDocumentUpload(caseData.getResTseDocument3());
                 break;
             case SELECTED_APP_CONSIDER_A_DECISION_AFRESH:
-                respondentTseType.setResTseTextBox(caseData.getResTseTextBox4());
-                respondentTseType.setResTseDocument(caseData.getResTseDocument4());
-                caseData.setResTseTextBox4(null);
-                caseData.setResTseDocument4(null);
+                respondentTseType.setDetails(caseData.getResTseTextBox4());
+                respondentTseType.setDocumentUpload(caseData.getResTseDocument4());
                 break;
             case SELECTED_APP_CONTACT_THE_TRIBUNAL:
-                respondentTseType.setResTseTextBox(caseData.getResTseTextBox5());
-                respondentTseType.setResTseDocument(caseData.getResTseDocument5());
-                caseData.setResTseTextBox5(null);
-                caseData.setResTseDocument5(null);
+                respondentTseType.setDetails(caseData.getResTseTextBox5());
+                respondentTseType.setDocumentUpload(caseData.getResTseDocument5());
                 break;
             case SELECTED_APP_ORDER_OTHER_PARTY:
-                respondentTseType.setResTseTextBox(caseData.getResTseTextBox6());
-                respondentTseType.setResTseDocument(caseData.getResTseDocument6());
-                caseData.setResTseTextBox6(null);
-                caseData.setResTseDocument6(null);
+                respondentTseType.setDetails(caseData.getResTseTextBox6());
+                respondentTseType.setDocumentUpload(caseData.getResTseDocument6());
                 break;
             case SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
-                respondentTseType.setResTseTextBox(caseData.getResTseTextBox7());
-                respondentTseType.setResTseDocument(caseData.getResTseDocument7());
-                caseData.setResTseTextBox7(null);
-                caseData.setResTseDocument7(null);
+                respondentTseType.setDetails(caseData.getResTseTextBox7());
+                respondentTseType.setDocumentUpload(caseData.getResTseDocument7());
                 break;
             case SELECTED_APP_POSTPONE_A_HEARING:
-                respondentTseType.setResTseTextBox(caseData.getResTseTextBox8());
-                respondentTseType.setResTseDocument(caseData.getResTseDocument8());
-                caseData.setResTseTextBox8(null);
-                caseData.setResTseDocument8(null);
+                respondentTseType.setDetails(caseData.getResTseTextBox8());
+                respondentTseType.setDocumentUpload(caseData.getResTseDocument8());
                 break;
             case SELECTED_APP_RECONSIDER_JUDGEMENT:
-                respondentTseType.setResTseTextBox(caseData.getResTseTextBox9());
-                respondentTseType.setResTseDocument(caseData.getResTseDocument9());
-                caseData.setResTseTextBox9(null);
-                caseData.setResTseDocument9(null);
+                respondentTseType.setDetails(caseData.getResTseTextBox9());
+                respondentTseType.setDocumentUpload(caseData.getResTseDocument9());
                 break;
             case SELECTED_APP_RESTRICT_PUBLICITY:
-                respondentTseType.setResTseTextBox(caseData.getResTseTextBox10());
-                respondentTseType.setResTseDocument(caseData.getResTseDocument10());
-                caseData.setResTseTextBox10(null);
-                caseData.setResTseDocument10(null);
+                respondentTseType.setDetails(caseData.getResTseTextBox10());
+                respondentTseType.setDocumentUpload(caseData.getResTseDocument10());
                 break;
             case SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
-                respondentTseType.setResTseTextBox(caseData.getResTseTextBox11());
-                respondentTseType.setResTseDocument(caseData.getResTseDocument11());
-                caseData.setResTseTextBox11(null);
-                caseData.setResTseDocument11(null);
+                respondentTseType.setDetails(caseData.getResTseTextBox11());
+                respondentTseType.setDocumentUpload(caseData.getResTseDocument11());
                 break;
             case SELECTED_APP_VARY_OR_REVOKE_AN_ORDER:
-                respondentTseType.setResTseTextBox(caseData.getResTseTextBox12());
-                respondentTseType.setResTseDocument(caseData.getResTseDocument12());
-                caseData.setResTseTextBox12(null);
-                caseData.setResTseDocument12(null);
+                respondentTseType.setDetails(caseData.getResTseTextBox12());
+                respondentTseType.setDocumentUpload(caseData.getResTseDocument12());
                 break;
             default:
                 break;
@@ -306,5 +290,16 @@ public class RespondentTellSomethingElseService {
         caseData.setResTseDocument10(null);
         caseData.setResTseDocument11(null);
         caseData.setResTseDocument12(null);
+    }
+
+    /**
+     * Gets the number a new TSE application should be labelled as.
+     * @param caseData contains all the case data
+     */
+    public static int getNextApplicationNumber(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+            return 1;
+        }
+        return caseData.getGenericTseApplicationCollection().size() + 1;
     }
 }

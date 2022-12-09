@@ -16,7 +16,7 @@ public class RespondentTellSomethingElseHelper {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static final String RES_TSE_FILE_NAME = "resTse.pdf";
-    private static final String RES_TSE_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02203.docx";
+    private static final String RES_TSE_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02822.docx";
 
     private static final String SELECTED_APP_AMEND_RESPONSE = "Amend response";
     private static final String SELECTED_APP_CHANGE_PERSONAL_DETAILS = "Change personal details";
@@ -46,6 +46,8 @@ public class RespondentTellSomethingElseHelper {
                 .resTseSelectApplication(defaultIfEmpty(caseData.getResTseSelectApplication(), null))
                 .resTseDocument(Optional.ofNullable(selectedAppData.getResTseDocument()).orElse(null))
                 .resTseTextBox(defaultIfEmpty(selectedAppData.getSelectedTextBox(), null))
+                .resTseCopyToOtherPartyYesOrNo(defaultIfEmpty(caseData.getResTseCopyToOtherPartyYesOrNo(), null))
+                .resTseCopyToOtherPartyTextArea(defaultIfEmpty(caseData.getResTseCopyToOtherPartyTextArea(), null))
                 .build();
 
         RespondentTellSomethingElseDocument document = RespondentTellSomethingElseDocument.builder()
@@ -61,41 +63,41 @@ public class RespondentTellSomethingElseHelper {
     private static RespondentTSEApplicationTypeData getSelectedAppAppType(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
             case SELECTED_APP_AMEND_RESPONSE:
-                return new
-                        RespondentTSEApplicationTypeData(caseData.getResTseDocument1(), caseData.getResTseTextBox1());
+                return new RespondentTSEApplicationTypeData(
+                        caseData.getResTseDocument1(), caseData.getResTseTextBox1());
             case SELECTED_APP_CHANGE_PERSONAL_DETAILS:
-                return new
-                        RespondentTSEApplicationTypeData(caseData.getResTseDocument2(), caseData.getResTseTextBox2());
+                return new RespondentTSEApplicationTypeData(
+                        caseData.getResTseDocument2(), caseData.getResTseTextBox2());
             case SELECTED_APP_CLAIMANT_NOT_COMPLIED:
-                return new
-                        RespondentTSEApplicationTypeData(caseData.getResTseDocument3(), caseData.getResTseTextBox3());
+                return new RespondentTSEApplicationTypeData(
+                        caseData.getResTseDocument3(), caseData.getResTseTextBox3());
             case SELECTED_APP_CONSIDER_A_DECISION_AFRESH:
-                return new
-                        RespondentTSEApplicationTypeData(caseData.getResTseDocument4(), caseData.getResTseTextBox4());
+                return new RespondentTSEApplicationTypeData(
+                        caseData.getResTseDocument4(), caseData.getResTseTextBox4());
             case SELECTED_APP_CONTACT_THE_TRIBUNAL:
-                return new
-                        RespondentTSEApplicationTypeData(caseData.getResTseDocument5(), caseData.getResTseTextBox5());
+                return new RespondentTSEApplicationTypeData(
+                        caseData.getResTseDocument5(), caseData.getResTseTextBox5());
             case SELECTED_APP_ORDER_OTHER_PARTY:
-                return new
-                        RespondentTSEApplicationTypeData(caseData.getResTseDocument6(), caseData.getResTseTextBox6());
+                return new RespondentTSEApplicationTypeData(
+                        caseData.getResTseDocument6(), caseData.getResTseTextBox6());
             case SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
-                return new
-                        RespondentTSEApplicationTypeData(caseData.getResTseDocument7(), caseData.getResTseTextBox7());
+                return new RespondentTSEApplicationTypeData(
+                        caseData.getResTseDocument7(), caseData.getResTseTextBox7());
             case SELECTED_APP_POSTPONE_A_HEARING:
-                return new
-                        RespondentTSEApplicationTypeData(caseData.getResTseDocument8(), caseData.getResTseTextBox8());
+                return new RespondentTSEApplicationTypeData(
+                        caseData.getResTseDocument8(), caseData.getResTseTextBox8());
             case SELECTED_APP_RECONSIDER_JUDGEMENT:
-                return new
-                        RespondentTSEApplicationTypeData(caseData.getResTseDocument9(), caseData.getResTseTextBox9());
+                return new RespondentTSEApplicationTypeData(
+                        caseData.getResTseDocument9(), caseData.getResTseTextBox9());
             case SELECTED_APP_RESTRICT_PUBLICITY:
-                return new
-                        RespondentTSEApplicationTypeData(caseData.getResTseDocument10(), caseData.getResTseTextBox10());
+                return new RespondentTSEApplicationTypeData(
+                        caseData.getResTseDocument10(), caseData.getResTseTextBox10());
             case SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
-                return new
-                        RespondentTSEApplicationTypeData(caseData.getResTseDocument11(), caseData.getResTseTextBox11());
+                return new RespondentTSEApplicationTypeData(
+                        caseData.getResTseDocument11(), caseData.getResTseTextBox11());
             case SELECTED_APP_VARY_OR_REVOKE_AN_ORDER:
-                return new
-                        RespondentTSEApplicationTypeData(caseData.getResTseDocument12(), caseData.getResTseTextBox12());
+                return new RespondentTSEApplicationTypeData(
+                        caseData.getResTseDocument12(), caseData.getResTseTextBox12());
             default:
                 return null;
         }

@@ -18,5 +18,9 @@ public class RespondentTellSomethingElseData {
     private UploadedDocumentType resTseDocument;
     @JsonProperty("resTseTextBox")
     private String resTseTextBox;
+    @JsonProperty("resTseCopyToOtherPartyYesOrNo")
+    private String resTseCopyToOtherPartyYesOrNo;
+    @JsonProperty("resTseCopyToOtherPartyTextArea")
+    private String resTseCopyToOtherPartyTextArea;
 
 }

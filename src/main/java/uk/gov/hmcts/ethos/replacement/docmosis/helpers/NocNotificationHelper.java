@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeService;
@@ -13,6 +14,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -39,6 +41,11 @@ public final class NocNotificationHelper {
         return newDetails.getRepCollection().get(getIndexOfSolicitor(newDetails)).getValue().getRepresentativeEmailAddress();
     }
 
+    public static String getRespondentNameForNewSolicitor(CallbackRequest callbackRequest) {
+        CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
+        return caseData.getChangeOrganisationRequestField().getOrganisationToAdd().getOrganisationName();
+    }
+
     public static RespondentSumType getRespondent(CallbackRequest callbackRequest, CaseData caseData,
                                                   RespondentRepresentativeService respondentRepresentativeService) {
         String selectedRole =
@@ -53,11 +60,11 @@ public final class NocNotificationHelper {
         return respondentRepresentativeService.getRespondent(representedPerson.getValue().getRespRepName(), caseData);
     }
 
-    public static Map<String, String> buildClaimantPersonalisation(CaseData caseData) {
+    public static Map<String, String> buildClaimantPersonalisation(CaseData caseData, String party_name) {
         Map<String, String> personalisation = new HashMap<>();
 
         addCommonValues(caseData, personalisation);
-        personalisation.put("party_name", "test party");
+        personalisation.put("party_name", party_name);
         personalisation.put("first_name", caseData.getClaimantIndType().getClaimantFirstNames());
         personalisation.put("last_name", caseData.getClaimantIndType().getClaimantLastName());
 
@@ -75,14 +82,14 @@ public final class NocNotificationHelper {
         return personalisation;
     }
 
-    public static Map<String, String> buildNewRespondentSolicitorPersonalisation(CaseData caseData) {
+    public static Map<String, String> buildNewRespondentSolicitorPersonalisation(CaseData caseData, String partyName) {
         Map<String, String> personalisation = new HashMap<>();
 
         addCommonValues(caseData, personalisation);
         personalisation.put("email_flag", caseData.getEthosCaseReference());
         personalisation.put("first_name", caseData.getClaimantIndType().getClaimantFirstNames());
         personalisation.put("last_name", caseData.getClaimantIndType().getClaimantLastName());
-        personalisation.put("party_name", "test party");
+        personalisation.put("party_name", partyName);
 
         return personalisation;
     }

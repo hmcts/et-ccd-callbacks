@@ -38,6 +38,7 @@ public class NocNotificationService {
     private String tribunalTemplateId;
 
     public void sendNotificationOfChangeEmails(CallbackRequest callbackRequest, CaseData caseData) {
+        String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(callbackRequest);
         String claimantEmail = NotificationHelper.buildMapForClaimant(caseData, "").get("emailAddress");
         if(isNullOrEmpty(claimantEmail)) {
             log.warn("missing claimantEmail");
@@ -45,7 +46,7 @@ public class NocNotificationService {
             emailService.sendEmail(
                     claimantTemplateId,
                     claimantEmail,
-                    NocNotificationHelper.buildClaimantPersonalisation(caseData)
+                    NocNotificationHelper.buildClaimantPersonalisation(caseData, partyName)
             );
         }
 
@@ -69,7 +70,7 @@ public class NocNotificationService {
             emailService.sendEmail(
                     newRespondentSolicitorTemplateId,
                     newSolicitorEmail,
-                    NocNotificationHelper.buildNewRespondentSolicitorPersonalisation(caseData)
+                    NocNotificationHelper.buildNewRespondentSolicitorPersonalisation(caseData, partyName)
             );
         }
         String tribunalEmail = caseData.getTribunalCorrespondenceEmail();

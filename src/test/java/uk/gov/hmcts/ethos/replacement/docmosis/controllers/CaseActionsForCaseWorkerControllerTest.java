@@ -21,25 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.*;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.File;
@@ -178,6 +160,9 @@ public class CaseActionsForCaseWorkerControllerTest {
     private FixCaseApiService fixCaseApiService;
     @MockBean
     private Et1VettingService et1VettingService;
+
+    @MockBean
+    private RespondentRepresentativeService respondentRepresentativeService;
 
     private MockMvc mvc;
     private JsonNode requestContent;
@@ -404,6 +389,11 @@ public class CaseActionsForCaseWorkerControllerTest {
     @Test
     public void amendRespondentRepresentative() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        CaseDetails caseDetails = objectMapper.treeToValue(requestContent,CaseDetails.class);
+        when(respondentRepresentativeService.updateRepresentation(any())).thenReturn(caseDetails.getCaseData());
+
         mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)

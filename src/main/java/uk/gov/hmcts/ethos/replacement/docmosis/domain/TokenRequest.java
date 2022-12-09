@@ -1,28 +1,28 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain;
 
 import feign.form.FormProperty;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class TokenRequest {
     @FormProperty("client_id")
-    private final String clientId;
+    private String clientId;
     @FormProperty("client_secret")
-    private final String clientSecret;
+    private String clientSecret;
     @FormProperty("grant_type")
-    private final String grantType;
+    private String grantType;
     @FormProperty("redirect_uri")
-    private final String redirectUri;
+    private String redirectUri;
     @FormProperty("username")
-    private final String username;
+    private String username;
     @FormProperty("password")
-    private final String password;
+    private String password;
     @FormProperty("scope")
-    private final String scope;
+    private String scope;
     @FormProperty("refresh_token")
-    private final String refreshToken;
+    private String refreshToken;
     @FormProperty("code")
-    private final String code;
+    private String code;
 
     public TokenRequest(
         String clientId,

@@ -18,7 +18,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAssignmentException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -43,7 +42,7 @@ public class NoticeOfChangeController {
     @PostMapping("/about-to-submit")
     public CCDCallbackResponse handleAboutToSubmit(@RequestBody CallbackRequest callbackRequest,
                                                       @RequestHeader("Authorization")
-                                                      String userToken) throws IOException, CaseAssignmentException {
+                                                      String userToken) throws IOException {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
         }

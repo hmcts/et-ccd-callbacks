@@ -8,10 +8,10 @@ import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator.NoticeOfChangeAnswersPopulationStrategy.BLANK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator.NoticeOfChangeAnswersPopulationStrategy.POPULATE;
@@ -35,7 +35,7 @@ public class NoticeOfChangeFieldPopulator {
      */
     public Map<String, Object> generate(CaseData caseData,
                                         NoticeOfChangeAnswersPopulationStrategy strategy) {
-        Map<String, Object> data = new HashMap<>();
+        Map<String, Object> data = new ConcurrentHashMap<>();
 
         List<RepresentedTypeRItem> repTypeItem = caseData.getRepCollection();
         int numElements = repTypeItem.size();

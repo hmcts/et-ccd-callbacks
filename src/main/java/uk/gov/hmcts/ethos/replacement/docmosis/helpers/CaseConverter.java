@@ -12,7 +12,7 @@ import static java.util.Objects.isNull;
 @RequiredArgsConstructor
 public class CaseConverter {
 
-    private static TypeReference<Map<String, Object>> MAPTYPE = new TypeReference<>() {};
+    private static TypeReference<Map<String, Object>> typeReference = new TypeReference<>() {};
 
     private final ObjectMapper objectMapper;
 
@@ -27,7 +27,7 @@ public class CaseConverter {
         if (isNull(object)) {
             return null;
         }
-        return objectMapper.convertValue(object, MAPTYPE);
+        return objectMapper.convertValue(object, typeReference);
     }
 }
 

@@ -70,6 +70,12 @@ public class RespondentRepresentativeService {
 
     private Map<String, Object> updateRepresentationMap(CaseData caseData, String caseId) throws IOException {
 
+        final ChangeOrganisationRequest change = caseData.getChangeOrganisationRequestField();
+
+        if (isEmpty(change) || isEmpty(change.getCaseRoleId()) || isEmpty(change.getOrganisationToAdd())) {
+            throw new IllegalStateException("Invalid or missing ChangeOrganisationRequest: " + change);
+        }
+
         String accessToken = String.join(" ", BEARER, userService.getAccessToken(systemUserName, systemUserPassword));
 
         Optional<AuditEvent> auditEvent =
@@ -77,12 +83,6 @@ public class RespondentRepresentativeService {
 
         Optional<UserDetails> userDetails = auditEvent
             .map(event -> userService.getUserDetailsById(accessToken, event.getUserId()));
-
-        final ChangeOrganisationRequest change = caseData.getChangeOrganisationRequestField();
-
-        if (isEmpty(change) || isEmpty(change.getCaseRoleId()) || isEmpty(change.getOrganisationToAdd())) {
-            throw new IllegalStateException("Invalid or missing ChangeOrganisationRequest: " + change);
-        }
 
         final SolicitorRole role = SolicitorRole.from(change.getCaseRoleId().getSelectedCode()).orElseThrow();
 

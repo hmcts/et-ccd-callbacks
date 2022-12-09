@@ -28,32 +28,24 @@ public class CcdCaseAssignment {
     @Qualifier("xui")
     private final AuthTokenGenerator serviceAuthTokenGenerator;
 
-    private final String ccdUrl;
     private final String aacUrl;
-    private final String ccdAssignmentsApiPath;
-    private final String aacAssignmentsApiPath;
+
     private final String applyNocAssignmentsApiPath;
 
     public CcdCaseAssignment(RestTemplate restTemplate,
                              AuthTokenGenerator serviceAuthTokenGenerator,
-                             @Value("${core_case_data_api_assignments_url}") String ccdUrl,
                              @Value("${assign_case_access_api_url}") String aacUrl,
-                             @Value("${core_case_data_api_assignments_path}") String ccdAssignmentsApiPath,
-                             @Value("${assign_case_access_api_assignments_path}") String aacAssignmentsApiPath,
                              @Value("${apply_noc_access_api_assignments_path}") String applyNocAssignmentsApiPath
     ) {
         this.restTemplate = restTemplate;
         this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
-        this.ccdUrl = ccdUrl;
         this.aacUrl = aacUrl;
-        this.ccdAssignmentsApiPath = ccdAssignmentsApiPath;
-        this.aacAssignmentsApiPath = aacAssignmentsApiPath;
         this.applyNocAssignmentsApiPath = applyNocAssignmentsApiPath;
     }
 
     public CCDCallbackResponse applyNoc(
         final CallbackRequest callback, String userToken
-    ) throws CaseAssignmentException {
+    )  {
         requireNonNull(callback, "callback must not be null");
 
         final String serviceAuthorizationToken = serviceAuthTokenGenerator.generate();
@@ -61,7 +53,7 @@ public class CcdCaseAssignment {
         HttpEntity<CallbackRequest> requestEntity =
             new HttpEntity<>(
                 callback,
-                setHeaders(serviceAuthorizationToken, userToken)
+                createHeaders(serviceAuthorizationToken, userToken)
             );
 
         ResponseEntity<CCDCallbackResponse> response;
@@ -74,9 +66,9 @@ public class CcdCaseAssignment {
                     CCDCallbackResponse.class
                 );
 
-        } catch (RestClientResponseException e) {
-            log.info("Error form ccd - {}", e.getMessage());
-            throw new  CaseAssignmentException("CCD error");
+        } catch (RestClientResponseException exception) {
+            log.info("Error form ccd - {}", exception.getMessage());
+            throw exception;
         }
 
         log.info("Apply NoC. Http status received from AAC API; {} for case {}",
@@ -85,7 +77,7 @@ public class CcdCaseAssignment {
         return response.getBody();
     }
 
-    private HttpHeaders setHeaders(String serviceAuthorizationToken, String accessToken) {
+    private HttpHeaders createHeaders(String serviceAuthorizationToken, String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);

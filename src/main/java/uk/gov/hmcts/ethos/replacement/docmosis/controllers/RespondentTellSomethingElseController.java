@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -98,6 +99,10 @@ public class RespondentTellSomethingElseController {
         }
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
+
+        // generate CYA document
+        DocumentInfo documentInfo = resTseService.generateDocument(caseDetails.getCaseData(), userToken,
+                caseDetails.getCaseTypeId());
 
         // send Respondent confirmation Email
         resTseService.sendRespondentApplicationEmail(caseDetails, userToken);

@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -27,6 +29,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getResponde
 public class RespondentTellSomethingElseService {
     private final EmailService emailService;
     private final UserService userService;
+    private final TornadoService tornadoService;
 
     @Value("${respondent.tse.template.id}")
     private String emailTemplateId;
@@ -58,6 +61,8 @@ public class RespondentTellSomethingElseService {
     private static final String RULE92_ANSWERED_YES_GROUP_B = "The other party is not expected to respond to this "
         + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
+    private static final String DOC_GEN_ERROR = "Failed to generate document for case id: %s";
+    private static final String DOC_OUTPUT_NAME = "resTse.pdf";
 
     /**
      * Validate Give Details (free text box) or file upload is mandatory.
@@ -301,5 +306,14 @@ public class RespondentTellSomethingElseService {
             return 1;
         }
         return caseData.getGenericTseApplicationCollection().size() + 1;
+    }
+
+    public DocumentInfo generateDocument(CaseData caseData, String userToken, String caseTypeId) {
+        try {
+            return tornadoService.generateEventDocument(caseData, userToken, caseTypeId, DOC_OUTPUT_NAME);
+        } catch (Exception e) {
+            throw new DocumentManagementException(String.format(DOC_GEN_ERROR, caseData.getEthosCaseReference()), e);
+        }
+
     }
 }

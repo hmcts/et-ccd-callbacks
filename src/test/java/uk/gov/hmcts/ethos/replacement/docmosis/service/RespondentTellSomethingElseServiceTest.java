@@ -44,6 +44,9 @@ class RespondentTellSomethingElseServiceTest {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private TornadoService tornadoService;
+
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String YES = "I do want to copy";
     private static final String NO = "I do not want to copy";
@@ -80,7 +83,8 @@ class RespondentTellSomethingElseServiceTest {
 
     @BeforeEach
     void setUp() {
-        respondentTellSomethingElseService = new RespondentTellSomethingElseService(emailService, userService);
+        respondentTellSomethingElseService =
+                new RespondentTellSomethingElseService(emailService, userService, tornadoService);
         ReflectionTestUtils.setField(respondentTellSomethingElseService, "emailTemplateId", TEMPLATE_ID);
 
         UserDetails userDetails = HelperTest.getUserDetails();

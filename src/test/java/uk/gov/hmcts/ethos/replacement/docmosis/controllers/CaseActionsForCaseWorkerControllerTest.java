@@ -171,6 +171,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     private SubmitEvent submitEvent;
     private DefaultValues defaultValues;
 
+    private CCDRequest ccdRequest;
     private void doRequestSetUp() throws IOException, URISyntaxException {
         ObjectMapper objectMapper = new ObjectMapper();
         requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
@@ -182,6 +183,9 @@ public class CaseActionsForCaseWorkerControllerTest {
 
         objectMapper.readTree(new File(Objects.requireNonNull(getClass()
                 .getResource("/CaseCloseEvent_ValidHearingStatusCaseDetails.json")).toURI()));
+
+        ccdRequest = objectMapper.readValue(new File(Objects.requireNonNull(getClass()
+                .getResource("/exampleV1.json")).toURI()),CCDRequest.class);
     }
 
     @Before
@@ -388,11 +392,10 @@ public class CaseActionsForCaseWorkerControllerTest {
 
     @Test
     public void amendRespondentRepresentative() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        ObjectMapper objectMapper = new ObjectMapper();
 
-        CaseDetails caseDetails = objectMapper.treeToValue(requestContent,CaseDetails.class);
-        when(respondentRepresentativeService.updateRepresentation(any())).thenReturn(caseDetails.getCaseData());
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
 
         mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
                 .content(requestContent.toString())

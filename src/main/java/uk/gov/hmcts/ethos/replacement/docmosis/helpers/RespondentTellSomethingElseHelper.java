@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.RespondentTellSomethingElseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.RespondentTellSomethingElseDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
@@ -41,13 +42,14 @@ public class RespondentTellSomethingElseHelper {
 
         RespondentTSEApplicationTypeData selectedAppData =
                 Optional.ofNullable(getSelectedAppAppType(caseData)).orElse(null);
-        
+
+        String documentName = getDocumentName(selectedAppData.getResTseDocument());
         String printYesOrNo = getPrintYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
 
         RespondentTellSomethingElseData data = RespondentTellSomethingElseData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
                 .resTseSelectApplication(defaultIfEmpty(caseData.getResTseSelectApplication(), null))
-                .resTseDocument(Optional.ofNullable(selectedAppData.getResTseDocument()).orElse(null))
+                .resTseDocument(documentName)
                 .resTseTextBox(defaultIfEmpty(selectedAppData.getSelectedTextBox(), null))
                 .resTseCopyToOtherPartyYesOrNo(printYesOrNo)
                 .resTseCopyToOtherPartyTextArea(defaultIfEmpty(caseData.getResTseCopyToOtherPartyTextArea(), null))
@@ -103,6 +105,14 @@ public class RespondentTellSomethingElseHelper {
                         caseData.getResTseDocument12(), caseData.getResTseTextBox12());
             default:
                 return null;
+        }
+    }
+
+    private static String getDocumentName(UploadedDocumentType resTseDocument) {
+        if (resTseDocument != null) {
+            return resTseDocument.getDocumentFilename();
+        } else {
+            return null;
         }
     }
 

@@ -92,10 +92,6 @@ public final class ReferralHelper {
 
     private static final String EMAIL_BODY_REPLY = "You have a reply to a referral on this case.";
 
-    private static final String REPLY_REFERRAL_REP = "Reply by";
-
-    private static final String REPLY_REFERRAL_REF = "Referred by";
-
     private ReferralHelper() {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
@@ -515,7 +511,6 @@ public final class ReferralHelper {
         personalisation.put("refNumber", referralNumber);
         personalisation.put("subject", getReferralSubject(caseData, isNew));
         personalisation.put("username", username);
-        personalisation.put("replyReferral", isNew ? REPLY_REFERRAL_REF : REPLY_REFERRAL_REP);
         return personalisation;
     }
 

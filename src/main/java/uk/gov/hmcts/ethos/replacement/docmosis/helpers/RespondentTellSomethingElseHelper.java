@@ -9,6 +9,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTyp
 
 import java.util.Optional;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 
 public class RespondentTellSomethingElseHelper {
@@ -40,13 +41,15 @@ public class RespondentTellSomethingElseHelper {
 
         RespondentTSEApplicationTypeData selectedAppData =
                 Optional.ofNullable(getSelectedAppAppType(caseData)).orElse(null);
+        
+        String printYesOrNo = getPrintYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
 
         RespondentTellSomethingElseData data = RespondentTellSomethingElseData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
                 .resTseSelectApplication(defaultIfEmpty(caseData.getResTseSelectApplication(), null))
                 .resTseDocument(Optional.ofNullable(selectedAppData.getResTseDocument()).orElse(null))
                 .resTseTextBox(defaultIfEmpty(selectedAppData.getSelectedTextBox(), null))
-                .resTseCopyToOtherPartyYesOrNo(defaultIfEmpty(caseData.getResTseCopyToOtherPartyYesOrNo(), null))
+                .resTseCopyToOtherPartyYesOrNo(printYesOrNo)
                 .resTseCopyToOtherPartyTextArea(defaultIfEmpty(caseData.getResTseCopyToOtherPartyTextArea(), null))
                 .build();
 
@@ -103,4 +106,15 @@ public class RespondentTellSomethingElseHelper {
         }
     }
 
+    private static String getPrintYesOrNo(String resTseCopyToOtherPartyYesOrNo) {
+        if (isNullOrEmpty(resTseCopyToOtherPartyYesOrNo)) {
+            return null;
+        } else if (resTseCopyToOtherPartyYesOrNo.equals("I confirm I want to copy")) {
+            return "Yes";
+        } else if (resTseCopyToOtherPartyYesOrNo.equals("I do not want to copy")) {
+            return "No";
+        } else {
+            return null;
+        }
+    }
 }

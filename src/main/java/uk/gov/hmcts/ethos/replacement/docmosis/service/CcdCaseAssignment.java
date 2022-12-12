@@ -25,7 +25,6 @@ public class CcdCaseAssignment {
 
     private final RestTemplate restTemplate;
 
-    @Qualifier("xui")
     private final AuthTokenGenerator serviceAuthTokenGenerator;
 
     private final String aacUrl;

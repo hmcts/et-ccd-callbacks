@@ -66,7 +66,7 @@ public class NoticeOfChangeController {
     public ResponseEntity<CCDCallbackResponse> updateNocRespondents(@RequestBody CCDRequest callbackRequest,
                                                                     @RequestHeader("Authorization")
                                                                     String userToken) {
-        log.info("START OF INITIAL CONSIDERATION FOR CASE ---> {}", callbackRequest.getCaseDetails().getCaseId());
+        log.info("Noc update respondents ---> {}", callbackRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -74,8 +74,6 @@ public class NoticeOfChangeController {
         }
 
         CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
-
-        log.info("Update after NOC call");
 
         return getCallbackRespEntityNoErrors(caseData);
     }

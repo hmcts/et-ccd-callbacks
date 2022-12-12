@@ -29,12 +29,14 @@ public class UserServiceTest {
     private IdamApi idamApi;
 
     private UserDetails userDetails;
+
+    private TokenResponse tokenResponse;
     private OAuth2Configuration oauth2Configuration;
 
     @Before
     public void setUp() {
         userDetails = HelperTest.getUserDetails();
-
+        tokenResponse = HelperTest.getUserToken();
         idamApi = new IdamApi() {
             @Override
             public UserDetails retrieveUserDetails(String authorisation) {
@@ -48,7 +50,7 @@ public class UserServiceTest {
 
             @Override
             public TokenResponse generateOpenIdToken(TokenRequest tokenRequest) {
-                return null;
+                return tokenResponse;
             }
         };
 
@@ -72,6 +74,21 @@ public class UserServiceTest {
         assertEquals(userDetails.toString(), userService.getUserDetails("TOKEN").toString());
     }
 
+    @Test
+    public void shouldGetUserById() {
+        assertEquals(userDetails,userService.getUserDetailsById("TOKEN","id"));
+    }
+
+    @Test
+    public void shouldGetAccessToken() {
+        assertEquals("abcefg",userService.getAccessToken("John@email.com","abc123"));
+    }
+
+    @Test
+    public void shouldReturnAccessTokenResponse() {
+        assertEquals(tokenResponse,userService.getAccessTokenResponse("John@email.com","abc123"));
+    }
+
     private void mockOauth2Configuration() {
         oauth2Configuration = mock(OAuth2Configuration.class);
         when(oauth2Configuration.getClientId()).thenReturn("111");
@@ -79,4 +96,5 @@ public class UserServiceTest {
         when(oauth2Configuration.getRedirectUri()).thenReturn("http://localhost:8080/test");
         when(oauth2Configuration.getClientScope()).thenReturn("roles");
     }
+
 }

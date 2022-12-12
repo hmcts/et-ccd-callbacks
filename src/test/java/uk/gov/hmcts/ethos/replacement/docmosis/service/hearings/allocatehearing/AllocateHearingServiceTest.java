@@ -43,11 +43,11 @@ public class AllocateHearingServiceTest {
     public void setup() {
         caseData = createCaseData();
 
-        var hearingSelectionService = mockHearingSelectionService();
-        var judgeSelectionService = mockJudgeSelectionService();
-        var venueSelectionService = mockVenueSelectionService();
+        HearingSelectionService hearingSelectionService = mockHearingSelectionService();
+        JudgeSelectionService judgeSelectionService = mockJudgeSelectionService();
+        VenueSelectionService venueSelectionService = mockVenueSelectionService();
         roomSelectionService = mockRoomSelectionService();
-        var courtWorkerSelectionService = mockCourtWorkerSelectionService();
+        CourtWorkerSelectionService courtWorkerSelectionService = mockCourtWorkerSelectionService();
         allocateHearingService = new AllocateHearingService(hearingSelectionService, judgeSelectionService,
                 venueSelectionService, roomSelectionService, courtWorkerSelectionService);
     }
@@ -56,18 +56,18 @@ public class AllocateHearingServiceTest {
     public void testInitialiseAllocatedHearing() {
         allocateHearingService.initialiseAllocateHearing(caseData);
 
-        var hearings = caseData.getAllocateHearingHearing();
+        DynamicFixedListType hearings = caseData.getAllocateHearingHearing();
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(hearings, "hearing", "Hearing ");
     }
 
     @Test
     public void testHandleListingSelectedNoExistingSelections() {
         // Arrange
-        var hearingSitAlone = String.valueOf(Boolean.TRUE);
+        String hearingSitAlone = String.valueOf(Boolean.TRUE);
         selectedHearing.setHearingSitAlone(hearingSitAlone);
 
-        var hearingStatus = Constants.HEARING_STATUS_HEARD;
-        var postponedBy = "Barney";
+        String hearingStatus = Constants.HEARING_STATUS_HEARD;
+        String postponedBy = "Barney";
         selectedListing.setHearingStatus(hearingStatus);
         selectedListing.setPostponedBy(postponedBy);
 
@@ -75,16 +75,16 @@ public class AllocateHearingServiceTest {
         allocateHearingService.handleListingSelected(caseData);
 
         // Assert
-        var judges = caseData.getAllocateHearingJudge();
+        DynamicFixedListType judges = caseData.getAllocateHearingJudge();
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(judges, "judge", "Judge ");
-        var venues = caseData.getAllocateHearingVenue();
+        DynamicFixedListType venues = caseData.getAllocateHearingVenue();
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(venues, "venue", "Venue ");
-        var clerks = caseData.getAllocateHearingClerk();
+        DynamicFixedListType clerks = caseData.getAllocateHearingClerk();
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(clerks, "clerk", "Clerk ");
-        var employerMembers = caseData.getAllocateHearingEmployerMember();
+        DynamicFixedListType employerMembers = caseData.getAllocateHearingEmployerMember();
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
                 employerMembers, "employerMember", "Employer Member ");
-        var employeeMembers = caseData.getAllocateHearingEmployeeMember();
+        DynamicFixedListType employeeMembers = caseData.getAllocateHearingEmployeeMember();
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
                 employeeMembers, "employeeMember", "Employee Member ");
 
@@ -96,35 +96,40 @@ public class AllocateHearingServiceTest {
     @Test
     public void testHandleListingSelectedWithExistingSelections() {
         // Arrange
-        var hearingSitAlone = String.valueOf(Boolean.TRUE);
+        String hearingSitAlone = String.valueOf(Boolean.TRUE);
         selectedHearing.setHearingSitAlone(hearingSitAlone);
-        var selectedEmployerMember = DynamicValueType.create("employerMember2", "Employer Member 2");
+        DynamicValueType selectedEmployerMember = DynamicValueType.create("employerMember2",
+            "Employer Member 2");
         selectedHearing.setHearingERMember(DynamicFixedListType.of(selectedEmployerMember));
-        var selectedEmployeeMember = DynamicValueType.create("employeeMember2", "Employee Member 2");
+        DynamicValueType selectedEmployeeMember = DynamicValueType.create("employeeMember2",
+            "Employee Member 2");
         selectedHearing.setHearingEEMember(DynamicFixedListType.of(selectedEmployeeMember));
 
-        var hearingStatus = Constants.HEARING_STATUS_HEARD;
-        var postponedBy = "Barney";
+        String hearingStatus = Constants.HEARING_STATUS_HEARD;
+        String postponedBy = "Barney";
         selectedListing.setHearingStatus(hearingStatus);
         selectedListing.setPostponedBy(postponedBy);
-        var selectedClerk = DynamicValueType.create("clerk2", "Clerk 2");
+        DynamicValueType selectedClerk = DynamicValueType.create("clerk2", "Clerk 2");
         selectedListing.setHearingClerk(DynamicFixedListType.of(selectedClerk));
 
         // Act
         allocateHearingService.handleListingSelected(caseData);
 
         // Assert
-        var judges = caseData.getAllocateHearingJudge();
+        DynamicFixedListType judges = caseData.getAllocateHearingJudge();
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(judges, "judge", "Judge ");
-        var venues = caseData.getAllocateHearingVenue();
+        DynamicFixedListType venues = caseData.getAllocateHearingVenue();
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(venues, "venue", "Venue ");
-        var clerks = caseData.getAllocateHearingClerk();
-        SelectionServiceTestUtils.verifyDynamicFixedListSelected(clerks, "clerk", "Clerk ", selectedClerk);
-        var employerMembers = caseData.getAllocateHearingEmployerMember();
-        SelectionServiceTestUtils.verifyDynamicFixedListSelected(employerMembers, "employerMember", "Employer Member ",
+        DynamicFixedListType clerks = caseData.getAllocateHearingClerk();
+        SelectionServiceTestUtils.verifyDynamicFixedListSelected(clerks, "clerk", "Clerk ",
+            selectedClerk);
+        DynamicFixedListType employerMembers = caseData.getAllocateHearingEmployerMember();
+        SelectionServiceTestUtils.verifyDynamicFixedListSelected(employerMembers, "employerMember",
+            "Employer Member ",
                 selectedEmployerMember);
-        var employeeMembers = caseData.getAllocateHearingEmployeeMember();
-        SelectionServiceTestUtils.verifyDynamicFixedListSelected(employeeMembers, "employeeMember", "Employee Member ",
+        DynamicFixedListType employeeMembers = caseData.getAllocateHearingEmployeeMember();
+        SelectionServiceTestUtils.verifyDynamicFixedListSelected(employeeMembers, "employeeMember",
+            "Employee Member ",
                 selectedEmployeeMember);
 
         assertEquals(hearingSitAlone, caseData.getAllocateHearingSitAlone());
@@ -142,39 +147,48 @@ public class AllocateHearingServiceTest {
 
     @Test
     public void testPopulateRoomsNewVenueSelected() {
-        selectedListing.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("venue1", "venue1")));
-        selectedListing.setHearingRoom(DynamicFixedListType.of(DynamicValueType.create("room1", "room1")));
-        caseData.setAllocateHearingVenue(DynamicFixedListType.of(DynamicValueType.create("venue2", "venue2")));
+        selectedListing.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("venue1",
+            "venue1")));
+        selectedListing.setHearingRoom(DynamicFixedListType.of(DynamicValueType.create("room1",
+            "room1")));
+        caseData.setAllocateHearingVenue(DynamicFixedListType.of(DynamicValueType.create("venue2",
+            "venue2")));
 
         allocateHearingService.populateRooms(caseData);
 
-        verify(roomSelectionService, times(1)).createRoomSelection(caseData, selectedListing, true);
+        verify(roomSelectionService, times(1)).createRoomSelection(caseData, selectedListing,
+            true);
     }
 
     @Test
     public void testPopulateRoomsExistingVenueSelected() {
-        selectedListing.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("venue1", "venue1")));
-        var selectedRoom = DynamicValueType.create("room1", "Room 1");
+        selectedListing.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("venue1",
+            "venue1")));
+        DynamicValueType selectedRoom = DynamicValueType.create("room1", "Room 1");
         selectedListing.setHearingRoom(DynamicFixedListType.of(selectedRoom));
-        caseData.setAllocateHearingVenue(DynamicFixedListType.of(DynamicValueType.create("venue1", "venue1")));
+        caseData.setAllocateHearingVenue(DynamicFixedListType.of(DynamicValueType.create("venue1",
+            "venue1")));
 
         allocateHearingService.populateRooms(caseData);
 
-        verify(roomSelectionService, times(1)).createRoomSelection(caseData, selectedListing, false);
+        verify(roomSelectionService, times(1)).createRoomSelection(caseData, selectedListing,
+            false);
     }
 
     @Test
     public void testUpdateCase() {
         // Arrange
-        var sitAlone = String.valueOf(Boolean.TRUE);
-        var judge = DynamicFixedListType.of(DynamicValueType.create("judge2", "Judge 2"));
-        var employerMember = DynamicFixedListType.of(DynamicValueType.create("employerMember2", "Employer Member 2"));
-        var employeeMember = DynamicFixedListType.of(DynamicValueType.create("employeeMember2", "Employee Member 2"));
-        var hearingStatus = Constants.HEARING_STATUS_POSTPONED;
-        var postponedBy = "Doris";
-        var venue = DynamicFixedListType.of(DynamicValueType.create("venue2", "Venue 2"));
-        var room = DynamicFixedListType.of(DynamicValueType.create("room2", "Room 2"));
-        var clerk = DynamicFixedListType.of(DynamicValueType.create("clerk2", "Clerk 2"));
+        String sitAlone = String.valueOf(Boolean.TRUE);
+        DynamicFixedListType judge = DynamicFixedListType.of(DynamicValueType.create("judge2", "Judge 2"));
+        DynamicFixedListType employerMember = DynamicFixedListType.of(DynamicValueType.create("employerMember2",
+            "Employer Member 2"));
+        DynamicFixedListType employeeMember = DynamicFixedListType.of(DynamicValueType.create("employeeMember2",
+            "Employee Member 2"));
+        String hearingStatus = Constants.HEARING_STATUS_POSTPONED;
+        String postponedBy = "Doris";
+        DynamicFixedListType venue = DynamicFixedListType.of(DynamicValueType.create("venue2", "Venue 2"));
+        DynamicFixedListType room = DynamicFixedListType.of(DynamicValueType.create("room2", "Room 2"));
+        DynamicFixedListType clerk = DynamicFixedListType.of(DynamicValueType.create("clerk2", "Clerk 2"));
         caseData.setAllocateHearingSitAlone(sitAlone);
         caseData.setAllocateHearingJudge(judge);
         caseData.setAllocateHearingEmployerMember(employerMember);
@@ -208,15 +222,15 @@ public class AllocateHearingServiceTest {
     }
 
     private CaseData createCaseData() {
-        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
+        CaseData caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         caseData.setAllocateHearingHearing(new DynamicFixedListType());
 
         selectedHearing = new HearingType();
         selectedListing = new DateListedType();
-        var dateListedTypeItem = new DateListedTypeItem();
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setValue(selectedListing);
         selectedHearing.setHearingDateCollection(List.of(dateListedTypeItem));
-        var hearingTypeItem = new HearingTypeItem();
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(selectedHearing);
         caseData.setHearingCollection(List.of(hearingTypeItem));
 
@@ -224,8 +238,9 @@ public class AllocateHearingServiceTest {
     }
 
     private HearingSelectionService mockHearingSelectionService() {
-        var hearingSelectionService = mock(HearingSelectionService.class);
-        var hearings = SelectionServiceTestUtils.createListItems("hearing", "Hearing ");
+        HearingSelectionService hearingSelectionService = mock(HearingSelectionService.class);
+        List<DynamicValueType> hearings = SelectionServiceTestUtils.createListItems("hearing",
+            "Hearing ");
         when(hearingSelectionService.getHearingSelection(isA(CaseData.class))).thenReturn(hearings);
 
         when(hearingSelectionService.getSelectedHearing(isA(CaseData.class),
@@ -237,9 +252,9 @@ public class AllocateHearingServiceTest {
     }
 
     private JudgeSelectionService mockJudgeSelectionService() {
-        var judgeSelectionService = mock(JudgeSelectionService.class);
-        var judges = SelectionServiceTestUtils.createListItems("judge", "Judge ");
-        var dynamicFixedListType = new DynamicFixedListType();
+        JudgeSelectionService judgeSelectionService = mock(JudgeSelectionService.class);
+        List<DynamicValueType> judges = SelectionServiceTestUtils.createListItems("judge", "Judge ");
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(judges);
         when(judgeSelectionService.createJudgeSelection(isA(TribunalOffice.class),
                 isA(HearingType.class))).thenReturn(dynamicFixedListType);
@@ -248,9 +263,9 @@ public class AllocateHearingServiceTest {
     }
 
     private VenueSelectionService mockVenueSelectionService() {
-        var venueSelectionService = mock(VenueSelectionService.class);
-        var venues = SelectionServiceTestUtils.createListItems("venue", "Venue ");
-        var dynamicFixedListType = new DynamicFixedListType();
+        VenueSelectionService venueSelectionService = mock(VenueSelectionService.class);
+        List<DynamicValueType> venues = SelectionServiceTestUtils.createListItems("venue", "Venue ");
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(venues);
         when(venueSelectionService.createVenueSelection(isA(TribunalOffice.class),
                 isA(DateListedType.class))).thenReturn(dynamicFixedListType);
@@ -259,9 +274,9 @@ public class AllocateHearingServiceTest {
     }
 
     private RoomSelectionService mockRoomSelectionService() {
-        var roomSelectionService = mock(RoomSelectionService.class);
-        var rooms = SelectionServiceTestUtils.createListItems("room", "Room ");
-        var dynamicFixedListType = new DynamicFixedListType();
+        RoomSelectionService roomSelectionService = mock(RoomSelectionService.class);
+        List<DynamicValueType> rooms = SelectionServiceTestUtils.createListItems("room", "Room ");
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(rooms);
         when(roomSelectionService.createRoomSelection(isA(CaseData.class),
                 isA(DateListedType.class), isA(Boolean.class))).thenReturn(dynamicFixedListType);
@@ -270,16 +285,18 @@ public class AllocateHearingServiceTest {
     }
 
     private CourtWorkerSelectionService mockCourtWorkerSelectionService() {
-        var courtWorkerService = mock(CourtWorkerService.class);
-        var clerks = SelectionServiceTestUtils.createListItems("clerk", "Clerk ");
+        CourtWorkerService courtWorkerService = mock(CourtWorkerService.class);
+        List<DynamicValueType> clerks = SelectionServiceTestUtils.createListItems("clerk", "Clerk ");
         when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
                 CourtWorkerType.CLERK)).thenReturn(clerks);
 
-        var employerMembers = SelectionServiceTestUtils.createListItems("employerMember", "Employer Member ");
+        List<DynamicValueType> employerMembers = SelectionServiceTestUtils.createListItems("employerMember",
+            "Employer Member ");
         when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
                 CourtWorkerType.EMPLOYER_MEMBER)).thenReturn(employerMembers);
 
-        var employeeMembers = SelectionServiceTestUtils.createListItems("employeeMember", "Employee Member ");
+        List<DynamicValueType> employeeMembers = SelectionServiceTestUtils.createListItems("employeeMember",
+            "Employee Member ");
         when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
                 CourtWorkerType.EMPLOYEE_MEMBER)).thenReturn(employeeMembers);
 

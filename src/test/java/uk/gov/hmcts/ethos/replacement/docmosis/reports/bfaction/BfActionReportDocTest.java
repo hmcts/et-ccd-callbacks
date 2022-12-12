@@ -64,7 +64,7 @@ public class BfActionReportDocTest {
         bfDateTypeItems.add(bfDateTypeItem);
         bfDateTypeItems.add(bfDateTypeItem2);
         bfActionReportDataDateRange.setBfDateCollection(bfDateTypeItems);
-        var resultListingData = bfActionReportDoc.getReportDocPart(bfActionReportDataDateRange);
+        StringBuilder resultListingData = bfActionReportDoc.getReportDocPart(bfActionReportDataDateRange);
         assertFalse(resultListingData.toString().isEmpty());
         assertEquals(bfActionReportDocTestDateRangeResource, resultListingData.toString());
     }
@@ -102,7 +102,7 @@ public class BfActionReportDocTest {
         bfDateTypeItems.add(bfDateTypeItem);
         bfDateTypeItems.add(bfDateTypeItem2);
         bfActionReportDataSingleDate.setBfDateCollection(bfDateTypeItems);
-        var resultListingData = bfActionReportDoc.getReportDocPart(bfActionReportDataSingleDate);
+        StringBuilder resultListingData = bfActionReportDoc.getReportDocPart(bfActionReportDataSingleDate);
         assertFalse(resultListingData.toString().isEmpty());
         assertEquals(bfActionReportDocTestSingleDateResource, resultListingData.toString());
     }
@@ -116,7 +116,7 @@ public class BfActionReportDocTest {
 
     private String getBfActionDocTestFileContent(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-            .getResource(jsonFileName)).toURI())));
+            .getResource(jsonFileName)).toURI()))).replace("\r\n", "\n");
         // returns the content by excluding the opening and closing curly brackets
         return json.substring(1, json.length() - 1);
     }

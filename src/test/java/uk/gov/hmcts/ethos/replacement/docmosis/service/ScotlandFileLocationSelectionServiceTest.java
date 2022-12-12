@@ -9,6 +9,8 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.SelectionServiceTestUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.FileLocationService;
 
+import java.util.List;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -17,10 +19,11 @@ public class ScotlandFileLocationSelectionServiceTest {
 
     @Test
     public void testInitialiseFileLocationNoFileLocationSelected() {
-        var fileLocationService = mockFileLocationService();
-        var caseData = new CaseData();
+        FileLocationService fileLocationService = mockFileLocationService();
+        CaseData caseData = new CaseData();
 
-        var fileLocationSelectionService = new ScotlandFileLocationSelectionService(fileLocationService);
+        ScotlandFileLocationSelectionService fileLocationSelectionService =
+            new ScotlandFileLocationSelectionService(fileLocationService);
         fileLocationSelectionService.initialiseFileLocation(caseData);
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(caseData.getFileLocationAberdeen(),
                 TribunalOffice.ABERDEEN.getOfficeNumber(), TribunalOffice.ABERDEEN.getOfficeName());
@@ -34,18 +37,19 @@ public class ScotlandFileLocationSelectionServiceTest {
 
     @Test
     public void testInitialiseFileLocationsWithFileLocationSelected() {
-        var fileLocationService = mockFileLocationService();
-        var caseData = new CaseData();
-        var selectedAberdeen = createSelectedListItemAtIndex(TribunalOffice.ABERDEEN, 1);
+        FileLocationService fileLocationService = mockFileLocationService();
+        CaseData caseData = new CaseData();
+        DynamicValueType selectedAberdeen = createSelectedListItemAtIndex(TribunalOffice.ABERDEEN, 1);
         caseData.setFileLocationAberdeen(DynamicFixedListType.of(selectedAberdeen));
-        var selectedDundee = createSelectedListItemAtIndex(TribunalOffice.DUNDEE, 2);
+        DynamicValueType selectedDundee = createSelectedListItemAtIndex(TribunalOffice.DUNDEE, 2);
         caseData.setFileLocationDundee(DynamicFixedListType.of(selectedDundee));
-        var selectedEdinburgh = createSelectedListItemAtIndex(TribunalOffice.EDINBURGH, 3);
+        DynamicValueType selectedEdinburgh = createSelectedListItemAtIndex(TribunalOffice.EDINBURGH, 3);
         caseData.setFileLocationEdinburgh(DynamicFixedListType.of(selectedEdinburgh));
-        var selectedGlasgow = createSelectedListItemAtIndex(TribunalOffice.GLASGOW, 3);
+        DynamicValueType selectedGlasgow = createSelectedListItemAtIndex(TribunalOffice.GLASGOW, 3);
         caseData.setFileLocationGlasgow(DynamicFixedListType.of(selectedGlasgow));
 
-        var fileLocationSelectionService = new ScotlandFileLocationSelectionService(fileLocationService);
+        ScotlandFileLocationSelectionService fileLocationSelectionService =
+            new ScotlandFileLocationSelectionService(fileLocationService);
         fileLocationSelectionService.initialiseFileLocation(caseData);
 
         SelectionServiceTestUtils.verifyDynamicFixedListSelected(caseData.getFileLocationAberdeen(),
@@ -61,10 +65,11 @@ public class ScotlandFileLocationSelectionServiceTest {
 
     @Test
     public void testInitialiseFileLocationMultipleDataNoFileLocationSelected() {
-        var fileLocationService = mockFileLocationService();
-        var caseData = new MultipleData();
+        FileLocationService fileLocationService = mockFileLocationService();
+        MultipleData caseData = new MultipleData();
 
-        var fileLocationSelectionService = new ScotlandFileLocationSelectionService(fileLocationService);
+        ScotlandFileLocationSelectionService fileLocationSelectionService =
+            new ScotlandFileLocationSelectionService(fileLocationService);
         fileLocationSelectionService.initialiseFileLocation(caseData);
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(caseData.getFileLocationAberdeen(),
                 TribunalOffice.ABERDEEN.getOfficeNumber(), TribunalOffice.ABERDEEN.getOfficeName());
@@ -78,18 +83,19 @@ public class ScotlandFileLocationSelectionServiceTest {
 
     @Test
     public void testInitialiseFileLocationsMultipleDataWithFileLocationSelected() {
-        var fileLocationService = mockFileLocationService();
-        var caseData = new MultipleData();
-        var selectedAberdeen = createSelectedListItemAtIndex(TribunalOffice.ABERDEEN, 1);
+        FileLocationService fileLocationService = mockFileLocationService();
+        MultipleData caseData = new MultipleData();
+        DynamicValueType selectedAberdeen = createSelectedListItemAtIndex(TribunalOffice.ABERDEEN, 1);
         caseData.setFileLocationAberdeen(DynamicFixedListType.of(selectedAberdeen));
-        var selectedDundee = createSelectedListItemAtIndex(TribunalOffice.DUNDEE, 2);
+        DynamicValueType selectedDundee = createSelectedListItemAtIndex(TribunalOffice.DUNDEE, 2);
         caseData.setFileLocationDundee(DynamicFixedListType.of(selectedDundee));
-        var selectedEdinburgh = createSelectedListItemAtIndex(TribunalOffice.EDINBURGH, 3);
+        DynamicValueType selectedEdinburgh = createSelectedListItemAtIndex(TribunalOffice.EDINBURGH, 3);
         caseData.setFileLocationEdinburgh(DynamicFixedListType.of(selectedEdinburgh));
-        var selectedGlasgow = createSelectedListItemAtIndex(TribunalOffice.GLASGOW, 3);
+        DynamicValueType selectedGlasgow = createSelectedListItemAtIndex(TribunalOffice.GLASGOW, 3);
         caseData.setFileLocationGlasgow(DynamicFixedListType.of(selectedGlasgow));
 
-        var fileLocationSelectionService = new ScotlandFileLocationSelectionService(fileLocationService);
+        ScotlandFileLocationSelectionService fileLocationSelectionService =
+            new ScotlandFileLocationSelectionService(fileLocationService);
         fileLocationSelectionService.initialiseFileLocation(caseData);
 
         SelectionServiceTestUtils.verifyDynamicFixedListSelected(caseData.getFileLocationAberdeen(),
@@ -104,11 +110,11 @@ public class ScotlandFileLocationSelectionServiceTest {
     }
 
     private FileLocationService mockFileLocationService() {
-        var fileLocationService = mock(FileLocationService.class);
+        FileLocationService fileLocationService = mock(FileLocationService.class);
 
         for (TribunalOffice tribunalOffice : TribunalOffice.SCOTLAND_OFFICES) {
-            var fileLocations = SelectionServiceTestUtils.createListItems(tribunalOffice.getOfficeNumber(),
-                    tribunalOffice.getOfficeName());
+            List<DynamicValueType> fileLocations = SelectionServiceTestUtils.createListItems(
+                tribunalOffice.getOfficeNumber(), tribunalOffice.getOfficeName());
             when(fileLocationService.getFileLocations(tribunalOffice)).thenReturn(fileLocations);
         }
 

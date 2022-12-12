@@ -18,7 +18,7 @@ public class HearingsToJudgmentsCcdReportDataSource implements HearingsToJudgmen
     public List<HearingsToJudgmentsSubmitEvent> getData(String caseTypeId, String managingOffice,
                                                         String listingDateFrom, String listingDateTo) {
         try {
-            var query = HearingsToJudgmentsElasticSearchQuery.create(managingOffice, listingDateFrom, listingDateTo);
+            String query = HearingsToJudgmentsElasticSearchQuery.create(managingOffice, listingDateFrom, listingDateTo);
             return ccdClient.hearingsToJudgementsSearch(authToken, caseTypeId, query);
         } catch (Exception e) {
             throw new ReportException(String.format(

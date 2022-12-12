@@ -27,32 +27,34 @@ class EccReportTest {
 
     @Test
     void shouldShowEnglandWalesOffice() {
-        var managingOffice = TribunalOffice.MANCHESTER;
-        var submitEvent = EccReportCaseDataBuilder.builder()
+        TribunalOffice managingOffice = TribunalOffice.MANCHESTER;
+        EccReportSubmitEvent submitEvent = EccReportCaseDataBuilder.builder()
                 .withNoEcc()
                 .buildAsSubmitEvent();
-        var submitEvents = List.of(submitEvent);
-        var reportDataSource = mockDataSource(ENGLANDWALES_CASE_TYPE_ID, managingOffice.getOfficeName(), submitEvents);
+        List<EccReportSubmitEvent> submitEvents = List.of(submitEvent);
+        EccReportDataSource reportDataSource = mockDataSource(ENGLANDWALES_CASE_TYPE_ID, managingOffice.getOfficeName(),
+            submitEvents);
 
-        var eccReport = new EccReport(reportDataSource);
-        var reportParams = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID, managingOffice.getOfficeName(),
+        EccReport eccReport = new EccReport(reportDataSource);
+        ReportParams reportParams = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID, managingOffice.getOfficeName(),
                 DATE_FROM, DATE_TO);
-        var reportData = eccReport.generateReport(reportParams);
+        EccReportData reportData = eccReport.generateReport(reportParams);
 
         assertEquals(managingOffice.getOfficeName(), reportData.getOffice());
     }
 
     @Test
     void shouldShowScotlandOffice() {
-        var submitEvent = EccReportCaseDataBuilder.builder()
+        EccReportSubmitEvent submitEvent = EccReportCaseDataBuilder.builder()
                 .withNoEcc()
                 .buildAsSubmitEvent();
-        var submitEvents = List.of(submitEvent);
-        var reportDataSource = mockDataSource(SCOTLAND_CASE_TYPE_ID, null, submitEvents);
+        List<EccReportSubmitEvent> submitEvents = List.of(submitEvent);
+        EccReportDataSource reportDataSource = mockDataSource(SCOTLAND_CASE_TYPE_ID, null, submitEvents);
 
-        var eccReport = new EccReport(reportDataSource);
-        var reportParams = new ReportParams(SCOTLAND_LISTING_CASE_TYPE_ID, null, DATE_FROM, DATE_TO);
-        var reportData = eccReport.generateReport(reportParams);
+        EccReport eccReport = new EccReport(reportDataSource);
+        ReportParams reportParams = new ReportParams(SCOTLAND_LISTING_CASE_TYPE_ID, null,
+            DATE_FROM, DATE_TO);
+        EccReportData reportData = eccReport.generateReport(reportParams);
 
         assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportData.getOffice());
         assertTrue(reportData.getReportDetails().isEmpty());
@@ -63,17 +65,18 @@ class EccReportTest {
         // Given a case has no Ecc cases
         // and report data is requested
         // the case should not be in the report data
-        var submitEvent = EccReportCaseDataBuilder.builder()
+        EccReportSubmitEvent submitEvent = EccReportCaseDataBuilder.builder()
                 .withNoEcc()
                 .buildAsSubmitEvent();
-        var submitEvents = List.of(submitEvent);
-        var managingOffice = TribunalOffice.MANCHESTER;
-        var reportDataSource = mockDataSource(ENGLANDWALES_CASE_TYPE_ID, managingOffice.getOfficeName(), submitEvents);
+        List<EccReportSubmitEvent> submitEvents = List.of(submitEvent);
+        TribunalOffice managingOffice = TribunalOffice.MANCHESTER;
+        EccReportDataSource reportDataSource = mockDataSource(ENGLANDWALES_CASE_TYPE_ID, managingOffice.getOfficeName(),
+            submitEvents);
 
-        var eccReport = new EccReport(reportDataSource);
-        var reportParams = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID, managingOffice.getOfficeName(),
+        EccReport eccReport = new EccReport(reportDataSource);
+        ReportParams reportParams = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID, managingOffice.getOfficeName(),
                 DATE_FROM, DATE_TO);
-        var reportData = eccReport.generateReport(reportParams);
+        EccReportData reportData = eccReport.generateReport(reportParams);
 
         assertEquals(managingOffice.getOfficeName(), reportData.getOffice());
         assertTrue(reportData.getReportDetails().isEmpty());

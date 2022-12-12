@@ -29,24 +29,24 @@ public final class DynamicDepositOrder {
     private static void populateDynamicDepositOrder(CaseData caseData, List<DynamicValueType> listItems,
                                                     List<DynamicValueType> listAllParties) {
         if (!listItems.isEmpty()) {
-            var listClaimantRespondent = new DynamicFixedListType();
+            DynamicFixedListType listClaimantRespondent = new DynamicFixedListType();
             listClaimantRespondent.setListItems(listItems);
-            var listAll = new DynamicFixedListType();
+            DynamicFixedListType listAll = new DynamicFixedListType();
             listAll.setListItems(listAllParties);
 
             if (CollectionUtils.isNotEmpty(caseData.getDepositCollection())) {
-                var depositCollection = caseData.getDepositCollection();
+                List<DepositTypeItem> depositCollection = caseData.getDepositCollection();
                 for (DepositTypeItem depositTypeItem : depositCollection) {
                     dynamicOrderAgainst(caseData, depositTypeItem.getValue(), listClaimantRespondent);
                     dynamicRequestedBy(caseData, depositTypeItem.getValue(), listAll);
                     dynamicRefundedTo(caseData, depositTypeItem.getValue(), listClaimantRespondent);
                 }
             } else {
-                var depositType = new DepositType();
+                DepositType depositType = new DepositType();
                 depositType.setDynamicDepositOrderAgainst(listClaimantRespondent);
                 depositType.setDynamicDepositRequestedBy(listAll);
                 depositType.setDynamicDepositRefundedTo(listClaimantRespondent);
-                var depositTypeItem = new DepositTypeItem();
+                DepositTypeItem depositTypeItem = new DepositTypeItem();
                 depositTypeItem.setValue(depositType);
                 List<DepositTypeItem> depositTypeItems = new ArrayList<>();
                 depositTypeItems.add(depositTypeItem);
@@ -58,7 +58,7 @@ public final class DynamicDepositOrder {
 
     private static void dynamicOrderAgainst(CaseData caseData, DepositType depositType,
                                             DynamicFixedListType dynamicFixedListType) {
-        var dynamicValueType = new DynamicValueType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
         if (depositType.getDynamicDepositOrderAgainst() == null) {
             depositType.setDynamicDepositOrderAgainst(dynamicFixedListType);
             if (!isNullOrEmpty(depositType.getDepositOrderAgainst())) {
@@ -74,7 +74,7 @@ public final class DynamicDepositOrder {
 
     private static void dynamicRequestedBy(CaseData caseData, DepositType depositType,
                                             DynamicFixedListType dynamicFixedListType) {
-        var dynamicValueType = new DynamicValueType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
         if (depositType.getDynamicDepositRequestedBy() == null) {
             depositType.setDynamicDepositRequestedBy(dynamicFixedListType);
             if (!isNullOrEmpty(depositType.getDepositRequestedBy())) {
@@ -90,7 +90,7 @@ public final class DynamicDepositOrder {
 
     private static void dynamicRefundedTo(CaseData caseData, DepositType depositType,
                                            DynamicFixedListType dynamicFixedListType) {
-        var dynamicValueType = depositType.getDynamicDepositOrderAgainst().getValue();
+        DynamicValueType dynamicValueType = depositType.getDynamicDepositOrderAgainst().getValue();
         if (depositType.getDynamicDepositRefundedTo() == null) {
             depositType.setDynamicDepositRefundedTo(dynamicFixedListType);
             if (!isNullOrEmpty(depositType.getDepositRefundedTo())) {

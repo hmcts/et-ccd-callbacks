@@ -114,7 +114,7 @@ public class TornadoServiceTest {
     @Test
     public void shouldCreateDocumentInfoForDocumentGenerationAllocatedOffice() throws IOException {
         mockConnectionSuccess();
-        var defaultValues = mock(DefaultValues.class);
+        DefaultValues defaultValues = mock(DefaultValues.class);
         when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName()))
                 .thenReturn(defaultValues);
         CaseData caseData = new CaseData();
@@ -163,7 +163,7 @@ public class TornadoServiceTest {
     @Test
     public void shouldCreateDocumentInforForScheduleGeneration() throws IOException {
         mockConnectionSuccess();
-        var bulkData = new BulkData();
+        BulkData bulkData = new BulkData();
         bulkData.setScheduleDocName(LIST_CASES_CONFIG);
         bulkData.setSearchCollection(new ArrayList<>());
 

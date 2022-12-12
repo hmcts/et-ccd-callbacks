@@ -24,7 +24,7 @@ public class CaseTransferToEcmService {
     private final CaseTransferEventService caseTransferEventService;
 
     public List<String> createCaseTransferToEcm(CaseDetails caseDetails, String userToken) {
-        var errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         List<CaseData> caseDataList = caseTransferUtils.getAllCasesToBeTransferred(caseDetails, userToken);
 
         if (caseDataList.isEmpty()) {
@@ -43,9 +43,9 @@ public class CaseTransferToEcmService {
 
     private List<String> transferCase(CaseDetails caseDetails, List<CaseData> caseDataList, String userToken) {
         List<String> errors = new ArrayList<>();
-        var sourceCaseData = caseDetails.getCaseData();
-        for (var caseData : caseDataList) {
-            var params = CaseTransferToEcmParams.builder()
+        CaseData sourceCaseData = caseDetails.getCaseData();
+        for (CaseData caseData : caseDataList) {
+            CaseTransferToEcmParams params = CaseTransferToEcmParams.builder()
                 .userToken(userToken)
                 .caseTypeId(caseDetails.getCaseTypeId())
                 .jurisdiction(caseDetails.getJurisdiction())
@@ -58,7 +58,7 @@ public class CaseTransferToEcmService {
 
             log.info("Creating ECM Case Transfer event for {}", caseData.getEthosCaseReference());
 
-            var transferErrors = caseTransferEventService.transferToEcm(params);
+            List<String> transferErrors = caseTransferEventService.transferToEcm(params);
             if (!transferErrors.isEmpty()) {
                 errors.addAll(transferErrors);
             }
@@ -73,8 +73,8 @@ public class CaseTransferToEcmService {
     }
 
     private List<String> validateCases(List<CaseData> caseDataList) {
-        var errors = new ArrayList<String>();
-        for (var caseData : caseDataList) {
+        List<String> errors = new ArrayList<>();
+        for (CaseData caseData : caseDataList) {
             errors.addAll(caseTransferUtils.validateCase(caseData));
         }
         return errors;

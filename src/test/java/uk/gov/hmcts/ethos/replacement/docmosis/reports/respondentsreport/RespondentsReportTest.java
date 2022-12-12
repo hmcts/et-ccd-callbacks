@@ -120,7 +120,7 @@ class RespondentsReportTest {
         caseDataBuilder.withMoreThanOneRespondents();
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
 
-        var reportData = respondentsReport.generateReport(params);
+        RespondentsReportData reportData = respondentsReport.generateReport(params);
         assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportData.getReportSummary().getOffice());
     }
 

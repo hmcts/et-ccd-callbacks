@@ -36,6 +36,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.AdhocReportTypeItem;
+import uk.gov.hmcts.et.common.model.listing.items.ListingTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.AdhocReportType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport;
@@ -958,8 +959,8 @@ public class ListingServiceTest {
     public void processListingHearings_causeListDateNull() throws IOException {
         when(ccdClient.retrieveCasesVenueAndDateElasticSearch(anyString(), anyString(), anyString(), anyString(),
                 anyString(), anyString(), anyString())).thenReturn(submitEvents);
-        var listingData = listingService.processListingHearingsRequest(listingDetailsRange, "authToken");
-        var listingCollection = listingData.getListingCollection();
+        ListingData listingData = listingService.processListingHearingsRequest(listingDetailsRange, "authToken");
+        List<ListingTypeItem> listingCollection = listingData.getListingCollection();
         listingCollection.get(0).getValue().setCauseListDate(null);
         listingCollection.sort(Comparator.comparing(o -> LocalDate.parse(o.getValue().getCauseListDate(),
                 CAUSE_LIST_DATE_TIME_PATTERN)));
@@ -967,7 +968,7 @@ public class ListingServiceTest {
 
     @Test
     public void processListingHearings_SameDayAndTimeDifferentMonth() throws IOException {
-        final var result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, "
+        final String result = "ListingData(tribunalCorrespondenceAddress=null, tribunalCorrespondenceTelephone=null, "
                 + "tribunalCorrespondenceFax=null, tribunalCorrespondenceDX=null, tribunalCorrespondenceEmail=null, "
                 + "reportDate=null, hearingDateType=Range, listingDate=null, listingDateFrom=2021-01-01, "
                 + "listingDateTo=2021-12-01, listingVenue=DynamicFixedListType(value=DynamicValueType(code=Aberdeen, "
@@ -1003,7 +1004,7 @@ public class ListingServiceTest {
         listingDetailsRange.getCaseData().setListingDateTo("2021-12-01");
         listingDetailsRange.getCaseData().setVenueAberdeen(new DynamicFixedListType("Aberdeen"));
         when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString())).thenReturn(submitEvents);
-        var listingDataResult = listingService
+        ListingData listingDataResult = listingService
                 .processListingHearingsRequest(listingDetailsRange, "authToken");
         assertEquals(result, listingDataResult.toString());
     }
@@ -1111,8 +1112,8 @@ public class ListingServiceTest {
                 .setRespondentCollection(new ArrayList<>(Arrays
                         .asList(respondentSumTypeItem, respondentSumTypeItem1)));
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
-        RepresentedTypeR representedTypeR = new RepresentedTypeR();
-        representedTypeR.setNameOfOrganisation("ITV");
+        RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
+            .nameOfOrganisation("ITV").build();
         representedTypeRItem.setId("222");
         representedTypeRItem.setValue(representedTypeR);
         submitEvents.get(0).getCaseData()
@@ -1517,14 +1518,14 @@ public class ListingServiceTest {
 
     @Test
     public void checkExistingDataInReport() throws IOException {
-        var adhocReportType = new AdhocReportType();
+        AdhocReportType adhocReportType = new AdhocReportType();
         adhocReportType.setSinglesTotal("6");
         adhocReportType.setMultiplesTotal("10");
         listingDetails.getCaseData().setLocalReportsSummaryHdr(adhocReportType);
-        var adhocReportType2 = new AdhocReportType();
+        AdhocReportType adhocReportType2 = new AdhocReportType();
         adhocReportType2.setCaseReference("1800001/2021");
         adhocReportType2.setDateOfAcceptance("2021-01-01");
-        var adhocReportTypeItem = new AdhocReportTypeItem();
+        AdhocReportTypeItem adhocReportTypeItem = new AdhocReportTypeItem();
         adhocReportTypeItem.setValue(adhocReportType2);
         List<AdhocReportTypeItem> localReportsSummary = List.of(adhocReportTypeItem);
         listingDetails.getCaseData().setLocalReportsSummary(localReportsSummary);

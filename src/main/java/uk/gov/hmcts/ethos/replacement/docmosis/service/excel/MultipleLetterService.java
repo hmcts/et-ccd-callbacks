@@ -8,6 +8,7 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
@@ -54,7 +55,7 @@ public class MultipleLetterService {
                         multipleDetails.getCaseData(),
                         FilterExcelType.FLAGS);
 
-        var documentInfo = new DocumentInfo();
+        DocumentInfo documentInfo = new DocumentInfo();
 
         if (!multipleObjects.keySet().isEmpty()) {
 
@@ -107,7 +108,7 @@ public class MultipleLetterService {
                                     SortedMap<String, Object> multipleObjects, List<String> errors,
                                     DocumentInfo documentInfo, boolean validation) {
 
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
 
         List<String> caseRefCollection = new ArrayList<>(multipleObjects.keySet());
 
@@ -139,7 +140,7 @@ public class MultipleLetterService {
 
             log.info("No validation then will generate a label document");
 
-            var submitEvent = singleCasesReadingService.retrieveSingleCase(userToken,
+            SubmitEvent submitEvent = singleCasesReadingService.retrieveSingleCase(userToken,
                     multipleDetails.getCaseTypeId(), multipleObjects.firstKey(), multipleData.getMultipleSource());
 
             return generateLetterOrLabel(userToken, multipleDetails, submitEvent);
@@ -154,7 +155,7 @@ public class MultipleLetterService {
 
         log.info("Pull information from first case filtered");
 
-        var submitEvent = singleCasesReadingService.retrieveSingleCase(userToken,
+        SubmitEvent submitEvent = singleCasesReadingService.retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(), multipleObjects.firstKey(),
                 multipleDetails.getCaseData().getMultipleSource());
 
@@ -201,10 +202,10 @@ public class MultipleLetterService {
 
     public void dynamicMultipleLetters(String userToken, MultipleDetails multipleDetails,
                                        List<String> errors) {
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
         multipleDynamicListFlagsService.populateDynamicListFlagsLogic(userToken, multipleDetails, errors);
-        var leadCase = MultiplesHelper.getCurrentLead(multipleData.getLeadCase());
-        var submitEvent = singleCasesReadingService.retrieveSingleCase(userToken,
+        String leadCase = MultiplesHelper.getCurrentLead(multipleData.getLeadCase());
+        SubmitEvent submitEvent = singleCasesReadingService.retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(), leadCase, multipleData.getMultipleSource());
         if (submitEvent != null) {
             DynamicLetters.dynamicMultipleLetters(submitEvent, multipleData,

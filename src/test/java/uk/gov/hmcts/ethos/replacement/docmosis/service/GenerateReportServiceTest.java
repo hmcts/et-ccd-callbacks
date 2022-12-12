@@ -24,9 +24,9 @@ class GenerateReportServiceTest {
 
     @Test
     void testInitGenerateReportForBroughtForwardReport() {
-        var listingData = new ListingData();
+        ListingData listingData = new ListingData();
         listingData.setReportType(BROUGHT_FORWARD_REPORT);
-        var listingDetails = new ListingDetails();
+        ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         listingDetails.setCaseData(listingData);
 

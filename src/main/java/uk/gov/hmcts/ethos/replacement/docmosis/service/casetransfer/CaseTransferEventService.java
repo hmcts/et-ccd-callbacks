@@ -23,7 +23,7 @@ public class CaseTransferEventService {
     }
 
     public List<String> transfer(CaseTransferEventParams params) {
-        var errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
 
         persistentQHelperService.sendCreationEventToSingles(
                 params.getUserToken(),
@@ -46,7 +46,7 @@ public class CaseTransferEventService {
     }
 
     public List<String> transferToEcm(CaseTransferToEcmParams params) {
-        var errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         persistentQHelperService.sendTransferToEcmEvent(
                 params.getUserToken(),
                 params.getCaseTypeId(),

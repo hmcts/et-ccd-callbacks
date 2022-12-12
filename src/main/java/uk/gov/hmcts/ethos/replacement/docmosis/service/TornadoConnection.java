@@ -17,8 +17,8 @@ public class TornadoConnection {
     }
 
     public HttpURLConnection createConnection() throws IOException {
-        var tornadoURL = tornadoConfiguration.getUrl();
-        var conn = (HttpURLConnection) new URL(tornadoURL).openConnection();
+        String tornadoURL = tornadoConfiguration.getUrl();
+        HttpURLConnection conn = (HttpURLConnection) new URL(tornadoURL).openConnection();
         conn.setRequestMethod("POST");
         conn.setUseCaches(false);
         conn.setDoOutput(true);

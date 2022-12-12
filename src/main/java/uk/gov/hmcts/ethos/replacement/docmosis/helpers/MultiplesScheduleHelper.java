@@ -70,7 +70,7 @@ public final class MultiplesScheduleHelper {
                         ? respondentName + " & Others"
                         : respondentName;
             }
-            var address = DocumentHelper.getRespondentAddressET3(respondentCollection.get(0).getValue());
+            Address address = DocumentHelper.getRespondentAddressET3(respondentCollection.get(0).getValue());
 
             return getScheduleAddress(field, address);
         } else {
@@ -80,7 +80,7 @@ public final class MultiplesScheduleHelper {
 
     private static String getClaimantData(ScheduleClaimantType scheduleClaimantType, String field) {
         if (scheduleClaimantType != null) {
-            var address = scheduleClaimantType.getClaimantAddressUK();
+            Address address = scheduleClaimantType.getClaimantAddressUK();
             return getScheduleAddress(field, address);
         } else {
             return "";

@@ -18,8 +18,8 @@ public class EccReportCcdDataSource implements EccReportDataSource {
     @Override
     public List<EccReportSubmitEvent> getData(ReportParams reportParams) {
         try {
-            var query = EccReportElasticSearchQuery.create(reportParams.getManagingOffice(), reportParams.getDateFrom(),
-                    reportParams.getDateTo());
+            String query = EccReportElasticSearchQuery.create(reportParams.getManagingOffice(),
+                reportParams.getDateFrom(), reportParams.getDateTo());
             return ccdClient.eccReportSearch(authToken, reportParams.getCaseTypeId(), query);
         } catch (Exception e) {
             throw new ReportException(String.format(

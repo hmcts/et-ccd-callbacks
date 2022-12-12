@@ -170,6 +170,7 @@ public class Et1VettingController {
         DocumentInfo documentInfo = et1VettingService.generateEt1VettingDocument(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setEt1VettingDocument(documentManagementService.addDocumentToDocumentField(documentInfo));
+        caseData.setSuggestedHearingVenues(caseData.getEt1HearingVenues());
         return getCallbackRespEntityNoErrors(caseData);
     }
 

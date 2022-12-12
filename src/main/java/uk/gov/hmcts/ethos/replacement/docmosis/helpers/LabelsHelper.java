@@ -13,6 +13,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 
 import java.util.ArrayList;
@@ -89,7 +91,7 @@ public class LabelsHelper {
                                                                String ethosCaseReference,
                                                                String printClaimantLabel) {
 
-        var addressLabelType = new AddressLabelType();
+        AddressLabelType addressLabelType = new AddressLabelType();
 
         addressLabelType.setPrintLabel(printClaimantLabel);
 
@@ -119,7 +121,7 @@ public class LabelsHelper {
         addressLabelType.setLabelEntityReference(REF);
         addressLabelType.setLabelCaseReference(ethosCaseReference);
 
-        var addressLabelTypeItem = new AddressLabelTypeItem();
+        AddressLabelTypeItem addressLabelTypeItem = new AddressLabelTypeItem();
 
         addressLabelTypeItem.setId(UUID.randomUUID().toString());
         addressLabelTypeItem.setValue(addressLabelType);
@@ -156,7 +158,7 @@ public class LabelsHelper {
                                                                    String ethosCaseReference,
                                                                    String printClaimantRepLabel) {
 
-        var addressLabelType = new AddressLabelType();
+        AddressLabelType addressLabelType = new AddressLabelType();
 
         addressLabelType.setPrintLabel(printClaimantRepLabel);
 
@@ -176,7 +178,7 @@ public class LabelsHelper {
 
         addressLabelType.setLabelCaseReference(ethosCaseReference);
 
-        var addressLabelTypeItem = new AddressLabelTypeItem();
+        AddressLabelTypeItem addressLabelTypeItem = new AddressLabelTypeItem();
 
         addressLabelTypeItem.setId(UUID.randomUUID().toString());
         addressLabelTypeItem.setValue(addressLabelType);
@@ -225,9 +227,9 @@ public class LabelsHelper {
 
         for (RespondentSumTypeItem activeRespondent : activeRespondents) {
 
-            var addressLabelType = new AddressLabelType();
+            AddressLabelType addressLabelType = new AddressLabelType();
 
-            var respondentSumType = activeRespondent.getValue();
+            RespondentSumType respondentSumType = activeRespondent.getValue();
 
             addressLabelType.setPrintLabel(printRespondentsLabels);
             addressLabelType.setFullName(RESPONDENT + nullCheck(respondentSumType.getRespondentName()));
@@ -239,7 +241,7 @@ public class LabelsHelper {
             addressLabelType.setLabelEntityReference(REF);
             addressLabelType.setLabelCaseReference(ethosCaseReference);
 
-            var addressLabelTypeItem = new AddressLabelTypeItem();
+            AddressLabelTypeItem addressLabelTypeItem = new AddressLabelTypeItem();
 
             addressLabelTypeItem.setId(UUID.randomUUID().toString());
             addressLabelTypeItem.setValue(addressLabelType);
@@ -288,9 +290,9 @@ public class LabelsHelper {
 
         for (RepresentedTypeRItem representedTypeRItem : repCollection) {
 
-            var addressLabelType = new AddressLabelType();
+            AddressLabelType addressLabelType = new AddressLabelType();
 
-            var representedTypeR = representedTypeRItem.getValue();
+            RepresentedTypeR representedTypeR = representedTypeRItem.getValue();
 
             addressLabelType.setPrintLabel(printRespondentsRepsLabels);
 
@@ -310,7 +312,7 @@ public class LabelsHelper {
 
             addressLabelType.setLabelCaseReference(ethosCaseReference);
 
-            var addressLabelTypeItem = new AddressLabelTypeItem();
+            AddressLabelTypeItem addressLabelTypeItem = new AddressLabelTypeItem();
 
             addressLabelTypeItem.setId(UUID.randomUUID().toString());
             addressLabelTypeItem.setValue(addressLabelType);
@@ -360,7 +362,7 @@ public class LabelsHelper {
 
     private static StringBuilder getFullAddressOneLine(Address address) {
 
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(nullCheck(address.getAddressLine1()));
         sb.append(!isNullOrEmpty(nullCheck(address.getAddressLine2())) && sb.length() > 0  ? ", " : "");
         sb.append(nullCheck(address.getAddressLine2()));
@@ -418,7 +420,7 @@ public class LabelsHelper {
 
                 log.info("Adding: CLAIMANT_REP_ADDRESS_LABEL");
 
-                var addressLabelTypeItem =
+                AddressLabelTypeItem addressLabelTypeItem =
                         LabelsHelper.getClaimantRepAddressLabelData(labelPayloadEvent.getLabelPayloadES(), YES);
                 if (addressLabelTypeItem != null) {
                     addressLabelTypeItems.add(addressLabelTypeItem);
@@ -506,8 +508,8 @@ public class LabelsHelper {
 
     private static boolean reachLimitOfTotalNumberLabels(AddressLabelsAttributesType addressLabelsAttributesType) {
 
-        var selectedLabels = Integer.parseInt(addressLabelsAttributesType.getNumberOfSelectedLabels());
-        var numberOfCopies = Integer.parseInt(addressLabelsAttributesType.getNumberOfCopies());
+        int selectedLabels = Integer.parseInt(addressLabelsAttributesType.getNumberOfSelectedLabels());
+        int numberOfCopies = Integer.parseInt(addressLabelsAttributesType.getNumberOfCopies());
         return selectedLabels * numberOfCopies > MAX_NUMBER_LABELS;
 
     }

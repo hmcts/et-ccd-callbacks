@@ -1,8 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -15,6 +19,9 @@ import uk.gov.hmcts.et.common.model.ccd.items.ReferralReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.ReferralTypeData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.ReferralTypeDocument;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,15 +33,17 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.LinguisticNaming", "PMD.ConfusingTernary",
-    "PMD.SimpleDateFormatNeedsLocale", "PMD.GodClass"})
+    "PMD.SimpleDateFormatNeedsLocale", "PMD.GodClass", "PMD.ExcessiveImports"})
 public final class ReferralHelper {
-
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String TRUE = "True";
     private static final String FALSE = "False";
     private static final String NO_TRACK_NAME = "No Track";
@@ -70,17 +79,25 @@ public final class ReferralHelper {
     private static final String DOCUMENT_LINK = "<br><br>Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09"
         + " <a href=\"%s\" download>%s</a>&nbsp;";
 
+    private static final String REF_OUTPUT_NAME = "Referral Summary.pdf";
+    private static final String REF_SUMMARY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-00067.docx";
+
     private static final String GENERAL_NOTES = "<br><br>General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 %s";
 
     private static final String INSTRUCTIONS = "<br><br>Recommended instructions &nbsp;&#09&#09&#09&nbsp; %s";
 
     private static final String INVALID_EMAIL_ERROR_MESSAGE = "The email address entered is invalid.";
 
-    private static final String JUDGE_DIRECTION_BODY = "A judge has sent directions on this employment tribunal case.";
+    private static final String EMAIL_BODY_NEW = "You have a new referral on this case.";
 
-    private static final String GENERIC_MESSAGE_BODY = "You have a new message about this employment tribunal case.";
+    private static final String EMAIL_BODY_REPLY = "You have a reply to a referral on this case.";
+
+    private static final String REPLY_REFERRAL_REP = "Reply by";
+
+    private static final String REPLY_REFERRAL_REF = "Referred by";
 
     private ReferralHelper() {
+        OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     /**
@@ -221,18 +238,30 @@ public final class ReferralHelper {
     }
 
     /**
+     * Gets the number a new referral should be labelled as.
+     * @param caseData contains all the case data
+     */
+    public static int getNextReferralNumber(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getReferralCollection())) {
+            return 1;
+        }
+        return caseData.getReferralCollection().size() + 1;
+    }
+
+    /**
      * Creates a referral and adds it to the referral collection.
      * @param caseData contains all the case data
      * @param userFullName Full name of the logged-in user
      */
-    public static void createReferral(CaseData caseData, String userFullName) {
+    public static void createReferral(CaseData caseData, String userFullName,
+                                      UploadedDocumentType documentInfo) {
         if (CollectionUtils.isEmpty(caseData.getReferralCollection())) {
             caseData.setReferralCollection(new ArrayList<>());
         }
 
         ReferralType referralType = new ReferralType();
 
-        referralType.setReferralNumber(String.valueOf(caseData.getReferralCollection().size() + 1));
+        referralType.setReferralNumber(String.valueOf(getNextReferralNumber(caseData)));
         referralType.setReferCaseTo(caseData.getReferCaseTo());
         referralType.setIsUrgent(caseData.getIsUrgent());
         referralType.setReferralSubject(caseData.getReferralSubject());
@@ -249,6 +278,7 @@ public final class ReferralHelper {
         referralType.setReferralStatus(ReferralStatus.AWAITING_INSTRUCTIONS);
 
         referralType.setReferralHearingDate(getNearestHearingToReferral(caseData, "None"));
+        referralType.setReferralSummaryPdf(documentInfo);
 
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId(UUID.randomUUID().toString());
@@ -258,6 +288,71 @@ public final class ReferralHelper {
         referralCollection.add(referralTypeItem);
         caseData.setReferralCollection(referralCollection);
         clearReferralDataFromCaseData(caseData);
+    }
+
+    /**
+     * Formats data needed for Referral PDF Document.
+     * @param caseData the case in which we extract the referral type
+     * @return stringified json data for pdf document
+     */
+    public static String getDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
+        ReferralTypeData data;
+        if (caseData.getReferentEmail() != null) {
+            data = newReferralRequest(caseData);
+        } else {
+            data = existingReferralRequest(caseData);
+        }
+        ReferralTypeDocument document = ReferralTypeDocument.builder()
+            .accessKey(accessKey)
+            .outputName(REF_OUTPUT_NAME)
+            .templateName(REF_SUMMARY_TEMPLATE_NAME)
+            .data(data).build();
+        return OBJECT_MAPPER.writeValueAsString(document);
+    }
+
+    /**
+     * Creates a new referral using the caseData temporary variables.
+     * @param caseData contains the temporary variables
+     * @return a referral object which can then be mapped into the pdf doc
+     */
+    private static ReferralTypeData newReferralRequest(CaseData caseData) {
+        return ReferralTypeData.builder()
+            .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+            .referralDate(Helper.getCurrentDate())
+            .referredBy(defaultIfEmpty(caseData.getReferredBy(), null))
+            .referCaseTo(defaultIfEmpty(caseData.getReferCaseTo(), null))
+            .referentEmail(defaultIfEmpty(caseData.getReferentEmail(), null))
+            .isUrgent(defaultIfEmpty(caseData.getIsUrgent(), null))
+            .nextHearingDate(getNearestHearingToReferral(caseData, "None"))
+            .referralSubject(defaultIfEmpty(caseData.getReferralSubject(), null))
+            .referralDetails(defaultIfEmpty(caseData.getReferralDetails(), null))
+            .referralDocument(caseData.getReferralDocument())
+            .referralInstruction(defaultIfEmpty(caseData.getReferralInstruction(), null))
+            .referralStatus(ReferralStatus.AWAITING_INSTRUCTIONS).build();
+    }
+
+    /**
+     * Creates a referral using the existing selected Referral.
+     * @param caseData contains selected referral
+     * @return a referral object which can then be mapped into the pdf doc
+     */
+    private static ReferralTypeData existingReferralRequest(CaseData caseData) {
+        ReferralType referral = getSelectedReferral(caseData);
+        return ReferralTypeData.builder()
+            .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+            .referralDate(Helper.getCurrentDate())
+            .referredBy(defaultIfEmpty(referral.getReferredBy(), null))
+            .referCaseTo(defaultIfEmpty(referral.getReferCaseTo(), null))
+            .referentEmail(defaultIfEmpty(referral.getReferentEmail(), null))
+            .isUrgent(defaultIfEmpty(referral.getIsUrgent(), null))
+            .nextHearingDate(getNearestHearingToReferral(caseData, "None"))
+            .referralSubject(defaultIfEmpty(referral.getReferralSubject(), null))
+            .referralDetails(defaultIfEmpty(referral.getReferralDetails(), null))
+            .referralDocument(referral.getReferralDocument())
+            .referralInstruction(defaultIfEmpty(referral.getReferralInstruction(), null))
+            .referralReplyCollection(referral.getReferralReplyCollection())
+            .referralStatus(referral.getReferralStatus())
+            .referralReplyCollection(referral.getReferralReplyCollection()).build();
     }
 
     /**
@@ -403,23 +498,44 @@ public final class ReferralHelper {
      * Generates a map of personalised information that will be used for the
      * placeholder fields in the Referral email template.
      * @param detail Contains all the case details.
-     * @param isJudge Flag for checking if a judge is creating the referral.
-     * @param isNewReferral Flag for checking is if it is a new referral.
+     * @param referralNumber The number of the referral.
+     * @param username Name of the user making or replying to this referral.
+     * @param isNew Flag for if this is a new referral.
      */
-    public static Map<String, String> buildPersonalisation(CaseDetails detail, boolean isJudge, boolean isNewReferral) {
+    public static Map<String, String> buildPersonalisation(CaseDetails detail, String referralNumber, boolean isNew,
+                                                              String username) {
         CaseData caseData = detail.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
-        personalisation.put("emailFlag", isNewReferral
-            ? getEmailFlag(caseData.getIsUrgent()) : getEmailFlag(caseData.getIsUrgentReply()));
+        personalisation.put("emailFlag", getEmailFlag(isNew ? caseData.getIsUrgent() : caseData.getIsUrgentReply()));
         personalisation.put("claimant", caseData.getClaimant());
-        personalisation.put("respondents",
-            caseData.getRespondentCollection().stream().map(o -> o.getValue().getRespondentName())
-                .collect(Collectors.joining(", ")));
+        personalisation.put("respondents", getRespondentNames(caseData));
         personalisation.put("date", getNearestHearingToReferral(caseData, "Not set"));
-        personalisation.put("body", isJudge ? JUDGE_DIRECTION_BODY : GENERIC_MESSAGE_BODY);
-        personalisation.put("ccdId", detail.getCaseId());
+        personalisation.put("body", isNew ? EMAIL_BODY_NEW : EMAIL_BODY_REPLY);
+        personalisation.put("refNumber", referralNumber);
+        personalisation.put("subject", getReferralSubject(caseData, isNew));
+        personalisation.put("username", username);
+        personalisation.put("replyReferral", isNew ? REPLY_REFERRAL_REF : REPLY_REFERRAL_REP);
         return personalisation;
+    }
+
+    private static String getRespondentNames(CaseData caseData) {
+        return caseData.getRespondentCollection().stream()
+            .map(o -> o.getValue().getRespondentName())
+            .collect(Collectors.joining(", "));
+    }
+
+    private static String getReferralSubject(CaseData caseData, boolean isNew) {
+        if (isNew) {
+            return caseData.getReferralSubject();
+        }
+
+        ReferralType selectedReferral = getSelectedReferral(caseData);
+        if (selectedReferral == null) {
+            throw new NotFoundException("Referral not found");
+        }
+
+        return selectedReferral.getReferralSubject();
     }
 
     private static String getEmailFlag(String isUrgent) {

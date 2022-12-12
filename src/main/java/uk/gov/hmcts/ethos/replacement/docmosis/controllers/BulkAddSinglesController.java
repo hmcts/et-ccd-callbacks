@@ -12,10 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles.BulkAddSinglesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles.BulkAddSinglesValidator;
+
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -57,8 +60,8 @@ public class BulkAddSinglesController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var multipleDetails = multipleRequest.getCaseDetails();
-        var errors = bulkAddSinglesValidator.validate(multipleDetails, userToken);
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
+        List<String> errors = bulkAddSinglesValidator.validate(multipleDetails, userToken);
 
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
@@ -82,8 +85,8 @@ public class BulkAddSinglesController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var multipleDetails = multipleRequest.getCaseDetails();
-        var errors = bulkAddSinglesService.execute(multipleDetails, userToken);
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
+        List<String> errors = bulkAddSinglesService.execute(multipleDetails, userToken);
 
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }

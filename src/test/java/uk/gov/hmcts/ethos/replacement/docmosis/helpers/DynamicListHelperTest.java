@@ -69,7 +69,7 @@ class DynamicListHelperTest {
     void createDynamicListForRespondentRepresentative() {
         DynamicRespondentRepresentative.dynamicRespondentRepresentativeNames(caseDetails1.getCaseData());
         assertNotNull(caseDetails1.getCaseData().getRepCollection());
-        var dynamicValueType = new DynamicValueType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode("R: Antonio Vazquez");
         dynamicValueType.setLabel("Antonio Vazquez");
         assertEquals(dynamicValueType, caseDetails1.getCaseData().getRepCollection().get(0)
@@ -80,7 +80,7 @@ class DynamicListHelperTest {
     void populateDynamicRespondentRepList() {
         DynamicRespondentRepresentative.dynamicRespondentRepresentativeNames(caseDetails6.getCaseData());
         assertNotNull(caseDetails6.getCaseData().getRepCollection().get(0).getValue().getDynamicRespRepName());
-        var dynamicValueType = new DynamicValueType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode("R: Antonio Vazquez");
         dynamicValueType.setLabel("Antonio Vazquez");
         assertEquals(dynamicValueType, caseDetails6.getCaseData().getRepCollection().get(0)
@@ -109,14 +109,14 @@ class DynamicListHelperTest {
 
     @Test
     void dynamicValueTypeRespondent() {
-        var dynamicValueRespondent = new DynamicValueType();
+        DynamicValueType dynamicValueRespondent = new DynamicValueType();
         dynamicValueRespondent.setCode("R: Antonio Vazquez");
         dynamicValueRespondent.setLabel("Antonio Vazquez");
         List<DynamicValueType> listItems = DynamicListHelper.createDynamicRespondentName(
                 caseDetails1.getCaseData().getRespondentCollection());
         listItems.add(DynamicListHelper.getDynamicCodeLabel(
                 "C: " + caseDetails1.getCaseData().getClaimant(), caseDetails1.getCaseData().getClaimant()));
-        var dynamicValue = DynamicListHelper.getDynamicValueParty(
+        DynamicValueType dynamicValue = DynamicListHelper.getDynamicValueParty(
                 caseDetails1.getCaseData(), listItems, "Respondent");
         assertEquals(dynamicValue, dynamicValueRespondent);
     }
@@ -181,8 +181,8 @@ class DynamicListHelperTest {
     void createDynamicJurisdictionCodesTest() {
         List<DynamicValueType> listItems = DynamicListHelper
                 .createDynamicJurisdictionCodes(caseDetails1.getCaseData());
-        var totalJurisdictions = caseDetails1.getCaseData().getJurCodesCollection().size();
-        var dynamicValue = DynamicListHelper
+        int totalJurisdictions = caseDetails1.getCaseData().getJurCodesCollection().size();
+        DynamicValueType dynamicValue = DynamicListHelper
                 .getDynamicValue(caseDetails1.getCaseData().getJurCodesCollection()
                 .get(0).getValue().getJuridictionCodesList());
         assertEquals(dynamicValue, listItems.get(0));
@@ -199,16 +199,16 @@ class DynamicListHelperTest {
 
     @Test
     void dynamicJudgementsTest() {
-        var caseData = caseDetails1.getCaseData();
+        CaseData caseData = caseDetails1.getCaseData();
         DynamicJudgements.dynamicJudgements(caseData);
-        var totalHearings = caseData.getHearingCollection().size();
+        int totalHearings = caseData.getHearingCollection().size();
         JudgementType judgementType = caseData.getJudgementCollection().get(0).getValue();
         assertEquals(totalHearings, judgementType.getDynamicJudgementHearing().getListItems().size());
     }
 
     @Test
     void dynamicJudgementHearing_HearingDateFilled() {
-        var caseData = caseDetails1.getCaseData();
+        CaseData caseData = caseDetails1.getCaseData();
         caseData.getJudgementCollection().get(0).getValue().setJudgmentHearingDate("2019-11-01");
         DynamicJudgements.dynamicJudgements(caseData);
         dynamicValueType.setCode("1");
@@ -219,9 +219,9 @@ class DynamicListHelperTest {
 
     @Test
     void dynamicJudgementHearing_DynamicValue() {
-        var caseData = caseDetails1.getCaseData();
+        CaseData caseData = caseDetails1.getCaseData();
         List<DynamicValueType> hearingListItems = DynamicListHelper.createDynamicHearingList(caseData);
-        var listHearing = new DynamicFixedListType();
+        DynamicFixedListType listHearing = new DynamicFixedListType();
         listHearing.setListItems(hearingListItems);
         caseData.getJudgementCollection().get(0).getValue().setDynamicJudgementHearing(listHearing);
         dynamicValueType.setCode("1");
@@ -234,17 +234,17 @@ class DynamicListHelperTest {
 
     @Test
     void createDynamicJudgementHearing() {
-        var caseData = caseDetails2.getCaseData();
+        CaseData caseData = caseDetails2.getCaseData();
         DynamicJudgements.dynamicJudgements(caseData);
         assertNotNull(caseData.getJudgementCollection());
-        var totalHearings = caseData.getHearingCollection().size();
+        int totalHearings = caseData.getHearingCollection().size();
         JudgementType judgementType = caseData.getJudgementCollection().get(0).getValue();
         assertEquals(totalHearings, judgementType.getDynamicJudgementHearing().getListItems().size());
     }
 
     @Test
     void createDynamicJudgementHearingNoHearing() {
-        var caseData = caseDetails2.getCaseData();
+        CaseData caseData = caseDetails2.getCaseData();
         caseData.setHearingCollection(null);
         DynamicJudgements.dynamicJudgements(caseData);
         assertNotNull(caseData.getJudgementCollection());
@@ -254,17 +254,17 @@ class DynamicListHelperTest {
 
     @Test
     void dynamicJudgment_ifHearingDateIsInvalid() {
-        var casedata = caseDetails2.getCaseData();
-        var judgmentType = new JudgementType();
+        CaseData casedata = caseDetails2.getCaseData();
+        JudgementType judgmentType = new JudgementType();
         judgmentType.setJudgmentHearingDate("2022-02-02");
-        var judgmentTypeItem = new JudgementTypeItem();
+        JudgementTypeItem judgmentTypeItem = new JudgementTypeItem();
         judgmentTypeItem.setValue(judgmentType);
         casedata.setJudgementCollection(List.of(judgmentTypeItem));
 
         DynamicJudgements.dynamicJudgements(casedata);
 
         assertNotNull(casedata.getJudgementCollection());
-        var judgementType = casedata.getJudgementCollection().get(0).getValue();
+        JudgementType judgementType = casedata.getJudgementCollection().get(0).getValue();
         assertNull(judgementType.getJudgmentHearingDate());
     }
 
@@ -282,7 +282,7 @@ class DynamicListHelperTest {
                         true)
                 .build();
 
-        var hearingList = DynamicListHelper.createDynamicHearingList(caseData);
+        List<DynamicValueType> hearingList = DynamicListHelper.createDynamicHearingList(caseData);
 
         assertEquals(1, hearingList.size());
         assertEquals(hearingNumber, hearingList.get(0).getCode());
@@ -306,7 +306,7 @@ class DynamicListHelperTest {
                         true)
                 .build();
 
-        var hearingList = DynamicListHelper.createDynamicHearingList(caseData);
+        List<DynamicValueType> hearingList = DynamicListHelper.createDynamicHearingList(caseData);
 
         assertEquals(1, hearingList.size());
         assertEquals(hearingNumber, hearingList.get(0).getCode());
@@ -354,7 +354,7 @@ class DynamicListHelperTest {
                         true)
                 .build();
 
-        var hearingList = DynamicListHelper.createDynamicHearingList(caseData);
+        List<DynamicValueType> hearingList = DynamicListHelper.createDynamicHearingList(caseData);
 
         assertEquals(1, hearingList.size());
         assertEquals(hearingNumber, hearingList.get(0).getCode());

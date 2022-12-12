@@ -23,11 +23,11 @@ class ClerkRowHandlerTest {
     @ParameterizedTest
     @CsvSource({"TRIB_fl_Clerks, true", "fl_Judge, false"})
     void testAcceptRow(String cellValue, boolean expected) {
-        var row = mock(Row.class);
+        Row row = mock(Row.class);
         mockCell(row, 0, cellValue);
-        var courtWorkerRepository = mock(CourtWorkerRepository.class);
+        CourtWorkerRepository courtWorkerRepository = mock(CourtWorkerRepository.class);
 
-        var clerkRowHandler = new ClerkRowHandler(courtWorkerRepository);
+        ClerkRowHandler clerkRowHandler = new ClerkRowHandler(courtWorkerRepository);
         assertEquals(expected, clerkRowHandler.accept(row));
     }
 

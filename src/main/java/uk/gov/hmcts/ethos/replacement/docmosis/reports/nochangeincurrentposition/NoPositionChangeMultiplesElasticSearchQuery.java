@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition;
 
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
@@ -14,7 +15,7 @@ public final class NoPositionChangeMultiplesElasticSearchQuery {
     }
 
     static String create(List<String> multiplesList) {
-        var boolQueryBuilder = boolQuery()
+        BoolQueryBuilder boolQueryBuilder = boolQuery()
                 .filter(new TermsQueryBuilder("data.multipleReference.keyword", multiplesList));
 
         return new SearchSourceBuilder()

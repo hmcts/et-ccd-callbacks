@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedl
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -25,18 +26,18 @@ public class VenueFixedListSheetImporter implements FixedListSheetImporter {
     public void importSheet(TribunalOffice tribunalOffice, XSSFSheet sheet) {
         deleteExistingData(tribunalOffice);
 
-        var fixedListId = getVenuesFixedListId(tribunalOffice);
-        var venues = getVenues(tribunalOffice, fixedListId, sheet);
+        String fixedListId = getVenuesFixedListId(tribunalOffice);
+        List<Venue> venues = getVenues(tribunalOffice, fixedListId, sheet);
         venueRepository.saveAll(venues);
-        var rooms = getRooms(tribunalOffice, venues, sheet);
+        List<Room> rooms = getRooms(tribunalOffice, venues, sheet);
         roomRepository.saveAll(rooms);
     }
 
     private void deleteExistingData(TribunalOffice tribunalOffice) {
         log.info("Deleting venue data for " + tribunalOffice);
-        var venues = venueRepository.findByTribunalOffice(tribunalOffice);
-        for (var venue : venues) {
-            var rooms = roomRepository.findByVenueCode(venue.getCode());
+        List<Venue> venues = venueRepository.findByTribunalOffice(tribunalOffice);
+        for (Venue venue : venues) {
+            List<Room> rooms = roomRepository.findByVenueCode(venue.getCode());
             roomRepository.deleteAll(rooms);
         }
         venueRepository.deleteAll(venues);
@@ -54,8 +55,8 @@ public class VenueFixedListSheetImporter implements FixedListSheetImporter {
     }
 
     private List<Venue> getVenues(TribunalOffice tribunalOffice, String fixedListId, XSSFSheet sheet) {
-        var venueRowHandler = new VenueRowHandler(fixedListId);
-        for (var row : sheet) {
+        VenueRowHandler venueRowHandler = new VenueRowHandler(fixedListId);
+        for (Row row : sheet) {
             if (venueRowHandler.accept(row)) {
                 venueRowHandler.handle(tribunalOffice, row);
             }
@@ -65,8 +66,8 @@ public class VenueFixedListSheetImporter implements FixedListSheetImporter {
     }
 
     private List<Room> getRooms(TribunalOffice tribunalOffice, List<Venue> venues, XSSFSheet sheet) {
-        var roomRowHandler = new RoomRowHandler(tribunalOffice, fixedListMappings, venues);
-        for (var row : sheet) {
+        RoomRowHandler roomRowHandler = new RoomRowHandler(tribunalOffice, fixedListMappings, venues);
+        for (Row row : sheet) {
             if (roomRowHandler.accept(row)) {
                 roomRowHandler.handle(row);
             }

@@ -34,7 +34,7 @@ public class BulkCreationTask implements Runnable {
     @Override
     public void run() {
         log.info("Waiting: " + Thread.currentThread().getName());
-        var caseId = String.valueOf(submitEvent.getCaseId());
+        String caseId = String.valueOf(submitEvent.getCaseId());
         CCDRequest returnedRequest;
         log.info("Current state ---> " + submitEvent.getState());
         try {

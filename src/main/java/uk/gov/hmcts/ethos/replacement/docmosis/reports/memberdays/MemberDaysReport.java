@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -35,7 +36,7 @@ public class MemberDaysReport {
 
     public MemberDaysReportData runReport(ListingDetails listings, List<SubmitEvent> submitEventList) {
 
-        var memberDaysReportData = initiateReport(listings);
+        MemberDaysReportData memberDaysReportData = initiateReport(listings);
 
         if (!CollectionUtils.isEmpty(submitEventList)) {
             addReportDetails(memberDaysReportData, submitEventList, listings.getCaseData());
@@ -47,9 +48,10 @@ public class MemberDaysReport {
     }
 
     private MemberDaysReportData initiateReport(ListingDetails listingDetails) {
-        var reportData = new MemberDaysReportData();
-        var caseData = listingDetails.getCaseData();
-        var reportOffice = ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), caseData.getManagingOffice());
+        MemberDaysReportData reportData = new MemberDaysReportData();
+        ListingData caseData = listingDetails.getCaseData();
+        String reportOffice = ReportHelper.getReportOffice(listingDetails.getCaseTypeId(),
+            caseData.getManagingOffice());
 
         reportData.setOffice(reportOffice);
         reportData.setHearingDateType(caseData.getHearingDateType());
@@ -66,14 +68,14 @@ public class MemberDaysReport {
 
         List<MemberDaysReportDetail> interimReportDetails = new ArrayList<>();
 
-        for (var submitEvent : submitEvents) {
+        for (SubmitEvent submitEvent : submitEvents) {
             if (CollectionUtils.isEmpty(submitEvent.getCaseData().getHearingCollection())) {
                 continue;
             }
             addValidHearingsFromCurrentCase(submitEvent.getCaseData(), interimReportDetails, listingData);
         }
 
-        var sortedReportDetails = interimReportDetails.stream()
+        List<MemberDaysReportDetail> sortedReportDetails = interimReportDetails.stream()
             .sorted(MemberDaysReportDetail::comparedTo).collect(Collectors.toList());
         reportData.getReportDetails().clear();
         sortedReportDetails.forEach(d -> reportData.getReportDetails().add(d));
@@ -82,11 +84,11 @@ public class MemberDaysReport {
     private void addValidHearingsFromCurrentCase(CaseData caseData,
                                                  List<MemberDaysReportDetail> reportDetails,
                                                  ListingData listingData) {
-        var fullPanelHearings = caseData.getHearingCollection().stream()
+        List<HearingTypeItem> fullPanelHearings = caseData.getHearingCollection().stream()
             .filter(this::isFullPanelHearing).collect(Collectors.toList());
 
         if (!CollectionUtils.isEmpty(fullPanelHearings)) {
-            for (var hearing : fullPanelHearings) {
+            for (HearingTypeItem hearing : fullPanelHearings) {
                 extractValidHearingDates(hearing, reportDetails, listingData, caseData.getEthosCaseReference());
             }
         }
@@ -103,13 +105,13 @@ public class MemberDaysReport {
     private void extractValidHearingDates(HearingTypeItem hearing,
                                                  List<MemberDaysReportDetail> interimReportDetails,
                                                  ListingData listingData, String ethosCaseReference) {
-        var hearingDatesWithHeardStatus = hearing.getValue().getHearingDateCollection().stream()
+        List<DateListedTypeItem> hearingDatesWithHeardStatus = hearing.getValue().getHearingDateCollection().stream()
             .filter(this::isHeardHearingDate).collect(Collectors.toList());
 
-        for (var hearingDate : hearingDatesWithHeardStatus) {
-            var currentHearingDate = ReportHelper.getFormattedLocalDate(hearingDate.getValue().getListedDate());
+        for (DateListedTypeItem hearingDate : hearingDatesWithHeardStatus) {
+            String currentHearingDate = ReportHelper.getFormattedLocalDate(hearingDate.getValue().getListedDate());
             if (currentHearingDate != null && isValidHearingDate(currentHearingDate, listingData)) {
-                var reportDetail = new MemberDaysReportDetail();
+                MemberDaysReportDetail reportDetail = new MemberDaysReportDetail();
                 reportDetail.setSortingHearingDate(currentHearingDate);
                 reportDetail.setHearingDate(UtilHelper.formatCurrentDate(LocalDate.parse(currentHearingDate)));
                 if (hearing.getValue().hasHearingEmployeeMember()) {
@@ -142,22 +144,22 @@ public class MemberDaysReport {
     }
 
     private boolean isDateInRange(String listedDate, String dateFrom, String dateTo) {
-        var hearingListedDate = LocalDate.parse(listedDate);
-        var hearingDatesFrom = LocalDate.parse(dateFrom);
-        var hearingDatesTo = LocalDate.parse(dateTo);
+        LocalDate hearingListedDate = LocalDate.parse(listedDate);
+        LocalDate hearingDatesFrom = LocalDate.parse(dateFrom);
+        LocalDate hearingDatesTo = LocalDate.parse(dateTo);
 
         return  (hearingListedDate.isEqual(hearingDatesFrom) ||  hearingListedDate.isAfter(hearingDatesFrom))
             && (hearingListedDate.isEqual(hearingDatesTo) || hearingListedDate.isBefore(hearingDatesTo));
     }
 
     private void addReportSummary(MemberDaysReportData reportData) {
-        var groupedByDate = reportData.getReportDetails()
+        Map<String, List<MemberDaysReportDetail>> groupedByDate = reportData.getReportDetails()
                 .stream().distinct().collect(groupingBy(MemberDaysReportDetail::getSortingHearingDate));
-        var uniqueDatesList = groupedByDate.keySet().stream().sorted()
+        List<String> uniqueDatesList = groupedByDate.keySet().stream().sorted()
             .collect(Collectors.toList());
 
-        for (var listingDate : uniqueDatesList) {
-            var memberDaySummaryItem = new MemberDaySummaryItem();
+        for (String listingDate : uniqueDatesList) {
+            MemberDaySummaryItem memberDaySummaryItem = new MemberDaySummaryItem();
             memberDaySummaryItem.setHearingDate(UtilHelper.formatCurrentDate(LocalDate.parse(listingDate)));
             setDayCounts(groupedByDate.get(listingDate), memberDaySummaryItem);
             reportData.getMemberDaySummaryItems().add(memberDaySummaryItem);
@@ -165,12 +167,12 @@ public class MemberDaysReport {
     }
 
     private void setDayCounts(List<MemberDaysReportDetail> reportDetails, MemberDaySummaryItem summaryItem) {
-        var dayCounts = getFullMembersDayCount(reportDetails);
-        var fullDaysTotal = dayCounts.get(0);
+        List<Integer> dayCounts = getFullMembersDayCount(reportDetails);
+        Integer fullDaysTotal = dayCounts.get(0);
         summaryItem.setFullDays(String.valueOf(fullDaysTotal));
-        var halfDaysTotal = dayCounts.get(1);
+        Integer halfDaysTotal = dayCounts.get(1);
         summaryItem.setHalfDays(String.valueOf(halfDaysTotal));
-        var totalDays = (double)fullDaysTotal + (double)halfDaysTotal / 2.0;
+        double totalDays = (double)fullDaysTotal + (double)halfDaysTotal / 2.0;
         summaryItem.setTotalDays(String.valueOf(totalDays));
     }
 
@@ -178,7 +180,7 @@ public class MemberDaysReport {
         int fullDayTotal = 0;
         int halfDayTotal = 0;
         int fullDayHearingDuration = 3;
-        for (var detail: reportDetails) {
+        for (MemberDaysReportDetail detail: reportDetails) {
             if ((Integer.parseInt(detail.getHearingDuration()) / MINUTES) >= fullDayHearingDuration) {
                 fullDayTotal = fullDayTotal + getPanelMembersTotalDuration(detail);
             } else {
@@ -190,8 +192,8 @@ public class MemberDaysReport {
     }
 
     private int getPanelMembersTotalDuration(MemberDaysReportDetail currentDetail) {
-        var employeeValue = getPanelMemberValue(currentDetail.getEmployeeMember());
-        var employerValue = getPanelMemberValue(currentDetail.getEmployerMember());
+        int employeeValue = getPanelMemberValue(currentDetail.getEmployeeMember());
+        int employerValue = getPanelMemberValue(currentDetail.getEmployerMember());
         return employeeValue + employerValue;
     }
 
@@ -200,19 +202,19 @@ public class MemberDaysReport {
     }
 
     private void addReportSummaryHeader(MemberDaysReportData reportData) {
-        var summaryItems = reportData.getMemberDaySummaryItems();
+        List<MemberDaySummaryItem> summaryItems = reportData.getMemberDaySummaryItems();
 
-        var fullDaysTotal = String.valueOf(summaryItems.stream()
+        String fullDaysTotal = String.valueOf(summaryItems.stream()
                 .map(item -> Integer.parseInt(item.getFullDays()))
                 .reduce(0, Integer::sum));
         reportData.setFullDaysTotal(fullDaysTotal);
 
-        var halfDaysTotal = String.valueOf(summaryItems.stream()
+        String halfDaysTotal = String.valueOf(summaryItems.stream()
             .map(item -> Integer.parseInt(item.getHalfDays()))
             .reduce(0, Integer::sum));
         reportData.setHalfDaysTotal(halfDaysTotal);
 
-        var totalDays = String.valueOf(summaryItems.stream()
+        String totalDays = String.valueOf(summaryItems.stream()
             .map(item -> Double.parseDouble(item.getTotalDays()))
             .reduce(0.0, Double::sum));
         reportData.setTotalDays(totalDays);

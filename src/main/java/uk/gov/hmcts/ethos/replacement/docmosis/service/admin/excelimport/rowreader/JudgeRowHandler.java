@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -26,22 +27,22 @@ public class JudgeRowHandler implements RowHandler {
 
     @Override
     public boolean accept(Row row) {
-        var cell = row.getCell(0);
+        Cell cell = row.getCell(0);
         return cell != null && JUDGE_ROW_ID.equals(cell.getStringCellValue());
     }
 
     @Override
     public void handle(TribunalOffice tribunalOffice, Row row) {
-        var judge = rowToJudge(tribunalOffice, row);
+        Judge judge = rowToJudge(tribunalOffice, row);
         judgeRepository.save(judge);
     }
 
     private Judge rowToJudge(TribunalOffice tribunalOffice, Row row) {
-        var code = row.getCell(1).getStringCellValue();
-        var name = row.getCell(2).getStringCellValue();
-        var employmentStatus = convertImportStatusCode(row.getCell(4).getStringCellValue());
+        String code = row.getCell(1).getStringCellValue();
+        String name = row.getCell(2).getStringCellValue();
+        JudgeEmploymentStatus employmentStatus = convertImportStatusCode(row.getCell(4).getStringCellValue());
 
-        var judge =  new Judge();
+        Judge judge =  new Judge();
         judge.setCode(code);
         judge.setName(name);
         judge.setEmploymentStatus(employmentStatus);

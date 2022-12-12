@@ -108,8 +108,8 @@ public class BulkUpdateServiceTest {
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(respondentSumType);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(respondentSumTypeItem)));
-        RepresentedTypeR representedTypeR = new RepresentedTypeR();
-        representedTypeR.setNameOfRepresentative("Juan");
+        RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
+            .nameOfRepresentative("Juan").build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setValue(representedTypeR);
         caseData.setRepCollection(new ArrayList<>(Collections.singletonList(representedTypeRItem)));

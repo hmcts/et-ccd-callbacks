@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.StaffImportService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AdminDataBuilder;
@@ -46,13 +47,13 @@ class StaffImportControllerTest {
 
     @Test
     void testImportSuccess() throws Exception {
-        var documentBinaryUrl = "http://dm-store:8888/documents/12131212";
-        var ccdRequest = AdminDataBuilder
+        String documentBinaryUrl = "http://dm-store:8888/documents/12131212";
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withStaffImportFile(documentBinaryUrl)
                 .buildAsCCDRequest();
 
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         mockMvc.perform(post("/admin/staff/import")
@@ -68,13 +69,13 @@ class StaffImportControllerTest {
 
     @Test
     void testImportForbidden() throws Exception {
-        var documentBinaryUrl = "http://dm-store:8888/documents/12131212";
-        var ccdRequest = AdminDataBuilder
+        String documentBinaryUrl = "http://dm-store:8888/documents/12131212";
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withStaffImportFile(documentBinaryUrl)
                 .buildAsCCDRequest();
 
-        var token = "invalid-token";
+        String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/admin/staff/import")
@@ -97,13 +98,13 @@ class StaffImportControllerTest {
 
     @Test
     void testImportServerError() throws Exception {
-        var documentBinaryUrl = "http://dm-store:8888/documents/12131212";
-        var ccdRequest = AdminDataBuilder
+        String documentBinaryUrl = "http://dm-store:8888/documents/12131212";
+        CCDRequest ccdRequest = AdminDataBuilder
                 .builder()
                 .withStaffImportFile(documentBinaryUrl)
                 .buildAsCCDRequest();
 
-        var token = "some-token";
+        String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
         doThrow(new IOException()).when(staffImportService).importStaff(ccdRequest.getCaseDetails().getAdminData(),
                 token);

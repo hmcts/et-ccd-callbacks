@@ -8,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.ScotlandVenueSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.VenueSelectionService;
@@ -48,8 +49,8 @@ public class ListHearingControllerTest {
 
     @Test
     public void testInitialiseHearingEnglandWales() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID).build();
-        var userToken = "some-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID).build();
+        String userToken = "some-token";
         when(verifyTokenService.verifyTokenSignature(userToken)).thenReturn(true);
 
         mockMvc.perform(post("/initialiseHearings")
@@ -68,8 +69,8 @@ public class ListHearingControllerTest {
 
     @Test
     public void testInitialiseHearingScotland() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().withCaseTypeId(SCOTLAND_CASE_TYPE_ID).build();
-        var userToken = "some-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseTypeId(SCOTLAND_CASE_TYPE_ID).build();
+        String userToken = "some-token";
         when(verifyTokenService.verifyTokenSignature(userToken)).thenReturn(true);
 
         mockMvc.perform(post("/initialiseHearings")
@@ -89,8 +90,8 @@ public class ListHearingControllerTest {
 
     @Test
     public void testInitialiseHearingInvalidToken() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID).build();
-        var userToken = "invalid-token";
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID).build();
+        String userToken = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(userToken)).thenReturn(false);
 
         mockMvc.perform(post("/initialiseHearings")

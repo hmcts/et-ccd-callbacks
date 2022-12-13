@@ -50,6 +50,7 @@ public final class NocNotificationHelper {
         return isNullOrEmpty(organisationName) ? "Unknown": organisationName;
     }
 
+
     public static RespondentSumType getRespondent(CallbackRequest callbackRequest, CaseData caseData,
                                                   RespondentRepresentativeService respondentRepresentativeService) {
         String selectedRole =
@@ -64,13 +65,21 @@ public final class NocNotificationHelper {
         return respondentRepresentativeService.getRespondent(representedPerson.getValue().getRespRepName(), caseData);
     }
 
+
+    public static void addNameToPersonalisation(CaseData caseData, Map<String, String> personalisation) {
+        String firstName = caseData.getClaimantIndType().getClaimantFirstNames();
+        String lastName =  caseData.getClaimantIndType().getClaimantLastName();
+
+        personalisation.put("first_name", isNullOrEmpty(firstName) ? "Unknown" : firstName);
+        personalisation.put("last_name", isNullOrEmpty(firstName) ? "Unknown" : lastName);
+    }
+
     public static Map<String, String> buildClaimantPersonalisation(CaseData caseData, String party_name) {
         Map<String, String> personalisation = new HashMap<>();
 
         addCommonValues(caseData, personalisation);
         personalisation.put("party_name", party_name);
-        personalisation.put("first_name", caseData.getClaimantIndType().getClaimantFirstNames());
-        personalisation.put("last_name", caseData.getClaimantIndType().getClaimantLastName());
+        addNameToPersonalisation(caseData, personalisation);
 
         return personalisation;
     }
@@ -79,9 +88,10 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new HashMap<>();
 
         addCommonValues(caseData, personalisation);
-        personalisation.put("email_flag", caseData.getEthosCaseReference());
-        personalisation.put("first_name", caseData.getClaimantIndType().getClaimantFirstNames());
-        personalisation.put("last_name", caseData.getClaimantIndType().getClaimantLastName());
+        //TODO: Figure out correct values for personalisation field
+        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? "Unknown" :
+                caseData.getEthosCaseReference());
+
 
         return personalisation;
     }
@@ -90,9 +100,10 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new HashMap<>();
 
         addCommonValues(caseData, personalisation);
-        personalisation.put("email_flag", caseData.getEthosCaseReference());
-        personalisation.put("first_name", caseData.getClaimantIndType().getClaimantFirstNames());
-        personalisation.put("last_name", caseData.getClaimantIndType().getClaimantLastName());
+        //TODO: Figure out correct values for personalisation field
+        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? "Unknown" :
+                caseData.getEthosCaseReference());
+        addNameToPersonalisation(caseData, personalisation);
         personalisation.put("party_name", partyName);
 
         return personalisation;
@@ -102,7 +113,9 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new HashMap<>();
 
         addCommonValues(caseData, personalisation);
-        personalisation.put("email_flag", caseData.getEthosCaseReference());
+        //TODO: Figure out correct values for personalisation field
+        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? "Unknown" :
+                caseData.getEthosCaseReference());
         personalisation.put("respondent_name", respondent.getRespondentName());
 
         String nextHearingDate = HearingsHelper.getEarliestFutureHearingDate(caseData.getHearingCollection());
@@ -126,7 +139,8 @@ public final class NocNotificationHelper {
 
         addCommonValues(caseData, personalisation);
         //TODO: Figure out correct values for personalisation field
-        personalisation.put("email_flag", caseData.getEthosCaseReference());
+        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? "Unknown" :
+            caseData.getEthosCaseReference());
         personalisation.put("date", new SimpleDateFormat("dd MMM yyyy").format(LocalDate.now()));
         personalisation.put("tribunal", isNullOrEmpty(caseData.getTribunalAndOfficeLocation()) ? "Unknown" :
             caseData.getTribunalAndOfficeLocation());

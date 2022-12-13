@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -16,7 +17,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,11 +30,14 @@ import java.util.stream.Stream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
 @SuppressWarnings("squid:S5961")
@@ -84,10 +90,13 @@ class RespondentTellSomethingElseServiceTest {
         + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
 
+    private static final String RES_TSE_FILE_NAME = "resTse.pdf";
+
     @BeforeEach
     void setUp() {
         respondentTellSomethingElseService =
-                new RespondentTellSomethingElseService(emailService, userService, tornadoService, documentManagementService);
+                new RespondentTellSomethingElseService(emailService, userService, tornadoService,
+                        documentManagementService);
         ReflectionTestUtils.setField(respondentTellSomethingElseService, "emailTemplateId", TEMPLATE_ID);
 
         UserDetails userDetails = HelperTest.getUserDetails();
@@ -237,7 +246,7 @@ class RespondentTellSomethingElseServiceTest {
     @ParameterizedTest
     @MethodSource("sendAcknowledgeEmailAndGeneratePdf")
     void sendAcknowledgeEmailAndGeneratePdf(String selectedApplication, String rule92Selection, String expectedAnswer,
-                                        Boolean emailSent) {
+                                        Boolean emailSent) throws IOException {
         CaseData caseData = createCaseData(selectedApplication, rule92Selection);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
@@ -252,6 +261,15 @@ class RespondentTellSomethingElseServiceTest {
             verify(emailService).sendEmail(TEMPLATE_ID, LEGAL_REP_EMAIL, expectedPersonalisation);
         } else {
             verify(emailService, never()).sendEmail(TEMPLATE_ID, LEGAL_REP_EMAIL, expectedPersonalisation);
+        }
+
+        if (YES.equals(rule92Selection) && emailSent) {
+            verify(documentManagementService).addDocumentToDocumentField(any());
+            verify(tornadoService)
+                    .generateEventDocument(caseData, AUTH_TOKEN, caseDetails.getCaseTypeId(), RES_TSE_FILE_NAME);
+        } else {
+            verify(documentManagementService, never()).addDocumentToDocumentField(any());
+            verify(tornadoService, never()).generateEventDocument(any(), anyString(), anyString(), anyString());
         }
     }
 
@@ -283,6 +301,14 @@ class RespondentTellSomethingElseServiceTest {
 
             Arguments.of("Order a witness to attend to give evidence", null, null, false)
         );
+    }
+
+    @Test
+    void sendAcknowledgeEmailAndGeneratePdf_GenDocError_ReturnErrMsg() throws IOException {
+        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
+                anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
+        assertThrows(Exception.class, () ->
+                respondentTellSomethingElseService.sendAcknowledgeEmailAndGeneratePdf(new CaseDetails(), ""));
     }
 
     @ParameterizedTest

@@ -10,7 +10,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTyp
 
 import java.util.Optional;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 
 public class RespondentTellSomethingElseHelper {
@@ -34,11 +33,6 @@ public class RespondentTellSomethingElseHelper {
     private static final String SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM = "Strike out all or part of a claim";
     private static final String SELECTED_APP_VARY_OR_REVOKE_AN_ORDER = "Vary or revoke an order";
 
-    private static final String RULE92_YES_VALUE = "I confirm I want to copy";
-    private static final String RULE92_YES_DISPLAY = "Yes";
-    private static final String RULE92_NO_VALUE = "I do not want to copy";
-    private static final String RULE92_NO_DISPLAY = "No";
-
     private RespondentTellSomethingElseHelper() {
     }
 
@@ -49,15 +43,12 @@ public class RespondentTellSomethingElseHelper {
                 Optional.ofNullable(getSelectedAppAppType(caseData)).orElse(null);
 
         String documentName = getDocumentName(selectedAppData.getResTseDocument());
-        String printYesOrNo = getPrintYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
 
         RespondentTellSomethingElseData data = RespondentTellSomethingElseData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
                 .resTseSelectApplication(defaultIfEmpty(caseData.getResTseSelectApplication(), null))
                 .resTseDocument(documentName)
                 .resTseTextBox(defaultIfEmpty(selectedAppData.getSelectedTextBox(), null))
-                .resTseCopyToOtherPartyYesOrNo(printYesOrNo)
-                .resTseCopyToOtherPartyTextArea(defaultIfEmpty(caseData.getResTseCopyToOtherPartyTextArea(), null))
                 .build();
 
         RespondentTellSomethingElseDocument document = RespondentTellSomethingElseDocument.builder()
@@ -121,13 +112,4 @@ public class RespondentTellSomethingElseHelper {
         }
     }
 
-    private static String getPrintYesOrNo(String resTseCopyToOtherPartyYesOrNo) {
-        if (RULE92_YES_VALUE.equals(resTseCopyToOtherPartyYesOrNo)) {
-            return RULE92_YES_DISPLAY;
-        } else if (RULE92_NO_VALUE.equals(resTseCopyToOtherPartyYesOrNo)) {
-            return RULE92_NO_DISPLAY;
-        } else {
-            return null;
-        }
-    }
 }

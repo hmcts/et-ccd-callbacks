@@ -33,7 +33,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
- * REST controller for the Create Referral event pages, formats data appropriately for rendering on the front end.
+ *  REST controller for the Create Referral event pages, formats data appropriately for rendering on the front end.
  */
 @Slf4j
 @RequestMapping("/createReferral")

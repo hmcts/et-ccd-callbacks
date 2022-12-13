@@ -24,7 +24,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -195,10 +194,11 @@ class RespondentRepresentativeServiceTest {
         when(userService.getUserDetails(any())).thenReturn(mockUser);
         caseDetails.setCaseId("111-222-111-333");
         caseDetails.setCaseData(caseData);
-        when(userService.getUserDetailsById(any(),any())).thenReturn(mockUserDetails());
-        when(userService.getAccessToken(any(),any())).thenReturn("accessToken");
+        when(userService.getUserDetailsById(any(), any())).thenReturn(mockUserDetails());
+        when(userService.getAccessToken(any(), any())).thenReturn("accessToken");
 
-        when(auditEventService.getLatestAuditEventByName(any(),any(),any())).thenReturn(Optional.of(mockAuditEvent()));
+        when(auditEventService.getLatestAuditEventByName(any(), any(), any())).thenReturn(
+            Optional.of(mockAuditEvent()));
         respondentRepresentativeService.updateRepresentation(caseDetails);
 
         assertThat(
@@ -211,17 +211,17 @@ class RespondentRepresentativeServiceTest {
         assertThat(caseData.getRepCollection().get(1).getValue().getRepresentativeEmailAddress()).isEqualTo(USER_EMAIL);
     }
 
-    private AuditEvent mockAuditEvent(){
+    private AuditEvent mockAuditEvent() {
         return AuditEvent.builder()
-                .id("123")
-        .userId("54321")
-        .userFirstName("John")
-        .userLastName("Brown")
-        .createdDate(LocalDateTime.now())
-                .build();
+            .id("123")
+            .userId("54321")
+            .userFirstName("John")
+            .userLastName("Brown")
+            .createdDate(LocalDateTime.now())
+            .build();
     }
 
-    private UserDetails mockUserDetails(){
+    private UserDetails mockUserDetails() {
         UserDetails user = new UserDetails();
         user.setUid("54321");
         user.setEmail("test@hmcts.net");

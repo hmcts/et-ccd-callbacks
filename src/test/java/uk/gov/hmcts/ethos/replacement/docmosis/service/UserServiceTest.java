@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.OAuth2Configuration;
@@ -19,15 +18,10 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings({"PMD.SingularField"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class UserServiceTest {
-
     @InjectMocks
     private UserService userService;
-    @Mock
-    private IdamApi idamApi;
-
     private UserDetails userDetails;
 
     private TokenResponse tokenResponse;
@@ -37,7 +31,7 @@ public class UserServiceTest {
     public void setUp() {
         userDetails = HelperTest.getUserDetails();
         tokenResponse = HelperTest.getUserToken();
-        idamApi = new IdamApi() {
+        IdamApi idamApi = new IdamApi() {
             @Override
             public UserDetails retrieveUserDetails(String authorisation) {
                 return HelperTest.getUserDetails();
@@ -76,17 +70,17 @@ public class UserServiceTest {
 
     @Test
     public void shouldGetUserById() {
-        assertEquals(userDetails,userService.getUserDetailsById("TOKEN","id"));
+        assertEquals(userDetails, userService.getUserDetailsById("TOKEN", "id"));
     }
 
     @Test
     public void shouldGetAccessToken() {
-        assertEquals("abcefg",userService.getAccessToken("John@email.com","abc123"));
+        assertEquals("abcefg", userService.getAccessToken("John@email.com", "abc123"));
     }
 
     @Test
     public void shouldReturnAccessTokenResponse() {
-        assertEquals(tokenResponse,userService.getAccessTokenResponse("John@email.com","abc123"));
+        assertEquals(tokenResponse, userService.getAccessTokenResponse("John@email.com", "abc123"));
     }
 
     private void mockOauth2Configuration() {
@@ -96,5 +90,4 @@ public class UserServiceTest {
         when(oauth2Configuration.getRedirectUri()).thenReturn("http://localhost:8080/test");
         when(oauth2Configuration.getClientScope()).thenReturn("roles");
     }
-
 }

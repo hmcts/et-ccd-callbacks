@@ -21,7 +21,26 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.*;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseRetrievalForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ConciliationTrackService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DepositOrderValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.File;
@@ -172,6 +191,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     private DefaultValues defaultValues;
 
     private CCDRequest ccdRequest;
+
     private void doRequestSetUp() throws IOException, URISyntaxException {
         ObjectMapper objectMapper = new ObjectMapper();
         requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
@@ -185,7 +205,7 @@ public class CaseActionsForCaseWorkerControllerTest {
                 .getResource("/CaseCloseEvent_ValidHearingStatusCaseDetails.json")).toURI()));
 
         ccdRequest = objectMapper.readValue(new File(Objects.requireNonNull(getClass()
-                .getResource("/exampleV1.json")).toURI()),CCDRequest.class);
+                .getResource("/exampleV1.json")).toURI()), CCDRequest.class);
     }
 
     @Before

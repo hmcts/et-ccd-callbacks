@@ -16,8 +16,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -57,7 +57,7 @@ class CcdCaseAssignmentTest {
                 eq(CCDCallbackResponse.class))).thenReturn(ResponseEntity.ok(expected));
         when(serviceAuthTokenGenerator.generate()).thenReturn("token");
 
-        CCDCallbackResponse actual = ccdCaseAssignment.applyNoc(callbackRequest,"token");
+        CCDCallbackResponse actual = ccdCaseAssignment.applyNoc(callbackRequest, "token");
 
         assertThat(expected).isEqualTo(actual);
     }

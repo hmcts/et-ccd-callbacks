@@ -46,9 +46,10 @@ public class HelperTest {
         return userDetails;
     }
 
-    public static TokenResponse getUserToken(){
-        return new TokenResponse("abcefg","28799","pqrst","hijklmno","openid profile roles","Bearer");
+    public static TokenResponse getUserToken() {
+        return new TokenResponse("abcefg", "28799", "pqrst", "hijklmno", "openid profile roles", "Bearer");
     }
+
     private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource(jsonFileName)).toURI())));

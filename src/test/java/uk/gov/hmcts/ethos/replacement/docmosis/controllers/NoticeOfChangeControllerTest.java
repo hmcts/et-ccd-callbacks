@@ -28,7 +28,7 @@ import java.util.Objects;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -36,11 +36,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(NoticeOfChangeController.class)
-@ContextConfiguration(classes ={
-        NoticeOfChangeController.class,
-        RespondentRepresentativeService.class,
-        VerifyTokenService.class,
-        CcdCaseAssignment.class
+@ContextConfiguration(classes = {
+    NoticeOfChangeController.class,
+    RespondentRepresentativeService.class,
+    VerifyTokenService.class,
+    CcdCaseAssignment.class
 })
 class NoticeOfChangeControllerTest {
 
@@ -70,27 +70,28 @@ class NoticeOfChangeControllerTest {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         ObjectMapper objectMapper = new ObjectMapper();
         requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
-                .getResource("/exampleV1.json")).toURI()));
-        callbackRequest = objectMapper.treeToValue(requestContent,CallbackRequest.class);
+            .getResource("/exampleV1.json")).toURI()));
+        callbackRequest = objectMapper.treeToValue(requestContent, CallbackRequest.class);
     }
+
     @Test
     void handleAboutToSubmit() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
         when(respondentRepresentativeService
-                .updateRepresentation(any())).thenReturn(caseData);
-        when(ccdCaseAssignment.applyNoc(any(),any())).thenReturn(CCDCallbackResponse.builder()
-                .data(caseData)
-                .build());
+            .updateRepresentation(any())).thenReturn(caseData);
+        when(ccdCaseAssignment.applyNoc(any(), any())).thenReturn(CCDCallbackResponse.builder()
+            .data(caseData)
+            .build());
 
         mvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .content(requestContent.toString())
+                .header(AUTHORIZATION, AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
     }
 
     @Test
@@ -98,13 +99,13 @@ class NoticeOfChangeControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mvc.perform(post(UPDATE_RESPONDENTS_URL)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .content(requestContent.toString())
+                .header(AUTHORIZATION, AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
     }
 
     @Test
@@ -112,11 +113,11 @@ class NoticeOfChangeControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mvc.perform(post(SUBMITTED_URL)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.errors", nullValue()))
-                .andExpect(jsonPath("$.warnings", nullValue()));
+                .content(requestContent.toString())
+                .header(AUTHORIZATION, AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
     }
 }

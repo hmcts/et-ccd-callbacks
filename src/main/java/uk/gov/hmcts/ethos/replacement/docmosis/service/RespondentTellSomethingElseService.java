@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.OPEN;
 
 @Slf4j
 @Service
@@ -186,13 +189,16 @@ public class RespondentTellSomethingElseService {
 
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
 
-        respondentTseType.setDate(Helper.getCurrentDate());
+        respondentTseType.setDate(UtilHelper.formatCurrentDate(LocalDate.now()));
+        respondentTseType.setDue(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
+        respondentTseType.setResponsesCount("0");
         respondentTseType.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
         respondentTseType.setApplicant(APPLICANT_CLAIMANT);
         assignDataToFieldsFromApplicationType(respondentTseType, caseData);
         respondentTseType.setType(caseData.getResTseSelectApplication());
         respondentTseType.setCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
         respondentTseType.setCopyToOtherPartyText(caseData.getResTseCopyToOtherPartyTextArea());
+        respondentTseType.setStatus(OPEN);
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
         tseApplicationTypeItem.setId(UUID.randomUUID().toString());

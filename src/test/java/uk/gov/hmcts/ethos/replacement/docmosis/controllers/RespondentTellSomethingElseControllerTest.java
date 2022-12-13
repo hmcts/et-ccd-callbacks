@@ -102,7 +102,7 @@ class RespondentTellSomethingElseControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(resTseService).sendRespondentApplicationEmail(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(resTseService).sendAcknowledgeEmailAndGeneratePdf(ccdRequest.getCaseDetails(), AUTH_TOKEN);
     }
 
     @Test

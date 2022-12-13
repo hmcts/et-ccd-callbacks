@@ -100,7 +100,7 @@ public class RespondentTellSomethingElseController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
 
         // send Respondent confirmation Email
-        resTseService.sendRespondentApplicationEmail(caseDetails, userToken);
+        resTseService.sendAcknowledgeEmailAndGeneratePdf(caseDetails, userToken);
 
         // send Claimant copy of Application Email
 

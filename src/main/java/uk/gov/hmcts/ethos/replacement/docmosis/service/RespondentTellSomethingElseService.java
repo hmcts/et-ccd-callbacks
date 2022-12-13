@@ -119,8 +119,9 @@ public class RespondentTellSomethingElseService {
      * @param caseDetails in which the case details are extracted from
      * @param userToken jwt used for authorization
      */
-    public void sendRespondentApplicationEmail(CaseDetails caseDetails, String userToken) {
+    public void sendAcknowledgeEmailAndGeneratePdf(CaseDetails caseDetails, String userToken) {
         String legalRepEmail = userService.getUserDetails(userToken).getEmail();
+        UploadedDocumentType resTseCyaPdfDocument;
 
         CaseData caseData = caseDetails.getCaseData();
         String customisedText = null;
@@ -137,11 +138,13 @@ public class RespondentTellSomethingElseService {
                 case SELECTED_APP_ORDER_OTHER_PARTY:
                 case SELECTED_APP_CLAIMANT_NOT_COMPLIED:
                 case SELECTED_APP_RESTRICT_PUBLICITY:
+                    resTseCyaPdfDocument = generateCyaPdfDocument(caseData, userToken, caseDetails.getCaseTypeId());
                     customisedText = String.format(RULE92_ANSWERED_YES_GROUP_A, caseData.getResTseSelectApplication());
                     break;
                 case SELECTED_APP_CHANGE_PERSONAL_DETAILS:
                 case SELECTED_APP_CONSIDER_A_DECISION_AFRESH:
                 case SELECTED_APP_RECONSIDER_JUDGEMENT:
+                    resTseCyaPdfDocument = generateCyaPdfDocument(caseData, userToken, caseDetails.getCaseTypeId());
                     customisedText = String.format(RULE92_ANSWERED_YES_GROUP_B, caseData.getResTseSelectApplication());
                     break;
                 case SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
@@ -153,8 +156,6 @@ public class RespondentTellSomethingElseService {
         }
 
         if (customisedText != null) {
-            UploadedDocumentType resTseCyaPdfDocument =
-                    generateCyaPdfDocument(caseData, userToken, caseDetails.getCaseTypeId());
             emailService.sendEmail(
                 emailTemplateId,
                 legalRepEmail,

@@ -235,8 +235,8 @@ class RespondentTellSomethingElseServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("sendRespondentApplicationEmail")
-    void sendRespondentApplicationEmail(String selectedApplication, String rule92Selection, String expectedAnswer,
+    @MethodSource("sendAcknowledgeEmailAndGeneratePdf")
+    void sendAcknowledgeEmailAndGeneratePdf(String selectedApplication, String rule92Selection, String expectedAnswer,
                                         Boolean emailSent) {
         CaseData caseData = createCaseData(selectedApplication, rule92Selection);
         CaseDetails caseDetails = new CaseDetails();
@@ -246,7 +246,7 @@ class RespondentTellSomethingElseServiceTest {
         Map<String, String> expectedPersonalisation = createPersonalisation(caseData, expectedAnswer,
             selectedApplication);
 
-        respondentTellSomethingElseService.sendRespondentApplicationEmail(caseDetails, AUTH_TOKEN);
+        respondentTellSomethingElseService.sendAcknowledgeEmailAndGeneratePdf(caseDetails, AUTH_TOKEN);
 
         if (emailSent) {
             verify(emailService).sendEmail(TEMPLATE_ID, LEGAL_REP_EMAIL, expectedPersonalisation);
@@ -255,7 +255,7 @@ class RespondentTellSomethingElseServiceTest {
         }
     }
 
-    private static Stream<Arguments> sendRespondentApplicationEmail() {
+    private static Stream<Arguments> sendAcknowledgeEmailAndGeneratePdf() {
         return Stream.of(
             Arguments.of("Amend response", NO, rule92AnsweredNoText, true),
             Arguments.of("Strike out all or part of a claim", NO, rule92AnsweredNoText, true),

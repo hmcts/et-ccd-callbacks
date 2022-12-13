@@ -30,6 +30,7 @@ public class RespondentTellSomethingElseService {
     private final EmailService emailService;
     private final UserService userService;
     private final TornadoService tornadoService;
+    private final DocumentManagementService documentManagementService;
 
     @Value("${respondent.tse.template.id}")
     private String emailTemplateId;
@@ -152,6 +153,8 @@ public class RespondentTellSomethingElseService {
         }
 
         if (customisedText != null) {
+            UploadedDocumentType resTseCyaPdfDocument =
+                    generateCyaPdfDocument(caseData, userToken, caseDetails.getCaseTypeId());
             emailService.sendEmail(
                 emailTemplateId,
                 legalRepEmail,
@@ -160,6 +163,19 @@ public class RespondentTellSomethingElseService {
                     customisedText,
                     caseData.getResTseSelectApplication()
                 ));
+        }
+    }
+
+    private UploadedDocumentType generateCyaPdfDocument(CaseData caseData, String userToken, String caseTypeId) {
+        DocumentInfo documentInfo = generateDocument(caseData, userToken, caseTypeId);
+        return documentManagementService.addDocumentToDocumentField(documentInfo);
+    }
+
+    private DocumentInfo generateDocument(CaseData caseData, String userToken, String caseTypeId) {
+        try {
+            return tornadoService.generateEventDocument(caseData, userToken, caseTypeId, RES_TSE_FILE_NAME);
+        } catch (Exception e) {
+            throw new DocumentManagementException(String.format(DOC_GEN_ERROR, caseData.getEthosCaseReference()), e);
         }
     }
 
@@ -308,12 +324,4 @@ public class RespondentTellSomethingElseService {
         return caseData.getGenericTseApplicationCollection().size() + 1;
     }
 
-    public DocumentInfo generateDocument(CaseData caseData, String userToken, String caseTypeId) {
-        try {
-            return tornadoService.generateEventDocument(caseData, userToken, caseTypeId, RES_TSE_FILE_NAME);
-        } catch (Exception e) {
-            throw new DocumentManagementException(String.format(DOC_GEN_ERROR, caseData.getEthosCaseReference()), e);
-        }
-
-    }
 }

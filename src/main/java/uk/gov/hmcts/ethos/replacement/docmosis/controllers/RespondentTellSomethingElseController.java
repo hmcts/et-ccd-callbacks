@@ -100,10 +100,6 @@ public class RespondentTellSomethingElseController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
 
-        // generate CYA document
-        DocumentInfo documentInfo = resTseService.generateDocument(caseDetails.getCaseData(), userToken,
-                caseDetails.getCaseTypeId());
-
         // send Respondent confirmation Email
         resTseService.sendRespondentApplicationEmail(caseDetails, userToken);
 

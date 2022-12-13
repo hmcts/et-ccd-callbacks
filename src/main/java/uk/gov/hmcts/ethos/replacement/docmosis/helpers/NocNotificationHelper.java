@@ -5,18 +5,19 @@ import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Slf4j
 public final class NocNotificationHelper {
@@ -37,13 +38,16 @@ public final class NocNotificationHelper {
     }
 
     public static String getNewSolicitorEmail(CallbackRequest callbackRequest) {
+        CaseData oldCaseData = callbackRequest.getCaseDetailsBefore().getCaseData();
         CaseData newDetails = callbackRequest.getCaseDetails().getCaseData();
-        return newDetails.getRepCollection().get(getIndexOfSolicitor(newDetails)).getValue().getRepresentativeEmailAddress();
+        return newDetails.getRepCollection().get(getIndexOfSolicitor(oldCaseData)).getValue().getRepresentativeEmailAddress();
     }
 
     public static String getRespondentNameForNewSolicitor(CallbackRequest callbackRequest) {
         CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
-        return caseData.getChangeOrganisationRequestField().getOrganisationToAdd().getOrganisationName();
+        String organisationName =
+            caseData.getChangeOrganisationRequestField().getOrganisationToAdd().getOrganisationName();
+        return isNullOrEmpty(organisationName) ? "Unknown": organisationName;
     }
 
     public static RespondentSumType getRespondent(CallbackRequest callbackRequest, CaseData caseData,
@@ -55,7 +59,7 @@ public final class NocNotificationHelper {
         SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
 
         RepresentedTypeRItem representedPerson =
-            solicitorRole.getRepresentedPerson(caseData).orElseThrow();
+            solicitorRole.getRepresentationItem(caseData).orElseThrow();
 
         return respondentRepresentativeService.getRespondent(representedPerson.getValue().getRespRepName(), caseData);
     }
@@ -121,7 +125,11 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new HashMap<>();
 
         addCommonValues(caseData, personalisation);
-        personalisation.put("tribunal", caseData.getTribunalAndOfficeLocation());
+        //TODO: Figure out correct values for personalisation field
+        personalisation.put("email_flag", caseData.getEthosCaseReference());
+        personalisation.put("date", new SimpleDateFormat("dd MMM yyyy").format(LocalDate.now()));
+        personalisation.put("tribunal", isNullOrEmpty(caseData.getTribunalAndOfficeLocation()) ? "Unknown" :
+            caseData.getTribunalAndOfficeLocation());
 
         return personalisation;
     }

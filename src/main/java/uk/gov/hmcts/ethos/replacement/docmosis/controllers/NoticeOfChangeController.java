@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -34,6 +35,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 public class NoticeOfChangeController {
     private final VerifyTokenService verifyTokenService;
+    private final NocNotificationService nocNotificationService;
     private final RespondentRepresentativeService respondentRepresentativeService;
     private final CcdCaseAssignment ccdCaseAssignment;
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -95,8 +97,19 @@ public class NoticeOfChangeController {
         GenericCallbackResponse callbackResponse = new GenericCallbackResponse();
 
         if (APPLY_NOC_DECISION.equals(callbackRequest.getEventId())) {
-            //sendNotification(callback);
-            String caseReference = callbackRequest.getCaseDetails().getCaseData().getEthosCaseReference();
+            CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
+
+            //send emails here
+            try {
+                nocNotificationService.sendNotificationOfChangeEmails(callbackRequest,
+                    caseData);
+            } catch (Exception e){
+                log.error(e.getMessage());
+                log.error(e.getStackTrace().toString());
+            }
+
+
+            String caseReference = caseData.getEthosCaseReference();
 
             callbackResponse.setConfirmation_header(
                 "# You're now representing a client on case " + caseReference

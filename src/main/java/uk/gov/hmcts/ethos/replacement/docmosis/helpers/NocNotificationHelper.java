@@ -12,6 +12,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeS
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -21,6 +23,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Slf4j
 public final class NocNotificationHelper {
+
+    public static final String UNKNOWN = "Unknown";
 
     private NocNotificationHelper() {
         // Access through static methods
@@ -47,7 +51,7 @@ public final class NocNotificationHelper {
         CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
         String organisationName =
             caseData.getChangeOrganisationRequestField().getOrganisationToAdd().getOrganisationName();
-        return isNullOrEmpty(organisationName) ? "Unknown": organisationName;
+        return isNullOrEmpty(organisationName) ? UNKNOWN : organisationName;
     }
 
 
@@ -70,8 +74,8 @@ public final class NocNotificationHelper {
         String firstName = caseData.getClaimantIndType().getClaimantFirstNames();
         String lastName =  caseData.getClaimantIndType().getClaimantLastName();
 
-        personalisation.put("first_name", isNullOrEmpty(firstName) ? "Unknown" : firstName);
-        personalisation.put("last_name", isNullOrEmpty(firstName) ? "Unknown" : lastName);
+        personalisation.put("first_name", isNullOrEmpty(firstName) ? UNKNOWN : firstName);
+        personalisation.put("last_name", isNullOrEmpty(firstName) ? UNKNOWN : lastName);
     }
 
     public static Map<String, String> buildClaimantPersonalisation(CaseData caseData, String party_name) {
@@ -89,7 +93,8 @@ public final class NocNotificationHelper {
 
         addCommonValues(caseData, personalisation);
         //TODO: Figure out correct values for personalisation field
-        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? "Unknown" :
+        addNameToPersonalisation(caseData,personalisation);
+        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? UNKNOWN :
                 caseData.getEthosCaseReference());
 
 
@@ -101,7 +106,7 @@ public final class NocNotificationHelper {
 
         addCommonValues(caseData, personalisation);
         //TODO: Figure out correct values for personalisation field
-        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? "Unknown" :
+        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? UNKNOWN :
                 caseData.getEthosCaseReference());
         addNameToPersonalisation(caseData, personalisation);
         personalisation.put("party_name", partyName);
@@ -114,7 +119,7 @@ public final class NocNotificationHelper {
 
         addCommonValues(caseData, personalisation);
         //TODO: Figure out correct values for personalisation field
-        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? "Unknown" :
+        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? UNKNOWN :
                 caseData.getEthosCaseReference());
         personalisation.put("respondent_name", respondent.getRespondentName());
 
@@ -139,10 +144,11 @@ public final class NocNotificationHelper {
 
         addCommonValues(caseData, personalisation);
         //TODO: Figure out correct values for personalisation field
-        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? "Unknown" :
+        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? UNKNOWN :
             caseData.getEthosCaseReference());
-        personalisation.put("date", new SimpleDateFormat("dd MMM yyyy").format(LocalDate.now()));
-        personalisation.put("tribunal", isNullOrEmpty(caseData.getTribunalAndOfficeLocation()) ? "Unknown" :
+        personalisation.put("date",
+            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")));
+        personalisation.put("tribunal", isNullOrEmpty(caseData.getTribunalAndOfficeLocation()) ? UNKNOWN :
             caseData.getTribunalAndOfficeLocation());
 
         return personalisation;

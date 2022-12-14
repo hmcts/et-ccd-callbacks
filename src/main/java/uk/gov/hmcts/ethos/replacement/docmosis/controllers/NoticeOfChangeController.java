@@ -103,11 +103,9 @@ public class NoticeOfChangeController {
             try {
                 nocNotificationService.sendNotificationOfChangeEmails(callbackRequest,
                     caseData);
-            } catch (Exception e){
-                log.error(e.getMessage());
-                log.error(e.getStackTrace().toString());
+            } catch (Exception exception){
+                log.error(exception.getMessage(), exception);
             }
-
 
             String caseReference = caseData.getEthosCaseReference();
 

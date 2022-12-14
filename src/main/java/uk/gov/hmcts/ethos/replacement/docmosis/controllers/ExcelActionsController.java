@@ -88,7 +88,7 @@ public class ExcelActionsController {
 
     /**
      * Creates a multiple case. Generates and uploads excel file from retrieved ethos case reference collection
-     * and from multipleDetails
+     * and from multipleDetails.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -124,7 +124,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Updates the state of the multiple
+     * Updates the state of the multiple.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -160,7 +160,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Fixes case event for multiples
+     * Fixes case event for multiples.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -195,7 +195,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Updates the state of the multiple
+     * Updates the state of the multiple.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -230,7 +230,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Validates uploading excel file and updates multiple data case imported file
+     * Validates uploading excel file and updates multiple data case imported file.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -266,7 +266,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Updates multiple case data(bulk of cases) status to accepted
+     * Updates multiple case data(bulk of cases) status to accepted.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -302,7 +302,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Initialises multiple case data for batch update event
+     * Initialises multiple case data for batch update event.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -412,7 +412,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Validates multiple and submultiple datas
+     * Validates multiple and submultiple datas.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -448,7 +448,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Validates submultiple data
+     * Validates submultiple data.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -485,7 +485,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Manages an action create/amend/delete for sub multiples according to "subMultipleActionType" type
+     * Manages an action create/amend/delete for sub multiples according to "subMultipleActionType" type.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -521,7 +521,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Validates if provided single cases for multiple creation
+     * Validates if provided single cases for multiple creation.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -559,7 +559,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Validates multiple amend case id's
+     * Validates multiple amend case id's.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -597,7 +597,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Checks if case exists in the multiple
+     * Checks if case exists in the multiple.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -634,7 +634,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Validates the receipts date introduced by the user
+     * Validates the receipts date introduced by the user.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -706,7 +706,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Initialises multiple case data for close event
+     * Initialises multiple case data for close event.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest   Holds MultipleRequest case data
@@ -740,7 +740,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Validates cases before close event. Closes a multiple and sends updates to all singles to be closed
+     * Validates cases before close event. Closes a multiple and sends updates to all singles to be closed.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest   Holds MultipleRequest case data
@@ -783,7 +783,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Updates the multiple payload to fix issues on it(changing preAcceptDone value YES/NO)
+     * Updates the multiple payload to fix issues on it(changing preAcceptDone value YES/NO).
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest   Holds MultipleRequest case data
@@ -820,7 +820,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Resets the multiple state to "Open"
+     * Resets the multiple state to "Open".
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest   Holds MultipleRequest case data
@@ -859,7 +859,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Populates all office options for England/Wales transfer except the current one in dynamic lists
+     * Populates all office options for England/Wales transfer except the current one in dynamic lists.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest   Holds MultipleRequest case data
@@ -894,7 +894,7 @@ public class ExcelActionsController {
     }
 
     /**
-     * Transfers a multiple and all single cases to a different office
+     * Transfers a multiple and all single cases to a different office.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest   Holds MultipleRequest case data

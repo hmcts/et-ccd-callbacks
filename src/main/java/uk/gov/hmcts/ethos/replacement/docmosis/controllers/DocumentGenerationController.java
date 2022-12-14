@@ -90,7 +90,7 @@ public class DocumentGenerationController {
     }
 
     /**
-     * Populates the address labels list with the user selected addresses to be printed
+     * Populates the address labels list with the user selected addresses to be printed.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -123,7 +123,7 @@ public class DocumentGenerationController {
     }
 
     /**
-     * Validates the address labels and print attributes before printing
+     * Validates the address labels and print attributes before printing.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -158,7 +158,7 @@ public class DocumentGenerationController {
     }
 
     /**
-     * Generates a document and "significantItem" for response entity
+     * Generates a document and "significantItem" for response entity.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -216,7 +216,7 @@ public class DocumentGenerationController {
     }
 
     /**
-     * Generates a document confirmation
+     * Generates a document confirmation.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -253,7 +253,7 @@ public class DocumentGenerationController {
     }
 
     /**
-     * Populates a dynamic list for hearing numbers for letter
+     * Populates a dynamic list for hearing numbers for letter.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data

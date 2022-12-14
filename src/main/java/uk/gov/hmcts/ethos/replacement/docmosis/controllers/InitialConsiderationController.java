@@ -43,7 +43,7 @@ public class InitialConsiderationController {
 
     /**
      * Complete initial consideration callback which handle the submission of data from the event into CCD and
-     * completes the Initial Consideration flow
+     * completes the Initial Consideration flow.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds CCDRequest case data
@@ -103,7 +103,7 @@ public class InitialConsiderationController {
 
     /**
      * Start initial consideration callback which handle the submission of data from the event into CCD and
-     * starts the Initial Consideration flow
+     * starts the Initial Consideration flow.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds CCDRequest case data

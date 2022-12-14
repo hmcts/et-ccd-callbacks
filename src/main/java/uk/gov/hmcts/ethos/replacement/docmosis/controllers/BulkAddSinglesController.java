@@ -42,7 +42,7 @@ public class BulkAddSinglesController {
     }
 
     /**
-     * After validation add single case to multiple
+     * After validation add single case to multiple.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds the multiple data caseDetails
@@ -74,7 +74,7 @@ public class BulkAddSinglesController {
     }
 
     /**
-     * Adds one or more single cases to a multiple
+     * Adds one or more single cases to a multiple.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds the multiple data caseDetails

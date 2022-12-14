@@ -99,7 +99,7 @@ public class CaseActionsForCaseWorkerController {
     private final Et1VettingService et1VettingService;
 
     /**
-     * Case creation for a caseWorker
+     * Case creation for a caseWorker.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data for request
@@ -132,7 +132,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Case retrievement for a caseWorker
+     * Case retrievement for a caseWorker.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data for request
@@ -168,7 +168,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Retrieves caseWorker cases
+     * Retrieves caseWorker cases.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data for request
@@ -202,7 +202,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Updates case for a caseWorker
+     * Updates case for a caseWorker.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data for request
@@ -235,7 +235,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Updates claimant type of Claimant in a case(preDefaultValues)
+     * Updates claimant type of Claimant in a case(preDefaultValues).
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data for request
@@ -268,7 +268,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Updates submitted case with default values(from Tribunal contact details)
+     * Updates submitted case with default values(from Tribunal contact details).
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data for request
@@ -353,8 +353,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Amends case details for a single case, validates case state if it is "Accepted"
-     * and validates receipt date
+     * Amends case details for a single case, validates case state if it is "Accepted" and validates receipt date.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data for request
@@ -410,7 +409,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Amends the case claimant details for a single case
+     * Amends the case claimant details for a single case.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data for request
@@ -443,7 +442,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Amends the case claimant details for a single case
+     * Amends the case claimant details for a single case.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data for request
@@ -485,7 +484,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Amends respondent representative for a single case and validates respondent representatives names
+     * Amends respondent representative for a single case and validates respondent representatives names.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data for request
@@ -520,7 +519,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Populates the respondents names into a dynamic list
+     * Populates the respondents names into a dynamic list.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data for request
@@ -553,7 +552,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Updates hearing details for a single case
+     * Updates hearing details for a single case.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data for request
@@ -586,7 +585,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Updates postponed date when allocating a hearing
+     * Updates postponed date when allocating a hearing.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data for request
@@ -619,7 +618,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Changes restricted reporting for a single case, validates restricted reporting names
+     * Changes restricted reporting for a single case, validates restricted reporting names.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -653,7 +652,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Populates a dynamic list for restricted reporting
+     * Populates a dynamic list for restricted reporting.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -686,7 +685,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Amends hearing details for a single case
+     * Amends hearing details for a single case.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -719,7 +718,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Mid event amends hearing details for a single case
+     * Mid event amends hearing details for a single case.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -753,7 +752,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Amends the case state for a single case and validates jurisdictionOutcome
+     * Amends the case state for a single case and validates jurisdictionOutcome.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -792,7 +791,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Populates the mid dynamic fixed list with the respondent addresses
+     * Populates the mid dynamic fixed list with the respondent addresses.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -824,7 +823,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Validates jurisdiction entries for duplication prevention
+     * Validates jurisdiction entries for duplication prevention.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -859,7 +858,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Amends populates conciliation track for jurisdiction details for a single case
+     * Amends populates conciliation track for jurisdiction details for a single case.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -891,7 +890,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Populates the mid dynamic list with the respondent names
+     * Populates the mid dynamic list with the respondent names.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -924,7 +923,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Creates a new employer contract claim. Sets claimant and respondent default details
+     * Creates a new employer contract claim. Sets claimant and respondent default details.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -959,7 +958,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Sends an update to the original case with the new employer contract claim reference created to link it
+     * Sends an update to the original case with the new employer contract claim reference created to link it.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -992,7 +991,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Validates the multiple and sub multiple in the single case when moving to a multiple
+     * Validates the multiple and sub multiple in the single case when moving to a multiple.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -1031,7 +1030,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Validates the hearing number and the hearing days to prevent their creation
+     * Validates the hearing number and the hearing days to prevent their creation.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -1063,7 +1062,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Populates BF actions in dynamic lists
+     * Populates BF actions in dynamic lists.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -1096,7 +1095,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Sets and update date(current date) on BF actions entered by user
+     * Sets and update date(current date) on BF actions entered by user.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -1129,7 +1128,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Populates the dynamic lists for judgements
+     * Populates the dynamic lists for judgements.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -1161,7 +1160,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Validates judgements and populates the dynamic lists for judgements
+     * Validates judgements and populates the dynamic lists for judgements.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -1193,7 +1192,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Validates jurisdiction codes within judgement collection
+     * Validates jurisdiction codes within judgement collection.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -1226,7 +1225,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Validates deposit amount and deposit refunded
+     * Validates deposit amount and deposit refunded.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -1259,7 +1258,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Populates the respondents names into a dynamic list
+     * Populates the respondents names into a dynamic list.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -1291,7 +1290,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Initialises file location and responsible clerk, updates the position type to "Case closed"
+     * Initialises file location and responsible clerk, updates the position type to "Case closed".
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -1341,7 +1340,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Amends case details in Fix Case API
+     * Amends case details in Fix Case API.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -1373,7 +1372,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     /**
-     * Checks if the case has a position type of "Case Closed" when the case is reinstating
+     * Checks if the case has a position type of "Case Closed" when the case is reinstating.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data

@@ -89,7 +89,7 @@ public class PersistentQueueActionsController {
     }
 
     /**
-     * Accepts bulk cases
+     * Accepts bulk cases.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds BulkRequest case data
@@ -128,7 +128,7 @@ public class PersistentQueueActionsController {
     }
 
     /**
-     * Updates a bulk case and a multiple collection
+     * Updates a bulk case and a multiple collection.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds BulkRequest case data

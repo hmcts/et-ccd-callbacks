@@ -60,7 +60,7 @@ public class BulkActionsController {
 
     /**
      * This service Gets userToken as a parameter for security validation and bulkRequest data for retrieving
-     * cases by ethos case reference and bulk case creation
+     * cases by ethos case reference and bulk case creation.
      * It is used to retrieve submit events by ethos case reference and build bulk case
      *
      * @param  userToken        Used for authorisation
@@ -101,7 +101,7 @@ public class BulkActionsController {
 
     /**
      * This service Gets userToken as a parameter for security validation and bulkRequest data for retrieving
-     * cases by ethos case reference(using Elastic search client) and bulk case creation
+     * cases by ethos case reference(using Elastic search client) and bulk case creation.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -188,7 +188,7 @@ public class BulkActionsController {
 
     /**
      * This service Gets userToken as a parameter for security validation and bulkRequest data for updating cases in
-     * a bulk case, also updates cases in searchCollection
+     * a bulk case, also updates cases in searchCollection.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -227,7 +227,7 @@ public class BulkActionsController {
 
     /**
      * This service Gets userToken as a parameter for security validation and bulkRequest data for updating cases in
-     * a bulk case, also updates multiple collection
+     * a bulk case, also updates multiple collection.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -264,7 +264,7 @@ public class BulkActionsController {
 
     /**
      * This service Gets userToken as a parameter for security validation and bulkRequest data for generating a bulk
-     * of letters
+     * of letters.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -303,7 +303,7 @@ public class BulkActionsController {
 
     /**
      * This service Gets userToken as a parameter for security validation and bulkRequest data for generating a bulk
-     * letter confirmation
+     * letter confirmation.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -338,7 +338,7 @@ public class BulkActionsController {
 
     /**
      * This service Gets userToken as a parameter for security validation and bulkRequest data for searching cases
-     * in a bulk case, also searches for cases in multipleCollection by provided parameters/fields
+     * in a bulk case, also searches for cases in multipleCollection by provided parameters/fields.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -376,7 +376,7 @@ public class BulkActionsController {
 
     /**
      * This service Gets userToken as a parameter for security validation and bulkRequest data for searching cases
-     * in a bulk case, also searches for cases in multipleCollection by provided parameters/fields
+     * in a bulk case, also searches for cases in multipleCollection by provided parameters/fields.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -412,7 +412,7 @@ public class BulkActionsController {
 
     /**
      * This service Gets userToken as a parameter for security validation and bulkRequest data for sub multiple
-     * collection filter creation to search for cases in multipleTypeItems list(mid event)
+     * collection filter creation to search for cases in multipleTypeItems list(mid event).
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -448,7 +448,7 @@ public class BulkActionsController {
     }
 
     /**
-     * Creates a sub multiple filter for case search in multipleColletion
+     * Creates a sub multiple filter for case search in multipleColletion.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -484,7 +484,7 @@ public class BulkActionsController {
     }
 
     /**
-     * Populates a dynamic list with all sub multiple names
+     * Populates a dynamic list with all sub multiple names.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -520,7 +520,7 @@ public class BulkActionsController {
     }
 
     /**
-     * Populates a dynamic list with all sub multiple names and "Select all" as a default value
+     * Populates a dynamic list with all sub multiple names and "Select all" as a default value.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -556,7 +556,7 @@ public class BulkActionsController {
     }
 
     /**
-     * Populates a dynamic list with all sub multiple names, jurcodes and "None" as a default value
+     * Populates a dynamic list with all sub multiple names, jurcodes and "None" as a default value.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -592,7 +592,7 @@ public class BulkActionsController {
     }
 
     /**
-     * Populates sub multiple name and search collection filter
+     * Populates sub multiple name and search collection filter.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -627,7 +627,7 @@ public class BulkActionsController {
     }
 
     /**
-     * Updates sub multiple collection name and the list of cases
+     * Updates sub multiple collection name and the list of cases.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -662,7 +662,7 @@ public class BulkActionsController {
     }
 
     /**
-     * Removes sub multiple references from multiple collection
+     * Removes sub multiple references from multiple collection.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -697,7 +697,7 @@ public class BulkActionsController {
     }
 
     /**
-     * Generates a multiple schedule from bulkRequest(using "Tornado" service)
+     * Generates a multiple schedule from bulkRequest(using "Tornado" service).
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -742,7 +742,7 @@ public class BulkActionsController {
     }
 
     /**
-     * Generates a multiple schedule confirmation from bulkRequest
+     * Generates a multiple schedule confirmation from bulkRequest.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData
@@ -777,7 +777,7 @@ public class BulkActionsController {
 
     /**
      * Retrieves bulk cases(for preAcceptRequest), updates multiple type collection with "Accepted" state,
-     * moving cases to the "Accepted" state
+     * moving cases to the "Accepted" state.
      *
      * @param  userToken        Used for authorisation
      * @param  bulkRequest      Holds the bulkRequest and bulk caseData

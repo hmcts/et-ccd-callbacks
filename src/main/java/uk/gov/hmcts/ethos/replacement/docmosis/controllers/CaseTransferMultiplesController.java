@@ -51,7 +51,7 @@ public class CaseTransferMultiplesController {
 
     /**
      * Initialises case from multipleData for transfer to England/Wales(populates "officeCT" with selected office
-     * from "managingOffice")
+     * from "managingOffice").
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleData case data
@@ -85,7 +85,7 @@ public class CaseTransferMultiplesController {
     }
 
     /**
-     * Initialises case from multipleData for transfer to Scotland(populates with default selected office in "Glasgow")
+     * Initialises case from multipleData for transfer to Scotland(populates with default selected office in "Glasgow").
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleData case data
@@ -119,7 +119,7 @@ public class CaseTransferMultiplesController {
     }
 
     /**
-     * Transfers a multiple and its cases to another office within the same country
+     * Transfers a multiple and its cases to another office within the same country.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleData case data
@@ -153,7 +153,7 @@ public class CaseTransferMultiplesController {
     }
 
     /**
-     * Transfers a multiple and its cases to another office in a different country
+     * Transfers a multiple and its cases to another office in a different country.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleData case data

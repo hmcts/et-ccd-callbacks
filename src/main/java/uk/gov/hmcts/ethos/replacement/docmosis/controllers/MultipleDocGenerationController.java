@@ -49,7 +49,7 @@ public class MultipleDocGenerationController {
     private final VerifyTokenService verifyTokenService;
 
     /**
-     * Validate limit of cases and generates schedules
+     * Validate limit of cases and generates schedules.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -85,7 +85,7 @@ public class MultipleDocGenerationController {
     }
 
     /**
-     * Generates a letter for the first case in the filtered collection
+     * Generates a letter for the first case in the filtered collection.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -122,7 +122,7 @@ public class MultipleDocGenerationController {
     }
 
     /**
-     * Generate a confirmation with a link to the  generated document
+     * Generate a confirmation with a link to the  generated document.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -197,7 +197,7 @@ public class MultipleDocGenerationController {
     }
 
     /**
-     * Validates the address labels collection and print attributes before printing
+     * Validates the address labels collection and print attributes before printing.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data
@@ -231,7 +231,7 @@ public class MultipleDocGenerationController {
     }
 
     /**
-     * Populate flags in dynamic lists with all flags values are in the excel
+     * Populate flags in dynamic lists with all flags values are in the excel.
      *
      * @param  userToken        Used for authorisation
      * @param  multipleRequest  Holds MultipleRequest case data

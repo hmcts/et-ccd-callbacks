@@ -54,7 +54,7 @@ public class CaseTransferController {
     }
 
     /**
-     * Initialises case for transfer to Scotland(populates with default selected office in "Glasgow")
+     * Initialises case for transfer to Scotland(populates with default selected office in "Glasgow").
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -87,7 +87,7 @@ public class CaseTransferController {
     }
 
     /**
-     * Initialises case for transfer to England/Wales(populates "officeCT" with selected office from "managingOffice")
+     * Initialises case for transfer to England/Wales(populates "officeCT" with selected office from "managingOffice").
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -121,7 +121,7 @@ public class CaseTransferController {
     }
 
     /**
-     * Transfers case to another office within the same country
+     * Transfers case to another office within the same country.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -154,7 +154,7 @@ public class CaseTransferController {
     }
 
     /**
-     * Transfers ECC linked case to another office within the same country
+     * Transfers ECC linked case to another office within the same country.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -189,7 +189,7 @@ public class CaseTransferController {
     }
 
     /**
-     * Transfer case to another office in a different country
+     * Transfer case to another office in a different country.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data
@@ -222,7 +222,7 @@ public class CaseTransferController {
     }
 
     /**
-     * Validates cases and transfers them to ECM
+     * Validates cases and transfers them to ECM.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds case data

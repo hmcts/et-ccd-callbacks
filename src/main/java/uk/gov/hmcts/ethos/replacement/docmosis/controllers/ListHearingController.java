@@ -40,7 +40,7 @@ public class ListHearingController {
     }
 
     /**
-     * Data initialisation for listing hearings
+     * Data initialisation for listing hearings.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds CCDRequest case data

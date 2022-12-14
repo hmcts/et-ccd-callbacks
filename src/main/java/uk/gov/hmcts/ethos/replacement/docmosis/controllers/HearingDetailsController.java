@@ -41,7 +41,7 @@ public class HearingDetailsController {
     }
 
     /**
-     * Initialises hearings selection list
+     * Initialises hearings selection list.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds CCDRequest case data
@@ -67,8 +67,9 @@ public class HearingDetailsController {
 
         return getCallbackRespEntityNoErrors(caseData);
     }
+
     /**
-     * Updates case data when a listing has been selected
+     * Updates case data when a listing has been selected.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds CCDRequest case data
@@ -96,7 +97,7 @@ public class HearingDetailsController {
     }
 
     /**
-     * Validates the hearing number and the hearing days to prevent their creation
+     * Validates the hearing number and the hearing days to prevent their creation.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds CCDRequest case data
@@ -123,7 +124,7 @@ public class HearingDetailsController {
     }
 
     /**
-     * Validates the hearing number and the hearing days to prevent their creation
+     * Validates the hearing number and the hearing days to prevent their creation.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds CCDRequest case data

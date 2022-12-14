@@ -65,7 +65,7 @@ public class ListingGenerationController {
     private final GenerateReportService generateReportService;
 
     /**
-     * Handles logic related to the creation of listing cases
+     * Handles logic related to the creation of listing cases.
      *
      * @param  userToken        Used for authorisation
      * @param  listingRequest   Holds ListingRequest case data
@@ -100,7 +100,7 @@ public class ListingGenerationController {
 
     /**
      * Validates listings. Searches hearings by venue and date in a specific case. Updates print hearing collection
-     * and updates it's listing collection
+     * and updates it's listing collection.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds CCDRequest case data
@@ -183,7 +183,7 @@ public class ListingGenerationController {
     }
 
     /**
-     * Generates a listing document
+     * Generates a listing document.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds CCDRequest case data
@@ -231,7 +231,7 @@ public class ListingGenerationController {
     }
 
     /**
-     * Generates a listing document confirmation
+     * Generates a listing document confirmation.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds CCDRequest case data
@@ -265,7 +265,7 @@ public class ListingGenerationController {
     }
 
     /**
-     * Generates a listing document confirmation
+     * Generates a listing document confirmation.
      *
      * @param  userToken        Used for authorisation
      * @param  listingRequest   Holds ListingRequest case data
@@ -296,7 +296,7 @@ public class ListingGenerationController {
     }
 
     /**
-     * Generates data for selected report
+     * Generates data for selected report.
      *
      * @param  userToken        Used for authorisation
      * @param  listingRequest   Holds ListingRequest case data
@@ -382,7 +382,7 @@ public class ListingGenerationController {
     }
 
     /**
-     * Generates hearing document
+     * Generates hearing document.
      *
      * @param  userToken        Used for authorisation
      * @param  listingRequest   Holds ListingRequest case data
@@ -433,7 +433,7 @@ public class ListingGenerationController {
     }
 
     /**
-     * Generates hearing document confirmation
+     * Generates hearing document confirmation.
      *
      * @param  userToken        Used for authorisation
      * @param  listingRequest   Holds ListingRequest case data
@@ -468,7 +468,7 @@ public class ListingGenerationController {
     }
 
     /**
-     * Initialises case data for print hearing lists event
+     * Initialises case data for print hearing lists event.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds ListingRequest case data
@@ -498,7 +498,7 @@ public class ListingGenerationController {
     }
 
     /**
-     * Initialises case data for print hearing lists event
+     * Initialises case data for print hearing lists event.
      *
      * @param  userToken        Used for authorisation
      * @param  listingRequest   Holds ListingRequest case data

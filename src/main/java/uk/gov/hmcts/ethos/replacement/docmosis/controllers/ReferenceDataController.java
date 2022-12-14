@@ -34,7 +34,7 @@ public class ReferenceDataController {
     private final ReferenceService referenceService;
 
     /**
-     * Populates the hearing venue dynamic list with reference data
+     * Populates the hearing venue dynamic list with reference data.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds CCDRequest case data
@@ -66,7 +66,7 @@ public class ReferenceDataController {
     }
 
     /**
-     * Populates the date listed dynamic lists with reference data
+     * Populates the date listed dynamic lists with reference data.
      *
      * @param  userToken        Used for authorisation
      * @param  ccdRequest       Holds CCDRequest case data

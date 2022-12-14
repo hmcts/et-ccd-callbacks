@@ -48,6 +48,13 @@ public class MultipleDocGenerationController {
     private final MultipleDocGenerationService multipleDocGenerationService;
     private final VerifyTokenService verifyTokenService;
 
+    /**
+     * Validate limit of cases and generates schedules
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/printSchedule", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "generate a multiple schedule.")
     @ApiResponses(value = {
@@ -77,6 +84,13 @@ public class MultipleDocGenerationController {
         return getMultipleCallbackRespEntityDocInfo(errors, multipleDetails, documentInfo);
     }
 
+    /**
+     * Generates a letter for the first case in the filtered collection
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/printLetter", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "generate a letter for the first case in the filtered collection.")
     @ApiResponses(value = {
@@ -107,6 +121,13 @@ public class MultipleDocGenerationController {
         return getMultipleCallbackRespEntityDocInfo(errors, multipleDetails, documentInfo);
     }
 
+    /**
+     * Generate a confirmation with a link to the  generated document
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/printDocumentConfirmation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "generate a confirmation with a link to the document generated.")
     @ApiResponses(value = {
@@ -136,6 +157,14 @@ public class MultipleDocGenerationController {
                 .build());
     }
 
+    /**
+     * Populates the address labels list with the user selected addresses to be printed. Validates number of the
+     * selected labels.
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/midSelectedAddressLabelsMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the address labels list with the user selected addresses to be printed.")
     @ApiResponses(value = {
@@ -167,6 +196,13 @@ public class MultipleDocGenerationController {
         return getMultipleCallbackRespEntity(errors, multipleRequest.getCaseDetails());
     }
 
+    /**
+     * Validates the address labels collection and print attributes before printing
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/midValidateAddressLabelsMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates the address labels collection and print attributes before printing.")
     @ApiResponses(value = {
@@ -194,6 +230,13 @@ public class MultipleDocGenerationController {
         return getMultipleCallbackRespEntity(errors, multipleRequest.getCaseDetails());
     }
 
+    /**
+     * Populate flags in dynamic lists with all flags values are in the excel
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/dynamicMultipleLetters", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populate flags in dynamic lists with all flags values are in the excel.")
     @ApiResponses(value = {

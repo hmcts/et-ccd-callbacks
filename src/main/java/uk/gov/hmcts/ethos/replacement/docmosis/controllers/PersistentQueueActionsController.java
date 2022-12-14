@@ -44,6 +44,13 @@ public class PersistentQueueActionsController {
     private final BulkSearchService bulkSearchService;
     private final VerifyTokenService verifyTokenService;
 
+    /**
+     * Retrieves bulk case payload and and updates bulkRequestPayload. Displays the bulk info.
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds BulkRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/afterSubmittedBulkPQ", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "display the bulk info.")
     @ApiResponses(value = {
@@ -81,6 +88,13 @@ public class PersistentQueueActionsController {
                 .build());
     }
 
+    /**
+     * Accepts bulk cases
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds BulkRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/preAcceptBulkPQ", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "accept a bulk of cases.")
     @ApiResponses(value = {
@@ -113,6 +127,13 @@ public class PersistentQueueActionsController {
                 .build());
     }
 
+    /**
+     * Updates a bulk case and a multiple collection
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds BulkRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/updateBulkCasePQ", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update a bulk case. Update the multiple collection.")
     @ApiResponses(value = {

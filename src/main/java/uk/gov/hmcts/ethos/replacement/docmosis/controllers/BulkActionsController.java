@@ -58,6 +58,15 @@ public class BulkActionsController {
     private final SubMultipleService subMultipleService;
     private final VerifyTokenService verifyTokenService;
 
+    /**
+     * This service Gets userToken as a parameter for security validation and bulkRequest data for retrieving
+     * cases by ethos case reference and bulk case creation
+     * It is used to retrieve submit events by ethos case reference and build bulk case
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/createBulk", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "creates a bulk case. Retrieves cases by ethos case reference.")
     @ApiResponses(value = {
@@ -90,6 +99,14 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation and bulkRequest data for retrieving
+     * cases by ethos case reference(using Elastic search client) and bulk case creation
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/createBulkES", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "creates a bulk case. Retrieves cases by ethos case reference.")
     @ApiResponses(value = {
@@ -127,6 +144,14 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation and bulkRequest data for retrieving
+     * cases by ethos case reference(using Elastic search client). Displays retrieved bulk info data.
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/afterSubmittedBulk", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "display the bulk info.")
     @ApiResponses(value = {
@@ -161,6 +186,14 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation and bulkRequest data for updating cases in
+     * a bulk case, also updates cases in searchCollection
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/updateBulk", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "updates cases in a bulk case. Update cases in searchCollection by given fields.")
     @ApiResponses(value = {
@@ -192,6 +225,14 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation and bulkRequest data for updating cases in
+     * a bulk case, also updates multiple collection
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/updateBulkCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update a bulk case. Update the multiple collection.")
     @ApiResponses(value = {
@@ -221,6 +262,14 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation and bulkRequest data for generating a bulk
+     * of letters
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/generateBulkLetter", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "generate a bulk of letters.")
     @ApiResponses(value = {
@@ -252,6 +301,14 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation and bulkRequest data for generating a bulk
+     * letter confirmation
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/generateBulkLetterConfirmation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "generate a bulk letter confirmation.")
     @ApiResponses(value = {
@@ -279,6 +336,14 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation and bulkRequest data for searching cases
+     * in a bulk case, also searches for cases in multipleCollection by provided parameters/fields
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/midSearchBulk", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "searches cases in a bulk case. Look for cases in multipleCollection by fields. "
             + "Mid event callback.")
@@ -309,6 +374,14 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation and bulkRequest data for searching cases
+     * in a bulk case, also searches for cases in multipleCollection by provided parameters/fields
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/searchBulk", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "searches cases in a bulk case. Look for cases in multipleCollection by fields.")
     @ApiResponses(value = {
@@ -337,6 +410,14 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation and bulkRequest data for sub multiple
+     * collection filter creation to search for cases in multipleTypeItems list(mid event)
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/midCreateSubMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a sub multiple looking for cases in multipleCollection. Mid event callback.")
     @ApiResponses(value = {
@@ -366,6 +447,13 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * Creates a sub multiple filter for case search in multipleColletion
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/createSubMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a sub multiple looking for cases in multipleCollection.")
     @ApiResponses(value = {
@@ -395,6 +483,13 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * Populates a dynamic list with all sub multiple names
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/subMultipleDynamicList", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populate a dynamic list with all sub multiple names.")
     @ApiResponses(value = {
@@ -424,6 +519,13 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * Populates a dynamic list with all sub multiple names and "Select all" as a default value
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/filterDefaultedAllDynamicList", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populate a dynamic list with all sub multiple names and Select All as default.")
     @ApiResponses(value = {
@@ -453,6 +555,13 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * Populates a dynamic list with all sub multiple names, jurcodes and "None" as a default value
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/filterDefaultedNoneDynamicList", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populate a dynamic list with all sub multiple names and jurCodes and None as default.")
     @ApiResponses(value = {
@@ -482,6 +591,13 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * Populates sub multiple name and search collection filter
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/midUpdateSubMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates Sub multiple name and search collection for edit.")
     @ApiResponses(value = {
@@ -510,6 +626,13 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * Updates sub multiple collection name and the list of cases
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/updateSubMultiple1", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "update the name and the list of cases of a sub multiple.")
     @ApiResponses(value = {
@@ -538,6 +661,13 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * Removes sub multiple references from multiple collection
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/deleteSubMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "delete a Sub multiple from a dynamic list.")
     @ApiResponses(value = {
@@ -566,6 +696,13 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * Generates a multiple schedule from bulkRequest(using "Tornado" service)
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/generateBulkSchedule", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "generate a multiple schedule.")
     @ApiResponses(value = {
@@ -604,6 +741,13 @@ public class BulkActionsController {
         }
     }
 
+    /**
+     * Generates a multiple schedule confirmation from bulkRequest
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/generateBulkScheduleConfirmation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "generate a multiple schedule confirmation.")
     @ApiResponses(value = {
@@ -631,6 +775,14 @@ public class BulkActionsController {
                 .build());
     }
 
+    /**
+     * Retrieves bulk cases(for preAcceptRequest), updates multiple type collection with "Accepted" state,
+     * moving cases to the "Accepted" state
+     *
+     * @param  userToken        Used for authorisation
+     * @param  bulkRequest      Holds the bulkRequest and bulk caseData
+     * @return ResponseEntity   It is an HTTPEntity response which has BulkCallbackResponse
+     */
     @PostMapping(value = "/preAcceptBulk", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "accept a bulk of cases.")
     @ApiResponses(value = {

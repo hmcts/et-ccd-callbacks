@@ -40,6 +40,13 @@ public class HearingDetailsController {
         this.hearingDetailsService = hearingDetailsService;
     }
 
+    /**
+     * Initialises hearings selection list
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds CCDRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/initialiseHearings", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise hearings selection list")
     @ApiResponses(value = {
@@ -60,7 +67,13 @@ public class HearingDetailsController {
 
         return getCallbackRespEntityNoErrors(caseData);
     }
-
+    /**
+     * Updates case data when a listing has been selected
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds CCDRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/handleListingSelected", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update case data when a listing has been selected")
     @ApiResponses(value = {
@@ -82,6 +95,13 @@ public class HearingDetailsController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * Validates the hearing number and the hearing days to prevent their creation
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds CCDRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/hearingMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates the hearing number and the hearing days to prevent their creation.")
     @ApiResponses(value = {
@@ -102,6 +122,13 @@ public class HearingDetailsController {
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
+    /**
+     * Validates the hearing number and the hearing days to prevent their creation
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds CCDRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update case data input in Hearing Details event")
     @ApiResponses(value = {

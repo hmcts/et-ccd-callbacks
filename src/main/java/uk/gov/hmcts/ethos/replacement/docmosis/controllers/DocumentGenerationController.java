@@ -50,6 +50,13 @@ public class DocumentGenerationController {
     private final VerifyTokenService verifyTokenService;
     private final EventValidationService eventValidationService;
 
+    /**
+     * Populates the address labels list with the user selected addresses.
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/midAddressLabels", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the address labels list with the user selected addresses.")
     @ApiResponses(value = {
@@ -82,6 +89,13 @@ public class DocumentGenerationController {
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
+    /**
+     * Populates the address labels list with the user selected addresses to be printed
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/midSelectedAddressLabels", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the address labels list with the user selected addresses to be printed.")
     @ApiResponses(value = {
@@ -108,6 +122,13 @@ public class DocumentGenerationController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * Validates the address labels and print attributes before printing
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/midValidateAddressLabels", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates the address labels collection and print attributes before printing.")
     @ApiResponses(value = {
@@ -136,6 +157,13 @@ public class DocumentGenerationController {
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
+    /**
+     * Generates a document and "significantItem" for response entity
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/generateDocument", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "generate a document.")
     @ApiResponses(value = {
@@ -187,6 +215,13 @@ public class DocumentGenerationController {
         }
     }
 
+    /**
+     * Generates a document confirmation
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/generateDocumentConfirmation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "generate a document confirmation.")
     @ApiResponses(value = {
@@ -217,6 +252,13 @@ public class DocumentGenerationController {
         return defaultValuesReaderService.getDefaultValues(caseDetails.getCaseData().getManagingOffice());
     }
 
+    /**
+     * Populates a dynamic list for hearing numbers for letter
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/dynamicLetters", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates a dynamic list for hearing numbers for letter")
     @ApiResponses(value = {

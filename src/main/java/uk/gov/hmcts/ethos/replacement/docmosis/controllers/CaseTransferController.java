@@ -53,6 +53,13 @@ public class CaseTransferController {
         this.caseTransferToEcmService = caseTransferToEcmService;
     }
 
+    /**
+     * Initialises case for transfer to Scotland(populates with default selected office in "Glasgow")
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/initTransferToScotland", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise case for transfer to Scotland")
     @ApiResponses(value = {
@@ -79,6 +86,13 @@ public class CaseTransferController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * Initialises case for transfer to England/Wales(populates "officeCT" with selected office from "managingOffice")
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/initTransferToEnglandWales", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise case for transfer to England/Wales")
     @ApiResponses(value = {
@@ -106,6 +120,13 @@ public class CaseTransferController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * Transfers case to another office within the same country
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/transferSameCountry", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Transfer a case to another office within the same country")
     @ApiResponses(value = {
@@ -132,6 +153,13 @@ public class CaseTransferController {
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
+    /**
+     * Transfers ECC linked case to another office within the same country
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/transferSameCountryEccLinkedCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Transfer a ECC linked case to another office within the same country")
     @ApiResponses(value = {
@@ -160,6 +188,13 @@ public class CaseTransferController {
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
+    /**
+     * Transfer case to another office in a different country
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/transferDifferentCountry", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Transfer a case to another office in a different country")
     @ApiResponses(value = {
@@ -186,6 +221,13 @@ public class CaseTransferController {
         return getCallbackRespEntityErrors(errors, ccdRequest.getCaseDetails().getCaseData());
     }
 
+    /**
+     * Validates cases and transfers them to ECM
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/transferToEcm", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Transfer a case to ECM")
     @ApiResponses(value = {

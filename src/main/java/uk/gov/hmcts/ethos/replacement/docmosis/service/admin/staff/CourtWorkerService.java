@@ -80,7 +80,6 @@ public class CourtWorkerService {
                 TribunalOffice.valueOfOfficeName(adminData.getCourtWorkerOffice()),
                 CourtWorkerType.valueOf(adminData.getCourtWorkerType()));
         if (selectedCourtWorker != null) {
-
             adminData.setCourtWorkerCode(selectedCourtWorker.getCode());
             adminData.setCourtWorkerName(selectedCourtWorker.getName());
         } else {

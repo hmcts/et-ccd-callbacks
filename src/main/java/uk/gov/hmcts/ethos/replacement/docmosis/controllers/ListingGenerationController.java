@@ -64,6 +64,13 @@ public class ListingGenerationController {
     private final PrintHearingListService printHearingListService;
     private final GenerateReportService generateReportService;
 
+    /**
+     * Handles logic related to the creation of listing cases
+     *
+     * @param  userToken        Used for authorisation
+     * @param  listingRequest   Holds ListingRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has ListingCallbackResponse
+     */
     @PostMapping(value = "/listingCaseCreation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "handles logic related to the creation of listing cases.")
     @ApiResponses(value = {
@@ -91,6 +98,14 @@ public class ListingGenerationController {
                 .build());
     }
 
+    /**
+     * Validates listings. Searches hearings by venue and date in a specific case. Updates print hearing collection
+     * and updates it's listing collection
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds CCDRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has ListingCallbackResponse
+     */
     @PostMapping(value = "/listingSingleCases", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "search hearings by venue and date in a specific case.")
     @ApiResponses(value = {
@@ -124,6 +139,13 @@ public class ListingGenerationController {
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
+    /**
+     * Validates listings(checks if listings range is valid). Searches hearings by venue and date.
+     *
+     * @param  userToken        Used for authorisation
+     * @param  listingRequest   Holds ListingRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has ListingCallbackResponse
+     */
     @PostMapping(value = "/listingHearings", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "search hearings by venue and date.")
     @ApiResponses(value = {
@@ -160,6 +182,13 @@ public class ListingGenerationController {
         return getListingCallbackRespEntityErrors(errors, listingData);
     }
 
+    /**
+     * Generates a listing document
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds CCDRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/generateListingsDocSingleCases", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "generate a listing document.")
     @ApiResponses(value = {
@@ -201,6 +230,13 @@ public class ListingGenerationController {
         }
     }
 
+    /**
+     * Generates a listing document confirmation
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds CCDRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/generateListingsDocSingleCasesConfirmation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "generate a listing document confirmation.")
     @ApiResponses(value = {
@@ -228,6 +264,13 @@ public class ListingGenerationController {
                 .build());
     }
 
+    /**
+     * Generates a listing document confirmation
+     *
+     * @param  userToken        Used for authorisation
+     * @param  listingRequest   Holds ListingRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has ListingCallbackResponse
+     */
     @PostMapping(value = "/initGenerateReport", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise listing data for generating a report")
     @ApiResponses(value = {
@@ -252,6 +295,13 @@ public class ListingGenerationController {
                 .build());
     }
 
+    /**
+     * Generates data for selected report
+     *
+     * @param  userToken        Used for authorisation
+     * @param  listingRequest   Holds ListingRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has ListingCallbackResponse
+     */
     @PostMapping(value = "/generateReport", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "generate data for selected report.")
     @ApiResponses(value = {
@@ -331,8 +381,15 @@ public class ListingGenerationController {
         return listingService.processHearingDocument(listingData, caseTypeId, userToken);
     }
 
+    /**
+     * Generates hearing document
+     *
+     * @param  userToken        Used for authorisation
+     * @param  listingRequest   Holds ListingRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has ListingCallbackResponse
+     */
     @PostMapping(value = "/generateHearingDocument", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "generate a listing document.")
+    @Operation(summary = "generate a hearing document.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -375,8 +432,15 @@ public class ListingGenerationController {
         }
     }
 
+    /**
+     * Generates hearing document confirmation
+     *
+     * @param  userToken        Used for authorisation
+     * @param  listingRequest   Holds ListingRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has ListingCallbackResponse
+     */
     @PostMapping(value = "/generateHearingDocumentConfirmation", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "generate a listing document confirmation.")
+    @Operation(summary = "generate a hearing document confirmation.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -403,6 +467,13 @@ public class ListingGenerationController {
                 .build());
     }
 
+    /**
+     * Initialises case data for print hearing lists event
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds ListingRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/initPrintHearingLists", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialises case data for Print Hearing Lists event")
     @ApiResponses(value = {
@@ -426,6 +497,13 @@ public class ListingGenerationController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * Initialises case data for print hearing lists event
+     *
+     * @param  userToken        Used for authorisation
+     * @param  listingRequest   Holds ListingRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/dynamicListingVenue", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates the dynamicList for reports")
     @ApiResponses(value = {

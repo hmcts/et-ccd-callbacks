@@ -86,6 +86,14 @@ public class ExcelActionsController {
     private final ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
     private final ClerkService clerkService;
 
+    /**
+     * Creates a multiple case. Generates and uploads excel file from retrieved ethos case reference collection
+     * and from multipleDetails
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/createMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Creates a multiple case. Retrieves cases by ethos case reference. Creates an Excel")
     @ApiResponses(value = {
@@ -115,6 +123,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Updates the state of the multiple
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/amendMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update the state of the multiple")
     @ApiResponses(value = {
@@ -144,6 +159,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Fixes case event for multiples
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/fixMultipleCaseApi", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Fix case event for multiples")
     @ApiResponses(value = {
@@ -172,6 +194,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Updates the state of the multiple
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/amendMultipleAPI", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update the state of the multiple")
     @ApiResponses(value = {
@@ -200,6 +229,13 @@ public class ExcelActionsController {
                 .build());
     }
 
+    /**
+     * Validates uploading excel file and updates multiple data case imported file
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/importMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Check errors uploading an excel to the multiple")
     @ApiResponses(value = {
@@ -229,6 +265,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Updates multiple case data(bulk of cases) status to accepted
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/preAcceptMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Accept a bulk of cases.")
     @ApiResponses(value = {
@@ -258,6 +301,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Initialises multiple case data for batch update event
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/initialiseBatchUpdate", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialises multiple case data for batch update event")
     @ApiResponses(value = {
@@ -289,6 +339,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Updates cases in a bulk case. Update cases by given fields.
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/batchUpdate", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "updates cases in a bulk case. Update cases by given fields.")
     @ApiResponses(value = {
@@ -318,6 +375,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Retrieves values from excel file to populate all flags in dynamic lists in multiple data.
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/dynamicListFlags", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populate flags in dynamic lists with all flags values are in the excel.")
     @ApiResponses(value = {
@@ -347,6 +411,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Validates multiple and submultiple datas
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/multipleMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates if multiple and sub multiples are correct.")
     @ApiResponses(value = {
@@ -376,6 +447,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Validates submultiple data
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/subMultipleMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates if sub multiple is correct.")
     @ApiResponses(value = {
@@ -406,6 +484,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Manages an action create/amend/delete for sub multiples according to "subMultipleActionType" type
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/updateSubMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "manage create/amend/delete actions for sub multiples.")
     @ApiResponses(value = {
@@ -435,6 +520,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Validates if provided single cases for multiple creation
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/multipleCreationMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates if single cases are right on the multiple creation.")
     @ApiResponses(value = {
@@ -466,6 +558,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Validates multiple amend case id's
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/multipleAmendCaseIdsMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates if single cases are right on the multiple amend case ids.")
     @ApiResponses(value = {
@@ -497,6 +596,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Checks if case exists in the multiple
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/multipleSingleMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates whether case exists in the multiple.")
     @ApiResponses(value = {
@@ -527,6 +633,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Validates the receipts date introduced by the user
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/multipleMidBatch1Validation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates the receipts date introduced by the user.")
     @ApiResponses(value = {
@@ -554,6 +667,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Validates the date range the user selects for report/listing.
+     *
+     * @param  userToken        Used for authorisation
+     * @param  listingRequest   Holds ListingRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/listingsDateRangeMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates the date range the user selects for report/listing.")
     @ApiResponses(value = {
@@ -585,6 +705,13 @@ public class ExcelActionsController {
         return getListingCallbackRespEntity(errors, caseData);
     }
 
+    /**
+     * Initialises multiple case data for close event
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest   Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/initialiseCloseMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialises multiple case data for close event")
     @ApiResponses(value = {
@@ -612,6 +739,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(Collections.emptyList(), multipleRequest.getCaseDetails());
     }
 
+    /**
+     * Validates cases before close event. Closes a multiple and sends updates to all singles to be closed
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest   Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/closeMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Closes a multiple and sends updates to all singles to be closed.")
     @ApiResponses(value = {
@@ -648,6 +782,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Updates the multiple payload to fix issues on it(changing preAcceptDone value YES/NO)
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest   Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/updatePayloadMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Updates the payload to fix issues on it.")
     @ApiResponses(value = {
@@ -678,6 +819,13 @@ public class ExcelActionsController {
                 .build());
     }
 
+    /**
+     * Resets the multiple state to "Open"
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest   Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/resetMultipleState", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Resets the multiple state to Open.")
     @ApiResponses(value = {
@@ -710,6 +858,13 @@ public class ExcelActionsController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Populates all office options for England/Wales transfer except the current one in dynamic lists
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest   Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/dynamicListOfficesMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates all offices except the current one in dynamic lists.")
     @ApiResponses(value = {
@@ -738,6 +893,13 @@ public class ExcelActionsController {
                 .build());
     }
 
+    /**
+     * Transfers a multiple and all single cases to a different office
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest   Holds MultipleRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/multipleTransfer", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Transfers a multiple and all single cases to a different office.")
     @ApiResponses(value = {

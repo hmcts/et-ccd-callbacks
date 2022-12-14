@@ -33,6 +33,18 @@ public class CourtWorkerController {
     private final VerifyTokenService verifyTokenService;
     private final CourtWorkerService courtWorkerService;
 
+    /**
+     * This service Gets userToken as a parameter for security validation
+     * and ccdRequest data which has adminData as an object.
+     * It is used to initialize court worker(it is set to null in admin data)
+     *
+     * @param  userToken        Used for authorisation
+     *
+     * @param ccdRequest        AdminData which is a generic data type for most of the
+     *                          methods which holds file location code, file location name
+     *                          and tribunal office.
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/initAddCourtWorker", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initial add Court Worker")
     @ApiResponses(value = {
@@ -56,6 +68,21 @@ public class CourtWorkerController {
         return CCDCallbackResponse.getCallbackRespEntityNoErrors(adminData);
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation
+     * and ccdRequest data which has adminData as an object.
+     * It is used to set a add a  court worker for the provided admin data in ccdRequest
+     * Returns a list of errors. For this method there may be one of two errors which are
+     * CODE_ERROR_MESSAGE defined as "The code %s already exists for the %s office"
+     * NAME_ERROR_MESSAGE defined as "The name %s already exists for the %s office"
+     *
+     * @param  userToken        Used for authorisation
+     *
+     * @param ccdRequest        AdminData which is a generic data type for most of the
+     *                          methods which holds file location code, file location name
+     *                          and tribunal office.
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/addCourtWorker", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add a court worker")
     @ApiResponses(value = {
@@ -79,6 +106,20 @@ public class CourtWorkerController {
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation
+     * and ccdRequest data which has adminData as an object.
+     * It is used to populate the dynamicList for court worker when office and type selected
+     * Returns a list of errors. For this method there may be an error which is
+     * NO_FOUND_ERROR_MESSAGE defined as "No %s court worker found in the %s office"
+     *
+     * @param  userToken        Used for authorisation
+     *
+     * @param ccdRequest        AdminData which is a generic data type for most of the
+     *                          methods which holds file location code, file location name
+     *                          and tribunal office.
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/midEventCourtWorkerSelectOffice", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates the dynamicList for court worker when office and type selected")
     @ApiResponses(value = {
@@ -100,6 +141,20 @@ public class CourtWorkerController {
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation
+     * and ccdRequest data which has adminData as an object.
+     * It is used to populate the court worker code and name when dynamicList selected
+     * Returns a list of errors. For this method there may be an error which is
+     * SAVE_ERROR_MESSAGE defined as "Update failed"
+     *
+     * @param  userToken        Used for authorisation
+     *
+     * @param ccdRequest        AdminData which is a generic data type for most of the
+     *                          methods which holds file location code, file location name
+     *                          and tribunal office.
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/midEventCourtWorkerSelectCourtWorker", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates the court worker code and name when dynamicList selected")
     @ApiResponses(value = {
@@ -121,6 +176,21 @@ public class CourtWorkerController {
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation
+     * and ccdRequest data which has adminData as an object.
+     * It is used to update court worker data
+     * Returns a list of errors. For this method there may be an errors which are
+     * NAME_ERROR_MESSAGE defined as "The name %s already exists for the %s office"
+     * SAVE_ERROR_MESSAGE defined as "Update failed"
+     *
+     * @param  userToken        Used for authorisation
+     *
+     * @param ccdRequest        AdminData which is a generic data type for most of the
+     *                          methods which holds file location code, file location name
+     *                          and tribunal office.
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/updateCourtWorker", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update a court worker")
     @ApiResponses(value = {
@@ -159,8 +229,7 @@ public class CourtWorkerController {
      * @param ccdRequest        AdminData which is a generic data type for most of the
      *                          methods which holds file location code, file location name
      *                          and tribunal office.
-     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse that
-     *                          includes adminData with a list of file locations
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
      */
     @PostMapping(value = "/deleteCourtWorker", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Delete a court worker")

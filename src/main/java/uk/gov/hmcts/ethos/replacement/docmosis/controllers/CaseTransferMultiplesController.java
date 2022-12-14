@@ -49,6 +49,14 @@ public class CaseTransferMultiplesController {
         this.multipleTransferDifferentCountryService = multipleTransferDifferentCountryService;
     }
 
+    /**
+     * Initialises case from multipleData for transfer to England/Wales(populates "officeCT" with selected office
+     * from "managingOffice")
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleData case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/initTransferToEnglandWales", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise case for transfer to England/Wales")
     @ApiResponses(value = {
@@ -76,6 +84,13 @@ public class CaseTransferMultiplesController {
                 .build());
     }
 
+    /**
+     * Initialises case from multipleData for transfer to Scotland(populates with default selected office in "Glasgow")
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleData case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/initTransferToScotland", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise case for transfer to Scotland")
     @ApiResponses(value = {
@@ -103,6 +118,13 @@ public class CaseTransferMultiplesController {
                 .build());
     }
 
+    /**
+     * Transfers a multiple and its cases to another office within the same country
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleData case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/transferSameCountry", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Transfer a multiple and its cases to another office within the same country")
     @ApiResponses(value = {
@@ -130,6 +152,13 @@ public class CaseTransferMultiplesController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Transfers a multiple and its cases to another office in a different country
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds MultipleData case data
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/transferDifferentCountry", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Transfer a multiple and its cases to another office in a different country")
     @ApiResponses(value = {

@@ -46,6 +46,18 @@ public class AllocateHearingController {
         this.scotlandAllocateHearingService = scotlandAllocateHearingService;
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation
+     * and ccdRequest data which has adminData as an object.
+     * Initializes hearing selection list from caseData hearing collection
+     *
+     * @param  userToken        Used for authorisation
+     *
+     * @param ccdRequest        AdminData which is a generic data type for most of the
+     *                          methods which holds file location code, file location name
+     *                          and tribunal office.
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/initialiseHearings", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise hearings selection list")
     @ApiResponses(value = {
@@ -70,6 +82,18 @@ public class AllocateHearingController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation
+     * and ccdRequest data which has adminData as an object.
+     * It is used to update case data when a listing has been selected
+     *
+     * @param  userToken        Used for authorisation
+     *
+     * @param ccdRequest        AdminData which is a generic data type for most of the
+     *                          methods which holds file location code, file location name
+     *                          and tribunal office.
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/handleListingSelected", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update case data when a listing has been selected")
     @ApiResponses(value = {
@@ -102,6 +126,20 @@ public class AllocateHearingController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation
+     * and ccdRequest data which has adminData as an object.
+     * It is used to update case data when a managing office has been selected
+     * Returns an INTERNAL_SERVER_ERROR if provided request does not contain "ET_Scotland" caseTypeId
+     * NAME_ERROR_MESSAGE defined as "The name %s already exists for the %s office"
+     *
+     * @param  userToken        Used for authorisation
+     *
+     * @param ccdRequest        AdminData which is a generic data type for most of the
+     *                          methods which holds file location code, file location name
+     *                          and tribunal office.
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/handleManagingOfficeSelected", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update case data when a managing office has been selected")
     @ApiResponses(value = {
@@ -132,6 +170,18 @@ public class AllocateHearingController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation
+     * and ccdRequest data which has adminData as an object.
+     * Populates rooms selection list in case data
+     *
+     * @param  userToken        Used for authorisation
+     *
+     * @param ccdRequest        AdminData which is a generic data type for most of the
+     *                          methods which holds file location code, file location name
+     *                          and tribunal office.
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/populateRooms", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populate rooms selection list in case data")
     @ApiResponses(value = {
@@ -161,6 +211,18 @@ public class AllocateHearingController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * This service Gets userToken as a parameter for security validation
+     * and ccdRequest data which has adminData as an object.
+     * It is used to update case data DateListedType with hearing information(clerk, room, hearingAllocation)
+     *
+     * @param  userToken        Used for authorisation
+     *
+     * @param ccdRequest        AdminData which is a generic data type for most of the
+     *                          methods which holds file location code, file location name
+     *                          and tribunal office.
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update case data input in Allocate Hearing event")
     @ApiResponses(value = {

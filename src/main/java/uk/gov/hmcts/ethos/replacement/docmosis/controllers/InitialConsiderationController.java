@@ -41,6 +41,14 @@ public class InitialConsiderationController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String COMPLETE_IC_HDR = "<h1>Initial consideration complete</h1>";
 
+    /**
+     * Complete initial consideration callback which handle the submission of data from the event into CCD and
+     * completes the Initial Consideration flow
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds CCDRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/completeInitialConsideration", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "completes the Initial Consideration flow")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
@@ -93,6 +101,14 @@ public class InitialConsiderationController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * Start initial consideration callback which handle the submission of data from the event into CCD and
+     * starts the Initial Consideration flow
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds CCDRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/startInitialConsideration", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "start the Initial Consideration flow")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {

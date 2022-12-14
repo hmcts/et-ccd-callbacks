@@ -34,6 +34,18 @@ public class JudgeController {
     private final VerifyTokenService verifyTokenService;
     private final JudgeService judgeService;
 
+    /**
+     * This service Gets userToken as a parameter for security validation
+     * and ccdRequest data which has adminData as an object.
+     * It is used to initially add a judge
+     *
+     * @param  userToken        Used for authorisation
+     *
+     * @param ccdRequest        AdminData which is a generic data type for most of the
+     *                          methods which holds file location code, file location name
+     *                          and tribunal office.
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/initAddJudge", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initial add Judge")
     @ApiResponses(value = {

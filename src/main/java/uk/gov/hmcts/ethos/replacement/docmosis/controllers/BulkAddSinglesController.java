@@ -41,6 +41,13 @@ public class BulkAddSinglesController {
         this.verifyTokenService = verifyTokenService;
     }
 
+    /**
+     * After validation add single case to multiple
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds the multiple data caseDetails
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/bulkAddSingleCasesImportFileMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Validate the single cases to be added to a multiple")
     @ApiResponses(value = {
@@ -66,6 +73,13 @@ public class BulkAddSinglesController {
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
+    /**
+     * Adds one or more single cases to a multiple
+     *
+     * @param  userToken        Used for authorisation
+     * @param  multipleRequest  Holds the multiple data caseDetails
+     * @return ResponseEntity   It is an HTTPEntity response which has MultipleCallbackResponse
+     */
     @PostMapping(value = "/bulkAddSingleCasesToMultiple", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add one or more single cases to a multiple")
     @ApiResponses(value = {

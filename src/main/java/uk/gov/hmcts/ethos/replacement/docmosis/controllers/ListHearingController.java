@@ -39,6 +39,13 @@ public class ListHearingController {
         this.scotlandVenueSelectionService = scotlandVenueSelectionService;
     }
 
+    /**
+     * Data initialisation for listing hearings
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds CCDRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/initialiseHearings")
     @Operation(summary = "Initialise data for Listing Hearings")
     @ApiResponses(value = {

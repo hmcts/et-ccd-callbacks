@@ -33,6 +33,13 @@ public class ReferenceDataController {
     private final VerifyTokenService verifyTokenService;
     private final ReferenceService referenceService;
 
+    /**
+     * Populates the hearing venue dynamic list with reference data
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds CCDRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/hearingVenueReferenceData", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the hearing venue dynamic list with reference data.")
     @ApiResponses(value = {
@@ -58,6 +65,13 @@ public class ReferenceDataController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * Populates the date listed dynamic lists with reference data
+     *
+     * @param  userToken        Used for authorisation
+     * @param  ccdRequest       Holds CCDRequest case data
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/dateListedReferenceData", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the date listed dynamic lists with reference data.")
     @ApiResponses(value = {

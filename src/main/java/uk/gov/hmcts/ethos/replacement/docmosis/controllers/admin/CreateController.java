@@ -33,6 +33,20 @@ public class CreateController {
     private final VerifyTokenService verifyTokenService;
     private final CreateService createService;
 
+    /**
+     * This service Gets userToken as a parameter for security validation
+     * and ccdRequest data which has adminData as an object.
+     * It is used to create admin user
+     * Returns a list of errors. For this method there may be error which is
+     * CREATE_EXIST_ERROR_MESSAGE defined as "ECM Admin already exists."
+     *
+     * @param  userToken        Used for authorisation
+     *
+     * @param ccdRequest        AdminData which is a generic data type for most of the
+     *                          methods which holds file location code, file location name
+     *                          and tribunal office.
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse
+     */
     @PostMapping(value = "/aboutToSubmitEvent", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Create Admin Case: About to Submit Event")
     @ApiResponses(value = {

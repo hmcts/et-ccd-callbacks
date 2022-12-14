@@ -9,7 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import java.util.UUID;
 
 /**
- * Contains helper methods to build a GenericTseApplicationType object. Each method returns an instance of itself to aid with
+ * Contains helper methods to build a GenericTseApplicationType object. Each method returns an instance of itself for
  * chaining method calls to build the object.
  */
 public class TseApplicationBuilder {

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -20,23 +21,27 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 
+@Slf4j
 public class TseHelper {
-    public static final String INTRO = "The respondent has applied to <b>%s</b>.</br>%s</br> If you have any " +
-        "objections or responses to their application you must send them to the tribunal as soon as possible and by " +
-        "%s at the latest.</br></br>If you need more time to respond, you may request more time from the tribunal. If" +
-        " you do not respond or request more time to respond, the tribunal will consider the application without your" +
-        " " +
-        "response.";
-    public static final String TABLE = "| | |\r\n" +
-        "|--|--|\r\n" +
-        "|Application date | %s\r\n" +
-        "|Details of the application | %s\r\n" +
-        "Application file upload | %s";
+    public static final String INTRO = "The respondent has applied to <b>%s</b>.</br>%s</br> If you have any "
+        + "objections or responses to their application you must send them to the tribunal as soon as possible and by "
+        + "%s at the latest.</br></br>If you need more time to respond, you may request more time from the tribunal. If"
+        + " you do not respond or request more time to respond, the tribunal will consider the application without your"
+        + " response.";
+    public static final String TABLE = "| | |\r\n"
+        + "|--|--|\r\n"
+        + "|Application date | %s\r\n"
+        + "|Details of the application | %s\r\n"
+        + "Application file upload | %s";
     public static final String GROUP_B = "You do not need to respond to this application.<br>";
-    public static final List<String> GROUP_B_TYPES = List.of("Change my personal details", "Consider a decision " +
-        "afresh", "Reconsider a judgment", "Withdraw my claim");
+    public static final List<String> GROUP_B_TYPES = List.of("Change my personal details", "Consider a decision "
+        + "afresh", "Reconsider a judgment", "Withdraw my claim");
     public static final String OPEN = "Open";
     public static final String CLOSED = "Closed";
+
+    private TseHelper() {
+        // Access through static methods
+    }
 
     /**
      * Create fields for application dropdown selector.
@@ -124,7 +129,6 @@ public class TseHelper {
             return;
         }
 
-        GenericTseApplicationType genericTseApplicationType = getSelectedApplication(caseData);
         TseRespondentReplyType tseRespondentReplyType = new TseRespondentReplyType();
         tseRespondentReplyType.setResponse(caseData.getTseResponseText());
         tseRespondentReplyType.setSupportingMaterial(caseData.getTseResponseSupportingMaterial());
@@ -136,6 +140,7 @@ public class TseHelper {
         TseRespondentReplyTypeItem tseRespondentReplyTypeItem = new TseRespondentReplyTypeItem();
         tseRespondentReplyTypeItem.setId(UUID.randomUUID().toString());
         tseRespondentReplyTypeItem.setValue(tseRespondentReplyType);
+        GenericTseApplicationType genericTseApplicationType = getSelectedApplication(caseData);
         genericTseApplicationType.setRespondentReply(List.of(tseRespondentReplyTypeItem));
         // TODO: This will need changing when we support admin decisions
         genericTseApplicationType.setResponsesCount("1");
@@ -145,12 +150,14 @@ public class TseHelper {
      * Clears fields that are used when responding to an application.
      * @param caseData contains all the case data
      */
-    public static void resetReplyToApplicationPage(CaseData caseData){
+    public static void resetReplyToApplicationPage(CaseData caseData) {
         caseData.setTseResponseText(null);
         caseData.setTseResponseIntro(null);
         caseData.setTseResponseTable(null);
         caseData.setTseResponseHasSupportingMaterial(null);
         caseData.setTseResponseSupportingMaterial(null);
+        caseData.setTseResponseCopyToOtherParty(null);
+        caseData.setTseResponseCopyNoGiveDetails(null);
     }
 
     private static GenericTseApplicationType getSelectedApplication(CaseData caseData) {

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -35,8 +34,9 @@ public class TseResponseController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
-     /**
-     * Populates the dynamic list for select an application to respond to.
+
+    /**
+     *  Populates the dynamic list for select an application to respond to.
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
@@ -64,10 +64,10 @@ public class TseResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
-         return getCallbackRespEntityNoErrors(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
-     /**
+    /**
      * Populates data needed for replying to a specific application.
      *
      * @param ccdRequest holds the request and case data
@@ -96,11 +96,10 @@ public class TseResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         TseHelper.setDataForRespondingToApplication(caseData);
-        // Code here
         return getCallbackRespEntityNoErrors(caseData);
     }
 
-     /**
+    /**
      * Saves the reply data onto the application object.
      *
      * @param ccdRequest holds the request and case data
@@ -130,11 +129,10 @@ public class TseResponseController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         TseHelper.saveReplyToApplication(caseData);
         TseHelper.resetReplyToApplicationPage(caseData);
-        // Code here
         return getCallbackRespEntityNoErrors(caseData);
     }
 
-     /**
+    /**
      * Formats data for submit successful page.
      *
      * @param ccdRequest holds the request and case data
@@ -162,7 +160,6 @@ public class TseResponseController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        // Code here
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

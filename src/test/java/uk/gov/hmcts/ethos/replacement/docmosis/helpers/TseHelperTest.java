@@ -10,7 +10,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondentReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondentReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
@@ -23,11 +22,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-import static org.hamcrest.core.Is.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -85,11 +82,11 @@ public class TseHelperTest {
         caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
         TseHelper.setDataForRespondingToApplication(caseData);
-        String expected = "The respondent has applied to <b>Withdraw my claim</b>.</br>You do not need to respond to " +
-            "this application.<br></br> If you have any objections or responses to their application you must send " +
-            "them to the tribunal as soon as possible and by 20 December 2022 at the latest.</br></br>If you need " +
-            "more time to respond, you may request more time from the tribunal. If you do not respond or request more" +
-            " time to respond, the tribunal will consider the application without your response.";
+        String expected = "The respondent has applied to <b>Withdraw my claim</b>.</br>You do not need to respond to "
+            + "this application.<br></br> If you have any objections or responses to their application you must send "
+            + "them to the tribunal as soon as possible and by 20 December 2022 at the latest.</br></br>If you need "
+            + "more time to respond, you may request more time from the tribunal. If you do not respond or request more"
+            + " time to respond, the tribunal will consider the application without your response.";
 
         assertThat(caseData.getTseResponseIntro(), is(expected));
     }
@@ -100,11 +97,11 @@ public class TseHelperTest {
         caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
         TseHelper.setDataForRespondingToApplication(caseData);
-        String expected = "The respondent has applied to <b>Postpone a hearing</b>.</br></br> If you have any " +
-            "objections or responses to their application you must send them to the tribunal as soon as possible and " +
-            "by 20 December 2022 at the latest.</br></br>If you need more time to respond, you may request more time " +
-            "from the tribunal. If you do not respond or request more time to respond, the tribunal will consider the" +
-            " application without your response.";
+        String expected = "The respondent has applied to <b>Postpone a hearing</b>.</br></br> If you have any "
+            + "objections or responses to their application you must send them to the tribunal as soon as possible and "
+            + "by 20 December 2022 at the latest.</br></br>If you need more time to respond, you may request more time "
+            + "from the tribunal. If you do not respond or request more time to respond, the tribunal will consider the"
+            + " application without your response.";
 
         assertThat(caseData.getTseResponseIntro(), is(expected));
     }
@@ -117,9 +114,9 @@ public class TseHelperTest {
         caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
         TseHelper.setDataForRespondingToApplication(caseData);
-        String expected = "| | |\r\n" + "|--|--|\r\n" + "|Application date | 13 December 2022\r\n" + "|Details of " +
-            "the application | Text\r\n" + "Application file upload | <a href=\"/documents/1234/binary\" " +
-            "target=\"_blank\">image.png</a>";
+        String expected = "| | |\r\n" + "|--|--|\r\n" + "|Application date | 13 December 2022\r\n" + "|Details of "
+            + "the application | Text\r\n" + "Application file upload | <a href=\"/documents/1234/binary\" "
+            + "target=\"_blank\">image.png</a>";
 
         assertThat(caseData.getTseResponseTable(), is(expected));
     }
@@ -162,6 +159,8 @@ public class TseHelperTest {
 
     @Test
     public void resetReplyToApplicationPage_resetsData() {
+        caseData.setTseResponseCopyToOtherParty(YES);
+        caseData.setTseResponseCopyNoGiveDetails(YES);
         caseData.setTseResponseText(YES);
         caseData.setTseResponseIntro(YES);
         caseData.setTseResponseTable(YES);
@@ -174,6 +173,8 @@ public class TseHelperTest {
         assertNull(caseData.getTseResponseTable());
         assertNull(caseData.getTseResponseHasSupportingMaterial());
         assertNull(caseData.getTseResponseSupportingMaterial());
+        assertNull(caseData.getTseResponseCopyToOtherParty());
+        assertNull(caseData.getTseResponseCopyNoGiveDetails());
     }
 
     private List<DocumentTypeItem> createSupportingMaterial() {

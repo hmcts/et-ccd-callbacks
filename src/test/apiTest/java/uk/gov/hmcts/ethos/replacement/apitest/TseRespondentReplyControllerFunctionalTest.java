@@ -11,11 +11,8 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 @Slf4j
-public class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
+class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
     private CCDRequest ccdRequest;
 
@@ -40,7 +37,46 @@ public class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTe
             .contentType(ContentType.JSON)
             .header(new Header(AUTHORIZATION, userToken))
             .body(ccdRequest)
-            .post("/tseRespond/aboutToStart")
+            .post("/tseResponse/aboutToStart")
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log().all(true);
+    }
+
+    @Test
+    void midPopulateReply_successResponse() {
+        RestAssured.given()
+            .spec(spec)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(ccdRequest)
+            .post("/tseResponse/midPopulateReply")
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log().all(true);
+    }
+
+    @Test
+    void aboutToSubmit_successResponse() {
+        RestAssured.given()
+            .spec(spec)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(ccdRequest)
+            .post("/tseResponse/aboutToSubmit")
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log().all(true);
+    }
+
+    @Test
+    void submitted_successResponse() {
+        RestAssured.given()
+            .spec(spec)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(ccdRequest)
+            .post("/tseResponse/submitted")
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log().all(true);

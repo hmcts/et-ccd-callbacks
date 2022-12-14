@@ -1,10 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
-import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-
-import java.util.UUID;
 
 /**
  * Contains helper methods to build a DocumentType object. Each method returns an instance of itself to aid with

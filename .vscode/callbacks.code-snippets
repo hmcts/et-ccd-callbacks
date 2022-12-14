@@ -293,5 +293,43 @@
 			"}"
 		],
 		"description": ""
+	},
+	"Test Builder - File": {
+		"prefix": "",
+		"body": [
+			"package uk.gov.hmcts.ethos.replacement.docmosis.utils;",
+			"",
+			"/**",
+			" * Contains helper methods to build a ${2:Object} object. Each method returns an instance of itself to aid with",
+			" * chaining method calls to build the object.",
+			" */",
+			"public class ${1:Respondent}Builder {",
+			"    private final ${2:Object} ${2/(.)(.*)/${1:/downcase}$2/} = new ${2:Object}();",
+			"",
+			"    public static ${1:Respondent}Builder builder() {",
+			"        return new ${1:Respondent}Builder();",
+			"    }",
+			"",
+			"    public ${2:Object} build() {",
+			"        return ${2/(.)(.*)/${1:/downcase}$2/};",
+			"    }",
+			"",
+			"    public ${1:Respondent}Builder with${3:Property}(String ${3/(.)(.*)/${1:/downcase}$2/}) {",
+			"        ${2/(.)(.*)/${1:/downcase}$2/}.set${3:Property}(${3/(.)(.*)/${1:/downcase}$2/});",
+			"        return this;",
+			"    }",
+			"}"
+		],
+		"description": "Test Builder - File"
+	},
+	"Test Builder - With method": {
+		"prefix": "",
+		"body": [
+			"public ${1:Respondent}Builder with${3:Property}(String ${3/(.)(.*)/${1:/downcase}$2/}) {",
+			"    ${2/(.)(.*)/${1:/downcase}$2/}.set${3:Property}(${3/(.)(.*)/${1:/downcase}$2/});",
+			"    return this;",
+			"}"
+		],
+		"description": "Test Builder - With method"
 	}
 }

@@ -13,8 +13,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.TseRespondentReplyType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 
 public class TseHelper {
@@ -76,12 +79,22 @@ public class TseHelper {
             )
         );
 
+        String document = "N/A";
+
+        if (genericTseApplicationType.getDocumentUpload() != null) {
+            Pattern pattern = Pattern.compile("^.+?/documents/");
+            Matcher matcher = pattern.matcher(genericTseApplicationType.getDocumentUpload().getDocumentBinaryUrl());
+            String documentLink = matcher.replaceFirst("");
+            String documentName = genericTseApplicationType.getDocumentUpload().getDocumentFilename();
+            document = String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
+        }
+
         caseData.setTseResponseTable(
             String.format(
                 TABLE,
                 genericTseApplicationType.getDate(),
-                genericTseApplicationType.getDetails(),
-                "[How do we link files here?](www.example.com)"
+                isNullOrEmpty(genericTseApplicationType.getDetails()) ? "N/A" : genericTseApplicationType.getDetails(),
+                document
             )
         );
 
@@ -97,6 +110,8 @@ public class TseHelper {
         caseData.setTseResponseHasSupportingMaterial(respondentReply.getHasSupportingMaterial());
         caseData.setTseResponseText(respondentReply.getResponse());
         caseData.setTseResponseSupportingMaterial(respondentReply.getSupportingMaterial());
+        caseData.setTseResponseCopyToOtherParty(respondentReply.getCopyToOtherParty());
+        caseData.setTseResponseCopyNoGiveDetails(respondentReply.getCopyNoGiveDetails());
     }
 
     /**
@@ -116,6 +131,8 @@ public class TseHelper {
         tseRespondentReplyType.setHasSupportingMaterial(caseData.getTseResponseHasSupportingMaterial());
         tseRespondentReplyType.setFrom("Respondent");
         tseRespondentReplyType.setDate(UtilHelper.formatCurrentDate(LocalDate.now()));
+        tseRespondentReplyType.setCopyToOtherParty(caseData.getTseResponseCopyToOtherParty());
+        tseRespondentReplyType.setCopyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails());
         TseRespondentReplyTypeItem tseRespondentReplyTypeItem = new TseRespondentReplyTypeItem();
         tseRespondentReplyTypeItem.setId(UUID.randomUUID().toString());
         tseRespondentReplyTypeItem.setValue(tseRespondentReplyType);

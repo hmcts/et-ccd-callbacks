@@ -109,4 +109,29 @@ public class RespondentTellSomethingElseController {
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 
+    @PostMapping(value = "/displayTable", consumes = APPLICATION_JSON_VALUE)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> displayRespondentApplicationsTable(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setResTseTableMarkUp(resTseService.generateTableMarkdown(caseData));
+
+
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
 }

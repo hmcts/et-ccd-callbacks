@@ -14,6 +14,6 @@ module.exports = async function () {
     I.click(amendRespondentRepresentative.find_address_button);
     I.wait(2);
     I.selectOption(amendRespondentRepresentative.representative_work_address_select_an_address,'1: Object');
-    await I.navByClick(commonConfig.continue);
+    await I.click(commonConfig.continue);
     await I.click(commonConfig.submit);
 };

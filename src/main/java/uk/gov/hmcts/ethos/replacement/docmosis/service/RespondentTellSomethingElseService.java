@@ -14,11 +14,18 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
@@ -35,7 +42,9 @@ public class RespondentTellSomethingElseService {
     @Value("${respondent.tse.template.id}")
     private String emailTemplateId;
 
+    private static final String APPLICANT_RESPONDENT = "Respondent";
     private static final String APPLICANT_CLAIMANT = "Claimant";
+    private static final String RULE92_YES = "I confirm I want to copy";
 
     private static final String SELECTED_APP_AMEND_RESPONSE = "Amend response";
     private static final String SELECTED_APP_CHANGE_PERSONAL_DETAILS = "Change personal details";
@@ -64,6 +73,14 @@ public class RespondentTellSomethingElseService {
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
     private static final String DOC_GEN_ERROR = "Failed to generate document for case id: %s";
     private static final String RES_TSE_FILE_NAME = "resTse.pdf";
+
+    private static final String TABLE_COLUMNS_MARKDOWN =
+        "| No | Application type | Applicant | Application date | Response due | Number of responses | Status |\r\n"
+            + "|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n"
+            + "%s\r\n";
+
+    private static final String TABLE_ROW_MARKDOWN = "|%s|%s|%s|%s|%s|%s|%s|\r\n";
+
 
     /**
      * Validate Give Details (free text box) or file upload is mandatory.
@@ -210,7 +227,7 @@ public class RespondentTellSomethingElseService {
 
         respondentTseType.setDate(Helper.getCurrentDate());
         respondentTseType.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
-        respondentTseType.setApplicant(APPLICANT_CLAIMANT);
+        respondentTseType.setApplicant(APPLICANT_RESPONDENT);
         assignDataToFieldsFromApplicationType(respondentTseType, caseData);
         respondentTseType.setType(caseData.getResTseSelectApplication());
         respondentTseType.setCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
@@ -318,11 +335,51 @@ public class RespondentTellSomethingElseService {
      * Gets the number a new TSE application should be labelled as.
      * @param caseData contains all the case data
      */
-    public static int getNextApplicationNumber(CaseData caseData) {
+    private static int getNextApplicationNumber(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
             return 1;
         }
         return caseData.getGenericTseApplicationCollection().size() + 1;
     }
 
+    public String generateTableMarkdown(CaseData caseData) {
+        List<GenericTseApplicationTypeItem> genericApplicationList = caseData.getGenericTseApplicationCollection();
+        if (genericApplicationList == null) {
+            return "";
+        }
+
+        // Check application is either created by respondent or claimant chosen yes in rule 92
+        // generate number from indices
+        // Response due is application date plus 7 days
+
+        AtomicInteger atomicInteger = new AtomicInteger(1);
+
+        String tableRowsMarkdown = genericApplicationList
+            .stream()
+            .filter(a -> a.getValue().getApplicant().equals(APPLICANT_RESPONDENT) ||
+                (a.getValue().getApplicant().equals(APPLICANT_CLAIMANT) &&
+                    a.getValue().getCopyToOtherPartyYesOrNo().equals(RULE92_YES)))
+            .map(a -> String.format(TABLE_ROW_MARKDOWN, atomicInteger.getAndIncrement(), a.getValue().getType(),
+                a.getValue().getApplicant(), a.getValue().getDate(), getResponseDueDate(a), 0,
+                Optional.ofNullable(a.getValue().getStatus()).orElse("Open") ))
+            .collect(Collectors.joining());
+
+        return String.format(TABLE_COLUMNS_MARKDOWN, tableRowsMarkdown);
+
+    }
+
+    private String getResponseDueDate(GenericTseApplicationTypeItem application) {
+        Date applicationDate = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("dd MMM yyyy");
+        try {
+            applicationDate = format.parse(application.getValue().getDate());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Calendar c = Calendar.getInstance();
+        c.setTime(applicationDate);
+        c.add(Calendar.DATE, 7);
+
+        return new SimpleDateFormat("dd MMM yyyy").format(c.getTime());
+    }
 }

@@ -35,10 +35,10 @@ public class RespondentRepresentativeService {
 
     private final AuditEventService auditEventService;
 
-    @Value("${aac.system.username}")
+    @Value("${etcos.system.username}")
     private String systemUserName;
 
-    @Value("${aac.system.password}")
+    @Value("${etcos.system.password}")
     private String systemUserPassword;
 
     /**

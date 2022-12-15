@@ -53,12 +53,13 @@ public class TseHelper {
         }
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
-            .filter(r -> r.getValue().getStatus() != null && !r.getValue().getStatus().equals(CLOSED))
-            .map(r -> DynamicValueType.create(
+            .filter(r -> r.getValue().getRespondentReply() == null
+                && r.getValue().getStatus() != null
+                && !r.getValue().getStatus().equals(CLOSED)
+            ).map(r -> DynamicValueType.create(
                 r.getValue().getNumber(),
                 r.getValue().getNumber() + " " + r.getValue().getType())
-            )
-            .collect(Collectors.toList()));
+            ).collect(Collectors.toList()));
     }
 
     /**

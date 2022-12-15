@@ -13,6 +13,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,45 +74,13 @@ public class RespondentTellSomethingElseService {
      */
     public List<String> validateGiveDetails(CaseData caseData) {
         List<String> errors = new ArrayList<>();
-        if (Boolean.TRUE.equals(checkSelectedAppGiveDetailsIsBlank(caseData))) {
+        RespondentTSEApplicationTypeData selectedAppData =
+                RespondentTellSomethingElseHelper.getSelectedAppAppType(caseData);
+        if (selectedAppData == null
+                || selectedAppData.getResTseDocument() == null && isNullOrEmpty(selectedAppData.getSelectedTextBox())) {
             errors.add(GIVE_DETAIL_MISSING);
         }
         return errors;
-    }
-
-    private Boolean checkSelectedAppGiveDetailsIsBlank(CaseData caseData) {
-        switch (caseData.getResTseSelectApplication()) {
-            case SELECTED_APP_AMEND_RESPONSE:
-                return checkGiveDetailsIsBlank(caseData.getResTseDocument1(), caseData.getResTseTextBox1());
-            case SELECTED_APP_CHANGE_PERSONAL_DETAILS:
-                return checkGiveDetailsIsBlank(caseData.getResTseDocument2(), caseData.getResTseTextBox2());
-            case SELECTED_APP_CLAIMANT_NOT_COMPLIED:
-                return checkGiveDetailsIsBlank(caseData.getResTseDocument3(), caseData.getResTseTextBox3());
-            case SELECTED_APP_CONSIDER_A_DECISION_AFRESH:
-                return checkGiveDetailsIsBlank(caseData.getResTseDocument4(), caseData.getResTseTextBox4());
-            case SELECTED_APP_CONTACT_THE_TRIBUNAL:
-                return checkGiveDetailsIsBlank(caseData.getResTseDocument5(), caseData.getResTseTextBox5());
-            case SELECTED_APP_ORDER_OTHER_PARTY:
-                return checkGiveDetailsIsBlank(caseData.getResTseDocument6(), caseData.getResTseTextBox6());
-            case SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
-                return checkGiveDetailsIsBlank(caseData.getResTseDocument7(), caseData.getResTseTextBox7());
-            case SELECTED_APP_POSTPONE_A_HEARING:
-                return checkGiveDetailsIsBlank(caseData.getResTseDocument8(), caseData.getResTseTextBox8());
-            case SELECTED_APP_RECONSIDER_JUDGEMENT:
-                return checkGiveDetailsIsBlank(caseData.getResTseDocument9(), caseData.getResTseTextBox9());
-            case SELECTED_APP_RESTRICT_PUBLICITY:
-                return checkGiveDetailsIsBlank(caseData.getResTseDocument10(), caseData.getResTseTextBox10());
-            case SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
-                return checkGiveDetailsIsBlank(caseData.getResTseDocument11(), caseData.getResTseTextBox11());
-            case SELECTED_APP_VARY_OR_REVOKE_AN_ORDER:
-                return checkGiveDetailsIsBlank(caseData.getResTseDocument12(), caseData.getResTseTextBox12());
-            default:
-                return true;
-        }
-    }
-
-    private Boolean checkGiveDetailsIsBlank(UploadedDocumentType document, String textBox) {
-        return document == null && isNullOrEmpty(textBox);
     }
 
     /**
@@ -228,57 +198,11 @@ public class RespondentTellSomethingElseService {
     }
 
     private void assignDataToFieldsFromApplicationType(GenericTseApplicationType respondentTseType, CaseData caseData) {
-        switch (caseData.getResTseSelectApplication()) {
-            case SELECTED_APP_AMEND_RESPONSE:
-                respondentTseType.setDetails(caseData.getResTseTextBox1());
-                respondentTseType.setDocumentUpload(caseData.getResTseDocument1());
-                break;
-            case SELECTED_APP_CHANGE_PERSONAL_DETAILS:
-                respondentTseType.setDetails(caseData.getResTseTextBox2());
-                respondentTseType.setDocumentUpload(caseData.getResTseDocument2());
-                break;
-            case SELECTED_APP_CLAIMANT_NOT_COMPLIED:
-                respondentTseType.setDetails(caseData.getResTseTextBox3());
-                respondentTseType.setDocumentUpload(caseData.getResTseDocument3());
-                break;
-            case SELECTED_APP_CONSIDER_A_DECISION_AFRESH:
-                respondentTseType.setDetails(caseData.getResTseTextBox4());
-                respondentTseType.setDocumentUpload(caseData.getResTseDocument4());
-                break;
-            case SELECTED_APP_CONTACT_THE_TRIBUNAL:
-                respondentTseType.setDetails(caseData.getResTseTextBox5());
-                respondentTseType.setDocumentUpload(caseData.getResTseDocument5());
-                break;
-            case SELECTED_APP_ORDER_OTHER_PARTY:
-                respondentTseType.setDetails(caseData.getResTseTextBox6());
-                respondentTseType.setDocumentUpload(caseData.getResTseDocument6());
-                break;
-            case SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
-                respondentTseType.setDetails(caseData.getResTseTextBox7());
-                respondentTseType.setDocumentUpload(caseData.getResTseDocument7());
-                break;
-            case SELECTED_APP_POSTPONE_A_HEARING:
-                respondentTseType.setDetails(caseData.getResTseTextBox8());
-                respondentTseType.setDocumentUpload(caseData.getResTseDocument8());
-                break;
-            case SELECTED_APP_RECONSIDER_JUDGEMENT:
-                respondentTseType.setDetails(caseData.getResTseTextBox9());
-                respondentTseType.setDocumentUpload(caseData.getResTseDocument9());
-                break;
-            case SELECTED_APP_RESTRICT_PUBLICITY:
-                respondentTseType.setDetails(caseData.getResTseTextBox10());
-                respondentTseType.setDocumentUpload(caseData.getResTseDocument10());
-                break;
-            case SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
-                respondentTseType.setDetails(caseData.getResTseTextBox11());
-                respondentTseType.setDocumentUpload(caseData.getResTseDocument11());
-                break;
-            case SELECTED_APP_VARY_OR_REVOKE_AN_ORDER:
-                respondentTseType.setDetails(caseData.getResTseTextBox12());
-                respondentTseType.setDocumentUpload(caseData.getResTseDocument12());
-                break;
-            default:
-                break;
+        RespondentTSEApplicationTypeData selectedAppData =
+                RespondentTellSomethingElseHelper.getSelectedAppAppType(caseData);
+        if (selectedAppData != null) {
+            respondentTseType.setDetails(selectedAppData.getSelectedTextBox());
+            respondentTseType.setDocumentUpload(selectedAppData.getResTseDocument());
         }
     }
 

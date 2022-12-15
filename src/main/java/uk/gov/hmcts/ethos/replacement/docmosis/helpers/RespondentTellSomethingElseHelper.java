@@ -3,12 +3,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.RespondentTellSomethingElseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.RespondentTellSomethingElseDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
-
-import java.util.Optional;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 
@@ -39,16 +36,13 @@ public class RespondentTellSomethingElseHelper {
     public static String getDocumentRequest(CaseData caseData, String accessKey)
             throws JsonProcessingException {
 
-        RespondentTSEApplicationTypeData selectedAppData =
-                Optional.ofNullable(getSelectedAppAppType(caseData)).orElse(null);
-
-        String documentName = getDocumentName(selectedAppData.getResTseDocument());
+        RespondentTSEApplicationTypeData selectedAppData = getSelectedAppAppType(caseData);
 
         RespondentTellSomethingElseData data = RespondentTellSomethingElseData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
                 .resTseSelectApplication(defaultIfEmpty(caseData.getResTseSelectApplication(), null))
-                .resTseDocument(documentName)
-                .resTseTextBox(defaultIfEmpty(selectedAppData.getSelectedTextBox(), null))
+                .resTseDocument(getDocumentName(selectedAppData))
+                .resTseTextBox(getTextBoxDetails(selectedAppData))
                 .build();
 
         RespondentTellSomethingElseDocument document = RespondentTellSomethingElseDocument.builder()
@@ -61,7 +55,7 @@ public class RespondentTellSomethingElseHelper {
 
     }
 
-    private static RespondentTSEApplicationTypeData getSelectedAppAppType(CaseData caseData) {
+    public static RespondentTSEApplicationTypeData getSelectedAppAppType(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
             case SELECTED_APP_AMEND_RESPONSE:
                 return new RespondentTSEApplicationTypeData(
@@ -104,9 +98,17 @@ public class RespondentTellSomethingElseHelper {
         }
     }
 
-    private static String getDocumentName(UploadedDocumentType resTseDocument) {
-        if (resTseDocument != null) {
-            return resTseDocument.getDocumentFilename();
+    private static String getDocumentName(RespondentTSEApplicationTypeData selectedAppData) {
+        if (selectedAppData != null && selectedAppData.getResTseDocument() != null) {
+            return selectedAppData.getResTseDocument().getDocumentFilename();
+        } else {
+            return null;
+        }
+    }
+
+    private static String getTextBoxDetails(RespondentTSEApplicationTypeData selectedAppData) {
+        if (selectedAppData != null) {
+            return selectedAppData.getSelectedTextBox();
         } else {
             return null;
         }

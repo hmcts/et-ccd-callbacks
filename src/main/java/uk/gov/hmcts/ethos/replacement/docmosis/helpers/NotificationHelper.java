@@ -34,7 +34,6 @@ public final class NotificationHelper {
         return String.format("%s, %s", getNameForClaimant(caseData), getNameOfRespondents(caseData));
     }
 
-
     public static Map<String, String> buildMapForClaimant(CaseData caseData, String caseId) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
@@ -69,6 +68,7 @@ public final class NotificationHelper {
         return personalisation;
 
     }
+
     /**
      * Builds personalisation object for sending an email to the claimant or claimant rep.
      */

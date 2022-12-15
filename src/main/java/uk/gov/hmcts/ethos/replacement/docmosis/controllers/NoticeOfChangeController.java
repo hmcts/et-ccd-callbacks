@@ -103,7 +103,7 @@ public class NoticeOfChangeController {
             try {
                 nocNotificationService.sendNotificationOfChangeEmails(callbackRequest,
                     caseData);
-            } catch (Exception exception){
+            } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);
             }
 

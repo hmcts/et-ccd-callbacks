@@ -11,13 +11,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeS
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -38,13 +37,17 @@ public final class NocNotificationHelper {
 
     public static String getOldSolicitorEmail(CallbackRequest callbackRequest) {
         CaseData prevCaseData = callbackRequest.getCaseDetailsBefore().getCaseData();
-        return prevCaseData.getRepCollection().get(getIndexOfSolicitor(prevCaseData)).getValue().getRepresentativeEmailAddress();
+        return prevCaseData.getRepCollection()
+            .get(getIndexOfSolicitor(prevCaseData))
+            .getValue().getRepresentativeEmailAddress();
     }
 
     public static String getNewSolicitorEmail(CallbackRequest callbackRequest) {
         CaseData oldCaseData = callbackRequest.getCaseDetailsBefore().getCaseData();
         CaseData newDetails = callbackRequest.getCaseDetails().getCaseData();
-        return newDetails.getRepCollection().get(getIndexOfSolicitor(oldCaseData)).getValue().getRepresentativeEmailAddress();
+        return newDetails.getRepCollection()
+            .get(getIndexOfSolicitor(oldCaseData))
+            .getValue().getRepresentativeEmailAddress();
     }
 
     public static String getRespondentNameForNewSolicitor(CallbackRequest callbackRequest) {
@@ -53,7 +56,6 @@ public final class NocNotificationHelper {
             caseData.getChangeOrganisationRequestField().getOrganisationToAdd().getOrganisationName();
         return isNullOrEmpty(organisationName) ? UNKNOWN : organisationName;
     }
-
 
     public static RespondentSumType getRespondent(CallbackRequest callbackRequest, CaseData caseData,
                                                   RespondentRepresentativeService respondentRepresentativeService) {
@@ -69,7 +71,6 @@ public final class NocNotificationHelper {
         return respondentRepresentativeService.getRespondent(representedPerson.getValue().getRespRepName(), caseData);
     }
 
-
     public static void addNameToPersonalisation(CaseData caseData, Map<String, String> personalisation) {
         String firstName = caseData.getClaimantIndType().getClaimantFirstNames();
         String lastName =  caseData.getClaimantIndType().getClaimantLastName();
@@ -78,31 +79,30 @@ public final class NocNotificationHelper {
         personalisation.put("last_name", isNullOrEmpty(firstName) ? UNKNOWN : lastName);
     }
 
-    public static Map<String, String> buildClaimantPersonalisation(CaseData caseData, String party_name) {
-        Map<String, String> personalisation = new HashMap<>();
+    public static Map<String, String> buildClaimantPersonalisation(CaseData caseData, String partyName) {
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
-        personalisation.put("party_name", party_name);
+        personalisation.put("party_name", partyName);
         addNameToPersonalisation(caseData, personalisation);
 
         return personalisation;
     }
 
     public static Map<String, String> buildPreviousRespondentSolicitorPersonalisation(CaseData caseData) {
-        Map<String, String> personalisation = new HashMap<>();
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
         //TODO: Figure out correct values for personalisation field
-        addNameToPersonalisation(caseData,personalisation);
+        addNameToPersonalisation(caseData, personalisation);
         personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? UNKNOWN :
-                caseData.getEthosCaseReference());
-
+            caseData.getEthosCaseReference());
 
         return personalisation;
     }
 
     public static Map<String, String> buildNewRespondentSolicitorPersonalisation(CaseData caseData, String partyName) {
-        Map<String, String> personalisation = new HashMap<>();
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
         //TODO: Figure out correct values for personalisation field
@@ -115,7 +115,7 @@ public final class NocNotificationHelper {
     }
 
     public static Map<String, String> buildRespondentPersonalisation(CaseData caseData, RespondentSumType respondent) {
-        Map<String, String> personalisation = new HashMap<>();
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
         //TODO: Figure out correct values for personalisation field
@@ -125,22 +125,23 @@ public final class NocNotificationHelper {
 
         String nextHearingDate = HearingsHelper.getEarliestFutureHearingDate(caseData.getHearingCollection());
 
-        if (nextHearingDate != null) {
+        if (nextHearingDate == null) {
+            personalisation.put("date", "Not set");
+        } else {
             try {
-                Date hearingStartDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(nextHearingDate);
-                personalisation.put("date", new SimpleDateFormat("dd MMM yyyy").format(hearingStartDate));
+                Date hearingStartDate =
+                    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.UK).parse(nextHearingDate);
+                personalisation.put("date", new SimpleDateFormat("dd MMM yyyy", Locale.UK).format(hearingStartDate));
             } catch (ParseException e) {
                 personalisation.put("date", "Not set");
             }
-        } else {
-            personalisation.put("date", "Not set");
         }
 
         return personalisation;
     }
 
     public static Map<String, String> buildTribunalPersonalisation(CaseData caseData) {
-        Map<String, String> personalisation = new HashMap<>();
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
         //TODO: Figure out correct values for personalisation field
@@ -158,7 +159,6 @@ public final class NocNotificationHelper {
         personalisation.put("claimant", caseData.getClaimant());
         personalisation.put("list_of_respondents", getListOfRespondents(caseData));
         personalisation.put("case_number", caseData.getEthosCaseReference());
-
     }
 
     @NotNull

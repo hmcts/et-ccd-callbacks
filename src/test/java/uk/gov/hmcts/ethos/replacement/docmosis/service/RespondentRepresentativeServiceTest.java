@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CaseConverter.class, NoticeOfChangeFieldPopulator.class, ObjectMapper.class})
+@SuppressWarnings({"PMD.ExcessiveImports"})
 class RespondentRepresentativeServiceTest {
     private static final String RESPONDENT_NAME = "Harry Johnson";
     private static final String RESPONDENT_NAME_TWO = "Jane Green";

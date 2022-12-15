@@ -15,7 +15,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -25,11 +28,9 @@ class NocNotificationServiceTest {
     private NocNotificationService nocNotificationService;
     @Mock
     private EmailService emailService;
-
     @Mock
     private RespondentRepresentativeService respondentRepresentativeService;
     private CaseData caseData;
-    private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
     private CallbackRequest callbackRequest;
 
@@ -42,7 +43,7 @@ class NocNotificationServiceTest {
             .organisationID("2")
             .organisationName("Old Organisation").build();
 
-        caseDetails = CaseDataBuilder.builder()
+        CaseDetails caseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")
             .withClaimantType("claimant@unrepresented.com")
             .withRepresentativeClaimantType("Claimant Rep", "claimant@represented.com")
@@ -56,13 +57,13 @@ class NocNotificationServiceTest {
                 "Manchester", "M11 4ED", "United Kingdom",
                 null)
             .withRespondentRepresentative("Respondent Represented", "Rep LastName", "newres@rep.com")
-            .withRespondent("Respondent",YES, "2022-03-01", "res@rep.com", false )
+            .withRespondent("Respondent", YES, "2022-03-01", "res@rep.com", false)
             .withChangeOrganisationRequestField(
-                    organisationToAdd,
-                    organisationToRemove,
-                    null,
-                    null,
-                    null)
+                organisationToAdd,
+                organisationToRemove,
+                null,
+                null,
+                null)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseDetailsBefore = CaseDataBuilder.builder()
@@ -78,14 +79,16 @@ class NocNotificationServiceTest {
                 "32 Sweet Street", "14 House", null,
                 "Manchester", "M11 4ED", "United Kingdom",
                 null)
-            .withRespondentRepresentative("Respondent Represented", "Rep LastName", "oldres@rep.com")
-            .withRespondent("Respondent",YES, "2022-03-01", "res@rep.com", false )
+            .withRespondentRepresentative("Respondent Represented",
+                "Rep LastName", "oldres@rep.com")
+            .withRespondent("Respondent", YES, "2022-03-01",
+                "res@rep.com", false)
             .withChangeOrganisationRequestField(
-                    organisationToAdd,
-                    organisationToRemove,
-                    null,
-                    null,
-                    null)
+                organisationToAdd,
+                organisationToRemove,
+                null,
+                null,
+                null)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         callbackRequest = CallbackRequest.builder()
@@ -100,7 +103,7 @@ class NocNotificationServiceTest {
     }
 
     @Test
-    void sendNotifications_shouldSendThreeNotifications() {
+    void sendNotificationsShouldSendThreeNotifications() {
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName("Respondent");
         respondentSumType.setRespondentEmail("res@rep.com");
@@ -119,7 +122,7 @@ class NocNotificationServiceTest {
     }
 
     @Test
-    void handle_missing_emails() {
+    void handleMissingEmails() {
         reset(emailService);
 
         caseDetailsBefore.getCaseData().getRepCollection().get(0).getValue().setRepresentativeEmailAddress(null);

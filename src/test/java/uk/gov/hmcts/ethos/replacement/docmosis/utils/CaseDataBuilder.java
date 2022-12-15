@@ -345,15 +345,16 @@ public class CaseDataBuilder {
         return this;
     }
 
-
     public CaseDataBuilder withRespondent(String respondentName, String responseReceived, String receivedDate,
                                           String respondentEmail, boolean extension) {
         withRespondent(respondentName, responseReceived, receivedDate, extension);
-        RespondentSumTypeItem respondentSumTypeItem = caseData.getRespondentCollection().get(caseData.getRespondentCollection().size() - 1);
+        RespondentSumTypeItem respondentSumTypeItem = caseData.getRespondentCollection()
+            .get(caseData.getRespondentCollection().size() - 1);
         respondentSumTypeItem.getValue().setRespondentEmail(respondentEmail);
         return this;
 
     }
+
     public CaseDataBuilder withRespondent(String respondentName, String responseReceived, String receivedDate,
                                           boolean extension) {
         RespondentSumType respondentSumType = new RespondentSumType();
@@ -479,7 +480,7 @@ public class CaseDataBuilder {
                                                               DynamicFixedListType caseRoleID,
                                                               LocalDateTime requestTimestamp,
                                                               ChangeOrganisationApprovalStatus approvalStatus) {
-        DynamicValueType caseRoleIDValue = DynamicValueType.create("[RESPONDENTSOLICITORONE]", "Respondent Solicitor");
+        DynamicValueType caseRoleIDValue = DynamicValueType.create("[SOLICITORA]", "Respondent Solicitor");
 
         DynamicFixedListType caseRoleIDList = new DynamicFixedListType();
         caseRoleIDList.setValue(caseRoleIDValue);

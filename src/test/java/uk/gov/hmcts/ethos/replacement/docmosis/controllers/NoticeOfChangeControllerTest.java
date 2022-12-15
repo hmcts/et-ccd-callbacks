@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -29,6 +30,7 @@ import java.util.Objects;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -42,6 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     VerifyTokenService.class,
     CcdCaseAssignment.class
 })
+@SuppressWarnings({"PMD.ExcessiveImports"})
 class NoticeOfChangeControllerTest {
 
     @MockBean
@@ -50,6 +53,9 @@ class NoticeOfChangeControllerTest {
     private RespondentRepresentativeService respondentRepresentativeService;
     @MockBean
     private CcdCaseAssignment ccdCaseAssignment;
+
+    @MockBean
+    private NocNotificationService notificationService;
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -111,6 +117,8 @@ class NoticeOfChangeControllerTest {
     @Test
     void nocSubmitted() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        doNothing().when(notificationService).sendNotificationOfChangeEmails(any(),
+            any());
 
         mvc.perform(post(SUBMITTED_URL)
                 .content(requestContent.toString())

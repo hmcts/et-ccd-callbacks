@@ -183,4 +183,11 @@
         <packageUrl regex="true">^pkg:maven/org\.apache\.xmlgraphics/xmlgraphics\-commons@.*$</packageUrl>
         <cve>CVE-2021-37533</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: qs:6.9.3
+   ]]></notes>
+        <packageUrl regex="true">^pkg:npm/qs@.*$</packageUrl>
+        <vulnerabilityName>1085139</vulnerabilityName>
+    </suppress>
 </suppressions>

@@ -10,6 +10,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 public class TseAdminHelper {
     public static final String CLOSED = "Closed";
 
+    private TseAdminHelper() {
+        // Sonar Lint: Utility classes should not have public constructors
+    }
+
     /**
      * Create fields for application dropdown selector.
      * @param caseData contains all the case data

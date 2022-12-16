@@ -68,15 +68,3 @@ resource "azurerm_key_vault_secret" "et_cos_s2s_secret" {
   value        = data.azurerm_key_vault_secret.et_cos_s2s_key.value
   key_vault_id = module.key-vault.key_vault_id
 }
-
-resource "azurerm_key_vault_secret" "cos-system-user" {
-  name         = "cos-system-user"
-  value        = data.azurerm_key_vault_secret.cos-system-user.value
-  key_vault_id = module.key-vault.key_vault_id
-}
-
-resource "azurerm_key_vault_secret" "cos-system-user-password" {
-  name         = "cos-system-user-password"
-  value        = data.azurerm_key_vault_secret.cos-system-user-password.value
-  key_vault_id = module.key-vault.key_vault_id
-}

@@ -184,7 +184,8 @@ public final class ReferralHelper {
     }
 
     private static String getReferralDocLink(DocumentTypeItem documentTypeItem) {
-        if (documentTypeItem != null && documentTypeItem.getValue() != null && documentTypeItem.getValue().getUploadedDocument() != null
+        if (documentTypeItem != null && documentTypeItem.getValue() != null
+                && documentTypeItem.getValue().getUploadedDocument() != null
                 && !Strings.isNullOrEmpty(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
             String docFileName = "";
             if (!Strings.isNullOrEmpty(documentTypeItem.getValue().getUploadedDocument().getDocumentFilename())) {

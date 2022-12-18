@@ -3,34 +3,49 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.elasticsearch.common.Strings;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.*;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ReferralReplyTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.ReferralTypeData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.ReferralTypeDocument;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.LinguisticNaming", "PMD.ConfusingTernary",
-        "PMD.SimpleDateFormatNeedsLocale", "PMD.GodClass", "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.TooManyMethods",
+                   "PMD.LinguisticNaming",
+                   "PMD.ConfusingTernary",
+                   "PMD.SimpleDateFormatNeedsLocale",
+                   "PMD.GodClass",
+                   "PMD.ExcessiveImports"
+})
 public final class ReferralHelper {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String TRUE = "True";
@@ -172,8 +187,8 @@ public final class ReferralHelper {
     }
 
     private static String getReferralDocLink(DocumentTypeItem d) {
-        if (d != null && d.getValue() != null && d.getValue().getUploadedDocument() != null &&
-                !Strings.isNullOrEmpty(d.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
+        if (d != null && d.getValue() != null && d.getValue().getUploadedDocument() != null
+                && !Strings.isNullOrEmpty(d.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
             String docFileName = "";
             if (!Strings.isNullOrEmpty(d.getValue().getUploadedDocument().getDocumentFilename())) {
                 docFileName = d.getValue().getUploadedDocument().getDocumentFilename();
@@ -196,10 +211,12 @@ public final class ReferralHelper {
         boolean singleReply = replyCollection.size() == 1;
         return replyCollection.stream()
                 .map(r -> String.format(REPLY_DETAILS, singleReply ? "" : count.incrementAndGet(),
-                        r.getValue().getReplyBy(), r.getValue().getDirectionTo(), r.getValue().getReplyToEmailAddress(),
+                        r.getValue().getReplyBy(), r.getValue().getDirectionTo(),
+                        r.getValue().getReplyToEmailAddress(),
                         r.getValue().getIsUrgentReply(), r.getValue().getReplyDate(),
                         getNearestHearingToReferral(caseData, "None"), referral.getReferralSubject(),
-                        r.getValue().getDirectionDetails(), createDocLinkFromCollection(r.getValue().getReplyDocument()),
+                        r.getValue().getDirectionDetails(), createDocLinkFromCollection(
+                                r.getValue().getReplyDocument()),
                         createGeneralNotes(r.getValue().getReplyGeneralNotes())))
                 .collect(Collectors.joining());
     }
@@ -234,7 +251,8 @@ public final class ReferralHelper {
             return documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
         } else {
             return "";
-        }    }
+        }
+    }
 
     private static ReferralType getSelectedReferral(CaseData caseData) {
         return caseData.getReferralCollection()

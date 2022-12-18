@@ -207,13 +207,13 @@ public final class ReferralHelper {
     }
 
     private static String getReferralDocLink(DocumentTypeItem d) {
-        if (d != null && d.getValue() != null && d.getValue().getUploadedDocument() != null &&
-                !Strings.isNullOrEmpty(d.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
+        if (d != null && d.getValue() != null && d.getValue().getUploadedDocument() != null
+                && !Strings.isNullOrEmpty(d.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
             String docFileName = "";
             if (!Strings.isNullOrEmpty(d.getValue().getUploadedDocument().getDocumentFilename())) {
                 docFileName = d.getValue().getUploadedDocument().getDocumentFilename();
             }
-           return String.format(DOCUMENT_LINK, createDocLinkBinary(d),
+            return String.format(DOCUMENT_LINK, createDocLinkBinary(d),
                    docFileName);
         } else {
             return "";

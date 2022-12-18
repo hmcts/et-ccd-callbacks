@@ -40,8 +40,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.LinguisticNaming", "PMD.ConfusingTernary",
-        "PMD.SimpleDateFormatNeedsLocale", "PMD.GodClass", "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.TooManyMethods",
+        "PMD.LinguisticNaming",
+        "PMD.ConfusingTernary",
+        "PMD.SimpleDateFormatNeedsLocale",
+        "PMD.GodClass",
+        "PMD.ExcessiveImports"
+})
 public final class ReferralHelper {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String TRUE = "True";
@@ -197,7 +202,8 @@ public final class ReferralHelper {
                         r.getValue().getReplyBy(), r.getValue().getDirectionTo(), r.getValue().getReplyToEmailAddress(),
                         r.getValue().getIsUrgentReply(), r.getValue().getReplyDate(),
                         getNearestHearingToReferral(caseData, "None"), referral.getReferralSubject(),
-                        r.getValue().getDirectionDetails(), createDocLinkFromCollection(r.getValue().getReplyDocument()),
+                        r.getValue().getDirectionDetails(), createDocLinkFromCollection(
+                                r.getValue().getReplyDocument()),
                         createGeneralNotes(r.getValue().getReplyGeneralNotes())))
                 .collect(Collectors.joining());
     }

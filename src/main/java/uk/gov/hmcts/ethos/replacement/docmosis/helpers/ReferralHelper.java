@@ -206,14 +206,14 @@ public final class ReferralHelper {
                 && !Strings.isNullOrEmpty(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl());
     }
 
-    private static String getReferralDocLink(DocumentTypeItem d) {
-        if (d != null && d.getValue() != null && d.getValue().getUploadedDocument() != null
-                && !Strings.isNullOrEmpty(d.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
+    private static String getReferralDocLink(DocumentTypeItem documentTypeItem) {
+        if (documentTypeItem != null && documentTypeItem.getValue() != null && documentTypeItem.getValue().getUploadedDocument() != null
+                && !Strings.isNullOrEmpty(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
             String docFileName = "";
-            if (!Strings.isNullOrEmpty(d.getValue().getUploadedDocument().getDocumentFilename())) {
-                docFileName = d.getValue().getUploadedDocument().getDocumentFilename();
+            if (!Strings.isNullOrEmpty(documentTypeItem.getValue().getUploadedDocument().getDocumentFilename())) {
+                docFileName = documentTypeItem.getValue().getUploadedDocument().getDocumentFilename();
             }
-            return String.format(DOCUMENT_LINK, createDocLinkBinary(d),
+            return String.format(DOCUMENT_LINK, createDocLinkBinary(documentTypeItem),
                    docFileName);
         } else {
             return "";

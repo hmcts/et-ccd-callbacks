@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.elasticsearch.common.Strings;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -172,8 +173,7 @@ public final class ReferralHelper {
         String referralDocLink = "";
         if (CollectionUtils.isNotEmpty(referral.getReferralDocument())) {
             referralDocLink = referral.getReferralDocument().stream()
-                .map(d -> String.format(DOCUMENT_LINK, createDocLinkBinary(d),
-                    d.getValue().getUploadedDocument().getDocumentFilename()))
+                .map(ReferralHelper::getReferralDocLink)
                 .collect(Collectors.joining());
         }
         return String.format(REFERRAL_DETAILS, referral.getReferredBy(), referral.getReferCaseTo(),
@@ -181,6 +181,20 @@ public final class ReferralHelper {
             getNearestHearingToReferral(caseData, "None"),
             referral.getReferralSubject(), referral.getReferralDetails(), referralDocLink,
             createReferralInstructions(referral.getReferralInstruction()));
+    }
+
+    private static String getReferralDocLink(DocumentTypeItem d) {
+        if (d != null && d.getValue() != null && d.getValue().getUploadedDocument() != null &&
+                !Strings.isNullOrEmpty(d.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
+            String docFileName = "";
+            if (!Strings.isNullOrEmpty(d.getValue().getUploadedDocument().getDocumentFilename())) {
+                docFileName = d.getValue().getUploadedDocument().getDocumentFilename();
+            }
+           return String.format(DOCUMENT_LINK, createDocLinkBinary(d),
+                   docFileName);
+        } else {
+            return "";
+        }
     }
 
     private static String populateReplyDetails(CaseData caseData) {
@@ -222,14 +236,17 @@ public final class ReferralHelper {
         }
 
         return docItem.stream()
-            .map(d -> String.format(DOCUMENT_LINK, createDocLinkBinary(d),
-                d.getValue().getUploadedDocument().getDocumentFilename()))
+            .map(ReferralHelper::getReferralDocLink)
             .collect(Collectors.joining());
     }
 
     private static String createDocLinkBinary(DocumentTypeItem documentTypeItem) {
         String documentBinaryUrl = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
-        return documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
+        if (!Strings.isNullOrEmpty(documentBinaryUrl) && documentBinaryUrl.contains("/documents/")) {
+            return documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
+        } else {
+            return "";
+        }
     }
 
     private static ReferralType getSelectedReferral(CaseData caseData) {

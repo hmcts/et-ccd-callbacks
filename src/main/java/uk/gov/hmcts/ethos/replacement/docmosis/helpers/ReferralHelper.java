@@ -41,11 +41,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @SuppressWarnings({"PMD.TooManyMethods",
-        "PMD.LinguisticNaming",
-        "PMD.ConfusingTernary",
-        "PMD.SimpleDateFormatNeedsLocale",
-        "PMD.GodClass",
-        "PMD.ExcessiveImports"
+                   "PMD.LinguisticNaming",
+                   "PMD.ConfusingTernary",
+                   "PMD.SimpleDateFormatNeedsLocale",
+                   "PMD.GodClass",
+                   "PMD.ExcessiveImports"
 })
 public final class ReferralHelper {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();

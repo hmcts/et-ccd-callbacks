@@ -4,6 +4,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.ImportStrategy;
 
+import java.util.Iterator;
+
 public class RowHandlerImportStrategy implements ImportStrategy {
 
     private SheetHandler sheetHandler;
@@ -18,10 +20,10 @@ public class RowHandlerImportStrategy implements ImportStrategy {
 
     @Override
     public void importWorkbook(XSSFWorkbook workbook) {
-        var iterator = sheetHandler.sheets(workbook);
+        Iterator<OfficeSheet> iterator = sheetHandler.sheets(workbook);
 
         while (iterator.hasNext()) {
-            var officeSheet = iterator.next();
+            OfficeSheet officeSheet = iterator.next();
             for (Row row : officeSheet.getSheet()) {
                 if (rowHandler.accept(row)) {
                     rowHandler.handle(officeSheet.getTribunalOffice(), row);

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.et.common.model.multiples.types.SubMultipleActionType;
 
 import java.util.List;
 
@@ -18,9 +19,9 @@ public class SubMultipleMidEventValidationService {
 
         log.info("Validating subMultiple");
 
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
 
-        var subMultipleActionType = multipleData.getSubMultipleAction();
+        SubMultipleActionType subMultipleActionType = multipleData.getSubMultipleAction();
 
         String actionType = subMultipleActionType.getActionType();
 

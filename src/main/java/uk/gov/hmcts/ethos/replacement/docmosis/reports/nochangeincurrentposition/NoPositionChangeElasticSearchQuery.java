@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.nochangeincurrentposition;
 
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -17,7 +18,7 @@ final class NoPositionChangeElasticSearchQuery {
     }
 
     static String create(String reportDateLimit, String managingOffice) {
-        var boolQueryBuilder = boolQuery()
+        BoolQueryBuilder boolQueryBuilder = boolQuery()
                 .must(new TermsQueryBuilder("state.keyword", VALID_CASE_STATES))
                 .filter(new RangeQueryBuilder("data.dateToPosition").lte(reportDateLimit).includeUpper(false));
 

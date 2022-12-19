@@ -27,9 +27,9 @@ class RespondentReportElasticSearchQueryTest {
     @ParameterizedTest
     @MethodSource
     void queryShouldNotIncludeManagingOffice(String managingOffice) {
-        var dateToSearchFrom = "2020-02-02";
-        var dateToSearchTo = "2020-02-20";
-        var elasticSearchQuery = RespondentsReportElasticSearchQuery.create(
+        String dateToSearchFrom = "2020-02-02";
+        String dateToSearchTo = "2020-02-20";
+        String elasticSearchQuery = RespondentsReportElasticSearchQuery.create(
                 managingOffice, dateToSearchFrom, dateToSearchTo);
         assertFalse(elasticSearchQuery.contains(ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD));
     }
@@ -54,9 +54,9 @@ class RespondentReportElasticSearchQueryTest {
     @ParameterizedTest
     @MethodSource
     void queryShouldIncludeManagingOffice(String managingOffice) {
-        var dateToSearchFrom = "2020-02-02";
-        var dateToSearchTo = "2020-02-20";
-        var elasticSearchQuery = RespondentsReportElasticSearchQuery.create(
+        String dateToSearchFrom = "2020-02-02";
+        String dateToSearchTo = "2020-02-20";
+        String elasticSearchQuery = RespondentsReportElasticSearchQuery.create(
                 managingOffice, dateToSearchFrom, dateToSearchTo);
         assertTrue(elasticSearchQuery.contains(ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD));
     }

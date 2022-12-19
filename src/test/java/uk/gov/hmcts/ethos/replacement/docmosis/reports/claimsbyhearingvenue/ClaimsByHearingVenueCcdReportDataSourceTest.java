@@ -17,18 +17,19 @@ import static org.mockito.Mockito.when;
 public class ClaimsByHearingVenueCcdReportDataSourceTest {
     @Test
     public void shouldReturnSearchResults() throws IOException {
-        var authToken = "test token";
-        var caseTypeId = "test caseTypeId";
-        var fromDate = "2021-12-13";
-        var toDate = "2021-12-27";
-        var ccdClient = mock(CcdClient.class);
-        var submitEventOne = new ClaimsByHearingVenueSubmitEvent();
-        var submitEventTwo = new ClaimsByHearingVenueSubmitEvent();
+        String authToken = "test token";
+        String caseTypeId = "test caseTypeId";
+        String fromDate = "2021-12-13";
+        String toDate = "2021-12-27";
+        CcdClient ccdClient = mock(CcdClient.class);
+        ClaimsByHearingVenueSubmitEvent submitEventOne = new ClaimsByHearingVenueSubmitEvent();
+        ClaimsByHearingVenueSubmitEvent submitEventTwo = new ClaimsByHearingVenueSubmitEvent();
 
-        var submitEvents = List.of(submitEventOne, submitEventTwo);
+        List<ClaimsByHearingVenueSubmitEvent> submitEvents = List.of(submitEventOne, submitEventTwo);
         when(ccdClient.claimsByHearingVenueSearch(anyString(), anyString(), anyString())).thenReturn(submitEvents);
-        var ccdReportDataSource = new ClaimsByHearingVenueCcdReportDataSource(authToken, ccdClient);
-        var results = ccdReportDataSource.getData(caseTypeId, fromDate, toDate);
+        ClaimsByHearingVenueCcdReportDataSource ccdReportDataSource = new ClaimsByHearingVenueCcdReportDataSource(
+            authToken, ccdClient);
+        List<ClaimsByHearingVenueSubmitEvent> results = ccdReportDataSource.getData(caseTypeId, fromDate, toDate);
         assertEquals(2, results.size());
         assertEquals(submitEventOne, results.get(0));
         assertEquals(submitEventTwo, results.get(1));
@@ -36,15 +37,16 @@ public class ClaimsByHearingVenueCcdReportDataSourceTest {
 
     @Test
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
-        var authToken = "test token";
-        var caseTypeId = "Test_caseTypeId";
-        var fromDate = "2021-12-13";
-        var toDate = "2021-12-27";
-        var ccdClient = mock(CcdClient.class);
+        String authToken = "test token";
+        String caseTypeId = "Test_caseTypeId";
+        String fromDate = "2021-12-13";
+        String toDate = "2021-12-27";
+        CcdClient ccdClient = mock(CcdClient.class);
         when(ccdClient.claimsByHearingVenueSearch(anyString(), anyString(), anyString()))
             .thenThrow(new IOException());
-        var ccdReportDataSource = new ClaimsByHearingVenueCcdReportDataSource(authToken, ccdClient);
-        var exception = assertThrows(ReportException.class, () -> {
+        ClaimsByHearingVenueCcdReportDataSource ccdReportDataSource = new ClaimsByHearingVenueCcdReportDataSource(
+            authToken, ccdClient);
+        ReportException exception = assertThrows(ReportException.class, () -> {
             ccdReportDataSource.getData(caseTypeId, fromDate, toDate);
         });
 

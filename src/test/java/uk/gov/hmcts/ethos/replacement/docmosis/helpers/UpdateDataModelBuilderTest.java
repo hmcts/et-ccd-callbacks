@@ -71,8 +71,9 @@ public class UpdateDataModelBuilderTest {
 
         // Respondent Representative
         caseData.setRepCollection(new ArrayList<>());
-        RepresentedTypeR representedType = new RepresentedTypeR();
-        representedType.setNameOfRepresentative(RESPONDENT_REPRESENTATIVE_NAME);
+        RepresentedTypeR representedType =
+            RepresentedTypeR.builder()
+                .nameOfRepresentative(RESPONDENT_REPRESENTATIVE_NAME).build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId(RESPONDENT_REPRESENTATIVE_ID);
         representedTypeRItem.setValue(representedType);

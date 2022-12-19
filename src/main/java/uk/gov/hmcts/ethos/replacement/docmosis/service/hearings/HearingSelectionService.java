@@ -6,6 +6,8 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
@@ -16,15 +18,15 @@ import java.util.List;
 public class HearingSelectionService {
 
     public List<DynamicValueType> getHearingSelection(CaseData caseData) {
-        var values = new ArrayList<DynamicValueType>();
+        List<DynamicValueType> values = new ArrayList<>();
 
         if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
-            for (var hearing : caseData.getHearingCollection()) {
-                for (var listing : hearing.getValue().getHearingDateCollection()) {
-                    var code = listing.getId();
+            for (HearingTypeItem hearing : caseData.getHearingCollection()) {
+                for (DateListedTypeItem listing : hearing.getValue().getHearingDateCollection()) {
+                    String code = listing.getId();
 
-                    var date = UtilHelper.formatLocalDateTime(listing.getValue().getListedDate());
-                    var label = String.format("Hearing %s, %s", hearing.getValue().getHearingNumber(), date);
+                    String date = UtilHelper.formatLocalDateTime(listing.getValue().getListedDate());
+                    String label = String.format("Hearing %s, %s", hearing.getValue().getHearingNumber(), date);
                     values.add(DynamicValueType.create(code, label));
                 }
             }
@@ -34,9 +36,9 @@ public class HearingSelectionService {
     }
 
     public HearingType getSelectedHearing(CaseData caseData, DynamicFixedListType dynamicFixedListType) {
-        var id = dynamicFixedListType.getValue().getCode();
-        for (var hearing : caseData.getHearingCollection()) {
-            for (var listing : hearing.getValue().getHearingDateCollection()) {
+        String id = dynamicFixedListType.getValue().getCode();
+        for (HearingTypeItem hearing : caseData.getHearingCollection()) {
+            for (DateListedTypeItem listing : hearing.getValue().getHearingDateCollection()) {
                 if (listing.getId().equals(id)) {
                     return hearing.getValue();
                 }
@@ -48,9 +50,9 @@ public class HearingSelectionService {
     }
 
     public DateListedType getSelectedListing(CaseData caseData, DynamicFixedListType dynamicFixedListType) {
-        var id = dynamicFixedListType.getValue().getCode();
-        for (var hearing : caseData.getHearingCollection()) {
-            for (var listing : hearing.getValue().getHearingDateCollection()) {
+        String id = dynamicFixedListType.getValue().getCode();
+        for (HearingTypeItem hearing : caseData.getHearingCollection()) {
+            for (DateListedTypeItem listing : hearing.getValue().getHearingDateCollection()) {
                 if (listing.getId().equals(id)) {
                     return listing.getValue();
                 }

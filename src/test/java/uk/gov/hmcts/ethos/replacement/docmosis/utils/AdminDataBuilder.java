@@ -60,8 +60,8 @@ public class AdminDataBuilder {
     }
 
     public CCDRequest buildAsCCDRequest() {
-        var ccdRequest = new CCDRequest();
-        var caseDetails = new CaseDetails();
+        CCDRequest ccdRequest = new CCDRequest();
+        CaseDetails caseDetails = new CaseDetails();
         caseDetails.setAdminData(adminData);
         ccdRequest.setCaseDetails(caseDetails);
         return ccdRequest;
@@ -69,7 +69,7 @@ public class AdminDataBuilder {
 
     public AdminDataBuilder withEmployeeMember(String tribunalOffice, String employeeMemberCode,
                                                String employeeMemberName) {
-        var employeeMember = new AdminCourtWorker();
+        AdminCourtWorker employeeMember = new AdminCourtWorker();
         employeeMember.setTribunalOffice(tribunalOffice);
         employeeMember.setCourtWorkerCode(employeeMemberCode);
         employeeMember.setCourtWorkerName(employeeMemberName);

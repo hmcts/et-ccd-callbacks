@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Venue;
@@ -19,15 +20,15 @@ class VenueRowHandler {
     }
 
     boolean accept(Row row) {
-        var cell = row.getCell(0);
+        Cell cell = row.getCell(0);
         return cell != null && rowId.equals(cell.getStringCellValue());
     }
 
     void handle(TribunalOffice tribunalOffice, Row row) {
-        var code = row.getCell(1).getStringCellValue();
-        var name = row.getCell(2).getStringCellValue();
+        String code = row.getCell(1).getStringCellValue();
+        String name = row.getCell(2).getStringCellValue();
 
-        var venue = new Venue();
+        Venue venue = new Venue();
         venue.setCode(code);
         venue.setName(name);
         venue.setTribunalOffice(tribunalOffice);

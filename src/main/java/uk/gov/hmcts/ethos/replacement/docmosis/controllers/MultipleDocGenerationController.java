@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.LabelsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -33,7 +36,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.LawOfDemeter"})
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.LawOfDemeter", "PMD.ExcessiveImports"})
 public class MultipleDocGenerationController {
 
     private static final String LOG_MESSAGE = "received notification request for multiple reference : ";
@@ -67,9 +70,9 @@ public class MultipleDocGenerationController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
-        var documentInfo = multipleScheduleService.bulkScheduleLogic(userToken, multipleDetails, errors);
+        DocumentInfo documentInfo = multipleScheduleService.bulkScheduleLogic(userToken, multipleDetails, errors);
 
         return getMultipleCallbackRespEntityDocInfo(errors, multipleDetails, documentInfo);
     }
@@ -96,9 +99,9 @@ public class MultipleDocGenerationController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
-        var documentInfo = multipleLetterService.bulkLetterLogic(userToken, multipleDetails,
+        DocumentInfo documentInfo = multipleLetterService.bulkLetterLogic(userToken, multipleDetails,
                 errors, false);
 
         return getMultipleCallbackRespEntityDocInfo(errors, multipleDetails, documentInfo);
@@ -125,7 +128,7 @@ public class MultipleDocGenerationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var multipleData = multipleRequest.getCaseDetails().getCaseData();
+        MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();
 
         return ResponseEntity.ok(MultipleCallbackResponse.builder()
                 .data(multipleData)
@@ -156,7 +159,7 @@ public class MultipleDocGenerationController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multipleDocGenerationService.midSelectedAddressLabelsMultiple(userToken, multipleDetails, errors);
         LabelsHelper.validateNumberOfSelectedLabels(multipleDetails.getCaseData(), errors);
@@ -213,7 +216,7 @@ public class MultipleDocGenerationController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
         multipleLetterService.dynamicMultipleLetters(userToken, multipleDetails, errors);
         return getMultipleCallbackRespEntity(errors, multipleDetails);
     }

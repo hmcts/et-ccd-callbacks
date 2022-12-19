@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -29,9 +30,9 @@ public class SimpleSheetHandler implements SheetHandler {
 
     @Override
     public Iterator<OfficeSheet> sheets(XSSFWorkbook workbook) {
-        var sheets = new ArrayList<OfficeSheet>();
-        for (var i = 0; i < workbook.getNumberOfSheets(); i++) {
-            var sheet = workbook.getSheetAt(i);
+        List<OfficeSheet> sheets = new ArrayList<>();
+        for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+            XSSFSheet sheet = workbook.getSheetAt(i);
             if (sheetNameMap.containsKey(sheet.getSheetName())) {
                 sheets.add(new OfficeSheet(sheetNameMap.get(sheet.getSheetName()), sheet));
             }

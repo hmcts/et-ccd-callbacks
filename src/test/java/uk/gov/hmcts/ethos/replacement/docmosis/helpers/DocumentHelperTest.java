@@ -2170,7 +2170,7 @@ public class DocumentHelperTest {
 
     private String getExpectedResult(String resourceFileName) throws URISyntaxException, IOException {
         String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource(resourceFileName)).toURI())));
+                .getResource(resourceFileName)).toURI()))).replace("\r\n", "\n");
         LocalDate currentLocalDate = LocalDate.now();
         LocalDate currentLocalDatePlus28Days = currentLocalDate.plusDays(28);
         return expectedJson.replace("current-date-placeholder",

@@ -10,6 +10,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Venue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -27,16 +28,16 @@ class RoomRowHandler {
     }
 
     boolean accept(Row row) {
-        var cell = row.getCell(0);
+        Cell cell = row.getCell(0);
         if (cell == null) {
             return false;
         }
-        var listId = cell.getStringCellValue();
+        String listId = cell.getStringCellValue();
         return getVenueCodeForRoomsListId(listId).isPresent();
     }
 
     void handle(Row row) {
-        var room = convertRowToRoom(row);
+        Room room = convertRowToRoom(row);
         rooms.add(room);
         log.info(String.format("Found room %s for venue %s", room.getCode(), room.getVenueCode()));
     }
@@ -47,7 +48,7 @@ class RoomRowHandler {
 
     private Optional<String> getVenueCodeForRoomsListId(String roomsListId) {
         if (fixedListMappings.getRooms().containsKey(tribunalOffice)) {
-            var officeMappings = fixedListMappings.getRooms().get(tribunalOffice);
+            Map<String, String> officeMappings = fixedListMappings.getRooms().get(tribunalOffice);
             if (officeMappings.containsKey(roomsListId)) {
                 return Optional.of(officeMappings.get(roomsListId));
             }
@@ -59,16 +60,16 @@ class RoomRowHandler {
     }
 
     private Room convertRowToRoom(Row row) {
-        var listId = getCellValue(row.getCell(0));
-        var venueCode = getVenueCodeForRoomsListId(listId);
+        String listId = getCellValue(row.getCell(0));
+        Optional<String> venueCode = getVenueCodeForRoomsListId(listId);
         if (venueCode.isEmpty()) {
             throw new IllegalArgumentException(String.format("No venue found for %s", listId));
         }
 
-        var code = getCellValue(row.getCell(1));
-        var name = getCellValue(row.getCell(2));
+        String code = getCellValue(row.getCell(1));
+        String name = getCellValue(row.getCell(2));
 
-        var room = new Room();
+        Room room = new Room();
         room.setCode(code);
         room.setName(name);
         room.setVenueCode(venueCode.get());
@@ -81,7 +82,7 @@ class RoomRowHandler {
             case STRING:
                 return cell.getStringCellValue();
             case NUMERIC:
-                var dataFormatter = new DataFormatter();
+                DataFormatter dataFormatter = new DataFormatter();
                 return dataFormatter.formatCellValue(cell);
             default:
                 throw new IllegalArgumentException(String.format("Unexpected cell type %s for cell %s",

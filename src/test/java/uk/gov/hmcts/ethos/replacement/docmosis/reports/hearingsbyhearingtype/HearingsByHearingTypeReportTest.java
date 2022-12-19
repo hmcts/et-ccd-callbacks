@@ -214,19 +214,19 @@ class HearingsByHearingTypeReportTest {
         submitEvents.clear();
         submitEvents.add(caseDataBuilder.createSubmitEventDateInOutRange());
         HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
-        var reportSummaryHdr = reportData.getReportSummaryHdr();
+        HearingsByHearingTypeReportSummaryHdr reportSummaryHdr = reportData.getReportSummaryHdr();
         assertEquals("1", reportSummaryHdr.getFields().getTotal());
         assertEquals("1", reportSummaryHdr.getFields().getCostsCount());
     }
 
     @Test
     void checkReportOfficeName_EngWales() {
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
         ReportParams reportParamsWithManagingOffice = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 managingOffice, DATE_FROM, DATE_TO);
         HearingsByHearingTypeReportData reportData =
                 hearingsByHearingTypeReport.generateReport(reportParamsWithManagingOffice);
-        var reportSummaryHdr = reportData.getReportSummaryHdr();
+        HearingsByHearingTypeReportSummaryHdr reportSummaryHdr = reportData.getReportSummaryHdr();
         assertEquals(managingOffice, reportSummaryHdr.getOffice());
     }
 
@@ -236,7 +236,7 @@ class HearingsByHearingTypeReportTest {
                 DATE_TO);
         HearingsByHearingTypeReportData reportData =
                 hearingsByHearingTypeReport.generateReport(reportParamsWithManagingOffice);
-        var reportSummaryHdr = reportData.getReportSummaryHdr();
+        HearingsByHearingTypeReportSummaryHdr reportSummaryHdr = reportData.getReportSummaryHdr();
         assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportSummaryHdr.getOffice());
     }
 
@@ -246,7 +246,7 @@ class HearingsByHearingTypeReportTest {
         submitEvents.clear();
         submitEvents.add(caseDataBuilder.createSubmitEventNullTime(time));
         HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport.generateReport(REPORT_PARAMS);
-        var reportDetail = reportData.getReportDetails().get(0);
+        HearingsByHearingTypeReportDetail reportDetail = reportData.getReportDetails().get(0);
         assertEquals(result, reportDetail.getDuration());
     }
 }

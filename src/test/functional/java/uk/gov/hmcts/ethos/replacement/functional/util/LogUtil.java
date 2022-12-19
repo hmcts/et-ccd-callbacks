@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LogUtil {
@@ -15,7 +16,7 @@ public class LogUtil {
     }
 
     public static String getDocMosisPayload() throws IOException {
-        var pattern = Pattern.compile(".*TornadoService Sending request: (.*)");
+        Pattern pattern = Pattern.compile(".*TornadoService Sending request: (.*)");
 
         List<String> logs = getLogs("ethos-repl-docmosis-service");
 
@@ -25,7 +26,7 @@ public class LogUtil {
 
         for (int i = logs.size() - 1; i > 0; i--) {
             String log = logs.get(i);
-            var matcher = pattern.matcher(log);
+            Matcher matcher = pattern.matcher(log);
             if (matcher.matches()) {
                 return matcher.group(1);
             }
@@ -39,12 +40,12 @@ public class LogUtil {
         // using the Runtime exec method:
         Process p = Runtime.getRuntime().exec("docker logs --since=60s " + containerName);
 
-        var stdInput = new BufferedReader(new
+        BufferedReader stdInput = new BufferedReader(new
                 InputStreamReader(p.getInputStream()));
 
         // read the output from the command
         String s;
-        var stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         while ((s = stdInput.readLine()) != null) {
 
             if (StringUtils.isEmpty(s)) {

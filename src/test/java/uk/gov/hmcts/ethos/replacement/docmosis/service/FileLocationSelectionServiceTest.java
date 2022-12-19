@@ -4,8 +4,12 @@ import org.junit.Test;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.SelectionServiceTestUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.FileLocationService;
+
+import java.util.List;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -16,10 +20,11 @@ public class FileLocationSelectionServiceTest {
 
     @Test
     public void testInitialiseFileLocationNoFileLocationSelected() {
-        var fileLocationService = mockFileLocationService();
-        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
+        FileLocationService fileLocationService = mockFileLocationService();
+        CaseData caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
 
-        var fileLocationSelectionService = new FileLocationSelectionService(fileLocationService);
+        FileLocationSelectionService fileLocationSelectionService = new FileLocationSelectionService(
+            fileLocationService);
         fileLocationSelectionService.initialiseFileLocation(caseData);
 
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(caseData.getFileLocation(), "fileLocation",
@@ -28,12 +33,13 @@ public class FileLocationSelectionServiceTest {
 
     @Test
     public void testInitialiseFileLocationWithFileLocationSelected() {
-        var fileLocationService = mockFileLocationService();
-        var caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
-        var selectedFileLocation = DynamicValueType.create("fileLocation2", "File Location 2");
+        FileLocationService fileLocationService = mockFileLocationService();
+        CaseData caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
+        DynamicValueType selectedFileLocation = DynamicValueType.create("fileLocation2", "File Location 2");
         caseData.setFileLocation(DynamicFixedListType.of(selectedFileLocation));
 
-        var fileLocationSelectionService = new FileLocationSelectionService(fileLocationService);
+        FileLocationSelectionService fileLocationSelectionService = new FileLocationSelectionService(
+            fileLocationService);
         fileLocationSelectionService.initialiseFileLocation(caseData);
 
         SelectionServiceTestUtils.verifyDynamicFixedListSelected(caseData.getFileLocation(), "fileLocation",
@@ -42,24 +48,26 @@ public class FileLocationSelectionServiceTest {
 
     @Test
     public void testInitialiseFileLocationMultipleDataNoFileLocationSelected() {
-        var fileLocationService = mockFileLocationService();
-        var multipleData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
+        FileLocationService fileLocationService = mockFileLocationService();
+        CaseData multipleData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
 
-        var fileLocationSelectionService = new FileLocationSelectionService(fileLocationService);
+        FileLocationSelectionService fileLocationSelectionService = new FileLocationSelectionService(
+            fileLocationService);
         fileLocationSelectionService.initialiseFileLocation(multipleData);
 
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(multipleData.getFileLocation(), "fileLocation",
-                "File Location ");
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(multipleData.getFileLocation(),
+            "fileLocation", "File Location ");
     }
 
     @Test
     public void testInitialiseFileLocationMultipleDataWithFileLocationSelected() {
-        var fileLocationService = mockFileLocationService();
-        var multipleData = SelectionServiceTestUtils.createMultipleData(tribunalOffice.getOfficeName());
-        var selectedFileLocation = DynamicValueType.create("fileLocation2", "File Location 2");
+        FileLocationService fileLocationService = mockFileLocationService();
+        MultipleData multipleData = SelectionServiceTestUtils.createMultipleData(tribunalOffice.getOfficeName());
+        DynamicValueType selectedFileLocation = DynamicValueType.create("fileLocation2", "File Location 2");
         multipleData.setFileLocation(DynamicFixedListType.of(selectedFileLocation));
 
-        var fileLocationSelectionService = new FileLocationSelectionService(fileLocationService);
+        FileLocationSelectionService fileLocationSelectionService = new FileLocationSelectionService(
+            fileLocationService);
         fileLocationSelectionService.initialiseFileLocation(multipleData);
 
         SelectionServiceTestUtils.verifyDynamicFixedListSelected(multipleData.getFileLocation(), "fileLocation",
@@ -67,8 +75,9 @@ public class FileLocationSelectionServiceTest {
     }
 
     private FileLocationService mockFileLocationService() {
-        var fileLocationService = mock(FileLocationService.class);
-        var fileLocations = SelectionServiceTestUtils.createListItems("fileLocation", "File Location ");
+        FileLocationService fileLocationService = mock(FileLocationService.class);
+        List<DynamicValueType> fileLocations = SelectionServiceTestUtils.createListItems("fileLocation",
+            "File Location ");
         when(fileLocationService.getFileLocations(tribunalOffice)).thenReturn(fileLocations);
 
         return fileLocationService;

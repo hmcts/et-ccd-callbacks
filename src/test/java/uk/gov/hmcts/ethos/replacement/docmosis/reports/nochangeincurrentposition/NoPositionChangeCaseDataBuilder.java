@@ -45,9 +45,9 @@ public class NoPositionChangeCaseDataBuilder {
     }
 
     public NoPositionChangeCaseDataBuilder withRespondent(String name) {
-        var respondentSumType = new RespondentSumType();
+        RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName(name);
-        var respondentSumTypeItem = new RespondentSumTypeItem();
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(respondentSumType);
 
         if (caseData.getRespondentCollection() == null) {
@@ -63,7 +63,7 @@ public class NoPositionChangeCaseDataBuilder {
     }
 
     public NoPositionChangeSubmitEvent buildAsSubmitEvent(String state) {
-        var submitEvent = new NoPositionChangeSubmitEvent();
+        NoPositionChangeSubmitEvent submitEvent = new NoPositionChangeSubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(state);
 

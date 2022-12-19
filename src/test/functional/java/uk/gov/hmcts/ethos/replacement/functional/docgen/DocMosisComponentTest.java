@@ -140,7 +140,7 @@ public class DocMosisComponentTest {
     public void invoke_pre_default_endpoint_without_payload() throws IOException {
         testUtil.loadAuthToken();
 
-        var ccdRequest = new CCDRequest();
+        CCDRequest ccdRequest = new CCDRequest();
 
         Response response = testUtil.getResponse(ccdRequest, Constants.DOCGEN_URI, 400);
     }

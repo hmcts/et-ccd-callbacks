@@ -20,19 +20,19 @@ public class SessionDaysCcdReportDataSourceTest {
 
     @Test
     public void shouldReturnSearchResults() throws IOException {
-        var authToken = "token";
-        var caseTypeId = "caseTypeId";
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var fromDate = "1-1-2022";
-        var toDate = "10-1-2022";
-        var ccdClient = mock(CcdClient.class);
-        var submitEvent = new SessionDaysSubmitEvent();
-        var submitEvents = List.of(submitEvent);
+        String authToken = "token";
+        String caseTypeId = "caseTypeId";
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String fromDate = "1-1-2022";
+        String toDate = "10-1-2022";
+        CcdClient ccdClient = mock(CcdClient.class);
+        SessionDaysSubmitEvent submitEvent = new SessionDaysSubmitEvent();
+        List<SessionDaysSubmitEvent> submitEvents = List.of(submitEvent);
         when(ccdClient.sessionDaysSearch(anyString(), anyString(), anyString())).thenReturn(submitEvents);
 
-        var ccdReportDataSource = new SessionDaysCcdReportDataSource(authToken, ccdClient);
+        SessionDaysCcdReportDataSource ccdReportDataSource = new SessionDaysCcdReportDataSource(authToken, ccdClient);
 
-        var results = ccdReportDataSource.getData(caseTypeId, managingOffice,
+        List<SessionDaysSubmitEvent> results = ccdReportDataSource.getData(caseTypeId, managingOffice,
                 fromDate, toDate);
         assertEquals(1, results.size());
         assertEquals(submitEvent, results.get(0));
@@ -40,15 +40,15 @@ public class SessionDaysCcdReportDataSourceTest {
 
     @Test(expected = ReportException.class)
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
-        var authToken = "token";
-        var caseTypeId = "caseTypeId";
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var fromDate = "1-1-2022";
-        var toDate = "10-1-2022";
-        var ccdClient = mock(CcdClient.class);
+        String authToken = "token";
+        String caseTypeId = "caseTypeId";
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String fromDate = "1-1-2022";
+        String toDate = "10-1-2022";
+        CcdClient ccdClient = mock(CcdClient.class);
         when(ccdClient.sessionDaysSearch(anyString(), anyString(), anyString())).thenThrow(new IOException());
 
-        var ccdReportDataSource = new SessionDaysCcdReportDataSource(authToken, ccdClient);
+        SessionDaysCcdReportDataSource ccdReportDataSource = new SessionDaysCcdReportDataSource(authToken, ccdClient);
         ccdReportDataSource.getData(caseTypeId, managingOffice, fromDate, toDate);
         fail("Should throw exception instead");
     }

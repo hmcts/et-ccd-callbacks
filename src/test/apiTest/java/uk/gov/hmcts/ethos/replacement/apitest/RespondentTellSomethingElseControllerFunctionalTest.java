@@ -64,6 +64,19 @@ class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctional
             .log().all(true);
     }
 
+    @Test
+    void shouldReceiveSuccessResponseWhenDisplayRespondentApplicationsTableInvoked() {
+        RestAssured.given()
+            .spec(spec)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(ccdRequest)
+            .post("/respondentTSE/displayTable")
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log().all(true);
+    }
+
     private RespondentSumTypeItem createRespondentType() {
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName("Boris Johnson");

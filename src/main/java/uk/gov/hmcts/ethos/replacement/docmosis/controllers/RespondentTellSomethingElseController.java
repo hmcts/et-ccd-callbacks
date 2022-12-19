@@ -130,7 +130,6 @@ public class RespondentTellSomethingElseController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setResTseTableMarkUp(resTseService.generateTableMarkdown(caseData));
 
-
         return getCallbackRespEntityNoErrors(caseData);
     }
 

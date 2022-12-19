@@ -12,6 +12,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -62,7 +64,7 @@ class RespondentTellSomethingElseServiceTest {
     private static final String TEMPLATE_ID = "someTemplateId";
     private static final String LEGAL_REP_EMAIL = "mail@mail.com";
     private static final String CASE_ID = "669718251103419";
-    private static final String APPLICANT_CLAIMANT = "Claimant";
+    private static final String APPLICANT_RESPONDENT = "Respondent";
 
     private static final String SELECTED_APP_AMEND_RESPONSE = "Amend response";
     private static final String SELECTED_APP_CHANGE_PERSONAL_DETAILS = "Change personal details";
@@ -91,6 +93,8 @@ class RespondentTellSomethingElseServiceTest {
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
 
     private static final String RES_TSE_FILE_NAME = "resTse.pdf";
+
+    private static final String EXPECTED_TABLE_MARKDOWN = "| No | Application type | Applicant | Application date | Response due | Number of responses | Status |\r\n|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n|1|testType|Respondent|testDate|testDueDate|0|Open|\r\n\r\n";
 
     @BeforeEach
     void setUp() {
@@ -335,7 +339,7 @@ class RespondentTellSomethingElseServiceTest {
             .getDocumentUpload().getDocumentUrl(), is(documentUrl));
 
         assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .getApplicant(), is(APPLICANT_CLAIMANT));
+            .getApplicant(), is(APPLICANT_RESPONDENT));
 
         assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
             .getType(), is(selectedApplication));
@@ -367,6 +371,44 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(caseData.getResTseDocument10(), is(nullValue()));
         assertThat(caseData.getResTseDocument11(), is(nullValue()));
         assertThat(caseData.getResTseDocument12(), is(nullValue()));
+    }
+
+    @Test
+    void displayRespondentApplicationsTable_hasApplications() {
+        CaseData caseData = createCaseData("Amend response", NO);
+        caseData.setGenericTseApplicationCollection(generateGenericTseApplicationList());
+        
+        assertThat(respondentTellSomethingElseService.generateTableMarkdown(caseData), is(EXPECTED_TABLE_MARKDOWN));
+    }
+
+    @Test
+    void displayRespondentApplicationsTable_hasNoApplications() {
+        CaseData caseData = createCaseData("Amend response", NO);
+        
+        assertThat(respondentTellSomethingElseService.generateTableMarkdown(caseData), is(""));
+    }
+
+    private List<GenericTseApplicationTypeItem> generateGenericTseApplicationList() {
+        GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
+
+        respondentTseType.setDate("testDate");
+        respondentTseType.setNumber("number");
+        respondentTseType.setApplicant(APPLICANT_RESPONDENT);
+        respondentTseType.setDetails("testDetails");
+        respondentTseType.setDocumentUpload(createDocumentType("test"));
+        respondentTseType.setType("testType");
+        respondentTseType.setCopyToOtherPartyYesOrNo("yes");
+        respondentTseType.setCopyToOtherPartyText("text");
+        respondentTseType.setDue("testDueDate");
+
+        GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        tseApplicationTypeItem.setId("id");
+        tseApplicationTypeItem.setValue(respondentTseType);
+
+        List<GenericTseApplicationTypeItem> tseApplicationCollection = new ArrayList<>();
+        tseApplicationCollection.add(tseApplicationTypeItem);
+        
+        return tseApplicationCollection;
     }
 
     private void setDocAndTextForSelectedApplication(CaseData caseData,

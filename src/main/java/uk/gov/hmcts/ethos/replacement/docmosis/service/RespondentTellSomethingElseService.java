@@ -6,6 +6,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
@@ -16,11 +17,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -82,7 +80,6 @@ public class RespondentTellSomethingElseService {
             + "%s\r\n";
 
     private static final String TABLE_ROW_MARKDOWN = "|%s|%s|%s|%s|%s|%s|%s|\r\n";
-
 
     /**
      * Validate Give Details (free text box) or file upload is mandatory.
@@ -195,13 +192,17 @@ public class RespondentTellSomethingElseService {
 
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
 
-        respondentTseType.setDate(Helper.getCurrentDate());
+        respondentTseType.setDate(UtilHelper.formatCurrentDate(LocalDate.now()));
         respondentTseType.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
         respondentTseType.setApplicant(APPLICANT_RESPONDENT);
         assignDataToFieldsFromApplicationType(respondentTseType, caseData);
         respondentTseType.setType(caseData.getResTseSelectApplication());
         respondentTseType.setCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
         respondentTseType.setCopyToOtherPartyText(caseData.getResTseCopyToOtherPartyTextArea());
+
+        respondentTseType.setDue(
+            UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)
+        );
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
         tseApplicationTypeItem.setId(UUID.randomUUID().toString());
@@ -272,38 +273,23 @@ public class RespondentTellSomethingElseService {
             return "";
         }
 
-        // Check application is either created by respondent or claimant chosen yes in rule 92
-        // generate number from indices
-        // Response due is application date plus 7 days
-
         AtomicInteger atomicInteger = new AtomicInteger(1);
+
+        // Need to add logic for getting number of responses
+        // For Respondent applications - need to count both claimants and admins responses
+        // For Claimant applications (chosen yes in rule 92) - need to count both respondents and admins responses
 
         String tableRowsMarkdown = genericApplicationList
             .stream()
-            .filter(a -> a.getValue().getApplicant().equals(APPLICANT_RESPONDENT) ||
-                (a.getValue().getApplicant().equals(APPLICANT_CLAIMANT) &&
-                    a.getValue().getCopyToOtherPartyYesOrNo().equals(RULE92_YES)))
+            .filter(a -> a.getValue().getApplicant().equals(APPLICANT_RESPONDENT)
+                || (a.getValue().getApplicant().equals(APPLICANT_CLAIMANT)
+                && a.getValue().getCopyToOtherPartyYesOrNo().equals(RULE92_YES)))
             .map(a -> String.format(TABLE_ROW_MARKDOWN, atomicInteger.getAndIncrement(), a.getValue().getType(),
-                a.getValue().getApplicant(), a.getValue().getDate(), getResponseDueDate(a), 0,
-                Optional.ofNullable(a.getValue().getStatus()).orElse("Open") ))
+                a.getValue().getApplicant(), a.getValue().getDate(), a.getValue().getDue(), 0,
+                Optional.ofNullable(a.getValue().getStatus()).orElse("Open")))
             .collect(Collectors.joining());
 
         return String.format(TABLE_COLUMNS_MARKDOWN, tableRowsMarkdown);
 
-    }
-
-    private String getResponseDueDate(GenericTseApplicationTypeItem application) {
-        Date applicationDate = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("dd MMM yyyy");
-        try {
-            applicationDate = format.parse(application.getValue().getDate());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        Calendar c = Calendar.getInstance();
-        c.setTime(applicationDate);
-        c.add(Calendar.DATE, 7);
-
-        return new SimpleDateFormat("dd MMM yyyy").format(c.getTime());
     }
 }

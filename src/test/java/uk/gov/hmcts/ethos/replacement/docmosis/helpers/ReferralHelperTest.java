@@ -81,6 +81,11 @@ class ReferralHelperTest {
         + "&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;<br><br>"
         + "General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr>";
 
+    private final String singleHearingDetailsNullDoc = "<br><br>Documents &nbsp;&#09&"
+            + "#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;"
+            + "<br><br>Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\""
+            + " download>testFileName</a>&nbsp;";
+
     private final String expectedHearingReferralDetailsMultipleReplies = "<hr><h3>Hearing details </h3><pre>Date &"
         + "nbsp;&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&nbsp; null<br><br>Type &n"
         + "bsp;&nbsp;&#09&#09&#09&#09&#09 Short track</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09"
@@ -284,6 +289,21 @@ class ReferralHelperTest {
 
         assertEquals(expectedHearingReferralDetailsMultipleReplies,
             ReferralHelper.populateHearingReferralDetails(caseData));
+    }
+
+    @Test
+    void populateHearingReferralDetails_NullReferralDocLink() {
+        caseData.setSelectReferral(new DynamicFixedListType("1"));
+        ReferralType referral = new ReferralType();
+        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1")));
+        ReferralTypeItem referralTypeItem = new ReferralTypeItem();
+        referralTypeItem.setId("1");
+        referralTypeItem.setValue(referral);
+        caseData.setReferralCollection(List.of(referralTypeItem));
+        caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
+
+        assertEquals(expectedHearingReferralDetailsSingleReply.replace(singleHearingDetailsNullDoc, ""),
+                ReferralHelper.populateHearingReferralDetails(caseData));
     }
 
     @Test

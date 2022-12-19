@@ -127,6 +127,7 @@ public class CreateReferralController {
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = ReferralHelper.validateEmail(caseData.getReferentEmail());
+        createReferralService.addDocumentUploadErrors(caseData, errors);
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
@@ -156,10 +157,7 @@ public class CreateReferralController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-        List<String> errors = new ArrayList<>();
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        createReferralService.addDocumentUploadErrors(caseData, errors);
-        if (CollectionUtils.isEmpty(errors)) {
             UserDetails userDetails = userService.getUserDetails(userToken);
             emailService.sendEmail(
                     referralTemplateId,
@@ -181,8 +179,8 @@ public class CreateReferralController {
                     caseData,
                     String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
                     this.documentManagementService.addDocumentToDocumentField(documentInfo));
-        }
-        return getCallbackRespEntityErrors(errors, caseData);
+
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     /**

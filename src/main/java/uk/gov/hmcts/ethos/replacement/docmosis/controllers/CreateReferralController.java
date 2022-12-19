@@ -24,9 +24,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-
 import java.util.List;
-
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
@@ -38,7 +36,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequestMapping("/createReferral")
 @RestController
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports"})
 public class CreateReferralController {
 
     private final String referralTemplateId;
@@ -126,6 +124,7 @@ public class CreateReferralController {
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = ReferralHelper.validateEmail(caseData.getReferentEmail());
+        createReferralService.addDocumentUploadErrors(caseData, errors);
         return getCallbackRespEntityErrors(errors, caseData);
     }
 

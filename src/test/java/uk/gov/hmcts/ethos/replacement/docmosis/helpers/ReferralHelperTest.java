@@ -81,10 +81,11 @@ class ReferralHelperTest {
         + "&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;<br><br>"
         + "General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr>";
 
-    private final String singleHearingDetailsNullDoc = "<br><br>Documents &nbsp;&#09&"
-            + "#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;"
-            + "<br><br>Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\""
-            + " download>testFileName</a>&nbsp;";
+    private final String reply = "<br><br>Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/"
+        + "\" download>testFileName</a>&nbsp;<br><br>Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\""
+        + "/documents/\" download>testFileName</a>&nbsp;";
+    private final String reply2 = "Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" "
+        + "download>testFileName</a>&nbsp;<br><br>";
 
     private final String expectedHearingReferralDetailsMultipleReplies = "<hr><h3>Hearing details </h3><pre>Date &"
         + "nbsp;&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&nbsp; null<br><br>Type &n"
@@ -296,13 +297,16 @@ class ReferralHelperTest {
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         ReferralType referral = new ReferralType();
         referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1")));
+        referral.getReferralReplyCollection().get(0).getValue()
+                .getReplyDocument().get(0).getValue().setUploadedDocument(null);
         ReferralTypeItem referralTypeItem = new ReferralTypeItem();
         referralTypeItem.setId("1");
         referralTypeItem.setValue(referral);
         caseData.setReferralCollection(List.of(referralTypeItem));
         caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
 
-        assertEquals(expectedHearingReferralDetailsSingleReply.replace(singleHearingDetailsNullDoc, ""),
+        assertEquals(expectedHearingReferralDetailsSingleReply.replace(reply, "")
+                .replace(reply2, ""),
                 ReferralHelper.populateHearingReferralDetails(caseData));
     }
 

@@ -207,18 +207,20 @@ public final class ReferralHelper {
     }
 
     private static String getReferralDocLink(DocumentTypeItem documentTypeItem) {
-        if (documentTypeItem != null && documentTypeItem.getValue() != null
-                && documentTypeItem.getValue().getUploadedDocument() != null
-                && !Strings.isNullOrEmpty(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
-            String docFileName = "";
-            if (!Strings.isNullOrEmpty(documentTypeItem.getValue().getUploadedDocument().getDocumentFilename())) {
-                docFileName = documentTypeItem.getValue().getUploadedDocument().getDocumentFilename();
-            }
+        String docFileName = "";
+        if (documentExists(documentTypeItem)) {
+            docFileName = documentTypeItem.getValue().getUploadedDocument().getDocumentFilename();
             return String.format(DOCUMENT_LINK, createDocLinkBinary(documentTypeItem),
-                   docFileName);
+                    docFileName);
         } else {
-            return "";
+            return docFileName;
         }
+    }
+
+    private static boolean documentExists(DocumentTypeItem documentTypeItem) {
+        return documentTypeItem != null && documentTypeItem.getValue() != null
+                && documentTypeItem.getValue().getUploadedDocument() != null
+                && !Strings.isNullOrEmpty(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl());
     }
 
     private static String populateReplyDetails(CaseData caseData) {

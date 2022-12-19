@@ -21,6 +21,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
@@ -34,6 +35,9 @@ public class TseResponseController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
+    private static final String SUBMITTED_BODY = "### What happens next \r\n\r\nYou have sent your response to the"
+        + " tribunal%s.\r\n\r\nThe tribunal will consider all correspondence and let you know what happens next.";
+    private static final String SUBMITTED_COPY = " and copied it to the claimant";
 
     /**
      *  Populates the dynamic list for select an application to respond to.
@@ -160,6 +164,14 @@ public class TseResponseController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        return getCallbackRespEntityNoErrors(caseData);
+
+        String body = String.format(
+            SUBMITTED_BODY,
+            YES.equals(caseData.getTseResponseCopyToOtherParty()) ? SUBMITTED_COPY : ""
+        );
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+            .confirmation_body(body)
+            .build());
     }
 }

@@ -156,28 +156,29 @@ public class CreateReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-            UserDetails userDetails = userService.getUserDetails(userToken);
 
-            emailService.sendEmail(
-                    referralTemplateId,
-                    caseData.getReferentEmail(),
-                    ReferralHelper.buildPersonalisation(
-                            ccdRequest.getCaseDetails(),
-                            String.valueOf(ReferralHelper.getNextReferralNumber(caseData)),
-                            true,
-                            userDetails.getName()
-                    )
-            );
+        UserDetails userDetails = userService.getUserDetails(userToken);
 
-            caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
+        emailService.sendEmail(
+                referralTemplateId,
+                caseData.getReferentEmail(),
+                ReferralHelper.buildPersonalisation(
+                        ccdRequest.getCaseDetails(),
+                        String.valueOf(ReferralHelper.getNextReferralNumber(caseData)),
+                        true,
+                        userDetails.getName()
+                )
+        );
 
-            DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,
-                    userToken, ccdRequest.getCaseDetails().getCaseTypeId());
+        caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
 
-            ReferralHelper.createReferral(
-                    caseData,
-                    String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
-                    this.documentManagementService.addDocumentToDocumentField(documentInfo));
+        DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,
+                userToken, ccdRequest.getCaseDetails().getCaseTypeId());
+
+        ReferralHelper.createReferral(
+                caseData,
+                String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
+                this.documentManagementService.addDocumentToDocumentField(documentInfo));
 
         return getCallbackRespEntityNoErrors(caseData);
     }

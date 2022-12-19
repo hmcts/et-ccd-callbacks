@@ -39,7 +39,7 @@ public class CreateReferralService {
      * @param caseData in which the referral type is extracted from
      * @param errors list
      */
-    public void getDocumentUploadErrors(CaseData caseData, List<String> errors) {
+    public void addDocumentUploadErrors(CaseData caseData, List<String> errors) {
         if (CollectionUtils.isNotEmpty(caseData.getReferralDocument())) {
             for (DocumentTypeItem documentTypeItem : caseData.getReferralDocument()) {
                 if (!Strings.isNullOrEmpty(documentTypeItem.getValue().getShortDescription())

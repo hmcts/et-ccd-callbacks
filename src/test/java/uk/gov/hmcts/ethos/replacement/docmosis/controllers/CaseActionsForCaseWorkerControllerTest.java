@@ -36,6 +36,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
@@ -179,12 +180,17 @@ public class CaseActionsForCaseWorkerControllerTest {
     @MockBean
     private Et1VettingService et1VettingService;
 
+    @MockBean
+    private RespondentRepresentativeService respondentRepresentativeService;
+
     private MockMvc mvc;
     private JsonNode requestContent;
     private JsonNode requestContent2;
     private JsonNode requestContent3;
     private SubmitEvent submitEvent;
     private DefaultValues defaultValues;
+
+    private CCDRequest ccdRequest;
 
     private void doRequestSetUp() throws IOException, URISyntaxException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -197,6 +203,9 @@ public class CaseActionsForCaseWorkerControllerTest {
 
         objectMapper.readTree(new File(Objects.requireNonNull(getClass()
                 .getResource("/CaseCloseEvent_ValidHearingStatusCaseDetails.json")).toURI()));
+
+        ccdRequest = objectMapper.readValue(new File(Objects.requireNonNull(getClass()
+                .getResource("/exampleV1.json")).toURI()), CCDRequest.class);
     }
 
     @Before
@@ -403,7 +412,11 @@ public class CaseActionsForCaseWorkerControllerTest {
 
     @Test
     public void amendRespondentRepresentative() throws Exception {
+
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(respondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
+
         mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)

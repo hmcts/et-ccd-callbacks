@@ -96,6 +96,7 @@ public class EventValidationService {
         + "disposed hearing days on this case. Please check the hearing details"
         + " for jurisdiction code %s.";
     private static final int THIRTY_DAYS = 30;
+    public static final int MAX_RESPONDENTS = 10;
     private static final List<String> HEARING_DISPOSALS = List.of(JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING,
         JURISDICTION_OUTCOME_UNSUCCESSFUL_AT_HEARING, JURISDICTION_OUTCOME_DISMISSED_AT_HEARING);
     private static final List<String> NO_DISPOSAL =
@@ -166,6 +167,13 @@ public class EventValidationService {
             }
         }
         return errors;
+    }
+
+    public Optional<String> validateMaximumSize(CaseData caseData) {
+        if (caseData.getRepCollection().size() > MAX_RESPONDENTS) {
+            return Optional.of(String.format("Maximum number of respondents is %s", MAX_RESPONDENTS));
+        }
+        return Optional.empty();
     }
 
     public List<String> validateRespRepNames(CaseData caseData) {

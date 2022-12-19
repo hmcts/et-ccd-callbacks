@@ -81,20 +81,11 @@ class ReferralHelperTest {
         + "&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;<br><br>"
         + "General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr>";
 
-    private final String getExpectedSingleHearingDetailsNullDoc = "<hr><h3>Hearing details </h3><pre>Date &nbsp;&#09&#09&#"
-        + "09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&nbsp; null<br><br>Type &nbsp;&nbsp;&#09&#09&#0"
-        + "9&#09&#09 No Track</pre><hr><h3>Referral</h3><pre>Referred by &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null"
-        + "<br><br>Referred to &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Email address &nbsp;&#09&#09&#09&#"
-        + "09&#09&#09&#09&#09&nbsp; null<br><br>Urgent &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; null<br><br>Referral "
-        + "date &#09&#09&#09&#09&#09&#09&#09&#09&#09 null<br><br>Next hearing date &#09&#09&#09&#09&#09&#09&#09 11 Nov 2030<br><br>"
-        + "Referral subject &#09&#09&#09&#09&#09&#09&#09&#09 null<br><br>Details of the referral &#09&#09&#09&#09&#09&#09 null</pre>"
-        + "<hr><h3>Reply </h3><pre>Reply by &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 replyBy<br><br>Reply to &nbsp;&nbsp"
-        + ";&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 directionTo<br><br>Email address &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyToEmail"
-        + "<br><br>Urgent &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 isUrgent<br><br>Referral date &nbsp;&nbsp;&#09&#09&"
-        + "#09&#09&#09&#09&#09&#09 replyDate<br><br>Hearing date &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 11 Nov 2030<br><br>"
-        + "Referral subject &nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09 null<br><br>Directions &nbsp;&nbsp;&nbsp;&#09&#09&#09&#09&#"
-        + "09&#09&#09&#09&#09 details<br><br>Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" downloa"
-        + "d>testFileName</a>&nbsp;<br><br>General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr>";
+    private final String singleHearingDetailsNullDoc = "<br><br>Documents &nbsp;&#09&"
+        + "#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;"
+        + "<br><br>Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\""
+        + " download>testFileName</a>&nbsp;";
+
 
     private final String expectedHearingReferralDetailsMultipleReplies = "<hr><h3>Hearing details </h3><pre>Date &"
         + "nbsp;&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&nbsp; null<br><br>Type &n"
@@ -312,7 +303,7 @@ class ReferralHelperTest {
         caseData.setReferralCollection(List.of(referralTypeItem));
         caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
 
-        assertEquals(getExpectedSingleHearingDetailsNullDoc,
+        assertEquals(expectedHearingReferralDetailsSingleReply.replace(singleHearingDetailsNullDoc, ""),
                 ReferralHelper.populateHearingReferralDetails(caseData));
     }
 

@@ -943,6 +943,8 @@ public class ListingServiceTest {
         when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ListingData listingDataResult = listingService.processListingHearingsRequest(listingDetailsRange, "authToken");
         assertEquals(result, listingDataResult.toString());
+        int expectedHearingsCount = 4;
+        assertEquals(expectedHearingsCount, listingDataResult.getListingCollection().size());
     }
 
     @Test(expected = Exception.class)

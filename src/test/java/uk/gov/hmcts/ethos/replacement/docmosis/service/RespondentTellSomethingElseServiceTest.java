@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -11,12 +12,16 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,11 +32,14 @@ import java.util.stream.Stream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
 @SuppressWarnings({"squid:S5961", "PMD.ExcessiveImports", "PMD.GodClass", "PMD.TooManyMethods",
@@ -45,13 +53,19 @@ class RespondentTellSomethingElseServiceTest {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private TornadoService tornadoService;
+
+    @MockBean
+    private DocumentManagementService documentManagementService;
+
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String YES = "I do want to copy";
     private static final String NO = "I do not want to copy";
     private static final String TEMPLATE_ID = "someTemplateId";
     private static final String LEGAL_REP_EMAIL = "mail@mail.com";
     private static final String CASE_ID = "669718251103419";
-    private static final String APPLICANT_CLAIMANT = "Claimant";
+    private static final String APPLICANT_RESPONDENT = "Respondent";
 
     private static final String SELECTED_APP_AMEND_RESPONSE = "Amend response";
     private static final String SELECTED_APP_CHANGE_PERSONAL_DETAILS = "Change personal details";
@@ -79,9 +93,15 @@ class RespondentTellSomethingElseServiceTest {
         + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
 
+    private static final String RES_TSE_FILE_NAME = "resTse.pdf";
+
+    private static final String EXPECTED_TABLE_MARKDOWN = "| No | Application type | Applicant | Application date | Response due | Number of responses | Status |\r\n|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n|1|testType|Respondent|testDate|testDueDate|0|Open|\r\n\r\n";
+
     @BeforeEach
     void setUp() {
-        respondentTellSomethingElseService = new RespondentTellSomethingElseService(emailService, userService);
+        respondentTellSomethingElseService =
+                new RespondentTellSomethingElseService(emailService, userService, tornadoService,
+                        documentManagementService);
         ReflectionTestUtils.setField(respondentTellSomethingElseService, "emailTemplateId", TEMPLATE_ID);
 
         UserDetails userDetails = HelperTest.getUserDetails();
@@ -229,9 +249,9 @@ class RespondentTellSomethingElseServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("sendRespondentApplicationEmail")
-    void sendRespondentApplicationEmail(String selectedApplication, String rule92Selection, String expectedAnswer,
-                                        Boolean emailSent) {
+    @MethodSource("sendAcknowledgeEmailAndGeneratePdf")
+    void sendAcknowledgeEmailAndGeneratePdf(String selectedApplication, String rule92Selection, String expectedAnswer,
+                                        Boolean emailSent) throws IOException {
         CaseData caseData = createCaseData(selectedApplication, rule92Selection);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
@@ -240,16 +260,25 @@ class RespondentTellSomethingElseServiceTest {
         Map<String, String> expectedPersonalisation = createPersonalisation(caseData, expectedAnswer,
             selectedApplication);
 
-        respondentTellSomethingElseService.sendRespondentApplicationEmail(caseDetails, AUTH_TOKEN);
+        respondentTellSomethingElseService.sendAcknowledgeEmailAndGeneratePdf(caseDetails, AUTH_TOKEN);
 
         if (emailSent) {
             verify(emailService).sendEmail(TEMPLATE_ID, LEGAL_REP_EMAIL, expectedPersonalisation);
         } else {
             verify(emailService, never()).sendEmail(TEMPLATE_ID, LEGAL_REP_EMAIL, expectedPersonalisation);
         }
+
+        if (YES.equals(rule92Selection) && emailSent) {
+            verify(documentManagementService).addDocumentToDocumentField(any());
+            verify(tornadoService)
+                    .generateEventDocument(caseData, AUTH_TOKEN, caseDetails.getCaseTypeId(), RES_TSE_FILE_NAME);
+        } else {
+            verify(documentManagementService, never()).addDocumentToDocumentField(any());
+            verify(tornadoService, never()).generateEventDocument(any(), anyString(), anyString(), anyString());
+        }
     }
 
-    private static Stream<Arguments> sendRespondentApplicationEmail() {
+    private static Stream<Arguments> sendAcknowledgeEmailAndGeneratePdf() {
         return Stream.of(
             Arguments.of("Amend response", NO, rule92AnsweredNoText, true),
             Arguments.of("Strike out all or part of a claim", NO, rule92AnsweredNoText, true),
@@ -279,6 +308,14 @@ class RespondentTellSomethingElseServiceTest {
         );
     }
 
+    @Test
+    void sendAcknowledgeEmailAndGeneratePdf_GenDocError_ReturnErrMsg() throws IOException {
+        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
+                anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
+        assertThrows(Exception.class, () ->
+                respondentTellSomethingElseService.sendAcknowledgeEmailAndGeneratePdf(new CaseDetails(), ""));
+    }
+
     @ParameterizedTest
     @MethodSource("createRespondentApplication")
     void createApplication_withRespondentTseData_shouldPersistDataAndEmptyFields(String selectedApplication,
@@ -303,7 +340,7 @@ class RespondentTellSomethingElseServiceTest {
             .getDocumentUpload().getDocumentUrl(), is(documentUrl));
 
         assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .getApplicant(), is(APPLICANT_CLAIMANT));
+            .getApplicant(), is(APPLICANT_RESPONDENT));
 
         assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
             .getType(), is(selectedApplication));
@@ -335,6 +372,44 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(caseData.getResTseDocument10(), is(nullValue()));
         assertThat(caseData.getResTseDocument11(), is(nullValue()));
         assertThat(caseData.getResTseDocument12(), is(nullValue()));
+    }
+
+    @Test
+    void displayRespondentApplicationsTable_hasApplications() {
+        CaseData caseData = createCaseData("Amend response", NO);
+        caseData.setGenericTseApplicationCollection(generateGenericTseApplicationList());
+        
+        assertThat(respondentTellSomethingElseService.generateTableMarkdown(caseData), is(EXPECTED_TABLE_MARKDOWN));
+    }
+
+    @Test
+    void displayRespondentApplicationsTable_hasNoApplications() {
+        CaseData caseData = createCaseData("Amend response", NO);
+        
+        assertThat(respondentTellSomethingElseService.generateTableMarkdown(caseData), is(""));
+    }
+
+    private List<GenericTseApplicationTypeItem> generateGenericTseApplicationList() {
+        GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
+
+        respondentTseType.setDate("testDate");
+        respondentTseType.setNumber("number");
+        respondentTseType.setApplicant(APPLICANT_RESPONDENT);
+        respondentTseType.setDetails("testDetails");
+        respondentTseType.setDocumentUpload(createDocumentType("test"));
+        respondentTseType.setType("testType");
+        respondentTseType.setCopyToOtherPartyYesOrNo("yes");
+        respondentTseType.setCopyToOtherPartyText("text");
+        respondentTseType.setDue("testDueDate");
+
+        GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        tseApplicationTypeItem.setId("id");
+        tseApplicationTypeItem.setValue(respondentTseType);
+
+        List<GenericTseApplicationTypeItem> tseApplicationCollection = new ArrayList<>();
+        tseApplicationCollection.add(tseApplicationTypeItem);
+        
+        return tseApplicationCollection;
     }
 
     private void setDocAndTextForSelectedApplication(CaseData caseData,

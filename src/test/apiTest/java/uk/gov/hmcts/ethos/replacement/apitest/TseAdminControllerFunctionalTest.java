@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.apitest;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
@@ -13,12 +16,11 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 @Slf4j
-class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctionalTest {
+class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
+    private static final String ABOUT_TO_START_URL = "/tseAdmin/aboutToStart";
+    private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmin/aboutToSubmit";
 
     private CCDRequest ccdRequest;
 
@@ -35,46 +37,35 @@ class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctional
             .withCaseData(caseData)
             .withCaseId("123")
             .build();
-        
+
     }
 
     @Test
-    void shouldReceiveSuccessResponseWhenValidateGiveDetailsInvoked() {
+    void aboutToStartSuccessResponse() {
         RestAssured.given()
             .spec(spec)
             .contentType(ContentType.JSON)
             .header(new Header(AUTHORIZATION, userToken))
             .body(ccdRequest)
-            .post("/respondentTSE/validateGiveDetails")
+            .post(ABOUT_TO_START_URL)
             .then()
             .statusCode(HttpStatus.SC_OK)
-            .log().all(true);
+            .log()
+            .all(true);
     }
 
     @Test
-    void shouldReceiveSuccessResponseWhenAboutToSubmitRespondentTseInvoked() {
+    void aboutToSubmitSuccessResponse() {
         RestAssured.given()
             .spec(spec)
             .contentType(ContentType.JSON)
             .header(new Header(AUTHORIZATION, userToken))
             .body(ccdRequest)
-            .post("/respondentTSE/aboutToSubmit")
+            .post(ABOUT_TO_SUBMIT_URL)
             .then()
             .statusCode(HttpStatus.SC_OK)
-            .log().all(true);
-    }
-
-    @Test
-    void shouldReceiveSuccessResponseWhenDisplayRespondentApplicationsTableInvoked() {
-        RestAssured.given()
-            .spec(spec)
-            .contentType(ContentType.JSON)
-            .header(new Header(AUTHORIZATION, userToken))
-            .body(ccdRequest)
-            .post("/respondentTSE/displayTable")
-            .then()
-            .statusCode(HttpStatus.SC_OK)
-            .log().all(true);
+            .log()
+            .all(true);
     }
 
     private RespondentSumTypeItem createRespondentType() {

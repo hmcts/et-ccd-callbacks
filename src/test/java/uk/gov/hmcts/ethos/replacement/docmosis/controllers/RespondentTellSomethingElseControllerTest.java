@@ -37,6 +37,7 @@ class RespondentTellSomethingElseControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String VALIDATE_GIVE_DETAILS = "/respondentTSE/validateGiveDetails";
     private static final String ABOUT_TO_SUBMIT_URL = "/respondentTSE/aboutToSubmit";
+    private static final String DISPLAY_TABLE_URL = "/respondentTSE/displayTable";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -102,13 +103,37 @@ class RespondentTellSomethingElseControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(resTseService).sendRespondentApplicationEmail(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(resTseService).sendAcknowledgeEmailAndGeneratePdf(ccdRequest.getCaseDetails(), AUTH_TOKEN);
     }
 
     @Test
     void aboutToSubmitRespondentTSE_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void displayRespondentApplicationsTable_Success() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(DISPLAY_TABLE_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(resTseService).generateTableMarkdown(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    void displayRespondentApplicationsTable_invalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(DISPLAY_TABLE_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))

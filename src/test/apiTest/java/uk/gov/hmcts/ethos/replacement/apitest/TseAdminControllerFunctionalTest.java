@@ -20,6 +20,7 @@ import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
 class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
     private static final String ABOUT_TO_START_URL = "/tseAdmin/aboutToStart";
+    private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmin/aboutToSubmit";
 
     private CCDRequest ccdRequest;
 
@@ -47,6 +48,20 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
             .header(new Header(AUTHORIZATION, userToken))
             .body(ccdRequest)
             .post(ABOUT_TO_START_URL)
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log()
+            .all(true);
+    }
+
+    @Test
+    void aboutToSubmitSuccessResponse() {
+        RestAssured.given()
+            .spec(spec)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(ccdRequest)
+            .post(ABOUT_TO_SUBMIT_URL)
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log()

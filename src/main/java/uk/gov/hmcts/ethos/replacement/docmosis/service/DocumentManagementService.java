@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
@@ -35,6 +36,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
@@ -50,6 +53,7 @@ public class DocumentManagementService {
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     private static final String JURISDICTION = "EMPLOYMENT";
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    private static final String FILE_DISPLAY = "<a href=\"/documents/%s\" target=\"_blank\">%s (%s, %s)</a>";
 
     private final DocumentUploadClientApi documentUploadClient;
     private final AuthTokenGenerator authTokenGenerator;
@@ -201,7 +205,6 @@ public class DocumentManagementService {
 
     /**
      * Returns document details of the given document id.
-     *
      * @param authToken  the caller's bearer token used to verify the caller
      * @param documentId the id of the document
      * @return the response entity which contains the document details object
@@ -233,8 +236,38 @@ public class DocumentManagementService {
         responseHeaders.add("X-Frame-Options", "DENY");
         responseHeaders.add("X-XSS-Protection", "1; mode=block");
         responseHeaders.add("X-Content-Type-Options", "nosniff");
-
         return responseHeaders;
+    }
+
+    /**
+     * Return document info in format [File Name] (File Type, File Size).
+     * @param document file in UploadedDocumentType
+     * @param authToken the caller's bearer token used to verify the caller
+     * @return String which contains the document name, type, size and link
+     */
+    public String displayDocNameTypeSizeLink(UploadedDocumentType document, String authToken) {
+        if (document == null) {
+            return "";
+        }
+
+        Pattern pattern = Pattern.compile("^.+?/documents/");
+        Matcher matcher = pattern.matcher(document.getDocumentBinaryUrl());
+        String documentLink = matcher.replaceFirst("");
+
+        int lastIndexDot = document.getDocumentFilename().lastIndexOf('.');
+        String documentName = document.getDocumentFilename().substring(0, lastIndexDot);
+        String documentType = document.getDocumentFilename().substring(lastIndexDot + 1).toUpperCase();
+
+        ResponseEntity<DocumentDetails> documentDetails =
+                getDocumentDetails(authToken, UUID.fromString(getDocumentUUID(document.getDocumentUrl())));
+        if (documentDetails != null && documentDetails.getBody() != null) {
+            return String.format(FILE_DISPLAY,
+                    documentLink,
+                    documentName,
+                    documentType,
+                    FileUtils.byteCountToDisplaySize(Long.parseLong(documentDetails.getBody().getSize())));
+        }
+        return String.format(FILE_DISPLAY, documentLink, documentName, documentType, "");
     }
 
 }

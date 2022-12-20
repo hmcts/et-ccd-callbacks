@@ -99,7 +99,7 @@ public class TseAdminController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        tseAdminService.initialTseAdminTableMarkUp(caseData);
+        tseAdminService.initialTseAdminTableMarkUp(caseData, userToken);
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

@@ -5,18 +5,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.DocumentDetails;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClient;
 import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
@@ -29,6 +34,7 @@ import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.UUID;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
@@ -43,16 +49,21 @@ public class DocumentManagementService {
     public static final String APPLICATION_DOCX_VALUE =
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     private static final String JURISDICTION = "EMPLOYMENT";
+    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+
     private final DocumentUploadClientApi documentUploadClient;
     private final AuthTokenGenerator authTokenGenerator;
     private final DocumentDownloadClientApi documentDownloadClientApi;
     private final UserService userService;
     private final CaseDocumentClient caseDocumentClient;
+    private final RestTemplate restTemplate;
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
     @Value("${document_management.ccdCaseDocument.url}")
     private String ccdDMStoreBaseUrl;
+    @Value("${case_document_am.url}")
+    private String caseDocumentAmUrl;
     @Value("${feature.secure-doc-store.enabled}")
     private boolean secureDocStoreEnabled;
 
@@ -60,12 +71,14 @@ public class DocumentManagementService {
     public DocumentManagementService(DocumentUploadClientApi documentUploadClient,
                                      AuthTokenGenerator authTokenGenerator, UserService userService,
                                      DocumentDownloadClientApi documentDownloadClientApi,
-                                     CaseDocumentClient caseDocumentClient) {
+                                     CaseDocumentClient caseDocumentClient,
+                                     RestTemplate restTemplate) {
         this.documentUploadClient = documentUploadClient;
         this.authTokenGenerator = authTokenGenerator;
         this.userService = userService;
         this.documentDownloadClientApi = documentDownloadClientApi;
         this.caseDocumentClient = caseDocumentClient;
+        this.restTemplate = restTemplate;
     }
 
     @Retryable(value = {DocumentManagementException.class}, backoff = @Backoff(delay = 200))
@@ -185,4 +198,43 @@ public class DocumentManagementService {
         document.setDocumentFilename(documentInfo.getDescription());
         return document;
     }
+
+    /**
+     * Returns document details of the given document id.
+     *
+     * @param authToken  the caller's bearer token used to verify the caller
+     * @param documentId the id of the document
+     * @return the response entity which contains the document details object
+     * @throws DocumentManagementException if the target API returns 404 response code
+     */
+    public ResponseEntity<DocumentDetails> getDocumentDetails(String authToken, UUID documentId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, authToken);
+        headers.add(SERVICE_AUTHORIZATION, authTokenGenerator.generate());
+        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(headers);
+        try {
+            ResponseEntity<DocumentDetails> response = restTemplate.exchange(
+                    caseDocumentAmUrl + "/cases/documents/" + documentId,
+                    HttpMethod.GET,
+                    request,
+                    DocumentDetails.class
+            );
+            return new ResponseEntity<>(response.getBody(), getResponseHeaders(), HttpStatus.OK);
+        } catch (Exception ex) {
+            throw new DocumentManagementException(
+                    String.format("Unable to get document details %s from document management", documentId), ex);
+        }
+    }
+
+    private HttpHeaders getResponseHeaders() {
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("Connection", "keep-alive");
+        responseHeaders.add("Content-Type", "application/json");
+        responseHeaders.add("X-Frame-Options", "DENY");
+        responseHeaders.add("X-XSS-Protection", "1; mode=block");
+        responseHeaders.add("X-Content-Type-Options", "nosniff");
+
+        return responseHeaders;
+    }
+
 }

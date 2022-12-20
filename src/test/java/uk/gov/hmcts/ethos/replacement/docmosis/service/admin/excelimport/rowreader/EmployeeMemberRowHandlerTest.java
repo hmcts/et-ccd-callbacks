@@ -22,36 +22,36 @@ class EmployeeMemberRowHandlerTest {
     @ParameterizedTest
     @CsvSource({"TRIB_fl_EEMember, true", "fl_Judge, false"})
     void testAcceptRow(String cellValue, boolean expected) {
-        var row = mock(Row.class);
+        Row row = mock(Row.class);
         mockCell(row, 0, cellValue);
-        var courtWorkerRepository = mock(CourtWorkerRepository.class);
+        CourtWorkerRepository courtWorkerRepository = mock(CourtWorkerRepository.class);
 
-        var employeeMemberRowHandler = new EmployeeMemberRowHandler(courtWorkerRepository);
+        EmployeeMemberRowHandler employeeMemberRowHandler = new EmployeeMemberRowHandler(courtWorkerRepository);
         assertEquals(expected, employeeMemberRowHandler.accept(row));
     }
 
     @Test
     void testHandle() {
-        var code = "EECode";
-        var name = "Employee Member";
-        var tribunalOffice = TribunalOffice.NEWCASTLE;
-        var row = mock(Row.class);
+        String code = "EECode";
+        String name = "Employee Member";
+        Row row = mock(Row.class);
         mockCell(row, 0, EMPLOYEE_MEMBER_ROW_ID);
         mockCell(row, 1, code);
         mockCell(row, 2, name);
         mockCell(row, 3, "1");
-        var invalidRow = mock(Row.class);
+        Row invalidRow = mock(Row.class);
         mockCell(invalidRow, 0, "fl_Judge");
 
-        var courtWorkerRepository = mock(CourtWorkerRepository.class);
+        CourtWorkerRepository courtWorkerRepository = mock(CourtWorkerRepository.class);
 
-        var employeeMemberRowHandler = new EmployeeMemberRowHandler(courtWorkerRepository);
+        EmployeeMemberRowHandler employeeMemberRowHandler = new EmployeeMemberRowHandler(courtWorkerRepository);
+        TribunalOffice tribunalOffice = TribunalOffice.NEWCASTLE;
         employeeMemberRowHandler.handle(tribunalOffice, row);
 
-        var captor = ArgumentCaptor.forClass(CourtWorker.class);
+        ArgumentCaptor<CourtWorker> captor = ArgumentCaptor.forClass(CourtWorker.class);
         verify(courtWorkerRepository, times(1)).save(captor.capture());
 
-        var actual = captor.getValue();
+        CourtWorker actual = captor.getValue();
         assertEquals(CourtWorkerType.EMPLOYEE_MEMBER, actual.getType());
         assertEquals(code, actual.getCode());
         assertEquals(name, actual.getName());
@@ -59,7 +59,7 @@ class EmployeeMemberRowHandlerTest {
     }
 
     private void mockCell(Row row, int cellNum, String value) {
-        var cell = mock(Cell.class);
+        Cell cell = mock(Cell.class);
         when(row.getCell(cellNum)).thenReturn(cell);
         when(cell.getStringCellValue()).thenReturn(value);
     }

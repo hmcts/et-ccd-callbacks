@@ -11,10 +11,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class CaseDataBuilder {
 
     private final CaseData caseData = new CaseData();
@@ -26,6 +28,34 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withHearing(String listedDate, String hearingStatus) {
         return withHearing(listedDate, hearingStatus, null, null, null);
+    }
+
+    public CaseDataBuilder withHearing(String listedDate, String hearingStatus,
+                                       String hearingNumber, String hearingType, String judge) {
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate(listedDate);
+        dateListedType.setHearingStatus(hearingStatus);
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setValue(dateListedType);
+
+        List<DateListedTypeItem> hearingDates = new ArrayList<>();
+        hearingDates.add(dateListedTypeItem);
+
+        HearingType type = new HearingType();
+        type.setHearingNumber(hearingNumber);
+        type.setHearingType(hearingType);
+        type.setJudge(new DynamicFixedListType(judge));
+        type.setHearingDateCollection(hearingDates);
+
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        hearingTypeItem.setValue(type);
+
+        if (caseData.getHearingCollection() == null) {
+            caseData.setHearingCollection(new ArrayList<>());
+        }
+        caseData.getHearingCollection().add(hearingTypeItem);
+
+        return this;
     }
 
     public CaseDataBuilder withSingleCaseType() {
@@ -54,36 +84,9 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withHearing(String listedDate, String hearingStatus, String hearingNumber, String hearingType, String judge) {
-        var dateListedType = new DateListedType();
-        dateListedType.setListedDate(listedDate);
-        dateListedType.setHearingStatus(hearingStatus);
-        var dateListedTypeItem = new DateListedTypeItem();
-        dateListedTypeItem.setValue(dateListedType);
-
-        var hearingDates = new ArrayList<DateListedTypeItem>();
-        hearingDates.add(dateListedTypeItem);
-
-        var type = new HearingType();
-        type.setHearingNumber(hearingNumber);
-        type.setHearingType(hearingType);
-        type.setJudge(new DynamicFixedListType(judge));
-        type.setHearingDateCollection(hearingDates);
-
-        var hearingTypeItem = new HearingTypeItem();
-        hearingTypeItem.setValue(type);
-
-        if (caseData.getHearingCollection() == null) {
-            caseData.setHearingCollection(new ArrayList<>());
-        }
-        caseData.getHearingCollection().add(hearingTypeItem);
-
-        return this;
-    }
-
     public CaseDataBuilder withJudgment() {
-        var judgementType = new JudgementType();
-        var judgementTypeItem = new JudgementTypeItem();
+        JudgementType judgementType = new JudgementType();
+        JudgementTypeItem judgementTypeItem = new JudgementTypeItem();
         judgementTypeItem.setValue(judgementType);
 
         if (caseData.getJudgementCollection() == null) {
@@ -104,7 +107,7 @@ public class CaseDataBuilder {
     }
 
     public CasesAwaitingJudgmentSubmitEvent buildAsSubmitEvent(String state) {
-        var submitEvent = new CasesAwaitingJudgmentSubmitEvent();
+        CasesAwaitingJudgmentSubmitEvent submitEvent = new CasesAwaitingJudgmentSubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(state);
 

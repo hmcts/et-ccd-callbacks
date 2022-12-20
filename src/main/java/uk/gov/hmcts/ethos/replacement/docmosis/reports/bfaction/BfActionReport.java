@@ -4,6 +4,7 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
@@ -20,7 +21,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REP
 public class BfActionReport {
     public ListingData runReport(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
         BfActionReportData bfActionReportData = new BfActionReportData();
-        var caseData = listingDetails.getCaseData();
+        ListingData caseData = listingDetails.getCaseData();
         bfActionReportData.setHearingDateType(caseData.getHearingDateType());
 
         if (!CollectionUtils.isEmpty(submitEvents)) {
@@ -36,7 +37,7 @@ public class BfActionReport {
         bfActionReportData.setReportType(BROUGHT_FORWARD_REPORT);
         bfActionReportData.setDocumentName(BROUGHT_FORWARD_REPORT);
 
-        var managingOffice = caseData.getManagingOffice();
+        String managingOffice = caseData.getManagingOffice();
         bfActionReportData.setOffice(ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), managingOffice));
         bfActionReportData.setListingDate(caseData.getListingDate());
         bfActionReportData.setListingDateFrom(caseData.getListingDateFrom());
@@ -47,8 +48,8 @@ public class BfActionReport {
     private void addBfDateTypeItems(SubmitEvent submitEvent, ListingData listingData,
         List<BFDateTypeItem> bfDateTypeItems) {
         if (!CollectionUtils.isEmpty(submitEvent.getCaseData().getBfActions())) {
-            for (var bfActionTypeItem : submitEvent.getCaseData().getBfActions()) {
-                var bfDateTypeItem = getBFDateTypeItem(bfActionTypeItem, listingData,
+            for (BFActionTypeItem bfActionTypeItem : submitEvent.getCaseData().getBfActions()) {
+                BFDateTypeItem bfDateTypeItem = getBFDateTypeItem(bfActionTypeItem, listingData,
                     submitEvent.getCaseData());
                 if (bfDateTypeItem != null && bfDateTypeItem.getValue() != null) {
                     bfDateTypeItems.add(bfDateTypeItem);
@@ -59,9 +60,9 @@ public class BfActionReport {
 
     private BFDateTypeItem getBFDateTypeItem(BFActionTypeItem bfActionTypeItem,
                                                     ListingData listingData, CaseData caseData) {
-        var bfActionType = bfActionTypeItem.getValue();
+        BFActionType bfActionType = bfActionTypeItem.getValue();
         if (!isNullOrEmpty(bfActionType.getBfDate()) && isNullOrEmpty(bfActionType.getCleared())) {
-            var bfDate = ReportHelper.getFormattedLocalDate(bfActionType.getBfDate());
+            String bfDate = ReportHelper.getFormattedLocalDate(bfActionType.getBfDate());
             boolean isValidBfDate = ReportHelper.validateMatchingDate(listingData, bfDate);
 
             if (isValidBfDate) {
@@ -73,8 +74,8 @@ public class BfActionReport {
 
     private BFDateTypeItem createBFDateTypeItem(BFActionTypeItem bfActionTypeItem, String bfDate,
                                              String ethosCaseReference) {
-        var bfActionType = bfActionTypeItem.getValue();
-        var bfDateType = new BFDateType();
+        BFActionType bfActionType = bfActionTypeItem.getValue();
+        BFDateType bfDateType = new BFDateType();
         bfDateType.setCaseReference(ethosCaseReference);
 
         if (!isNullOrEmpty(bfActionType.getAllActions())) {
@@ -87,11 +88,11 @@ public class BfActionReport {
         bfDateType.setBroughtForwardDate(bfDate);
 
         if (!isNullOrEmpty(bfActionType.getNotes())) {
-            var bfReason = bfActionType.getNotes().replace("\n", ". ");
+            String bfReason = bfActionType.getNotes().replace("\n", ". ");
             bfDateType.setBroughtForwardDateReason(bfReason);
         }
 
-        var bfDateTypeItem = new BFDateTypeItem();
+        BFDateTypeItem bfDateTypeItem = new BFDateTypeItem();
         bfDateTypeItem.setId(String.valueOf(bfActionTypeItem.getId()));
         bfDateTypeItem.setValue(bfDateType);
         return bfDateTypeItem;

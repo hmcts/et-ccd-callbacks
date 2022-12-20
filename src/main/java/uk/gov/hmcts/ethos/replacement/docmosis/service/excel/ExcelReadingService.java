@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -35,6 +36,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesScheduleH
 
 @Slf4j
 @Service("excelReadingService")
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.LiteralsFirstInComparisons", "PMD.LawOfDemeter",
+    "PMD.LinguisticNaming", "PMD.ExcessiveImports"})
 public class ExcelReadingService {
 
     private static final String ERROR_SHEET_NAME_NOT_FOUND = "Worksheet name not found";
@@ -49,31 +52,24 @@ public class ExcelReadingService {
 
     public XSSFWorkbook readWorkbook(String userToken, String documentBinaryUrl) throws IOException {
         ZipSecureFile.setMinInflateRatio(0);
-        var excelInputStream =
+        InputStream excelInputStream =
                 excelDocManagementService.downloadExcelDocument(userToken, documentBinaryUrl);
         return new XSSFWorkbook(excelInputStream);
     }
 
     public SortedMap<String, Object> readExcel(String userToken, String documentBinaryUrl, List<String> errors,
                                                MultipleData multipleData, FilterExcelType filter) {
-
         SortedMap<String, Object> multipleObjects = new TreeMap<>();
 
         try {
-
             XSSFSheet datatypeSheet = checkExcelErrors(userToken, documentBinaryUrl, errors);
-
             if (errors.isEmpty()) {
-
                 populateMultipleObjects(multipleObjects, datatypeSheet, multipleData, filter);
-
             }
 
         } catch (IOException e) {
-
             throw new RuntimeException("Error reading the excel for multiple reference"
                     + multipleData.getMultipleReference(), e);
-
         }
 
         return multipleObjects;
@@ -83,22 +79,15 @@ public class ExcelReadingService {
     public XSSFSheet checkExcelErrors(String userToken, String documentBinaryUrl, List<String> errors)
             throws IOException {
 
-        var workbook = readWorkbook(userToken, documentBinaryUrl);
-
-        XSSFSheet datatypeSheet = workbook.getSheet(SHEET_NAME);
-
-        if (datatypeSheet == null) {
-
-            errors.add(ERROR_SHEET_NAME_NOT_FOUND);
-
-        } else if (!datatypeSheet.validateSheetPassword(CONSTRAINT_KEY)) {
-
-            errors.add(ERROR_DOCUMENT_NOT_VALID);
-
+        try (XSSFWorkbook workbook = readWorkbook(userToken, documentBinaryUrl)) {
+            XSSFSheet datatypeSheet = workbook.getSheet(SHEET_NAME);
+            if (datatypeSheet == null) {
+                errors.add(ERROR_SHEET_NAME_NOT_FOUND);
+            } else if (!datatypeSheet.validateSheetPassword(CONSTRAINT_KEY)) {
+                errors.add(ERROR_DOCUMENT_NOT_VALID);
+            }
+            return datatypeSheet;
         }
-
-        return datatypeSheet;
-
     }
 
     private void getSubMultipleObjects(SortedMap<String, Object> multipleObjects, String ethosCaseRef,

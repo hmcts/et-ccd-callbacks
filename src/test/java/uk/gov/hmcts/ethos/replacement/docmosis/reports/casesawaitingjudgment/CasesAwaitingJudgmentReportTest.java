@@ -32,6 +32,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.LawOfDemeter", "PMD.TooManyMethods"})
 public class CasesAwaitingJudgmentReportTest {
 
     ReportDataSource reportDataSource;
@@ -52,10 +53,12 @@ public class CasesAwaitingJudgmentReportTest {
         submitEvents.clear();
 
         reportDataSource = mock(ReportDataSource.class);
-        when(reportDataSource.getData(ENGLANDWALES_CASE_TYPE_ID, TribunalOffice.LEEDS.getOfficeName())).thenReturn(submitEvents);
+        when(reportDataSource.getData(ENGLANDWALES_CASE_TYPE_ID,
+                TribunalOffice.LEEDS.getOfficeName()))
+                .thenReturn(submitEvents);
 
-        var now = "2021-07-31T10:00:00.Z";
-        var clock = Clock.fixed(Instant.parse(now), ZoneId.of("UTC"));
+        String now = "2021-07-31T10:00:00.Z";
+        Clock clock = Clock.fixed(Instant.parse(now), ZoneId.of("UTC"));
 
         casesAwaitingJudgmentReport = new CasesAwaitingJudgmentReport(reportDataSource, clock);
     }
@@ -67,12 +70,12 @@ public class CasesAwaitingJudgmentReportTest {
         // Then the case should not be in the report data
 
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent(CLOSED_STATE));
-        var listingDetails = new ListingDetails();
-        var caseData = new ListingData();
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -87,19 +90,19 @@ public class CasesAwaitingJudgmentReportTest {
         // When I request report data
         // Then the case should not be in the report data
 
-        var invalidPositionTypes = new String[] { "An invalid position type", null};
-        for (var invalidPositionType : invalidPositionTypes) {
+        String[] invalidPositionTypes = { "An invalid position type", null};
+        for (String invalidPositionType : invalidPositionTypes) {
             submitEvents.clear();
             caseDataBuilder = new CaseDataBuilder();
             submitEvents.add(caseDataBuilder
                     .withPositionType(invalidPositionType)
                     .buildAsSubmitEvent(ACCEPTED_STATE));
-            var listingDetails = new ListingDetails();
-            var caseData = new ListingData();
+            ListingDetails listingDetails = new ListingDetails();
+            ListingData caseData = new ListingData();
             caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
             listingDetails.setCaseData(caseData);
             listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-            var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+            CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
             assertCommonValues(reportData);
             assertTrue(reportData.getReportDetails().isEmpty());
         }
@@ -116,12 +119,12 @@ public class CasesAwaitingJudgmentReportTest {
         submitEvents.add(caseDataBuilder
                 .withPositionType(validPositionType)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
-        var listingDetails = new ListingDetails();
-        var caseData = new ListingData();
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -138,12 +141,12 @@ public class CasesAwaitingJudgmentReportTest {
                 .withPositionType(validPositionType)
                 .withHearing(LISTING_DATE, HEARING_STATUS_LISTED)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
-        var listingDetails = new ListingDetails();
-        var caseData = new ListingData();
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -162,12 +165,12 @@ public class CasesAwaitingJudgmentReportTest {
                 .withHearing(LISTING_DATE, HEARING_STATUS_HEARD)
                 .withJudgment()
                 .buildAsSubmitEvent(ACCEPTED_STATE));
-        var listingDetails = new ListingDetails();
-        var caseData = new ListingData();
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertTrue(reportData.getReportDetails().isEmpty());
     }
@@ -184,12 +187,12 @@ public class CasesAwaitingJudgmentReportTest {
                 .withPositionType(validPositionType)
                 .withHearing(LISTING_DATE, HEARING_STATUS_HEARD)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
-        var listingDetails = new ListingDetails();
-        var caseData = new ListingData();
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
     }
@@ -199,16 +202,16 @@ public class CasesAwaitingJudgmentReportTest {
         // Given I have 3 valid cases with position type Draft with Members
         // When I request report data
         // Then the report summary shows 3 Draft with Members
-        var positionType = "Draft with members";
+        String positionType = "Draft with members";
         submitEvents.add(createValidSubmitEvent(positionType));
         submitEvents.add(createValidSubmitEvent(positionType));
         submitEvents.add(createValidSubmitEvent(positionType));
-        var listingDetails = new ListingDetails();
-        var caseData = new ListingData();
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals(3, reportData.getReportDetails().size());
         assertEquals(1, reportData.getReportSummary().getPositionTypes().size());
@@ -227,21 +230,21 @@ public class CasesAwaitingJudgmentReportTest {
         //    | Awaiting written reasons             | 2 |
         //    | Draft with members                   | 3 |
 
-        var positionType1 = "Draft with members";
-        var positionType2 = "Awaiting written reasons";
-        var positionType3 = "Fair copy, to chairman for signature";
+        String positionType1 = "Draft with members";
+        String positionType2 = "Awaiting written reasons";
+        String positionType3 = "Fair copy, to chairman for signature";
         submitEvents.add(createValidSubmitEvent(positionType2));
         submitEvents.add(createValidSubmitEvent(positionType1));
         submitEvents.add(createValidSubmitEvent(positionType1));
         submitEvents.add(createValidSubmitEvent(positionType1));
         submitEvents.add(createValidSubmitEvent(positionType3));
         submitEvents.add(createValidSubmitEvent(positionType2));
-        var listingDetails = new ListingDetails();
-        var caseData = new ListingData();
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals(6, reportData.getReportDetails().size());
         assertEquals(3, reportData.getReportSummary().getPositionTypes().size());
@@ -254,24 +257,19 @@ public class CasesAwaitingJudgmentReportTest {
         assertEquals(3, reportData.getReportSummary().getPositionTypes().get(2).getPositionTypeCount());
     }
 
-
     @Test
     public void shouldContainCorrectDetailValuesForCaseWithOneHearing() {
         // Given I have a valid case
         // When I request report data
         // Then I have correct report detail values for the case
-        var listedDate = "2021-07-16T10:00:00.000";
-        var expectedWeeksSinceHearing = 2;
-        var expectedDaysSinceHearing = 15;
-        var caseReference = "2500123/2021";
-        var currentPosition = MANUALLY_CREATED_POSITION;
-        var dateToPosition = "2021-07-10";
-        var expectedDateToPosition = "10/07/2021";
-        var expectedLastHeardHearingDate = "16/07/2021";
-        var conciliationTrack = CONCILIATION_TRACK_FAST_TRACK;
-        var hearingNumber = "1";
-        var hearingType = HEARING_TYPE_JUDICIAL_COSTS_HEARING;
-        var judge = "Hugh Parkfield";
+        String listedDate = "2021-07-16T10:00:00.000";
+        String caseReference = "2500123/2021";
+        String currentPosition = MANUALLY_CREATED_POSITION;
+        String dateToPosition = "2021-07-10";
+        String conciliationTrack = CONCILIATION_TRACK_FAST_TRACK;
+        String hearingNumber = "1";
+        String hearingType = HEARING_TYPE_JUDICIAL_COSTS_HEARING;
+        String judge = "Hugh Parkfield";
 
         submitEvents.add(caseDataBuilder
                 .withEthosCaseReference(caseReference)
@@ -282,28 +280,26 @@ public class CasesAwaitingJudgmentReportTest {
                 .withConciliationTrack(conciliationTrack)
                 .withHearing(listedDate, HEARING_STATUS_HEARD, hearingNumber, hearingType, judge)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
-        var listingDetails = new ListingDetails();
-        var caseData = new ListingData();
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
-
-        var reportDetail = reportData.getReportDetails().get(0);
+        ReportDetail reportDetail = reportData.getReportDetails().get(0);
         assertEquals(validPositionType, reportDetail.getPositionType());
-
-        assertEquals(expectedWeeksSinceHearing, reportDetail.getWeeksSinceHearing());
-        assertEquals(expectedDaysSinceHearing, reportDetail.getDaysSinceHearing());
+        assertEquals(2, reportDetail.getWeeksSinceHearing());
+        assertEquals(15, reportDetail.getDaysSinceHearing());
         assertEquals(caseReference, reportDetail.getCaseNumber());
         assertEquals(ReportDetail.NO_MULTIPLE_REFERENCE, reportDetail.getMultipleReference());
-        assertEquals(expectedLastHeardHearingDate, reportDetail.getLastHeardHearingDate());
+        assertEquals("16/07/2021", reportDetail.getLastHeardHearingDate());
         assertEquals(hearingNumber, reportDetail.getHearingNumber());
         assertEquals(hearingType, reportDetail.getHearingType());
         assertEquals(judge, reportDetail.getJudge());
         assertEquals(currentPosition, reportDetail.getCurrentPosition());
-        assertEquals(expectedDateToPosition, reportDetail.getDateToPosition());
+        assertEquals("10/07/2021", reportDetail.getDateToPosition());
         assertEquals(conciliationTrack, reportDetail.getConciliationTrack());
     }
 
@@ -313,9 +309,9 @@ public class CasesAwaitingJudgmentReportTest {
         // And the case is a Multiple case type
         // When I request report data
         // Then I have correct Multiple Reference value in the report data
-        var listedDate = "2021-07-16T10:00:00.000";
-        var caseReference = "2500123/2021";
-        var multipleReference = "250999/2021";
+        String listedDate = "2021-07-16T10:00:00.000";
+        String caseReference = "2500123/2021";
+        String multipleReference = "250999/2021";
 
         submitEvents.add(caseDataBuilder
                 .withEthosCaseReference(caseReference)
@@ -323,16 +319,16 @@ public class CasesAwaitingJudgmentReportTest {
                 .withMultipleCaseType(multipleReference)
                 .withHearing(listedDate, HEARING_STATUS_HEARD)
                 .buildAsSubmitEvent(ACCEPTED_STATE));
-        var listingDetails = new ListingDetails();
-        var caseData = new ListingData();
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
 
-        var reportDetail = reportData.getReportDetails().get(0);
+        ReportDetail reportDetail = reportData.getReportDetails().get(0);
         assertEquals(multipleReference, reportDetail.getMultipleReference());
     }
 
@@ -347,37 +343,38 @@ public class CasesAwaitingJudgmentReportTest {
         // | 2021-07-06 | 4 | Withdrawn |
         // When I request report data
         // Then I have correct hearing values for hearing #3
-        var expectedWeeksSinceHearing = 3;
-        var expectedDaysSinceHearing = 26;
-        var expectedLastHeardHearingDate = "05/07/2021";
-        var caseReference = "2500123/2021";
-        var judge = "Hugh Parkfield";
+        String caseReference = "2500123/2021";
+        String judge = "Hugh Parkfield";
 
         submitEvents.add(caseDataBuilder
                 .withEthosCaseReference(caseReference)
                 .withPositionType(validPositionType)
                 .withSingleCaseType()
-                .withHearing("2021-07-01T10:00:00.000", HEARING_STATUS_HEARD, "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
-                .withHearing("2021-07-02T10:00:00.000", HEARING_STATUS_POSTPONED, "2", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
-                .withHearing("2021-07-05T10:00:00.000", HEARING_STATUS_HEARD, "3", HEARING_TYPE_JUDICIAL_MEDIATION, judge)
-                .withHearing("2021-07-06T10:00:00.000", HEARING_STATUS_WITHDRAWN, "4", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
+                .withHearing("2021-07-01T10:00:00.000", HEARING_STATUS_HEARD,
+                        "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
+                .withHearing("2021-07-02T10:00:00.000", HEARING_STATUS_POSTPONED,
+                        "2", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
+                .withHearing("2021-07-05T10:00:00.000", HEARING_STATUS_HEARD,
+                        "3", HEARING_TYPE_JUDICIAL_MEDIATION, judge)
+                .withHearing("2021-07-06T10:00:00.000", HEARING_STATUS_WITHDRAWN,
+                        "4", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
                 .buildAsSubmitEvent(ACCEPTED_STATE));
-        var listingDetails = new ListingDetails();
-        var caseData = new ListingData();
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
 
-        var reportDetail = reportData.getReportDetails().get(0);
+        ReportDetail reportDetail = reportData.getReportDetails().get(0);
         assertEquals(validPositionType, reportDetail.getPositionType());
 
-        assertEquals(expectedWeeksSinceHearing, reportDetail.getWeeksSinceHearing());
-        assertEquals(expectedDaysSinceHearing, reportDetail.getDaysSinceHearing());
+        assertEquals(3, reportDetail.getWeeksSinceHearing());
+        assertEquals(26, reportDetail.getDaysSinceHearing());
         assertEquals(caseReference, reportDetail.getCaseNumber());
-        assertEquals(expectedLastHeardHearingDate, reportDetail.getLastHeardHearingDate());
+        assertEquals("05/07/2021", reportDetail.getLastHeardHearingDate());
         assertEquals("3", reportDetail.getHearingNumber());
         assertEquals(HEARING_TYPE_JUDICIAL_MEDIATION, reportDetail.getHearingType());
         assertEquals(judge, reportDetail.getJudge());
@@ -404,36 +401,40 @@ public class CasesAwaitingJudgmentReportTest {
                 .withPositionType(validPositionType)
                 .withEthosCaseReference("Case 1")
                 .withSingleCaseType()
-                .withHearing("2021-07-10T10:00:00.000", HEARING_STATUS_HEARD, "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
+                .withHearing("2021-07-10T10:00:00.000", HEARING_STATUS_HEARD,
+                        "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         caseDataBuilder = new CaseDataBuilder();
         submitEvents.add(caseDataBuilder
                 .withPositionType(validPositionType)
                 .withEthosCaseReference("Case 2")
                 .withSingleCaseType()
-                .withHearing("2021-07-02T10:00:00.000", HEARING_STATUS_HEARD, "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
+                .withHearing("2021-07-02T10:00:00.000", HEARING_STATUS_HEARD,
+                        "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         caseDataBuilder = new CaseDataBuilder();
         submitEvents.add(caseDataBuilder
                 .withPositionType(validPositionType)
                 .withEthosCaseReference("Case 3")
                 .withSingleCaseType()
-                .withHearing("2021-07-05T10:00:00.000", HEARING_STATUS_HEARD, "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
+                .withHearing("2021-07-05T10:00:00.000", HEARING_STATUS_HEARD,
+                        "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         caseDataBuilder = new CaseDataBuilder();
         submitEvents.add(caseDataBuilder
                 .withPositionType(validPositionType)
                 .withEthosCaseReference("Case 4")
                 .withSingleCaseType()
-                .withHearing("2021-07-01T10:00:00.000", HEARING_STATUS_HEARD, "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
+                .withHearing("2021-07-01T10:00:00.000", HEARING_STATUS_HEARD,
+                        "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "A.N. Other")
                 .buildAsSubmitEvent(ACCEPTED_STATE));
         caseDataBuilder = new CaseDataBuilder();
-        var listingDetails = new ListingDetails();
-        var caseData = new ListingData();
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertCommonValues(reportData);
         assertEquals(4, reportData.getReportDetails().size());
 
@@ -445,23 +446,23 @@ public class CasesAwaitingJudgmentReportTest {
 
     @Test
     public void checkReportOfficeName_EngWales() {
-        var listingDetails = new ListingDetails();
-        var caseData = new ListingData();
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
         caseData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), reportData.getReportSummary().getOffice());
     }
 
     @Test
     public void checkReportOfficeName_Scotland() {
-        var listingDetails = new ListingDetails();
-        var caseData = new ListingData();
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
         caseData.setManagingOffice(null);
         listingDetails.setCaseData(caseData);
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportData.getReportSummary().getOffice());
     }
 

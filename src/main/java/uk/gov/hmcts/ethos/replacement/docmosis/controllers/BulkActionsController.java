@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ecm.common.model.helper.BulkCasesPayload;
+import uk.gov.hmcts.ecm.common.model.helper.BulkRequestPayload;
 import uk.gov.hmcts.et.common.model.bulk.BulkCallbackResponse;
+import uk.gov.hmcts.et.common.model.bulk.BulkDocumentInfo;
 import uk.gov.hmcts.et.common.model.bulk.BulkRequest;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
@@ -40,6 +43,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.BulkCreationServic
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals", "PMD.UnnecessaryAnnotationValueElement",
+    "PMD.LawOfDemeter", "PMD.ConfusingTernary", "PMD.ExcessiveImports"})
 public class BulkActionsController {
 
     private static final String LOG_MESSAGE = "received notification request for bulk reference :    ";
@@ -73,10 +78,10 @@ public class BulkActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkCasesPayload = bulkSearchService.bulkCasesRetrievalRequest(
+        BulkCasesPayload bulkCasesPayload = bulkSearchService.bulkCasesRetrievalRequest(
                 bulkRequest.getCaseDetails(), userToken, true);
 
-        var bulkRequestPayload = bulkCreationService.bulkCreationLogic(
+        BulkRequestPayload bulkRequestPayload = bulkCreationService.bulkCreationLogic(
                 bulkRequest.getCaseDetails(), bulkCasesPayload, userToken, BULK_CREATION_STEP);
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
@@ -110,10 +115,10 @@ public class BulkActionsController {
             bulkRequest.getCaseDetails().getCaseData().setMultipleSource(MANUALLY_CREATED_POSITION);
         }
 
-        var bulkCasesPayload = bulkSearchService.bulkCasesRetrievalRequestElasticSearch(
+        BulkCasesPayload bulkCasesPayload = bulkSearchService.bulkCasesRetrievalRequestElasticSearch(
                 bulkRequest.getCaseDetails(), userToken, true, true);
 
-        var bulkRequestPayload = bulkCreationService.bulkCreationLogic(
+        BulkRequestPayload bulkRequestPayload = bulkCreationService.bulkCreationLogic(
                 bulkRequest.getCaseDetails(), bulkCasesPayload, userToken, BULK_CREATION_STEP);
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
@@ -144,7 +149,7 @@ public class BulkActionsController {
 
         if (bulkRequest.getCaseDetails().getCaseData().getMultipleSource() != null
                 && !bulkRequest.getCaseDetails().getCaseData().getMultipleSource().equals(ET1_ONLINE_CASE_SOURCE)) {
-            var bulkCasesPayload = bulkSearchService.bulkCasesRetrievalRequestElasticSearch(
+            BulkCasesPayload bulkCasesPayload = bulkSearchService.bulkCasesRetrievalRequestElasticSearch(
                     bulkRequest.getCaseDetails(), userToken, true, false);
             bulkCreationService.bulkCreationLogic(bulkRequest.getCaseDetails(), bulkCasesPayload, userToken,
                     UPDATE_SINGLES_STEP);
@@ -176,7 +181,7 @@ public class BulkActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkRequestPayload = bulkUpdateService.bulkUpdateLogic(bulkRequest.getCaseDetails(),
+        BulkRequestPayload bulkRequestPayload = bulkUpdateService.bulkUpdateLogic(bulkRequest.getCaseDetails(),
                 userToken);
 
         bulkRequestPayload = bulkUpdateService.clearUpFields(bulkRequestPayload);
@@ -207,7 +212,7 @@ public class BulkActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkRequestPayload = bulkCreationService.bulkUpdateCaseIdsLogic(bulkRequest, userToken,
+        BulkRequestPayload bulkRequestPayload = bulkCreationService.bulkUpdateCaseIdsLogic(bulkRequest, userToken,
                 false);
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
@@ -236,7 +241,7 @@ public class BulkActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkDocumentInfo = documentGenerationService.processBulkDocumentRequest(bulkRequest,
+        BulkDocumentInfo bulkDocumentInfo = documentGenerationService.processBulkDocumentRequest(bulkRequest,
                 userToken);
         bulkRequest.getCaseDetails().getCaseData().setDocMarkUp(bulkDocumentInfo.getMarkUps());
         documentGenerationService.clearUserChoicesForMultiples(bulkRequest.getCaseDetails());
@@ -295,7 +300,7 @@ public class BulkActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkRequestPayload = bulkSearchService.bulkMidSearchLogic(
+        BulkRequestPayload bulkRequestPayload = bulkSearchService.bulkMidSearchLogic(
                 bulkRequest.getCaseDetails(), false);
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
@@ -324,7 +329,7 @@ public class BulkActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkRequestPayload = bulkSearchService.bulkSearchLogic(bulkRequest.getCaseDetails());
+        BulkRequestPayload bulkRequestPayload = bulkSearchService.bulkSearchLogic(bulkRequest.getCaseDetails());
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
                 .errors(bulkRequestPayload.getErrors())
@@ -352,7 +357,7 @@ public class BulkActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkRequestPayload = bulkSearchService.bulkMidSearchLogic(
+        BulkRequestPayload bulkRequestPayload = bulkSearchService.bulkMidSearchLogic(
                 bulkRequest.getCaseDetails(), true);
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
@@ -381,7 +386,7 @@ public class BulkActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkRequestPayload = subMultipleService.createSubMultipleLogic(
+        BulkRequestPayload bulkRequestPayload = subMultipleService.createSubMultipleLogic(
                 bulkRequest.getCaseDetails());
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
@@ -410,7 +415,7 @@ public class BulkActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkRequestPayload = subMultipleService.populateSubMultipleDynamicListLogic(
+        BulkRequestPayload bulkRequestPayload = subMultipleService.populateSubMultipleDynamicListLogic(
                 bulkRequest.getCaseDetails());
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
@@ -439,7 +444,7 @@ public class BulkActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkRequestPayload = subMultipleService.populateFilterDefaultedDynamicListLogic(
+        BulkRequestPayload bulkRequestPayload = subMultipleService.populateFilterDefaultedDynamicListLogic(
                 bulkRequest.getCaseDetails(), SELECT_ALL_VALUE);
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
@@ -468,7 +473,7 @@ public class BulkActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkRequestPayload = subMultipleService.populateFilterDefaultedDynamicListLogic(
+        BulkRequestPayload bulkRequestPayload = subMultipleService.populateFilterDefaultedDynamicListLogic(
                 bulkRequest.getCaseDetails(), SELECT_NONE_VALUE);
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
@@ -497,7 +502,7 @@ public class BulkActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkRequestPayload = subMultipleService.bulkMidUpdateLogic(bulkRequest.getCaseDetails());
+        BulkRequestPayload bulkRequestPayload = subMultipleService.bulkMidUpdateLogic(bulkRequest.getCaseDetails());
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
                 .errors(bulkRequestPayload.getErrors())
@@ -525,7 +530,7 @@ public class BulkActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkRequestPayload = subMultipleService.updateSubMultipleLogic(bulkRequest.getCaseDetails());
+        BulkRequestPayload bulkRequestPayload = subMultipleService.updateSubMultipleLogic(bulkRequest.getCaseDetails());
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
                 .errors(bulkRequestPayload.getErrors())
@@ -553,7 +558,7 @@ public class BulkActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkRequestPayload = subMultipleService.deleteSubMultipleLogic(bulkRequest.getCaseDetails());
+        BulkRequestPayload bulkRequestPayload = subMultipleService.deleteSubMultipleLogic(bulkRequest.getCaseDetails());
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()
                 .errors(bulkRequestPayload.getErrors())
@@ -581,7 +586,7 @@ public class BulkActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var bulkDocumentInfo = documentGenerationService.processBulkScheduleRequest(
+        BulkDocumentInfo bulkDocumentInfo = documentGenerationService.processBulkScheduleRequest(
                 bulkRequest, userToken);
 
         if (bulkDocumentInfo.getErrors().isEmpty()) {
@@ -649,7 +654,7 @@ public class BulkActionsController {
         List<SubmitEvent> submitEvents =
                 bulkSearchService.retrievalCasesForPreAcceptRequest(bulkRequest.getCaseDetails(), userToken);
 
-        var bulkRequestPayload = bulkUpdateService.bulkPreAcceptLogic(bulkRequest.getCaseDetails(),
+        BulkRequestPayload bulkRequestPayload = bulkUpdateService.bulkPreAcceptLogic(bulkRequest.getCaseDetails(),
                 submitEvents, userToken, false);
 
         return ResponseEntity.ok(BulkCallbackResponse.builder()

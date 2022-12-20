@@ -10,7 +10,8 @@ import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class DynamicRestrictedReporting {
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.ConfusingTernary"})
+public final class DynamicRestrictedReporting {
     private DynamicRestrictedReporting() {
     }
 
@@ -24,8 +25,8 @@ public class DynamicRestrictedReporting {
         listItems.add(DynamicListHelper.getDynamicValue("None"));
 
         if (!listItems.isEmpty()) {
-            var restrictedReporting = caseData.getRestrictedReporting();
-            var dynamicFixedListType = new DynamicFixedListType();
+            RestrictedReportingType restrictedReporting = caseData.getRestrictedReporting();
+            DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(listItems);
             if (restrictedReporting != null) {
                 DynamicValueType dynamicValueType;
@@ -43,7 +44,7 @@ public class DynamicRestrictedReporting {
                 }
                 restrictedReporting.getDynamicRequestedBy().setValue(dynamicValueType);
             } else {
-                var restrictedReportingType = new RestrictedReportingType();
+                RestrictedReportingType restrictedReportingType = new RestrictedReportingType();
                 restrictedReportingType.setDynamicRequestedBy(dynamicFixedListType);
                 caseData.setRestrictedReporting(restrictedReportingType);
             }

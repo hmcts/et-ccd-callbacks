@@ -14,6 +14,9 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.items.ListingTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.ListingType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.OAuth2Configuration;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
@@ -44,6 +47,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIST_CASES_CONFIG;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ExcessiveImports", "PMD.CloseResource", "PMD.TooManyMethods"})
 public class TornadoServiceTest {
     private TornadoService tornadoService;
     private TornadoConnection tornadoConnection;
@@ -52,8 +56,9 @@ public class TornadoServiceTest {
     private DefaultValuesReaderService defaultValuesReaderService;
     private VenueAddressReaderService venueAddressReaderService;
     private MockHttpURLConnection mockConnection;
-    private final String authToken = "a-test-auth-token";
-    private final String documentInfoMarkup = "<a>some test markup</a>";
+    private static final String AUTH_TOKEN = "a-test-auth-token";
+    private static final String DOCUMENT_INFO_MARKUP = "<a>some test markup</a>";
+    private OAuth2Configuration oauth2Configuration;
 
     @Before
     public void setUp() throws IOException {
@@ -72,7 +77,7 @@ public class TornadoServiceTest {
         CaseData caseData = new CaseData();
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
-        tornadoService.documentGeneration(authToken, caseData, ENGLANDWALES_CASE_TYPE_ID,
+        tornadoService.documentGeneration(AUTH_TOKEN, caseData, ENGLANDWALES_CASE_TYPE_ID,
                 caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null);
     }
 
@@ -80,14 +85,14 @@ public class TornadoServiceTest {
     public void listingGenerationNoTornadoConnectionShouldThrowException() throws IOException {
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
-        tornadoService.listingGeneration(authToken, createListingData(), ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        tornadoService.listingGeneration(AUTH_TOKEN, createListingData(), ENGLANDWALES_LISTING_CASE_TYPE_ID);
     }
 
     @Test(expected = IOException.class)
     public void scheduleGenerationNoTornadoConnectionShouldThrowException() throws IOException {
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 
-        tornadoService.scheduleGeneration(authToken, createBulkData(), ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        tornadoService.scheduleGeneration(AUTH_TOKEN, createBulkData(), ENGLANDWALES_LISTING_CASE_TYPE_ID);
     }
 
     @Test(expected = IOException.class)
@@ -95,7 +100,7 @@ public class TornadoServiceTest {
         mockConnectionError();
         CaseData caseData = new CaseData();
 
-        tornadoService.documentGeneration(authToken, caseData, ENGLANDWALES_CASE_TYPE_ID,
+        tornadoService.documentGeneration(AUTH_TOKEN, caseData, ENGLANDWALES_CASE_TYPE_ID,
                 caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null);
     }
 
@@ -104,7 +109,7 @@ public class TornadoServiceTest {
         mockConnectionSuccess();
         CaseData caseData = new CaseData();
 
-        DocumentInfo documentInfo = tornadoService.documentGeneration(authToken, caseData, ENGLANDWALES_CASE_TYPE_ID,
+        DocumentInfo documentInfo = tornadoService.documentGeneration(AUTH_TOKEN, caseData, ENGLANDWALES_CASE_TYPE_ID,
                 caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null);
 
         verifyDocumentInfo(documentInfo);
@@ -113,7 +118,7 @@ public class TornadoServiceTest {
     @Test
     public void shouldCreateDocumentInfoForDocumentGenerationAllocatedOffice() throws IOException {
         mockConnectionSuccess();
-        var defaultValues = mock(DefaultValues.class);
+        DefaultValues defaultValues = mock(DefaultValues.class);
         when(defaultValuesReaderService.getDefaultValues(TribunalOffice.GLASGOW.getOfficeName()))
                 .thenReturn(defaultValues);
         CaseData caseData = new CaseData();
@@ -123,7 +128,7 @@ public class TornadoServiceTest {
         correspondenceScotType.setLetterAddress(LETTER_ADDRESS_ALLOCATED_OFFICE);
         caseData.setCorrespondenceScotType(correspondenceScotType);
 
-        DocumentInfo documentInfo = tornadoService.documentGeneration(authToken, caseData, SCOTLAND_CASE_TYPE_ID,
+        DocumentInfo documentInfo = tornadoService.documentGeneration(AUTH_TOKEN, caseData, SCOTLAND_CASE_TYPE_ID,
                 caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), null);
 
         verifyDocumentInfo(documentInfo);
@@ -142,7 +147,7 @@ public class TornadoServiceTest {
         correspondenceScotType.setLetterAddress(LETTER_ADDRESS_ALLOCATED_OFFICE);
         caseData.setCorrespondenceScotType(correspondenceScotType);
 
-        DocumentInfo documentInfo = tornadoService.documentGeneration(authToken, caseData, SCOTLAND_CASE_TYPE_ID,
+        DocumentInfo documentInfo = tornadoService.documentGeneration(AUTH_TOKEN, caseData, SCOTLAND_CASE_TYPE_ID,
                 caseData.getCorrespondenceType(), caseData.getCorrespondenceScotType(), new MultipleData());
 
         verifyDocumentInfo(documentInfo);
@@ -153,7 +158,8 @@ public class TornadoServiceTest {
         mockConnectionSuccess();
         ListingData listingData = createListingData();
 
-        DocumentInfo documentInfo = tornadoService.listingGeneration(authToken, listingData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        DocumentInfo documentInfo = tornadoService.listingGeneration(
+            AUTH_TOKEN, listingData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
 
         verifyDocumentInfo(documentInfo);
     }
@@ -161,11 +167,12 @@ public class TornadoServiceTest {
     @Test
     public void shouldCreateDocumentInforForScheduleGeneration() throws IOException {
         mockConnectionSuccess();
-        var bulkData = new BulkData();
+        BulkData bulkData = new BulkData();
         bulkData.setScheduleDocName(LIST_CASES_CONFIG);
         bulkData.setSearchCollection(new ArrayList<>());
 
-        DocumentInfo documentInfo = tornadoService.scheduleGeneration(authToken, bulkData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        DocumentInfo documentInfo = tornadoService.scheduleGeneration(
+            AUTH_TOKEN, bulkData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
 
         verifyDocumentInfo(documentInfo);
     }
@@ -176,7 +183,7 @@ public class TornadoServiceTest {
         ListingData listingData = createListingData();
         listingData.setReportType(CLAIMS_ACCEPTED_REPORT);
 
-        DocumentInfo documentInfo = tornadoService.listingGeneration(authToken, listingData,
+        DocumentInfo documentInfo = tornadoService.listingGeneration(AUTH_TOKEN, listingData,
                 ENGLANDWALES_LISTING_CASE_TYPE_ID);
 
         verifyDocumentInfo(documentInfo);
@@ -186,7 +193,7 @@ public class TornadoServiceTest {
     public void generateEt1VettingDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID, "ET1 Vetting.pdf");
+                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "ET1 Vetting.pdf");
         verifyDocumentInfo(documentInfo);
     }
 
@@ -194,7 +201,7 @@ public class TornadoServiceTest {
     public void generateEt3VettingDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID, "ET3 Processing.pdf");
+                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "ET3 Processing.pdf");
         verifyDocumentInfo(documentInfo);
     }
 
@@ -202,7 +209,7 @@ public class TornadoServiceTest {
     public void generateInConEWDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID, "Initial Consideration.pdf");
+                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "Initial Consideration.pdf");
         verifyDocumentInfo(documentInfo);
     }
 
@@ -210,28 +217,44 @@ public class TornadoServiceTest {
     public void generateInConSCDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), authToken, SCOTLAND_CASE_TYPE_ID, "Initial Consideration.pdf");
+                new CaseData(), AUTH_TOKEN, SCOTLAND_CASE_TYPE_ID, "Initial Consideration.pdf");
         verifyDocumentInfo(documentInfo);
     }
 
     @Test(expected = IOException.class)
     public void generateDocument_exception() throws IOException {
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
-        tornadoService.generateEventDocument(new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID,
+        tornadoService.generateEventDocument(new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
                 "random-string");
     }
 
     @Test(expected = NullPointerException.class)
     public void generateDocument_noDocumentName() throws IOException {
         mockConnectionSuccess();
-        tornadoService.generateEventDocument(new CaseData(), authToken, ENGLANDWALES_CASE_TYPE_ID,
+        tornadoService.generateEventDocument(new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
                 null);
     }
 
     private void createUserService() {
-        UserDetails userDetails = HelperTest.getUserDetails();
-        IdamApi idamApi = authorisation -> userDetails;
-        userService = new UserService(idamApi);
+        IdamApi idamApi = new IdamApi() {
+            @Override
+            public UserDetails retrieveUserDetails(String authorisation) {
+                return HelperTest.getUserDetails();
+            }
+
+            @Override
+            public UserDetails getUserByUserId(String authorisation, String userId) {
+                return HelperTest.getUserDetails();
+            }
+
+            @Override
+            public TokenResponse generateOpenIdToken(TokenRequest tokenRequest) {
+                return null;
+            }
+        };
+
+        mockOauth2Configuration();
+        userService = new UserService(idamApi, oauth2Configuration);
     }
 
     private void mockTornadoConnection() throws IOException {
@@ -247,7 +270,7 @@ public class TornadoServiceTest {
         when(documentManagementService.uploadDocument(anyString(), any(byte[].class),
                 anyString(), anyString(), anyString())).thenReturn(uri);
         when(documentManagementService.generateDownloadableURL(uri)).thenReturn(documentUrl);
-        when(documentManagementService.generateMarkupDocument(anyString())).thenReturn(documentInfoMarkup);
+        when(documentManagementService.generateMarkupDocument(anyString())).thenReturn(DOCUMENT_INFO_MARKUP);
     }
 
     private void mockDefaultValuesReaderService() {
@@ -301,7 +324,15 @@ public class TornadoServiceTest {
     }
 
     private void verifyDocumentInfo(DocumentInfo documentInfo) {
-        assertEquals(documentInfoMarkup, documentInfo.getMarkUp());
+        assertEquals(DOCUMENT_INFO_MARKUP, documentInfo.getMarkUp());
         assertEquals(SignificantItemType.DOCUMENT.name(), documentInfo.getType());
+    }
+
+    private void mockOauth2Configuration() {
+        oauth2Configuration = mock(OAuth2Configuration.class);
+        when(oauth2Configuration.getClientId()).thenReturn("111");
+        when(oauth2Configuration.getClientSecret()).thenReturn("AAAAA");
+        when(oauth2Configuration.getRedirectUri()).thenReturn("http://localhost:8080/test");
+        when(oauth2Configuration.getClientScope()).thenReturn("roles");
     }
 }

@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.listing.ListingCallbackResponse;
+import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingRequest;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
@@ -55,6 +58,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@SuppressWarnings({"PMD.TooManyFields", "PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.AvoidDuplicateLiterals",
+    "PMD.UnnecessaryAnnotationValueElement", "PMD.LawOfDemeter", "PMD.ConfusingTernary"})
 public class ExcelActionsController {
 
     private static final String LOG_MESSAGE = "received notification request for multiple reference : ";
@@ -103,7 +108,7 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multipleCreationService.bulkCreationLogic(userToken, multipleDetails, errors);
 
@@ -132,7 +137,7 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multipleAmendService.bulkAmendMultipleLogic(userToken, multipleDetails, errors);
 
@@ -161,7 +166,7 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
         multipleAmendService.bulkAmendMultipleLogic(userToken, multipleDetails, errors);
         fixMultipleCaseApiService.fixMultipleCase(userToken, multipleDetails, errors);
         return getMultipleCallbackRespEntity(errors, multipleDetails);
@@ -188,7 +193,7 @@ public class ExcelActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         return ResponseEntity.ok(MultipleCallbackResponse.builder()
                 .data(multipleDetails.getCaseData())
@@ -217,7 +222,7 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multipleUploadService.bulkUploadLogic(userToken, multipleDetails, errors);
 
@@ -246,7 +251,7 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multiplePreAcceptService.bulkPreAcceptLogic(userToken, multipleDetails, errors);
 
@@ -269,11 +274,11 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multipleDynamicListFlagsService.populateDynamicListFlagsLogic(userToken, multipleDetails, errors);
         if (errors.isEmpty()) {
-            var caseTypeId = multipleDetails.getCaseTypeId();
+            String caseTypeId = multipleDetails.getCaseTypeId();
             if (ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
                 fileLocationSelectionService.initialiseFileLocation(multipleDetails.getCaseData());
             } else if (SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
@@ -306,7 +311,7 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multipleUpdateService.bulkUpdateLogic(userToken, multipleDetails, errors);
 
@@ -335,7 +340,7 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multipleDynamicListFlagsService.populateDynamicListFlagsLogic(userToken, multipleDetails, errors);
 
@@ -364,7 +369,7 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multipleMidEventValidationService.multipleValidationLogic(userToken, multipleDetails, errors);
 
@@ -394,7 +399,7 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         subMultipleMidEventValidationService.subMultipleValidationLogic(multipleDetails, errors);
 
@@ -423,7 +428,7 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         subMultipleUpdateService.subMultipleUpdateLogic(userToken, multipleDetails, errors);
 
@@ -453,7 +458,7 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multipleCreationMidEventValidationService.multipleCreationValidationLogic(
                 userToken, multipleDetails, errors, false);
@@ -484,7 +489,7 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multipleCreationMidEventValidationService.multipleCreationValidationLogic(
                 userToken, multipleDetails, errors, true);
@@ -515,7 +520,7 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multipleSingleMidEventValidationService.multipleSingleValidationLogic(userToken, multipleDetails, errors);
 
@@ -543,7 +548,7 @@ public class ExcelActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
         List<String> errors = eventValidationService.validateReceiptDateMultiple(multipleDetails.getCaseData());
 
         return getMultipleCallbackRespEntity(errors, multipleDetails);
@@ -570,7 +575,7 @@ public class ExcelActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = listingRequest.getCaseDetails().getCaseData();
+        ListingData caseData = listingRequest.getCaseDetails().getCaseData();
 
         List<String> errors = eventValidationService.validateListingDateRange(
                 caseData.getListingDateFrom(),
@@ -595,8 +600,8 @@ public class ExcelActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseTypeId = multipleRequest.getCaseDetails().getCaseTypeId();
-        var multipleData = multipleRequest.getCaseDetails().getCaseData();
+        String caseTypeId = multipleRequest.getCaseDetails().getCaseTypeId();
+        MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();
         if (ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
             fileLocationSelectionService.initialiseFileLocation(multipleData);
         } else if (SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId)) {
@@ -628,7 +633,7 @@ public class ExcelActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         List<String> errors = multipleCloseEventValidationService.validateCasesBeforeCloseEvent(userToken,
                 multipleDetails);
@@ -664,7 +669,7 @@ public class ExcelActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         MultiplesHelper.updatePayloadMultiple(multipleDetails.getCaseData());
 
@@ -695,7 +700,7 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multipleHelperService.sendResetMultipleStateWithoutConfirmation(userToken, multipleDetails.getCaseTypeId(),
                 multipleDetails.getJurisdiction(), multipleDetails.getCaseData(), errors, multipleDetails.getCaseId());
@@ -725,7 +730,7 @@ public class ExcelActionsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var multipleData = multipleRequest.getCaseDetails().getCaseData();
+        MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();
         CaseTransferOfficeService.populateTransferToEnglandWalesOfficeOptions(multipleData);
 
         return ResponseEntity.ok(MultipleCallbackResponse.builder()
@@ -755,7 +760,7 @@ public class ExcelActionsController {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
+        MultipleDetails multipleDetails = multipleRequest.getCaseDetails();
 
         multipleTransferService.multipleTransferLogic(userToken, multipleDetails, errors);
 

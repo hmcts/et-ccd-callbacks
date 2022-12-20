@@ -14,6 +14,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.C
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.JudgeSelectionService;
 
 @Service
+@SuppressWarnings({"PMD.ConfusingTernary"})
 public class ScotlandAllocateHearingService {
     private final HearingSelectionService hearingSelectionService;
     private final JudgeSelectionService judgeSelectionService;
@@ -34,14 +35,14 @@ public class ScotlandAllocateHearingService {
     }
 
     public void handleListingSelected(CaseData caseData) {
-        var selectedListing = getSelectedListing(caseData);
+        DateListedType selectedListing = getSelectedListing(caseData);
         caseData.setAllocateHearingManagingOffice(selectedListing.getHearingVenueDayScotland());
     }
 
     public void handleManagingOfficeSelected(CaseData caseData) {
-        var selectedHearing = getSelectedHearing(caseData);
-        var selectedListing = getSelectedListing(caseData);
-        var managingOffice = TribunalOffice.valueOfOfficeName(caseData.getAllocateHearingManagingOffice());
+        HearingType selectedHearing = getSelectedHearing(caseData);
+        DateListedType selectedListing = getSelectedListing(caseData);
+        TribunalOffice managingOffice = TribunalOffice.valueOfOfficeName(caseData.getAllocateHearingManagingOffice());
 
         caseData.setAllocateHearingJudge(judgeSelectionService.createJudgeSelection(managingOffice, selectedHearing));
         caseData.setAllocateHearingVenue(scotlandVenueSelectionService.createVenueSelection(managingOffice,
@@ -56,7 +57,7 @@ public class ScotlandAllocateHearingService {
 
         // If the managing office has changed then we need to remove any selected
         // values that are controlled by it so that no invalid options are selected
-        var existingManagingOffice = selectedListing.getHearingVenueDayScotland();
+        String existingManagingOffice = selectedListing.getHearingVenueDayScotland();
         if (!managingOffice.getOfficeName().equals(existingManagingOffice)) {
             caseData.getAllocateHearingJudge().setValue(null);
             caseData.getAllocateHearingVenue().setValue(null);
@@ -70,26 +71,26 @@ public class ScotlandAllocateHearingService {
     }
 
     public void populateRooms(CaseData caseData) {
-        var selectedListing = getSelectedListing(caseData);
-        var venueChanged = isVenueChanged(selectedListing, caseData.getAllocateHearingVenue());
+        DateListedType selectedListing = getSelectedListing(caseData);
+        boolean venueChanged = isVenueChanged(selectedListing, caseData.getAllocateHearingVenue());
 
         caseData.setAllocateHearingRoom(roomSelectionService.createRoomSelection(caseData, selectedListing,
                 venueChanged));
     }
 
     public void updateCase(CaseData caseData) {
-        var selectedHearing = getSelectedHearing(caseData);
+        HearingType selectedHearing = getSelectedHearing(caseData);
         selectedHearing.setHearingSitAlone(caseData.getAllocateHearingSitAlone());
         selectedHearing.setJudge(caseData.getAllocateHearingJudge());
         selectedHearing.setHearingERMember(caseData.getAllocateHearingEmployerMember());
         selectedHearing.setHearingEEMember(caseData.getAllocateHearingEmployeeMember());
 
-        var selectedListing = getSelectedListing(caseData);
+        DateListedType selectedListing = getSelectedListing(caseData);
         selectedListing.setHearingTypeReadingDeliberation(caseData.getAllocateHearingReadingDeliberation());
         selectedListing.setHearingStatus(caseData.getAllocateHearingStatus());
         selectedListing.setPostponedBy(caseData.getAllocateHearingPostponedBy());
 
-        var managingOffice = caseData.getAllocateHearingManagingOffice();
+        String managingOffice = caseData.getAllocateHearingManagingOffice();
         selectedListing.setHearingVenueDayScotland(managingOffice);
         selectedListing.setHearingGlasgow(null);
         selectedListing.setHearingAberdeen(null);
@@ -133,13 +134,13 @@ public class ScotlandAllocateHearingService {
     }
 
     private boolean isVenueChanged(DateListedType listing, DynamicFixedListType newVenue) {
-        var currentVenue = getCurrentVenue(listing);
+        DynamicFixedListType currentVenue = getCurrentVenue(listing);
         return isVenueChanged(currentVenue, newVenue);
     }
 
     private boolean isVenueChanged(DynamicFixedListType currentVenue, DynamicFixedListType newVenue) {
-        var currentVenueCode = currentVenue != null ? currentVenue.getSelectedCode() : null;
-        var newVenueCode = newVenue != null ? newVenue.getSelectedCode() : null;
+        String currentVenueCode = currentVenue != null ? currentVenue.getSelectedCode() : null;
+        String newVenueCode = newVenue != null ? newVenue.getSelectedCode() : null;
         return !StringUtils.equals(currentVenueCode, newVenueCode);
     }
 
@@ -163,8 +164,8 @@ public class ScotlandAllocateHearingService {
     }
 
     private DynamicFixedListType getEmployerMembers(TribunalOffice tribunalOffice, HearingType selectedHearing) {
-        var dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(tribunalOffice,
-                CourtWorkerType.EMPLOYER_MEMBER);
+        DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
+            tribunalOffice, CourtWorkerType.EMPLOYER_MEMBER);
 
         if (selectedHearing.hasHearingEmployerMember()) {
             dynamicFixedListType.setValue(selectedHearing.getHearingERMember().getValue());
@@ -173,8 +174,8 @@ public class ScotlandAllocateHearingService {
     }
 
     private DynamicFixedListType getEmployeeMembers(TribunalOffice tribunalOffice, HearingType selectedHearing) {
-        var dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(tribunalOffice,
-                CourtWorkerType.EMPLOYEE_MEMBER);
+        DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
+            tribunalOffice, CourtWorkerType.EMPLOYEE_MEMBER);
 
         if (selectedHearing.hasHearingEmployeeMember()) {
             dynamicFixedListType.setValue(selectedHearing.getHearingEEMember().getValue());
@@ -183,8 +184,8 @@ public class ScotlandAllocateHearingService {
     }
 
     private DynamicFixedListType getClerks(TribunalOffice tribunalOffice, DateListedType selectedListing) {
-        var dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(tribunalOffice,
-                CourtWorkerType.CLERK);
+        DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
+            tribunalOffice, CourtWorkerType.CLERK);
 
         if (selectedListing.hasHearingClerk()) {
             dynamicFixedListType.setValue(selectedListing.getHearingClerk().getValue());

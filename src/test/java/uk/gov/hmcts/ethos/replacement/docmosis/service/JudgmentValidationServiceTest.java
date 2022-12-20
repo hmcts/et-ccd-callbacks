@@ -3,6 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DynamicListHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
@@ -16,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements.NO_HEARINGS;
 
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming"})
 class JudgmentValidationServiceTest {
 
     private JudgmentValidationService judgmentValidationService;
@@ -38,18 +41,22 @@ class JudgmentValidationServiceTest {
     @Test
     void populateJudgmentDateOfHearingTest() throws ParseException {
         DynamicJudgements.dynamicJudgements(caseDetails1.getCaseData());
-        caseDetails1.getCaseData().getJudgementCollection().get(0).getValue().getDynamicJudgementHearing().setValue(caseDetails1.getCaseData().getJudgementCollection().get(0).getValue().getDynamicJudgementHearing().getListItems().get(0));
+        caseDetails1.getCaseData().getJudgementCollection().get(0).getValue()
+                .getDynamicJudgementHearing().setValue(caseDetails1.getCaseData()
+                .getJudgementCollection().get(0).getValue().getDynamicJudgementHearing().getListItems().get(0));
         judgmentValidationService.validateJudgments(caseDetails1.getCaseData());
-        assertEquals("2019-11-01", caseDetails1.getCaseData().getJudgementCollection().get(0).getValue().getJudgmentHearingDate());
+        assertEquals("2019-11-01", caseDetails1.getCaseData()
+                .getJudgementCollection().get(0).getValue().getJudgmentHearingDate());
     }
 
     @Test
     void populateJudgmentZeroHearings() throws ParseException {
-        var caseData = caseDetails1.getCaseData();
+        CaseData caseData = caseDetails1.getCaseData();
         caseData.setHearingCollection(null);
         DynamicJudgements.dynamicJudgements(caseData);
-        var dynamicValue = DynamicListHelper.getDynamicValue(NO_HEARINGS);
-        assertEquals(dynamicValue, caseData.getJudgementCollection().get(0).getValue().getDynamicJudgementHearing().getListItems().get(0));
+        DynamicValueType dynamicValue = DynamicListHelper.getDynamicValue(NO_HEARINGS);
+        assertEquals(dynamicValue, caseData.getJudgementCollection()
+                .get(0).getValue().getDynamicJudgementHearing().getListItems().get(0));
 
         judgmentValidationService.validateJudgments(caseDetails1.getCaseData());
         assertNull(caseData.getJudgementCollection().get(0).getValue().getDynamicJudgementHearing());

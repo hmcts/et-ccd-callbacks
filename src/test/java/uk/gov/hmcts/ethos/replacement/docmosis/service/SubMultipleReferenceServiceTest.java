@@ -25,10 +25,10 @@ public class SubMultipleReferenceServiceTest {
 
     @Test
     public void createManchesterReference() {
-        var multipleRef = "6000001";
+        String multipleRef = "6000001";
         when(subMultipleRefEnglandWalesRepository.ethosSubMultipleCaseRefGen(Integer.parseInt(multipleRef), 1))
                 .thenReturn(multipleRef + "/1");
-        var expectedRef = multipleRef + "/1";
+        String expectedRef = multipleRef + "/1";
 
         assertEquals(expectedRef, subMultipleReferenceService.createReference(ENGLANDWALES_BULK_CASE_TYPE_ID,
                 multipleRef, 1));
@@ -36,10 +36,10 @@ public class SubMultipleReferenceServiceTest {
 
     @Test
     public void createScotlandReference() {
-        var multipleRef = "8000001";
-        when(subMultipleRefScotlandRepository.ethosSubMultipleCaseRefGen(Integer.parseInt(multipleRef), 1)).
-                thenReturn(multipleRef + "/1");
-        var expectedRef = multipleRef + "/1";
+        String multipleRef = "8000001";
+        when(subMultipleRefScotlandRepository.ethosSubMultipleCaseRefGen(Integer.parseInt(multipleRef), 1))
+                .thenReturn(multipleRef + "/1");
+        String expectedRef = multipleRef + "/1";
 
         assertEquals(expectedRef, subMultipleReferenceService.createReference(SCOTLAND_BULK_CASE_TYPE_ID,
                 multipleRef, 1));

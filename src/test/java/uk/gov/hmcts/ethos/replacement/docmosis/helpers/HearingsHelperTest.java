@@ -34,6 +34,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.fin
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.HEARING_CREATION_DAY_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.HEARING_CREATION_NUMBER_ERROR;
 
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LawOfDemeter", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 public class HearingsHelperTest {
 
     private CaseDetails caseDetails1;
@@ -241,7 +243,7 @@ public class HearingsHelperTest {
 
     @Test
     public void earliestDateReturnsEarliestDate() {
-        var hearingCollection = caseDetails1.getCaseData().getHearingCollection();
+        List<HearingTypeItem> hearingCollection = caseDetails1.getCaseData().getHearingCollection();
         setListingDate(hearingCollection, 0, 2, "2100-02-01T01:01:01.000");
         setListingDate(hearingCollection, 1, 0, "2100-03-01T01:01:01.000");
         setListingDate(hearingCollection, 1, 1, "2100-01-01T01:01:01.000");
@@ -252,7 +254,7 @@ public class HearingsHelperTest {
 
     @Test
     public void earliestDateHandlesAHearingWithNoDatesInFuture() {
-        var hearingCollection = caseDetails1.getCaseData().getHearingCollection();
+        List<HearingTypeItem> hearingCollection = caseDetails1.getCaseData().getHearingCollection();
         setListingDate(hearingCollection, 0, 2, "2100-02-01T01:01:01.000");
         setListingDate(hearingCollection, 1, 0, "1999-01-01T01:01:01.000");
         setListingDate(hearingCollection, 1, 1, "1999-01-01T01:01:01.000");

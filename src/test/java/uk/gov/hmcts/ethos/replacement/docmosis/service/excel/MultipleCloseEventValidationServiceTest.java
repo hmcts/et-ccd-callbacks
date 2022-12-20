@@ -73,11 +73,11 @@ public class MultipleCloseEventValidationServiceTest {
 
     @Test
     public void multipleCloseEventValidationReturnsErrors() {
-        var jurCodesTypeItem = new JurCodesTypeItem();
+        JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
         jurCodesTypeItem.setId("TEST");
         jurCodesTypeItem.setValue(new JurCodesType());
 
-        var judgmentTypeItem = new JudgementTypeItem();
+        JudgementTypeItem judgmentTypeItem = new JudgementTypeItem();
         judgmentTypeItem.setId("TEST");
         judgmentTypeItem.setValue(new JudgementType());
 
@@ -86,7 +86,7 @@ public class MultipleCloseEventValidationServiceTest {
         caseData.setJurCodesCollection(List.of(jurCodesTypeItem));
         caseData.setJudgementCollection(List.of(judgmentTypeItem));
 
-        var submitEvent = getSubmitEventForCase(caseData);
+        SubmitEvent submitEvent = getSubmitEventForCase(caseData);
 
         multipleDetails.getCaseData().setLeadCase(null);
 
@@ -123,15 +123,15 @@ public class MultipleCloseEventValidationServiceTest {
 
     @Test
     public void multipleCloseEventValidationNoError() {
-        var jurCodeType = new JurCodesType();
+        JurCodesType jurCodeType = new JurCodesType();
         jurCodeType.setJudgmentOutcome("some outcome");
-        var jurCodesTypeItem = new JurCodesTypeItem();
+        JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
         jurCodesTypeItem.setId("TEST");
         jurCodesTypeItem.setValue(jurCodeType);
 
-        var judgmentType = new JudgementType();
+        JudgementType judgmentType = new JudgementType();
         judgmentType.setJurisdictionCodes(List.of(jurCodesTypeItem));
-        var judgmentTypeItem = new JudgementTypeItem();
+        JudgementTypeItem judgmentTypeItem = new JudgementTypeItem();
         judgmentTypeItem.setId("TEST");
         judgmentTypeItem.setValue(judgmentType);
 
@@ -140,7 +140,7 @@ public class MultipleCloseEventValidationServiceTest {
         caseData.setJurCodesCollection(List.of(jurCodesTypeItem));
         caseData.setJudgementCollection(List.of(judgmentTypeItem));
 
-        var submitEvent = getSubmitEventForCase(caseData);
+        SubmitEvent submitEvent = getSubmitEventForCase(caseData);
 
         multipleDetails.getCaseData().setLeadCase(null);
 
@@ -177,7 +177,7 @@ public class MultipleCloseEventValidationServiceTest {
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(CLOSED_STATE);
-        submitEvent.setCaseId(1232121232);
+        submitEvent.setCaseId(1_232_121_232);
         return submitEvent;
     }
 }

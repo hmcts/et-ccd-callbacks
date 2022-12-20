@@ -6,6 +6,7 @@ import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.et.common.model.bulk.items.CaseIdTypeItem;
 import uk.gov.hmcts.et.common.model.bulk.types.CaseType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.TreeMap;
 
 import static org.junit.Assert.assertEquals;
 
+@SuppressWarnings({ "PMD.LinguisticNaming"})
 public class MultiplesHelperTest {
 
     private MultipleData multipleData;
@@ -51,8 +53,8 @@ public class MultiplesHelperTest {
 
     @Test
     public void orderMultiplesStringRef() {
-        var refList = Arrays.asList("1800074/2020", "1800074/2021", "1800075/2020", "1800075/2021");
-        var expectedResult = new TreeMap<>(Map.of(
+        List<String> refList = Arrays.asList("1800074/2020", "1800074/2021", "1800075/2020", "1800075/2021");
+        TreeMap<String, TreeMap<String, String>> expectedResult = new TreeMap<>(Map.of(
                 "2020", new TreeMap<>(Map.of("1800074", "1800074/2020", "1800075", "1800075/2020")),
                 "2021", new TreeMap<>(Map.of("1800074", "1800074/2021", "1800075", "1800075/2021")))
         );
@@ -62,13 +64,13 @@ public class MultiplesHelperTest {
 
     @Test
     public void orderMultipleObjects() {
-        var refList = Arrays.asList(
+        List<MultipleObject> refList = Arrays.asList(
                 MultiplesHelper.createMultipleObject("1800074/2020", ""),
                 MultiplesHelper.createMultipleObject("1800074/2021", ""),
                 MultiplesHelper.createMultipleObject("1800075/2020", ""),
                 MultiplesHelper.createMultipleObject("1800075/2021", "")
         );
-        var expectedResult = new TreeMap<>(Map.of(
+        TreeMap<String, TreeMap<String, MultipleObject>> expectedResult = new TreeMap<>(Map.of(
                 "2020",
                 new TreeMap<>(Map.of(
                         "1800074", MultiplesHelper.createMultipleObject("1800074/2020", ""),
@@ -86,14 +88,14 @@ public class MultiplesHelperTest {
 
     @Test
     public void orderSchedulePayloads() {
-        var refList = Arrays.asList(
+        List<SchedulePayload> refList = Arrays.asList(
                 SchedulePayload.builder().ethosCaseRef("1800074/2020").build(),
                 SchedulePayload.builder().ethosCaseRef("1800074/2021").build(),
                 SchedulePayload.builder().ethosCaseRef("1800075/2020").build(),
                 SchedulePayload.builder().ethosCaseRef("1800075/2021").build()
         );
 
-        var expectedResult = new TreeMap<>(Map.of(
+        TreeMap<String, TreeMap<String, SchedulePayload>> expectedResult = new TreeMap<>(Map.of(
                 "2020",
                 new TreeMap<>(Map.of(
                         "1800074", SchedulePayload.builder().ethosCaseRef("1800074/2020").build(),
@@ -111,7 +113,7 @@ public class MultiplesHelperTest {
     @Test
     public void orderMultiplesObjectTypNotRecognised() {
         List<Object> refList = Arrays.asList(5, 6, 4, 5);
-        var expectedResult = new TreeMap<>();
+        TreeMap<Object, Object> expectedResult = new TreeMap<>();
         assertEquals(MultiplesHelper.createCollectionOrderedByCaseRef(refList), expectedResult);
     }
 

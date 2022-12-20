@@ -14,7 +14,6 @@ import java.util.UUID;
 public class RespondentsReportCaseDataBuilder {
     private final RespondentsReportCaseData caseData = new RespondentsReportCaseData();
 
-
     public void withNoRespondents() {
         caseData.setRespondentCollection(null);
     }
@@ -30,9 +29,9 @@ public class RespondentsReportCaseDataBuilder {
 
     public RepresentedTypeRItem getRepresentative(String respName, String repName) {
         RepresentedTypeRItem item = new RepresentedTypeRItem();
-        RepresentedTypeR type = new RepresentedTypeR();
-        type.setRespRepName(respName);
-        type.setNameOfRepresentative(repName);
+        RepresentedTypeR type = RepresentedTypeR.builder()
+            .respRepName(respName)
+            .nameOfRepresentative(repName).build();
         item.setId(UUID.randomUUID().toString());
         item.setValue(type);
         return item;
@@ -51,15 +50,15 @@ public class RespondentsReportCaseDataBuilder {
     public void withMoreThan1RespondentsRepresented() {
         RespondentSumTypeItem item1 = getRespondent("Resp1");
         RespondentSumTypeItem item2 = getRespondent("Resp2");
-        RepresentedTypeRItem rItem1 = getRepresentative("Resp1", "Rep1");
-        RepresentedTypeRItem rItem2 = getRepresentative("Resp2", "Rep1");
+        RepresentedTypeRItem repItem1 = getRepresentative("Resp1", "Rep1");
+        RepresentedTypeRItem repItem2 = getRepresentative("Resp2", "Rep1");
 
-        caseData.setRepCollection(Arrays.asList(rItem1, rItem2));
+        caseData.setRepCollection(Arrays.asList(repItem1, repItem2));
         caseData.setRespondentCollection(Arrays.asList(item1, item2));
     }
 
     public RespondentsReportSubmitEvent buildAsSubmitEvent() {
-        var submitEvent = new RespondentsReportSubmitEvent();
+        RespondentsReportSubmitEvent submitEvent = new RespondentsReportSubmitEvent();
         caseData.setEthosCaseReference("111");
         submitEvent.setCaseData(caseData);
         return submitEvent;

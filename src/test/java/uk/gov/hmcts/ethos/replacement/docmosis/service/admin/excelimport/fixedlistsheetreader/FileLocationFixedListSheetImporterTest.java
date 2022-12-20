@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -24,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+@SuppressWarnings({"PMD.UseProperClassLoader"})
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {FileLocationFixedListSheetImporter.class, FileLocationRowHandler.class})
 class FileLocationFixedListSheetImporterTest {
@@ -38,7 +40,7 @@ class FileLocationFixedListSheetImporterTest {
 
     @BeforeAll
     static void setup() throws IOException, InvalidFormatException {
-        var file = new File(FileLocationFixedListSheetImporterTest.class.getClassLoader()
+        File file = new File(FileLocationFixedListSheetImporterTest.class.getClassLoader()
                 .getResource("admin/VenuesImportFile.xlsx").getFile());
         workbook = new XSSFWorkbook(file);
     }
@@ -51,14 +53,14 @@ class FileLocationFixedListSheetImporterTest {
     @ParameterizedTest
     @MethodSource
     void testImportSheet(TribunalOffice tribunalOffice, String sheetName, int expectedFileLocations) {
-        var sheet = workbook.getSheet(sheetName);
+        XSSFSheet sheet = workbook.getSheet(sheetName);
 
         fileLocationFixedListSheetImporter.importSheet(tribunalOffice, sheet);
 
         verify(fileLocationRepository, times(expectedFileLocations)).save(any(FileLocation.class));
     }
 
-    private static Stream<Arguments> testImportSheet() {
+    private static Stream<Arguments> testImportSheet() { //NOPMD - parameterized tests
         return Stream.of(
                 Arguments.of(TribunalOffice.ABERDEEN, "Scotland Scrubbed", 46),
                 Arguments.of(TribunalOffice.BRISTOL, "Bristol Scrubbed", 162),

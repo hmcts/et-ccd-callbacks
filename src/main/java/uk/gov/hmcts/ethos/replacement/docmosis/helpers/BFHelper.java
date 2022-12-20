@@ -17,6 +17,10 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
 
 @Slf4j
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
+    "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
+    "PMD.ExcessiveImports", "PMD.ConfusingTernary", "PDM.UselessParentheses",
+    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.AvoidInstantiatingObjectsInLoops"})
 public class BFHelper {
 
     private BFHelper() {
@@ -29,14 +33,11 @@ public class BFHelper {
         if (bfActions != null && !bfActions.isEmpty()) {
 
             for (BFActionTypeItem bfActionTypeItem : bfActions) {
-                var bfActionType = bfActionTypeItem.getValue();
+                BFActionType bfActionType = bfActionTypeItem.getValue();
 
                 if (isNullOrEmpty(bfActionType.getDateEntered())) {
                     bfActionType.setDateEntered(UtilHelper.formatCurrentDate2(LocalDate.now()));
                 }
-                var dateEntered = bfActions.get(0).getValue().getDateEntered().substring(0, 10);
-                LocalDate date = LocalDate.parse(dateEntered);
-                caseData.setClaimServedDate(String.valueOf(date));
             }
 
         }
@@ -53,13 +54,13 @@ public class BFHelper {
 
             for (BFActionTypeItem bfActionTypeItem : bfActionTypeItemList) {
 
-                var dynamicFixedListType = bfActionTypeItem.getValue().getAction();
+                DynamicFixedListType dynamicFixedListType = bfActionTypeItem.getValue().getAction();
 
                 if (dynamicFixedListType != null) {
 
                     log.info("Updating the value of bfActionDynamicLists: " + dynamicFixedListType.getValue());
 
-                    var bfActionTypeItemAux = new BFActionTypeItem();
+                    BFActionTypeItem bfActionTypeItemAux = new BFActionTypeItem();
                     bfActionTypeItemAux.setId(bfActionTypeItem.getId());
                     bfActionTypeItemAux.setValue(bfActionTypeItem.getValue());
                     bfActionTypeItemListAux.add(bfActionTypeItemAux);
@@ -69,12 +70,12 @@ public class BFHelper {
             log.info("BF Actions for case reference {} is empty. Creating a dummy one",
                     caseData.getEthosCaseReference());
 
-            var dynamicFixedListType = new DynamicFixedListType();
+            DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(Helper.getDefaultBfListItems());
             dynamicFixedListType.setValue(DynamicListHelper.getDynamicValue(BF_ACTION_ACAS));
 
-            var bfActionTypeItem = new BFActionTypeItem();
-            var bfActionType = new BFActionType();
+            BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
+            BFActionType bfActionType = new BFActionType();
 
             bfActionType.setAction(dynamicFixedListType);
             bfActionTypeItem.setId(UUID.randomUUID().toString());

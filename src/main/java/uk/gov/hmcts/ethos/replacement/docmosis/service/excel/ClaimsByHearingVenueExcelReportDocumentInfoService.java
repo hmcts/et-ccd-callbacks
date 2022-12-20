@@ -16,8 +16,8 @@ public class ClaimsByHearingVenueExcelReportDocumentInfoService {
 
     public DocumentInfo generateExcelReportDocumentInfo(ClaimsByHearingVenueReportData reportData, String caseTypeId,
                                                     String userToken) {
-        var excelBytes = excelReportCreationService.getReportExcelFile(reportData);
-        var outPutFileName = caseTypeId + CLAIMS_BY_HEARING_VENUE_FILE_NAME;
+        byte[] excelBytes = excelReportCreationService.getReportExcelFile(reportData);
+        String outPutFileName = caseTypeId + CLAIMS_BY_HEARING_VENUE_FILE_NAME;
         return excelDocManagementService.uploadExcelReportDocument(userToken, outPutFileName, excelBytes);
     }
 }

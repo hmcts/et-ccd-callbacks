@@ -47,6 +47,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOUR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATING_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.NullAssignment", "PMD.LawOfDemeter",
+    "PMD.ExcessiveImports"})
 @RequiredArgsConstructor
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleTransferServiceTest {
@@ -115,9 +117,8 @@ public class MultipleTransferServiceTest {
                 MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl,
                         multipleDetails.getCaseId(),
                         multipleDetails.getCaseData().getMultipleReference()),
-                true,null
-                );
-
+                true, null
+        );
         verifyNoMoreInteractions(persistentQHelperService);
 
     }
@@ -165,31 +166,31 @@ public class MultipleTransferServiceTest {
 
     @Test
     public void validateCasesBeforeTransfer() {
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("245004/2020");
 
-        // Un cleared BF Action
-        var bfActionType = new BFActionType();
+        // Uncleared BF Action
+        BFActionType bfActionType = new BFActionType();
         bfActionType.setDateEntered("2020-11-11");
-        var bfActionTypeItem = new BFActionTypeItem();
+        BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
         bfActionTypeItem.setValue(bfActionType);
         caseData.setBfActions(List.of(bfActionTypeItem));
 
         // Listed hearing
-        var dateListedType = new DateListedType();
+        DateListedType dateListedType = new DateListedType();
         dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
-        var dateListedTypeItem = new DateListedTypeItem();
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setValue(dateListedType);
-        var hearingType = new HearingType();
+        HearingType hearingType = new HearingType();
         hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
-        var hearingTypeItem = new HearingTypeItem();
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(hearingType);
         caseData.setHearingCollection(List.of(hearingTypeItem));
 
-        var submitEvent = new SubmitEvent();
+        SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(ACCEPTED_STATE);
-        submitEvent.setCaseId(1232121232);
+        submitEvent.setCaseId(1_232_121_232);
 
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);
@@ -197,7 +198,7 @@ public class MultipleTransferServiceTest {
                 .thenReturn(new ArrayList<>(Collections.singletonList(submitEvent)));
         doCallRealMethod().when(caseTransferUtils).validateCase(isA(CaseData.class));
 
-        var validationErrors = caseTransferUtils.validateCase(caseData);
+        List<String> validationErrors = caseTransferUtils.validateCase(caseData);
         assertEquals(2, validationErrors.size());
         assertEquals(String.format(CaseTransferUtils.BF_ACTIONS_ERROR_MSG, caseData.getEthosCaseReference()),
                 validationErrors.get(0));
@@ -207,37 +208,37 @@ public class MultipleTransferServiceTest {
 
     @Test
     public void validateCasesBeforeTransfer_withoutErrors() {
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("245004/2020");
 
         // Cleared BF
-        var bfActionType = new BFActionType();
+        BFActionType bfActionType = new BFActionType();
         bfActionType.setDateEntered("2020-11-11");
         bfActionType.setCleared("2020-11-10");
-        var bfActionTypeItem = new BFActionTypeItem();
+        BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
         bfActionTypeItem.setValue(bfActionType);
         caseData.setBfActions(List.of(bfActionTypeItem));
 
         // 'Heard' hearing
-        var dateListedType = new DateListedType();
+        DateListedType dateListedType = new DateListedType();
         dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
-        var dateListedTypeItem = new DateListedTypeItem();
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setValue(dateListedType);
-        var hearingType = new HearingType();
+        HearingType hearingType = new HearingType();
         hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
-        var hearingTypeItem = new HearingTypeItem();
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(hearingType);
         caseData.setHearingCollection(List.of(hearingTypeItem));
 
-        var submitEvent = new SubmitEvent();
+        SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(ACCEPTED_STATE);
-        submitEvent.setCaseId(1232121232);
+        submitEvent.setCaseId(1_232_121_232);
 
-        var submitEvent2 = new SubmitEvent();
+        SubmitEvent submitEvent2 = new SubmitEvent();
         submitEvent2.setCaseData(caseData);
         submitEvent2.setState(ACCEPTED_STATE);
-        submitEvent2.setCaseId(1232121232);
+        submitEvent2.setCaseId(1_232_121_232);
 
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjects);

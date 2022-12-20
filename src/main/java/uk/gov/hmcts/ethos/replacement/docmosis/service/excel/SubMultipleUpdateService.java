@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.et.common.model.multiples.items.SubMultipleTypeItem;
+import uk.gov.hmcts.et.common.model.multiples.types.SubMultipleActionType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SubMultipleReferenceService;
@@ -21,6 +22,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CREATE_ACTION;
 @Slf4j
 @RequiredArgsConstructor
 @Service("subMultipleUpdateService")
+@SuppressWarnings({"PMD.ConfusingTernary"})
 public class SubMultipleUpdateService {
 
     private final ExcelReadingService excelReadingService;
@@ -52,7 +54,7 @@ public class SubMultipleUpdateService {
     private void actionTypeLogic(String userToken, MultipleDetails multipleDetails,
                                  SortedMap<String, Object> multipleObjects) {
 
-        var subMultipleActionType = multipleDetails.getCaseData().getSubMultipleAction();
+        SubMultipleActionType subMultipleActionType = multipleDetails.getCaseData().getSubMultipleAction();
 
         String actionType = subMultipleActionType.getActionType();
 
@@ -92,7 +94,7 @@ public class SubMultipleUpdateService {
 
         String subMultipleName = multipleDetails.getCaseData().getSubMultipleAction().getCreateSubMultipleName();
 
-        var subMultipleTypeItem = createSubMultipleTypeItemWithReference(
+        SubMultipleTypeItem subMultipleTypeItem = createSubMultipleTypeItemWithReference(
                 multipleDetails, subMultipleName);
 
         log.info("Add sub multiple to the multiple");
@@ -194,7 +196,7 @@ public class SubMultipleUpdateService {
         List<MultipleObject> multipleObjectsExcel = new ArrayList<>();
 
         multipleObjects.forEach((key, value) -> {
-            var multipleObject = (MultipleObject) value;
+            MultipleObject multipleObject = (MultipleObject) value;
             if (multipleObject.getSubMultiple().equals(existingSubMultipleName)) {
                 multipleObject.setSubMultiple(newSubMultipleName);
             }

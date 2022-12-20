@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
@@ -29,6 +31,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 @RequiredArgsConstructor
 @Service("multipleTransferService")
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.PreserveStackTrace", "PMD.LawOfDemeter"})
 public class MultipleTransferService {
 
     private final ExcelReadingService excelReadingService;
@@ -77,11 +80,11 @@ public class MultipleTransferService {
     private void validateCaseBeforeTransfer(String userToken, MultipleDetails multipleDetails, List<String> errors,
                                             SortedMap<String, Object> multipleObjects) {
         List<String> ethosCaseRefCollection = new ArrayList<>(multipleObjects.keySet());
-        var submitEvents = singleCasesReadingService.retrieveSingleCases(userToken,
+        List<SubmitEvent> submitEvents = singleCasesReadingService.retrieveSingleCases(userToken,
                 multipleDetails.getCaseTypeId(), ethosCaseRefCollection,
                 multipleDetails.getCaseData().getMultipleSource());
-        for (var submitEvent : submitEvents) {
-            var validationErrors = caseTransferUtils.validateCase(submitEvent.getCaseData());
+        for (SubmitEvent submitEvent : submitEvents) {
+            List<String> validationErrors = caseTransferUtils.validateCase(submitEvent.getCaseData());
             if (!validationErrors.isEmpty()) {
                 errors.addAll(validationErrors);
             }
@@ -92,7 +95,7 @@ public class MultipleTransferService {
                                         List<String> errors, SortedMap<String, Object> multipleObjects) {
 
         List<String> ethosCaseRefCollection = new ArrayList<>(multipleObjects.keySet());
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
         boolean sameCountryCaseTransfer = isSameCountryCaseTransfer(multipleDetails.getCaseTypeId(),
                 multipleData.getOfficeMultipleCT().getValue().getCode());
         persistentQHelperService.sendCreationEventToSingles(
@@ -116,11 +119,11 @@ public class MultipleTransferService {
     }
 
     public boolean isSameCountryCaseTransfer(String caseTypeId, String officeMultipleCT) {
-        var tribunalOffice = TribunalOffice.valueOfOfficeName(officeMultipleCT);
+        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(officeMultipleCT);
         boolean isScottishDestinationOffice = TribunalOffice.SCOTLAND_OFFICES.contains(tribunalOffice);
 
-        return ((isScottishDestinationOffice && SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId))
-                || (!isScottishDestinationOffice && ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId)));
+        return isScottishDestinationOffice && SCOTLAND_BULK_CASE_TYPE_ID.equals(caseTypeId)
+                || !isScottishDestinationOffice && ENGLANDWALES_BULK_CASE_TYPE_ID.equals(caseTypeId);
     }
 
     public void populateDataIfComingFromCT(String userToken, MultipleDetails multipleDetails, List<String> errors) {
@@ -133,7 +136,7 @@ public class MultipleTransferService {
 
             log.info("Retrieve the old multiple data");
 
-            var oldSubmitMultipleEvent = multipleCasesReadingService.retrieveMultipleCasesWithRetries(
+            SubmitMultipleEvent oldSubmitMultipleEvent = multipleCasesReadingService.retrieveMultipleCasesWithRetries(
                     userToken,
                     oldCaseTypeId,
                     multipleReference).get(0);
@@ -175,10 +178,10 @@ public class MultipleTransferService {
         if (!multipleObjects.keySet().isEmpty()) {
 
             multipleObjects.forEach((key, value) -> {
-                var multipleObject = (MultipleObject) value;
-                var caseMultipleTypeItem = new CaseMultipleTypeItem();
+                MultipleObject multipleObject = (MultipleObject) value;
+                CaseMultipleTypeItem caseMultipleTypeItem = new CaseMultipleTypeItem();
 
-                var multipleObjectType = new MultipleObjectType();
+                MultipleObjectType multipleObjectType = new MultipleObjectType();
                 multipleObjectType.setSubMultiple(multipleObject.getSubMultiple());
                 multipleObjectType.setEthosCaseRef(multipleObject.getEthosCaseRef());
 

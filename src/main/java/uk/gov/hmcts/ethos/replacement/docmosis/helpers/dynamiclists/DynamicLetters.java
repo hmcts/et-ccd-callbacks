@@ -15,14 +15,15 @@ import java.util.List;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
-public class DynamicLetters {
+@SuppressWarnings({"PMD.ConfusingTernary"})
+public final class DynamicLetters {
     private DynamicLetters() {
     }
 
     public static void dynamicLetters(CaseData caseData, String caseTypeId) {
         List<DynamicValueType> listItems = DynamicListHelper.createDynamicHearingList(caseData);
         if (CollectionUtils.isNotEmpty(listItems)) {
-            var dynamicFixedListType = new DynamicFixedListType();
+            DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(listItems);
             if (!caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
                 CorrespondenceType correspondenceType = new CorrespondenceType();
@@ -39,7 +40,7 @@ public class DynamicLetters {
     public static void dynamicMultipleLetters(SubmitEvent submitEvent, MultipleData multipleData, String caseTypeId) {
         List<DynamicValueType> listItems = DynamicListHelper.createDynamicHearingList(submitEvent.getCaseData());
         if (CollectionUtils.isNotEmpty(listItems)) {
-            var dynamicFixedListType = new DynamicFixedListType();
+            DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(listItems);
             if (!caseTypeId.equals(SCOTLAND_BULK_CASE_TYPE_ID)) {
                 CorrespondenceType correspondenceType = new CorrespondenceType();

@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 
@@ -20,15 +21,16 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CA
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.generateListingDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.generateSubmitEventList;
 
+@SuppressWarnings({"PMD.LawOfDemeter"})
 class ReportHelperTest {
 
     @Test
     void testLiveCaseloadGetLocalReportDetailsForAllOfTheOffices() throws Exception {
-        var listingDetails = generateListingDetails("listingDetailsTest5.json");
-        var submitEvents = generateSubmitEventList("submitEvents1.json");
+        ListingDetails listingDetails = generateListingDetails("listingDetailsTest5.json");
+        List<SubmitEvent> submitEvents = generateSubmitEventList("submitEvents1.json");
         ListingData listingData = ReportHelper.processLiveCaseloadRequest(listingDetails, submitEvents);
-        var expected = List.of("Edinburgh", "Glasgow", "Dundee", "Aberdeen", "London Central");
-        var offices = listingData.getLocalReportsDetail()
+        List<String> expected = List.of("Edinburgh", "Glasgow", "Dundee", "Aberdeen", "London Central");
+        List<String> offices = listingData.getLocalReportsDetail()
                 .stream()
                 .map(lrd -> lrd.getValue().getReportOffice())
                 .filter(Objects::nonNull)
@@ -38,12 +40,12 @@ class ReportHelperTest {
 
     @Test
     void testLiveCaseloadGetLocalReportDetailsForEngWales() throws Exception {
-        var listingDetailsEngWales = generateListingDetails("listingDetailsTest5.json");
+        ListingDetails listingDetailsEngWales = generateListingDetails("listingDetailsTest5.json");
         listingDetailsEngWales.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        var submitEvents = generateSubmitEventList("submitEvents1.json");
+        List<SubmitEvent> submitEvents = generateSubmitEventList("submitEvents1.json");
         ListingData listingData = ReportHelper.processLiveCaseloadRequest(listingDetailsEngWales, submitEvents);
-        var expected = List.of("EngWales");
-        var offices = listingData.getLocalReportsDetail()
+        List<String> expected = List.of("EngWales");
+        List<String> offices = listingData.getLocalReportsDetail()
                 .stream()
                 .map(lrd -> lrd.getValue().getFileLocation())
                 .filter(Objects::nonNull)
@@ -55,16 +57,16 @@ class ReportHelperTest {
     @MethodSource
     void testLiveCaseloadShowsReportOfficeWithEmptyReport(String caseTypeId, String managingOffice,
                                                           String expectedReportOffice) {
-        var listingDetails = new ListingDetails();
+        ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(caseTypeId);
         listingDetails.setCaseData(new ListingData());
         listingDetails.getCaseData().setManagingOffice(managingOffice);
 
-        var listingData = ReportHelper.processLiveCaseloadRequest(listingDetails, Collections.emptyList());
+        ListingData listingData = ReportHelper.processLiveCaseloadRequest(listingDetails, Collections.emptyList());
         assertEquals(expectedReportOffice, listingData.getLocalReportsDetailHdr().getReportOffice());
     }
 
-    private static Stream<Arguments> testLiveCaseloadShowsReportOfficeWithEmptyReport() {
+    private static Stream<Arguments> testLiveCaseloadShowsReportOfficeWithEmptyReport() { //NOPMD - parameterized tests
         return Stream.of(
                 Arguments.of(ENGLANDWALES_LISTING_CASE_TYPE_ID, TribunalOffice.MANCHESTER.getOfficeName(),
                         TribunalOffice.MANCHESTER.getOfficeName()),

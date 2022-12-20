@@ -53,12 +53,12 @@ class ClaimsByHearingVenueReportTest {
         // When report data is requested
         // Then only all cases with valid date should be in the report data detail entries
 
-        var claimantAddressUK = new Address();
+        Address claimantAddressUK = new Address();
         claimantAddressUK.setPostCode("DH3 8HL");
-        var claimant = new ClaimantType();
+        ClaimantType claimant = new ClaimantType();
         claimant.setClaimantAddressUK(claimantAddressUK);
 
-        var submitEventOne = caseDataBuilder
+        ClaimsByHearingVenueSubmitEvent submitEventOne = caseDataBuilder
                 .withEthosCaseReference("18000012/2022")
                 .withReceiptDate("2021-12-14")
                 .withClaimantType(claimant)
@@ -67,7 +67,7 @@ class ClaimsByHearingVenueReportTest {
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvents.add(submitEventOne);
 
-        var submitEventTwo = caseDataBuilder
+        ClaimsByHearingVenueSubmitEvent submitEventTwo = caseDataBuilder
                 .withEthosCaseReference("18000013/2022")
                 .withReceiptDate("2021-12-08")
                 .withClaimantType(claimant)
@@ -80,11 +80,11 @@ class ClaimsByHearingVenueReportTest {
                 UtilHelper.getListingCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID), RANGE_START_DATE, RANGE_END_DATE))
                 .thenReturn(submitEvents);
 
-        var expectedReportTitle = getReportTitle(RANGE_HEARING_DATE_TYPE);
-        var expectedNumberOfSubmitEventEntries = submitEvents.size();
-        var reportData = claimsByHearingVenueReport
+        String expectedReportTitle = getReportTitle(RANGE_HEARING_DATE_TYPE);
+        int expectedNumberOfSubmitEventEntries = submitEvents.size();
+        ClaimsByHearingVenueReportData reportData = claimsByHearingVenueReport
                 .generateReport(reportParams);
-        var actualReportTitle = reportData.getReportPeriodDescription();
+        String actualReportTitle = reportData.getReportPeriodDescription();
 
         assertEquals(expectedReportTitle, actualReportTitle);
         assertEquals(expectedNumberOfSubmitEventEntries, reportData.getReportDetails().size());
@@ -96,12 +96,12 @@ class ClaimsByHearingVenueReportTest {
         // When report data is requested
         // Then only all cases with matching Receipt date should be in the report data detail entries
 
-        var claimantAddressUK = new Address();
+        Address claimantAddressUK = new Address();
         claimantAddressUK.setPostCode("DH3 8HL");
-        var claimant = new ClaimantType();
+        ClaimantType claimant = new ClaimantType();
         claimant.setClaimantAddressUK(claimantAddressUK);
 
-        var submitEventOne = caseDataBuilder
+        ClaimsByHearingVenueSubmitEvent submitEventOne = caseDataBuilder
                 .withEthosCaseReference("18000012/2022")
                 .withReceiptDate("2021-12-08")
                 .withClaimantType(claimant)
@@ -114,13 +114,14 @@ class ClaimsByHearingVenueReportTest {
                 UtilHelper.getListingCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID), SINGLE_START_DATE, SINGLE_END_DATE))
                 .thenReturn(submitEvents);
 
-        var expectedReportTitle = getReportTitle(SINGLE_HEARING_DATE_TYPE);
-        var expectedNumberOfSubmitEventEntries = 1;
-        var singleHearingDateTypeReportParams = new ClaimsByHearingVenueReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        String expectedReportTitle = getReportTitle(SINGLE_HEARING_DATE_TYPE);
+        int expectedNumberOfSubmitEventEntries = 1;
+        ClaimsByHearingVenueReportParams singleHearingDateTypeReportParams =
+                new ClaimsByHearingVenueReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 OFFICE_NAME, SINGLE_START_DATE, SINGLE_END_DATE, SINGLE_HEARING_DATE_TYPE, TEST_USERNAME);
-        var reportData = claimsByHearingVenueReport
+        ClaimsByHearingVenueReportData reportData = claimsByHearingVenueReport
                 .generateReport(singleHearingDateTypeReportParams);
-        var actualReportTitle = reportData.getReportPeriodDescription();
+        String actualReportTitle = reportData.getReportPeriodDescription();
 
         assertEquals(expectedReportTitle, actualReportTitle);
         assertEquals(expectedNumberOfSubmitEventEntries, reportData.getReportDetails().size());
@@ -131,12 +132,12 @@ class ClaimsByHearingVenueReportTest {
         // Given a case has Claimant Work Address not set or is null
         // When report data is requested
         // Then on all cases with valid date, "Null" should be used for postcode in the report data detail entries
-        var claimantAddressUK = new Address();
+        Address claimantAddressUK = new Address();
         claimantAddressUK.setPostCode("DH3 8HL");
-        var claimant = new ClaimantType();
+        ClaimantType claimant = new ClaimantType();
         claimant.setClaimantAddressUK(claimantAddressUK);
 
-        var submitEventOne = caseDataBuilder
+        ClaimsByHearingVenueSubmitEvent submitEventOne = caseDataBuilder
                 .withEthosCaseReference("18000012/2022")
                 .withReceiptDate("2021-12-14")
                 .withClaimantType(claimant)
@@ -148,21 +149,16 @@ class ClaimsByHearingVenueReportTest {
                 UtilHelper.getListingCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID), RANGE_START_DATE, RANGE_END_DATE))
                 .thenReturn(submitEvents);
 
-        var expectedClaimantAddressUKPostcode = "DH3 8HL";
-        var expectedClaimantWorkPostcode = "Null";
-        var expectedRespondentPostcode = "Null";
-        var expectedRespondentET3Postcode = "Null";
-        var reportData = claimsByHearingVenueReport
+        ClaimsByHearingVenueReportData reportData = claimsByHearingVenueReport
                 .generateReport(reportParams);
-        var actualClaimantAddressUKPostcode = reportData.getReportDetails().get(0).getClaimantPostcode();
-        var actualClaimantWorkPostcode = reportData.getReportDetails().get(0).getClaimantWorkPostcode();
-        var actualRespondentPostcode = reportData.getReportDetails().get(0).getRespondentPostcode();
-        var actualRespondentET3Postcode = reportData.getReportDetails().get(0).getRespondentET3Postcode();
-
-        assertEquals(expectedClaimantAddressUKPostcode, actualClaimantAddressUKPostcode);
-        assertEquals(expectedClaimantWorkPostcode, actualClaimantWorkPostcode);
-        assertEquals(expectedRespondentPostcode, actualRespondentPostcode);
-        assertEquals(expectedRespondentET3Postcode, actualRespondentET3Postcode);
+        String actualClaimantAddressUKPostcode = reportData.getReportDetails().get(0).getClaimantPostcode();
+        String actualClaimantWorkPostcode = reportData.getReportDetails().get(0).getClaimantWorkPostcode();
+        String actualRespondentPostcode = reportData.getReportDetails().get(0).getRespondentPostcode();
+        assertEquals("DH3 8HL", actualClaimantAddressUKPostcode);
+        assertEquals("Null", actualClaimantWorkPostcode);
+        assertEquals("Null", actualRespondentPostcode);
+        String actualRespondentET3Postcode = reportData.getReportDetails().get(0).getRespondentET3Postcode();
+        assertEquals("Null", actualRespondentET3Postcode);
     }
 
     @Test
@@ -170,17 +166,17 @@ class ClaimsByHearingVenueReportTest {
         // Given a case has a Claimant Work Address provided and postcode in it is not set or is null
         // When report data is requested
         // Then on all cases with valid date, "Null" should be used for postcode in the report data detail entries
-        var claimantAddressUK = new Address();
+        Address claimantAddressUK = new Address();
         claimantAddressUK.setPostCode("DH3 8HL");
-        var claimant = new ClaimantType();
+        ClaimantType claimant = new ClaimantType();
         claimant.setClaimantAddressUK(claimantAddressUK);
 
-        var claimantWorkAddress = new Address();
+        Address claimantWorkAddress = new Address();
         claimantAddressUK.setPostCode(null);
-        var claimantWorkAddressType = new ClaimantWorkAddressType();
+        ClaimantWorkAddressType claimantWorkAddressType = new ClaimantWorkAddressType();
         claimantWorkAddressType.setClaimantWorkAddress(claimantWorkAddress);
 
-        var submitEventOne = caseDataBuilder
+        ClaimsByHearingVenueSubmitEvent submitEventOne = caseDataBuilder
                 .withEthosCaseReference("18000012/2022")
                 .withReceiptDate("2021-12-14")
                 .withClaimantType(claimant)
@@ -192,23 +188,17 @@ class ClaimsByHearingVenueReportTest {
         when(claimsByHearingVenueReportDataSource.getData(
                 UtilHelper.getListingCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID), RANGE_START_DATE, RANGE_END_DATE))
                 .thenReturn(submitEvents);
-
-        var expectedClaimantAddressUKPostcode = "Null";
-        var expectedClaimantWorkPostcode = "Null";
-        var expectedRespondentPostcode = "Null";
-        var expectedRespondentET3Postcode = "Null";
-        var reportData = claimsByHearingVenueReport
+        ClaimsByHearingVenueReportData reportData = claimsByHearingVenueReport
                 .generateReport(reportParams);
 
-        var actualClaimantAddressUKPostcode = reportData.getReportDetails().get(0).getClaimantPostcode();
-        var actualClaimantWorkPostcode = reportData.getReportDetails().get(0).getClaimantWorkPostcode();
-        var actualRespondentPostcode = reportData.getReportDetails().get(0).getRespondentPostcode();
-        var actualRespondentET3Postcode = reportData.getReportDetails().get(0).getRespondentET3Postcode();
-
-        assertEquals(expectedClaimantAddressUKPostcode, actualClaimantAddressUKPostcode);
-        assertEquals(expectedClaimantWorkPostcode, actualClaimantWorkPostcode);
-        assertEquals(expectedRespondentPostcode, actualRespondentPostcode);
-        assertEquals(expectedRespondentET3Postcode, actualRespondentET3Postcode);
+        String actualClaimantAddressUKPostcode = reportData.getReportDetails().get(0).getClaimantPostcode();
+        String actualClaimantWorkPostcode = reportData.getReportDetails().get(0).getClaimantWorkPostcode();
+        String actualRespondentPostcode = reportData.getReportDetails().get(0).getRespondentPostcode();
+        assertEquals("Null", actualClaimantAddressUKPostcode);
+        assertEquals("Null", actualClaimantWorkPostcode);
+        assertEquals("Null", actualRespondentPostcode);
+        String actualRespondentET3Postcode = reportData.getReportDetails().get(0).getRespondentET3Postcode();
+        assertEquals("Null", actualRespondentET3Postcode);
     }
 
     @Test
@@ -218,33 +208,33 @@ class ClaimsByHearingVenueReportTest {
         // Then only the postcode of the first respondent detail should be used to set "Respondent Postcode"
         // and "Respondent ET3 Postcode" values in the report data detail entry. "Null" should be used if
         // no postcodes found
-        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
-        var respondentSumTypeItem = new RespondentSumTypeItem();
-        var respondentSumType = new RespondentSumType();
-        var firstRespondentAddress = new Address();
+        RespondentSumType respondentSumType = new RespondentSumType();
+        Address firstRespondentAddress = new Address();
         firstRespondentAddress.setPostCode("DH1 1AE");
         respondentSumType.setRespondentAddress(firstRespondentAddress);
 
-        var firstRespondentET3Address = new Address();
+        Address firstRespondentET3Address = new Address();
         firstRespondentET3Address.setPostCode("DH1 1AJ");
         respondentSumType.setResponseRespondentAddress(firstRespondentET3Address);
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(respondentSumType);
+        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
         respondentCollection.add(respondentSumTypeItem);
 
-        var respondentSumTypeItemTwo = new RespondentSumTypeItem();
-        var respondentSumTypeTwo = new RespondentSumType();
-        var secondRespondentAddress = new Address();
+        RespondentSumTypeItem respondentSumTypeItemTwo = new RespondentSumTypeItem();
+        RespondentSumType respondentSumTypeTwo = new RespondentSumType();
+        Address secondRespondentAddress = new Address();
         secondRespondentAddress.setPostCode("DH5 9AJ");
         respondentSumTypeTwo.setRespondentAddress(secondRespondentAddress);
         respondentSumTypeItemTwo.setValue(respondentSumTypeTwo);
         respondentCollection.add(respondentSumTypeItemTwo);
 
-        var claimantAddressUK = new Address();
+        Address claimantAddressUK = new Address();
         claimantAddressUK.setPostCode("DH3 8HL");
-        var claimant = new ClaimantType();
+        ClaimantType claimant = new ClaimantType();
         claimant.setClaimantAddressUK(claimantAddressUK);
 
-        var submitEventOne = caseDataBuilder
+        ClaimsByHearingVenueSubmitEvent submitEventOne = caseDataBuilder
                 .withEthosCaseReference("18000012/2022")
                 .withReceiptDate("2021-12-14")
                 .withClaimantType(claimant)
@@ -256,27 +246,26 @@ class ClaimsByHearingVenueReportTest {
                 UtilHelper.getListingCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID), RANGE_START_DATE, RANGE_END_DATE))
                 .thenReturn(submitEvents);
 
-        var expectedReportDetailEntriesCount = submitEvents.size();
-        var expectedRespondentPostCode = firstRespondentAddress.getPostCode();
-        var expectedFirstRespondentET3AddressPostCode = firstRespondentET3Address.getPostCode();
-        var reportData = claimsByHearingVenueReport
+        String expectedRespondentPostCode = firstRespondentAddress.getPostCode();
+        String expectedFirstRespondentET3AddressPostCode = firstRespondentET3Address.getPostCode();
+        ClaimsByHearingVenueReportData reportData = claimsByHearingVenueReport
                 .generateReport(reportParams);
-        var actualRespondentPostCode = reportData.getReportDetails().get(0).getRespondentPostcode();
-        var actualRespondentET3PostCode = reportData.getReportDetails().get(0).getRespondentET3Postcode();
-
+        String actualRespondentPostCode = reportData.getReportDetails().get(0).getRespondentPostcode();
+        int expectedReportDetailEntriesCount = submitEvents.size();
         assertEquals(expectedReportDetailEntriesCount, reportData.getReportDetails().size());
         assertEquals(expectedRespondentPostCode, actualRespondentPostCode);
+        String actualRespondentET3PostCode = reportData.getReportDetails().get(0).getRespondentET3Postcode();
         assertEquals(expectedFirstRespondentET3AddressPostCode, actualRespondentET3PostCode);
     }
 
     @Test
     void shouldShowReportDetailEntriesSortedByEthosCaseReferenceAscending() {
-        var claimantAddressUK = new Address();
+        Address claimantAddressUK = new Address();
         claimantAddressUK.setPostCode("DH3 8HL");
-        var claimant = new ClaimantType();
+        ClaimantType claimant = new ClaimantType();
         claimant.setClaimantAddressUK(claimantAddressUK);
 
-        var submitEventOne = caseDataBuilder
+        ClaimsByHearingVenueSubmitEvent submitEventOne = caseDataBuilder
                 .withEthosCaseReference("18000012/2022")
                 .withReceiptDate("2021-12-14")
                 .withClaimantType(claimant)
@@ -285,7 +274,7 @@ class ClaimsByHearingVenueReportTest {
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvents.add(submitEventOne);
 
-        var submitEventTwo = caseDataBuilder
+        ClaimsByHearingVenueSubmitEvent submitEventTwo = caseDataBuilder
                 .withEthosCaseReference("1800154/2021")
                 .withReceiptDate("2021-12-08")
                 .withClaimantType(claimant)
@@ -294,7 +283,7 @@ class ClaimsByHearingVenueReportTest {
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvents.add(submitEventTwo);
 
-        var submitEventThree = caseDataBuilder
+        ClaimsByHearingVenueSubmitEvent submitEventThree = caseDataBuilder
                 .withEthosCaseReference("18000003/2022")
                 .withReceiptDate("2021-12-08")
                 .withClaimantType(claimant)
@@ -307,16 +296,15 @@ class ClaimsByHearingVenueReportTest {
                 UtilHelper.getListingCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID), RANGE_START_DATE, RANGE_END_DATE))
                 .thenReturn(submitEvents);
 
-        var expectedNumberOfSubmitEventEntries = submitEvents.size();
-        var expectedFirstCaseReference = submitEvents.get(1).getCaseData().getEthosCaseReference();
-        var expectedSecondCaseReference = submitEvents.get(2).getCaseData().getEthosCaseReference();
-        var expectedThirdFirstCaseReference = submitEvents.get(0).getCaseData().getEthosCaseReference();
-        var reportData = claimsByHearingVenueReport
+        int expectedNumberOfSubmitEventEntries = submitEvents.size();
+        String expectedFirstCaseReference = submitEvents.get(1).getCaseData().getEthosCaseReference();
+        String expectedSecondCaseReference = submitEvents.get(2).getCaseData().getEthosCaseReference();
+        ClaimsByHearingVenueReportData reportData = claimsByHearingVenueReport
                 .generateReport(reportParams);
-
         assertEquals(expectedNumberOfSubmitEventEntries, reportData.getReportDetails().size());
         assertEquals(expectedFirstCaseReference, reportData.getReportDetails().get(0).getCaseReference());
         assertEquals(expectedSecondCaseReference, reportData.getReportDetails().get(1).getCaseReference());
+        String expectedThirdFirstCaseReference = submitEvents.get(0).getCaseData().getEthosCaseReference();
         assertEquals(expectedThirdFirstCaseReference, reportData.getReportDetails().get(2).getCaseReference());
     }
 
@@ -326,12 +314,12 @@ class ClaimsByHearingVenueReportTest {
         // When report data is requested
         // Then excel report should print correct value for "ReportPrintedOnDescription" field
 
-        var claimantAddressUK = new Address();
+        Address claimantAddressUK = new Address();
         claimantAddressUK.setPostCode("DH3 8HL");
-        var claimant = new ClaimantType();
+        ClaimantType claimant = new ClaimantType();
         claimant.setClaimantAddressUK(claimantAddressUK);
 
-        var submitEventOne = caseDataBuilder
+        ClaimsByHearingVenueSubmitEvent submitEventOne = caseDataBuilder
                 .withEthosCaseReference("18000012/2022")
                 .withReceiptDate("2021-12-08")
                 .withClaimantType(claimant)
@@ -339,17 +327,16 @@ class ClaimsByHearingVenueReportTest {
                 .withRespondentCollection(null)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvents.add(submitEventOne);
-        var singleHearingDateTypeReportParams = new ClaimsByHearingVenueReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        ClaimsByHearingVenueReportParams singleHearingDateTypeReportParams = new ClaimsByHearingVenueReportParams(
+                ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 OFFICE_NAME, SINGLE_START_DATE, SINGLE_END_DATE, SINGLE_HEARING_DATE_TYPE, TEST_USERNAME);
         when(claimsByHearingVenueReportDataSource.getData(
                 UtilHelper.getListingCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID), SINGLE_START_DATE, SINGLE_END_DATE))
                 .thenReturn(submitEvents);
-
-        var expectedReportPrintedOnDescription = getTestReportPrintedDescription();
-        var reportData = claimsByHearingVenueReport
+        ClaimsByHearingVenueReportData reportData = claimsByHearingVenueReport
                 .generateReport(singleHearingDateTypeReportParams);
-        var actualReportTitle = reportData.getReportPrintedOnDescription();
-
+        String actualReportTitle = reportData.getReportPrintedOnDescription();
+        String expectedReportPrintedOnDescription = getTestReportPrintedDescription();
         assertEquals(expectedReportPrintedOnDescription, actualReportTitle);
     }
 

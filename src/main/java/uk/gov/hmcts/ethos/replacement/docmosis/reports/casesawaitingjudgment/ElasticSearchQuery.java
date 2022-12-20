@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment;
 
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
@@ -12,14 +13,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReport.VALID_POSITION_TYPES;
 
-class ElasticSearchQuery {
+final class ElasticSearchQuery {
 
     private ElasticSearchQuery() {
         // Access through static methods
     }
 
     static String create(String managingOffice) {
-        var boolQueryBuilder = boolQuery()
+        BoolQueryBuilder boolQueryBuilder = boolQuery()
                 .mustNot(new MatchQueryBuilder("state.keyword", "Closed"))
                 .mustNot(new ExistsQueryBuilder("data.judgementCollection"))
                 .must(new ExistsQueryBuilder("data.hearingCollection"))

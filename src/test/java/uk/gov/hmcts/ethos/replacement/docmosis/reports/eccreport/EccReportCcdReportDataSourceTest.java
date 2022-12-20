@@ -19,56 +19,59 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
+@SuppressWarnings("PMD.LawOfDemeter")
 public class EccReportCcdReportDataSourceTest {
 
     @Test
     public void shouldReturnSearchResultsForManagingOffice() throws IOException {
-        var authToken = "token";
-        var caseTypeId = ENGLANDWALES_CASE_TYPE_ID;
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var fromDate = "1-1-2022";
-        var toDate = "10-1-2022";
-        var ccdClient = mock(CcdClient.class);
-        var submitEvent = new EccReportSubmitEvent();
-        var submitEvents = List.of(submitEvent);
+        String authToken = "token";
+        String caseTypeId = ENGLANDWALES_CASE_TYPE_ID;
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String fromDate = "1-1-2022";
+        String toDate = "10-1-2022";
+        CcdClient ccdClient = mock(CcdClient.class);
+        EccReportSubmitEvent submitEvent = new EccReportSubmitEvent();
+        List<EccReportSubmitEvent> submitEvents = List.of(submitEvent);
         when(ccdClient.eccReportSearch(eq(authToken), eq(caseTypeId), anyString())).thenReturn(submitEvents);
 
-        var ccdReportDataSource = new EccReportCcdDataSource(authToken, ccdClient);
+        EccReportCcdDataSource ccdReportDataSource = new EccReportCcdDataSource(authToken, ccdClient);
 
-        var results = ccdReportDataSource.getData(new ReportParams(caseTypeId, managingOffice, fromDate, toDate));
+        List<EccReportSubmitEvent> results = ccdReportDataSource.getData(new ReportParams(caseTypeId, managingOffice,
+            fromDate, toDate));
         assertEquals(1, results.size());
         assertEquals(submitEvent, results.get(0));
     }
 
     @Test
     public void shouldReturnSearchResultsForNullManagingOffice() throws IOException {
-        var authToken = "token";
-        var caseTypeId = SCOTLAND_CASE_TYPE_ID;
-        var fromDate = "1-1-2022";
-        var toDate = "10-1-2022";
-        var ccdClient = mock(CcdClient.class);
-        var submitEvent = new EccReportSubmitEvent();
-        var submitEvents = List.of(submitEvent);
+        String authToken = "token";
+        String caseTypeId = SCOTLAND_CASE_TYPE_ID;
+        String fromDate = "1-1-2022";
+        String toDate = "10-1-2022";
+        CcdClient ccdClient = mock(CcdClient.class);
+        EccReportSubmitEvent submitEvent = new EccReportSubmitEvent();
+        List<EccReportSubmitEvent> submitEvents = List.of(submitEvent);
         when(ccdClient.eccReportSearch(eq(authToken), eq(caseTypeId), anyString())).thenReturn(submitEvents);
 
-        var ccdReportDataSource = new EccReportCcdDataSource(authToken, ccdClient);
+        EccReportCcdDataSource ccdReportDataSource = new EccReportCcdDataSource(authToken, ccdClient);
 
-        var results = ccdReportDataSource.getData(new ReportParams(caseTypeId, null, fromDate, toDate));
+        List<EccReportSubmitEvent> results = ccdReportDataSource.getData(new ReportParams(caseTypeId, null,
+            fromDate, toDate));
         assertEquals(1, results.size());
         assertEquals(submitEvent, results.get(0));
     }
 
     @Test(expected = ReportException.class)
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
-        var authToken = "token";
-        var caseTypeId = "caseTypeId";
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var fromDate = "1-1-2022";
-        var toDate = "10-1-2022";
-        var ccdClient = mock(CcdClient.class);
+        String authToken = "token";
+        String caseTypeId = "caseTypeId";
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String fromDate = "1-1-2022";
+        String toDate = "10-1-2022";
+        CcdClient ccdClient = mock(CcdClient.class);
         when(ccdClient.eccReportSearch(anyString(), anyString(), anyString())).thenThrow(new IOException());
 
-        var ccdReportDataSource = new EccReportCcdDataSource(authToken, ccdClient);
+        EccReportCcdDataSource ccdReportDataSource = new EccReportCcdDataSource(authToken, ccdClient);
         ccdReportDataSource.getData(new ReportParams(caseTypeId, managingOffice, fromDate, toDate));
         fail("Should throw exception instead");
     }

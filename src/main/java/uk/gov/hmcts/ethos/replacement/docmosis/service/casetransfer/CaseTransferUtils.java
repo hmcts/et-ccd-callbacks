@@ -24,6 +24,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LIST
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.PreserveStackTrace",
+    "PMD.UnnecessaryFullyQualifiedName"})
 public class CaseTransferUtils {
 
     public static final String BF_ACTIONS_ERROR_MSG = "There are one or more open Brought Forward actions that must be "
@@ -36,11 +38,11 @@ public class CaseTransferUtils {
 
     List<CaseData> getAllCasesToBeTransferred(CaseDetails caseDetails, String userToken) {
         try {
-            var claimantCaseData = getClaimantCase(caseDetails, userToken);
+            CaseData claimantCaseData = getClaimantCase(caseDetails, userToken);
             List<CaseData> cases = new ArrayList<>();
             cases.add(claimantCaseData);
 
-            var eccCases = getEccCases(claimantCaseData, caseDetails.getCaseTypeId(), userToken);
+            List<CaseData> eccCases = getEccCases(claimantCaseData, caseDetails.getCaseTypeId(), userToken);
             if (!eccCases.isEmpty()) {
                 cases.addAll(eccCases);
             }
@@ -53,7 +55,7 @@ public class CaseTransferUtils {
     }
 
     public List<String> validateCase(CaseData caseData) {
-        var errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         if (!checkBfActionsCleared(caseData)) {
             errors.add(String.format(BF_ACTIONS_ERROR_MSG, caseData.getEthosCaseReference()));
         }
@@ -65,7 +67,7 @@ public class CaseTransferUtils {
     }
 
     private CaseData getClaimantCase(CaseDetails caseDetails, String userToken) {
-        var caseData = caseDetails.getCaseData();
+        CaseData caseData = caseDetails.getCaseData();
         if (Strings.isNullOrEmpty(caseData.getCounterClaim())) {
             return caseData;
         }
@@ -82,12 +84,12 @@ public class CaseTransferUtils {
     }
 
     private List<CaseData> getEccCases(CaseData caseData, String caseTypeId, String userToken) throws IOException {
-        var eccCases = new ArrayList<CaseData>();
+        List<CaseData> eccCases = new ArrayList<>();
 
         if (CollectionUtils.isNotEmpty(caseData.getEccCases())) {
             for (EccCounterClaimTypeItem counterClaimItem : caseData.getEccCases()) {
-                var counterClaim = counterClaimItem.getValue().getCounterClaim();
-                var submitEvents = ccdClient.retrieveCasesElasticSearch(userToken, caseTypeId,
+                String counterClaim = counterClaimItem.getValue().getCounterClaim();
+                List<SubmitEvent> submitEvents = ccdClient.retrieveCasesElasticSearch(userToken, caseTypeId,
                         new ArrayList<>(Collections.singleton(counterClaim)));
                 if (submitEvents != null && !submitEvents.isEmpty()) {
                     eccCases.add(submitEvents.get(0).getCaseData());

@@ -21,7 +21,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-public class UpdateDataModelBuilder {
+public final class UpdateDataModelBuilder {
 
     private UpdateDataModelBuilder() {
         // Access through static methods
@@ -175,7 +175,7 @@ public class UpdateDataModelBuilder {
             return null;
         }
 
-        var representedTypeC = caseData.getRepresentativeClaimantType();
+        RepresentedTypeC representedTypeC = caseData.getRepresentativeClaimantType();
         if (multipleData.getBatchUpdateClaimantRep() != null && representedTypeC != null) {
             String claimantRepresentative = multipleData.getBatchUpdateClaimantRep().getValue().getCode();
 

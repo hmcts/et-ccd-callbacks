@@ -33,6 +33,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
 @Slf4j
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
+    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
+    "PMD.LawOfDemeter"})
 public class ReportHelper {
 
     public static final String CASES_SEARCHED = "Cases searched: ";
@@ -78,14 +82,14 @@ public class ReportHelper {
 
     public static ListingData processClaimsAcceptedRequest(ListingDetails listingDetails,
                                                            List<SubmitEvent> submitEvents) {
-        var localReportsDetailHdr = new AdhocReportType();
+        AdhocReportType localReportsDetailHdr = new AdhocReportType();
         localReportsDetailHdr.setReportOffice(getReportOffice(
                 listingDetails.getCaseTypeId(), listingDetails.getCaseData().getManagingOffice()));
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             log.info(CASES_SEARCHED + submitEvents.size());
-            var totalCases = 0;
-            var totalSingles = 0;
-            var totalMultiples = 0;
+            int totalCases = 0;
+            int totalSingles = 0;
+            int totalMultiples = 0;
             List<AdhocReportTypeItem> localReportsDetailList = new ArrayList<>();
             for (SubmitEvent submitEvent : submitEvents) {
                 AdhocReportTypeItem localReportsDetailItem =
@@ -112,8 +116,8 @@ public class ReportHelper {
 
     public static ListingData processLiveCaseloadRequest(ListingDetails listingDetails,
                                                          List<SubmitEvent> submitEvents) {
-        var localReportsDetailHdr = new AdhocReportType();
-        var reportOffice = getReportOffice(listingDetails.getCaseTypeId(),
+        AdhocReportType localReportsDetailHdr = new AdhocReportType();
+        String reportOffice = getReportOffice(listingDetails.getCaseTypeId(),
                 listingDetails.getCaseData().getManagingOffice());
         localReportsDetailHdr.setReportOffice(reportOffice);
         listingDetails.getCaseData().setLocalReportsDetailHdr(localReportsDetailHdr);
@@ -131,10 +135,10 @@ public class ReportHelper {
             }
             listingDetails.getCaseData().setLocalReportsDetail(localReportsDetailList);
 
-            var localReportsSummaryHdr = new AdhocReportType();
-            var singlesTotal = getSinglesTotal(localReportsDetailList);
-            var multiplesTotal = getMultiplesTotal(localReportsDetailList);
-            var total = singlesTotal + multiplesTotal;
+            AdhocReportType localReportsSummaryHdr = new AdhocReportType();
+            long singlesTotal = getSinglesTotal(localReportsDetailList);
+            long multiplesTotal = getMultiplesTotal(localReportsDetailList);
+            long total = singlesTotal + multiplesTotal;
             localReportsSummaryHdr.setSinglesTotal(String.valueOf(singlesTotal));
             localReportsSummaryHdr.setMultiplesTotal(String.valueOf(multiplesTotal));
             localReportsSummaryHdr.setTotal(String.valueOf(total));
@@ -164,15 +168,15 @@ public class ReportHelper {
     }
 
     private static AdhocReportTypeItem getClaimsAcceptedDetailItem(ListingDetails listingDetails, CaseData caseData) {
-        var adhocReportTypeItem = new AdhocReportTypeItem();
-        var listingData = listingDetails.getCaseData();
+        AdhocReportTypeItem adhocReportTypeItem = new AdhocReportTypeItem();
+        ListingData listingData = listingDetails.getCaseData();
         if (caseData.getPreAcceptCase() != null && caseData.getPreAcceptCase().getDateAccepted() != null) {
             boolean matchingDateIsValid =
                     validateMatchingDate(listingData, caseData.getPreAcceptCase().getDateAccepted());
             if (matchingDateIsValid) {
-                var adhocReportType = new AdhocReportType();
+                AdhocReportType adhocReportType = new AdhocReportType();
                 adhocReportType.setCaseType(caseData.getEcmCaseType());
-                getCommonReportDetailFields(listingDetails, caseData, adhocReportType);
+                setCommonReportDetailFields(listingDetails, caseData, adhocReportType);
                 adhocReportTypeItem.setValue(adhocReportType);
             }
         }
@@ -180,24 +184,24 @@ public class ReportHelper {
     }
 
     private static AdhocReportTypeItem getLiveCaseloadDetailItem(ListingDetails listingDetails, CaseData caseData) {
-        var adhocReportTypeItem = new AdhocReportTypeItem();
-        var listingData = listingDetails.getCaseData();
+        AdhocReportTypeItem adhocReportTypeItem = new AdhocReportTypeItem();
+        ListingData listingData = listingDetails.getCaseData();
         if (caseData.getPreAcceptCase() != null && caseData.getPreAcceptCase().getDateAccepted() != null) {
             boolean matchingDateIsValid =
                     validateMatchingDate(listingData, caseData.getPreAcceptCase().getDateAccepted());
             boolean liveCaseloadIsValid = liveCaseloadIsValid(caseData);
             if (matchingDateIsValid && liveCaseloadIsValid) {
-                var adhocReportType = new AdhocReportType();
+                AdhocReportType adhocReportType = new AdhocReportType();
                 adhocReportType.setReportOffice(getTribunalOffice(listingDetails, caseData));
                 // TODO : hearingCollection.Hearing_stage implementation
-                getCommonReportDetailFields(listingDetails, caseData, adhocReportType);
+                setCommonReportDetailFields(listingDetails, caseData, adhocReportType);
                 adhocReportTypeItem.setValue(adhocReportType);
             }
         }
         return adhocReportTypeItem;
     }
 
-    private static void getCommonReportDetailFields(ListingDetails listingDetails, CaseData caseData,
+    private static void setCommonReportDetailFields(ListingDetails listingDetails, CaseData caseData,
                                                     AdhocReportType adhocReportType) {
         adhocReportType.setCaseReference(caseData.getEthosCaseReference());
         adhocReportType.setDateOfAcceptance(caseData.getPreAcceptCase().getDateAccepted());
@@ -259,7 +263,7 @@ public class ReportHelper {
     }
 
     public static String getReportOffice(String listingCaseTypeId, String managingOffice) {
-        var caseTypeId = UtilHelper.getListingCaseTypeId(listingCaseTypeId);
+        String caseTypeId = UtilHelper.getListingCaseTypeId(listingCaseTypeId);
         if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
             return managingOffice;
         } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {

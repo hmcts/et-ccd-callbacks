@@ -59,5 +59,5 @@ module.exports =  async function () {
     I.fillField(caseTypeOfClaimant.email_address, 'xxxx@test.com');
     I.selectOption(caseTypeOfClaimant.contact_preference,'1: Email');
 
-    I.navByClick(commonConfig.continueButton);
+    I.click(commonConfig.continueButton);
 }

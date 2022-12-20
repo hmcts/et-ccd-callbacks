@@ -23,7 +23,7 @@ public class BulkAddSinglesServiceTest {
     private SingleCasesImporter singleCasesImporter;
     private MultipleAmendService multipleAmendService;
     private MultipleDetails multipleDetails;
-    private final String authToken = "some-token";
+    private static final String AUTH_TOKEN = "some-token";
 
     @Before
     public void setup() {
@@ -36,30 +36,32 @@ public class BulkAddSinglesServiceTest {
 
     @Test
     public void shouldSubmitCases() throws ImportException {
-        var ethosCaseReferences = List.of("case1");
-        when(singleCasesImporter.importCases(multipleDetails.getCaseData(), authToken)).thenReturn(ethosCaseReferences);
+        List<String> ethosCaseReferences = List.of("case1");
+        when(singleCasesImporter.importCases(multipleDetails.getCaseData(), AUTH_TOKEN))
+            .thenReturn(ethosCaseReferences);
 
-        var errors = bulkAddSinglesService.execute(multipleDetails, authToken);
+        List<String> errors = bulkAddSinglesService.execute(multipleDetails, AUTH_TOKEN);
 
         assertTrue(errors.isEmpty());
-        verify(multipleAmendService, times(1)).bulkAmendMultipleLogic(anyString(), any(MultipleDetails.class),
+        verify(multipleAmendService, times(1)).bulkAmendMultipleLogic(anyString(),
+            any(MultipleDetails.class),
                 anyList());
     }
 
     @Test
     public void shouldReturnErrorWhenImportCasesFails() throws ImportException {
-        when(singleCasesImporter.importCases(multipleDetails.getCaseData(), authToken))
+        when(singleCasesImporter.importCases(multipleDetails.getCaseData(), AUTH_TOKEN))
                 .thenThrow(ImportException.class);
 
-        var errors = bulkAddSinglesService.execute(multipleDetails, authToken);
+        List<String> errors = bulkAddSinglesService.execute(multipleDetails, AUTH_TOKEN);
 
         assertEquals(1, errors.size());
         assertEquals("Unexpected error when importing single cases", errors.get(0));
     }
 
     private MultipleDetails createMultipleDetails() {
-        var multipleData = new MultipleData();
-        var multipleDetails = new MultipleDetails();
+        MultipleData multipleData = new MultipleData();
+        MultipleDetails multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(multipleData);
         return multipleDetails;
     }

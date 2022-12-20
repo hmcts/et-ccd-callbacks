@@ -18,7 +18,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
-
+@SuppressWarnings({"PMD.LawOfDemeter"})
 @ExtendWith(SpringExtension.class)
 class CaseTransferEventServiceTest {
 
@@ -30,7 +30,7 @@ class CaseTransferEventServiceTest {
 
     @Test
     void testTransfer() {
-        var params = CaseTransferEventParams.builder()
+        CaseTransferEventParams params = CaseTransferEventParams.builder()
                 .userToken("test-token")
                 .caseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .jurisdiction("EMPLOYMENT")
@@ -44,7 +44,7 @@ class CaseTransferEventServiceTest {
                 .sourceEthosCaseReference("120002/2021")
                 .build();
 
-        var errors = caseTransferEventService.transfer(params);
+        List<String> errors = caseTransferEventService.transfer(params);
 
         Assertions.assertTrue(errors.isEmpty());
         verify(persistentQHelperService, times(1)).sendCreationEventToSingles(
@@ -55,7 +55,7 @@ class CaseTransferEventServiceTest {
 
     @Test
     void testEcmTransfer() {
-        var params = CaseTransferToEcmParams.builder()
+        CaseTransferToEcmParams params = CaseTransferToEcmParams.builder()
                 .userToken("test-token")
                 .caseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .jurisdiction("EMPLOYMENT")
@@ -67,7 +67,7 @@ class CaseTransferEventServiceTest {
                 .sourceEthosCaseReference("120002/2021")
                 .build();
 
-        var errors = caseTransferEventService.transferToEcm(params);
+        List<String> errors = caseTransferEventService.transferToEcm(params);
 
         Assertions.assertTrue(errors.isEmpty());
         verify(persistentQHelperService, times(1)).sendTransferToEcmEvent(

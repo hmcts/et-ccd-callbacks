@@ -41,6 +41,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrac
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.LiteralsFirstInComparisons",
+    "PMD.FieldNamingConventions", "PMD.LawOfDemeter", "PMD.TooManyMethods", "PMD.ImplicitSwitchFallThrough",
+    "PMD.SwitchStmtsShouldHaveDefault", "PMD.ExcessiveImports", "PMD.GodClass"})
 public class Et1VettingService {
 
     private final TornadoService tornadoService;
@@ -93,6 +96,8 @@ public class Et1VettingService {
     private static final String TRIBUNAL_SCOTLAND = "Scotland";
     private static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br><br><br>";
     private static final String NO_ACAS_CERT_DISPLAY = "No certificate has been provided.<br><br><br>";
+    private static final int FIVE_ACAS_DOC_TYPE_ITEMS_COUNT = 5;
+    private static final int ONE_RESPONDENT_COUNT = 1;
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
     private final JpaVenueService jpaVenueService;
 
@@ -122,6 +127,19 @@ public class Et1VettingService {
             caseData.setEt1TribunalRegion(caseData.getManagingOffice());
         }
         caseData.setEt1HearingVenues(getHearingVenuesList(caseData.getEt1TribunalRegion()));
+    }
+
+    /**
+     * Populates hearing venues for suggestedHearingVenues from the managing office.
+     * @param caseData data on the case.
+     */
+    public void populateSuggestedHearingVenues(CaseData caseData) {
+        DynamicFixedListType hearingVenuesList = getHearingVenuesList(caseData.getManagingOffice());
+        DynamicFixedListType suggestedHearingVenues = caseData.getSuggestedHearingVenues();
+        if (suggestedHearingVenues != null) {
+            hearingVenuesList.setValue(suggestedHearingVenues.getValue());
+        }
+        caseData.setSuggestedHearingVenues(hearingVenuesList);
     }
 
     /**
@@ -158,7 +176,7 @@ public class Et1VettingService {
                     .collect(Collectors.joining());
         }
 
-        if (acasCount.getValue() > 5) {
+        if (acasCount.getValue() > FIVE_ACAS_DOC_TYPE_ITEMS_COUNT) {
             acasDisplay = String.format(BEFORE_LABEL_ACAS_OPEN_TAB, caseDetails.getCaseId());
         }
 
@@ -188,7 +206,7 @@ public class Et1VettingService {
      * @return et1VettingRespondentDetailsMarkUp
      */
     private String initialRespondentDetailsMarkUp(CaseData caseData) {
-        if (caseData.getRespondentCollection().size() == 1) {
+        if (caseData.getRespondentCollection().size() == ONE_RESPONDENT_COUNT) {
             RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
             return String.format(RESPONDENT_DETAILS, "",
                     respondentSumType.getRespondentName(),
@@ -211,22 +229,22 @@ public class Et1VettingService {
         switch (respondentList.size()) {
             case 6:
                 caseData.setEt1VettingRespondentAcasDetails6(
-                    generateRespondentAndAcasDetails(respondentList.get(5).getValue(), 6));
+                        generateRespondentAndAcasDetails(respondentList.get(5).getValue(), 6));
             case 5:
                 caseData.setEt1VettingRespondentAcasDetails5(
-                    generateRespondentAndAcasDetails(respondentList.get(4).getValue(), 5));
+                        generateRespondentAndAcasDetails(respondentList.get(4).getValue(), 5));
             case 4:
                 caseData.setEt1VettingRespondentAcasDetails4(
-                    generateRespondentAndAcasDetails(respondentList.get(3).getValue(), 4));
+                        generateRespondentAndAcasDetails(respondentList.get(3).getValue(), 4));
             case 3:
                 caseData.setEt1VettingRespondentAcasDetails3(
-                    generateRespondentAndAcasDetails(respondentList.get(2).getValue(), 3));
+                        generateRespondentAndAcasDetails(respondentList.get(2).getValue(), 3));
             case 2:
                 caseData.setEt1VettingRespondentAcasDetails2(
-                    generateRespondentAndAcasDetails(respondentList.get(1).getValue(), 2));
+                        generateRespondentAndAcasDetails(respondentList.get(1).getValue(), 2));
             case 1:
                 caseData.setEt1VettingRespondentAcasDetails1(
-                    generateRespondentAndAcasDetails(respondentList.get(0).getValue(), 1));
+                        generateRespondentAndAcasDetails(respondentList.get(0).getValue(), 1));
                 break;
             default:
         }
@@ -290,14 +308,18 @@ public class Et1VettingService {
 
         if (caseData.getJurCodesCollection().stream()
             .anyMatch(c -> JUR_CODE_CONCILIATION_TRACK_OP.contains(c.getValue().getJuridictionCodesList()))) {
+            caseData.setTrackType(TRACK_OPEN);
             return String.format(TRACK_ALLOCATION_HTML, TRACK_OPEN);
         } else if (caseData.getJurCodesCollection().stream()
             .anyMatch(c -> JUR_CODE_CONCILIATION_TRACK_ST.contains(c.getValue().getJuridictionCodesList()))) {
+            caseData.setTrackType(TRACK_STANDARD);
             return String.format(TRACK_ALLOCATION_HTML, TRACK_STANDARD);
         } else if (caseData.getJurCodesCollection().stream()
             .anyMatch(c -> JUR_CODE_CONCILIATION_TRACK_SH.contains(c.getValue().getJuridictionCodesList()))) {
+            caseData.setTrackType(TRACK_SHORT);
             return String.format(TRACK_ALLOCATION_HTML, TRACK_SHORT);
         } else {
+            caseData.setTrackType(TRACK_NO);
             return String.format(TRACK_ALLOCATION_HTML, TRACK_NO);
         }
     }

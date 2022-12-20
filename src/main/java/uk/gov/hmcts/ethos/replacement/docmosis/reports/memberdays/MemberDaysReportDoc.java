@@ -11,7 +11,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_OFFICE;
 
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.LiteralsFirstInComparisons",
+    "PMD.FieldNamingConventions", "PMD.LawOfDemeter", "PMD.ConsecutiveAppendsShouldReuse",
+    "PMD.ConsecutiveLiteralAppends", "PMD.InsufficientStringBufferDeclaration"})
 public class MemberDaysReportDoc {
+    private static final int ONE_REMAINING_ITEM = 1;
 
     public StringBuilder getReportDocPart(ListingData data) {
         return getMemberDaysReport(data);
@@ -19,11 +23,11 @@ public class MemberDaysReportDoc {
 
     private StringBuilder getMemberDaysReport(ListingData listingData) {
         if (!(listingData instanceof MemberDaysReportData)) {
-            throw new IllegalStateException(("ListingData is not instance of MemberDaysReportData"));
+            throw new IllegalStateException("ListingData is not instance of MemberDaysReportData");
         }
 
-        var reportData = (MemberDaysReportData) listingData;
-        var sb = ListingHelper.getListingDate(reportData);
+        MemberDaysReportData reportData = (MemberDaysReportData) listingData;
+        StringBuilder sb = ListingHelper.getListingDate(reportData);
         sb.append(REPORT_OFFICE).append(nullCheck(reportData.getOffice())).append(NEW_LINE);
         sb.append(addMemberDaysReportSummaryHeader(reportData));
         sb.append("\"memberDaySummaryItems\":[\n");
@@ -36,7 +40,7 @@ public class MemberDaysReportDoc {
     }
 
     private static StringBuilder addMemberDaysReportSummaryHeader(MemberDaysReportData reportData) {
-        var summaryHeaderContent = new StringBuilder();
+        StringBuilder summaryHeaderContent = new StringBuilder();
 
         if (reportData == null) {
             return summaryHeaderContent;
@@ -53,15 +57,15 @@ public class MemberDaysReportDoc {
     }
 
     private static StringBuilder addMemberDaysReportSummary(List<MemberDaySummaryItem> memberDaySummaryItems) {
-        var reportSummaryContent = new StringBuilder();
+        StringBuilder reportSummaryContent = new StringBuilder();
         if (CollectionUtils.isEmpty(memberDaySummaryItems)) {
             return reportSummaryContent;
         }
 
-        var itemsCount = memberDaySummaryItems.size();
-        for (var i = 0; i < itemsCount; i++) {
+        int itemsCount = memberDaySummaryItems.size();
+        for (int i = 0; i < itemsCount; i++) {
             reportSummaryContent.append(getMemberDaySummaryRow(memberDaySummaryItems.get(i)));
-            if ((itemsCount - i) > 1) {
+            if ((itemsCount - i) > ONE_REMAINING_ITEM) {
                 reportSummaryContent.append(",\n");
             }
         }
@@ -70,7 +74,7 @@ public class MemberDaysReportDoc {
     }
 
     private static StringBuilder getMemberDaySummaryRow(MemberDaySummaryItem summaryItem) {
-        var summaryRowContent = new StringBuilder();
+        StringBuilder summaryRowContent = new StringBuilder();
         summaryRowContent.append("{\n\"Hearing_Date\":\"").append(
             nullCheck(summaryItem.getHearingDate())).append(NEW_LINE);
         summaryRowContent.append("\"Full_Days\":\"").append(
@@ -84,16 +88,16 @@ public class MemberDaysReportDoc {
     }
 
     private static StringBuilder addMemberDaysReportDetails(List<MemberDaysReportDetail> reportDetails) {
-        var reportDetailsContent = new StringBuilder();
+        StringBuilder reportDetailsContent = new StringBuilder();
 
         if (CollectionUtils.isEmpty(reportDetails)) {
             return reportDetailsContent;
         }
 
-        var detailEntriesCount = reportDetails.size();
-        for (var i = 0; i < detailEntriesCount; i++) {
+        int detailEntriesCount = reportDetails.size();
+        for (int i = 0; i < detailEntriesCount; i++) {
             reportDetailsContent.append(getMemberDayReportDetailRow(reportDetails.get(i)));
-            if ((detailEntriesCount - i) > 1) {
+            if ((detailEntriesCount - i) > ONE_REMAINING_ITEM) {
                 reportDetailsContent.append(",\n");
             }
         }
@@ -102,7 +106,7 @@ public class MemberDaysReportDoc {
     }
 
     private static StringBuilder getMemberDayReportDetailRow(MemberDaysReportDetail reportDetail) {
-        var detailRowContent = new StringBuilder();
+        StringBuilder detailRowContent = new StringBuilder();
         detailRowContent.append("{\n\"Detail_Hearing_Date\":\"")
             .append(nullCheck(reportDetail.getHearingDate()))
             .append(NEW_LINE);
@@ -124,7 +128,7 @@ public class MemberDaysReportDoc {
         detailRowContent.append("\"Hearing_Clerk\":\"")
             .append(nullCheck(reportDetail.getHearingClerk()))
             .append(NEW_LINE);
-        var durationInMinutes = Double.parseDouble(reportDetail.getHearingDuration());
+        double durationInMinutes = Double.parseDouble(reportDetail.getHearingDuration());
         detailRowContent.append("\"Hearing_Duration\":\"")
             .append(nullCheck(String.valueOf(new DecimalFormat("#").format(durationInMinutes))))
             .append("\"\n}");

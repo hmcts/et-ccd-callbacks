@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseRetrievalException;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
@@ -52,6 +53,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDE
 @RequiredArgsConstructor
 @Slf4j
 @Service
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.LinguisticNaming",
+    "PMD.LiteralsFirstInComparisons", "PMD.LawOfDemeter", "PMD.ExcessiveImports", "PMD.CyclomaticComplexity"})
 public class ReportDataService {
     private final CcdClient ccdClient;
     private final ListingService listingService;
@@ -92,10 +95,10 @@ public class ReportDataService {
             ListingDetails listingDetails, String authToken) {
         log.info("Cases Awaiting Judgment for {}, Office {}", listingDetails.getCaseTypeId(),
                 listingDetails.getCaseData().getManagingOffice());
-        var reportDataSource = new CcdReportDataSource(authToken, ccdClient);
+        CcdReportDataSource reportDataSource = new CcdReportDataSource(authToken, ccdClient);
 
-        var casesAwaitingJudgmentReport = new CasesAwaitingJudgmentReport(reportDataSource);
-        var reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        CasesAwaitingJudgmentReport casesAwaitingJudgmentReport = new CasesAwaitingJudgmentReport(reportDataSource);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
         setSharedReportDocumentFields(reportData, listingDetails, false);
         return reportData;
     }
@@ -103,10 +106,11 @@ public class ReportDataService {
     private HearingsToJudgmentsReportData getHearingsToJudgmentsReport(ListingDetails listingDetails,
                                                                        String authToken) {
         log.info("Hearings To Judgments for {}", listingDetails.getCaseTypeId());
-        var params = setListingDateRangeForSearch(listingDetails);
-        var reportDataSource = new HearingsToJudgmentsCcdReportDataSource(authToken, ccdClient);
-        var hearingsToJudgmentsReport = new HearingsToJudgmentsReport(reportDataSource, params);
-        var reportData = hearingsToJudgmentsReport.runReport(listingDetails.getCaseTypeId(),
+        ReportParams params = setListingDateRangeForSearch(listingDetails);
+        HearingsToJudgmentsCcdReportDataSource reportDataSource = new HearingsToJudgmentsCcdReportDataSource(
+            authToken, ccdClient);
+        HearingsToJudgmentsReport hearingsToJudgmentsReport = new HearingsToJudgmentsReport(reportDataSource, params);
+        HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(listingDetails.getCaseTypeId(),
                 listingDetails.getCaseData().getManagingOffice());
         reportData.setDocumentName(listingDetails.getCaseData().getDocumentName());
         reportData.setReportType(listingDetails.getCaseData().getReportType());
@@ -119,10 +123,10 @@ public class ReportDataService {
 
     private NoPositionChangeReportData getNoPositionChangeReport(ListingDetails listingDetails, String authToken) {
         log.info("No Change In Current Position for {}", listingDetails.getCaseTypeId());
-        var reportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
-        var hearingsToJudgmentsReport = new NoPositionChangeReport(reportDataSource,
+        NoPositionChangeCcdDataSource reportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
+        NoPositionChangeReport hearingsToJudgmentsReport = new NoPositionChangeReport(reportDataSource,
                 listingDetails.getCaseData().getReportDate());
-        var reportData = hearingsToJudgmentsReport.runReport(listingDetails);
+        NoPositionChangeReportData reportData = hearingsToJudgmentsReport.runReport(listingDetails);
         setSharedReportDocumentFields(reportData, listingDetails, false);
         return reportData;
     }
@@ -130,31 +134,32 @@ public class ReportDataService {
     private ClaimsByHearingVenueReportData getClaimsByHearingVenueReport(ListingDetails listingDetails,
                                                                          String authToken) {
         log.info("Claims By Hearing Venue Report for {}", listingDetails.getCaseTypeId());
-        var genericReportParams = setListingDateRangeForSearch(listingDetails);
-        var listingData = listingDetails.getCaseData();
-        var claimsByHearingVenueReportParams = new ClaimsByHearingVenueReportParams(
+        ReportParams genericReportParams = setListingDateRangeForSearch(listingDetails);
+        ListingData listingData = listingDetails.getCaseData();
+        ClaimsByHearingVenueReportParams claimsByHearingVenueReportParams = new ClaimsByHearingVenueReportParams(
                 genericReportParams.getCaseTypeId(), genericReportParams.getManagingOffice(),
                 genericReportParams.getDateFrom(), genericReportParams.getDateTo(), listingData.getHearingDateType(),
                 getUserFullName(authToken));
-        var reportDataSource = new ClaimsByHearingVenueCcdReportDataSource(authToken, ccdClient);
-        var claimsByHearingVenueReport = new ClaimsByHearingVenueReport(reportDataSource);
+        ClaimsByHearingVenueCcdReportDataSource reportDataSource = new ClaimsByHearingVenueCcdReportDataSource(
+            authToken, ccdClient);
+        ClaimsByHearingVenueReport claimsByHearingVenueReport = new ClaimsByHearingVenueReport(reportDataSource);
         return claimsByHearingVenueReport.generateReport(claimsByHearingVenueReportParams);
     }
 
     private String getUserFullName(String userToken) {
-        var userDetails = userService.getUserDetails(userToken);
-        var firstName = userDetails.getFirstName() != null ? userDetails.getFirstName() : "";
-        var lastName = userDetails.getLastName() != null ? userDetails.getLastName() : "";
+        UserDetails userDetails = userService.getUserDetails(userToken);
+        String firstName = userDetails.getFirstName() != null ? userDetails.getFirstName() : "";
+        String lastName = userDetails.getLastName() != null ? userDetails.getLastName() : "";
         return firstName + " " + lastName;
     }
 
     private EccReportData getEccReport(ListingDetails listingDetails, String authToken) {
         log.info("Ecc Report for {}", listingDetails.getCaseTypeId());
-        var reportDataSource = new EccReportCcdDataSource(authToken, ccdClient);
-        var listingData = listingDetails.getCaseData();
-        var params = setListingDateRangeForSearch(listingDetails);
-        var eccReport = new EccReport(reportDataSource);
-        var reportData = eccReport.generateReport(params);
+        EccReportCcdDataSource reportDataSource = new EccReportCcdDataSource(authToken, ccdClient);
+        ListingData listingData = listingDetails.getCaseData();
+        ReportParams params = setListingDateRangeForSearch(listingDetails);
+        EccReport eccReport = new EccReport(reportDataSource);
+        EccReportData reportData = eccReport.generateReport(params);
         setReportData(reportData, listingData);
         return reportData;
     }
@@ -170,24 +175,24 @@ public class ReportDataService {
 
     private RespondentsReportData getRespondentsReport(ListingDetails listingDetails, String authToken) {
         log.info("Respondents Report for {}", listingDetails.getCaseData().getManagingOffice());
-        var reportDataSource = new RespondentsReportCcdDataSource(authToken, ccdClient);
+        RespondentsReportCcdDataSource reportDataSource = new RespondentsReportCcdDataSource(authToken, ccdClient);
 
-        var params = setListingDateRangeForSearch(listingDetails);
-        var respondentsReport = new RespondentsReport(reportDataSource);
-        var reportData = respondentsReport.generateReport(params);
+        ReportParams params = setListingDateRangeForSearch(listingDetails);
+        RespondentsReport respondentsReport = new RespondentsReport(reportDataSource);
+        RespondentsReportData reportData = respondentsReport.generateReport(params);
         setSharedReportDocumentFields(reportData, listingDetails, true);
         return reportData;
     }
 
     private SessionDaysReportData getSessionDaysReport(ListingDetails listingDetails, String authToken) {
         log.info("Session Days Report for {}", listingDetails.getCaseTypeId());
-        var reportDataSource = new SessionDaysCcdReportDataSource(authToken, ccdClient);
+        SessionDaysCcdReportDataSource reportDataSource = new SessionDaysCcdReportDataSource(authToken, ccdClient);
         setListingDateRangeForSearch(listingDetails);
 
-        var sessionDaysReport = new SessionDaysReport(reportDataSource, judgeService);
-        var listingData = listingDetails.getCaseData();
-        var params = setListingDateRangeForSearch(listingDetails);
-        var reportData = sessionDaysReport.generateReport(params);
+        SessionDaysReport sessionDaysReport = new SessionDaysReport(reportDataSource, judgeService);
+        ListingData listingData = listingDetails.getCaseData();
+        ReportParams params = setListingDateRangeForSearch(listingDetails);
+        SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
         reportData.setDocumentName(listingData.getDocumentName());
         reportData.setReportType(listingData.getReportType());
         reportData.setHearingDateType(listingData.getHearingDateType());
@@ -200,19 +205,20 @@ public class ReportDataService {
     private HearingsByHearingTypeReportData getHearingsByHearingTypeReport(ListingDetails listingDetails,
                                                                            String authToken) {
         log.info("Hearings By Hearing Type Report for {}", listingDetails.getCaseTypeId());
-        var reportDataSource = new HearingsByHearingTypeCcdReportDataSource(authToken, ccdClient);
+        HearingsByHearingTypeCcdReportDataSource reportDataSource = new HearingsByHearingTypeCcdReportDataSource(
+            authToken, ccdClient);
         setListingDateRangeForSearch(listingDetails);
-        var listingData = listingDetails.getCaseData();
-        var hearingsByHearingTypeReport = new HearingsByHearingTypeReport(reportDataSource);
-        var params = setListingDateRangeForSearch(listingDetails);
-        var reportData = hearingsByHearingTypeReport
+        ListingData listingData = listingDetails.getCaseData();
+        HearingsByHearingTypeReport hearingsByHearingTypeReport = new HearingsByHearingTypeReport(reportDataSource);
+        ReportParams params = setListingDateRangeForSearch(listingDetails);
+        HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport
                 .generateReport(params);
         setReportData(reportData, listingData);
         return reportData;
     }
 
     private ReportParams setListingDateRangeForSearch(ListingDetails listingDetails) {
-        var listingData = listingDetails.getCaseData();
+        ListingData listingData = listingDetails.getCaseData();
         boolean isRangeHearingDateType = listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE);
         String listingDateFrom;
         String listingDateTo;

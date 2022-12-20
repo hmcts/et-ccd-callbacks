@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings;
 
 import org.junit.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
@@ -13,14 +14,15 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+@SuppressWarnings({"PMD.LinguisticNaming"})
 public class HearingSelectionServiceTest {
 
     @Test
     public void testGetHearingSelection() {
-        var caseData = createCaseData();
+        CaseData caseData = createCaseData();
 
-        var hearingSelectionService = new HearingSelectionService();
-        var actualResult = hearingSelectionService.getHearingSelection(caseData);
+        HearingSelectionService hearingSelectionService = new HearingSelectionService();
+        List<DynamicValueType> actualResult = hearingSelectionService.getHearingSelection(caseData);
 
         assertEquals(3, actualResult.size());
         assertEquals("id1", actualResult.get(0).getCode());
@@ -33,10 +35,11 @@ public class HearingSelectionServiceTest {
 
     @Test
     public void testGetSelectedHearing() {
-        var caseData = createCaseData();
+        CaseData caseData = createCaseData();
 
-        var hearingSelectionService = new HearingSelectionService();
-        var selectedHearing = hearingSelectionService.getSelectedHearing(caseData, new DynamicFixedListType("id1"));
+        HearingSelectionService hearingSelectionService = new HearingSelectionService();
+        HearingType selectedHearing = hearingSelectionService.getSelectedHearing(caseData,
+            new DynamicFixedListType("id1"));
         assertEquals("1", selectedHearing.getHearingNumber());
         selectedHearing = hearingSelectionService.getSelectedHearing(caseData, new DynamicFixedListType("id2"));
         assertEquals("1", selectedHearing.getHearingNumber());
@@ -46,9 +49,9 @@ public class HearingSelectionServiceTest {
 
     @Test(expected = IllegalStateException.class)
     public void testGetSelectedHearingNotFound() {
-        var caseData = createCaseData();
+        CaseData caseData = createCaseData();
 
-        var hearingSelectionService = new HearingSelectionService();
+        HearingSelectionService hearingSelectionService = new HearingSelectionService();
         hearingSelectionService.getSelectedHearing(caseData, new DynamicFixedListType("id4"));
 
         fail("No hearing should be found");
@@ -56,10 +59,11 @@ public class HearingSelectionServiceTest {
 
     @Test
     public void getSelectedListing() {
-        var caseData = createCaseData();
+        CaseData caseData = createCaseData();
 
-        var hearingSelectionService = new HearingSelectionService();
-        var selectedListing = hearingSelectionService.getSelectedListing(caseData, new DynamicFixedListType("id1"));
+        HearingSelectionService hearingSelectionService = new HearingSelectionService();
+        DateListedType selectedListing = hearingSelectionService.getSelectedListing(caseData,
+            new DynamicFixedListType("id1"));
         assertEquals("1970-01-01T10:00:00.000", selectedListing.getListedDate());
         selectedListing = hearingSelectionService.getSelectedListing(caseData, new DynamicFixedListType("id2"));
         assertEquals("1970-01-02T10:00:00.000", selectedListing.getListedDate());
@@ -69,17 +73,17 @@ public class HearingSelectionServiceTest {
 
     @Test(expected = IllegalStateException.class)
     public void testGetSelectedListingNotFound() {
-        var caseData = createCaseData();
+        CaseData caseData = createCaseData();
 
-        var hearingSelectionService = new HearingSelectionService();
+        HearingSelectionService hearingSelectionService = new HearingSelectionService();
         hearingSelectionService.getSelectedListing(caseData, new DynamicFixedListType("id4"));
         fail("No listing should be found");
     }
 
     private CaseData createCaseData() {
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
 
-        var hearings = List.of(
+        List<HearingTypeItem> hearings = List.of(
                 createHearing("1", List.of(createListing("id1", "1970-01-01T10:00:00.000"),
                         createListing("id2", "1970-01-02T10:00:00.000"))),
                 createHearing("2", List.of(createListing("id3", "1970-01-03T10:00:00.000")))
@@ -91,18 +95,18 @@ public class HearingSelectionServiceTest {
     }
 
     private HearingTypeItem createHearing(String hearingNumber, List<DateListedTypeItem> listings) {
-        var hearing = new HearingType();
+        HearingType hearing = new HearingType();
         hearing.setHearingNumber(hearingNumber);
         hearing.setHearingDateCollection(listings);
-        var hearingTypeItem = new HearingTypeItem();
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(hearing);
         return hearingTypeItem;
     }
 
     private DateListedTypeItem createListing(String id, String listedDate) {
-        var dateListedType = new DateListedType();
+        DateListedType dateListedType = new DateListedType();
         dateListedType.setListedDate(listedDate);
-        var dateListedTypeItem = new DateListedTypeItem();
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setId(id);
         dateListedTypeItem.setValue(dateListedType);
         return dateListedTypeItem;

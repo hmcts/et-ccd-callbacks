@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
@@ -16,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.DOUBLE_SPACE_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.NEW_LINE_ERROR;
 
+@SuppressWarnings({"PMD.UseProperClassLoader"})
 public class InvalidCharacterCheckTest {
 
     private CaseDetails caseDetails1;
@@ -34,14 +36,14 @@ public class InvalidCharacterCheckTest {
 
     @Test
     public void checkInvalidCharactersInNames() {
-        var casedata = caseDetails1.getCaseData();
+        CaseData casedata = caseDetails1.getCaseData();
         casedata.setClaimant("Double  Space");
         casedata.getRepresentativeClaimantType().setNameOfRepresentative("New\nLine");
         casedata.getRespondentCollection().get(0).getValue().setRespondentName("Double  Space and New\nLine");
 
-        var representedTypeR = new RepresentedTypeR();
-        representedTypeR.setNameOfRepresentative("No Errors In Name");
-        var representedTypeRItem = new RepresentedTypeRItem();
+        RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
+            .nameOfRepresentative("No Errors In Name").build();
+        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setValue(representedTypeR);
         casedata.setRepCollection(List.of(representedTypeRItem));
 
@@ -59,7 +61,7 @@ public class InvalidCharacterCheckTest {
 
     @Test
     public void checkInvalidCharactersInNamesNoClaimantResp() {
-        var casedata = caseDetails1.getCaseData();
+        CaseData casedata = caseDetails1.getCaseData();
         casedata.setClaimant("Single Space");
         casedata.setClaimantRepresentedQuestion("No");
         casedata.getRepresentativeClaimantType().setNameOfRepresentative("New\nLine");

@@ -16,38 +16,42 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("PMD.LawOfDemeter")
 public class HearingsByHearingTypeCcdReportDataSourceTest {
 
     @Test
     public void shouldReturnSearchResults() throws IOException {
-        var authToken = "token";
-        var caseTypeId = "caseTypeId_Listings";
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var fromDate = "1-1-2022";
-        var toDate = "10-1-2022";
-        var ccdClient = mock(CcdClient.class);
-        var submitEvent = new HearingsByHearingTypeSubmitEvent();
-        var submitEvents = List.of(submitEvent);
+        String authToken = "token";
+        String caseTypeId = "caseTypeId_Listings";
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String fromDate = "1-1-2022";
+        String toDate = "10-1-2022";
+        CcdClient ccdClient = mock(CcdClient.class);
+        HearingsByHearingTypeSubmitEvent submitEvent = new HearingsByHearingTypeSubmitEvent();
+        List<HearingsByHearingTypeSubmitEvent> submitEvents = List.of(submitEvent);
         when(ccdClient.hearingsByHearingTypeSearch(anyString(), anyString(), anyString())).thenReturn(submitEvents);
 
-        var ccdReportDataSource = new HearingsByHearingTypeCcdReportDataSource(authToken, ccdClient);
+        HearingsByHearingTypeCcdReportDataSource ccdReportDataSource = new HearingsByHearingTypeCcdReportDataSource(
+            authToken, ccdClient);
 
-        var results = ccdReportDataSource.getData(new ReportParams(caseTypeId, managingOffice, fromDate, toDate));
+        List<HearingsByHearingTypeSubmitEvent> results = ccdReportDataSource.getData(new ReportParams(caseTypeId,
+            managingOffice, fromDate, toDate));
         assertEquals(1, results.size());
         assertEquals(submitEvent, results.get(0));
     }
 
     @Test(expected = ReportException.class)
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
-        var authToken = "token";
-        var caseTypeId = "caseTypeId_Listings";
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var fromDate = "1-1-2022";
-        var toDate = "10-1-2022";
-        var ccdClient = mock(CcdClient.class);
+        String authToken = "token";
+        String caseTypeId = "caseTypeId_Listings";
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String fromDate = "1-1-2022";
+        String toDate = "10-1-2022";
+        CcdClient ccdClient = mock(CcdClient.class);
         when(ccdClient.hearingsByHearingTypeSearch(anyString(), anyString(), anyString())).thenThrow(new IOException());
 
-        var ccdReportDataSource = new HearingsByHearingTypeCcdReportDataSource(authToken, ccdClient);
+        HearingsByHearingTypeCcdReportDataSource ccdReportDataSource = new HearingsByHearingTypeCcdReportDataSource(
+            authToken, ccdClient);
         ccdReportDataSource.getData(new ReportParams(caseTypeId, managingOffice, fromDate, toDate));
         fail("Should throw exception instead");
     }

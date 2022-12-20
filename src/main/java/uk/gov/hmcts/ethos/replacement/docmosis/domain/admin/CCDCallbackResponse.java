@@ -30,7 +30,7 @@ public class CCDCallbackResponse extends GenericCallbackResponse {
     public static ResponseEntity<CCDCallbackResponse> getCallbackRespEntityErrors(
             List<String> errors, AdminData adminData) {
 
-        return ResponseEntity.ok(CCDCallbackResponse.builder()
+        return ResponseEntity.ok(builder()
                 .data(adminData)
                 .errors(errors)
                 .build());

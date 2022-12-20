@@ -21,6 +21,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MIGRATION_CASE_SOUR
 
 @Service
 @Slf4j
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
+    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
+    "PMD.LawOfDemeter", "PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
 public class CaseSourceLocalReport {
 
     public ListingData generateReportData(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
@@ -36,26 +40,25 @@ public class CaseSourceLocalReport {
     }
 
     private void populateLocalReportSummary(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
-        var listingData = listingDetails.getCaseData();
+        ListingData listingData = listingDetails.getCaseData();
         if (CollectionUtils.isEmpty(listingData.getLocalReportsSummary())) {
-            var adhocReportTypeItem = new AdhocReportTypeItem();
-            var reportType = new AdhocReportType();
+            AdhocReportTypeItem adhocReportTypeItem = new AdhocReportTypeItem();
+            AdhocReportType reportType = new AdhocReportType();
             adhocReportTypeItem.setId(UUID.randomUUID().toString());
             adhocReportTypeItem.setValue(reportType);
-            var newSummary = new ArrayList<AdhocReportTypeItem>();
+            List<AdhocReportTypeItem> newSummary = new ArrayList<>();
             newSummary.add(adhocReportTypeItem);
             listingData.setLocalReportsSummary(newSummary);
         }
-        var adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
+        AdhocReportType adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
         adhocReportType.setReportOffice(ReportHelper.getReportOffice(listingDetails.getCaseTypeId(),
                 listingData.getManagingOffice()));
-        var manuallyCreatedCases = 0;
-        var et1OnlineCases = 0;
-        var eccCases = 0;
-        var migrationCases = 0;
-        var totalCases = 0;
+        int manuallyCreatedCases = 0;
+        int et1OnlineCases = 0;
+        int eccCases = 0;
+        int migrationCases = 0;
 
-        for (var submitEvent : submitEvents) {
+        for (SubmitEvent submitEvent : submitEvents) {
             if (ET1_ONLINE_CASE_SOURCE.equals(submitEvent.getCaseData().getCaseSource())) {
                 et1OnlineCases = et1OnlineCases + 1;
             }
@@ -72,7 +75,7 @@ public class CaseSourceLocalReport {
                 manuallyCreatedCases = manuallyCreatedCases + 1;
             }
         }
-        totalCases = manuallyCreatedCases + et1OnlineCases + eccCases + migrationCases;
+        int totalCases = manuallyCreatedCases + et1OnlineCases + eccCases + migrationCases;
 
         float manuallyCreatedPercent = (totalCases != 0)
                 ? ((float)manuallyCreatedCases / totalCases) * 100 : 0;

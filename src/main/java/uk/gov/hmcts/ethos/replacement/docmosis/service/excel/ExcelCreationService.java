@@ -4,7 +4,9 @@ import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.DataValidationConstraint;
+import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -20,6 +22,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.CONSTRAINT_KEY;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HIDDEN_SHEET_NAME;
@@ -27,12 +30,13 @@ import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.SHEET_NAM
 
 @Slf4j
 @Service("excelCreationService")
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.CloseResource", "PMD.LawOfDemeter"})
 public class ExcelCreationService {
 
     public byte[] writeExcel(List<?> multipleCollection, List<String> subMultipleCollection, String leadCaseString) {
-        var workbook = new XSSFWorkbook();
-        var sheet = workbook.createSheet(SHEET_NAME);
-        var hiddenSheet = workbook.createSheet(HIDDEN_SHEET_NAME);
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet(SHEET_NAME);
+        XSSFSheet hiddenSheet = workbook.createSheet(HIDDEN_SHEET_NAME);
 
         enableLocking(sheet);
         enableLocking(hiddenSheet);
@@ -94,7 +98,7 @@ public class ExcelCreationService {
         //Adjust the column width to fit the content
         sheet.autoSizeColumn(0);
         sheet.setColumnWidth(1, 8000);
-        for (var i = 2; i <= 5; i++) {
+        for (int i = 2; i <= 5; i++) {
             sheet.setColumnWidth(i, 4000);
         }
     }
@@ -102,7 +106,7 @@ public class ExcelCreationService {
     private void createHiddenSheet(XSSFWorkbook workbook, XSSFSheet hiddenSheet, List<String> subMultipleCollection) {
         if (!subMultipleCollection.isEmpty()) {
             CellStyle styleForLocking = getStyleForLocking(workbook, false);
-            for (var i = 0; i < subMultipleCollection.size(); i++) {
+            for (int i = 0; i < subMultipleCollection.size(); i++) {
                 XSSFRow row = hiddenSheet.createRow(i);
                 createCell(row, 0, subMultipleCollection.get(i), styleForLocking);
             }
@@ -116,11 +120,11 @@ public class ExcelCreationService {
             namedCell.setNameName(HIDDEN_SHEET_NAME);
             namedCell.setRefersToFormula(HIDDEN_SHEET_NAME + "!$A$1:$A$" + subMultipleCollection.size());
 
-            var cellRangeAddressList =
+            CellRangeAddressList cellRangeAddressList =
                     new CellRangeAddressList(1, multipleCollection.size(), 1, 1);
-            var helper = sheet.getDataValidationHelper();
+            DataValidationHelper helper = sheet.getDataValidationHelper();
             DataValidationConstraint constraint = helper.createFormulaListConstraint(HIDDEN_SHEET_NAME);
-            var dataValidation = helper.createValidation(constraint, cellRangeAddressList);
+            DataValidation dataValidation = helper.createValidation(constraint, cellRangeAddressList);
             dataValidation.setSuppressDropDownArrow(true);
             dataValidation.setShowErrorBox(true);
 
@@ -133,7 +137,7 @@ public class ExcelCreationService {
         XSSFRow rowHead = sheet.createRow(0);
         CellStyle styleForLocking = getStyleForLocking(workbook, false);
 
-        for (var j = 0; j < MultiplesHelper.HEADERS.size(); j++) {
+        for (int j = 0; j < MultiplesHelper.HEADERS.size(); j++) {
             rowHead.createCell(j).setCellValue(MultiplesHelper.HEADERS.get(j));
             createCell(rowHead, j, MultiplesHelper.HEADERS.get(j), styleForLocking);
         }
@@ -155,10 +159,11 @@ public class ExcelCreationService {
             return;
         }
 
-        var isStringRefsList = multipleCollection.get(0) instanceof String;
+        boolean isStringRefsList = multipleCollection.get(0) instanceof String;
         log.info(isStringRefsList ? "Initializing multipleRefs" : "Initializing data");
 
-        var orderedAllCasesList = MultiplesHelper.createCollectionOrderedByCaseRef(multipleCollection);
+        SortedMap<String, SortedMap<String, Object>> orderedAllCasesList =
+            MultiplesHelper.createCollectionOrderedByCaseRef(multipleCollection);
         if (orderedAllCasesList.isEmpty()) {
             return;
         }
@@ -170,7 +175,7 @@ public class ExcelCreationService {
                     constructCaseExcelRow(workbook, sheet, rowIndex[0], (String) caseItem, leadCase, null,
                             !subMultipleCollection.isEmpty());
                 } else {
-                    var multipleObject = (MultipleObject) caseItem;
+                    MultipleObject multipleObject = (MultipleObject) caseItem;
                     constructCaseExcelRow(workbook, sheet, rowIndex[0], multipleObject.getEthosCaseRef(), leadCase,
                             multipleObject, !subMultipleCollection.isEmpty());
                 }
@@ -195,7 +200,7 @@ public class ExcelCreationService {
         }
 
         if (multipleObject == null) {
-            for (var k = 0; k < MultiplesHelper.HEADERS.size() - 1; k++) {
+            for (int k = 0; k < MultiplesHelper.HEADERS.size() - 1; k++) {
                 if (k == 0 && !hasSubMultiples) {
                     columnIndex++;
                     createCell(row, columnIndex, "", styleForLocking);

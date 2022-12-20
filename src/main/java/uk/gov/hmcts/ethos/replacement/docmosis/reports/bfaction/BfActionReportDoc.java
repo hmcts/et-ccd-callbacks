@@ -11,7 +11,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_OFFICE;
 
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity",
+    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.CognitiveComplexity",
+    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons",
+    "PMD.ConsecutiveAppendsShouldReuse" })
 public class BfActionReportDoc {
+
+    private static final int ONE_REMAINING_ITEM = 1;
 
     public StringBuilder getReportDocPart(ListingData data) {
         return getBfActionReportDoc(data);
@@ -19,11 +25,11 @@ public class BfActionReportDoc {
 
     private StringBuilder getBfActionReportDoc(ListingData listingData) {
         if (!(listingData instanceof BfActionReportData)) {
-            throw new IllegalStateException(("ListingData is not instance of BfActionReportData"));
+            throw new IllegalStateException("ListingData is not instance of BfActionReportData");
         }
 
-        var reportData = (BfActionReportData) listingData;
-        var sb = ListingHelper.getListingDate(reportData);
+        BfActionReportData reportData = (BfActionReportData) listingData;
+        StringBuilder sb = ListingHelper.getListingDate(reportData);
         sb.append(REPORT_OFFICE).append(nullCheck(reportData.getOffice())).append(NEW_LINE);
         sb.append("\"bf_list\":[\n");
         sb.append(addBfActionItemsList(reportData.getBfDateCollection()));
@@ -32,16 +38,16 @@ public class BfActionReportDoc {
     }
 
     private StringBuilder addBfActionItemsList(List<BFDateTypeItem> bfDateTypeItems) {
-        var bfActionItemsListContent = new StringBuilder();
+        StringBuilder bfActionItemsListContent = new StringBuilder();
 
         if (CollectionUtils.isEmpty(bfDateTypeItems)) {
             return bfActionItemsListContent;
         }
 
-        var itemsCount = bfDateTypeItems.size();
-        for (var i = 0; i < itemsCount; i++) {
+        int itemsCount = bfDateTypeItems.size();
+        for (int i = 0; i < itemsCount; i++) {
             bfActionItemsListContent.append(getBfActionRow(bfDateTypeItems.get(i)));
-            if ((itemsCount - i) > 1) {
+            if ((itemsCount - i) > ONE_REMAINING_ITEM) {
                 bfActionItemsListContent.append(",\n");
             }
         }
@@ -50,7 +56,7 @@ public class BfActionReportDoc {
     }
 
     private StringBuilder getBfActionRow(BFDateTypeItem bfActionItem) {
-        var rowContent = new StringBuilder();
+        StringBuilder rowContent = new StringBuilder();
         rowContent.append("{\n\"Case_No\":\"").append(
             nullCheck(bfActionItem.getValue().getCaseReference())).append(NEW_LINE);
         rowContent.append("\"Bf_Action\":\"").append(

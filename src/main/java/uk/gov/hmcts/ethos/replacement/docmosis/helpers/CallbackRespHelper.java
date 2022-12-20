@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import com.sun.istack.NotNull;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -13,7 +13,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 
 import java.util.List;
 
-public class CallbackRespHelper {
+public final class CallbackRespHelper {
 
     private CallbackRespHelper() {
     }

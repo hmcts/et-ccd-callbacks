@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
+import io.micrometer.core.instrument.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.MultipleReferenceService;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
@@ -28,6 +30,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 @RequiredArgsConstructor
 @Service("multipleCreationService")
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
+    "PMD.LinguisticNaming", "PMD.LiteralsFirstInComparisons", "PMD.LooseCoupling",
+    "PMD.LawOfDemeter"})
 public class MultipleCreationService {
 
     @Value("${ccd_gateway_base_url}")
@@ -78,7 +84,7 @@ public class MultipleCreationService {
 
     private void multipleCreationUI(String userToken, MultipleDetails multipleDetails, List<String> errors) {
 
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
 
         multipleData.setPreAcceptDone(YES);
 
@@ -150,16 +156,15 @@ public class MultipleCreationService {
 
         List<CaseMultipleTypeItem> caseMultipleTypeItemList = multipleDetails.getCaseData().getCaseMultipleCollection();
 
-        HashSet<SubMultipleTypeItem> subMultipleTypeItems = new HashSet<>();
+        Set<SubMultipleTypeItem> subMultipleTypeItems = new HashSet<>();
 
         if (caseMultipleTypeItemList != null) {
 
             for (CaseMultipleTypeItem caseMultipleTypeItem : caseMultipleTypeItemList) {
 
-                var multipleObjectType = caseMultipleTypeItem.getValue();
+                MultipleObjectType multipleObjectType = caseMultipleTypeItem.getValue();
 
-                if (multipleObjectType.getSubMultiple() != null
-                        && !multipleObjectType.getSubMultiple().trim().isEmpty()
+                if (StringUtils.isNotBlank(multipleObjectType.getSubMultiple())
                         && !subMultipleNames.contains(multipleObjectType.getSubMultiple())) {
 
                     subMultipleNames.add(multipleObjectType.getSubMultiple());
@@ -199,7 +204,7 @@ public class MultipleCreationService {
 
     private String generateMultipleRef(MultipleDetails multipleDetails) {
 
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
 
         if (multipleData.getMultipleReference() == null
                 || multipleData.getMultipleReference().trim().equals("")) {
@@ -228,7 +233,7 @@ public class MultipleCreationService {
 
     private void getLeadMarkUpAndAddLeadToCaseIds(String userToken, MultipleDetails multipleDetails) {
 
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
 
         String leadCase;
 
@@ -268,7 +273,7 @@ public class MultipleCreationService {
 
         log.info("Ethos case ref collection: " + ethosCaseRefCollection);
 
-        var refMarkup = MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl, multipleDetails.getCaseId(),
+        String refMarkup = MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl, multipleDetails.getCaseId(),
                 multipleDetails.getCaseData().getMultipleReference());
 
         if (!ethosCaseRefCollection.isEmpty()) {

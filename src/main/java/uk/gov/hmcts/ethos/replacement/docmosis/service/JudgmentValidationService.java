@@ -8,11 +8,13 @@ import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements.NO_HEARINGS;
 
 @Service("judgmentValidationService")
+@SuppressWarnings({"PMD.SimpleDateFormatNeedsLocale"})
 public class JudgmentValidationService {
 
     public void validateJudgments(CaseData caseData) throws ParseException {
@@ -26,10 +28,10 @@ public class JudgmentValidationService {
     private void populateJudgmentDateOfHearing(JudgementType judgementType) throws ParseException {
         if (NO.equals(judgementType.getNonHearingJudgment())
                 && !NO_HEARINGS.equals(judgementType.getDynamicJudgementHearing().getValue().getLabel())) {
-            var hearingDate = judgementType.getDynamicJudgementHearing().getValue().getLabel();
+            String hearingDate = judgementType.getDynamicJudgementHearing().getValue().getLabel();
             hearingDate = hearingDate.substring(hearingDate.length() - 11);
-            var simpleDateFormat = new SimpleDateFormat("dd MMM yyyy");
-            var date = simpleDateFormat.parse(hearingDate);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMM yyyy");
+            Date date = simpleDateFormat.parse(hearingDate);
             simpleDateFormat.applyPattern("yyyy-MM-dd");
             judgementType.setJudgmentHearingDate(simpleDateFormat.format(date));
         } else {

@@ -31,13 +31,18 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEAR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingDurationInMinutes;
 
-public class SessionDaysReport {
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.InsufficientStringBufferDeclaration",
+    "PMD.LiteralsFirstInComparisons", "PMD.UnnecessaryFullyQualifiedName", "PMD.LawOfDemeter"})
+public final class SessionDaysReport {
 
     public static final String ONE_HOUR = "One Hour";
     public static final String HALF_DAY = "Half Day";
     public static final String FULL_DAY = "Full Day";
     public static final String NONE = "None";
-
+    private static final int ZERO_MINUTES = 0;
+    private static final int SIXTY_MINUTES = 60;
+    private static final int HUNDRED_EIGHTY_MINUTES = 180;
     private final SessionDaysReportDataSource reportDataSource;
     private final JudgeService judgeService;
     private ReportParams params;
@@ -49,8 +54,8 @@ public class SessionDaysReport {
 
     public SessionDaysReportData generateReport(ReportParams params) {
         this.params = params;
-        var submitEvents = getCases();
-        var reportData = initReport();
+        List<SessionDaysSubmitEvent> submitEvents = getCases();
+        SessionDaysReportData reportData = initReport();
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             executeReport(submitEvents, reportData);
         }
@@ -58,7 +63,7 @@ public class SessionDaysReport {
     }
 
     private SessionDaysReportData initReport() {
-        var reportSummary = new SessionDaysReportSummary(
+        SessionDaysReportSummary reportSummary = new SessionDaysReportSummary(
                 ReportHelper.getReportOffice(params.getCaseTypeId(), params.getManagingOffice()));
         reportSummary.setFtSessionDaysTotal("0");
         reportSummary.setPtSessionDaysTotal("0");
@@ -75,9 +80,9 @@ public class SessionDaysReport {
     }
 
     private boolean isHearingDateInRange(String dateListed) {
-        var hearingListedDate = LocalDate.parse(ReportHelper.getFormattedLocalDate(dateListed));
-        var hearingDatesFrom = LocalDate.parse(ReportHelper.getFormattedLocalDate(params.getDateFrom()));
-        var hearingDatesTo = LocalDate.parse(ReportHelper.getFormattedLocalDate(params.getDateTo()));
+        LocalDate hearingListedDate = LocalDate.parse(ReportHelper.getFormattedLocalDate(dateListed));
+        LocalDate hearingDatesFrom = LocalDate.parse(ReportHelper.getFormattedLocalDate(params.getDateFrom()));
+        LocalDate hearingDatesTo = LocalDate.parse(ReportHelper.getFormattedLocalDate(params.getDateTo()));
         return  (hearingListedDate.isEqual(hearingDatesFrom) ||  hearingListedDate.isAfter(hearingDatesFrom))
                 && (hearingListedDate.isEqual(hearingDatesTo) || hearingListedDate.isBefore(hearingDatesTo));
     }
@@ -117,7 +122,7 @@ public class SessionDaysReport {
         List<SessionDaysReportDetail> sessionDaysReportDetailList = new ArrayList<>();
         List<List<String>> sessionsList = new ArrayList<>();
         for (SessionDaysSubmitEvent submitEvent : submitEvents) {
-            var caseData = submitEvent.getCaseData();
+            SessionDaysCaseData caseData = submitEvent.getCaseData();
             setCaseReportSummaries(caseData, reportData.getReportSummary(),
                     sessionDaysReportSummary2List, sessionsList);
             setReportDetail(caseData, sessionDaysReportDetailList);
@@ -136,7 +141,7 @@ public class SessionDaysReport {
     }
 
     private boolean areDatesEqual(String date1, String date2) {
-        var date2Formatted =  LocalDateTime.parse(date2, OLD_DATE_TIME_PATTERN).toLocalDate().toString();
+        String date2Formatted =  LocalDateTime.parse(date2, OLD_DATE_TIME_PATTERN).toLocalDate().toString();
         return date1.equals(date2Formatted);
 
     }
@@ -163,7 +168,7 @@ public class SessionDaysReport {
                                         List<SessionDaysReportSummary2> sessionDaysReportSummary2List,
                                         List<List<String>> sessionsList) {
         for (HearingTypeItem hearingTypeItem : getHearings(caseData)) {
-            var dates = hearingTypeItem.getValue().getHearingDateCollection();
+            List<DateListedTypeItem> dates = hearingTypeItem.getValue().getHearingDateCollection();
             dates = filterValidHearingDates(dates);
             if (CollectionUtils.isNotEmpty(dates)) {
                 for (DateListedTypeItem dateListedTypeItem : dates) {
@@ -235,7 +240,7 @@ public class SessionDaysReport {
                 && TribunalOffice.isEnglandWalesOffice(params.getManagingOffice())) {
             judges = judgeService.getJudges(TribunalOffice.valueOfOfficeName(params.getManagingOffice()));
         } else {
-            for (var office : TribunalOffice.SCOTLAND_OFFICES) {
+            for (TribunalOffice office : TribunalOffice.SCOTLAND_OFFICES) {
                 judges.addAll(judgeService.getJudges(office));
             }
         }
@@ -253,7 +258,7 @@ public class SessionDaysReport {
     }
 
     private List<HearingTypeItem> getHearings(SessionDaysCaseData caseData) {
-        var hearings = caseData.getHearingCollection();
+        List<HearingTypeItem> hearings = caseData.getHearingCollection();
         if (hearings == null) {
             return Collections.emptyList();
         }
@@ -262,7 +267,7 @@ public class SessionDaysReport {
 
     private void setReportDetail(SessionDaysCaseData caseData, List<SessionDaysReportDetail> reportDetailList) {
         for (HearingTypeItem hearingTypeItem : getHearings(caseData)) {
-            var dates = hearingTypeItem.getValue().getHearingDateCollection();
+            List<DateListedTypeItem> dates = hearingTypeItem.getValue().getHearingDateCollection();
             dates = filterValidHearingDates(dates);
             if (CollectionUtils.isNotEmpty(dates)) {
                 for (DateListedTypeItem dateListedTypeItem : dates) {
@@ -325,18 +330,18 @@ public class SessionDaysReport {
     }
 
     private void setTelCon(HearingTypeItem hearingTypeItem, SessionDaysReportDetail reportDetail) {
-        var telConf = CollectionUtils.isNotEmpty(hearingTypeItem.getValue().getHearingFormat())
+        String telConf = CollectionUtils.isNotEmpty(hearingTypeItem.getValue().getHearingFormat())
                 && hearingTypeItem.getValue().getHearingFormat().contains("Telephone") ? "Y" : "";
         reportDetail.setHearingTelConf(telConf);
 
     }
 
     private String getSessionType(long duration) {
-        if (duration > 0 && duration < 60) {
+        if (duration > ZERO_MINUTES && duration < SIXTY_MINUTES) {
             return ONE_HOUR;
-        } else if (duration >= 60 && duration <= 180) {
+        } else if (duration >= SIXTY_MINUTES && duration <= HUNDRED_EIGHTY_MINUTES) {
             return HALF_DAY;
-        } else if (duration > 180) {
+        } else if (duration > HUNDRED_EIGHTY_MINUTES) {
             return FULL_DAY;
         } else {
             return NONE;

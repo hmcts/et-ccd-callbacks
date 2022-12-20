@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondentReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondentReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
@@ -28,6 +30,7 @@ import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@SuppressWarnings({"PMD.LinguisticNaming"})
 public class TseHelperTest {
     CCDRequest ccdRequest;
     CaseData caseData;
@@ -177,9 +180,44 @@ public class TseHelperTest {
         assertNull(caseData.getTseResponseCopyNoGiveDetails());
     }
 
+    @Test
+    public void getReplyDocumentRequest_generatesData() throws JsonProcessingException {
+        caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
+        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
+
+        caseData.getGenericTseApplicationCollection().get(0).getValue()
+            .setRespondentReply(List.of(
+                TseRespondentReplyTypeItem.builder()
+                    .id("c0bae193-ded6-4db8-a64d-b260847bcc9b")
+                    .value(
+                        TseRespondentReplyType.builder()
+                            .from("Claimant")
+                            .date("16-May-1996")
+                            .response("response")
+                            .hasSupportingMaterial(YES)
+                            .supportingMaterial(createSupportingMaterial())
+                            .copyToOtherParty(YES)
+                            .build()
+                    ).build()));
+
+        String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "");
+        String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
+            + "\"outputName\":\"Withdraw my claim Reply.pdf\",\"data\":{\"caseNumber\":\"1234\","
+            + "\"type\":\"Withdraw my claim\",\"supportingYesNo\":\"Yes\","
+            + "\"documentCollection\":[{\"id\":\"1234\","
+            + "\"value\":{\"typeOfDocument\":null,"
+            + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234/binary"
+            + "\",\"document_filename\":\"image.png\","
+            + "\"document_url\":\"http://dm-store:8080/documents/1234\"},\"ownerDocument\":null,"
+            + "\"creationDate\":null,\"shortDescription\":null}}],\"copy\":\"Yes\","
+            + "\"response\":\"response\"}}";
+
+        assertThat(replyDocumentRequest, is(expected));
+    }
+
     private List<DocumentTypeItem> createSupportingMaterial() {
         DocumentTypeItem documentTypeItem = new DocumentTypeItem();
-        documentTypeItem.setId(UUID.randomUUID().toString());
+        documentTypeItem.setId("1234");
         documentTypeItem.setValue(DocumentTypeBuilder.builder().withUploadedDocument("image.png", "1234").build());
         return List.of(documentTypeItem);
     }

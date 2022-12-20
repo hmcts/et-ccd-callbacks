@@ -34,7 +34,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
 @ExtendWith(SpringExtension.class)
-@SuppressWarnings("squid:S5961")
+@SuppressWarnings({"squid:S5961", "PMD.ExcessiveImports", "PMD.GodClass", "PMD.TooManyMethods",
+    "PMD.FieldNamingConventions", "PMD.CyclomaticComplexity"})
 class RespondentTellSomethingElseServiceTest {
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
 
@@ -408,14 +409,6 @@ class RespondentTellSomethingElseServiceTest {
             Arguments.of(SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, "textBox11", "document11"),
             Arguments.of(SELECTED_APP_VARY_OR_REVOKE_AN_ORDER, "textBox12", "document12")
         );
-    }
-
-    private UploadedDocumentType createDocumentTypeWithUrl(String url) {
-        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
-        uploadedDocumentType.setDocumentBinaryUrl("binaryUrl/documents/");
-        uploadedDocumentType.setDocumentFilename("testFileName");
-        uploadedDocumentType.setDocumentUrl(url);
-        return uploadedDocumentType;
     }
 
     private CaseData createCaseData(String selectedApplication, String selectedRule92Answer) {

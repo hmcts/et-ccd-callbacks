@@ -13,10 +13,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -31,13 +35,19 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/tseResponse")
 @RestController
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class TseResponseController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
+    private final TornadoService tornadoService;
+    private final DocumentManagementService documentManagementService;
     private static final String SUBMITTED_BODY = "### What happens next \r\n\r\nYou have sent your response to the"
         + " tribunal%s.\r\n\r\nThe tribunal will consider all correspondence and let you know what happens next.";
     private static final String SUBMITTED_COPY = " and copied it to the claimant";
+    private static final String YES_COPY = "I confirm I want to copy";
+    private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
+
 
     /**
      *  Populates the dynamic list for select an application to respond to.
@@ -132,6 +142,17 @@ public class TseResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         TseHelper.saveReplyToApplication(caseData);
+
+        if (YES_COPY.equals(caseData.getTseResponseCopyToOtherParty())) {
+            try {
+                DocumentInfo documentInfo = tornadoService.generateEventDocument(caseData, userToken, "",
+                    "TSE Reply.pdf");
+                TseHelper.getSelectedApplication(caseData).getRespondentReply().get(0).getValue()
+                     .setSummaryPdf(documentManagementService.addDocumentToDocumentField(documentInfo));
+            } catch (Exception e) {
+                throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
+            }
+        }
         TseHelper.resetReplyToApplicationPage(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }

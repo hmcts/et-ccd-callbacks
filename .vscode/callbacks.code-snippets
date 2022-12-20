@@ -331,5 +331,85 @@
 			"}"
 		],
 		"description": "Test Builder - With method"
+	},
+	"Docmosis Document File": {
+		"prefix": "",
+		"body": [
+			"package uk.gov.hmcts.ethos.replacement.docmosis.domain.documents;",
+			"",
+			"import com.fasterxml.jackson.annotation.JsonProperty;",
+			"import lombok.Data;",
+			"import lombok.experimental.SuperBuilder;",
+			"",
+			"/**",
+			" * Object which contains data needed by Tornado to generate a document.",
+			" */",
+			"@SuperBuilder",
+			"@Data",
+			"@SuppressWarnings({\"PMD.LinguisticNaming\", \"PMD.TooManyFields\"})",
+			"public class ${1:Type}Document {",
+			"    @JsonProperty(\"accessKey\")",
+			"    private String accessKey;",
+			"    @JsonProperty(\"templateName\")",
+			"    private String templateName;",
+			"    @JsonProperty(\"outputName\")",
+			"    private String outputName;",
+			"    @JsonProperty(\"data\")",
+			"    private ${1:Type}Data data;",
+			"}",
+			""
+		],
+		"description": "Docmosis Document File"
+	},
+	"Docmosis Data File": {
+		"prefix": "",
+		"body": [
+			"package uk.gov.hmcts.ethos.replacement.docmosis.domain.documents;",
+			"",
+			"import com.fasterxml.jackson.annotation.JsonProperty;",
+			"import lombok.Data;",
+			"import lombok.experimental.SuperBuilder;",
+			"",
+			"import java.util.List;",
+			"",
+			"/**",
+			" * This object captures information related to the ${1:Type} object during creation event for docmosis.",
+			" */",
+			"@SuppressWarnings({\"PMD.LinguisticNaming\"})",
+			"@SuperBuilder",
+			"@Data",
+			"public class ${1:Type}Data {",
+			"    @JsonProperty(\"caseNumber\")",
+			"    private String caseNumber;",
+			"}",
+			""
+		],
+		"description": "Docmosis Data File"
+	},
+	"Generate PDF - Helper Method": {
+		"prefix": "",
+		"body": [
+			"    /**",
+			"     * Builds a document request for ${1:what does this do?}",
+			"     * @param caseData contains all the case data",
+			"     * @param accessKey access key required for docmosis",
+			"     * @return a string representing the api request to docmosis",
+			"     */",
+			"    public static String get${2:What}DocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {",
+			"        ${2:What}Data data = ${3:methodForBuildingData}",
+			"        ${2:What}Document document = ${2:What}Document.builder()",
+			"            .accessKey(accessKey)",
+			"            .outputName(OUTPUT_NAME)",
+			"            .templateName(TEMPLATE_NAME)",
+			"            .data(data).build();",
+			"        return new ObjectMapper().writeValueAsString(document);",
+			"    }",
+			"",
+			"    private static ${2:What}Data ${3:methodForBuildingData}(CaseData caseData) {",
+			"        return ${2:What}Data.builder()",
+			"            .build();",
+			"    }"
+		],
+		"description": "Generate PDF - Helper Method"
 	}
 }

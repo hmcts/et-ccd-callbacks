@@ -1,12 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
-import org.elasticsearch.core.List;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondentReplyTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondentReplyType;
-import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-
-import java.util.UUID;
 
 /**
  * Contains helper methods to build a GenericTseApplicationType object. Each method returns an instance of itself for
@@ -43,30 +37,8 @@ public class TseApplicationBuilder {
         return this;
     }
 
-    public TseApplicationBuilder withDocumentUpload(UploadedDocumentType documentUpload) {
-        genericTseApplicationType.setDocumentUpload(documentUpload);
-        return this;
-    }
-
-    public TseApplicationBuilder withDocumentUpload(String filename, String uuid) {
-        genericTseApplicationType.setDocumentUpload(
-            UploadedDocumentBuilder.builder().withFilename(filename).withUuid(uuid).build()
-        );
-        return this;
-    }
-
     public TseApplicationBuilder withDetails(String details) {
         genericTseApplicationType.setDetails(details);
-        return this;
-    }
-
-    public TseApplicationBuilder withCopyToOtherPartyYesOrNo(String copyToOtherPartyYesOrNo) {
-        genericTseApplicationType.setCopyToOtherPartyYesOrNo(copyToOtherPartyYesOrNo);
-        return this;
-    }
-
-    public TseApplicationBuilder withCopyToOtherPartyText(String copyToOtherPartyText) {
-        genericTseApplicationType.setCopyToOtherPartyText(copyToOtherPartyText);
         return this;
     }
 
@@ -77,14 +49,6 @@ public class TseApplicationBuilder {
 
     public TseApplicationBuilder withResponsesCount(String responsesCount) {
         genericTseApplicationType.setResponsesCount(responsesCount);
-        return this;
-    }
-
-    public TseApplicationBuilder withReply(TseRespondentReplyType reply) {
-        TseRespondentReplyTypeItem tseRespondentReplyTypeItem = new TseRespondentReplyTypeItem();
-        tseRespondentReplyTypeItem.setId(UUID.randomUUID().toString());
-        tseRespondentReplyTypeItem.setValue(reply);
-        genericTseApplicationType.setRespondentReply(List.of(tseRespondentReplyTypeItem));
         return this;
     }
 

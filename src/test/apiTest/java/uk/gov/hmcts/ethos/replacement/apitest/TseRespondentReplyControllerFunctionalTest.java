@@ -22,7 +22,6 @@ class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
         caseData.setEthosCaseReference("testCaseReference");
         caseData.setClaimant("claimant");
 
-
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)
             .withCaseId("123")

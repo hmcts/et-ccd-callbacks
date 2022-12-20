@@ -26,6 +26,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TornadoDocumentFilter;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -47,7 +48,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 @RequiredArgsConstructor
 @Service("tornadoService")
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.LawOfDemeter", "PMD.AvoidThrowingNullPointerException",
-    "PMD.ExcessiveImports"})
+    "PMD.ExcessiveImports", "PMD.CyclomaticComplexity"})
 public class TornadoService {
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
@@ -303,6 +304,8 @@ public class TornadoService {
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
             case "Referral Summary.pdf":
                 return ReferralHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            case "TSE Reply.pdf":
+                return TseHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
             default:
                 throw new IllegalArgumentException("Unexpected document name " + documentName);
         }

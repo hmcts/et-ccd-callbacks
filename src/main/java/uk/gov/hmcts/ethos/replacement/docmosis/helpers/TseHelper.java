@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -10,6 +12,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondentReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondentReplyType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,7 +26,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 
 @Slf4j
-public class TseHelper {
+public final class TseHelper {
     public static final String INTRO = "The respondent has applied to <b>%s</b>.</br>%s</br> If you have any "
         + "objections or responses to their application you must send them to the tribunal as soon as possible and by "
         + "%s at the latest.</br></br>If you need more time to respond, you may request more time from the tribunal. If"
@@ -38,6 +42,8 @@ public class TseHelper {
         + "afresh", "Reconsider a judgment", "Withdraw my claim");
     public static final String OPEN = "Open";
     public static final String CLOSED = "Closed";
+    private static final String REPLY_OUTPUT_NAME = "%s Reply.pdf";
+    private static final String REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-01212.docx";
 
     private TseHelper() {
         // Access through static methods
@@ -55,7 +61,7 @@ public class TseHelper {
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
             .filter(r -> r.getValue().getRespondentReply() == null
                 && r.getValue().getStatus() != null
-                && !r.getValue().getStatus().equals(CLOSED)
+                && !CLOSED.equals(r.getValue().getStatus())
             ).map(r -> DynamicValueType.create(
                 r.getValue().getNumber(),
                 r.getValue().getNumber() + " " + r.getValue().getType())
@@ -103,21 +109,6 @@ public class TseHelper {
                 document
             )
         );
-
-        if (genericTseApplicationType.getRespondentReply() == null) {
-            return;
-        }
-
-        TseRespondentReplyType respondentReply = genericTseApplicationType.getRespondentReply().get(0).getValue();
-        if (respondentReply == null) {
-            return;
-        }
-
-        caseData.setTseResponseHasSupportingMaterial(respondentReply.getHasSupportingMaterial());
-        caseData.setTseResponseText(respondentReply.getResponse());
-        caseData.setTseResponseSupportingMaterial(respondentReply.getSupportingMaterial());
-        caseData.setTseResponseCopyToOtherParty(respondentReply.getCopyToOtherParty());
-        caseData.setTseResponseCopyNoGiveDetails(respondentReply.getCopyNoGiveDetails());
     }
 
     /**
@@ -130,19 +121,20 @@ public class TseHelper {
             return;
         }
 
-        TseRespondentReplyType tseRespondentReplyType = new TseRespondentReplyType();
-        tseRespondentReplyType.setResponse(caseData.getTseResponseText());
-        tseRespondentReplyType.setSupportingMaterial(caseData.getTseResponseSupportingMaterial());
-        tseRespondentReplyType.setHasSupportingMaterial(caseData.getTseResponseHasSupportingMaterial());
-        tseRespondentReplyType.setFrom("Respondent");
-        tseRespondentReplyType.setDate(UtilHelper.formatCurrentDate(LocalDate.now()));
-        tseRespondentReplyType.setCopyToOtherParty(caseData.getTseResponseCopyToOtherParty());
-        tseRespondentReplyType.setCopyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails());
-        TseRespondentReplyTypeItem tseRespondentReplyTypeItem = new TseRespondentReplyTypeItem();
-        tseRespondentReplyTypeItem.setId(UUID.randomUUID().toString());
-        tseRespondentReplyTypeItem.setValue(tseRespondentReplyType);
         GenericTseApplicationType genericTseApplicationType = getSelectedApplication(caseData);
-        genericTseApplicationType.setRespondentReply(List.of(tseRespondentReplyTypeItem));
+        genericTseApplicationType.setRespondentReply(List.of(TseRespondentReplyTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(
+                TseRespondentReplyType.builder()
+                    .response(caseData.getTseResponseText())
+                    .supportingMaterial(caseData.getTseResponseSupportingMaterial())
+                    .hasSupportingMaterial(caseData.getTseResponseHasSupportingMaterial())
+                    .from("Respondent")
+                    .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+                    .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
+                    .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
+                    .build()
+            ).build()));
         // TODO: This will need changing when we support admin decisions
         genericTseApplicationType.setResponsesCount("1");
     }
@@ -161,8 +153,42 @@ public class TseHelper {
         caseData.setTseResponseCopyNoGiveDetails(null);
     }
 
-    private static GenericTseApplicationType getSelectedApplication(CaseData caseData) {
+    /**
+     * Gets the select application.
+     * @param caseData contains all the case data
+     * @return the select application
+     */
+    public static GenericTseApplicationType getSelectedApplication(CaseData caseData) {
         return caseData.getGenericTseApplicationCollection()
             .get(Integer.parseInt(caseData.getTseRespondSelectApplication().getValue().getCode()) - 1).getValue();
+    }
+
+    /**
+     * Builds a document request for generating the pdf of the CYA page for responsing to a claimant application.
+     * @param caseData contains all the case data
+     * @param accessKey access key required for docmosis
+     * @return a string representing the api request to docmosis
+     */
+    public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
+        GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
+        TseReplyData data = createDataForTseReply(caseData.getEthosCaseReference(), selectedApplication);
+        TseReplyDocument document = TseReplyDocument.builder()
+            .accessKey(accessKey)
+            .outputName(String.format(REPLY_OUTPUT_NAME, selectedApplication.getType()))
+            .templateName(REPLY_TEMPLATE_NAME)
+            .data(data).build();
+        return new ObjectMapper().writeValueAsString(document);
+    }
+
+    private static TseReplyData createDataForTseReply(String caseId, GenericTseApplicationType application) {
+        TseRespondentReplyType replyType = application.getRespondentReply().get(0).getValue();
+        return TseReplyData.builder()
+            .copy(replyType.getCopyToOtherParty())
+            .caseNumber(caseId)
+            .supportingYesNo(replyType.getHasSupportingMaterial())
+            .type(application.getType())
+            .documentCollection(replyType.getSupportingMaterial())
+            .response(replyType.getResponse())
+            .build();
     }
 }

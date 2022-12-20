@@ -29,6 +29,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RestController
 @RequestMapping("/respondentTSE")
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class RespondentTellSomethingElseController {
 
     private final VerifyTokenService verifyTokenService;

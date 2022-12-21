@@ -12,13 +12,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondentReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondentReplyType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
@@ -57,7 +56,7 @@ class TseResponseControllerTest {
     @MockBean
     private TornadoService tornadoService;
     @MockBean
-    private DocumentManagementService documentManagementService;
+    private EmailService emailService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -66,13 +65,19 @@ class TseResponseControllerTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        CaseDetails caseDetails = CaseDataBuilder.builder()
-            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        CaseData caseData = CaseDataBuilder.builder()
+            .withEthosCaseReference("9876")
+            .withClaimantType("person@email.com")
+            .withRespondent(
+            "respondent", YES, "01-Jan-2003", false)
+            .build();
 
-        caseDetails.getCaseData().setEthosCaseReference("1234");
+        caseData.setClaimant("Claimant LastName");
 
         ccdRequest = CCDRequestBuilder.builder()
-            .withCaseData(caseDetails.getCaseData())
+            .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+            .withCaseId("1234")
+            .withCaseData(caseData)
             .build();
     }
 
@@ -155,8 +160,7 @@ class TseResponseControllerTest {
 
     @Test
     void aboutToSubmit_generatePdf() throws Exception {
-        when(tornadoService.generateEventDocument(any(), any(), any(), any())).thenReturn(null);
-        when(documentManagementService.addDocumentToDocumentField(any())).thenReturn(null);
+        when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseResponseCopyToOtherParty(YES_COPY);

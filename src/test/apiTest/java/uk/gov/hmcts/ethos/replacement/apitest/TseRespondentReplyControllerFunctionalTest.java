@@ -7,20 +7,68 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondentReplyTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespondentReplyType;
 import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationBuilder;
+
+import java.util.List;
+import java.util.UUID;
+
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
+    private static final String YES_COPY = "I confirm I want to copy";
     private CCDRequest ccdRequest;
 
     @BeforeAll
     public void setUpCaseData() {
-        CaseData caseData = new CaseData();
-        caseData.setEthosCaseReference("testCaseReference");
-        caseData.setClaimant("claimant");
+        CaseData caseData = CaseDataBuilder.builder()
+            .withEthosCaseReference("9876")
+            .withClaimantType("person@email.com")
+            .withRespondent(
+                "respondent", YES, "01-Jan-2003", false)
+            .build();
+
+        caseData.setClaimant("claimant Lastname");
+
+        caseData.setTseResponseCopyToOtherParty(YES_COPY);
+
+        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant("Claimant")
+            .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
+            .withDetails("Text").withNumber("1").withResponsesCount("0").withStatus("Open").build();
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
+        genericTseApplicationTypeItem.setValue(build);
+        caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+
+        caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
+        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
+
+        caseData.getGenericTseApplicationCollection().get(0).getValue()
+            .setRespondentReply(List.of(
+                TseRespondentReplyTypeItem.builder()
+                    .id("c0bae193-ded6-4db8-a64d-b260847bcc9b")
+                    .value(
+                        TseRespondentReplyType.builder()
+                            .from("Claimant")
+                            .date("16-May-1996")
+                            .response("response")
+                            .hasSupportingMaterial(NO)
+                            .copyToOtherParty(YES)
+                            .build()
+                    ).build()));
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)

@@ -95,7 +95,10 @@ class RespondentTellSomethingElseServiceTest {
 
     private static final String RES_TSE_FILE_NAME = "resTse.pdf";
 
-    private static final String EXPECTED_TABLE_MARKDOWN = "| No | Application type | Applicant | Application date | Response due | Number of responses | Status |\r\n|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n|1|testType|Respondent|testDate|testDueDate|0|Open|\r\n\r\n";
+    private static final String EXPECTED_TABLE_MARKDOWN = "| No | Application type | Applicant | Application date | "
+        + "Response due | Number of responses | Status "
+        + "|\r\n|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n|1|testType"
+        + "|Respondent|testDate|testDueDate|0|Open|\r\n\r\n";
 
     @BeforeEach
     void setUp() {

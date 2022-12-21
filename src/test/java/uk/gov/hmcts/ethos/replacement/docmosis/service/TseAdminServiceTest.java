@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -32,6 +34,25 @@ class TseAdminServiceTest {
 
     @MockBean
     private DocumentManagementService documentManagementService;
+
+    private CaseData caseData;
+
+    private static final String APP_DETAILS = "| | |\r\n"
+            + "|--|--|\r\n"
+            + "|%s application | %s|\r\n"
+            + "|Application date | %s|\r\n"
+            + "|%s | %s|\r\n"
+            + "|Supporting material | %s|\r\n"
+            + "\r\n";
+    private static final String RESPONSE_DETAILS = "|Response %s | |\r\n"
+            + "|--|--|\r\n"
+            + "|Response from | %s|\r\n"
+            + "|Response date | %s|\r\n"
+            + "|Details | %s|\r\n"
+            + "|Supporting material | %s|\r\n"
+            + "\r\n";
+    private static final String STRING_BR = "<br>";
+    private static final String AUTH_TOKEN = "authToken";
 
     private static final String TEMPLATE_ID = "someTemplateId";
     private static final String CASE_NUMBER = "Some Case Number";
@@ -50,12 +71,12 @@ class TseAdminServiceTest {
     void setUp() {
         tseAdminService = new TseAdminService(emailService, documentManagementService);
         ReflectionTestUtils.setField(tseAdminService, "emailTemplateId", TEMPLATE_ID);
+        caseData = CaseDataBuilder.builder().build();
     }
 
     @ParameterizedTest
     @CsvSource({BOTH, CLAIMANT_ONLY, RESPONDENT_ONLY})
     void sendRecordADecisionEmails(String partyNotified) {
-        CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setEthosCaseReference(CASE_NUMBER);
         createClaimant(caseData);
         createRespondent(caseData);

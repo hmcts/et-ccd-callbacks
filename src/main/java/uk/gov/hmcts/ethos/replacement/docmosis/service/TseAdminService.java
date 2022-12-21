@@ -35,7 +35,6 @@ public class TseAdminService {
             + "|%s | %s|\r\n"
             + "|Supporting material | %s|\r\n"
             + "\r\n";
-
     private static final String RESPONSE_DETAILS = "|Response %s | |\r\n"
             + "|--|--|\r\n"
             + "|Response from | %s|\r\n"
@@ -43,11 +42,11 @@ public class TseAdminService {
             + "|Details | %s|\r\n"
             + "|Supporting material | %s|\r\n"
             + "\r\n";
+    private static final String STRING_BR = "<br>";
 
     private static final String BOTH = "Both parties";
     private static final String CLAIMANT_ONLY = "Claimant only";
     private static final String RESPONDENT_ONLY = "Respondent only";
-    private static final String STRING_BR = "<br>";
 
     /**
      * Initial Application and Respond details table.

@@ -93,6 +93,7 @@ public class TseAdminController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         tseAdminService.sendRecordADecisionEmails(caseData);
+        tseAdminService.clearTseAdminDataFromCaseData(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

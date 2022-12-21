@@ -53,16 +53,17 @@ public class TseAdminService {
      * @param caseData contains all the case data
      */
     public void initialTseAdminTableMarkUp(CaseData caseData, String authToken) {
-        GenericTseApplicationTypeItem applicationTypeItem = getApplication(caseData);
+        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplication(caseData);
         if (applicationTypeItem != null) {
             GenericTseApplicationType applicationType = applicationTypeItem.getValue();
             String appDetails = initialTseAdminAppDetails(applicationType, authToken);
             String responseDetails = initialTseAdminRespondDetails(applicationType, authToken);
             caseData.setTseAdminTableMarkUp(appDetails + responseDetails);
+            // TODO: Add Admin Respond to TseAdminTableMarkUp
         }
     }
 
-    private GenericTseApplicationTypeItem getApplication(CaseData caseData) {
+    private GenericTseApplicationTypeItem getSelectedApplication(CaseData caseData) {
         String selectedAppId = caseData.getTseAdminSelectApplication().getSelectedCode();
         return caseData.getGenericTseApplicationCollection().stream()
                 .filter(genericTseApplicationTypeItem ->
@@ -157,4 +158,24 @@ public class TseAdminService {
         return personalisation;
     }
 
+    /**
+     * Clear Tse Admin Record a Decision Interface data from caseData.
+     * @param caseData in which the case details are extracted from
+     */
+    public void clearTseAdminDataFromCaseData(CaseData caseData) {
+        caseData.setTseAdminSelectApplication(null);
+        caseData.setTseAdminTableMarkUp(null);
+        caseData.setTseAdminEnterNotificationTitle(null);
+        caseData.setTseAdminDecision(null);
+        caseData.setTseAdminDecisionDetails(null);
+        caseData.setTseAdminTypeOfDecision(null);
+        caseData.setTseAdminIsResponseRequired(null);
+        caseData.setTseAdminSelectPartyRespond(null);
+        caseData.setTseAdminAdditionalInformation(null);
+        caseData.setTseAdminResponseRequiredYesDoc(null);
+        caseData.setTseAdminResponseRequiredNoDoc(null);
+        caseData.setTseAdminDecisionMadeBy(null);
+        caseData.setTseAdminDecisionMadeByFullName(null);
+        caseData.setTseAdminSelectPartyNotify(null);
+    }
 }

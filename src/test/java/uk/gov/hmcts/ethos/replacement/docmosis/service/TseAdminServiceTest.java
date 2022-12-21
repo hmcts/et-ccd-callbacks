@@ -1,13 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,6 +13,14 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
 @SuppressWarnings("squid:S5961")
@@ -51,6 +51,7 @@ class TseAdminServiceTest {
         tseAdminService = new TseAdminService(emailService, documentManagementService);
         ReflectionTestUtils.setField(tseAdminService, "emailTemplateId", TEMPLATE_ID);
     }
+
     @ParameterizedTest
     @CsvSource({BOTH, CLAIMANT_ONLY, RESPONDENT_ONLY})
     void sendRecordADecisionEmails(String partyNotified) {

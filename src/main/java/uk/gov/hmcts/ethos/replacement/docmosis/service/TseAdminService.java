@@ -22,6 +22,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TseAdminService {
 
+    @Value("${tse.admin.template.id}")
+    private String emailTemplateId;
+
+    private final EmailService emailService;
+    private final DocumentManagementService documentManagementService;
+
     private static final String APP_DETAILS = "| | |\r\n"
             + "|--|--|\r\n"
             + "|%s application | %s|\r\n"
@@ -38,17 +44,10 @@ public class TseAdminService {
             + "|Supporting material | %s|\r\n"
             + "\r\n";
 
-    private final EmailService emailService;
-
-    @Value("${tse.admin.template.id}")
-    private String emailTemplateId;
-
     private static final String BOTH = "Both parties";
     private static final String CLAIMANT_ONLY = "Claimant only";
     private static final String RESPONDENT_ONLY = "Respondent only";
     private static final String STRING_BR = "<br>";
-
-    private final DocumentManagementService documentManagementService;
 
     /**
      * Initial Application and Respond details table.
@@ -122,7 +121,8 @@ public class TseAdminService {
         Map<String, String> emailsToSend = new HashMap<>();
 
         // if respondent only or both parties: send Respondents Decision Emails
-        if (RESPONDENT_ONLY.equals(caseData.getTseAdminSelectPartyNotify()) || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
+        if (RESPONDENT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
+                || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
             for (RespondentSumTypeItem respondentSumTypeItem: caseData.getRespondentCollection()) {
                 if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
                     emailsToSend.put(respondentSumTypeItem.getValue().getRespondentEmail(),
@@ -132,7 +132,8 @@ public class TseAdminService {
         }
 
         // if claimant only or both parties: send Claimant Decision Email
-        if (CLAIMANT_ONLY.equals(caseData.getTseAdminSelectPartyNotify()) || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
+        if (CLAIMANT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
+                || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
             String claimantName = caseData.getClaimantIndType().getClaimantFirstNames()
                 + " " + caseData.getClaimantIndType().getClaimantLastName();

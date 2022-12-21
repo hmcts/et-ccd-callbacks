@@ -400,7 +400,7 @@ class RespondentTellSomethingElseServiceTest {
         respondentTseType.setType("testType");
         respondentTseType.setCopyToOtherPartyYesOrNo("yes");
         respondentTseType.setCopyToOtherPartyText("text");
-        respondentTseType.setDue("testDueDate");
+        respondentTseType.setDueDate("testDueDate");
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
         tseApplicationTypeItem.setId("id");

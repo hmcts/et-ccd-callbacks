@@ -43,7 +43,7 @@ public class TseApplicationBuilder {
     }
 
     public TseApplicationBuilder withDue(String due) {
-        genericTseApplicationType.setDue(due);
+        genericTseApplicationType.setDueDate(due);
         return this;
     }
 

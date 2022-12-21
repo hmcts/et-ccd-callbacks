@@ -30,6 +30,9 @@ class TseAdminServiceTest {
     @MockBean
     private EmailService emailService;
 
+    @MockBean
+    private DocumentManagementService documentManagementService;
+
     private static final String TEMPLATE_ID = "someTemplateId";
     private static final String CASE_NUMBER = "Some Case Number";
 
@@ -45,7 +48,7 @@ class TseAdminServiceTest {
 
     @BeforeEach
     void setUp() {
-        tseAdminService = new TseAdminService(emailService);
+        tseAdminService = new TseAdminService(emailService, documentManagementService);
         ReflectionTestUtils.setField(tseAdminService, "emailTemplateId", TEMPLATE_ID);
     }
     @ParameterizedTest

@@ -46,6 +46,7 @@ public class TseAdminService {
             + "|Supporting material | %s|\r\n"
             + "\r\n";
     private static final String STRING_BR = "<br>";
+    private static final String APPLICATION_QUESTION = "Give details";
 
     private static final String BOTH = "Both parties";
     private static final String CLAIMANT_ONLY = "Claimant only";
@@ -81,7 +82,7 @@ public class TseAdminService {
                 applicationType.getApplicant(),
                 applicationType.getType(),
                 applicationType.getDate(),
-                "Give details",
+                APPLICATION_QUESTION,
                 applicationType.getDetails(),
                 documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken)
         );
@@ -100,7 +101,8 @@ public class TseAdminService {
                         respondent.getValue().getDate(),
                         respondent.getValue().getResponse(),
                         populateListDocWithInfoAndLink(respondent.getValue().getSupportingMaterial(), authToken)))
-                .collect(Collectors.joining());
+                .findFirst()
+                .orElse(null);
     }
 
     private String populateListDocWithInfoAndLink(List<DocumentTypeItem> supportingMaterial, String authToken) {

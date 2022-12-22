@@ -53,6 +53,7 @@ class TseAdminControllerTest {
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseDetails.getCaseData().setEthosCaseReference("1234");
+        caseDetails.setCaseId("4321");
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseDetails.getCaseData())
@@ -102,7 +103,9 @@ class TseAdminControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(tseAdminService).sendRecordADecisionEmails(ccdRequest.getCaseDetails().getCaseData());
+        verify(tseAdminService).sendRecordADecisionEmails(
+            ccdRequest.getCaseDetails().getCaseId(),
+            ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -113,7 +116,9 @@ class TseAdminControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isForbidden());
-        verify(tseAdminService, never()).sendRecordADecisionEmails(ccdRequest.getCaseDetails().getCaseData());
+        verify(tseAdminService, never()).sendRecordADecisionEmails(
+            ccdRequest.getCaseDetails().getCaseId(),
+            ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -123,6 +128,8 @@ class TseAdminControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
-        verify(tseAdminService, never()).sendRecordADecisionEmails(ccdRequest.getCaseDetails().getCaseData());
+        verify(tseAdminService, never()).sendRecordADecisionEmails(
+            ccdRequest.getCaseDetails().getCaseId(),
+            ccdRequest.getCaseDetails().getCaseData());
     }
 }

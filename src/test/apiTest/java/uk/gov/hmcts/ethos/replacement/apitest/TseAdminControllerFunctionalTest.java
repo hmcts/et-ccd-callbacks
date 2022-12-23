@@ -37,7 +37,6 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
             .withCaseData(caseData)
             .withCaseId("123")
             .build();
-
     }
 
     @Test

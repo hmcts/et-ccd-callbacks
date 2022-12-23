@@ -12,13 +12,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -37,6 +40,18 @@ public class RespondentTellSomethingElseController {
     private final RespondentTellSomethingElseService resTseService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
+
+    private static final String YES = "I confirm I want to copy";
+    private static final String APPLICATION_COMPLETE_RULE92_ANSWERED_NO = "<hr>"
+        + "<h3>What happens next</h3>"
+        + "<p>The tribunal will consider all correspondence and let you know what happens next.</p>";
+
+    private static final String APPLICATION_COMPLETE_RULE92_ANSWERED_YES = "<hr>"
+        + "<h3>What happens next</h3>"
+        + "<p>You have sent a copy of your application to the claimant. They will have until %s to respond.</p>"
+        + "<p>If they do respond, they are expected to copy their response to you.</p>"
+        + "<p>You may be asked to supply further information. "
+        + "The tribunal will consider all correspondence and let you know what happens next.</p>";
 
     public RespondentTellSomethingElseController(
         VerifyTokenService verifyTokenService,
@@ -103,8 +118,6 @@ public class RespondentTellSomethingElseController {
         // send Respondent confirmation Email
         resTseService.sendAcknowledgeEmailAndGeneratePdf(caseDetails, userToken);
 
-        // send Claimant copy of Application Email
-
         resTseService.createRespondentApplication(caseDetails.getCaseData());
 
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
@@ -134,4 +147,48 @@ public class RespondentTellSomethingElseController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * Called after submitting a create application event.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with confirmation header and body
+     */
+    @PostMapping(value = "/completeApplication", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "completes the reply to referral event flow")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> completeApplication(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        List<GenericTseApplicationTypeItem> tseApplicationCollection =
+            ccdRequest.getCaseDetails().getCaseData().getGenericTseApplicationCollection();
+        GenericTseApplicationTypeItem latestTSEApplication =
+            tseApplicationCollection.get(tseApplicationCollection.size() - 1);
+
+        String body;
+        if (YES.equals(latestTSEApplication.getValue().getCopyToOtherPartyYesOrNo())) {
+            body = String.format(APPLICATION_COMPLETE_RULE92_ANSWERED_YES,
+                UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
+        } else {
+            body = APPLICATION_COMPLETE_RULE92_ANSWERED_NO;
+        }
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+            .confirmation_body(body)
+            .build());
+    }
 }

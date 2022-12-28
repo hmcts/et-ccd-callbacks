@@ -10,8 +10,9 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,8 +23,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TseAdminService {
 
-    @Value("${tse.admin.template.id}")
-    private String emailTemplateId;
+    @Value("${tse.admin.claimant.template.id}")
+    private String emailToClaimantTemplateId;
+    @Value("${tse.admin.respondent.template.id}")
+    private String emailToRespondentTemplateId;
 
     private final EmailService emailService;
     private final DocumentManagementService documentManagementService;
@@ -43,6 +46,7 @@ public class TseAdminService {
             + "|Supporting material | %s|\r\n"
             + "\r\n";
     private static final String STRING_BR = "<br>";
+    private static final String APPLICATION_QUESTION = "Give details";
 
     private static final String BOTH = "Both parties";
     private static final String CLAIMANT_ONLY = "Claimant only";
@@ -78,7 +82,7 @@ public class TseAdminService {
                 applicationType.getApplicant(),
                 applicationType.getType(),
                 applicationType.getDate(),
-                "Give details",
+                APPLICATION_QUESTION,
                 applicationType.getDetails(),
                 documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken)
         );
@@ -97,7 +101,8 @@ public class TseAdminService {
                         respondent.getValue().getDate(),
                         respondent.getValue().getResponse(),
                         populateListDocWithInfoAndLink(respondent.getValue().getSupportingMaterial(), authToken)))
-                .collect(Collectors.joining());
+                .findFirst()
+                .orElse(null);
     }
 
     private String populateListDocWithInfoAndLink(List<DocumentTypeItem> supportingMaterial, String authToken) {
@@ -115,18 +120,23 @@ public class TseAdminService {
      * Uses {@link EmailService} to generate an email.
      * @param caseData in which the case details are extracted from
      */
-    public void sendRecordADecisionEmails(CaseData caseData) {
+    public void sendRecordADecisionEmails(String caseId, CaseData caseData) {
         String caseNumber = caseData.getEthosCaseReference();
 
-        Map<String, String> emailsToSend = new HashMap<>();
+        List<TSEAdminEmailRecipientsData> emailsToSend = new ArrayList<>();
 
         // if respondent only or both parties: send Respondents Decision Emails
         if (RESPONDENT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
                 || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
             for (RespondentSumTypeItem respondentSumTypeItem: caseData.getRespondentCollection()) {
                 if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
-                    emailsToSend.put(respondentSumTypeItem.getValue().getRespondentEmail(),
-                        respondentSumTypeItem.getValue().getRespondentName());
+                    TSEAdminEmailRecipientsData respondentDetails =
+                        new TSEAdminEmailRecipientsData(
+                            emailToRespondentTemplateId,
+                            respondentSumTypeItem.getValue().getRespondentEmail(),
+                            respondentSumTypeItem.getValue().getRespondentName());
+
+                    emailsToSend.add(respondentDetails);
                 }
             }
         }
@@ -139,22 +149,29 @@ public class TseAdminService {
                 + " " + caseData.getClaimantIndType().getClaimantLastName();
 
             if (claimantEmail != null) {
-                emailsToSend.put(claimantEmail, claimantName);
+                TSEAdminEmailRecipientsData claimantDetails =
+                    new TSEAdminEmailRecipientsData(
+                        emailToClaimantTemplateId,
+                        claimantEmail,
+                        claimantName);
+
+                emailsToSend.add(claimantDetails);
             }
         }
 
-        for (Map.Entry<String, String> emailRecipient : emailsToSend.entrySet()) {
+        for (final TSEAdminEmailRecipientsData emailRecipient : emailsToSend) {
             emailService.sendEmail(
-                emailTemplateId,
-                emailRecipient.getKey(),
-                buildPersonalisation(caseNumber, emailRecipient.getValue()));
+                emailRecipient.getRecipientTemplate(),
+                emailRecipient.getRecipientEmail(),
+                buildPersonalisation(caseNumber, caseId, emailRecipient.getRecipientName()));
         }
     }
 
-    private Map<String, String> buildPersonalisation(String caseNumber, String name) {
+    private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String recipientName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseNumber);
-        personalisation.put("name", name);
+        personalisation.put("caseId", caseId);
+        personalisation.put("name", recipientName);
         return personalisation;
     }
 

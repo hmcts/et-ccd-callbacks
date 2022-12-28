@@ -1,15 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +16,16 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
+
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({TseAdminController.class, JsonMapper.class})
@@ -53,6 +53,7 @@ class TseAdminControllerTest {
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseDetails.getCaseData().setEthosCaseReference("1234");
+        caseDetails.setCaseId("4321");
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseDetails.getCaseData())
@@ -102,7 +103,9 @@ class TseAdminControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(tseAdminService).sendRecordADecisionEmails(ccdRequest.getCaseDetails().getCaseData());
+        verify(tseAdminService).sendRecordADecisionEmails(
+            ccdRequest.getCaseDetails().getCaseId(),
+            ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -113,7 +116,9 @@ class TseAdminControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isForbidden());
-        verify(tseAdminService, never()).sendRecordADecisionEmails(ccdRequest.getCaseDetails().getCaseData());
+        verify(tseAdminService, never()).sendRecordADecisionEmails(
+            ccdRequest.getCaseDetails().getCaseId(),
+            ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -123,6 +128,8 @@ class TseAdminControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
-        verify(tseAdminService, never()).sendRecordADecisionEmails(ccdRequest.getCaseDetails().getCaseData());
+        verify(tseAdminService, never()).sendRecordADecisionEmails(
+            ccdRequest.getCaseDetails().getCaseId(),
+            ccdRequest.getCaseDetails().getCaseData());
     }
 }

@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,6 +19,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdminHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdminService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
  * REST controller for the Response to an Application event.
@@ -88,7 +88,7 @@ public class TseAdminController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        tseAdminService.sendRecordADecisionEmails(caseData);
+        tseAdminService.sendRecordADecisionEmails(ccdRequest.getCaseDetails().getCaseId(), caseData);
         tseAdminService.clearTseAdminDataFromCaseData(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);

@@ -7,7 +7,7 @@ module.exports = async function (clerkResponsible, physicalLocation, conciliatio
     await I.selectOption('#clerkResponsible', clerkResponsible);
     await I.selectOption('#fileLocation', physicalLocation)
     await I.selectOption('#conciliationTrack', conciliationTrack)
-    await I.navByClick(commonConfig.continue);
-    await I.navByClick(commonConfig.continue);
+    await I.click(commonConfig.continue);
+    await I.click(commonConfig.continue);
     await I.click(commonConfig.submit);
 };

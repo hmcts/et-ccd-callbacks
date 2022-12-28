@@ -26,7 +26,7 @@ public class ServingService {
     public static final String SERVING_DOCUMENT_OTHER_TYPE = "Another type of document";
     private static final String SERVING_RECIPIENT_CLAIMANT = "Claimant";
     private static final String SERVING_RECIPIENT_RESPONDENT = "Respondent";
-    private static final String ACAS_MAILTO_LINK = "mailto:ET3@acas.org.uk?subject={0}&body=Parties%20in%20claim"
+    private static final String ACAS_MAILTO_LINK = "mailto:etsmail@acas.org.uk?subject={0}&body=Parties%20in%20claim"
             + "%3A%20{1}%20vs%20{2}%0D%0ACase%20reference%20number%3A%20{3}%0D%0A%0D%0ADear%20Acas%2C%0D%0A%0D%0AThe%"
             + "20tribunal%20has%20completed%20{4}%20to%20the%20{5}.%0D%0A%0D%0AThe%20documents%20we"
             + "%20sent%20are%20attached%20to%20this%20email.%0D%0A%0D%0A";
@@ -42,6 +42,9 @@ public class ServingService {
 
     @Value("${et1Serving.template.id}")
     private String templateId;
+
+    @Value("${et1Serving.respondent.template.id}")
+    private String respondentTemplateId;
 
     private final EmailService emailService;
 
@@ -118,7 +121,7 @@ public class ServingService {
                 if (isNullOrEmpty(respondent.get(EMAIL_ADDRESS))) {
                     return;
                 }
-                emailService.sendEmail(templateId, respondent.get(EMAIL_ADDRESS), respondent);
+                emailService.sendEmail(respondentTemplateId, respondent.get(EMAIL_ADDRESS), respondent);
             });
 
         if (isNullOrEmpty(claimant.get(EMAIL_ADDRESS))) {

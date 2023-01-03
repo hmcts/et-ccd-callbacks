@@ -378,14 +378,14 @@ class RespondentTellSomethingElseServiceTest {
     void displayRespondentApplicationsTable_hasApplications() {
         CaseData caseData = createCaseData("Amend response", NO);
         caseData.setGenericTseApplicationCollection(generateGenericTseApplicationList());
-        
+
         assertThat(respondentTellSomethingElseService.generateTableMarkdown(caseData), is(EXPECTED_TABLE_MARKDOWN));
     }
 
     @Test
     void displayRespondentApplicationsTable_hasNoApplications() {
         CaseData caseData = createCaseData("Amend response", NO);
-        
+
         assertThat(respondentTellSomethingElseService.generateTableMarkdown(caseData), is(""));
     }
 
@@ -400,7 +400,7 @@ class RespondentTellSomethingElseServiceTest {
         respondentTseType.setType("testType");
         respondentTseType.setCopyToOtherPartyYesOrNo("yes");
         respondentTseType.setCopyToOtherPartyText("text");
-        respondentTseType.setDue("testDueDate");
+        respondentTseType.setDueDate("testDueDate");
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
         tseApplicationTypeItem.setId("id");
@@ -408,7 +408,7 @@ class RespondentTellSomethingElseServiceTest {
 
         List<GenericTseApplicationTypeItem> tseApplicationCollection = new ArrayList<>();
         tseApplicationCollection.add(tseApplicationTypeItem);
-        
+
         return tseApplicationCollection;
     }
 

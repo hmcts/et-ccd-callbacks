@@ -196,7 +196,7 @@ public class RespondentTellSomethingElseService {
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
 
         respondentTseType.setDate(UtilHelper.formatCurrentDate(LocalDate.now()));
-        respondentTseType.setDue(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
+        respondentTseType.setDueDate(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
         respondentTseType.setResponsesCount("0");
         respondentTseType.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
         respondentTseType.setApplicant(APPLICANT_RESPONDENT);
@@ -206,7 +206,7 @@ public class RespondentTellSomethingElseService {
         respondentTseType.setCopyToOtherPartyText(caseData.getResTseCopyToOtherPartyTextArea());
         respondentTseType.setStatus(OPEN);
 
-        respondentTseType.setDue(
+        respondentTseType.setDueDate(
             UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)
         );
 
@@ -291,7 +291,7 @@ public class RespondentTellSomethingElseService {
                 || (a.getValue().getApplicant().equals(APPLICANT_CLAIMANT)
                 && a.getValue().getCopyToOtherPartyYesOrNo().equals(RULE92_YES)))
             .map(a -> String.format(TABLE_ROW_MARKDOWN, atomicInteger.getAndIncrement(), a.getValue().getType(),
-                a.getValue().getApplicant(), a.getValue().getDate(), a.getValue().getDue(), 0,
+                a.getValue().getApplicant(), a.getValue().getDate(), a.getValue().getDueDate(), 0,
                 Optional.ofNullable(a.getValue().getStatus()).orElse("Open")))
             .collect(Collectors.joining());
 

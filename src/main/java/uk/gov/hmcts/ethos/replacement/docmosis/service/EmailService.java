@@ -27,10 +27,9 @@ public class EmailService {
      * @param emailAddress The email address of the recipient.
      * @param personalisation A map of values that contains the personalised information.
      */
-    public void sendEmail(String templateId, String emailAddress, Map<String, String> personalisation) {
+    public void sendEmail(String templateId, String emailAddress, Map<String, ?> personalisation) {
 
         String referenceId = UUID.randomUUID().toString();
-
         try {
             emailClient.sendEmail(
                 templateId,

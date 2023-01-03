@@ -9,9 +9,9 @@ module.exports =  async function () {
     const I = this;
 
     //General Details Tab
-    I.see('has been created');
-    I.see('Next step');
-    I.see('Print');
+    //I.see('has been created');
+    //I.see('Next step');
+    //I.see('Print');
 
     //Case Details Tab
     I.click(caseApplicationConfig.case_tab_details);

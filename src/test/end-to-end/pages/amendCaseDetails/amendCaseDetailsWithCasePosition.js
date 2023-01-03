@@ -8,8 +8,8 @@ module.exports = async function (clerkResponsible, casePosition, physicalLocatio
     await I.selectOption('#positionType', casePosition);
     await I.selectOption('#fileLocation', physicalLocation);
     await I.selectOption('#conciliationTrack', conciliationTrack);
-    await I.navByClick(commonConfig.continue);
-    await I.navByClick(commonConfig.continue);
+    await I.click(commonConfig.continue);
+    await I.click(commonConfig.continue);
     await I.click(commonConfig.submit);
     await I.see(commonConfig.moveAcceptedCaseToCloseCaseErrorCheck);
 };

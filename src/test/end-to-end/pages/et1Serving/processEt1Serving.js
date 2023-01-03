@@ -11,8 +11,8 @@ module.exports =  async function () {
     await I.click(et1Config.et1Select_document_type);
     await I.selectOption(et1Config.et1Select_document_type, '2.6 Notice of Claim');
     await I.attachFile(et1Config.et1UploadET1ServingDocument, 'data/RET-1950_3.png');
-    I.wait(5)
     await I.fillField(et1Config.et1ShortDescription, 'blah');
+    I.wait(5)
     await I.click(commonConfig.continueButton);
     I.wait(2);
     I.waitForVisible(commonConfig.continueButton, 15)

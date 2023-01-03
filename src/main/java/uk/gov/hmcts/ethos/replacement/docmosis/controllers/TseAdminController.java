@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -92,7 +88,9 @@ public class TseAdminController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        tseAdminService.saveTseAdminDataFromCaseData(caseData);
         tseAdminService.sendRecordADecisionEmails(caseData);
+        tseAdminService.clearTseAdminDataFromCaseData(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

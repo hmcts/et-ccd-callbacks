@@ -440,6 +440,7 @@ class ReferralHelperTest {
         personalisation.put("refNumber", "1");
         personalisation.put("subject", "ET1");
         personalisation.put("username", "First Last");
+        personalisation.put("replyReferral", "Referred by");
         return personalisation;
     }
 

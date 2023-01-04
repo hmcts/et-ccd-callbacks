@@ -9,5 +9,5 @@ module.exports =  async function () {
     I.see('Is the Claimant Represented?');
     I.checkOption(caseRepConfig.is_the_claimant_represented);
 
-    I.navByClick(commonConfig.continueButton);
+    I.click(commonConfig.continueButton);
 }

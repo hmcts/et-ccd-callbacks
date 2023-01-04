@@ -35,5 +35,5 @@ module.exports =  async function () {
     I.fillField(caseOtherDetails.disabilities_please_provide_details, 'Has a condition');
 
 
-    I.navByClick(commonConfig.continueButton);
+    I.click(commonConfig.continueButton);
 }

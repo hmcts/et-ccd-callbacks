@@ -285,7 +285,7 @@ public class RespondentTellSomethingElseService {
                 || (a.getValue().getApplicant().equals(APPLICANT_CLAIMANT)
                 && a.getValue().getCopyToOtherPartyYesOrNo().equals(RULE92_YES)))
             .map(a -> String.format(TABLE_ROW_MARKDOWN, atomicInteger.getAndIncrement(), a.getValue().getType(),
-                a.getValue().getApplicant(), a.getValue().getDate(), a.getValue().getDueDate(), 0,
+                a.getValue().getApplicant(), a.getValue().getDate(), a.getValue().getDueDateDate(), 0,
                 Optional.ofNullable(a.getValue().getStatus()).orElse("Open")))
             .collect(Collectors.joining());
 

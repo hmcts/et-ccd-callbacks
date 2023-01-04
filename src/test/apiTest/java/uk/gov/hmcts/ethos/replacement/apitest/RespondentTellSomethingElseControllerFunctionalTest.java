@@ -9,16 +9,21 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
+    private static final String NO = "I do not want to copy";
 
     private CCDRequest ccdRequest;
 
@@ -27,15 +32,15 @@ class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctional
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("testCaseReference");
         caseData.setResTseSelectApplication("Amend response");
-        caseData.setResTseCopyToOtherPartyYesOrNo("I do not want to copy");
+        caseData.setResTseCopyToOtherPartyYesOrNo(NO);
         caseData.setClaimant("claimant");
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
+        caseData.setGenericTseApplicationCollection(createApplicationCollection());
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)
             .withCaseId("123")
             .build();
-        
     }
 
     @Test
@@ -77,6 +82,20 @@ class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctional
             .log().all(true);
     }
 
+    @Test
+    void shouldReceiveSuccessResponseWhenCompleteApplicationInvoked() {
+        RestAssured.given()
+            .spec(spec)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(ccdRequest)
+            .post("/respondentTSE/completeApplication")
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log()
+            .all(true);
+    }
+
     private RespondentSumTypeItem createRespondentType() {
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName("Boris Johnson");
@@ -84,5 +103,16 @@ class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctional
         respondentSumTypeItem.setValue(respondentSumType);
 
         return respondentSumTypeItem;
+    }
+
+    private List<GenericTseApplicationTypeItem> createApplicationCollection() {
+        GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
+        respondentTseType.setCopyToOtherPartyYesOrNo(NO);
+
+        GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        tseApplicationTypeItem.setId(UUID.randomUUID().toString());
+        tseApplicationTypeItem.setValue(respondentTseType);
+
+        return new ArrayList<>(Collections.singletonList(tseApplicationTypeItem));
     }
 }

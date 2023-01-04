@@ -4,19 +4,24 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.json.JSONObject;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondentReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondentReplyType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument;
+import uk.gov.service.notify.NotificationClient;
+import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -178,6 +183,24 @@ public final class TseHelper {
             .templateName(REPLY_TEMPLATE_NAME)
             .data(data).build();
         return new ObjectMapper().writeValueAsString(document);
+    }
+
+    public static Map<String, Object> getPersonalisationForResponse(CaseDetails caseDetails, byte[] document)
+        throws NotificationClientException {
+        CaseData caseData = caseDetails.getCaseData();
+        GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
+        TseRespondentReplyType replyType = selectedApplication.getRespondentReply().get(0).getValue();
+        JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
+
+        return Map.of(
+            "ccdId", caseDetails.getCaseId(),
+            "caseNumber", caseData.getEthosCaseReference(),
+            "applicationType", selectedApplication.getType(),
+            "response", isNullOrEmpty(replyType.getResponse()) ? "" : replyType.getResponse(),
+            "claimant", caseData.getClaimant(),
+            "respondents", Helper.getRespondentNames(caseData),
+            "linkToDocument", documentJson
+        );
     }
 
     private static TseReplyData createDataForTseReply(String caseId, GenericTseApplicationType application) {

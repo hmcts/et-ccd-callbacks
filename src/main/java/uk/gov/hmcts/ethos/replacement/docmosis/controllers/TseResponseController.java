@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,11 +18,13 @@ import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -29,7 +32,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
- * REST controller for the Respond to an Application event.
+ * REST controller for the "Respond to an Application" event.
  */
 @Slf4j
 @RequestMapping("/tseResponse")
@@ -38,10 +41,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class TseResponseController {
 
+    @Value("${tseRespondentResponse.template.id}")
+    private String emailTemplateId;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
     private final TornadoService tornadoService;
-    private final DocumentManagementService documentManagementService;
+    private final EmailService emailService;
     private static final String SUBMITTED_BODY = "### What happens next \r\n\r\nYou have sent your response to the"
         + " tribunal%s.\r\n\r\nThe tribunal will consider all correspondence and let you know what happens next.";
     private static final String SUBMITTED_COPY = " and copied it to the claimant";
@@ -140,15 +145,16 @@ public class TseResponseController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
         TseHelper.saveReplyToApplication(caseData);
 
         if (YES_COPY.equals(caseData.getTseResponseCopyToOtherParty())) {
             try {
-                DocumentInfo documentInfo = tornadoService.generateEventDocument(caseData, userToken, "",
-                    "TSE Reply.pdf");
-                TseHelper.getSelectedApplication(caseData).getRespondentReply().get(0).getValue()
-                     .setSummaryPdf(documentManagementService.addDocumentToDocumentField(documentInfo));
+                byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", "TSE Reply.pdf");
+                String email = caseData.getClaimantType().getClaimantEmailAddress();
+                Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails, bytes);
+                emailService.sendEmail(emailTemplateId, email, personalisation);
             } catch (Exception e) {
                 throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
             }

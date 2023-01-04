@@ -55,6 +55,7 @@ class TseAdminServiceTest {
 
     private static final String TEMPLATE_ID = "someTemplateId";
     private static final String CASE_NUMBER = "Some Case Number";
+    private static final String CASE_ID = "4321";
 
     private static final String BOTH = "Both parties";
     private static final String CLAIMANT_ONLY = "Claimant only";
@@ -71,7 +72,8 @@ class TseAdminServiceTest {
     @BeforeEach
     void setUp() {
         tseAdminService = new TseAdminService(emailService, documentManagementService);
-        ReflectionTestUtils.setField(tseAdminService, "emailTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(tseAdminService, "emailToClaimantTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(tseAdminService, "emailToRespondentTemplateId", TEMPLATE_ID);
         caseData = CaseDataBuilder.builder().build();
     }
 
@@ -331,7 +333,6 @@ class TseAdminServiceTest {
     @ParameterizedTest
     @CsvSource({BOTH, CLAIMANT_ONLY, RESPONDENT_ONLY})
     void sendRecordADecisionEmails(String partyNotified) {
-        CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setEthosCaseReference(CASE_NUMBER);
         createClaimant(caseData);
         createRespondent(caseData);
@@ -339,9 +340,10 @@ class TseAdminServiceTest {
 
         Map<String, String> expectedPersonalisationClaimant =
             createPersonalisation(caseData, CLAIMANT_FIRSTNAME + " " + CLAIMANT_LASTNAME);
-        Map<String, String> expectedPersonalisationRespondent = createPersonalisation(caseData, RESPONDENT_NAME);
+        Map<String, String> expectedPersonalisationRespondent =
+            createPersonalisation(caseData, RESPONDENT_NAME);
 
-        tseAdminService.sendRecordADecisionEmails(caseData);
+        tseAdminService.sendRecordADecisionEmails(CASE_ID, caseData);
 
         if (CLAIMANT_ONLY.equals(partyNotified)) {
             verify(emailService).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL, expectedPersonalisationClaimant);
@@ -382,6 +384,7 @@ class TseAdminServiceTest {
                                                       String expectedName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
+        personalisation.put("caseId", CASE_ID);
         personalisation.put("name", expectedName);
         return personalisation;
     }

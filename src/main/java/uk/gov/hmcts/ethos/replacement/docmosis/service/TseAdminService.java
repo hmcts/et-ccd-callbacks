@@ -15,10 +15,10 @@ import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,8 +32,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @RequiredArgsConstructor
 public class TseAdminService {
 
-    @Value("${tse.admin.template.id}")
-    private String emailTemplateId;
+    @Value("${tse.admin.claimant.template.id}")
+    private String emailToClaimantTemplateId;
+    @Value("${tse.admin.respondent.template.id}")
+    private String emailToRespondentTemplateId;
 
     private final EmailService emailService;
     private final DocumentManagementService documentManagementService;
@@ -171,44 +173,58 @@ public class TseAdminService {
      * Uses {@link EmailService} to generate an email.
      * @param caseData in which the case details are extracted from
      */
-    public void sendRecordADecisionEmails(CaseData caseData) {
+    public void sendRecordADecisionEmails(String caseId, CaseData caseData) {
         String caseNumber = caseData.getEthosCaseReference();
 
-        Map<String, String> emailsToSend = new HashMap<>();
+        List<TSEAdminEmailRecipientsData> emailsToSend = new ArrayList<>();
 
         // if respondent only or both parties: send Respondents Decision Emails
-        if (RESPONDENT_ONLY.equals(caseData.getTseAdminSelectPartyNotify()) || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
+        if (RESPONDENT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
+                || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
             for (RespondentSumTypeItem respondentSumTypeItem: caseData.getRespondentCollection()) {
                 if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
-                    emailsToSend.put(respondentSumTypeItem.getValue().getRespondentEmail(),
-                        respondentSumTypeItem.getValue().getRespondentName());
+                    TSEAdminEmailRecipientsData respondentDetails =
+                        new TSEAdminEmailRecipientsData(
+                            emailToRespondentTemplateId,
+                            respondentSumTypeItem.getValue().getRespondentEmail(),
+                            respondentSumTypeItem.getValue().getRespondentName());
+
+                    emailsToSend.add(respondentDetails);
                 }
             }
         }
 
         // if claimant only or both parties: send Claimant Decision Email
-        if (CLAIMANT_ONLY.equals(caseData.getTseAdminSelectPartyNotify()) || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
+        if (CLAIMANT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
+                || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
             String claimantName = caseData.getClaimantIndType().getClaimantFirstNames()
                 + " " + caseData.getClaimantIndType().getClaimantLastName();
 
             if (claimantEmail != null) {
-                emailsToSend.put(claimantEmail, claimantName);
+                TSEAdminEmailRecipientsData claimantDetails =
+                    new TSEAdminEmailRecipientsData(
+                        emailToClaimantTemplateId,
+                        claimantEmail,
+                        claimantName);
+
+                emailsToSend.add(claimantDetails);
             }
         }
 
-        for (Map.Entry<String, String> emailRecipient : emailsToSend.entrySet()) {
+        for (final TSEAdminEmailRecipientsData emailRecipient : emailsToSend) {
             emailService.sendEmail(
-                emailTemplateId,
-                emailRecipient.getKey(),
-                buildPersonalisation(caseNumber, emailRecipient.getValue()));
+                emailRecipient.getRecipientTemplate(),
+                emailRecipient.getRecipientEmail(),
+                buildPersonalisation(caseNumber, caseId, emailRecipient.getRecipientName()));
         }
     }
 
-    private Map<String, String> buildPersonalisation(String caseNumber, String name) {
+    private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String recipientName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseNumber);
-        personalisation.put("name", name);
+        personalisation.put("caseId", caseId);
+        personalisation.put("name", recipientName);
         return personalisation;
     }
 

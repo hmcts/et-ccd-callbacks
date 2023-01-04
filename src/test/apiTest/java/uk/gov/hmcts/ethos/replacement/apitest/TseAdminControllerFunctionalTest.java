@@ -20,6 +20,7 @@ import java.util.Collections;
 class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
     private static final String ABOUT_TO_START_URL = "/tseAdmin/aboutToStart";
+    private static final String MID_DETAILS_TABLE = "/tseAdmin/midDetailsTable";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmin/aboutToSubmit";
 
     private CCDRequest ccdRequest;
@@ -37,7 +38,6 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
             .withCaseData(caseData)
             .withCaseId("123")
             .build();
-
     }
 
     @Test
@@ -55,6 +55,20 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
     }
 
     @Test
+    void midDetailsTableSuccessResponse() {
+        RestAssured.given()
+                .spec(spec)
+                .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, userToken))
+                .body(ccdRequest)
+                .post(MID_DETAILS_TABLE)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .log()
+                .all(true);
+    }
+
+    @Test
     void aboutToSubmitSuccessResponse() {
         RestAssured.given()
             .spec(spec)
@@ -62,6 +76,20 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
             .header(new Header(AUTHORIZATION, userToken))
             .body(ccdRequest)
             .post(ABOUT_TO_SUBMIT_URL)
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log()
+            .all(true);
+    }
+
+    @Test
+    void submittedSuccessResponse() {
+        RestAssured.given()
+            .spec(spec)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(ccdRequest)
+            .post("/tseAdmin/submitted")
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log()

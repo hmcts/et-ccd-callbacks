@@ -109,13 +109,15 @@
 			"    ",
 			"}",
 			"",
-		]
+		],
+		"description": "Controller Test - File"
 	},
 	"Controller Test - MockBean": {
 		"body": [
 			"@MockBean",
 			"private ${1:ServiceName} ${1/(.)(.*)/${1:/downcase}$2/};",
-		]
+		],
+		"description": "Controller Test - MockBean"
 	},
 	"Controller Test - Add Route": {
 		"body": [
@@ -153,7 +155,8 @@
 			"    }",
 			"    ",
 			""
-		]
+		],
+		"description": "Controller Test - Add Route"
 	},
 	"Helper Test - File": {
 		"body": [
@@ -201,7 +204,7 @@
 			"}",
 			""
 		],
-		"description": "Helper Test File"
+		"description": "Helper Test - File"
 	},
 	"Helper Test - Single Test": {
 		"body": [
@@ -213,7 +216,7 @@
 			"    assertThat(actual, is(expected));",
 			"}"
 		],
-		"description": "Helper Test File"
+		"description": "Helper Test - Single Test"
 	},
 	"Controller Code - Add Endpoint": {
 		"prefix": "controllerEndpoint",
@@ -292,7 +295,7 @@
 			"    private final VerifyTokenService verifyTokenService;",
 			"}"
 		],
-		"description": ""
+		"description": "Controller Code - File"
 	},
 	"Test Builder - File": {
 		"prefix": "",
@@ -411,5 +414,24 @@
 			"    }"
 		],
 		"description": "Generate PDF - Helper Method"
+	},
+	"Controller Test (API) - Add Endpoint": {
+		"prefix": "",
+		"body": [
+			"    @Test",
+			"    void ${2:endPoint}SuccessResponse() {",
+			"        RestAssured.given()",
+			"            .spec(spec)",
+			"            .contentType(ContentType.JSON)",
+			"            .header(new Header(AUTHORIZATION, userToken))",
+			"            .body(ccdRequest)",
+			"            .post(${1:url})",
+			"            .then()",
+			"            .statusCode(HttpStatus.SC_OK)",
+			"            .log()",
+			"            .all(true);",
+			"    }"
+		],
+		"description": "Controller Test (API) - Add Endpoint"
 	}
 }

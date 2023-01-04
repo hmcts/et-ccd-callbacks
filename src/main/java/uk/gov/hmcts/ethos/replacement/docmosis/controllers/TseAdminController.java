@@ -89,6 +89,7 @@ public class TseAdminController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        tseAdminService.saveTseAdminDataFromCaseData(caseData);
         tseAdminService.sendRecordADecisionEmails(caseData);
         tseAdminService.clearTseAdminDataFromCaseData(caseData);
 
@@ -129,8 +130,15 @@ public class TseAdminController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
-    @PostMapping(value = "/displayCloseApplicationTable", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "To display the selected application details for close application event.")
+     /**
+     * Returns data needed to populate the submitted page.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Populates data for the submitted page")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -140,7 +148,7 @@ public class TseAdminController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> displayCloseApplicationTable(
+    public ResponseEntity<CCDCallbackResponse> submitted(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader(value = "Authorization") String userToken) {
 
@@ -149,11 +157,12 @@ public class TseAdminController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setTseAdminCloseApplicationTable(
-            tseAdminService
-                .generateCloseApplicationDetailsMarkdown(caseData, userToken));
+        String body = String.format("### What happens next\r\n\r\nYou can view the decision in the <a " + "href" +
+            "=\"/cases/case-details/%s#Applications\" target=\"_blank\">Applications tab (opens in new tab)</a>",
+            ccdRequest.getCaseDetails().getCaseId());
 
-        return getCallbackRespEntityNoErrors(caseData);
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+            .confirmation_body(body)
+            .build());
     }
 }

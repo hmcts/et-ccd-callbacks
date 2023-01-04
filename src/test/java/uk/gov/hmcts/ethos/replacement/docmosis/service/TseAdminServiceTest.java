@@ -41,14 +41,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(SpringExtension.class)
 @SuppressWarnings("squid:S5961")
 class TseAdminServiceTest {
@@ -222,10 +214,6 @@ class TseAdminServiceTest {
                 .isEqualTo("Legal Officer Full Name");
         assertThat(actual.getSelectPartyNotify())
                 .isEqualTo("Both parties");
-        tseAdminService = new TseAdminService(emailService, documentManagementService);
-        ReflectionTestUtils.setField(tseAdminService, "emailToClaimantTemplateId", TEMPLATE_ID);
-        ReflectionTestUtils.setField(tseAdminService, "emailToRespondentTemplateId", TEMPLATE_ID);
-        caseData = CaseDataBuilder.builder().build();
     }
 
     @Test

@@ -19,10 +19,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 

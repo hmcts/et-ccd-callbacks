@@ -165,4 +165,32 @@ public class TseAdminController {
             .confirmation_body(body)
             .build());
     }
+
+    @PostMapping(value = "/displayCloseApplicationTable", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "To display the selected application details for close application event.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> displayCloseApplicationTable(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setTseAdminCloseApplicationTable(
+            tseAdminService
+                .generateCloseApplicationDetailsMarkdown(caseData, userToken));
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
 }

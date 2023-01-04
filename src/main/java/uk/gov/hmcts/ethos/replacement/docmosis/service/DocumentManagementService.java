@@ -267,35 +267,4 @@ public class DocumentManagementService {
         return responseHeaders;
     }
 
-    /**
-     * Return document info in format [File Name] (File Type, File Size).
-     * @param document file in UploadedDocumentType
-     * @param authToken the caller's bearer token used to verify the caller
-     * @return String which contains the document name, type, size and link
-     */
-    public String displayDocNameTypeSizeLink(UploadedDocumentType document, String authToken) {
-        if (document == null) {
-            return "";
-        }
-
-        Pattern pattern = Pattern.compile("^.+?/documents/");
-        Matcher matcher = pattern.matcher(document.getDocumentBinaryUrl());
-        String documentLink = matcher.replaceFirst("");
-
-        int lastIndexDot = document.getDocumentFilename().lastIndexOf('.');
-        String documentName = document.getDocumentFilename().substring(0, lastIndexDot);
-        String documentType = document.getDocumentFilename().substring(lastIndexDot + 1).toUpperCase();
-
-        ResponseEntity<DocumentDetails> documentDetails =
-                getDocumentDetails(authToken, UUID.fromString(getDocumentUUID(document.getDocumentUrl())));
-        if (documentDetails != null && documentDetails.getBody() != null) {
-            return String.format(FILE_DISPLAY,
-                    documentLink,
-                    documentName,
-                    documentType,
-                    FileUtils.byteCountToDisplaySize(Long.parseLong(documentDetails.getBody().getSize())));
-        }
-        return String.format(FILE_DISPLAY, documentLink, documentName, documentType, "");
-    }
-
 }

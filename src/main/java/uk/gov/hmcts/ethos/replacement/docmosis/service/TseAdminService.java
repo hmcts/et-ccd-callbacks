@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -86,9 +87,6 @@ public class TseAdminService {
         + "|Sent to | %s|\r\n"
         + "\r\n";
 
-    private static final String STRING_BR = "<br>";
-    private static final String APPLICATION_QUESTION = "Give details";
-
     private static final String BOTH = "Both parties";
     private static final String CLAIMANT_ONLY = "Claimant only";
     private static final String RESPONDENT_ONLY = "Respondent only";
@@ -129,7 +127,6 @@ public class TseAdminService {
                 APPLICATION_QUESTION,
                 applicationType.getDetails(),
                 documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken)
-                documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken)
         );
     }
 
@@ -148,8 +145,6 @@ public class TseAdminService {
                         populateListDocWithInfoAndLink(respondent.getValue().getSupportingMaterial(), authToken)))
                 .findFirst()
                 .orElse(null);
-                .findFirst()
-                .orElse(null);
     }
 
     private String populateListDocWithInfoAndLink(List<DocumentTypeItem> supportingMaterial, String authToken) {
@@ -158,7 +153,6 @@ public class TseAdminService {
         }
         return supportingMaterial.stream()
                 .map(documentTypeItem ->
-                        documentManagementService.displayDocNameTypeSizeLink(
                         documentManagementService.displayDocNameTypeSizeLink(
                                 documentTypeItem.getValue().getUploadedDocument(), authToken) + STRING_BR)
                 .collect(Collectors.joining());
@@ -277,4 +271,59 @@ public class TseAdminService {
         caseData.setTseAdminDecisionMadeByFullName(null);
         caseData.setTseAdminSelectPartyNotify(null);
     }
+
+     // TODO -
+    //  display decision's document link (currently not sure if it is a list or just a single decision to display)
+    //  display responses from admin and/or claimant/respondent
+    public String generateCloseApplicationDetailsMarkdown(CaseData caseData, String authToken) {
+        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
+        if (applicationTypeItem.getValue().getAdminDecision() != null) {
+            String decisionsMarkdown = applicationTypeItem.getValue().getAdminDecision()
+                .stream()
+                .map(d -> String.format(CLOSE_APP_DECISION_DETAILS,
+                    d.getValue().getEnterNotificationTitle(),
+                    d.getValue().getDecision(),
+                    d.getValue().getDate(),
+                    "Tribunal",
+                    d.getValue().getTypeOfDecision(),
+                    d.getValue().getAdditionalInformation(),
+                    d.getValue().getDecisionDetails(),
+                    getDecisionDocumentLink(d.getValue(), authToken),
+                    d.getValue().getDecisionMadeBy(),
+                    d.getValue().getDecisionMadeByFullName(),
+                    d.getValue().getSelectPartyNotify()))
+                .collect(Collectors.joining());
+        }
+
+        return String.format(
+            ClOSE_APP_DETAILS,
+            applicationTypeItem.getValue().getApplicant(),
+            applicationTypeItem.getValue().getType(),
+            applicationTypeItem.getValue().getDate(),
+            applicationTypeItem.getValue().getDetails(),
+            getDocumentLink(applicationTypeItem, authToken),
+            applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo()
+        );
+
+    }
+
+   private String getDecisionDocumentLink(TseAdminRecordDecisionType decisionType, String authToken) {
+       if (decisionType.getResponseRequiredDoc() != null) {
+           return documentManagementService
+               .displayDocNameTypeSizeLink(decisionType.getResponseRequiredDoc(), authToken);
+       }
+
+       return "";
+   }
+
+    private String getDocumentLink(GenericTseApplicationTypeItem applicationTypeItem, String authToken) {
+        String documentLink;
+        if (applicationTypeItem.getValue().getDocumentUpload() != null) {
+            return documentManagementService
+                .displayDocNameTypeSizeLink(applicationTypeItem.getValue().getDocumentUpload(), authToken);
+        }
+
+        return "";
+    }
+
 }

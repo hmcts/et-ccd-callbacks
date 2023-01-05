@@ -33,6 +33,7 @@ class TseAdminControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_START_URL = "/tseAdmin/aboutToStart";
+    private static final String MID_DETAILS_TABLE = "/tseAdmin/midDetailsTable";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmin/aboutToSubmit";
     private static final String SUBMITTED_URL = "/tseAdmin/submitted";
 
@@ -94,6 +95,47 @@ class TseAdminControllerTest {
     }
 
     @Test
+    void midDetailsTable_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(MID_DETAILS_TABLE)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(tseAdminService).initialTseAdminTableMarkUp(
+                ccdRequest.getCaseDetails().getCaseData(),
+                AUTH_TOKEN);
+    }
+
+    @Test
+    void midDetailsTable_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(MID_DETAILS_TABLE)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+        verify(tseAdminService, never()).initialTseAdminTableMarkUp(
+                ccdRequest.getCaseDetails().getCaseData(),
+                AUTH_TOKEN);
+    }
+
+    @Test
+    void midDetailsTable_badRequest() throws Exception {
+        mockMvc.perform(post(MID_DETAILS_TABLE)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        verify(tseAdminService, never()).initialTseAdminTableMarkUp(
+                ccdRequest.getCaseDetails().getCaseData(),
+                AUTH_TOKEN);
+    }
+
+    @Test
     void aboutToSubmit_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
@@ -104,9 +146,13 @@ class TseAdminControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(tseAdminService).saveTseAdminDataFromCaseData(
+                ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdminService).sendRecordADecisionEmails(
             ccdRequest.getCaseDetails().getCaseId(),
             ccdRequest.getCaseDetails().getCaseData());
+        verify(tseAdminService).clearTseAdminDataFromCaseData(
+                ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -117,9 +163,13 @@ class TseAdminControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isForbidden());
+        verify(tseAdminService, never()).saveTseAdminDataFromCaseData(
+                ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdminService, never()).sendRecordADecisionEmails(
             ccdRequest.getCaseDetails().getCaseId(),
             ccdRequest.getCaseDetails().getCaseData());
+        verify(tseAdminService, never()).clearTseAdminDataFromCaseData(
+                ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -129,11 +179,15 @@ class TseAdminControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
+        verify(tseAdminService, never()).saveTseAdminDataFromCaseData(
+                ccdRequest.getCaseDetails().getCaseData());
         verify(tseAdminService, never()).sendRecordADecisionEmails(
             ccdRequest.getCaseDetails().getCaseId(),
             ccdRequest.getCaseDetails().getCaseData());
+        verify(tseAdminService, never()).clearTseAdminDataFromCaseData(
+                ccdRequest.getCaseDetails().getCaseData());
     }
-    
+
     @Test
     void submitted_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);

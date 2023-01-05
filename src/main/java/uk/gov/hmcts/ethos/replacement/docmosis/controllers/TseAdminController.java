@@ -116,7 +116,7 @@ public class TseAdminController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> validateGiveDetails(
+    public ResponseEntity<CCDCallbackResponse> midDetailsTable(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
 

@@ -206,23 +206,6 @@ public final class ReferralHelper {
                 && !Strings.isNullOrEmpty(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl());
     }
 
-    private static String getReferralDocLink(DocumentTypeItem documentTypeItem) {
-        String docFileName = "";
-        if (documentExists(documentTypeItem)) {
-            docFileName = documentTypeItem.getValue().getUploadedDocument().getDocumentFilename();
-            return String.format(DOCUMENT_LINK, createDocLinkBinary(documentTypeItem),
-                    docFileName);
-        } else {
-            return docFileName;
-        }
-    }
-
-    private static boolean documentExists(DocumentTypeItem documentTypeItem) {
-        return documentTypeItem != null && documentTypeItem.getValue() != null
-                && documentTypeItem.getValue().getUploadedDocument() != null
-                && !Strings.isNullOrEmpty(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl());
-    }
-
     private static String populateReplyDetails(CaseData caseData) {
         ReferralType referral = getSelectedReferral(caseData);
         List<ReferralReplyTypeItem> replyCollection = referral.getReferralReplyCollection();

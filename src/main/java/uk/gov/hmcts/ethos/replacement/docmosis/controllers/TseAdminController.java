@@ -31,6 +31,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/tseAdmin")
 @RestController
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class TseAdminController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -129,7 +130,7 @@ public class TseAdminController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
-     /**
+    /**
      * Returns data needed to populate the submitted page.
      *
      * @param ccdRequest holds the request and case data
@@ -156,8 +157,8 @@ public class TseAdminController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        String body = String.format("### What happens next\r\n\r\nYou can view the decision in the <a " + "href" +
-            "=\"/cases/case-details/%s#Applications\" target=\"_blank\">Applications tab (opens in new tab)</a>",
+        String body = String.format("### What happens next\r\n\r\nYou can view the decision in the <a " + "href"
+            + "=\"/cases/case-details/%s#Applications\" target=\"_blank\">Applications tab (opens in new tab)</a>",
             ccdRequest.getCaseDetails().getCaseId());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()

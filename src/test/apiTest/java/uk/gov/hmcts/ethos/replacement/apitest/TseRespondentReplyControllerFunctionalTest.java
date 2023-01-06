@@ -78,7 +78,7 @@ class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
     }
 
     @Test
-    void aboutToStart_successResponse() {
+    void aboutToStartSuccessResponse() {
         RestAssured.given()
             .spec(spec)
             .contentType(ContentType.JSON)
@@ -91,7 +91,7 @@ class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
     }
 
     @Test
-    void midPopulateReply_successResponse() {
+    void midPopulateReplySuccessResponse() {
         RestAssured.given()
             .spec(spec)
             .contentType(ContentType.JSON)
@@ -104,7 +104,7 @@ class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
     }
 
     @Test
-    void aboutToSubmit_successResponse() {
+    void aboutToSubmitSuccessResponse() {
         RestAssured.given()
             .spec(spec)
             .contentType(ContentType.JSON)
@@ -117,7 +117,7 @@ class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
     }
 
     @Test
-    void submitted_successResponse() {
+    void submittedSuccessResponse() {
         RestAssured.given()
             .spec(spec)
             .contentType(ContentType.JSON)

@@ -117,6 +117,7 @@ public class RespondentTellSomethingElseController {
 
         // send Respondent confirmation Email
         resTseService.sendAcknowledgeEmailAndGeneratePdf(caseDetails, userToken);
+        resTseService.sendClaimantEmail(caseDetails);
 
         resTseService.createRespondentApplication(caseDetails.getCaseData());
 

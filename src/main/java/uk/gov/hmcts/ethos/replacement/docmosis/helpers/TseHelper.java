@@ -169,7 +169,21 @@ public final class TseHelper {
     }
 
     /**
-     * Builds a document request for generating the pdf of the CYA page for responding to a claimant application.
+     * Gets the select application in GenericTseApplicationTypeItem.
+     * @param caseData contains all the case data
+     * @return the select application in GenericTseApplicationTypeItem
+     */
+    public static GenericTseApplicationTypeItem getSelectedApplicationTypeItem(CaseData caseData) {
+        String selectedAppId = caseData.getTseAdminSelectApplication().getSelectedCode();
+        return caseData.getGenericTseApplicationCollection().stream()
+                .filter(genericTseApplicationTypeItem ->
+                        genericTseApplicationTypeItem.getValue().getNumber().equals(selectedAppId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Builds a document request for generating the pdf of the CYA page for responsing to a claimant application.
      * @param caseData contains all the case data
      * @param accessKey access key required for docmosis
      * @return a string representing the api request to docmosis

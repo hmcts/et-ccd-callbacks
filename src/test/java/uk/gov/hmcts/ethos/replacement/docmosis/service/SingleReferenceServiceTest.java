@@ -26,16 +26,18 @@ public class SingleReferenceServiceTest {
 
     @Test
     public void createEnglandWalesReference() {
-        String expectedRef = "6000001/2023";
         int currentYear = LocalDate.now().getYear();
+        String testYearText = String.valueOf(currentYear);
+        String expectedRef = "6000001/" + testYearText;
         when(singleRefEnglandWalesRepository.ethosCaseRefGen(currentYear)).thenReturn(expectedRef);
         assertEquals(expectedRef, singleReferenceService.createReference(ENGLANDWALES_CASE_TYPE_ID));
     }
 
     @Test
     public void createScotlandReference() {
-        String expectedRef = "8000001/2023";
         int currentYear = LocalDate.now().getYear();
+        String testYearText = String.valueOf(currentYear);
+        String expectedRef = "8000001/" + testYearText;
         when(singleRefScotlandRepository.ethosCaseRefGen(currentYear)).thenReturn(expectedRef);
         assertEquals(expectedRef, singleReferenceService.createReference(SCOTLAND_CASE_TYPE_ID));
     }

@@ -22,6 +22,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.Map;
@@ -43,16 +44,22 @@ public class TseResponseController {
 
     @Value("${tseRespondentResponse.template.id}")
     private String emailTemplateId;
-    private static final String INVALID_TOKEN = "Invalid Token {}";
+    @Value("${tseRespondentAcknowledgementRule92No.template.id}")
+    private String acknowledgementRule92NoEmailTemplateId;
+    @Value("${tseRespondentAcknowledgementRule92Yes.template.id}")
+    private String acknowledgementRule92YesEmailTemplateId;
+
     private final VerifyTokenService verifyTokenService;
     private final TornadoService tornadoService;
     private final EmailService emailService;
+    private final UserService userService;
+
+    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String SUBMITTED_BODY = "### What happens next \r\n\r\nYou have sent your response to the"
         + " tribunal%s.\r\n\r\nThe tribunal will consider all correspondence and let you know what happens next.";
     private static final String SUBMITTED_COPY = " and copied it to the claimant";
     private static final String YES_COPY = "I confirm I want to copy";
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
-
 
     /**
      *  Populates the dynamic list for select an application to respond to.
@@ -152,13 +159,22 @@ public class TseResponseController {
         if (YES_COPY.equals(caseData.getTseResponseCopyToOtherParty())) {
             try {
                 byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", "TSE Reply.pdf");
-                String email = caseData.getClaimantType().getClaimantEmailAddress();
+                String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
                 Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails, bytes);
-                emailService.sendEmail(emailTemplateId, email, personalisation);
+                emailService.sendEmail(emailTemplateId, claimantEmail, personalisation);
             } catch (Exception e) {
                 throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
             }
         }
+
+        String legalRepEmail = userService.getUserDetails(userToken).getEmail();
+        emailService.sendEmail(
+            YES_COPY.equals(caseData.getTseResponseCopyToOtherParty())
+                ? acknowledgementRule92YesEmailTemplateId
+                : acknowledgementRule92NoEmailTemplateId,
+            legalRepEmail,
+            TseHelper.getPersonalisationForAcknowledgement(caseDetails));
+
         TseHelper.resetReplyToApplicationPage(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }

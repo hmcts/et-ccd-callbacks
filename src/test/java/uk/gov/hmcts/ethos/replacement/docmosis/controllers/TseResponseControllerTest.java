@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -16,9 +17,11 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondentReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondentReplyType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
@@ -31,6 +34,10 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -49,7 +56,14 @@ class TseResponseControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/tseResponse/aboutToSubmit";
     private static final String MID_POPULATE_REPLY_URL = "/tseResponse/midPopulateReply";
     private static final String SUBMITTED_URL = "/tseResponse/submitted";
+    private static final String RESPONSE_TEMPLATE_ID = "responseToClaimantTemplateId";
     private static final String YES_COPY = "I confirm I want to copy";
+    private static final String YES_COPY_TEMPLATE_ID = "acknowledgeResponseRule92YesTemplateId";
+    private static final String NO_COPY = "I do not want to copy";
+    private static final String NO_COPY_TEMPLATE_ID = "acknowledgeResponseRule92NoTemplateId";
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -57,8 +71,9 @@ class TseResponseControllerTest {
     private TornadoService tornadoService;
     @MockBean
     private EmailService emailService;
-    @Autowired
-    private MockMvc mockMvc;
+    @MockBean
+    private UserService userService;
+
     @Autowired
     private JsonMapper jsonMapper;
     private CCDRequest ccdRequest;
@@ -68,17 +83,20 @@ class TseResponseControllerTest {
         CaseData caseData = CaseDataBuilder.builder()
             .withEthosCaseReference("9876")
             .withClaimantType("person@email.com")
-            .withRespondent(
-            "respondent", YES, "01-Jan-2003", false)
+            .withRespondent("respondent", YES, "01-Jan-2003", false)
             .build();
 
         caseData.setClaimant("Claimant LastName");
+        caseData.setResTseSelectApplication("caseRef");
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
             .withCaseId("1234")
             .withCaseData(caseData)
             .build();
+
+        UserDetails userDetails = HelperTest.getUserDetails();
+        when(userService.getUserDetails(anyString())).thenReturn(userDetails);
     }
 
     @Test
@@ -179,17 +197,17 @@ class TseResponseControllerTest {
 
         caseData.getGenericTseApplicationCollection().get(0).getValue()
             .setRespondentReply(List.of(
-                    TseRespondentReplyTypeItem.builder()
-                        .id("c0bae193-ded6-4db8-a64d-b260847bcc9b")
-                        .value(
-                            TseRespondentReplyType.builder()
-                                .from("Claimant")
-                                .date("16-May-1996")
-                                .response("response")
-                                .hasSupportingMaterial(NO)
-                                .copyToOtherParty(YES)
-                                .build()
-                        ).build()));
+                TseRespondentReplyTypeItem.builder()
+                    .id("c0bae193-ded6-4db8-a64d-b260847bcc9b")
+                    .value(
+                        TseRespondentReplyType.builder()
+                            .from("Claimant")
+                            .date("16-May-1996")
+                            .response("response")
+                            .hasSupportingMaterial(NO)
+                            .copyToOtherParty(YES)
+                            .build()
+                    ).build()));
 
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -199,6 +217,31 @@ class TseResponseControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
+
+        verify(emailService, times(2)).sendEmail(anyString(), anyString(), any());
+        verify(emailService).sendEmail(eq(RESPONSE_TEMPLATE_ID), anyString(), any());
+        verify(emailService).sendEmail(eq(YES_COPY_TEMPLATE_ID), anyString(), any());
+    }
+
+    @Test
+    void aboutToSubmit_Rule92No() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setTseResponseCopyToOtherParty(NO_COPY);
+
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .header("Authorization", AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+
+        verify(emailService, times(1)).sendEmail(anyString(), anyString(), any());
+        verify(emailService, times(1)).sendEmail(eq(NO_COPY_TEMPLATE_ID), anyString(), any());
     }
 
     @Test

@@ -169,7 +169,7 @@ public final class TseHelper {
     }
 
     /**
-     * Builds a document request for generating the pdf of the CYA page for responsing to a claimant application.
+     * Builds a document request for generating the pdf of the CYA page for responding to a claimant application.
      * @param caseData contains all the case data
      * @param accessKey access key required for docmosis
      * @return a string representing the api request to docmosis
@@ -200,6 +200,18 @@ public final class TseHelper {
             "claimant", caseData.getClaimant(),
             "respondents", Helper.getRespondentNames(caseData),
             "linkToDocument", documentJson
+        );
+    }
+
+    public static Map<String, Object> getPersonalisationForAcknowledgement(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+
+        return Map.of(
+            "caseNumber", caseData.getEthosCaseReference(),
+            "claimant", caseData.getClaimant(),
+            "respondents", Helper.getRespondentNames(caseData),
+            "shortText", caseData.getResTseSelectApplication(),
+            "caseId", caseDetails.getCaseId()
         );
     }
 

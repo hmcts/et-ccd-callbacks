@@ -25,15 +25,15 @@ public class SingleReferenceServiceTest {
 
     @Test
     public void createEnglandWalesReference() {
-        String expectedRef = "6000001/2022";
-        when(singleRefEnglandWalesRepository.ethosCaseRefGen(2022)).thenReturn(expectedRef);
+        String expectedRef = "6000001/2023";
+        when(singleRefEnglandWalesRepository.ethosCaseRefGen(2023)).thenReturn(expectedRef);
         assertEquals(expectedRef, singleReferenceService.createReference(ENGLANDWALES_CASE_TYPE_ID));
     }
 
     @Test
     public void createScotlandReference() {
-        String expectedRef = "8000001/2022";
-        when(singleRefScotlandRepository.ethosCaseRefGen(2022)).thenReturn(expectedRef);
+        String expectedRef = "8000001/2023";
+        when(singleRefScotlandRepository.ethosCaseRefGen(2023)).thenReturn(expectedRef);
         assertEquals(expectedRef, singleReferenceService.createReference(SCOTLAND_CASE_TYPE_ID));
     }
 }

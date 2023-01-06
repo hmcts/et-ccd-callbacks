@@ -8,11 +8,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
-
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import java.io.IOException;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -55,5 +59,19 @@ class CreateReferralServiceTest {
         assertThrows(DocumentManagementException.class,
             () -> createReferralService.generateCRDocument(new CaseData(), "",
             ""));
+    }
+
+    @Test
+    void addErrorDocumentUpload() {
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        DocumentType documentType = new DocumentType();
+        documentType.setShortDescription("shortDescription");
+        documentTypeItem.setId(UUID.randomUUID().toString());
+        documentTypeItem.setValue(documentType);
+        CaseData caseData = new CaseData();
+        caseData.setReferralDocument(List.of(documentTypeItem));
+        List<String> errors = new ArrayList<>();
+        createReferralService.addDocumentUploadErrors(caseData, errors);
+        assertEquals("Short description is added but document is not uploaded.", errors.get(0));
     }
 }

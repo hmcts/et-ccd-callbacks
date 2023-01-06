@@ -38,7 +38,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequestMapping("/createReferral")
 @RestController
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports"})
 public class CreateReferralController {
 
     private final String referralTemplateId;
@@ -126,6 +126,7 @@ public class CreateReferralController {
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = ReferralHelper.validateEmail(caseData.getReferentEmail());
+        createReferralService.addDocumentUploadErrors(caseData, errors);
         return getCallbackRespEntityErrors(errors, caseData);
     }
 

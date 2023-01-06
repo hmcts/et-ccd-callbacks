@@ -12,25 +12,35 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseAdminReplyTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseReplyTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondentReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("squid:S1192")
 public class TseAdminService {
 
     @Value("${tse.admin.claimant.template.id}")
@@ -56,7 +66,7 @@ public class TseAdminService {
             + "|Supporting material | %s|\r\n"
             + "\r\n";
 
-    private static final String ClOSE_APP_DETAILS = "| | |\r\n"
+    private static final String CLOSE_APP_DETAILS = "| | |\r\n"
         + "|--|--|\r\n"
         + "|Applicant | %s|\r\n"
         + "|Type of application | %s|\r\n"
@@ -101,7 +111,7 @@ public class TseAdminService {
      * @param caseData contains all the case data
      */
     public void initialTseAdminTableMarkUp(CaseData caseData, String authToken) {
-        GenericTseApplicationTypeItem applicationTypeItem = TseHelper.getSelectedApplicationTypeItem(caseData);
+        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem != null) {
             GenericTseApplicationType applicationType = applicationTypeItem.getValue();
             String appDetails = initialTseAdminAppDetails(applicationType, authToken);
@@ -128,15 +138,15 @@ public class TseAdminService {
         }
         IntWrapper respondCount = new IntWrapper(0);
         return applicationType.getRespondentReply().stream()
-                .map(respondent -> String.format(
-                        RESPONSE_DETAILS,
-                        respondCount.incrementAndReturnValue(),
-                        respondent.getValue().getFrom(),
-                        respondent.getValue().getDate(),
-                        respondent.getValue().getResponse(),
-                        populateListDocWithInfoAndLink(respondent.getValue().getSupportingMaterial(), authToken)))
-                .findFirst()
-                .orElse(null);
+            .map(respondent -> String.format(
+                RESPONSE_DETAILS,
+                respondCount.incrementAndReturnValue(),
+                respondent.getValue().getFrom(),
+                respondent.getValue().getDate(),
+                respondent.getValue().getResponse(),
+                populateListDocWithInfoAndLink(respondent.getValue().getSupportingMaterial(), authToken)))
+            .findFirst()
+            .orElse(null);
     }
 
     private String populateListDocWithInfoAndLink(List<DocumentTypeItem> supportingMaterial, String authToken) {
@@ -159,7 +169,7 @@ public class TseAdminService {
             return;
         }
 
-        GenericTseApplicationTypeItem applicationTypeItem = TseHelper.getSelectedApplicationTypeItem(caseData);
+        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem != null) {
 
             GenericTseApplicationType genericTseApplicationType = applicationTypeItem.getValue();
@@ -276,49 +286,69 @@ public class TseAdminService {
         caseData.setTseAdminSelectPartyNotify(null);
     }
 
-     // TODO -
+    // TODO -
     //  display decision's document link (currently not sure if it is a list or just a single decision to display)
     //  display responses from admin and/or claimant/respondent
     public String generateCloseApplicationDetailsMarkdown(CaseData caseData, String authToken) {
         GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
+        String decisionsMarkdown = "";
         if (applicationTypeItem.getValue().getAdminDecision() != null) {
-            String decisionsMarkdown = applicationTypeItem.getValue().getAdminDecision()
+            // Multiple decisions can be made for the same application but we are only showing the last one for now
+            Optional<String> decisionsMarkdownResult = applicationTypeItem.getValue().getAdminDecision()
                 .stream()
+                .reduce((first, second) -> second)
                 .map(d -> String.format(CLOSE_APP_DECISION_DETAILS,
-                    d.getValue().getEnterNotificationTitle(),
+                    Optional.ofNullable(d.getValue().getEnterNotificationTitle()).orElse(""),
                     d.getValue().getDecision(),
                     d.getValue().getDate(),
                     "Tribunal",
                     d.getValue().getTypeOfDecision(),
-                    d.getValue().getAdditionalInformation(),
-                    d.getValue().getDecisionDetails(),
+                    Optional.ofNullable(d.getValue().getAdditionalInformation()).orElse(""),
+                    Optional.ofNullable(d.getValue().getDecisionDetails()).orElse(""),
                     getDecisionDocumentLink(d.getValue(), authToken),
                     d.getValue().getDecisionMadeBy(),
                     d.getValue().getDecisionMadeByFullName(),
-                    d.getValue().getSelectPartyNotify()))
-                .collect(Collectors.joining());
+                    d.getValue().getSelectPartyNotify()));
+
+            if (decisionsMarkdownResult.isPresent()) {
+                decisionsMarkdown = decisionsMarkdownResult.get();
+            }
         }
 
+        List<? extends TseReplyTypeItem> repliesList = Stream.of(
+            Optional.ofNullable(applicationTypeItem.getValue().getAdminReply())
+                .orElse(Collections.<TseAdminReplyTypeItem>emptyList()),
+            Optional.ofNullable(applicationTypeItem.getValue().getRespondentReply())
+                .orElse(Collections.<TseRespondentReplyTypeItem>emptyList()))
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
+        repliesList.sort(
+            Comparator.comparing(tseReplyTypeItem -> LocalDate.parse(tseReplyTypeItem.getDate(), formatter)));
+
+        // TODO - Stream the repliesList and format the markdown strings for Claimant/Respondent/Admin responses
+
         return String.format(
-            ClOSE_APP_DETAILS,
+            CLOSE_APP_DETAILS,
             applicationTypeItem.getValue().getApplicant(),
             applicationTypeItem.getValue().getType(),
             applicationTypeItem.getValue().getDate(),
             applicationTypeItem.getValue().getDetails(),
             getDocumentLink(applicationTypeItem, authToken),
             applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo()
-        );
+        ) + decisionsMarkdown;
 
     }
 
-   private String getDecisionDocumentLink(TseAdminRecordDecisionType decisionType, String authToken) {
-       if (decisionType.getResponseRequiredDoc() != null) {
-           return documentManagementService
-               .displayDocNameTypeSizeLink(decisionType.getResponseRequiredDoc(), authToken);
-       }
+    private String getDecisionDocumentLink(TseAdminRecordDecisionType decisionType, String authToken) {
+        if (decisionType.getResponseRequiredDoc() != null) {
+            return documentManagementService
+                .displayDocNameTypeSizeLink(decisionType.getResponseRequiredDoc(), authToken);
+        }
 
-       return "";
-   }
+        return "";
+    }
 
     private String getDocumentLink(GenericTseApplicationTypeItem applicationTypeItem, String authToken) {
         String documentLink;

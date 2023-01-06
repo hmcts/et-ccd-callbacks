@@ -49,7 +49,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 @RequiredArgsConstructor
 @Service("tornadoService")
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.LawOfDemeter", "PMD.AvoidThrowingNullPointerException",
-    "PMD.ExcessiveImports", "PMD.CyclomaticComplexity"})
+    "PMD.ExcessiveImports", "PMD.CyclomaticComplexity", "PMD.GodClass"})
 public class TornadoService {
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";

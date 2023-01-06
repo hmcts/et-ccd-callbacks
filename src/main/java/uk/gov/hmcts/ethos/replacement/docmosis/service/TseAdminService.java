@@ -14,6 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
@@ -100,22 +101,13 @@ public class TseAdminService {
      * @param caseData contains all the case data
      */
     public void initialTseAdminTableMarkUp(CaseData caseData, String authToken) {
-        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
+        GenericTseApplicationTypeItem applicationTypeItem = TseHelper.getSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem != null) {
             GenericTseApplicationType applicationType = applicationTypeItem.getValue();
             String appDetails = initialTseAdminAppDetails(applicationType, authToken);
             String responseDetails = initialTseAdminRespondDetails(applicationType, authToken);
             caseData.setTseAdminTableMarkUp(appDetails + responseDetails);
         }
-    }
-
-    private GenericTseApplicationTypeItem getSelectedApplicationTypeItem(CaseData caseData) {
-        String selectedAppId = caseData.getTseAdminSelectApplication().getSelectedCode();
-        return caseData.getGenericTseApplicationCollection().stream()
-                .filter(genericTseApplicationTypeItem ->
-                        genericTseApplicationTypeItem.getValue().getNumber().equals(selectedAppId))
-                .findFirst()
-                .orElse(null);
     }
 
     private String initialTseAdminAppDetails(GenericTseApplicationType applicationType, String authToken) {
@@ -167,7 +159,7 @@ public class TseAdminService {
             return;
         }
 
-        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
+        GenericTseApplicationTypeItem applicationTypeItem = TseHelper.getSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem != null) {
 
             GenericTseApplicationType genericTseApplicationType = applicationTypeItem.getValue();

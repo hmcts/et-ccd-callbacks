@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
 
@@ -34,6 +35,9 @@ class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctional
         caseData.setResTseSelectApplication("Amend response");
         caseData.setResTseCopyToOtherPartyYesOrNo(NO);
         caseData.setClaimant("claimant");
+        ClaimantType claimantType = new ClaimantType();
+        claimantType.setClaimantEmailAddress("person@email.com");
+        caseData.setClaimantType(claimantType);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
 

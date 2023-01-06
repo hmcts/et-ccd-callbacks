@@ -7,7 +7,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
 import java.util.stream.Collectors;
 
-public class TseAdminHelper {
+public final class TseAdminHelper {
     public static final String CLOSED = "Closed";
 
     private TseAdminHelper() {

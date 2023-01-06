@@ -6,22 +6,28 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
+import uk.gov.service.notify.NotificationClientException;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,16 +38,14 @@ import java.util.stream.Stream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 @SuppressWarnings({"squid:S5961", "PMD.ExcessiveImports", "PMD.GodClass", "PMD.TooManyMethods",
     "PMD.FieldNamingConventions", "PMD.CyclomaticComplexity"})
 class RespondentTellSomethingElseServiceTest {
@@ -58,6 +62,9 @@ class RespondentTellSomethingElseServiceTest {
 
     @MockBean
     private DocumentManagementService documentManagementService;
+
+    @Captor
+    ArgumentCaptor<Map<String, Object>> personalisationCaptor;
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String YES = "I do want to copy";
@@ -270,15 +277,6 @@ class RespondentTellSomethingElseServiceTest {
         } else {
             verify(emailService, never()).sendEmail(TEMPLATE_ID, LEGAL_REP_EMAIL, expectedPersonalisation);
         }
-
-        if (YES.equals(rule92Selection) && emailSent) {
-            verify(documentManagementService).addDocumentToDocumentField(any());
-            verify(tornadoService)
-                    .generateEventDocument(caseData, AUTH_TOKEN, caseDetails.getCaseTypeId(), RES_TSE_FILE_NAME);
-        } else {
-            verify(documentManagementService, never()).addDocumentToDocumentField(any());
-            verify(tornadoService, never()).generateEventDocument(any(), anyString(), anyString(), anyString());
-        }
     }
 
     private static Stream<Arguments> sendAcknowledgeEmailAndGeneratePdf() {
@@ -312,11 +310,78 @@ class RespondentTellSomethingElseServiceTest {
     }
 
     @Test
-    void sendAcknowledgeEmailAndGeneratePdf_GenDocError_ReturnErrMsg() throws IOException {
-        when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
-                anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
-        assertThrows(Exception.class, () ->
-                respondentTellSomethingElseService.sendAcknowledgeEmailAndGeneratePdf(new CaseDetails(), ""));
+    void claimantPersonalisation_buildsCorrectData() throws NotificationClientException {
+        CaseData caseData = createCaseData("Amend response", YES);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        Map<String, Object> actual = respondentTellSomethingElseService.claimantPersonalisation(caseDetails, "test",
+            new byte[]{});
+
+        assertThat(actual.get("ccdId"), is(caseDetails.getCaseId()));
+        assertThat(actual.get("caseNumber"), is(caseData.getEthosCaseReference()));
+        assertThat(actual.get("applicationType"), is("Amend response"));
+        assertThat(actual.get("instructions"), is("test"));
+        assertThat(actual.get("claimant"), is("claimant"));
+        assertThat(actual.get("respondents"), is("Father Ted"));
+        assertThat(actual.get("linkToDocument").toString(), is("{\"file\":\"\",\"confirm_email_before_download"
+            + "\":true,\"retention_period\":\"52 weeks\",\"is_csv\":false}"));
+    }
+
+    @Test
+    void sendClaimantEmail_rule92No_doesNothing() {
+        CaseData caseData = createCaseData("Amend response", NO);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
+        verify(emailService, never()).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void sendClaimantEmail_groupC_doesNothing() {
+        CaseData caseData = createCaseData("Order a witness to attend to give evidence", NO);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
+        verify(emailService, never()).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void sendClaimantEmail_groupA_sendsEmail() throws IOException {
+        CaseData caseData = createCaseData("Amend response", YES);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[] {});
+        respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
+        verify(emailService).sendEmail(any(), any(), personalisationCaptor.capture());
+        Map<String, Object> personalisation = personalisationCaptor.getValue();
+        String expectedInstructions = String.format("You should respond as soon as possible, and in any event by %s.",
+            UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
+        assertThat(personalisation.get("instructions"), is(expectedInstructions));
+    }
+
+    @Test
+    void sendClaimantEmail_groupB_sendsEmail() throws IOException {
+        CaseData caseData = createCaseData("Change personal details", YES);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[] {});
+        respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
+        verify(emailService).sendEmail(any(), any(), personalisationCaptor.capture());
+        Map<String, Object> personalisation = personalisationCaptor.getValue();
+        String expected = String.format("You are not expected to respond to this application"
+            + ".\r\n\r\nIf you do respond you should do so as soon as possible and in any event by %s.",
+            UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
+        assertThat(personalisation.get("instructions"), is(expected));
     }
 
     @ParameterizedTest
@@ -495,6 +560,9 @@ class RespondentTellSomethingElseServiceTest {
         caseData.setResTseCopyToOtherPartyYesOrNo(selectedRule92Answer);
         caseData.setEthosCaseReference("test");
         caseData.setClaimant("claimant");
+        ClaimantType claimantType = new ClaimantType();
+        claimantType.setClaimantEmailAddress("person@email.com");
+        caseData.setClaimantType(claimantType);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
 
         return caseData;

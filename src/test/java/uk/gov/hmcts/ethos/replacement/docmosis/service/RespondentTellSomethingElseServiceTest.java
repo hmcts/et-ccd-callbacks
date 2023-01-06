@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -360,7 +362,8 @@ class RespondentTellSomethingElseServiceTest {
         respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
         verify(emailService).sendEmail(any(), any(), personalisationCaptor.capture());
         Map<String, Object> personalisation = personalisationCaptor.getValue();
-        String expectedInstructions = "You should respond as soon as possible, and in any event by 12 January 2023.";
+        String expectedInstructions = String.format("You should respond as soon as possible, and in any event by %s.",
+            UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
         assertThat(personalisation.get("instructions"), is(expectedInstructions));
     }
 
@@ -375,8 +378,10 @@ class RespondentTellSomethingElseServiceTest {
         respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
         verify(emailService).sendEmail(any(), any(), personalisationCaptor.capture());
         Map<String, Object> personalisation = personalisationCaptor.getValue();
-        assertThat(personalisation.get("instructions"), is("You are not expected to respond to this application"
-            + ".\r\n\r\nIf you do respond you should do so as soon as possible and in any event by 12 January 2023."));
+        String expected = String.format("You are not expected to respond to this application"
+            + ".\r\n\r\nIf you do respond you should do so as soon as possible and in any event by %s.",
+            UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
+        assertThat(personalisation.get("instructions"), is(expected));
     }
 
     @ParameterizedTest

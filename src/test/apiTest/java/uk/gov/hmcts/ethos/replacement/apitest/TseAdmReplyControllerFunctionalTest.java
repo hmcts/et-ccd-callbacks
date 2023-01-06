@@ -52,4 +52,17 @@ class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
                 .all(true);
     }
 
+    @Test
+    void submittedSuccessResponse() {
+        RestAssured.given()
+            .spec(spec)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(ccdRequest)
+            .post("/tseAdmReply/submitted")
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log()
+            .all(true);
+    }
 }

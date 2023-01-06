@@ -335,29 +335,29 @@ public class TseAdminService {
             applicationTypeItem.getValue().getType(),
             applicationTypeItem.getValue().getDate(),
             applicationTypeItem.getValue().getDetails(),
-            getDocumentLink(applicationTypeItem, authToken),
+            getApplicationDocumentLink(applicationTypeItem, authToken),
             applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo()
         ) + decisionsMarkdown;
 
     }
 
     private String getDecisionDocumentLink(TseAdminRecordDecisionType decisionType, String authToken) {
-        if (decisionType.getResponseRequiredDoc() != null) {
-            return documentManagementService
-                .displayDocNameTypeSizeLink(decisionType.getResponseRequiredDoc(), authToken);
+        if (decisionType.getResponseRequiredDoc() == null) {
+            return "";
         }
 
-        return "";
+        return documentManagementService
+            .displayDocNameTypeSizeLink(decisionType.getResponseRequiredDoc(), authToken);
     }
 
-    private String getDocumentLink(GenericTseApplicationTypeItem applicationTypeItem, String authToken) {
+    private String getApplicationDocumentLink(GenericTseApplicationTypeItem applicationTypeItem, String authToken) {
         String documentLink;
-        if (applicationTypeItem.getValue().getDocumentUpload() != null) {
-            return documentManagementService
-                .displayDocNameTypeSizeLink(applicationTypeItem.getValue().getDocumentUpload(), authToken);
+        if (applicationTypeItem.getValue().getDocumentUpload() == null) {
+            return "";
         }
 
-        return "";
+        return documentManagementService
+            .displayDocNameTypeSizeLink(applicationTypeItem.getValue().getDocumentUpload(), authToken);
     }
 
 }

@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SingleRefEnglandWalesRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.SingleRefScotlandRepository;
+import java.time.LocalDate;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -25,15 +26,17 @@ public class SingleReferenceServiceTest {
 
     @Test
     public void createEnglandWalesReference() {
-        String expectedRef = "6000001/2022";
-        when(singleRefEnglandWalesRepository.ethosCaseRefGen(2022)).thenReturn(expectedRef);
+        String expectedRef = "6000001/2023";
+        int currentYear = LocalDate.now().getYear();
+        when(singleRefEnglandWalesRepository.ethosCaseRefGen(currentYear)).thenReturn(expectedRef);
         assertEquals(expectedRef, singleReferenceService.createReference(ENGLANDWALES_CASE_TYPE_ID));
     }
 
     @Test
     public void createScotlandReference() {
-        String expectedRef = "8000001/2022";
-        when(singleRefScotlandRepository.ethosCaseRefGen(2022)).thenReturn(expectedRef);
+        String expectedRef = "8000001/2023";
+        int currentYear = LocalDate.now().getYear();
+        when(singleRefScotlandRepository.ethosCaseRefGen(currentYear)).thenReturn(expectedRef);
         assertEquals(expectedRef, singleReferenceService.createReference(SCOTLAND_CASE_TYPE_ID));
     }
 }

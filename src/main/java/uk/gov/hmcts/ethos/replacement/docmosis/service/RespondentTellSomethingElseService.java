@@ -222,10 +222,6 @@ public class RespondentTellSomethingElseService {
         respondentTseType.setCopyToOtherPartyText(caseData.getResTseCopyToOtherPartyTextArea());
         respondentTseType.setStatus(OPEN);
 
-        respondentTseType.setDueDate(
-            UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)
-        );
-
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
         tseApplicationTypeItem.setId(UUID.randomUUID().toString());
         tseApplicationTypeItem.setValue(respondentTseType);

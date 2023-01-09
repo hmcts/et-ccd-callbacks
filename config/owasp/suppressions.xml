@@ -212,5 +212,26 @@
         <cve>CVE-2021-4277</cve>
     </suppress>
 
+    <suppress>
+        <notes><![CDATA[
+   file name: yarn.lock?flat
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async-http-client-netty-utils@.*$</packageUrl>
+        <cve>CVE-2021-4277</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: npm/flat@4.1.1
+   ]]></notes>
+        <packageUrl regex="true">^pkg:npm/flat@.*$</packageUrl>
+        <vulnerabilityName>1085318</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: pkg:npm/json5@1.0.1
+   ]]></notes>
+        <packageUrl regex="true">^pkg:npm/json5@.*$</packageUrl>
+        <vulnerabilityName>1085311</vulnerabilityName>
+    </suppress>
 </suppressions>
 

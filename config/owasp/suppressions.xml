@@ -204,4 +204,13 @@
         <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
         <cve>CVE-2021-4235</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: async-http-client-netty-utils-2.12.3.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async-http-client-netty-utils@.*$</packageUrl>
+        <cve>CVE-2021-4277</cve>
+    </suppress>
+
 </suppressions>
+

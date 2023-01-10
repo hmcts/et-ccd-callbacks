@@ -302,4 +302,25 @@
         <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-native\-unix\-common@.*$</packageUrl>
         <cpe>cpe:/a:netty:netty</cpe>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: flat:4.1.1
+    ]]></notes>
+        <packageUrl regex="true">^pkg:npm/flat@.*$</packageUrl>
+        <vulnerabilityName>1085318</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: json5:1.0.1
+    ]]></notes>
+        <packageUrl regex="true">^pkg:npm/json5@.*$</packageUrl>
+        <vulnerabilityName>1085311</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: json5:1.0.1
+    ]]></notes>
+        <packageUrl regex="true">^pkg:npm/json5@.*$</packageUrl>
+        <vulnerabilityName>1085311</vulnerabilityName>
+    </suppress>
 </suppressions>

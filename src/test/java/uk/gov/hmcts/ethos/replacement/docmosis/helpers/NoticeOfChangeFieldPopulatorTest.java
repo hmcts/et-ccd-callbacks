@@ -3,8 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
-import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
+import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import java.util.List;
@@ -15,7 +15,6 @@ import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
 
 class NoticeOfChangeFieldPopulatorTest {
     private final CaseData caseData = mock(CaseData.class);
@@ -47,7 +46,6 @@ class NoticeOfChangeFieldPopulatorTest {
         when(caseData.getRepCollection()).thenReturn(List.of(RESPONDENT_REP_1, RESPONDENT_REP_2, RESPONDENT_REP_3));
         when(caseData.getClaimantIndType()).thenReturn(CLAIMENT);
         
-
         when(policyConverter.generate(SolicitorRole.SOLICITORA, Optional.of(RESPONDENT_REP_1))).thenReturn(
             ORG_POLICY_A);
         when(policyConverter.generate(SolicitorRole.SOLICITORB, Optional.of(RESPONDENT_REP_2))).thenReturn(

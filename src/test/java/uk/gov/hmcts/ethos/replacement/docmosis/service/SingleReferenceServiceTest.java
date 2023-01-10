@@ -27,7 +27,6 @@ public class SingleReferenceServiceTest {
     public void createEnglandWalesReference() {
         String expectedRef = "6000001/2022";
         when(singleRefEnglandWalesRepository.ethosCaseRefGen(2022)).thenReturn(expectedRef);
-        System.out.println("!!!!!!!" + singleReferenceService.createReference(ENGLANDWALES_CASE_TYPE_ID));
         assertEquals(expectedRef, singleReferenceService.createReference(ENGLANDWALES_CASE_TYPE_ID));
     }
 

@@ -2,8 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
-import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
+import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 
 @Component
 public class NoticeOfChangeAnswersConverter {
@@ -12,7 +12,8 @@ public class NoticeOfChangeAnswersConverter {
      * @param respondentRepresentative respondent representative
      * @return notice of change answer
      */
-    public NoticeOfChangeAnswers generateForSubmission(RepresentedTypeRItem respondentRepresentative,  ClaimantIndType claimant) {
+    public NoticeOfChangeAnswers generateForSubmission(RepresentedTypeRItem respondentRepresentative,
+        ClaimantIndType claimant) {
         String respRepName = respondentRepresentative.getValue().getRespRepName();
         return NoticeOfChangeAnswers.builder()
                 .respondentName(respRepName)

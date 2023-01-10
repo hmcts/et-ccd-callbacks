@@ -14,7 +14,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
@@ -28,6 +27,7 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
 @Service
@@ -83,7 +83,7 @@ public class TseAdmReplyService {
      * @param authToken the caller's bearer token used to verify the caller
      */
     public String initialTseAdmReplyTableMarkUp(CaseData caseData, String authToken) {
-        GenericTseApplicationTypeItem applicationTypeItem = TseHelper.getSelectedApplicationTypeItem(caseData);
+        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem != null) {
             return initialAppDetails(applicationTypeItem.getValue(), authToken)
                     + initialRespondDetails(applicationTypeItem.getValue(), authToken);
@@ -153,7 +153,7 @@ public class TseAdmReplyService {
             return;
         }
 
-        GenericTseApplicationTypeItem applicationTypeItem = TseHelper.getSelectedApplicationTypeItem(caseData);
+        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem != null) {
 
             GenericTseApplicationType genericTseApplicationType = applicationTypeItem.getValue();

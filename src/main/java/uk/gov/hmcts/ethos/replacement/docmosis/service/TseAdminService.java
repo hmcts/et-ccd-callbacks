@@ -33,9 +33,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @RequiredArgsConstructor
 public class TseAdminService {
 
-    @Value("${tse.admin.claimant.template.id}")
+    @Value("${tse.admin.record-a-decision.claimant.template.id}")
     private String emailToClaimantTemplateId;
-    @Value("${tse.admin.respondent.template.id}")
+    @Value("${tse.admin.record-a-decision.respondent.template.id}")
     private String emailToRespondentTemplateId;
 
     private final EmailService emailService;
@@ -163,6 +163,7 @@ public class TseAdminService {
 
     /**
      * Uses {@link EmailService} to generate an email.
+     * @param caseId used in email link to case
      * @param caseData in which the case details are extracted from
      */
     public void sendRecordADecisionEmails(String caseId, CaseData caseData) {
@@ -178,8 +179,8 @@ public class TseAdminService {
                     TSEAdminEmailRecipientsData respondentDetails =
                         new TSEAdminEmailRecipientsData(
                             emailToRespondentTemplateId,
-                            respondentSumTypeItem.getValue().getRespondentEmail(),
-                            respondentSumTypeItem.getValue().getRespondentName());
+                            respondentSumTypeItem.getValue().getRespondentEmail());
+                    respondentDetails.setRecipientName(respondentSumTypeItem.getValue().getRespondentName());
 
                     emailsToSend.add(respondentDetails);
                 }
@@ -195,10 +196,8 @@ public class TseAdminService {
 
             if (claimantEmail != null) {
                 TSEAdminEmailRecipientsData claimantDetails =
-                    new TSEAdminEmailRecipientsData(
-                        emailToClaimantTemplateId,
-                        claimantEmail,
-                        claimantName);
+                    new TSEAdminEmailRecipientsData(emailToClaimantTemplateId, claimantEmail);
+                claimantDetails.setRecipientName(claimantName);
 
                 emailsToSend.add(claimantDetails);
             }

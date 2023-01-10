@@ -7,12 +7,13 @@ public class TSEAdminEmailRecipientsData {
 
     private String recipientTemplate;
     private String recipientEmail;
-    private String recipientName;
 
-    public TSEAdminEmailRecipientsData(String recipientTemplate, String recipientEmail, String recipientName) {
+    private String recipientName;
+    private String customisedText;
+
+    public TSEAdminEmailRecipientsData(String recipientTemplate, String recipientEmail) {
         this.recipientTemplate = recipientTemplate;
         this.recipientEmail = recipientEmail;
-        this.recipientName = recipientName;
     }
 
 }

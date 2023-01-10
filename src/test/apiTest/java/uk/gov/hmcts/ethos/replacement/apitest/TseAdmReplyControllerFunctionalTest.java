@@ -16,6 +16,7 @@ class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
     private static final String AUTHORIZATION = "Authorization";
     private static final String MID_DETAILS_TABLE = "/tseAdmReply/midDetailsTable";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmReply/aboutToSubmit";
+    private static final String SUBMITTED_URL = "/tseAdmReply/submitted";
 
     private CCDRequest ccdRequest;
 
@@ -59,7 +60,7 @@ class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
             .contentType(ContentType.JSON)
             .header(new Header(AUTHORIZATION, userToken))
             .body(ccdRequest)
-            .post("/tseAdmReply/submitted")
+            .post(SUBMITTED_URL)
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log()

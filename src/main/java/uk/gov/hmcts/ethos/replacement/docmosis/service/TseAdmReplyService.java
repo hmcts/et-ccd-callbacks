@@ -3,22 +3,27 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -28,6 +33,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Service
 @RequiredArgsConstructor
 public class TseAdmReplyService {
+
+    @Value("${tse.admin.reply.claimant.template.id}")
+    private String emailToClaimantTemplateId;
+    @Value("${tse.admin.reply.respondent.template.id}")
+    private String emailToRespondentTemplateId;
+
+    private final EmailService emailService;
 
     private final DocumentManagementService documentManagementService;
 
@@ -52,6 +64,18 @@ public class TseAdmReplyService {
     private static final String APPLICATION_QUESTION = "Give details";
     private static final String COPY_TO_OTHER_PARTY_YES = "I confirm I want to copy";
     private static final String COPY_TO_OTHER_PARTY_NO = "I do not want to copy";
+    private static final String BOTH_NOTIFY = "Both parties";
+    private static final String CLAIMANT_NOTIFY_ONLY = "Claimant only";
+    private static final String RESPONDENT_NOTIFY_ONLY = "Respondent only";
+
+    private static final String IS_RESPONSE_REQUIRED = "Yes";
+    private static final String BOTH_RESPOND = "Both parties";
+    private static final String CLAIMANT_RESPOND_ONLY = "Claimant";
+    private static final String RESPONDENT_RESPOND_ONLY = "Respondent";
+    private static final String RESPONSE_REQUIRED =
+        "The tribunal requires some information from you about an application.";
+    private static final String RESPONSE_NOT_REQUIRED =
+        "You have a new message from HMCTS about a claim made to an employment tribunal.";
 
     /**
      * Initial Application and Respond details table.
@@ -163,6 +187,82 @@ public class TseAdmReplyService {
             return caseData.getTseAdmReplyAddDocumentMandatory();
         }
         return caseData.getTseAdmReplyAddDocumentOptional();
+    }
+
+    /**
+     * Uses {@link EmailService} to generate an email.
+     * @param caseId used in email link to case
+     * @param caseData in which the case details are extracted from
+     */
+    public void sendAdmReplyEmails(String caseId, CaseData caseData) {
+        String caseNumber = caseData.getEthosCaseReference();
+
+        List<TSEAdminEmailRecipientsData> emailsToSend = new ArrayList<>();
+        collectRespondents(caseData, emailsToSend);
+        collectClaimants(caseData, emailsToSend);
+
+        for (final TSEAdminEmailRecipientsData emailRecipient : emailsToSend) {
+            emailService.sendEmail(
+                emailRecipient.getRecipientTemplate(),
+                emailRecipient.getRecipientEmail(),
+                buildPersonalisation(caseNumber, caseId, emailRecipient.getCustomisedText()));
+        }
+    }
+
+    private void collectRespondents(CaseData caseData, List<TSEAdminEmailRecipientsData> emailsToSend) {
+        // if respondent only or both parties: send Respondents Reply Emails
+        if (RESPONDENT_NOTIFY_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())
+            || BOTH_NOTIFY.equals(caseData.getTseAdmReplySelectPartyNotify())) {
+            for (RespondentSumTypeItem respondentSumTypeItem: caseData.getRespondentCollection()) {
+                if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
+                    TSEAdminEmailRecipientsData respondentDetails =
+                        new TSEAdminEmailRecipientsData(
+                            emailToRespondentTemplateId,
+                            respondentSumTypeItem.getValue().getRespondentEmail());
+
+                    if (IS_RESPONSE_REQUIRED.equals(caseData.getTseAdmReplyIsResponseRequired())
+                        && (BOTH_RESPOND.equals(caseData.getTseAdmReplySelectPartyRespond())
+                        || RESPONDENT_RESPOND_ONLY.equals(caseData.getTseAdmReplySelectPartyRespond()))) {
+                        respondentDetails.setCustomisedText(RESPONSE_REQUIRED);
+                    } else {
+                        respondentDetails.setCustomisedText(RESPONSE_NOT_REQUIRED);
+                    }
+
+                    emailsToSend.add(respondentDetails);
+                }
+            }
+        }
+    }
+
+    private void collectClaimants(CaseData caseData, List<TSEAdminEmailRecipientsData> emailsToSend) {
+        // if claimant only or both parties: send Claimant Reply Email
+        if (CLAIMANT_NOTIFY_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())
+            || BOTH_NOTIFY.equals(caseData.getTseAdmReplySelectPartyNotify())) {
+            String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
+
+            if (claimantEmail != null) {
+                TSEAdminEmailRecipientsData claimantDetails =
+                    new TSEAdminEmailRecipientsData(emailToClaimantTemplateId, claimantEmail);
+
+                if (IS_RESPONSE_REQUIRED.equals(caseData.getTseAdmReplyIsResponseRequired())
+                    && (BOTH_RESPOND.equals(caseData.getTseAdmReplySelectPartyRespond())
+                    || CLAIMANT_RESPOND_ONLY.equals(caseData.getTseAdmReplySelectPartyRespond()))) {
+                    claimantDetails.setCustomisedText(RESPONSE_REQUIRED);
+                } else {
+                    claimantDetails.setCustomisedText(RESPONSE_NOT_REQUIRED);
+                }
+
+                emailsToSend.add(claimantDetails);
+            }
+        }
+    }
+
+    private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String customText) {
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
+        personalisation.put("caseNumber", caseNumber);
+        personalisation.put("caseId", caseId);
+        personalisation.put("customisedText", customText);
+        return personalisation;
     }
 
     /**

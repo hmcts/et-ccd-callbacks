@@ -87,6 +87,7 @@ public class TseAdmReplyController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
+        tseAdmReplyService.sendAdmReplyEmails(ccdRequest.getCaseDetails().getCaseId(), caseData);
         tseAdmReplyService.clearTseAdmReplyDataFromCaseData(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);

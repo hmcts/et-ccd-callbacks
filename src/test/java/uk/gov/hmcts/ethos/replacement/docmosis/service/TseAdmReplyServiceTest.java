@@ -3,15 +3,22 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondentReplyTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondentReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -20,10 +27,17 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationBuilder;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -32,17 +46,42 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @SuppressWarnings("squid:S5961")
 class TseAdmReplyServiceTest {
 
+    private TseAdmReplyService tseAdmReplyService;
+
+    @MockBean
+    private EmailService emailService;
+
     @MockBean
     private DocumentManagementService documentManagementService;
 
-    private TseAdmReplyService tseAdmReplyService;
     private CaseData caseData;
 
     private static final String AUTH_TOKEN = "Bearer authToken";
 
+    private static final String TEMPLATE_ID = "someTemplateId";
+    private static final String CASE_NUMBER = "Some Case Number";
+    private static final String CASE_ID = "someCaseId";
+
+    private static final String BOTH_NOTIFY = "Both parties";
+    private static final String CLAIMANT_NOTIFY_ONLY = "Claimant only";
+    private static final String RESPONDENT_NOTIFY_ONLY = "Respondent only";
+
+    private static final String CLAIMANT_EMAIL = "Claimant@mail.com";
+    private static final String RESPONDENT_EMAIL = "Respondent@mail.com";
+    private static final String BOTH_RESPOND = "Both parties";
+    private static final String CLAIMANT_RESPOND_ONLY = "Claimant";
+    private static final String RESPONDENT_RESPOND_ONLY = "Respondent";
+    private static final String RESPONSE_REQUIRED =
+        "The tribunal requires some information from you about an application.";
+    private static final String RESPONSE_NOT_REQUIRED =
+        "You have a new message from HMCTS about a claim made to an employment tribunal.";
+
     @BeforeEach
     void setUp() {
-        tseAdmReplyService = new TseAdmReplyService(documentManagementService);
+        tseAdmReplyService = new TseAdmReplyService(emailService, documentManagementService);
+        ReflectionTestUtils.setField(tseAdmReplyService, "emailToClaimantTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(tseAdmReplyService, "emailToRespondentTemplateId", TEMPLATE_ID);
+
         caseData = CaseDataBuilder.builder().build();
     }
 
@@ -289,6 +328,100 @@ class TseAdmReplyServiceTest {
                 .isEqualTo("Both parties");
     }
 
+    @ParameterizedTest
+    @MethodSource("sendEmails")
+    void sendAdmReplyEmailsNotifications(String admReplySelectPartyNotify,
+                                         String admReplyIsResponseRequired,
+                                         String admReplySelectPartyRespond,
+                                         Boolean emailSentToClaimant,
+                                         String expectedClaimantCustomText,
+                                         Boolean emailSentToRespondent,
+                                         String expectedRespondentCustomText) {
+        caseData.setEthosCaseReference(CASE_NUMBER);
+        createClaimant(caseData);
+        createRespondent(caseData);
+
+        caseData.setTseAdmReplySelectPartyNotify(admReplySelectPartyNotify);
+        caseData.setTseAdmReplyIsResponseRequired(admReplyIsResponseRequired);
+        caseData.setTseAdmReplySelectPartyRespond(admReplySelectPartyRespond);
+
+        Map<String, String> expectedPersonalisationClaimant =
+            createPersonalisation(caseData, expectedClaimantCustomText);
+        Map<String, String> expectedPersonalisationRespondent =
+            createPersonalisation(caseData, expectedRespondentCustomText);
+
+        tseAdmReplyService.sendAdmReplyEmails(CASE_ID, caseData);
+
+        if (emailSentToClaimant) {
+            verify(emailService).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL, expectedPersonalisationClaimant);
+        } else {
+            verify(emailService, never()).sendEmail(TEMPLATE_ID, CLAIMANT_EMAIL, expectedPersonalisationClaimant);
+        }
+
+        if (emailSentToRespondent) {
+            verify(emailService).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, expectedPersonalisationRespondent);
+        } else {
+            verify(emailService, never()).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, expectedPersonalisationRespondent);
+        }
+    }
+
+    private static Stream<Arguments> sendEmails() {
+        return Stream.of(
+            Arguments.of(BOTH_NOTIFY, "Yes", BOTH_RESPOND,
+                true, RESPONSE_REQUIRED, true, RESPONSE_REQUIRED),
+            Arguments.of(BOTH_NOTIFY, "Yes", CLAIMANT_RESPOND_ONLY,
+                true, RESPONSE_REQUIRED, true, RESPONSE_NOT_REQUIRED),
+            Arguments.of(BOTH_NOTIFY, "Yes", RESPONDENT_RESPOND_ONLY,
+                true, RESPONSE_NOT_REQUIRED, true, RESPONSE_REQUIRED),
+
+            Arguments.of(BOTH_NOTIFY, "No", BOTH_RESPOND,
+                true, RESPONSE_NOT_REQUIRED, true, RESPONSE_NOT_REQUIRED),
+            Arguments.of(BOTH_NOTIFY, "No", CLAIMANT_RESPOND_ONLY,
+                true, RESPONSE_NOT_REQUIRED, true, RESPONSE_NOT_REQUIRED),
+            Arguments.of(BOTH_NOTIFY, "No", RESPONDENT_RESPOND_ONLY,
+                true, RESPONSE_NOT_REQUIRED, true, RESPONSE_NOT_REQUIRED),
+
+            Arguments.of(CLAIMANT_NOTIFY_ONLY, "Yes", BOTH_RESPOND,
+                true, RESPONSE_REQUIRED, false, "never sent"),
+            Arguments.of(CLAIMANT_NOTIFY_ONLY, "Yes", CLAIMANT_RESPOND_ONLY,
+                true, RESPONSE_REQUIRED, false, "never sent"),
+            Arguments.of(CLAIMANT_NOTIFY_ONLY, "Yes", RESPONDENT_RESPOND_ONLY,
+                true, RESPONSE_NOT_REQUIRED, false, "never sent"),
+
+            Arguments.of(CLAIMANT_NOTIFY_ONLY, "No", BOTH_RESPOND,
+                true, RESPONSE_NOT_REQUIRED, false, "never sent"),
+            Arguments.of(CLAIMANT_NOTIFY_ONLY, "No", CLAIMANT_RESPOND_ONLY,
+                true, RESPONSE_NOT_REQUIRED, false, "never sent"),
+            Arguments.of(CLAIMANT_NOTIFY_ONLY, "No", RESPONDENT_RESPOND_ONLY,
+                true, RESPONSE_NOT_REQUIRED, false, "never sent"),
+
+            Arguments.of(RESPONDENT_NOTIFY_ONLY, "Yes", BOTH_RESPOND,
+                false, "never sent", true, RESPONSE_REQUIRED),
+            Arguments.of(RESPONDENT_NOTIFY_ONLY, "Yes", CLAIMANT_RESPOND_ONLY,
+                false, "never sent", true, RESPONSE_NOT_REQUIRED),
+            Arguments.of(RESPONDENT_NOTIFY_ONLY, "Yes", RESPONDENT_RESPOND_ONLY,
+                false, "never sent", true, RESPONSE_REQUIRED),
+
+            Arguments.of(RESPONDENT_NOTIFY_ONLY, "No", BOTH_RESPOND,
+                false, "never sent", true, RESPONSE_NOT_REQUIRED),
+            Arguments.of(RESPONDENT_NOTIFY_ONLY, "No", CLAIMANT_RESPOND_ONLY,
+                false, "never sent", true, RESPONSE_NOT_REQUIRED),
+            Arguments.of(RESPONDENT_NOTIFY_ONLY, "No", RESPONDENT_RESPOND_ONLY,
+                false, "never sent", true, RESPONSE_NOT_REQUIRED)
+        );
+    }
+
+    private Map<String, String> createPersonalisation(CaseData caseData,
+                                                      String expectedCustomText) {
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
+        personalisation.put("caseNumber", caseData.getEthosCaseReference());
+        personalisation.put("caseId", CASE_ID);
+        if (expectedCustomText != null) {
+            personalisation.put("customisedText", expectedCustomText);
+        }
+        return personalisation;
+    }
+
     @Test
     void clearTseAdminDataFromCaseData() {
         caseData.setTseAdminSelectApplication(
@@ -323,4 +456,19 @@ class TseAdmReplyServiceTest {
         assertThat(caseData.getTseAdmReplySelectPartyNotify()).isNull();
     }
 
+    private void createClaimant(CaseData caseData) {
+        ClaimantType claimantType = new ClaimantType();
+        claimantType.setClaimantEmailAddress(CLAIMANT_EMAIL);
+        caseData.setClaimantType(claimantType);
+    }
+
+    private void createRespondent(CaseData caseData) {
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentEmail(RESPONDENT_EMAIL);
+
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(respondentSumType);
+
+        caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(respondentSumTypeItem)));
+    }
 }

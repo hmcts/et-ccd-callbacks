@@ -13,7 +13,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminReplyType;
-import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
@@ -76,6 +75,9 @@ public class TseAdmReplyService {
         "The tribunal requires some information from you about an application.";
     private static final String RESPONSE_NOT_REQUIRED =
         "You have a new message from HMCTS about a claim made to an employment tribunal.";
+    private static final String ERROR_MSG_ADD_DOC_MISSING = "Select or fill the required Add document field";
+    private static final String IS_CMO_OR_REQUEST_CMO = "Case management order";
+    private static final String IS_CMO_OR_REQUEST_REQUEST = "Request";
 
     /**
      * Initial Application and Respond details table.
@@ -144,6 +146,21 @@ public class TseAdmReplyService {
         }
     }
 
+    public List<String> validateInput(CaseData caseData) {
+        List<String> errors = new ArrayList<>();
+        if (addDocumentMissing(caseData)) {
+            errors.add(ERROR_MSG_ADD_DOC_MISSING);
+        }
+        return errors;
+    }
+
+    private boolean addDocumentMissing(CaseData caseData) {
+        return caseData.getTseAdmReplyAddDocument() == null
+                && (IS_CMO_OR_REQUEST_CMO.equals(caseData.getTseAdmReplyIsCmoOrRequest())
+                    || IS_CMO_OR_REQUEST_REQUEST.equals(caseData.getTseAdmReplyIsCmoOrRequest()))
+                && YES.equals(caseData.getTseAdmReplyIsResponseRequired());
+    }
+
     /**
      * Save Tse Admin Record a Decision data to the application object.
      * @param caseData in which the case details are extracted from
@@ -169,7 +186,7 @@ public class TseAdmReplyService {
                                             .date(UtilHelper.formatCurrentDate(LocalDate.now()))
                                             .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
                                             .additionalInformation(caseData.getTseAdmReplyAdditionalInformation())
-                                            .addDocument(getDocumentMandatoryOrOptional(caseData))
+                                            .addDocument(caseData.getTseAdmReplyAddDocument())
                                             .isCmoOrRequest(caseData.getTseAdmReplyIsCmoOrRequest())
                                             .cmoMadeBy(caseData.getTseAdmReplyCmoMadeBy())
                                             .requestMadeBy(caseData.getTseAdmReplyRequestMadeBy())
@@ -180,13 +197,6 @@ public class TseAdmReplyService {
                                             .build()
                             ).build());
         }
-    }
-
-    private UploadedDocumentType getDocumentMandatoryOrOptional(CaseData caseData) {
-        if (YES.equals(caseData.getTseAdmReplyIsResponseRequired())) {
-            return caseData.getTseAdmReplyAddDocumentMandatory();
-        }
-        return caseData.getTseAdmReplyAddDocumentOptional();
     }
 
     /**
@@ -274,8 +284,7 @@ public class TseAdmReplyService {
         caseData.setTseAdmReplyTableMarkUp(null);
         caseData.setTseAdmReplyEnterResponseTitle(null);
         caseData.setTseAdmReplyAdditionalInformation(null);
-        caseData.setTseAdmReplyAddDocumentMandatory(null);
-        caseData.setTseAdmReplyAddDocumentOptional(null);
+        caseData.setTseAdmReplyAddDocument(null);
         caseData.setTseAdmReplyIsCmoOrRequest(null);
         caseData.setTseAdmReplyCmoMadeBy(null);
         caseData.setTseAdmReplyRequestMadeBy(null);

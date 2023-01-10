@@ -57,6 +57,9 @@ class TseAdmReplyServiceTest {
     private CaseData caseData;
 
     private static final String AUTH_TOKEN = "Bearer authToken";
+    private static final String ERROR_MSG_ADD_DOC_MISSING = "Select or fill the required Add document field";
+    private static final String IS_CMO_OR_REQUEST_CMO = "Case management order";
+    private static final String IS_CMO_OR_REQUEST_REQUEST = "Request";
 
     private static final String TEMPLATE_ID = "someTemplateId";
     private static final String CASE_NUMBER = "Some Case Number";
@@ -177,6 +180,65 @@ class TseAdmReplyServiceTest {
     }
 
     @Test
+    void validateInput_Yes_NoDoc_ReturnErrorMsg() {
+        caseData.setTseAdmReplyIsCmoOrRequest(IS_CMO_OR_REQUEST_CMO);
+        caseData.setTseAdmReplyIsResponseRequired(YES);
+        List<String> errors = tseAdmReplyService.validateInput(caseData);
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0)).isEqualTo(ERROR_MSG_ADD_DOC_MISSING);
+    }
+
+    @Test
+    void validateInput_CmoYes_HaveDoc_NoErrorMsg() {
+        caseData.setTseAdmReplyIsCmoOrRequest(IS_CMO_OR_REQUEST_CMO);
+        caseData.setTseAdmReplyIsResponseRequired(YES);
+        caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
+        List<String> errors = tseAdmReplyService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_RequestYes_HaveDoc_NoErrorMsg() {
+        caseData.setTseAdmReplyIsCmoOrRequest(IS_CMO_OR_REQUEST_REQUEST);
+        caseData.setTseAdmReplyIsResponseRequired(YES);
+        caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
+        List<String> errors = tseAdmReplyService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_No_HaveDoc_NoErrorMsg() {
+        caseData.setTseAdmReplyIsCmoOrRequest(IS_CMO_OR_REQUEST_CMO);
+        caseData.setTseAdmReplyIsResponseRequired(NO);
+        caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
+        List<String> errors = tseAdmReplyService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_No_NoDoc_NoErrorMsg() {
+        caseData.setTseAdmReplyIsCmoOrRequest(IS_CMO_OR_REQUEST_CMO);
+        caseData.setTseAdmReplyIsResponseRequired(NO);
+        List<String> errors = tseAdmReplyService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_Neither_HaveDoc_NoErrorMsg() {
+        caseData.setTseAdmReplyIsCmoOrRequest("Neither");
+        caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
+        List<String> errors = tseAdmReplyService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_Neither_NoDoc_NoErrorMsg() {
+        caseData.setTseAdmReplyIsCmoOrRequest("Neither");
+        List<String> errors = tseAdmReplyService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
     void saveTseAdmReplyDataFromCaseData_CmoYes_SaveString() {
         caseData.setGenericTseApplicationCollection(
                 List.of(GenericTseApplicationTypeItem.builder()
@@ -192,7 +254,7 @@ class TseAdmReplyServiceTest {
                 DynamicFixedListType.of(DynamicValueType.create("2", "2 - Change personal details")));
         caseData.setTseAdmReplyEnterResponseTitle("Submit hearing agenda");
         caseData.setTseAdmReplyAdditionalInformation("Additional Information Details");
-        caseData.setTseAdmReplyAddDocumentMandatory(createUploadedDocumentType("document.txt"));
+        caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         caseData.setTseAdmReplyIsCmoOrRequest("Case management order");
         caseData.setTseAdmReplyCmoMadeBy("Legal Officer");
         caseData.setTseAdmReplyEnterFullName("Full Name");
@@ -244,7 +306,7 @@ class TseAdmReplyServiceTest {
 
         caseData.setTseAdminSelectApplication(
                 DynamicFixedListType.of(DynamicValueType.create("3", "3 - Claimant not complied")));
-        caseData.setTseAdmReplyAddDocumentOptional(createUploadedDocumentType("document.txt"));
+        caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         caseData.setTseAdmReplyIsCmoOrRequest("Request");
         caseData.setTseAdmReplyRequestMadeBy("Judge");
         caseData.setTseAdmReplyEnterFullName("Full Name");
@@ -429,8 +491,7 @@ class TseAdmReplyServiceTest {
         caseData.setTseAdmReplyTableMarkUp("| | |\r\n|--|--|\r\n|%s application | %s|\r\n\r\n");
         caseData.setTseAdmReplyEnterResponseTitle("View notice of hearing");
         caseData.setTseAdmReplyAdditionalInformation("Additional information text");
-        caseData.setTseAdmReplyAddDocumentMandatory(createUploadedDocumentType("document.txt"));
-        caseData.setTseAdmReplyAddDocumentOptional(createUploadedDocumentType("document.txt"));
+        caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         caseData.setTseAdmReplyIsCmoOrRequest("Case management order");
         caseData.setTseAdmReplyCmoMadeBy("Legal Officer");
         caseData.setTseAdmReplyRequestMadeBy("Legal Officer");
@@ -445,8 +506,7 @@ class TseAdmReplyServiceTest {
         assertThat(caseData.getTseAdmReplyTableMarkUp()).isNull();
         assertThat(caseData.getTseAdmReplyEnterResponseTitle()).isNull();
         assertThat(caseData.getTseAdmReplyAdditionalInformation()).isNull();
-        assertThat(caseData.getTseAdmReplyAddDocumentMandatory()).isNull();
-        assertThat(caseData.getTseAdmReplyAddDocumentOptional()).isNull();
+        assertThat(caseData.getTseAdmReplyAddDocument()).isNull();
         assertThat(caseData.getTseAdmReplyIsCmoOrRequest()).isNull();
         assertThat(caseData.getTseAdmReplyCmoMadeBy()).isNull();
         assertThat(caseData.getTseAdmReplyRequestMadeBy()).isNull();

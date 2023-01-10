@@ -47,6 +47,7 @@ class TseAdmReplyControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String MID_DETAILS_TABLE = "/tseAdmReply/midDetailsTable";
+    private static final String MID_VALIDATE_INPUT = "/tseAdmReply/midValidateInput";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmReply/aboutToSubmit";
     private static final String SUBMITTED_URL = "/tseAdmReply/submitted";
 
@@ -102,6 +103,44 @@ class TseAdmReplyControllerTest {
         verify(tseAdmReplyService, never()).initialTseAdmReplyTableMarkUp(
                 ccdRequest.getCaseDetails().getCaseData(),
                 AUTH_TOKEN);
+    }
+
+    @Test
+    void midValidateInput_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(MID_VALIDATE_INPUT)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", notNullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(tseAdmReplyService).validateInput(
+                ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    void midValidateInput_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(MID_VALIDATE_INPUT)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+        verify(tseAdmReplyService, never()).validateInput(
+                ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    void midValidateInput_badRequest() throws Exception {
+        mockMvc.perform(post(MID_VALIDATE_INPUT)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        verify(tseAdmReplyService, never()).validateInput(
+                ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test

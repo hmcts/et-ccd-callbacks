@@ -15,6 +15,7 @@ class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
 
     private static final String AUTHORIZATION = "Authorization";
     private static final String MID_DETAILS_TABLE = "/tseAdmReply/midDetailsTable";
+    private static final String MID_VALIDATE_INPUT = "/tseAdmReply/midValidateInput";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmReply/aboutToSubmit";
     private static final String SUBMITTED_URL = "/tseAdmReply/submitted";
 
@@ -33,6 +34,20 @@ class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
                 .header(new Header(AUTHORIZATION, userToken))
                 .body(ccdRequest)
                 .post(MID_DETAILS_TABLE)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .log()
+                .all(true);
+    }
+
+    @Test
+    void midValidateInputSuccessResponse() {
+        RestAssured.given()
+                .spec(spec)
+                .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, userToken))
+                .body(ccdRequest)
+                .post(MID_VALIDATE_INPUT)
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .log()

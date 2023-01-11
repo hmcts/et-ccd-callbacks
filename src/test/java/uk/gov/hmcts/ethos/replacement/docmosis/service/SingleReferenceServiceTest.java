@@ -33,7 +33,7 @@ public class SingleReferenceServiceTest {
 
     @Test
     public void createScotlandReference() {
-        String expectedRef = "8000001/2022" + LocalDateTime.now().getYear();
+        String expectedRef = "8000001/" + LocalDateTime.now().getYear();
         when(singleRefScotlandRepository.ethosCaseRefGen(LocalDateTime.now().getYear())).thenReturn(expectedRef);
         assertEquals(expectedRef, singleReferenceService.createReference(SCOTLAND_CASE_TYPE_ID));
     }

@@ -87,7 +87,6 @@ class TseResponseControllerTest {
             .build();
 
         caseData.setClaimant("Claimant LastName");
-        caseData.setResTseSelectApplication("caseRef");
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
@@ -166,6 +165,21 @@ class TseResponseControllerTest {
     @Test
     void aboutToSubmit_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        GenericTseApplicationType build = TseApplicationBuilder.builder()
+            .withType("Withdraw my claim")
+            .build();
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
+        genericTseApplicationTypeItem.setValue(build);
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+
+        caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
+        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
+
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
@@ -228,8 +242,20 @@ class TseResponseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
 
+        GenericTseApplicationType build = TseApplicationBuilder.builder()
+            .withType("Withdraw my claim")
+            .build();
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
+        genericTseApplicationTypeItem.setValue(build);
+
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseResponseCopyToOtherParty(NO_COPY);
+        caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+
+        caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
+        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
 
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .header("Authorization", AUTH_TOKEN)

@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -161,6 +162,11 @@ public class ReplyToReferralController {
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = ReferralHelper.validateEmail(caseData.getReplyToEmailAddress());
+
+        if (CollectionUtils.isNotEmpty(caseData.getReferralDocument())) {
+            ReferralHelper.addDocumentUploadErrors(caseData.getReferralDocument(), errors);
+        }
+
         return getCallbackRespEntityErrors(errors, caseData);
     }
 

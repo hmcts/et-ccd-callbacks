@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.elasticsearch.common.Strings;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -517,6 +518,20 @@ public final class ReferralHelper {
         personalisation.put("username", username);
         personalisation.put("replyReferral", isNew ? REPLY_REFERRAL_REF : REPLY_REFERRAL_REP);
         return personalisation;
+    }
+
+    /**
+     * Gets errors in document upload.
+     * @param documentTypeItems - a list from which referral document items are extracted
+     * @param errors list
+     */
+    public static void addDocumentUploadErrors(List<DocumentTypeItem> documentTypeItems, List<String> errors) {
+        for (DocumentTypeItem documentTypeItem : documentTypeItems) {
+            if (!Strings.isNullOrEmpty(documentTypeItem.getValue().getShortDescription())
+                && documentTypeItem.getValue().getUploadedDocument() == null) {
+                errors.add("Short description is added but document is not uploaded.");
+            }
+        }
     }
 
     private static String getRespondentNames(CaseData caseData) {

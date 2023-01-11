@@ -333,6 +333,9 @@ dependencies {
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.7'
     // 1084765
     implementation group: 'org.webjars.npm', name: 'minimatch', version: '3.1.1'
+    implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.3'
+    implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.86.Final'
+    implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.86.Final'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

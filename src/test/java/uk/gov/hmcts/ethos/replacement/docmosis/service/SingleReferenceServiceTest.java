@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.joda.time.LocalDateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -26,19 +27,15 @@ public class SingleReferenceServiceTest {
 
     @Test
     public void createEnglandWalesReference() {
-        int currentYear = LocalDate.now().getYear();
-        String testYearText = String.valueOf(currentYear);
-        String expectedRef = "6000001/" + testYearText;
-        when(singleRefEnglandWalesRepository.ethosCaseRefGen(currentYear)).thenReturn(expectedRef);
+        String expectedRef = "6000001/" + LocalDateTime.now().getYear();
+        when(singleRefEnglandWalesRepository.ethosCaseRefGen(LocalDateTime.now().getYear())).thenReturn(expectedRef);
         assertEquals(expectedRef, singleReferenceService.createReference(ENGLANDWALES_CASE_TYPE_ID));
     }
 
     @Test
     public void createScotlandReference() {
-        int currentYear = LocalDate.now().getYear();
-        String testYearText = String.valueOf(currentYear);
-        String expectedRef = "8000001/" + testYearText;
-        when(singleRefScotlandRepository.ethosCaseRefGen(currentYear)).thenReturn(expectedRef);
+        String expectedRef = "8000001/" + LocalDateTime.now().getYear();
+        when(singleRefScotlandRepository.ethosCaseRefGen(LocalDateTime.now().getYear())).thenReturn(expectedRef);
         assertEquals(expectedRef, singleReferenceService.createReference(SCOTLAND_CASE_TYPE_ID));
     }
 }

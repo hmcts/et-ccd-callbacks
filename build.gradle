@@ -260,7 +260,7 @@ ext {
     pact_version = '4.3.10'
     reformLoggingVersion = '5.1.9'
     serenity = '3.3.4'
-    tomcatEmbedVersion = '9.0.68'
+    tomcatEmbedVersion = '10.1.4'
 }
 
 ext["rest-assured.version"] = '5.1.0'
@@ -299,6 +299,7 @@ dependencies {
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.25.4'
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
     implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.54.Final'
+
     implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.21'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'

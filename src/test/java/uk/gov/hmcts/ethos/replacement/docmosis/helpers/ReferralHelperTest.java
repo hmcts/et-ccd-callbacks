@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -29,6 +30,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -447,6 +449,20 @@ class ReferralHelperTest {
 
         String result = ReferralHelper.getDocumentRequest(caseData, "key");
         assertEquals(expectedDocumentSummaryExisting, result);
+    }
+
+    @Test
+    void addErrorDocumentUpload() {
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        DocumentType documentType = new DocumentType();
+        documentType.setShortDescription("shortDescription");
+        documentTypeItem.setId(UUID.randomUUID().toString());
+        documentTypeItem.setValue(documentType);
+        CaseData caseData = new CaseData();
+        caseData.setReferralDocument(List.of(documentTypeItem));
+        List<String> errors = new ArrayList<>();
+        ReferralHelper.addDocumentUploadErrors(caseData.getReferralDocument(), errors);
+        Assert.assertEquals("Short description is added but document is not uploaded.", errors.get(0));
     }
 
     private Map<String, String> getExpectedPersonalisation() {

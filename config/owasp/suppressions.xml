@@ -183,4 +183,144 @@
         <packageUrl regex="true">^pkg:maven/org\.apache\.xmlgraphics/xmlgraphics\-commons@.*$</packageUrl>
         <cve>CVE-2021-37533</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: snakeyaml-1.33.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cve>CVE-2022-3064</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: snakeyaml-1.33.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cve>CVE-2021-4235</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: yarn.lock?flat
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async-http-client-netty-utils@.*$</packageUrl>
+        <cve>CVE-2021-4277</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: LatencyUtils-2.0.3.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.latencyutils/LatencyUtils@.*$</packageUrl>
+        <cve>CVE-2021-4277</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: async-http-client-netty-utils-2.12.3.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async-http-client-netty-utils@.*$</packageUrl>
+        <cve>CVE-2021-4277</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+     file name: tomcat-embed-websocket-9.0.68.jar
+     ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-websocket@.*$</packageUrl>
+        <cve>CVE-2022-45143</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+     file name: debug:2.6.9
+     ]]></notes>
+        <packageUrl regex="true">^pkg:npm/debug@.*$</packageUrl>
+        <vulnerabilityName>1087958</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+     file name: tomcat-embed-core-9.0.68.jar
+     ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-core@.*$</packageUrl>
+        <cve>CVE-2022-45143</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+     file name: flat:4.1.1
+     ]]></notes>
+        <packageUrl regex="true">^pkg:npm/flat@.*$</packageUrl>
+        <vulnerabilityName>1085318</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+     file name: json5:1.0.1
+     ]]></notes>
+        <packageUrl regex="true">^pkg:npm/json5@.*$</packageUrl>
+        <vulnerabilityName>1085311</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+     file name: json5:1.0.1
+     ]]></notes>
+        <packageUrl regex="true">^pkg:npm/json5@.*$</packageUrl>
+        <vulnerabilityName>1085311</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+     file name: LatencyUtils-2.0.3.jar
+     ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.latencyutils/LatencyUtils@.*$</packageUrl>
+        <cpe>cpe:/a:utils_project:utils</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+         file name: LatencyUtils-2.0.3.jar
+         ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.latencyutils/LatencyUtils@.*$</packageUrl>
+        <cve>CVE-2021-4277</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+         file name: async-http-client-netty-utils-2.12.1.jar
+         ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async\-http\-client\-netty\-utils@.*$</packageUrl>
+        <cpe>cpe:/a:utils_project:utils</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+     file name: async-http-client-netty-utils-2.12.1.jar
+     ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async\-http\-client\-netty\-utils@.*$</packageUrl>
+        <cve>CVE-2021-4277</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+         file name: async-http-client-netty-utils-2.12.1.jar
+         ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async\-http\-client\-netty\-utils@.*$</packageUrl>
+        <cve>CVE-2021-4277</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+     file name: snakeyaml-1.33.jar
+     ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cpe>cpe:/a:snakeyaml_project:snakeyaml</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+     file name: snakeyaml-1.33.jar
+     ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cpe>cpe:/a:yaml_project:yaml</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+     file name: snakeyaml-1.33.jar
+     ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cve>CVE-2022-3064</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+         file name: snakeyaml-1.33.jar
+         ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cve>CVE-2021-4235</cve>
+    </suppress>
 </suppressions>

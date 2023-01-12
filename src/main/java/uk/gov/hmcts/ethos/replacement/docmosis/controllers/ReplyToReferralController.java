@@ -164,7 +164,7 @@ public class ReplyToReferralController {
         List<String> errors = ReferralHelper.validateEmail(caseData.getReplyToEmailAddress());
 
         if (CollectionUtils.isNotEmpty(caseData.getReferralDocument())) {
-            ReferralHelper.addDocumentUploadErrors(caseData.getReferralDocument(), errors);
+            ReferralHelper.addDocumentUploadErrors(caseData.getReplyDocument(), errors);
         }
 
         return getCallbackRespEntityErrors(errors, caseData);

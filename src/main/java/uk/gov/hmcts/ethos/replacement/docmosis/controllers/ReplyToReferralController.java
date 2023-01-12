@@ -163,7 +163,7 @@ public class ReplyToReferralController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = ReferralHelper.validateEmail(caseData.getReplyToEmailAddress());
 
-        if (CollectionUtils.isNotEmpty(caseData.getReferralDocument())) {
+        if (CollectionUtils.isNotEmpty(caseData.getReplyDocument())) {
             ReferralHelper.addDocumentUploadErrors(caseData.getReplyDocument(), errors);
         }
 

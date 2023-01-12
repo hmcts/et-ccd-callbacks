@@ -343,4 +343,16 @@ public class CaseTransferControllerTest {
                 .andExpect(jsonPath("$.data.managingOffice",
                         hasToString(TribunalOffice.GLASGOW.getOfficeName())));
     }
+
+    @Test
+    public void assignCaseForbidden() throws Exception {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+
+        mockMvc.perform(post(ASSIGN_CASE)
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
+    }
 }

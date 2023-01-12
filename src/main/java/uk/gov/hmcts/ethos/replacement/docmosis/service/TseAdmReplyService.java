@@ -95,14 +95,14 @@ public class TseAdmReplyService {
 
     private String initialAppDetails(GenericTseApplicationType applicationType, String authToken) {
         return String.format(
-                APP_DETAILS,
-                applicationType.getApplicant(),
-                applicationType.getType(),
-                applicationType.getDate(),
-                APPLICATION_QUESTION,
-                applicationType.getDetails(),
-                documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken),
-                displayCopyToOtherPartyYesOrNo(applicationType.getCopyToOtherPartyYesOrNo())
+            APP_DETAILS,
+            applicationType.getApplicant(),
+            applicationType.getType(),
+            applicationType.getDate(),
+            APPLICATION_QUESTION,
+            applicationType.getDetails(),
+            documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken),
+            displayCopyToOtherPartyYesOrNo(applicationType.getCopyToOtherPartyYesOrNo())
         );
     }
 
@@ -112,17 +112,17 @@ public class TseAdmReplyService {
         }
         IntWrapper respondCount = new IntWrapper(0);
         return applicationType.getRespondentReply().stream()
-                .map(respondent -> String.format(
-                        RESPONSE_DETAILS,
-                        respondCount.incrementAndReturnValue(),
-                        respondent.getValue().getFrom(),
-                        respondent.getValue().getDate(),
-                        respondent.getValue().getFrom().toLowerCase(),
-                        respondent.getValue().getResponse(),
-                        populateListDocWithInfoAndLink(respondent.getValue().getSupportingMaterial(), authToken),
-                        displayCopyToOtherPartyYesOrNo(respondent.getValue().getCopyToOtherParty())))
-                .findFirst()
-                .orElse(null);
+            .map(respondent -> String.format(
+                RESPONSE_DETAILS,
+                respondCount.incrementAndReturnValue(),
+                respondent.getValue().getFrom(),
+                respondent.getValue().getDate(),
+                respondent.getValue().getFrom().toLowerCase(),
+                respondent.getValue().getResponse(),
+                populateListDocWithInfoAndLink(respondent.getValue().getSupportingMaterial(), authToken),
+                displayCopyToOtherPartyYesOrNo(respondent.getValue().getCopyToOtherParty())))
+            .findFirst()
+            .orElse(null);
     }
 
     private String populateListDocWithInfoAndLink(List<DocumentTypeItem> supportingMaterial, String authToken) {
@@ -130,10 +130,10 @@ public class TseAdmReplyService {
             return "";
         }
         return supportingMaterial.stream()
-                .map(documentTypeItem ->
-                        documentManagementService.displayDocNameTypeSizeLink(
-                                documentTypeItem.getValue().getUploadedDocument(), authToken) + STRING_BR)
-                .collect(Collectors.joining());
+            .map(documentTypeItem ->
+                documentManagementService.displayDocNameTypeSizeLink(
+                    documentTypeItem.getValue().getUploadedDocument(), authToken) + STRING_BR)
+            .collect(Collectors.joining());
     }
 
     private String displayCopyToOtherPartyYesOrNo(String copyToOtherPartyYesOrNo) {
@@ -156,9 +156,9 @@ public class TseAdmReplyService {
 
     private boolean addDocumentMissing(CaseData caseData) {
         return caseData.getTseAdmReplyAddDocument() == null
-                && (IS_CMO_OR_REQUEST_CMO.equals(caseData.getTseAdmReplyIsCmoOrRequest())
-                    || IS_CMO_OR_REQUEST_REQUEST.equals(caseData.getTseAdmReplyIsCmoOrRequest()))
-                && YES.equals(caseData.getTseAdmReplyIsResponseRequired());
+            && (IS_CMO_OR_REQUEST_CMO.equals(caseData.getTseAdmReplyIsCmoOrRequest())
+                || IS_CMO_OR_REQUEST_REQUEST.equals(caseData.getTseAdmReplyIsCmoOrRequest()))
+            && YES.equals(caseData.getTseAdmReplyIsResponseRequired());
     }
 
     /**
@@ -179,23 +179,23 @@ public class TseAdmReplyService {
             }
 
             genericTseApplicationType.getAdminReply().add(
-                    TseAdminReplyTypeItem.builder()
-                            .id(UUID.randomUUID().toString())
-                            .value(
-                                    TseAdminReplyType.builder()
-                                            .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                                            .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
-                                            .additionalInformation(caseData.getTseAdmReplyAdditionalInformation())
-                                            .addDocument(caseData.getTseAdmReplyAddDocument())
-                                            .isCmoOrRequest(caseData.getTseAdmReplyIsCmoOrRequest())
-                                            .cmoMadeBy(caseData.getTseAdmReplyCmoMadeBy())
-                                            .requestMadeBy(caseData.getTseAdmReplyRequestMadeBy())
-                                            .enterFullName(caseData.getTseAdmReplyEnterFullName())
-                                            .isResponseRequired(caseData.getTseAdmReplyIsResponseRequired())
-                                            .selectPartyRespond(caseData.getTseAdmReplySelectPartyRespond())
-                                            .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
-                                            .build()
-                            ).build());
+                TseAdminReplyTypeItem.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(
+                        TseAdminReplyType.builder()
+                            .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+                            .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
+                            .additionalInformation(caseData.getTseAdmReplyAdditionalInformation())
+                            .addDocument(caseData.getTseAdmReplyAddDocument())
+                            .isCmoOrRequest(caseData.getTseAdmReplyIsCmoOrRequest())
+                            .cmoMadeBy(caseData.getTseAdmReplyCmoMadeBy())
+                            .requestMadeBy(caseData.getTseAdmReplyRequestMadeBy())
+                            .enterFullName(caseData.getTseAdmReplyEnterFullName())
+                            .isResponseRequired(caseData.getTseAdmReplyIsResponseRequired())
+                            .selectPartyRespond(caseData.getTseAdmReplySelectPartyRespond())
+                            .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
+                            .build()
+                    ).build());
         }
     }
 

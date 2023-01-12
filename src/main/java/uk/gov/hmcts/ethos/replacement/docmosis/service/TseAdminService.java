@@ -122,13 +122,13 @@ public class TseAdminService {
 
     private String initialTseAdminAppDetails(GenericTseApplicationType applicationType, String authToken) {
         return String.format(
-                APP_DETAILS,
-                applicationType.getApplicant(),
-                applicationType.getType(),
-                applicationType.getDate(),
-                APPLICATION_QUESTION,
-                applicationType.getDetails(),
-                documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken)
+            APP_DETAILS,
+            applicationType.getApplicant(),
+            applicationType.getType(),
+            applicationType.getDate(),
+            APPLICATION_QUESTION,
+            applicationType.getDetails(),
+            documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken)
         );
     }
 
@@ -154,10 +154,10 @@ public class TseAdminService {
             return "";
         }
         return supportingMaterial.stream()
-                .map(documentTypeItem ->
-                        documentManagementService.displayDocNameTypeSizeLink(
-                                documentTypeItem.getValue().getUploadedDocument(), authToken) + STRING_BR)
-                .collect(Collectors.joining());
+            .map(documentTypeItem ->
+                documentManagementService.displayDocNameTypeSizeLink(
+                    documentTypeItem.getValue().getUploadedDocument(), authToken) + STRING_BR)
+            .collect(Collectors.joining());
     }
 
     /**
@@ -178,24 +178,24 @@ public class TseAdminService {
             }
 
             genericTseApplicationType.getAdminDecision().add(
-                    TseAdminRecordDecisionTypeItem.builder()
-                            .id(UUID.randomUUID().toString())
-                            .value(
-                                    TseAdminRecordDecisionType.builder()
-                                            .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                                            .enterNotificationTitle(caseData.getTseAdminEnterNotificationTitle())
-                                            .decision(caseData.getTseAdminDecision())
-                                            .decisionDetails(caseData.getTseAdminDecisionDetails())
-                                            .typeOfDecision(caseData.getTseAdminTypeOfDecision())
-                                            .isResponseRequired(caseData.getTseAdminIsResponseRequired())
-                                            .selectPartyRespond(caseData.getTseAdminSelectPartyRespond())
-                                            .additionalInformation(caseData.getTseAdminAdditionalInformation())
-                                            .responseRequiredDoc(getResponseRequiredDocYesOrNo(caseData))
-                                            .decisionMadeBy(caseData.getTseAdminDecisionMadeBy())
-                                            .decisionMadeByFullName(caseData.getTseAdminDecisionMadeByFullName())
-                                            .selectPartyNotify(caseData.getTseAdminSelectPartyNotify())
-                                            .build()
-                            ).build());
+                TseAdminRecordDecisionTypeItem.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(
+                        TseAdminRecordDecisionType.builder()
+                            .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+                            .enterNotificationTitle(caseData.getTseAdminEnterNotificationTitle())
+                            .decision(caseData.getTseAdminDecision())
+                            .decisionDetails(caseData.getTseAdminDecisionDetails())
+                            .typeOfDecision(caseData.getTseAdminTypeOfDecision())
+                            .isResponseRequired(caseData.getTseAdminIsResponseRequired())
+                            .selectPartyRespond(caseData.getTseAdminSelectPartyRespond())
+                            .additionalInformation(caseData.getTseAdminAdditionalInformation())
+                            .responseRequiredDoc(getResponseRequiredDocYesOrNo(caseData))
+                            .decisionMadeBy(caseData.getTseAdminDecisionMadeBy())
+                            .decisionMadeByFullName(caseData.getTseAdminDecisionMadeByFullName())
+                            .selectPartyNotify(caseData.getTseAdminSelectPartyNotify())
+                            .build()
+                    ).build());
         }
     }
 

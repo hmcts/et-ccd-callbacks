@@ -232,8 +232,7 @@ public class CaseTransferController {
 
         CaseData caseData =  ccdRequest.getCaseDetails().getCaseData();
         if (ENGLANDWALES_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
-            caseData.setManagingOffice(caseData.getOfficeCT().getSelectedCode());
-            caseData.setOfficeCT(null);
+            caseData.setManagingOffice(caseData.getAssignOffice().getSelectedCode());
         } else if (SCOTLAND_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
             caseData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
         }

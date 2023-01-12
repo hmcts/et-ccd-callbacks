@@ -305,7 +305,7 @@ public class CaseTransferControllerTest {
     public void assignCaseEnglandWales() throws Exception {
         CaseData caseData = CaseDataBuilder.builder()
                 .withManagingOffice(UNASSIGNED_OFFICE)
-                .withOfficeCt(TribunalOffice.LEEDS.getOfficeName())
+                .withAssignOffice(TribunalOffice.LEEDS.getOfficeName())
                 .build();
 
         CCDRequest ccdRequest = CCDRequestBuilder.builder()

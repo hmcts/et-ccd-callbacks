@@ -462,13 +462,13 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withOfficeCt(String selectedOffice) {
+    public CaseDataBuilder withAssignOffice(String selectedOffice) {
         List<DynamicValueType> tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
                 .map(tribunalOffice ->
                         DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
                 .collect(Collectors.toList());
-        caseData.setOfficeCT(DynamicFixedListType.from(tribunalOffices));
-        caseData.getOfficeCT().setValue(DynamicValueType.create(selectedOffice, selectedOffice));
+        caseData.setAssignOffice(DynamicFixedListType.from(tribunalOffices));
+        caseData.getAssignOffice().setValue(DynamicValueType.create(selectedOffice, selectedOffice));
         return this;
     }
 }

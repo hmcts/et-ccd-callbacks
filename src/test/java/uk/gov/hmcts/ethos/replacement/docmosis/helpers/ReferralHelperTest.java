@@ -551,5 +551,4 @@ class ReferralHelperTest {
         hearingTypeItem.setValue(hearingType);
         caseData.setHearingCollection(List.of(hearingTypeItem));
     }
-
 }

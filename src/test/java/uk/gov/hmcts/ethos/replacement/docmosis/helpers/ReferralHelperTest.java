@@ -477,6 +477,7 @@ class ReferralHelperTest {
         personalisation.put("subject", "ET1");
         personalisation.put("username", "First Last");
         personalisation.put("replyReferral", "Referred by");
+        personalisation.put("ccdId", "123");
         return personalisation;
     }
 

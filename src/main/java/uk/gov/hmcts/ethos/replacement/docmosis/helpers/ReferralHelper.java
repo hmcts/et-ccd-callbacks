@@ -517,6 +517,7 @@ public final class ReferralHelper {
         personalisation.put("subject", getReferralSubject(caseData, isNew));
         personalisation.put("username", username);
         personalisation.put("replyReferral", isNew ? REPLY_REFERRAL_REF : REPLY_REFERRAL_REP);
+        personalisation.put("ccdId", detail.getCaseId());
         return personalisation;
     }
 

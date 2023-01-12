@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -29,6 +30,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,6 +82,11 @@ class ReferralHelperTest {
         + "#09 null<br><br>Directions &nbsp;&nbsp;&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 details<br><br>Documents "
         + "&nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;<br><br>"
         + "General notes &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09 replyNotes</pre><hr>";
+
+    private final String singleHearingDetailsNullDoc = "<br><br>Documents &nbsp;&#09&"
+        + "#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\" download>testFileName</a>&nbsp;"
+        + "<br><br>Documents &nbsp;&#09&#09&#09&#09&#09&#09&#09&#09&#09 <a href=\"/documents/\""
+        + " download>testFileName</a>&nbsp;";
 
     private final String expectedHearingReferralDetailsMultipleReplies = "<hr><h3>Hearing details </h3><pre>Date &"
         + "nbsp;&#09&#09&#09&#09&#09&nbsp; 11 November 2030<br><br>Hearing &#09&#09&#09&#09&nbsp; null<br><br>Type &n"
@@ -287,6 +294,21 @@ class ReferralHelperTest {
     }
 
     @Test
+    void populateHearingReferralDetails_NullReferralDocLink() {
+        caseData.setSelectReferral(new DynamicFixedListType("1"));
+        ReferralType referral = new ReferralType();
+        referral.setReferralReplyCollection(List.of(createReferralReplyTypeItem("1")));
+        ReferralTypeItem referralTypeItem = new ReferralTypeItem();
+        referralTypeItem.setId("1");
+        referralTypeItem.setValue(referral);
+        caseData.setReferralCollection(List.of(referralTypeItem));
+        caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
+
+        assertEquals(expectedHearingReferralDetailsSingleReply.replace(singleHearingDetailsNullDoc, ""),
+            ReferralHelper.populateHearingReferralDetails(caseData));
+    }
+
+    @Test
     void clearReferralReplyDataFromCaseData() {
         setReferralReplyData();
         ReferralHelper.clearReferralReplyDataFromCaseData(caseData);
@@ -429,6 +451,20 @@ class ReferralHelperTest {
         assertEquals(expectedDocumentSummaryExisting, result);
     }
 
+    @Test
+    void addErrorDocumentUpload() {
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        DocumentType documentType = new DocumentType();
+        documentType.setShortDescription("shortDescription");
+        documentTypeItem.setId(UUID.randomUUID().toString());
+        documentTypeItem.setValue(documentType);
+        CaseData caseData = new CaseData();
+        caseData.setReferralDocument(List.of(documentTypeItem));
+        List<String> errors = new ArrayList<>();
+        ReferralHelper.addDocumentUploadErrors(caseData.getReferralDocument(), errors);
+        Assert.assertEquals("Short description is added but document is not uploaded.", errors.get(0));
+    }
+
     private Map<String, String> getExpectedPersonalisation() {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", "caseRef");
@@ -515,5 +551,4 @@ class ReferralHelperTest {
         hearingTypeItem.setValue(hearingType);
         caseData.setHearingCollection(List.of(hearingTypeItem));
     }
-
 }

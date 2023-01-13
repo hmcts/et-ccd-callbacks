@@ -35,7 +35,7 @@ Scenario('Ensure date notified field is not present for "withdrawn or private se
 
 }).tag('@e2e')
     .tag('@nightly')
-    .tag('@wip');
+    .tag('@wip').tag('@RET-BAT')
 
 
 Scenario('User enters a disposal date outside of hearing collection - error message displayed', async ({I}) => {

@@ -38,6 +38,6 @@ module.exports = async function (jurisdictionOutcome) {
         default:
             console.log("No jurisdiction code matched with" + jurisdictionOutcome);
     }
-    await I.navByClick(commonConfig.continue);
+    I.click(commonConfig.continue);
     await I.click(commonConfig.submit);
 };

@@ -8,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferDifferentCountryService;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({CaseTransferController.class, JsonMapper.class})
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class CaseTransferControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -63,7 +65,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testInitTransferToScotland() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(INIT_TRANSFER_TO_SCOTLAND_URL)
@@ -84,7 +86,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testInitTransferToScotlandForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(INIT_TRANSFER_TO_SCOTLAND_URL)
@@ -96,7 +98,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testInitTransferToEnglandWales() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(INIT_TRANSFER_TO_ENGLANDWALES_URL)
@@ -117,7 +119,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testInitTransferToEnglandWalesForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(INIT_TRANSFER_TO_ENGLANDWALES_URL)
@@ -129,7 +131,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testTransferSameCountry() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_URL)
@@ -157,7 +159,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testTransferSameCountryForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_URL)
@@ -171,7 +173,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testTransferSameCountryEccLinkedCase() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL)
@@ -199,7 +201,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testTransferSameCountryEccLinkedCaseForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL)
@@ -213,7 +215,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testTransferDifferentCountry() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(CASE_TRANSFER_DIFFERENT_COUNTRY_URL)
@@ -241,7 +243,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testTransferDifferentCountryForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(CASE_TRANSFER_DIFFERENT_COUNTRY_URL)
@@ -255,7 +257,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testCaseTransferToECM() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(CASE_TRANSFER_TO_ECM)
@@ -276,7 +278,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testCaseTransferToEcmForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(CASE_TRANSFER_TO_ECM)

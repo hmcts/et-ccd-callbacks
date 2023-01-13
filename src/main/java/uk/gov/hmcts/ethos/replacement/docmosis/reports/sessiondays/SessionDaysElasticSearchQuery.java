@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays;
 
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
@@ -13,13 +14,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICS
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_HEARING_LISTED_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD;
 
-public class SessionDaysElasticSearchQuery {
+public final class SessionDaysElasticSearchQuery {
     private SessionDaysElasticSearchQuery() {
         // Access through static methods
     }
 
     static String create(String dateToSearchFrom, String dateToSearchTo, String managingOffice) {
-        var boolQueryBuilder = boolQuery()
+        BoolQueryBuilder boolQueryBuilder = boolQuery()
                 .must(new ExistsQueryBuilder(ELASTICSEARCH_FIELD_HEARING_COLLECTION))
                 .filter(new RangeQueryBuilder(ELASTICSEARCH_FIELD_HEARING_LISTED_DATE
                 ).gte(dateToSearchFrom).lte(dateToSearchTo));

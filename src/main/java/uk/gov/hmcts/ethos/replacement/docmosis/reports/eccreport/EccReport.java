@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport;
 
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.reports.eccreport.EccReportCaseData;
 import uk.gov.hmcts.ecm.common.model.reports.eccreport.EccReportSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
@@ -11,7 +12,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class EccReport {
+@SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+public final class EccReport {
 
     private final EccReportDataSource reportDataSource;
 
@@ -20,9 +22,9 @@ public class EccReport {
     }
 
     public EccReportData generateReport(ReportParams params) {
-        var submitEvents = getCases(params);
-        var office = ReportHelper.getReportOffice(params.getCaseTypeId(), params.getManagingOffice());
-        var reportData = initReport(office);
+        List<EccReportSubmitEvent> submitEvents = getCases(params);
+        String office = ReportHelper.getReportOffice(params.getCaseTypeId(), params.getManagingOffice());
+        EccReportData reportData = initReport(office);
 
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             executeReport(reportData, submitEvents);
@@ -35,7 +37,7 @@ public class EccReport {
     }
 
     private List<EccReportSubmitEvent> getCases(ReportParams params) {
-        var caseTypeId = UtilHelper.getListingCaseTypeId(params.getCaseTypeId());
+        String caseTypeId = UtilHelper.getListingCaseTypeId(params.getCaseTypeId());
         return reportDataSource.getData(new ReportParams(caseTypeId, params.getManagingOffice(), params.getDateFrom(),
                 params.getDateTo()));
     }
@@ -46,12 +48,12 @@ public class EccReport {
     }
 
     private List<EccReportDetail> getReportDetail(List<EccReportSubmitEvent> submitEvents) {
-        var eccReportDetailList = new ArrayList<EccReportDetail>();
+        List<EccReportDetail> eccReportDetailList = new ArrayList<>();
         for (EccReportSubmitEvent submitEvent : submitEvents) {
-            var eccReportDetail = new EccReportDetail();
-            var caseData = submitEvent.getCaseData();
+            EccReportCaseData caseData = submitEvent.getCaseData();
             if (CollectionUtils.isNotEmpty(caseData.getEccCases())
                     && CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
+                EccReportDetail eccReportDetail = new EccReportDetail();
                 eccReportDetail.setState(submitEvent.getState());
                 eccReportDetail.setDate(caseData.getReceiptDate());
                 eccReportDetail.setCaseNumber(caseData.getEthosCaseReference());
@@ -69,7 +71,7 @@ public class EccReport {
     private String getEccCases(List<EccCounterClaimTypeItem> eccItems) {
         StringBuilder eccCasesList = new StringBuilder();
         for (EccCounterClaimTypeItem eccItem : eccItems) {
-            eccCasesList.append(eccItem.getValue().getCounterClaim()).append("\n");
+            eccCasesList.append(eccItem.getValue().getCounterClaim()).append('\n');
         }
         return eccCasesList.toString().trim();
     }

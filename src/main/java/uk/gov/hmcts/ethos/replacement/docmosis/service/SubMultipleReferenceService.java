@@ -12,6 +12,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_
 @Slf4j
 @RequiredArgsConstructor
 @Service("subMultipleReferenceService")
+@SuppressWarnings({"PMD.AvoidSynchronizedAtMethodLevel"})
 public class SubMultipleReferenceService {
 
     private final SubMultipleRefEnglandWalesRepository subMultipleRefEnglandWalesRepository;

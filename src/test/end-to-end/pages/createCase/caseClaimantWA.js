@@ -17,5 +17,5 @@ module.exports =  async function () {
     I.selectOption(caseClaimantWorkAddress.claimant_work_address_select_an_address,'1: Object');
     I.fillField(caseClaimantWorkAddress.claimant_work_address_phone_number,'07315621019');
 
-    I.navByClick(commonConfig.continueButton);
+    I.click(commonConfig.continueButton);
 }

@@ -5,6 +5,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_ABERDEEN_VENUE_FIELD_NAME;
@@ -15,7 +16,8 @@ import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_VENUE_FIELD_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
 
 @Slf4j
-public class ListingVenueHelper {
+@SuppressWarnings({"PMD.ConfusingTernary"})
+public final class ListingVenueHelper {
 
     private ListingVenueHelper() {
         // All access through static methods
@@ -92,7 +94,7 @@ public class ListingVenueHelper {
     }
 
     public static boolean isAllScottishVenues(ListingData listingData) {
-        var venues = new ArrayList<DynamicFixedListType>();
+        List<DynamicFixedListType> venues = new ArrayList<>();
         venues.add(listingData.getVenueGlasgow());
         venues.add(listingData.getVenueAberdeen());
         venues.add(listingData.getVenueDundee());
@@ -102,7 +104,7 @@ public class ListingVenueHelper {
 
     private static boolean isNotAllVenuesValue(DynamicFixedListType dynamicFixedListType) {
         if (dynamicFixedListType != null && dynamicFixedListType.getValue() != null) {
-            var selectedValue = dynamicFixedListType.getSelectedCode();
+            String selectedValue = dynamicFixedListType.getSelectedCode();
             return !ALL_VENUES.equals(selectedValue);
         } else {
             return false;
@@ -111,7 +113,7 @@ public class ListingVenueHelper {
 
     private static boolean isAllVenuesValue(DynamicFixedListType dynamicFixedListType) {
         if (dynamicFixedListType != null && dynamicFixedListType.getValue() != null) {
-            var selectedValue = dynamicFixedListType.getSelectedCode();
+            String selectedValue = dynamicFixedListType.getSelectedCode();
             return ALL_VENUES.equals(selectedValue);
         } else {
             return false;

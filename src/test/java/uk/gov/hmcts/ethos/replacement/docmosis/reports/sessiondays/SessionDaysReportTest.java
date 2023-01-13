@@ -35,6 +35,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Judge
 import static uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JudgeEmploymentStatus.UNKNOWN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays.SessionDaysReport.FULL_DAY;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ExcessiveImports"})
 class SessionDaysReportTest {
 
     SessionDaysReportDataSource reportDataSource;
@@ -82,9 +83,9 @@ class SessionDaysReportTest {
         submitEvents.add(caseDataBuilder
                 .buildAsSubmitEvent());
 
-        var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        ReportParams params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
-        var reportData = sessionDaysReport.generateReport(params);
+        SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);
         assertEquals("0", reportData.getReportSummary().getFtSessionDaysTotal());
         assertEquals("0", reportData.getReportSummary().getPtSessionDaysTotal());
@@ -104,9 +105,9 @@ class SessionDaysReportTest {
         caseDataBuilder.withHearingData(hearingStatus);
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
 
-        var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        ReportParams params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
-        var reportData = sessionDaysReport.generateReport(params);
+        SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);
         assertEquals("0", reportData.getReportSummary().getFtSessionDaysTotal());
         assertEquals("0", reportData.getReportSummary().getPtSessionDaysTotal());
@@ -126,9 +127,9 @@ class SessionDaysReportTest {
         caseDataBuilder.withHearingData(HEARING_STATUS_HEARD);
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
 
-        var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        ReportParams params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
-        var reportData = sessionDaysReport.generateReport(params);
+        SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);
         assertEquals("1", reportData.getReportSummary().getFtSessionDaysTotal());
         assertEquals("1", reportData.getReportSummary().getPtSessionDaysTotal());
@@ -141,7 +142,7 @@ class SessionDaysReportTest {
     }
 
     private void assertReportSummary2Values(SessionDaysReportData reportData) {
-        var reportSummary2 = reportData.getReportSummary2List().get(0);
+        SessionDaysReportSummary2 reportSummary2 = reportData.getReportSummary2List().get(0);
         assertEquals("1", reportSummary2.getFtSessionDays());
         assertEquals("1", reportSummary2.getPtSessionDays());
         assertEquals("1", reportSummary2.getOtherSessionDays());
@@ -154,11 +155,11 @@ class SessionDaysReportTest {
     void assertReportDetailsValues(String judge, String judgeType, int index) {
         caseDataBuilder.withHearingData(HEARING_STATUS_HEARD);
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
-        var params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+        ReportParams params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
-        var reportData = sessionDaysReport.generateReport(params);
+        SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
         assertCommonValues(reportData);
-        var reportDetail = reportData.getReportDetails().get(index);
+        SessionDaysReportDetail reportDetail = reportData.getReportDetails().get(index);
         assertEquals("111", reportDetail.getCaseReference());
         assertEquals("Clerk A", reportDetail.getHearingClerk());
         assertEquals("2022-01-20", reportDetail.getHearingDate());
@@ -183,9 +184,9 @@ class SessionDaysReportTest {
 
         caseDataBuilder.withHearingData(HEARING_STATUS_HEARD);
         submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
-        var params = new ReportParams(SCOTLAND_LISTING_CASE_TYPE_ID, null,
+        ReportParams params = new ReportParams(SCOTLAND_LISTING_CASE_TYPE_ID, null,
                 DATE_FROM, DATE_TO);
-        var reportData = sessionDaysReport.generateReport(params);
+        SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
         assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportData.getReportSummary().getOffice());
     }
 }

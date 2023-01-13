@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -51,6 +52,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
 @Service("caseManagementForCaseWorkerService")
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.TooManyMethods",
+    "PMD.UnnecessaryFullyQualifiedName", "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.ExcessiveImports",
+    "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions", "PMD.ImplicitSwitchFallThrough",
+    "PMD.LawOfDemeter", "PMD.PreserveStackTrace", "PMD.CyclomaticComplexity"})
 public class CaseManagementForCaseWorkerService {
 
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
@@ -97,7 +102,7 @@ public class CaseManagementForCaseWorkerService {
 
     private void respondentDefaults(CaseData caseData) {
         if (caseData.getRespondentCollection() != null && !caseData.getRespondentCollection().isEmpty()) {
-            var respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+            RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
             caseData.setRespondent(nullCheck(respondentSumType.getRespondentName()));
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
                 checkExtensionRequired(respondentSumTypeItem);
@@ -183,12 +188,12 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public CaseData struckOutRespondents(CCDRequest ccdRequest) {
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         if (caseData.getRespondentCollection() != null && !caseData.getRespondentCollection().isEmpty()) {
             List<RespondentSumTypeItem> activeRespondent = new ArrayList<>();
             List<RespondentSumTypeItem> struckRespondent = new ArrayList<>();
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-                var respondentSumType = respondentSumTypeItem.getValue();
+                RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
                 if (respondentSumType.getResponseStruckOut() != null) {
                     if (respondentSumType.getResponseStruckOut().equals(YES)) {
                         struckRespondent.add(respondentSumTypeItem);
@@ -208,12 +213,12 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public CaseData continuingRespondent(CCDRequest ccdRequest) {
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         if (CollectionUtils.isEmpty(caseData.getRepCollection())) {
             List<RespondentSumTypeItem> continuingRespondent = new ArrayList<>();
             List<RespondentSumTypeItem> notContinuingRespondent = new ArrayList<>();
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-                var respondentSumType = respondentSumTypeItem.getValue();
+                RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
                 if (YES.equals(respondentSumType.getResponseContinue())) {
                     continuingRespondent.add(respondentSumTypeItem);
                 } else if (NO.equals(respondentSumType.getResponseContinue())) {
@@ -231,18 +236,18 @@ public class CaseManagementForCaseWorkerService {
     }
 
     private boolean positionChanged(CaseData caseData) {
-        return (isNullOrEmpty(caseData.getCurrentPosition())
-                || !caseData.getPositionType().equals(caseData.getCurrentPosition()));
+        return isNullOrEmpty(caseData.getCurrentPosition())
+                || !caseData.getPositionType().equals(caseData.getCurrentPosition());
     }
 
     public void amendHearing(CaseData caseData, String caseTypeId) {
         if (!CollectionUtils.isEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-                var hearingType =  hearingTypeItem.getValue();
+                HearingType hearingType =  hearingTypeItem.getValue();
                 if (!CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
                     for (DateListedTypeItem dateListedTypeItem
                             : hearingTypeItem.getValue().getHearingDateCollection()) {
-                        var dateListedType = dateListedTypeItem.getValue();
+                        DateListedType dateListedType = dateListedTypeItem.getValue();
                         if (dateListedType.getHearingStatus() == null) {
                             dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
                             dateListedType.setHearingTimingStart(dateListedType.getListedDate());
@@ -271,7 +276,7 @@ public class CaseManagementForCaseWorkerService {
 
     private void addHearingsOnWeekendError(DateListedTypeItem dateListedTypeItem, List<String> errors,
                                            String hearingNumber) {
-        var date = LocalDateTime.parse(
+        LocalDate date = LocalDateTime.parse(
                 dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         if (SUNDAY.equals(dayOfWeek)
@@ -307,7 +312,7 @@ public class CaseManagementForCaseWorkerService {
         dateListedType.setHearingDundee(null);
         dateListedType.setHearingEdinburgh(null);
 
-        var hearingVenue = hearingType.getHearingVenueScotland();
+        String hearingVenue = hearingType.getHearingVenueScotland();
         if (TribunalOffice.GLASGOW.getOfficeName().equals(hearingVenue)) {
             dateListedType.setHearingGlasgow(hearingType.getHearingGlasgow());
             hearingType.setHearingAberdeen(null);
@@ -332,10 +337,10 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public CaseData createECC(CaseDetails caseDetails, String authToken, List<String> errors, String callback) {
-        var currentCaseData = caseDetails.getCaseData();
+        CaseData currentCaseData = caseDetails.getCaseData();
         List<SubmitEvent> submitEvents = getCasesES(caseDetails, authToken);
         if (submitEvents != null && !submitEvents.isEmpty()) {
-            var submitEvent = submitEvents.get(0);
+            SubmitEvent submitEvent = submitEvents.get(0);
             if (ECCHelper.validCaseForECC(submitEvent, errors)) {
                 switch (callback) {
                     case MID_EVENT_CALLBACK:
@@ -371,8 +376,8 @@ public class CaseManagementForCaseWorkerService {
     private void sendUpdateSingleCaseECC(String authToken, CaseDetails currentCaseDetails,
                                          CaseData originalCaseData, String caseIdToLink) {
         try {
-            var eccCounterClaimTypeItem = new EccCounterClaimTypeItem();
-            var eccCounterClaimType = new EccCounterClaimType();
+            EccCounterClaimTypeItem eccCounterClaimTypeItem = new EccCounterClaimTypeItem();
+            EccCounterClaimType eccCounterClaimType = new EccCounterClaimType();
             eccCounterClaimType.setCounterClaim(currentCaseDetails.getCaseData().getEthosCaseReference());
             eccCounterClaimTypeItem.setId(UUID.randomUUID().toString());
             eccCounterClaimTypeItem.setValue(eccCounterClaimType);

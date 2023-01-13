@@ -10,8 +10,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.CreateService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AdminDataBuilder;
@@ -34,6 +36,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.CreateCo
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CreateController.class, JsonMapper.class})
+@SuppressWarnings({"PMD.ExcessiveImports"})
 class CreateControllerTest {
 
     private String token;
@@ -57,7 +60,7 @@ class CreateControllerTest {
 
     @Test
     void testHandleAboutToSubmitEventSuccess() throws Exception {
-        var ccdRequest = AdminDataBuilder.builder().buildAsCCDRequest();
+        CCDRequest ccdRequest = AdminDataBuilder.builder().buildAsCCDRequest();
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
 
         ResultActions resultActions = mockMvc.perform(post("/admin/create/aboutToSubmitEvent")
@@ -69,10 +72,10 @@ class CreateControllerTest {
                 .andExpect(jsonPath("$.errors", hasSize(0)))
                 .andExpect(jsonPath("$.warnings", nullValue()));
 
-        var result = resultActions.andReturn();
-        var contentAsString = result.getResponse().getContentAsString();
-        var json = new JSONObject(contentAsString).getJSONObject("data");
-        var adminData = jsonMapper.fromJson(json.toString(), AdminData.class);
+        MvcResult result = resultActions.andReturn();
+        String contentAsString = result.getResponse().getContentAsString();
+        JSONObject json = new JSONObject(contentAsString).getJSONObject("data");
+        AdminData adminData = jsonMapper.fromJson(json.toString(), AdminData.class);
 
         verify(createService, times(1)).initCreateAdmin(token);
         assertEquals(ADMIN_CASE_NAME, adminData.getName());
@@ -80,7 +83,7 @@ class CreateControllerTest {
 
     @Test
     void testHandleAboutToSubmitEventForbidden() throws Exception {
-        var ccdRequest = AdminDataBuilder.builder().buildAsCCDRequest();
+        CCDRequest ccdRequest = AdminDataBuilder.builder().buildAsCCDRequest();
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
 
         mockMvc.perform(post("/admin/create/aboutToSubmitEvent")

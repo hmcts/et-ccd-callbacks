@@ -27,7 +27,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CA
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-        BroughtForwardInitialiser.class, ClerkService.class
+    BroughtForwardInitialiser.class, ClerkService.class
 })
 class BroughtForwardInitialiserTest {
 
@@ -42,10 +42,10 @@ class BroughtForwardInitialiserTest {
 
     @Test
     void shouldAddScotlandClerks() {
-        var clerks = List.of(DynamicValueType.create("clerk1", "Clerk1"));
+        List<DynamicValueType> clerks = List.of(DynamicValueType.create("clerk1", "Clerk1"));
         when(courtWorkerService.getCourtWorkerByTribunalOffice(TribunalOffice.SCOTLAND,
                 CourtWorkerType.CLERK)).thenReturn(clerks);
-        var listingDetails = createListingDetails(SCOTLAND_LISTING_CASE_TYPE_ID, BROUGHT_FORWARD_REPORT);
+        ListingDetails listingDetails = createListingDetails(SCOTLAND_LISTING_CASE_TYPE_ID, BROUGHT_FORWARD_REPORT);
 
         broughtForwardInitialiser.init(listingDetails);
 
@@ -55,23 +55,24 @@ class BroughtForwardInitialiserTest {
 
     @Test
     void shouldThrowExceptionForInvalidReportType() {
-        var listingDetails = createListingDetails(SCOTLAND_LISTING_CASE_TYPE_ID, CASES_AWAITING_JUDGMENT_REPORT);
+        ListingDetails listingDetails = createListingDetails(SCOTLAND_LISTING_CASE_TYPE_ID,
+            CASES_AWAITING_JUDGMENT_REPORT);
 
         assertThrows(IllegalArgumentException.class, () -> broughtForwardInitialiser.init(listingDetails));
     }
 
     @Test
     void shouldIgnoreEnglandWalesCaseType() {
-        var listingDetails = createListingDetails(ENGLANDWALES_LISTING_CASE_TYPE_ID, BROUGHT_FORWARD_REPORT);
+        ListingDetails listingDetails = createListingDetails(ENGLANDWALES_LISTING_CASE_TYPE_ID, BROUGHT_FORWARD_REPORT);
         broughtForwardInitialiser.init(listingDetails);
 
         assertNull(listingDetails.getCaseData().getClerkResponsible());
     }
 
     private ListingDetails createListingDetails(String caseTypeId, String reportType) {
-        var listingData = new ListingData();
+        ListingData listingData = new ListingData();
         listingData.setReportType(reportType);
-        var listingDetails = new ListingDetails();
+        ListingDetails listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(caseTypeId);
         listingDetails.setCaseData(listingData);
 

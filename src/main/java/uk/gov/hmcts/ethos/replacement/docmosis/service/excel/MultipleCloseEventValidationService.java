@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 
@@ -30,18 +31,18 @@ public class MultipleCloseEventValidationService {
 
     public List<String> validateCasesBeforeCloseEvent(String userToken, MultipleDetails multipleDetails) {
         List<String> errors = new ArrayList<>();
-        var ethosCaseRefCollection = multipleHelperService.getEthosCaseRefCollection(userToken,
+        List<String> ethosCaseRefCollection = multipleHelperService.getEthosCaseRefCollection(userToken,
                 multipleDetails.getCaseData(), errors);
 
         if (ethosCaseRefCollection.isEmpty()) {
             return errors;
         }
 
-        var submitEvents = singleCasesReadingService.retrieveSingleCases(userToken,
+        List<SubmitEvent> submitEvents = singleCasesReadingService.retrieveSingleCases(userToken,
                 multipleDetails.getCaseTypeId(), ethosCaseRefCollection,
                 multipleDetails.getCaseData().getMultipleSource());
 
-        for (var submitEvent : submitEvents) {
+        for (SubmitEvent submitEvent : submitEvents) {
             eventValidationService.validateCaseBeforeCloseEvent(submitEvent.getCaseData(),
                     submitEvent.getState().equals(REJECTED_STATE), true, errors);
         }

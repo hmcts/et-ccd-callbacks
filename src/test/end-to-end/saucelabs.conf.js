@@ -1,13 +1,14 @@
 const config = require('../config.js');
 const supportedBrowsers = require('../crossbrowser/supportedBrowsers');
+const testUrl = process.env.TEST_URL || config.TestUrl;
 
 const waitForTimeout = parseInt(process.env.WAIT_FOR_TIMEOUT) || 45000;
 const smartWait = parseInt(process.env.SMART_WAIT) || 30000;
 const browser = process.env.BROWSER_GROUP || 'chrome';
 
 const defaultSauceOptions = {
-    username: process.env.SAUCE_USERNAME,
-    accessKey: process.env.SAUCE_ACCESS_KEY,
+    username: process.env.SAUCE_USERNAME || 'username',
+    accessKey: process.env.SAUCE_ACCESS_KEY || 'privatekey',
     tunnelIdentifier: process.env.TUNNEL_IDENTIFIER || 'reformtunnel',
     acceptSslCerts: true,
     windowSize: '1600x900',
@@ -44,7 +45,7 @@ const setupConfig = {
     output: `${process.cwd()}/${config.TestOutputDir}`,
     helpers: {
         WebDriver: {
-            url: config.TestUrl,
+            url: testUrl,
             browser,
             smartWait,
             waitForTimeout,
@@ -53,16 +54,10 @@ const setupConfig = {
             port: 80,
             region: 'eu',
             capabilities: {}
-
         },
-        SauceLabsReportingHelper: {
-            require: './helpers/SauceLabsReportingHelper.js'
-        },
-        WebDriverHelper: {
-            require: './helpers/WebDriverHelper.js'
-        },
-        JSWait: {
-            require: './helpers/JSWait.js'
+        MyHelper: {
+            require: './helpers/saucelabsHelper.js',
+            url: testUrl,
         },
         Mochawesome: {
             uniqueScreenshotNames: 'true'

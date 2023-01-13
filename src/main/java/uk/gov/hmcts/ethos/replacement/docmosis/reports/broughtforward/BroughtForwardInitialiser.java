@@ -8,6 +8,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ClerkService;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 
 @Service
+@SuppressWarnings({"PMD.LawOfDemeter"})
 public class BroughtForwardInitialiser {
 
     private final ClerkService clerkService;
@@ -17,12 +18,12 @@ public class BroughtForwardInitialiser {
     }
 
     public void init(ListingDetails listingDetails) {
-        var reportType = listingDetails.getCaseData().getReportType();
+        String reportType = listingDetails.getCaseData().getReportType();
         if (!BROUGHT_FORWARD_REPORT.equals(reportType)) {
             throw new IllegalArgumentException("Unexpected report type " + reportType);
         }
 
-        var caseTypeId = listingDetails.getCaseTypeId();
+        String caseTypeId = listingDetails.getCaseTypeId();
         if (Constants.SCOTLAND_LISTING_CASE_TYPE_ID.equals(caseTypeId)) {
             clerkService.initialiseClerkResponsible(caseTypeId, listingDetails.getCaseData());
         }

@@ -23,7 +23,8 @@ import java.util.List;
 import static uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreationSingleDataModel.builder;
 
 @Slf4j
-public class PersistentQHelper {
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.CognitiveComplexity", "PMD.ConfusingTernary", "PMD.ExcessiveParameterList"})
+public final class PersistentQHelper {
 
     private PersistentQHelper() {
     }
@@ -52,7 +53,7 @@ public class PersistentQHelper {
                                               String updateSize, String multipleRefLinkMarkUp) {
         log.info("Case Ref collection: " + ethosCaseRefCollection);
         if (!ethosCaseRefCollection.isEmpty()) {
-            var createUpdatesDto = PersistentQHelper.getCreateUpdatesDto(bulkDetails,
+            CreateUpdatesDto createUpdatesDto = PersistentQHelper.getCreateUpdatesDto(bulkDetails,
                     ethosCaseRefCollection, username, multipleRef, multipleRefLinkMarkUp);
 
             createUpdatesBusSender.sendUpdatesToQueue(
@@ -78,7 +79,7 @@ public class PersistentQHelper {
                                                     ) {
         log.info("Case Ref collection: " + ethosCaseRefCollection);
         if (!ethosCaseRefCollection.isEmpty()) {
-            var createUpdatesDto = PersistentQHelper.getMultipleCreateUpdatesDto(caseTypeId,
+            CreateUpdatesDto createUpdatesDto = PersistentQHelper.getMultipleCreateUpdatesDto(caseTypeId,
                     jurisdiction, ethosCaseRefCollection, username, multipleRef, confirmation,
                     multipleReferenceLinkMarkUp);
 

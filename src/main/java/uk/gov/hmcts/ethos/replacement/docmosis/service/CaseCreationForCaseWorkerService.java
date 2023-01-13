@@ -6,18 +6,20 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service("caseCreationForCaseWorkerService")
+@SuppressWarnings({ "PMD.PreserveStackTrace"})
 public class CaseCreationForCaseWorkerService {
 
     private static final String MESSAGE = "Failed to create new case for case id : ";
     private final CcdClient ccdClient;
 
     public SubmitEvent caseCreationRequest(CCDRequest ccdRequest, String userToken) {
-        var caseDetails = ccdRequest.getCaseDetails();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
         log.info("EventId: " + ccdRequest.getEventId());
         try {
             return ccdClient.submitCaseCreation(userToken, caseDetails,

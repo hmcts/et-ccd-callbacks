@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments;
 
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
@@ -16,14 +17,14 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICS
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_STATE_KEYWORD;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReport.VALID_CASE_STATES;
 
-class HearingsToJudgmentsElasticSearchQuery {
+final class HearingsToJudgmentsElasticSearchQuery {
 
     private HearingsToJudgmentsElasticSearchQuery() {
         // Access through static methods
     }
 
     static String create(String managingOffice, String dateToSearchFrom, String dateToSearchTo) {
-        var boolQueryBuilder = boolQuery()
+        BoolQueryBuilder boolQueryBuilder = boolQuery()
                 .must(new ExistsQueryBuilder(ELASTICSEARCH_FIELD_JUDGMENT_COLLECTION))
                 .must(new ExistsQueryBuilder(ELASTICSEARCH_FIELD_HEARING_COLLECTION))
                 .filter(new TermsQueryBuilder(ELASTICSEARCH_FIELD_STATE_KEYWORD, VALID_CASE_STATES))

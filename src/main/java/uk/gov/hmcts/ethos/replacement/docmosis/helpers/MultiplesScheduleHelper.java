@@ -22,7 +22,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_SCHEDULE_D
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
-public class MultiplesScheduleHelper {
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.GodClass", "PMD.TooManyMethods", "PMD.LiteralsFirstInComparisons",
+    "PMD.LawOfDemeter", "PMD.AvoidInstantiatingObjectsInLoops", "PMD.CyclomaticComplexity"})
+public final class MultiplesScheduleHelper {
 
     public static final String SUB_ZERO = "/0";
     public static final String NOT_ALLOCATED = "Not_Allocated";
@@ -68,7 +70,7 @@ public class MultiplesScheduleHelper {
                         ? respondentName + " & Others"
                         : respondentName;
             }
-            var address = DocumentHelper.getRespondentAddressET3(respondentCollection.get(0).getValue());
+            Address address = DocumentHelper.getRespondentAddressET3(respondentCollection.get(0).getValue());
 
             return getScheduleAddress(field, address);
         } else {
@@ -78,7 +80,7 @@ public class MultiplesScheduleHelper {
 
     private static String getClaimantData(ScheduleClaimantType scheduleClaimantType, String field) {
         if (scheduleClaimantType != null) {
-            var address = scheduleClaimantType.getClaimantAddressUK();
+            Address address = scheduleClaimantType.getClaimantAddressUK();
             return getScheduleAddress(field, address);
         } else {
             return "";
@@ -138,7 +140,7 @@ public class MultiplesScheduleHelper {
         TreeMap<String, SortedMap<String, SortedMap<String, Object>>> subMultipleTreeMap = new TreeMap<>();
 
         for (Map.Entry<String, Object> entry : multipleObjectsFiltered.entrySet()) {
-            List<String> caseIds = ((List<String>) entry.getValue());
+            List<String> caseIds = (List<String>) entry.getValue();
             SortedMap<String, SortedMap<String, Object>> scheduleEvents = new TreeMap<>();
 
             for (String caseId : caseIds) {

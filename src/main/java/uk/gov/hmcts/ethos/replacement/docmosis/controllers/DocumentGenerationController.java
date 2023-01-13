@@ -15,7 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.SignificantItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicLetters;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck;
@@ -36,6 +39,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports"})
 public class DocumentGenerationController {
 
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
@@ -67,7 +71,7 @@ public class DocumentGenerationController {
         }
 
         List<String> errors = new ArrayList<>();
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData = documentGenerationService.midAddressLabels(caseData);
 
         if (caseData.getAddressLabelCollection() != null && caseData.getAddressLabelCollection().isEmpty()) {
@@ -98,7 +102,7 @@ public class DocumentGenerationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData = documentGenerationService.midSelectedAddressLabels(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -125,7 +129,7 @@ public class DocumentGenerationController {
         }
 
         List<String> errors;
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         errors = documentGenerationService.midValidateAddressLabels(caseData);
         log.info("Event fields validation: " + errors);
 
@@ -152,7 +156,7 @@ public class DocumentGenerationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseDetails = ccdRequest.getCaseDetails();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
 
         List<String> errors = eventValidationService.validateHearingNumber(caseDetails.getCaseData(),
                 caseDetails.getCaseData().getCorrespondenceType(), caseDetails.getCaseData()
@@ -160,14 +164,14 @@ public class DocumentGenerationController {
 
         if (errors.isEmpty()) {
 
-            var defaultValues = getPostDefaultValues(caseDetails);
+            DefaultValues defaultValues = getPostDefaultValues(caseDetails);
             defaultValuesReaderService.getCaseData(caseDetails.getCaseData(), defaultValues);
-            var documentInfo = documentGenerationService.processDocumentRequest(ccdRequest, userToken);
+            DocumentInfo documentInfo = documentGenerationService.processDocumentRequest(ccdRequest, userToken);
             documentGenerationService.updateBfActions(documentInfo, caseDetails.getCaseData());
             caseDetails.getCaseData().setDocMarkUp(documentInfo.getMarkUp());
             documentGenerationService.clearUserChoices(caseDetails);
 
-            var significantItem = Helper.generateSignificantItem(documentInfo, errors);
+            SignificantItem significantItem = Helper.generateSignificantItem(documentInfo, errors);
 
             if (errors.isEmpty()) {
                 return ResponseEntity.ok(CCDCallbackResponse.builder()
@@ -233,7 +237,7 @@ public class DocumentGenerationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DynamicLetters.dynamicLetters(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
         List<String> errors = InvalidCharacterCheck.checkNamesForInvalidCharacters(caseData, "letter");
         return getCallbackRespEntityErrors(errors, caseData);

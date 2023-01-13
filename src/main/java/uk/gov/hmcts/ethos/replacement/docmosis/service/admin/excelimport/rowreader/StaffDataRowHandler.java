@@ -17,7 +17,7 @@ public class StaffDataRowHandler implements RowHandler {
 
     @Override
     public boolean accept(Row row) {
-        for (var rowHandler : rowHandlers) {
+        for (RowHandler rowHandler : rowHandlers) {
             if (rowHandler.accept(row)) {
                 return true;
             }
@@ -28,7 +28,7 @@ public class StaffDataRowHandler implements RowHandler {
 
     @Override
     public void handle(TribunalOffice tribunalOffice, Row row) {
-        for (var rowHandler : rowHandlers) {
+        for (RowHandler rowHandler : rowHandlers) {
             if (rowHandler.accept(row)) {
                 rowHandler.handle(tribunalOffice, row);
                 return;

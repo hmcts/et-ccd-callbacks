@@ -2,6 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedl
 
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,13 +44,13 @@ class FileLocationRowHandlerTest {
     @ParameterizedTest
     @MethodSource
     void testAcceptTrue(TribunalOffice tribunalOffice, String rowId) {
-        var row = createRow(rowId, "fileLocationCode", "fileLocationName");
-        var fileLocationRowHandler = new FileLocationRowHandler(mock(FileLocationRepository.class));
+        Row row = createRow(rowId, "fileLocationCode", "fileLocationName");
+        FileLocationRowHandler fileLocationRowHandler = new FileLocationRowHandler(mock(FileLocationRepository.class));
 
         assertTrue(fileLocationRowHandler.accept(tribunalOffice, row));
     }
 
-    private static Stream<Arguments> testAcceptTrue() {
+    private static Stream<Arguments> testAcceptTrue() { //NOPMD - parameterized tests
         return Stream.of(
           Arguments.of(TribunalOffice.ABERDEEN, "fl_Locations_Aberdeen"),
                 Arguments.of(TribunalOffice.BRISTOL, "fl_Location"),
@@ -71,13 +73,13 @@ class FileLocationRowHandlerTest {
     @ParameterizedTest
     @MethodSource
     void testAcceptFalse(TribunalOffice tribunalOffice, String rowId) {
-        var row = createRow(rowId, "fileLocationCode", "fileLocationName");
-        var fileLocationRowHandler = new FileLocationRowHandler(mock(FileLocationRepository.class));
+        Row row = createRow(rowId, "fileLocationCode", "fileLocationName");
+        FileLocationRowHandler fileLocationRowHandler = new FileLocationRowHandler(mock(FileLocationRepository.class));
 
         assertFalse(fileLocationRowHandler.accept(tribunalOffice, row));
     }
 
-    private static Stream<Arguments> testAcceptFalse() {
+    private static Stream<Arguments> testAcceptFalse() { //NOPMD - parameterized tests
         return Stream.of(
                 Arguments.of(TribunalOffice.ABERDEEN, "fl_Location"),
                 Arguments.of(TribunalOffice.BRISTOL, "fl_Locations_Bristol"),
@@ -99,26 +101,26 @@ class FileLocationRowHandlerTest {
 
     @Test
     void testHandle() {
-        var tribunalOffice = TribunalOffice.LEEDS;
-        var rows = List.of(
+        TribunalOffice tribunalOffice = TribunalOffice.LEEDS;
+        List<Row> rows = List.of(
                 createRow("fl_Judges", "judge1", "Judge 1"),
                 createRow("fl_Location", "leeds1", "Leeds File Location 1"),
                 createRow("fl_Location", "leeds2", "Leeds File Location 2"),
                 createRow("fl_Location", "leeds3", "Leeds File Location 3"),
                 createRow("VenueLeeds", "York", "York")
         );
-        var fileLocationRepository = mock(FileLocationRepository.class);
+        FileLocationRepository fileLocationRepository = mock(FileLocationRepository.class);
 
-        var fileLocationRowHandler = new FileLocationRowHandler(fileLocationRepository);
-        for (var row : rows) {
+        FileLocationRowHandler fileLocationRowHandler = new FileLocationRowHandler(fileLocationRepository);
+        for (Row row : rows) {
             if (fileLocationRowHandler.accept(tribunalOffice, row)) {
                 fileLocationRowHandler.handle(tribunalOffice, row);
             }
         }
 
-        var fileLocationArgumentCaptor = ArgumentCaptor.forClass(FileLocation.class);
+        ArgumentCaptor<FileLocation> fileLocationArgumentCaptor = ArgumentCaptor.forClass(FileLocation.class);
         verify(fileLocationRepository, times(3)).save(fileLocationArgumentCaptor.capture());
-        var actualFileLocations = fileLocationArgumentCaptor.getAllValues();
+        List<FileLocation> actualFileLocations = fileLocationArgumentCaptor.getAllValues();
         assertEquals(3, actualFileLocations.size());
         verifyFileLocation("leeds1", "Leeds File Location 1", actualFileLocations.get(0));
         verifyFileLocation("leeds2", "Leeds File Location 2", actualFileLocations.get(1));
@@ -126,8 +128,8 @@ class FileLocationRowHandlerTest {
     }
 
     private Row createRow(String listId, String code, String name) {
-        var sheet = workbook.getSheet("Test");
-        var row = sheet.createRow(sheet.getLastRowNum() + 1);
+        XSSFSheet sheet = workbook.getSheet("Test");
+        XSSFRow row = sheet.createRow(sheet.getLastRowNum() + 1);
         row.createCell(0, CellType.STRING);
         row.getCell(0).setCellValue(listId);
         row.createCell(1, CellType.STRING);

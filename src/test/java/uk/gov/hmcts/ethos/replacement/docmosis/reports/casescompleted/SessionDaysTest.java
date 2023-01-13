@@ -22,58 +22,60 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.LawOfDemeter", "PMD.UseShortArrayInitializer",
+    "PMD.TooManyMethods" })
 public class SessionDaysTest {
 
     @Test
     public void shouldGetSessionDaysForSingleHearingSingleSession() {
-        var caseDataBuilder = new CaseDataBuilder();
-        var caseData = caseDataBuilder
+        CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
+        CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
                 .withHearingSession(0, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                 .build();
-        var listingData = createListingData("2021-07-02");
+        ListingData listingData = createListingData("2021-07-02");
 
-        var sessionDays = new SessionDays(listingData, caseData);
+        SessionDays sessionDays = new SessionDays(listingData, caseData);
 
         verifySessionDays(sessionDays, HEARING_TYPE_JUDICIAL_HEARING, 1, "2021-07-02T10:00:00");
     }
 
     @Test
     public void shouldGetSessionDaysForSingleHearingMultipleSession() {
-        var caseDataBuilder = new CaseDataBuilder();
-        var caseData = caseDataBuilder
+        CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
+        CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
                 .withHearingSession(0, "1", "2021-07-01T09:00:00", HEARING_STATUS_HEARD, false)
                 .withHearingSession(0, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                 .build();
-        var listingData = createListingData("2021-07-02");
+        ListingData listingData = createListingData("2021-07-02");
 
-        var sessionDays = new SessionDays(listingData, caseData);
+        SessionDays sessionDays = new SessionDays(listingData, caseData);
 
         verifySessionDays(sessionDays, HEARING_TYPE_JUDICIAL_HEARING, 2, "2021-07-02T10:00:00");
     }
 
     @Test
     public void shouldGetSessionDaysForMultipleHearings() {
-        var caseDataBuilder = new CaseDataBuilder();
-        var caseData = caseDataBuilder
+        CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
+        CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
                 .withHearing("2", HEARING_TYPE_JUDICIAL_HEARING, "Judge Brenda", null, null, null, null)
                 .withHearingSession(0, "1", "2021-07-01T09:00:00", HEARING_STATUS_POSTPONED, false)
                 .withHearingSession(1, "1", "2021-07-03T09:00:00", HEARING_STATUS_HEARD, false)
                 .withHearingSession(1, "2", "2021-07-04T10:00:00", HEARING_STATUS_HEARD, true)
                 .build();
-        var listingData = createListingData("2021-07-04");
+        ListingData listingData = createListingData("2021-07-04");
 
-        var sessionDays = new SessionDays(listingData, caseData);
+        SessionDays sessionDays = new SessionDays(listingData, caseData);
 
         verifySessionDays(sessionDays, HEARING_TYPE_JUDICIAL_HEARING, 2, "2021-07-04T10:00:00");
     }
 
     @Test
     public void shouldGetSessionDaysForMultipleHearingsScenario2() {
-        var caseDataBuilder = new CaseDataBuilder();
-        var caseData = caseDataBuilder
+        CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
+        CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_PERLIMINARY_HEARING, "Judge Dave", null, null, null, null)
                 .withHearing("2", HEARING_TYPE_JUDICIAL_HEARING, "Judge Brenda", null, null, null, null)
                 .withHearingSession(0, "1", "2021-07-01T09:00:00", HEARING_STATUS_POSTPONED, false)
@@ -81,42 +83,42 @@ public class SessionDaysTest {
                 .withHearingSession(1, "1", "2021-07-03T10:00:00", HEARING_STATUS_HEARD, true)
                 .withHearingSession(1, "2", "2021-07-04T10:00:00", HEARING_STATUS_WITHDRAWN, false)
                 .build();
-        var listingData = createListingData("2021-07-03");
+        ListingData listingData = createListingData("2021-07-03");
 
-        var sessionDays = new SessionDays(listingData, caseData);
+        SessionDays sessionDays = new SessionDays(listingData, caseData);
 
         verifySessionDays(sessionDays, HEARING_TYPE_JUDICIAL_HEARING, 2, "2021-07-03T10:00:00");
     }
 
     @Test
     public void shouldGetSessionDaysIgnoreInvalidHearingType() {
-        var caseDataBuilder = new CaseDataBuilder();
-        var caseData = caseDataBuilder
+        CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
+        CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_PERLIMINARY_HEARING, "Judge Dave", null, null, null, null)
                 .withHearing("2", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "Judge Brenda", null, null, null, null)
                 .withHearingSession(0, "1", "2021-07-01T09:00:00", HEARING_STATUS_POSTPONED, false)
                 .withHearingSession(0, "2", "2021-07-02T09:00:00", HEARING_STATUS_HEARD, true)
                 .withHearingSession(1, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                 .build();
-        var listingData = createListingData("2021-07-02");
+        ListingData listingData = createListingData("2021-07-02");
 
-        var sessionDays = new SessionDays(listingData, caseData);
+        SessionDays sessionDays = new SessionDays(listingData, caseData);
 
         verifySessionDays(sessionDays, HEARING_TYPE_PERLIMINARY_HEARING, 1, "2021-07-02T09:00:00");
     }
 
     @Test
     public void shouldGetSessionDaysForValidHearingType() {
-        for (var hearingType : CasesCompletedReport.VALID_HEARING_TYPES) {
-            var caseDataBuilder = new CaseDataBuilder();
-            var caseData = caseDataBuilder
+        for (String hearingType : CasesCompletedReport.VALID_HEARING_TYPES) {
+            CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
+            CaseData caseData = caseDataBuilder
                     .withHearing("1", hearingType, "Judge Dave", null, null, null, null)
                     .withHearingSession(0, "1", "2021-07-01T09:00:00", HEARING_STATUS_HEARD, false)
                     .withHearingSession(0, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                     .build();
-            var listingData = createListingData("2021-07-02");
+            ListingData listingData = createListingData("2021-07-02");
 
-            var sessionDays = new SessionDays(listingData, caseData);
+            SessionDays sessionDays = new SessionDays(listingData, caseData);
 
             verifySessionDays(sessionDays, hearingType, 2, "2021-07-02T10:00:00");
         }
@@ -124,74 +126,74 @@ public class SessionDaysTest {
 
     @Test
     public void shouldGetNoSessionDaysIfCaseHasNoHearings() {
-        var sessionDays = new SessionDays(new ListingData(), new CaseData());
+        SessionDays sessionDays = new SessionDays(new ListingData(), new CaseData());
         assertNull(sessionDays.getLatestDisposedHearingSession());
     }
 
     @Test
     public void shouldGetNoSessionDaysIfCaseHasEmptyHearingsCollection() {
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setHearingCollection(new ArrayList<>());
-        var sessionDays = new SessionDays(new ListingData(), caseData);
+        SessionDays sessionDays = new SessionDays(new ListingData(), caseData);
         assertNull(sessionDays.getLatestDisposedHearingSession());
     }
 
     @Test
     public void shouldGetNoSessionDaysIfCaseHasNoValidHearingType() {
-        var invalidHearingTypes = List.of(
+        List<String> invalidHearingTypes = List.of(
                 HEARING_TYPE_JUDICIAL_COSTS_HEARING,
                 HEARING_TYPE_JUDICIAL_MEDIATION,
                 HEARING_TYPE_JUDICIAL_MEDIATION_TCC,
                 HEARING_TYPE_JUDICIAL_RECONSIDERATION,
                 HEARING_TYPE_JUDICIAL_REMEDY);
 
-        for (var invalidHearingType : invalidHearingTypes) {
-            var caseDataBuilder = new CaseDataBuilder();
-            var caseData = caseDataBuilder
+        for (String invalidHearingType : invalidHearingTypes) {
+            CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
+            CaseData caseData = caseDataBuilder
                     .withHearing("1", invalidHearingType, "Judge Doris", null, null, null, null)
                     .withHearingSession(0, "1", "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                     .build();
 
-            var listingData = new ListingData();
+            ListingData listingData = new ListingData();
             listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
             listingData.setListingDate("2021-07-02");
-            var sessionDays = new SessionDays(listingData, caseData);
+            SessionDays sessionDays = new SessionDays(listingData, caseData);
             assertNull(sessionDays.getLatestDisposedHearingSession());
         }
     }
 
     @Test
     public void shouldGetNoSessionDaysIfNotEqualsListedDate() {
-        var caseDataBuilder = new CaseDataBuilder();
-        var caseData = caseDataBuilder
+        CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
+        CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
                 .withHearingSession(0, "1", "2021-07-01T10:00:00", HEARING_STATUS_HEARD, true)
                 .build();
 
-        var listingData = new ListingData();
+        ListingData listingData = new ListingData();
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingData.setListingDate("2021-07-02");
-        var sessionDays = new SessionDays(listingData, caseData);
+        SessionDays sessionDays = new SessionDays(listingData, caseData);
         assertNull(sessionDays.getLatestDisposedHearingSession());
     }
 
     @Test
     public void shouldGetNoSessionDaysIfHearingNotDisposed() {
-        var caseDataBuilder = new CaseDataBuilder();
-        var caseData = caseDataBuilder
+        CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
+        CaseData caseData = caseDataBuilder
                 .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge Dave", null, null, null, null)
                 .withHearingSession(0, "1", "2021-07-01T10:00:00", HEARING_STATUS_HEARD, false)
                 .build();
 
-        var listingData = new ListingData();
+        ListingData listingData = new ListingData();
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingData.setListingDate("2021-07-01");
-        var sessionDays = new SessionDays(listingData, caseData);
+        SessionDays sessionDays = new SessionDays(listingData, caseData);
         assertNull(sessionDays.getLatestDisposedHearingSession());
     }
 
     private ListingData createListingData(String listingDate) {
-        var listingData = new ListingData();
+        ListingData listingData = new ListingData();
         listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
         listingData.setListingDate(listingDate);
         return listingData;
@@ -199,7 +201,7 @@ public class SessionDaysTest {
 
     private void verifySessionDays(SessionDays sessionDays, String expectedHearingType, int expectedSessionDaysCount,
                                    String expectedListedDate) {
-        var latestDisposedHearingSession = sessionDays.getLatestDisposedHearingSession();
+        HearingSession latestDisposedHearingSession = sessionDays.getLatestDisposedHearingSession();
         assertEquals(expectedHearingType, latestDisposedHearingSession.getHearingType().getHearingType());
         assertEquals(expectedSessionDaysCount, latestDisposedHearingSession.getSessionDays());
         assertEquals(expectedListedDate, latestDisposedHearingSession.getDateListedType().getListedDate());

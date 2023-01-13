@@ -26,5 +26,5 @@ module.exports =  async function () {
     I.wait(2);
     I.selectOption(caseResp.respondent_select_an_address,'1: Object');
 
-    I.navByClick('Continue');
+    I.click('Continue');
 }

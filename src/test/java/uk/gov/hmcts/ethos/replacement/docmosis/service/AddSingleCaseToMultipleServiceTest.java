@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
@@ -33,6 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ExtendWith(SpringExtension.class)
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.FieldNamingConventions"})
 class AddSingleCaseToMultipleServiceTest {
 
     @Mock
@@ -43,11 +45,11 @@ class AddSingleCaseToMultipleServiceTest {
     private AddSingleCaseToMultipleService addSingleCaseToMultipleService;
 
     private CaseDetails caseDetails;
-    private final String userToken = "authString";
     private final String multipleCaseTypeId = ENGLANDWALES_BULK_CASE_TYPE_ID;
     private MultipleDetails multipleDetails;
     private List<SubmitMultipleEvent> submitMultipleEvents;
     private final List<String> caseIdCollection = List.of("21006/2020", "245000/2020", "245001/2020");
+    private static final String userToken = "authString";
 
     @BeforeEach
     void setUp() {
@@ -62,14 +64,12 @@ class AddSingleCaseToMultipleServiceTest {
         caseDetails.setCaseId("12321321");
 
         submitMultipleEvents = MultipleUtil.getSubmitMultipleEvents();
-        submitMultipleEvents.get(0).setCaseId(12121212);
+        submitMultipleEvents.get(0).setCaseId(12_121_212);
     }
 
     @Test
     void addSingleCaseToMultipleLogicLead() {
         List<String> errors = new ArrayList<>();
-        String updatedSubMultipleName = caseDetails.getCaseData().getSubMultipleName();
-
         when(multipleCasesReadingService.retrieveMultipleCases(userToken,
                 multipleDetails.getCaseTypeId(),
                 caseDetails.getCaseData().getMultipleReference())
@@ -94,14 +94,14 @@ class AddSingleCaseToMultipleServiceTest {
 
         verify(multipleHelperService, times(1))
                 .sendCreationUpdatesToSinglesWithoutConfirmation(
-                userToken,
-                multipleDetails.getCaseTypeId(),
-                multipleDetails.getJurisdiction(),
-                submitMultipleEvents.get(0).getCaseData(),
-                errors,
-                new ArrayList<>(Collections.singletonList("21006/2020")),
-                "",
-                multipleDetails.getCaseId());
+                    userToken,
+                    multipleDetails.getCaseTypeId(),
+                    multipleDetails.getJurisdiction(),
+                    submitMultipleEvents.get(0).getCaseData(),
+                    errors,
+                    new ArrayList<>(Collections.singletonList("21006/2020")),
+                    "",
+                    multipleDetails.getCaseId());
 
         verify(multipleHelperService, times(1)).addLeadMarkUp(
                 userToken,
@@ -109,7 +109,7 @@ class AddSingleCaseToMultipleServiceTest {
                 submitMultipleEvents.get(0).getCaseData(),
                 caseDetails.getCaseData().getEthosCaseReference(),
                 caseDetails.getCaseId());
-
+        String updatedSubMultipleName = caseDetails.getCaseData().getSubMultipleName();
         verify(multipleHelperService, times(1)).moveCasesAndSendUpdateToMultiple(
                 userToken,
                 updatedSubMultipleName,
@@ -131,8 +131,6 @@ class AddSingleCaseToMultipleServiceTest {
         caseDetails.getCaseData().setLeadClaimant(NO);
 
         List<String> errors = new ArrayList<>();
-        String updatedSubMultipleName = caseDetails.getCaseData().getSubMultipleName();
-
         when(multipleCasesReadingService.retrieveMultipleCases(userToken,
                 multipleDetails.getCaseTypeId(),
                 caseDetails.getCaseData().getMultipleReference())
@@ -154,7 +152,7 @@ class AddSingleCaseToMultipleServiceTest {
                 userToken,
                 submitMultipleEvents.get(0).getCaseData(),
                 errors);
-
+        String updatedSubMultipleName = caseDetails.getCaseData().getSubMultipleName();
         verify(multipleHelperService, times(1)).moveCasesAndSendUpdateToMultiple(
                 userToken,
                 updatedSubMultipleName,
@@ -178,8 +176,6 @@ class AddSingleCaseToMultipleServiceTest {
         caseDetails.getCaseData().setLeadClaimant(NO);
         submitMultipleEvents.get(0).getCaseData().setCaseIdCollection(null);
         submitMultipleEvents.get(0).getCaseData().setLeadCase(null);
-        String updatedSubMultipleName = caseDetails.getCaseData().getSubMultipleName();
-
         List<String> errors = new ArrayList<>();
 
         when(multipleCasesReadingService.retrieveMultipleCases(userToken,
@@ -210,7 +206,7 @@ class AddSingleCaseToMultipleServiceTest {
                 submitMultipleEvents.get(0).getCaseData(),
                 caseDetails.getCaseData().getEthosCaseReference(),
                 caseDetails.getCaseId());
-
+        String updatedSubMultipleName = caseDetails.getCaseData().getSubMultipleName();
         verify(multipleHelperService, times(1)).moveCasesAndSendUpdateToMultiple(
                 userToken,
                 updatedSubMultipleName,
@@ -232,7 +228,6 @@ class AddSingleCaseToMultipleServiceTest {
     @Test
     void addSingleCaseToMultiple_DifferentManagingOffice() {
         List<String> errors = new ArrayList<>();
-        String updatedSubMultipleName = caseDetails.getCaseData().getSubMultipleName();
         submitMultipleEvents.get(0).getCaseData().setManagingOffice(TribunalOffice.NEWCASTLE.getOfficeName());
         caseDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
 
@@ -275,7 +270,7 @@ class AddSingleCaseToMultipleServiceTest {
                 submitMultipleEvents.get(0).getCaseData(),
                 caseDetails.getCaseData().getEthosCaseReference(),
                 caseDetails.getCaseId());
-
+        String updatedSubMultipleName = caseDetails.getCaseData().getSubMultipleName();
         verify(multipleHelperService, times(0)).moveCasesAndSendUpdateToMultiple(
                 userToken,
                 updatedSubMultipleName,
@@ -286,7 +281,7 @@ class AddSingleCaseToMultipleServiceTest {
                 new ArrayList<>(Collections.singletonList(caseDetails.getCaseData().getEthosCaseReference())),
                 new ArrayList<>());
 
-        var multipleData = submitMultipleEvents.get(0).getCaseData();
+        MultipleData multipleData = submitMultipleEvents.get(0).getCaseData();
         assertEquals(1, errors.size());
         assertEquals(String.format("Multiple %s is managed by %s", multipleData.getMultipleReference(),
                 multipleData.getManagingOffice()), errors.get(0));

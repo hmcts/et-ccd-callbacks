@@ -3,6 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreationSingleDataModel;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.TransferToEcmDataModel;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PersistentQHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.servicebus.CreateUpdatesBusSender;
 
@@ -11,6 +13,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Service("persistentQHelperService")
+@SuppressWarnings({"PMD.ExcessiveParameterList"})
 public class PersistentQHelperService {
 
     private final CreateUpdatesBusSender createUpdatesBusSender;
@@ -24,8 +27,8 @@ public class PersistentQHelperService {
                                            String sourceEthosCaseReference) {
 
         String username = userService.getUserDetails(userToken).getEmail();
-        var dataModel = PersistentQHelper.getCreationSingleDataModel(ccdGatewayBaseUrl, officeCT, positionTypeCT,
-                reasonForCT, transferSameCountry, sourceEthosCaseReference);
+        CreationSingleDataModel dataModel = PersistentQHelper.getCreationSingleDataModel(ccdGatewayBaseUrl,
+            officeCT, positionTypeCT, reasonForCT, transferSameCountry, sourceEthosCaseReference);
 
         PersistentQHelper.sendSingleUpdatesPersistentQ(caseTypeId,
                 jurisdiction,
@@ -47,8 +50,8 @@ public class PersistentQHelperService {
                                        String positionTypeCT, String ccdGatewayBaseUrl,
                                        String reasonForCT, String confirmation, String sourceEthosCaseReference) {
         String username = userService.getUserDetails(userToken).getEmail();
-        var dataModel = PersistentQHelper.getTransferToEcmModel(ccdGatewayBaseUrl, officeCT, positionTypeCT,
-                reasonForCT, sourceEthosCaseReference);
+        TransferToEcmDataModel dataModel = PersistentQHelper.getTransferToEcmModel(ccdGatewayBaseUrl, officeCT,
+            positionTypeCT, reasonForCT, sourceEthosCaseReference);
 
         PersistentQHelper.sendSingleUpdatesPersistentQ(caseTypeId,
                 jurisdiction,

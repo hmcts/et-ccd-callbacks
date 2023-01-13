@@ -25,6 +25,7 @@ import java.util.List;
 
 @Slf4j
 @Service
+@SuppressWarnings({"PMD.CloseResource", "PMD.LawOfDemeter"})
 public class ClaimsByHearingVenueExcelReportCreationService {
     private static final String EXCEL_REPORT_WORKBOOK_NAME = "Claims By Hearing Venue Report";
     private static final String CASE_NUMBER_HEADER = "Case Number";
@@ -42,9 +43,9 @@ public class ClaimsByHearingVenueExcelReportCreationService {
             return new byte[0];
         }
 
-        var reportDetails = reportData.getReportDetails();
-        var workbook = new XSSFWorkbook();
-        var sheet = workbook.createSheet(EXCEL_REPORT_WORKBOOK_NAME);
+        List<ClaimsByHearingVenueReportDetail> reportDetails = reportData.getReportDetails();
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet(EXCEL_REPORT_WORKBOOK_NAME);
         adjustColumnSize(sheet);
         initializeReportHeaders(reportData, workbook, sheet);
         initializeReportData(workbook, sheet, reportDetails, reportData.getReportPrintedOnDescription());
@@ -53,7 +54,7 @@ public class ClaimsByHearingVenueExcelReportCreationService {
 
     private void adjustColumnSize(XSSFSheet sheet) {
         //Adjust the column width to fit the content
-        for (var i = 0; i <= 5; i++) {
+        for (int i = 0; i <= 5; i++) {
             sheet.setColumnWidth(i, 9000);
         }
     }
@@ -71,13 +72,13 @@ public class ClaimsByHearingVenueExcelReportCreationService {
         sheet.addMergedRegion(reportPeriodCellRange);
         XSSFRow rowReportPeriod = sheet.createRow(1);
         rowReportPeriod.setHeight((short)(rowReportPeriod.getHeight() * 6));
-        var styleForSubTitleCell = getReportSubTitleCellStyle(workbook);
+        CellStyle styleForSubTitleCell = getReportSubTitleCellStyle(workbook);
         createCell(rowReportPeriod, 0, reportData.getReportPeriodDescription(), styleForSubTitleCell);
 
         XSSFRow rowHead = sheet.createRow(2);
         rowHead.setHeight((short)(rowHead.getHeight() * 4));
-        var styleForColHeaderCell = getHeaderCellStyle(workbook);
-        for (var j = 0; j < HEADERS.size(); j++) {
+        CellStyle styleForColHeaderCell = getHeaderCellStyle(workbook);
+        for (int j = 0; j < HEADERS.size(); j++) {
             rowHead.createCell(j).setCellValue(HEADERS.get(j));
             createCell(rowHead, j, HEADERS.get(j), styleForColHeaderCell);
         }
@@ -85,7 +86,7 @@ public class ClaimsByHearingVenueExcelReportCreationService {
     }
 
     private CellStyle getReportTitleCellStyle(XSSFWorkbook workbook) {
-        var font = getFont(workbook);
+        Font font = getFont(workbook);
         font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
         font.setFontHeightInPoints((short)25);
         CellStyle cellStyle = getHeadersCellStyle(workbook);
@@ -95,7 +96,7 @@ public class ClaimsByHearingVenueExcelReportCreationService {
     }
 
     private CellStyle getReportSubTitleCellStyle(XSSFWorkbook workbook) {
-        var font = getFont(workbook);
+        Font font = getFont(workbook);
         font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
         font.setFontHeightInPoints((short)20);
         CellStyle cellStyle = getHeadersCellStyle(workbook);
@@ -104,7 +105,7 @@ public class ClaimsByHearingVenueExcelReportCreationService {
     }
 
     private CellStyle getHeaderCellStyle(XSSFWorkbook workbook) {
-        var font = getFont(workbook);
+        Font font = getFont(workbook);
         font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
         CellStyle cellStyle = getHeadersCellStyle(workbook);
         cellStyle.setFont(font);
@@ -132,7 +133,7 @@ public class ClaimsByHearingVenueExcelReportCreationService {
         int rowIndex = 3;
         addColumnFilterCellRange(sheet, reportDetails.size());
 
-        for (var claim : reportDetails) {
+        for (ClaimsByHearingVenueReportDetail claim : reportDetails) {
             constructCaseExcelRow(workbook, sheet, rowIndex, claim);
             rowIndex++;
         }
@@ -141,8 +142,8 @@ public class ClaimsByHearingVenueExcelReportCreationService {
     }
 
     private void addColumnFilterCellRange(XSSFSheet sheet, int reportDetailsCount) {
-        var firstRow = 2;
-        var lastRow = firstRow + reportDetailsCount;
+        int firstRow = 2;
+        int lastRow = firstRow + reportDetailsCount;
         sheet.setAutoFilter(new CellRangeAddress(firstRow, lastRow, 0, 5));
     }
 
@@ -169,7 +170,7 @@ public class ClaimsByHearingVenueExcelReportCreationService {
         XSSFRow row = sheet.createRow(rowIndex);
         row.setHeight((short)(row.getHeight() * 4));
         int columnIndex = 0;
-        var cellStyle = getCellStyle(workbook);
+        CellStyle cellStyle = getCellStyle(workbook);
         createCell(row, columnIndex, item.getCaseReference(), cellStyle);
         createCell(row, columnIndex + 1, item.getDateOfReceipt(), cellStyle);
         createCell(row, columnIndex + 2, item.getClaimantPostcode(), cellStyle);
@@ -190,7 +191,7 @@ public class ClaimsByHearingVenueExcelReportCreationService {
     private CellStyle getCellStyle(XSSFWorkbook workbook) {
         CellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-        var font = getFont(workbook);
+        Font font = getFont(workbook);
         font.setColor(IndexedColors.BLACK1.getIndex());
         font.setFontHeightInPoints((short)14);
         font.setBold(false);
@@ -207,7 +208,7 @@ public class ClaimsByHearingVenueExcelReportCreationService {
     }
 
     private static byte[] writeExcelFileToByteArray(XSSFWorkbook workbook) {
-        var bos = new ByteArrayOutputStream();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             workbook.write(bos);
             workbook.close();

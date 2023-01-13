@@ -21,11 +21,12 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferToEcmService.NO_CASES_FOUND;
 
+@SuppressWarnings({"PMD.LawOfDemeter"})
 @ExtendWith(SpringExtension.class)
 class CaseTransferToEcmServiceTest {
 
-    private final String CASE_TRANSFER_TO_ECM = " Transferring case to ECM";
-    private final String AUTH_TOKEN = "Bearer some-random-token";
+    private static final String CASE_TRANSFER_TO_ECM = " Transferring case to ECM";
+    private static final String AUTH_TOKEN = "Bearer some-random-token";
 
     @InjectMocks
     private CaseTransferToEcmService caseTransferToEcmService;
@@ -38,27 +39,26 @@ class CaseTransferToEcmServiceTest {
 
     @Test
     void transferToEcm() {
-        var ecmOfficeCT = TribunalOffice.BRISTOL.getOfficeName();
-        var caseDetails = createCaseDetails(TribunalOffice.LEEDS.getOfficeName(), ecmOfficeCT);
+        String ecmOfficeCT = TribunalOffice.BRISTOL.getOfficeName();
+        CaseDetails caseDetails = createCaseDetails(TribunalOffice.LEEDS.getOfficeName(), ecmOfficeCT);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, AUTH_TOKEN))
                 .thenReturn(List.of(caseDetails.getCaseData()));
 
-        var errors = caseTransferToEcmService.createCaseTransferToEcm(caseDetails, AUTH_TOKEN);
+        List<String> errors = caseTransferToEcmService.createCaseTransferToEcm(caseDetails, AUTH_TOKEN);
         assertTrue(errors.isEmpty());
         verify(caseTransferEventService, times(1)).transferToEcm(isA(CaseTransferToEcmParams.class));
     }
 
     @Test
     void noCasesFound() {
-        var ecmOfficeCT = TribunalOffice.BRISTOL.getOfficeName();
-        var caseDetails = createCaseDetails(TribunalOffice.LEEDS.getOfficeName(), ecmOfficeCT);
+        String ecmOfficeCT = TribunalOffice.BRISTOL.getOfficeName();
+        CaseDetails caseDetails = createCaseDetails(TribunalOffice.LEEDS.getOfficeName(), ecmOfficeCT);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, AUTH_TOKEN))
                 .thenReturn(Collections.emptyList());
-        var errors = caseTransferToEcmService.createCaseTransferToEcm(caseDetails, AUTH_TOKEN);
+        List<String> errors = caseTransferToEcmService.createCaseTransferToEcm(caseDetails, AUTH_TOKEN);
         assertEquals(1, errors.size());
         assertEquals(String.format(NO_CASES_FOUND, "60000001/2022"), errors.get(0));
     }
-
 
     private CaseDetails createCaseDetails(String managingOffice, String ecmOfficeCT) {
         CaseDataBuilder builder = CaseDataBuilder.builder()

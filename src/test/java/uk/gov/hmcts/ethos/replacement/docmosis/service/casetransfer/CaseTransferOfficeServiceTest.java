@@ -17,13 +17,14 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+@SuppressWarnings({"PMD.LawOfDemeter"})
 class CaseTransferOfficeServiceTest {
 
     @Test
     void populateTransferToEnglandWalesOfficeOptionsForCaseInEnglandWales() {
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
-        var expectedTribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
+        ArrayList<TribunalOffice> expectedTribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
         expectedTribunalOffices.remove(TribunalOffice.MANCHESTER);
 
         CaseTransferOfficeService.populateTransferToEnglandWalesOfficeOptions(caseData);
@@ -33,9 +34,9 @@ class CaseTransferOfficeServiceTest {
 
     @Test
     void populateTransferToEnglandWalesOfficeOptionsForCaseInScotland() {
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
-        var expectedTribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
+        ArrayList<TribunalOffice> expectedTribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
 
         CaseTransferOfficeService.populateTransferToEnglandWalesOfficeOptions(caseData);
 
@@ -46,9 +47,9 @@ class CaseTransferOfficeServiceTest {
     @NullAndEmptySource
     @ValueSource(strings = {"", " "})
     void populateTransferToEnglandWalesOfficeOptionsHandlesMissingManagingOffice(String managingOffice) {
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setManagingOffice(managingOffice);
-        var existingOfficeCT = TribunalOffice.MANCHESTER.getOfficeName();
+        String existingOfficeCT = TribunalOffice.MANCHESTER.getOfficeName();
         caseData.setOfficeCT(DynamicFixedListType.of(DynamicValueType.create(existingOfficeCT, existingOfficeCT)));
 
         CaseTransferOfficeService.populateTransferToEnglandWalesOfficeOptions(caseData);
@@ -60,9 +61,9 @@ class CaseTransferOfficeServiceTest {
 
     @Test
     void populateTransferToScotlandOfficeOptionsForCaseInEnglandWales() {
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
-        var expectedTribunalOffices = new ArrayList<>(TribunalOffice.SCOTLAND_OFFICES);
+        ArrayList<TribunalOffice> expectedTribunalOffices = new ArrayList<>(TribunalOffice.SCOTLAND_OFFICES);
 
         CaseTransferOfficeService.populateTransferToScotlandOfficeOptions(caseData);
 
@@ -72,9 +73,9 @@ class CaseTransferOfficeServiceTest {
 
     @Test
     void populateTransferToEnglandWalesOfficeOptionsForMultipleCaseInEnglandWales() {
-        var multipleData = new MultipleData();
+        MultipleData multipleData = new MultipleData();
         multipleData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
-        var expectedTribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
+        ArrayList<TribunalOffice> expectedTribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
         expectedTribunalOffices.remove(TribunalOffice.MANCHESTER);
 
         CaseTransferOfficeService.populateTransferToEnglandWalesOfficeOptions(multipleData);
@@ -84,9 +85,9 @@ class CaseTransferOfficeServiceTest {
 
     @Test
     void populateTransferToEnglandWalesOfficeOptionsForMultipleCaseInScotland() {
-        var multipleData = new MultipleData();
+        MultipleData multipleData = new MultipleData();
         multipleData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
-        var expectedTribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
+        ArrayList<TribunalOffice> expectedTribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
 
         CaseTransferOfficeService.populateTransferToEnglandWalesOfficeOptions(multipleData);
 
@@ -97,9 +98,9 @@ class CaseTransferOfficeServiceTest {
     @NullAndEmptySource
     @ValueSource(strings = {"", " "})
     void populateTransferToEnglandWalesOfficeOptionsHandlesMissingManagingOfficeMultiple(String managingOffice) {
-        var multipleData = new MultipleData();
+        MultipleData multipleData = new MultipleData();
         multipleData.setManagingOffice(managingOffice);
-        var existingOfficeCT = TribunalOffice.MANCHESTER.getOfficeName();
+        String existingOfficeCT = TribunalOffice.MANCHESTER.getOfficeName();
         multipleData.setOfficeMultipleCT(DynamicFixedListType.of(DynamicValueType.create(existingOfficeCT,
                 existingOfficeCT)));
 
@@ -112,9 +113,9 @@ class CaseTransferOfficeServiceTest {
 
     @Test
     void populateTransferToScotlandOfficeOptionsForMultipleCaseInEnglandWales() {
-        var multipleData = new MultipleData();
+        MultipleData multipleData = new MultipleData();
         multipleData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
-        var expectedTribunalOffices = new ArrayList<>(TribunalOffice.SCOTLAND_OFFICES);
+        ArrayList<TribunalOffice> expectedTribunalOffices = new ArrayList<>(TribunalOffice.SCOTLAND_OFFICES);
 
         CaseTransferOfficeService.populateTransferToScotlandOfficeOptions(multipleData);
 
@@ -128,17 +129,18 @@ class CaseTransferOfficeServiceTest {
         Iterator<TribunalOffice> expectedItr = expectedOffices.listIterator();
         Iterator<DynamicValueType> listItemsItr = actual.getListItems().listIterator();
         while (expectedItr.hasNext() && listItemsItr.hasNext()) {
-            var tribunalOffice = expectedItr.next();
-            var dynamicValueType = listItemsItr.next();
+            TribunalOffice tribunalOffice = expectedItr.next();
+            DynamicValueType dynamicValueType = listItemsItr.next();
             assertEquals(tribunalOffice.getOfficeName(), dynamicValueType.getCode());
             assertEquals(tribunalOffice.getOfficeName(), dynamicValueType.getLabel());
         }
 
-        if (expectedValue != null) {
+        if (expectedValue == null) {
+            assertNull(actual.getValue());
+        } else {
             assertEquals(expectedValue, actual.getValue().getCode());
             assertEquals(expectedValue, actual.getValue().getLabel());
-        } else {
-            assertNull(actual.getValue());
         }
+
     }
 }

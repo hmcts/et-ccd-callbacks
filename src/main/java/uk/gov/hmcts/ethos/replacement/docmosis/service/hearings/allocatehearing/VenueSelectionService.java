@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @Service
 @Slf4j
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
 public class VenueSelectionService {
     private final VenueService venueService;
 
@@ -24,24 +26,24 @@ public class VenueSelectionService {
     }
 
     public void initHearingCollection(CaseData caseData) {
-        var tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
-        var venues = venueService.getVenues(tribunalOffice);
+        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
+        List<DynamicValueType> venues = venueService.getVenues(tribunalOffice);
         log.info(venues.size() + " venues found for " + tribunalOffice);
 
         if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
-            var hearingTypeItem = new HearingTypeItem();
+            HearingTypeItem hearingTypeItem = new HearingTypeItem();
             hearingTypeItem.setId(UUID.randomUUID().toString());
             caseData.setHearingCollection(List.of(hearingTypeItem));
 
-            var hearingType = new HearingType();
-            var dynamicFixedListType = new DynamicFixedListType();
+            HearingType hearingType = new HearingType();
+            DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(venues);
             hearingType.setHearingVenue(dynamicFixedListType);
             hearingTypeItem.setValue(hearingType);
         } else {
-            for (var hearingItemType : caseData.getHearingCollection()) {
-                var hearingType = hearingItemType.getValue();
-                var dynamicFixedListType = hearingType.getHearingVenue();
+            for (HearingTypeItem hearingItemType : caseData.getHearingCollection()) {
+                HearingType hearingType = hearingItemType.getValue();
+                DynamicFixedListType dynamicFixedListType = hearingType.getHearingVenue();
                 if (dynamicFixedListType == null) {
                     dynamicFixedListType = new DynamicFixedListType();
                     hearingType.setHearingVenue(dynamicFixedListType);
@@ -52,8 +54,8 @@ public class VenueSelectionService {
     }
 
     public DynamicFixedListType createVenueSelection(TribunalOffice tribunalOffice, DateListedType selectedListing) {
-        var listItems = venueService.getVenues(tribunalOffice);
-        var selectedVenue = selectedListing.getHearingVenueDay();
+        List<DynamicValueType> listItems = venueService.getVenues(tribunalOffice);
+        DynamicFixedListType selectedVenue = selectedListing.getHearingVenueDay();
         return DynamicFixedListType.from(listItems, selectedVenue);
     }
 }

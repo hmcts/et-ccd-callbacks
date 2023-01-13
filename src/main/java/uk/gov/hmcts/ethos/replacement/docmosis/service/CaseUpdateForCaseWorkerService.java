@@ -5,11 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
+import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 
 @Slf4j
 @Service("CaseUpdateForCaseWorkerService")
+@SuppressWarnings({"PMD.PreserveStackTrace"})
 public class CaseUpdateForCaseWorkerService {
 
     private static final String MESSAGE = "Failed to update case for case id : ";
@@ -24,14 +27,14 @@ public class CaseUpdateForCaseWorkerService {
     }
 
     public SubmitEvent caseUpdateRequest(CCDRequest ccdRequest, String authToken) {
-        var caseDetails = ccdRequest.getCaseDetails();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
         log.info("EventId: " + ccdRequest.getEventId());
 
         try {
             String caseId = ccdRequest.getCaseDetails().getCaseId();
             CCDRequest returnedRequest = ccdClient.startEventForCase(authToken,
                     caseDetails.getCaseTypeId(), caseDetails.getJurisdiction(), caseId);
-            var defaultValues = defaultValuesReaderService.getDefaultValues(
+            DefaultValues defaultValues = defaultValuesReaderService.getDefaultValues(
                     caseDetails.getCaseData().getManagingOffice());
 
             ccdRequest.getCaseDetails().getCaseData().setPositionType(defaultValues.getPositionType());

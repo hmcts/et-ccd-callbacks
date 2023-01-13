@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 
@@ -29,22 +30,22 @@ class SessionDays {
     }
 
     HearingSession getLatestDisposedHearingSession() {
-        var heardSessions = getHeardSessions();
-        var disposedOfSessions = getDisposedOfSessions(heardSessions);
+        List<HearingSession> heardSessions = getHeardSessions();
+        List<HearingSession> disposedOfSessions = getDisposedOfSessions(heardSessions);
         if (disposedOfSessions.isEmpty()) {
             return null;
         }
 
-        var latestHearingSession = Collections.max(disposedOfSessions,
+        HearingSession latestHearingSession = Collections.max(disposedOfSessions,
                 Comparator.comparing(c -> c.getDateListedType().getListedDate()));
 
-        var sessionDays = getSessionDays(heardSessions, latestHearingSession.getDateListedType().getListedDate());
+        long sessionDays = getSessionDays(heardSessions, latestHearingSession.getDateListedType().getListedDate());
         latestHearingSession.setSessionDays(sessionDays);
         return latestHearingSession;
     }
 
     private List<HearingSession> getHeardSessions() {
-        var hearingSessions = getHearingSessions();
+        List<HearingSession> hearingSessions = getHearingSessions();
         return hearingSessions.stream()
                 .filter(h -> HEARING_STATUS_HEARD.equals(h.getDateListedType().getHearingStatus()))
                 .collect(Collectors.toList());
@@ -54,7 +55,7 @@ class SessionDays {
         return hearingSessions.stream()
                 .filter(h -> YES.equals(h.getDateListedType().getHearingCaseDisposed()))
                 .filter(h -> {
-                    var listingDate = h.getDateListedType().getListedDate().substring(0, 10);
+                    String listingDate = h.getDateListedType().getListedDate().substring(0, 10);
                     return ReportHelper.validateMatchingDate(listingData, listingDate);
                 })
                 .collect(Collectors.toList());
@@ -67,14 +68,13 @@ class SessionDays {
     }
 
     private boolean isOnOrEarlierDate(String date, String compareTo) {
-        var localDate = LocalDate.parse(date.substring(0, 10), OLD_DATE_TIME_PATTERN2);
-        var localDateCompareTo = LocalDate.parse(compareTo.substring(0, 10), OLD_DATE_TIME_PATTERN2);
-        var after = localDate.isAfter(localDateCompareTo);
-        return !after;
+        LocalDate localDate = LocalDate.parse(date.substring(0, 10), OLD_DATE_TIME_PATTERN2);
+        LocalDate localDateCompareTo = LocalDate.parse(compareTo.substring(0, 10), OLD_DATE_TIME_PATTERN2);
+        return !localDate.isAfter(localDateCompareTo);
     }
 
     private List<HearingSession> getHearingSessions() {
-        var hearings = caseData.getHearingCollection();
+        List<HearingTypeItem> hearings = caseData.getHearingCollection();
         if (hearings == null) {
             return Collections.emptyList();
         }
@@ -87,7 +87,7 @@ class SessionDays {
     }
 
     private List<HearingSession> mapToHearingSessions(HearingTypeItem hearingTypeItem) {
-        var hearingType = hearingTypeItem.getValue();
+        HearingType hearingType = hearingTypeItem.getValue();
         return hearingTypeItem.getValue().getHearingDateCollection().stream()
                 .map(h -> new HearingSession(hearingType, h.getValue()))
                 .collect(Collectors.toList());

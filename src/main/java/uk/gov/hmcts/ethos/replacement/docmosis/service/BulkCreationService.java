@@ -32,6 +32,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
 @Slf4j
 @Service("bulkCreationService")
+@SuppressWarnings({"PMD.ConfusingTernary",  "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.DoNotUseThreads", "PMD.GodClass", "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons",
+    "PMD.FieldNamingConventions", "PMD.LawOfDemeter", "PMD.CyclomaticComplexity", "PMD.CognitiveComplexity"})
 public class BulkCreationService {
 
     public static final String BULK_CREATION_STEP = "BulkCreation";
@@ -54,7 +57,7 @@ public class BulkCreationService {
 
     public BulkRequestPayload bulkCreationLogic(BulkDetails bulkDetails, BulkCasesPayload bulkCasesPayload,
                                                 String userToken, String action) {
-        var bulkRequestPayload = new BulkRequestPayload();
+        BulkRequestPayload bulkRequestPayload = new BulkRequestPayload();
         if (bulkCasesPayload.getErrors().isEmpty()) {
             // 1) Retrieve cases by ethos reference
             List<SubmitEvent> submitEvents = bulkCasesPayload.getSubmitEvents();
@@ -111,7 +114,7 @@ public class BulkCreationService {
 
     private void createCaseEventsToUpdateMultipleRef(List<SubmitEvent> submitEvents, BulkDetails bulkDetails,
                                                      String userToken) {
-        var start = Instant.now();
+        Instant start = Instant.now();
         ExecutorService executor = Executors.newFixedThreadPool(NUMBER_THREADS);
         for (SubmitEvent submitEvent : submitEvents) {
             executor.execute(new BulkCreationTask(bulkDetails, submitEvent, userToken,
@@ -122,8 +125,8 @@ public class BulkCreationService {
     }
 
     public BulkRequestPayload bulkUpdateCaseIdsLogic(BulkRequest bulkRequest, String authToken, boolean isPersistentQ) {
-        var bulkRequestPayload = new BulkRequestPayload();
-        var bulkCasesPayload = updateBulkRequest(bulkRequest, authToken, isPersistentQ);
+        BulkRequestPayload bulkRequestPayload = new BulkRequestPayload();
+        BulkCasesPayload bulkCasesPayload = updateBulkRequest(bulkRequest, authToken, isPersistentQ);
         if (bulkCasesPayload.getErrors().isEmpty()) {
             bulkRequest.setCaseDetails(BulkHelper.setMultipleCollection(bulkRequest.getCaseDetails(),
                     bulkCasesPayload.getMultipleTypeItems()));
@@ -136,8 +139,8 @@ public class BulkCreationService {
     }
 
     BulkCasesPayload updateBulkRequest(BulkRequest bulkRequest, String authToken, boolean isPersistentQ) {
-        var bulkDetails = bulkRequest.getCaseDetails();
-        var bulkCasesPayload = new BulkCasesPayload();
+        BulkDetails bulkDetails = bulkRequest.getCaseDetails();
+        BulkCasesPayload bulkCasesPayload = new BulkCasesPayload();
         List<String> errors = new ArrayList<>();
         List<String> caseIds = BulkHelper.getCaseIds(bulkDetails);
         List<String> multipleCaseIds = BulkHelper.getMultipleCaseIds(bulkDetails);
@@ -210,7 +213,7 @@ public class BulkCreationService {
 
         if (isPersistentQ) {
 
-            var updateSize = String.valueOf(detachCasesList.size() + attachCasesList.size());
+            String updateSize = String.valueOf(detachCasesList.size() + attachCasesList.size());
             String username = userService.getUserDetails(authToken).getEmail();
 
             PersistentQHelper.sendUpdatesPersistentQ(bulkDetails,

@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadEvent;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
 
+@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleLetterServiceTest {
 
@@ -211,7 +213,6 @@ public class MultipleLetterServiceTest {
     @Test
     public void dynamicMultipleLetters() {
         MultipleUtil.addHearingToCaseData(submitEvents.get(0).getCaseData());
-        var hearingFromCase = DynamicListHelper.createDynamicHearingList(submitEvents.get(0).getCaseData()).get(0);
         when(excelReadingService.readExcel(anyString(), anyString(), anyList(), any(), any()))
                 .thenReturn(multipleObjectsFlags);
         when(singleCasesReadingService.retrieveSingleCase(userToken,
@@ -226,6 +227,8 @@ public class MultipleLetterServiceTest {
                 multipleDetails.getCaseData().getMultipleSource());
         assertEquals(1, multipleDetails.getCaseData().getCorrespondenceType().getDynamicHearingNumber()
                 .getListItems().size());
+        DynamicValueType hearingFromCase = DynamicListHelper.createDynamicHearingList(
+                submitEvents.get(0).getCaseData()).get(0);
         assertEquals(hearingFromCase, multipleDetails.getCaseData().getCorrespondenceType().getDynamicHearingNumber()
                 .getListItems().get(0));
     }

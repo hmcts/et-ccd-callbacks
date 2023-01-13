@@ -19,7 +19,7 @@ public class SessionDaysCcdReportDataSource implements SessionDaysReportDataSour
     public List<SessionDaysSubmitEvent> getData(String caseTypeId, String managingOffice,
                                                 String listingDateFrom, String listingDateTo) {
         try {
-            var query = SessionDaysElasticSearchQuery.create(listingDateFrom, listingDateTo, managingOffice);
+            String query = SessionDaysElasticSearchQuery.create(listingDateFrom, listingDateTo, managingOffice);
             return ccdClient.sessionDaysSearch(authToken, caseTypeId, query);
         } catch (Exception e) {
             throw new ReportException(String.format(

@@ -15,6 +15,7 @@ import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_GLASGOW_VENUE_FIE
 import static uk.gov.hmcts.ecm.common.helpers.ESHelper.LISTING_VENUE_FIELD_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
 
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LawOfDemeter", "PMD.UnusedPrivateMethod", "PMD.TooManyMethods"})
 class ListingVenueHelperTest {
 
     private static final String VENUE_NAME = "Test Venue";
@@ -106,7 +107,7 @@ class ListingVenueHelperTest {
     }
 
     private static ListingData createEnglandWales(String venue) {
-        var listingData = new ListingData();
+        ListingData listingData = new ListingData();
         if (venue != null) {
             listingData.setListingVenue(new DynamicFixedListType(venue));
         }
@@ -114,25 +115,25 @@ class ListingVenueHelperTest {
     }
 
     private static ListingData createAberdeen(String venue) {
-        var listingData = new ListingData();
+        ListingData listingData = new ListingData();
         listingData.setVenueAberdeen(new DynamicFixedListType(venue));
         return listingData;
     }
 
     private static ListingData createDundee(String venue) {
-        var listingData = new ListingData();
+        ListingData listingData = new ListingData();
         listingData.setVenueDundee(new DynamicFixedListType(venue));
         return listingData;
     }
 
     private static ListingData createEdinburgh(String venue) {
-        var listingData = new ListingData();
+        ListingData listingData = new ListingData();
         listingData.setVenueEdinburgh(new DynamicFixedListType(venue));
         return listingData;
     }
 
     private static ListingData createGlasgow(String venue) {
-        var listingData = new ListingData();
+        ListingData listingData = new ListingData();
         listingData.setVenueGlasgow(new DynamicFixedListType(venue));
         return listingData;
     }

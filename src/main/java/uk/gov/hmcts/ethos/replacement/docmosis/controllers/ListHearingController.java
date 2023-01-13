@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.ScotlandVenueSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.VenueSelectionService;
@@ -22,6 +23,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 
 @RestController
 @Slf4j
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class ListHearingController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -55,8 +57,8 @@ public class ListHearingController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         try {
             log.info("/initialiseHearings case type id " + caseTypeId);

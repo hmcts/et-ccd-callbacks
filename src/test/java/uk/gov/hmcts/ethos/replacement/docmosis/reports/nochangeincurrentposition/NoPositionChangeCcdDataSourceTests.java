@@ -4,6 +4,7 @@ import org.junit.Test;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCaseSearchResult;
+import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 
 import java.io.IOException;
@@ -18,22 +19,23 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("PMD.LawOfDemeter")
 public class NoPositionChangeCcdDataSourceTests {
 
     @Test
     public void shouldReturnSearchResults() throws IOException {
-        var authToken = "A test token";
-        var caseTypeId = "A test case type";
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var reportDate = "2021-07-10";
-        var ccdClient = mock(CcdClient.class);
-        var searchResult = new NoPositionChangeSearchResult();
+        String authToken = "A test token";
+        String caseTypeId = "A test case type";
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String reportDate = "2021-07-10";
+        CcdClient ccdClient = mock(CcdClient.class);
+        NoPositionChangeSearchResult searchResult = new NoPositionChangeSearchResult();
         searchResult.setCases(List.of(new NoPositionChangeSubmitEvent()));
         when(ccdClient.runElasticSearch(anyString(), anyString(), anyString(), eq(NoPositionChangeSearchResult.class)))
                 .thenReturn(searchResult);
 
-        var ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
-        var results = ccdReportDataSource.getData(caseTypeId, reportDate, managingOffice);
+        NoPositionChangeCcdDataSource ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
+        List<NoPositionChangeSubmitEvent> results = ccdReportDataSource.getData(caseTypeId, reportDate, managingOffice);
 
         assertEquals(1, results.size());
         assertEquals(searchResult.getCases().get(0), results.get(0));
@@ -41,16 +43,16 @@ public class NoPositionChangeCcdDataSourceTests {
 
     @Test
     public void shouldReturnEmptyListForNullSearchResults() throws IOException {
-        var authToken = "A test token";
-        var caseTypeId = "A test case type";
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var reportDate = "2021-07-10";
-        var ccdClient = mock(CcdClient.class);
+        String authToken = "A test token";
+        String caseTypeId = "A test case type";
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String reportDate = "2021-07-10";
+        CcdClient ccdClient = mock(CcdClient.class);
         when(ccdClient.runElasticSearch(anyString(), anyString(), anyString(), eq(NoPositionChangeSearchResult.class)))
                 .thenReturn(null);
 
-        var ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
-        var results = ccdReportDataSource.getData(caseTypeId, reportDate, managingOffice);
+        NoPositionChangeCcdDataSource ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
+        List<NoPositionChangeSubmitEvent> results = ccdReportDataSource.getData(caseTypeId, reportDate, managingOffice);
 
         assertNotNull(results);
         assertEquals(0, results.size());
@@ -58,30 +60,30 @@ public class NoPositionChangeCcdDataSourceTests {
 
     @Test(expected = ReportException.class)
     public void shouldThrowReportExceptionWhenSearchFails() throws IOException {
-        var authToken = "A test token";
-        var caseTypeId = "A test case type";
-        var managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
-        var reportDate = "2021-07-10";
-        var ccdClient = mock(CcdClient.class);
+        String authToken = "A test token";
+        String caseTypeId = "A test case type";
+        String managingOffice = TribunalOffice.MANCHESTER.getOfficeName();
+        String reportDate = "2021-07-10";
+        CcdClient ccdClient = mock(CcdClient.class);
         when(ccdClient.runElasticSearch(anyString(), anyString(), anyString(), eq(NoPositionChangeSearchResult.class)))
                 .thenThrow(new IOException());
 
-        var ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
+        NoPositionChangeCcdDataSource ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
         ccdReportDataSource.getData(caseTypeId, reportDate, managingOffice);
         fail("Should throw exception instead");
     }
 
     @Test
     public void shouldReturnMultipleSearchResults() throws IOException {
-        var authToken = "A test token";
-        var caseTypeId = "A test case type";
-        var ccdClient = mock(CcdClient.class);
-        var searchResult = new MultipleCaseSearchResult();
+        String authToken = "A test token";
+        String caseTypeId = "A test case type";
+        CcdClient ccdClient = mock(CcdClient.class);
+        MultipleCaseSearchResult searchResult = new MultipleCaseSearchResult();
         when(ccdClient.runElasticSearch(anyString(), anyString(), anyString(), eq(MultipleCaseSearchResult.class)))
                 .thenReturn(searchResult);
 
-        var ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
-        var results = ccdReportDataSource.getMultiplesData(caseTypeId, new ArrayList<>());
+        NoPositionChangeCcdDataSource ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
+        List<SubmitMultipleEvent> results = ccdReportDataSource.getMultiplesData(caseTypeId, new ArrayList<>());
 
         assertNotNull(results);
         assertEquals(0, results.size());
@@ -89,14 +91,14 @@ public class NoPositionChangeCcdDataSourceTests {
 
     @Test
     public void shouldReturnEmptyListForNullMultipleSearchResults() throws IOException {
-        var authToken = "A test token";
-        var caseTypeId = "A test case type";
-        var ccdClient = mock(CcdClient.class);
+        String authToken = "A test token";
+        String caseTypeId = "A test case type";
+        CcdClient ccdClient = mock(CcdClient.class);
         when(ccdClient.runElasticSearch(anyString(), anyString(), anyString(), eq(MultipleCaseSearchResult.class)))
                 .thenReturn(null);
 
-        var ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
-        var results = ccdReportDataSource.getMultiplesData(caseTypeId, new ArrayList<>());
+        NoPositionChangeCcdDataSource ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
+        List<SubmitMultipleEvent> results = ccdReportDataSource.getMultiplesData(caseTypeId, new ArrayList<>());
 
         assertNotNull(results);
         assertEquals(0, results.size());
@@ -104,13 +106,13 @@ public class NoPositionChangeCcdDataSourceTests {
 
     @Test(expected = ReportException.class)
     public void shouldThrowReportExceptionWhenMultipleSearchFails() throws IOException {
-        var authToken = "A test token";
-        var caseTypeId = "A test case type";
-        var ccdClient = mock(CcdClient.class);
+        String authToken = "A test token";
+        String caseTypeId = "A test case type";
+        CcdClient ccdClient = mock(CcdClient.class);
         when(ccdClient.runElasticSearch(anyString(), anyString(), anyString(), eq(MultipleCaseSearchResult.class)))
                 .thenThrow(new IOException());
 
-        var ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
+        NoPositionChangeCcdDataSource ccdReportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
         ccdReportDataSource.getMultiplesData(caseTypeId, new ArrayList<>());
         fail("Should throw exception instead");
     }

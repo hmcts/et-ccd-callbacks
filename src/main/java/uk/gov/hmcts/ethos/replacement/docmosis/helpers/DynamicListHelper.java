@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +22,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements.NO_HEARINGS;
 
-public class DynamicListHelper {
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.ConfusingTernary"})
+public final class DynamicListHelper {
 
     /** Format for the label property of a Hearing DynamicList item. */
     static final String DYNAMIC_HEARING_LABEL_FORMAT = "%s : %s - %s - %s";
@@ -33,8 +35,8 @@ public class DynamicListHelper {
         List<DynamicValueType> listItems = new ArrayList<>();
         if (respondentCollection != null) {
             for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
-                var dynamicValueType = new DynamicValueType();
-                var respondentSumType = respondentSumTypeItem.getValue();
+                DynamicValueType dynamicValueType = new DynamicValueType();
+                RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
                 dynamicValueType.setCode("R: " + respondentSumType.getRespondentName());
                 dynamicValueType.setLabel(respondentSumType.getRespondentName());
                 listItems.add(dynamicValueType);
@@ -44,14 +46,14 @@ public class DynamicListHelper {
     }
 
     public static DynamicValueType getDynamicValue(String value) {
-        var dynamicValueType = new DynamicValueType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode(value);
         dynamicValueType.setLabel(value);
         return dynamicValueType;
     }
 
     public static DynamicValueType getDynamicCodeLabel(String code, String label) {
-        var dynamicValueType = new DynamicValueType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode(code);
         dynamicValueType.setLabel(label);
         return dynamicValueType;
@@ -74,11 +76,11 @@ public class DynamicListHelper {
         List<DynamicValueType> listItems = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-                var hearing = hearingTypeItem.getValue();
-                var hearingNumber = hearing.getHearingNumber();
-                var hearingType = hearing.getHearingType();
-                var venue = getHearingVenue(hearing);
-                var listedDate = getListedDate(hearing.getHearingDateCollection().get(0).getValue());
+                HearingType hearing = hearingTypeItem.getValue();
+                String hearingNumber = hearing.getHearingNumber();
+                String hearingType = hearing.getHearingType();
+                String venue = getHearingVenue(hearing);
+                String listedDate = getListedDate(hearing.getHearingDateCollection().get(0).getValue());
 
                 String hearingData = String.format(DYNAMIC_HEARING_LABEL_FORMAT, hearingNumber, hearingType, venue,
                         listedDate);
@@ -128,7 +130,7 @@ public class DynamicListHelper {
     }
 
     public static DynamicValueType findDynamicValue(List<DynamicValueType> listItems, String code) {
-        var dynamicValue = new DynamicValueType();
+        DynamicValueType dynamicValue = new DynamicValueType();
         for (DynamicValueType dynamicValueType : listItems) {
             if (dynamicValueType.getCode().equals(code)) {
                 dynamicValue.setCode(code);

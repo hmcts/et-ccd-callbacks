@@ -25,6 +25,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_CLOSED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.UseProperClassLoader", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.TooManyMethods"})
 public class DefaultValuesReaderServiceTest {
 
     private CaseDefaultValuesConfiguration config;
@@ -55,15 +57,15 @@ public class DefaultValuesReaderServiceTest {
         contactDetails.setEmail("TestEmail");
         contactDetails.setManagingOffice("TestManagingOffice");
 
-        var officeName = TribunalOffice.MANCHESTER.getOfficeName();
+        String officeName = TribunalOffice.MANCHESTER.getOfficeName();
         when(tribunalOfficesService.getTribunalContactDetails(officeName)).thenReturn(contactDetails);
-        var caseType = MULTIPLE_CASE_TYPE;
+        String caseType = MULTIPLE_CASE_TYPE;
         when(config.getCaseType()).thenReturn(caseType);
-        var positionType = Constants.POSITION_TYPE_CASE_CLOSED;
+        String positionType = POSITION_TYPE_CASE_CLOSED;
         when(config.getPositionType()).thenReturn(positionType);
 
         // Act
-        var defaultValues = defaultValuesReaderService.getDefaultValues(officeName);
+        DefaultValues defaultValues = defaultValuesReaderService.getDefaultValues(officeName);
 
         // Assert
         assertEquals(positionType, defaultValues.getPositionType());
@@ -82,7 +84,7 @@ public class DefaultValuesReaderServiceTest {
 
     @Test
     public void testGetClaimantTypeOfClaimant() {
-        var claimantTypeOfClaimant = Constants.INDIVIDUAL_TYPE_CLAIMANT;
+        String claimantTypeOfClaimant = Constants.INDIVIDUAL_TYPE_CLAIMANT;
         when(config.getClaimantTypeOfClaimant()).thenReturn(claimantTypeOfClaimant);
 
         assertEquals(claimantTypeOfClaimant, defaultValuesReaderService.getClaimantTypeOfClaimant());
@@ -90,7 +92,7 @@ public class DefaultValuesReaderServiceTest {
 
     @Test
     public void testGetPositionType() {
-        var positionType = Constants.POSITION_TYPE_CASE_CLOSED;
+        String positionType = POSITION_TYPE_CASE_CLOSED;
         when(config.getPositionType()).thenReturn(positionType);
 
         assertEquals(positionType, defaultValuesReaderService.getPositionType());
@@ -98,8 +100,8 @@ public class DefaultValuesReaderServiceTest {
 
     @Test
     public void testGetCaseDataWithNoValues() {
-        var defaultValues = createDefaultValues();
-        var caseData = new CaseData();
+        DefaultValues defaultValues = createDefaultValues();
+        CaseData caseData = new CaseData();
 
         defaultValuesReaderService.getCaseData(caseData, defaultValues);
 
@@ -117,8 +119,8 @@ public class DefaultValuesReaderServiceTest {
 
     @Test
     public void testGetCaseDataWithExistingValues() {
-        var defaultValues = createDefaultValues();
-        var caseData = createCaseWithValues();
+        DefaultValues defaultValues = createDefaultValues();
+        CaseData caseData = createCaseWithValues();
 
         defaultValuesReaderService.getCaseData(caseData, defaultValues);
 
@@ -136,12 +138,11 @@ public class DefaultValuesReaderServiceTest {
 
     @Test
     public void testGetCaseDataWithClaimantWorkAddress() {
-        var defaultValues = createDefaultValues();
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setClaimantWorkAddressQuestion(YES);
         caseData.setClaimantWorkAddressQRespondent(new DynamicFixedListType("Respondent 2"));
         caseData.setRespondentCollection(createRespondents());
-
+        DefaultValues defaultValues = createDefaultValues();
         defaultValuesReaderService.getCaseData(caseData, defaultValues);
 
         assertEquals(POSITION_TYPE_CASE_CLOSED, caseData.getPositionType());
@@ -153,15 +154,14 @@ public class DefaultValuesReaderServiceTest {
         assertEquals("TestFax", caseData.getTribunalCorrespondenceFax());
         assertEquals("TestDX", caseData.getTribunalCorrespondenceDX());
         assertEquals("TestEmail", caseData.getTribunalCorrespondenceEmail());
-
-        var address = caseData.getClaimantWorkAddress().getClaimantWorkAddress();
+        Address address = caseData.getClaimantWorkAddress().getClaimantWorkAddress();
         assertEquals("Respondent 2 AddressLine1", address.getAddressLine1());
     }
 
     @Test
     public void testGetListingData() {
-        var defaultValues = createDefaultValues();
-        var listingData = new ListingData();
+        DefaultValues defaultValues = createDefaultValues();
+        ListingData listingData = new ListingData();
 
         defaultValuesReaderService.getListingData(listingData, defaultValues);
 
@@ -190,7 +190,7 @@ public class DefaultValuesReaderServiceTest {
     }
 
     private CaseData createCaseWithValues() {
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setPositionType("ExistingPositionType");
         caseData.setCaseSource("ExistingCaseSource");
         caseData.setManagingOffice("ExistingManagingOffice");
@@ -200,15 +200,15 @@ public class DefaultValuesReaderServiceTest {
     }
 
     private List<RespondentSumTypeItem> createRespondents() {
-        var respondents = new ArrayList<RespondentSumTypeItem>();
+        List<RespondentSumTypeItem> respondents = new ArrayList<>();
 
-        for (var i = 1; i <= 3; i++) {
-            var respondentSumType = new RespondentSumType();
+        for (int i = 1; i <= 3; i++) {
+            RespondentSumType respondentSumType = new RespondentSumType();
             respondentSumType.setRespondentName("Respondent " + i);
-            var address = new Address();
+            Address address = new Address();
             address.setAddressLine1(respondentSumType.getRespondentName() + " AddressLine1");
             respondentSumType.setRespondentAddress(address);
-            var item = new RespondentSumTypeItem();
+            RespondentSumTypeItem item = new RespondentSumTypeItem();
             item.setValue(respondentSumType);
             respondents.add(item);
         }

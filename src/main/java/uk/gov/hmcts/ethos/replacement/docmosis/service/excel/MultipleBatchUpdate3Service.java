@@ -29,6 +29,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @Service("multipleBatchUpdate3Service")
+@SuppressWarnings({"PMD.UselessParentheses", "PMD.PreserveStackTrace"})
 public class MultipleBatchUpdate3Service {
 
     private final MultipleHelperService multipleHelperService;
@@ -46,7 +47,7 @@ public class MultipleBatchUpdate3Service {
     public void batchUpdate3Logic(String userToken, MultipleDetails multipleDetails,
                                   List<String> errors, SortedMap<String, Object> multipleObjects) {
 
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
 
         log.info("Batch update type = 3");
 
@@ -76,7 +77,7 @@ public class MultipleBatchUpdate3Service {
                 removeClaimantRep(caseSearched, multipleData);
             }
             if (YES.equals(multipleData.getBatchRemoveRespondentRep())) {
-                var representedTypeRToBeRemoved = UpdateDataModelBuilder.getRespondentRepType(
+                RepresentedTypeR representedTypeRToBeRemoved = UpdateDataModelBuilder.getRespondentRepType(
                         multipleData, caseSearched.getCaseData());
                 removeRespondentRep(caseSearched.getCaseData(), representedTypeRToBeRemoved);
             }
@@ -109,7 +110,7 @@ public class MultipleBatchUpdate3Service {
     private void removeClaimantRep(SubmitEvent caseSearched, MultipleData multipleData) {
         log.info("Claimant Rep is to be removed for case: " + caseSearched.getCaseData().getEthosCaseReference()
                 + " of multiple: " + multipleData.getMultipleReference());
-        var representedTypeC = new RepresentedTypeC();
+        RepresentedTypeC representedTypeC = new RepresentedTypeC();
         caseSearched.getCaseData().setRepresentativeClaimantType(representedTypeC);
         caseSearched.getCaseData().setClaimantRepresentedQuestion(NO);
     }

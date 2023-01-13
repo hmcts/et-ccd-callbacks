@@ -56,11 +56,11 @@ public class AddSingleCaseToMultipleService {
                             updatedMultipleReference);
 
             SubmitMultipleEvent multipleEvent = multipleEvents.get(0);
-            var multipleData = multipleEvent.getCaseData();
+            MultipleData multipleData = multipleEvent.getCaseData();
 
             if (!multipleData.getManagingOffice().equals(caseData.getManagingOffice())) {
-                errors.add((String.format("Multiple %s is managed by %s", multipleData.getMultipleReference(),
-                        multipleData.getManagingOffice())));
+                errors.add(String.format("Multiple %s is managed by %s", multipleData.getMultipleReference(),
+                        multipleData.getManagingOffice()));
             }
 
             if (errors.isEmpty()) {
@@ -73,7 +73,7 @@ public class AddSingleCaseToMultipleService {
                     leadClaimant = YES;
                 }
 
-                var parentMultipleCaseId = String.valueOf(multipleEvent.getCaseId());
+                String parentMultipleCaseId = String.valueOf(multipleEvent.getCaseId());
                 addNewLeadToMultiple(userToken, multipleCaseTypeId, jurisdiction,
                         multipleData, leadClaimant, newEthosCaseReferenceToAdd, caseId, errors, parentMultipleCaseId);
 
@@ -81,7 +81,7 @@ public class AddSingleCaseToMultipleService {
                         jurisdiction, multipleCaseTypeId, String.valueOf(multipleEvent.getCaseId()),
                         multipleData, new ArrayList<>(Collections.singletonList(newEthosCaseReferenceToAdd)), errors);
 
-                var multipleCaseId = String.valueOf(multipleEvent.getCaseId());
+                String multipleCaseId = String.valueOf(multipleEvent.getCaseId());
                 updateCaseDataForMultiple(caseData, updatedMultipleReference, leadClaimant, multipleCaseId);
 
                 caseData.setSubMultipleName(subMultipleName);

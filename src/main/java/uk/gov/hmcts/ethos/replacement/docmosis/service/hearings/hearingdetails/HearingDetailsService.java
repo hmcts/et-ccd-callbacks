@@ -20,7 +20,7 @@ public class HearingDetailsService {
     }
 
     public void initialiseHearingDetails(CaseData caseData) {
-        var dynamicFixedListType = new DynamicFixedListType();
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(hearingSelectionService.getHearingSelection(caseData));
         caseData.setHearingDetailsHearing(dynamicFixedListType);
     }
@@ -51,8 +51,8 @@ public class HearingDetailsService {
     }
 
     public void updateCase(CaseDetails caseDetails) {
-        var caseData = caseDetails.getCaseData();
-        var selectedListing = getSelectedListing(caseData);
+        CaseData caseData = caseDetails.getCaseData();
+        DateListedType selectedListing = getSelectedListing(caseData);
 
         selectedListing.setHearingStatus(caseData.getHearingDetailsStatus());
         selectedListing.setPostponedBy(caseData.getHearingDetailsPostponedBy());

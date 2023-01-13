@@ -21,9 +21,12 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.ListingTypeItem;
+import uk.gov.hmcts.et.common.model.listing.types.ListingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingVenueHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
@@ -80,6 +83,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICS
 @RequiredArgsConstructor
 @Slf4j
 @Service("listingService")
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.UnnecessaryFullyQualifiedName",
+    "PMD.ExcessiveImports", "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.PreserveStackTrace",
+    "PMD.LinguisticNaming", "PMD.AvoidInstantiatingObjectsInLoops", "PMD.FieldNamingConventions",
+    "PMD.LawOfDemeter", "PMD.TooManyMethods", "PMD.CyclomaticComplexity"})
 public class ListingService {
 
     private final TornadoService tornadoService;
@@ -96,7 +103,7 @@ public class ListingService {
 
     public ListingData listingCaseCreation(ListingDetails listingDetails) {
 
-        var listingData = listingDetails.getCaseData();
+        ListingData listingData = listingDetails.getCaseData();
 
         if (listingData.getHearingDocType() != null) {
             listingData.setDocumentName(listingData.getHearingDocType());
@@ -110,7 +117,7 @@ public class ListingService {
     }
 
     public CaseData processListingSingleCasesRequest(CaseDetails caseDetails) {
-        var caseData = caseDetails.getCaseData();
+        CaseData caseData = caseDetails.getCaseData();
         List<ListingTypeItem> listingTypeItems = new ArrayList<>();
         if (caseData.getHearingCollection() != null && !caseData.getHearingCollection().isEmpty()) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
@@ -128,7 +135,7 @@ public class ListingService {
     }
 
     public ListingData setManagingOfficeAndCourtAddressFromCaseData(CaseData caseData) {
-        var listingData = caseData.getPrintHearingCollection();
+        ListingData listingData = caseData.getPrintHearingCollection();
         listingData.setTribunalCorrespondenceAddress(caseData.getTribunalCorrespondenceAddress());
         listingData.setTribunalCorrespondenceTelephone(caseData.getTribunalCorrespondenceTelephone());
         listingData.setTribunalCorrespondenceFax(caseData.getTribunalCorrespondenceFax());
@@ -191,7 +198,7 @@ public class ListingService {
 
     private List<SubmitEvent> getListingHearingsSearch(ListingDetails listingDetails, String authToken)
             throws IOException {
-        var listingData = listingDetails.getCaseData();
+        ListingData listingData = listingDetails.getCaseData();
         Map.Entry<String, String> entry =
                 ListingVenueHelper.getListingVenueToSearch(listingData).entrySet().iterator().next();
         String venueToSearchMapping = entry.getKey();
@@ -220,8 +227,10 @@ public class ListingService {
         BoolQueryBuilder boolQueryBuilder = boolQuery()
                 .filter(new RangeQueryBuilder(
                         ELASTICSEARCH_FIELD_HEARING_LISTED_DATE)
-                        .gte(dateFrom).lte(dateTo))
-                .must(new MatchQueryBuilder(key, venue));
+                        .gte(dateFrom).lte(dateTo));
+        if (!venue.equals(ALL_VENUES)) {
+            boolQueryBuilder.must(new MatchQueryBuilder(key, venue));
+        }
         return new SearchSourceBuilder()
                 .size(MAX_ES_SIZE)
                 .query(boolQueryBuilder).toString();
@@ -240,26 +249,20 @@ public class ListingService {
 
     private List<ListingTypeItem> getListingTypeItems(HearingTypeItem hearingTypeItem,
                                                       ListingData listingData, CaseData caseData, boolean singleCase) {
-        String caseTypeId = "";
-        if (singleCase) {
-            caseTypeId = TribunalOffice.getCaseTypeId(getSelectedOfficeForPrintLists(caseData));
-        } else {
-            caseTypeId = TribunalOffice.getCaseTypeId(listingData.getManagingOffice());
-        }
         List<ListingTypeItem> listingTypeItems = new ArrayList<>();
         if (isHearingTypeValid(listingData, hearingTypeItem)) {
             int hearingDateCollectionSize = hearingTypeItem.getValue().getHearingDateCollection().size();
-            for (var i = 0; i < hearingDateCollectionSize; i++) {
+            for (int i = 0; i < hearingDateCollectionSize; i++) {
                 log.info("EthosCaseRef Listing: " + caseData.getEthosCaseReference());
                 hearingTypeItem.getValue().getHearingNumber();
                 log.info("Hearing number: " + hearingTypeItem.getValue().getHearingNumber());
-                var dateListedTypeItem = hearingTypeItem.getValue().getHearingDateCollection().get(i);
+                DateListedTypeItem dateListedTypeItem = hearingTypeItem.getValue().getHearingDateCollection().get(i);
                 boolean isListingVenueValid = isListingVenueValid(listingData, dateListedTypeItem,
-                        caseTypeId, caseData.getEthosCaseReference());
+                    getCaseTypeId(listingData, caseData, singleCase), caseData.getEthosCaseReference());
                 boolean isListingDateValid = isListingDateValid(listingData, dateListedTypeItem);
                 log.info("isListingVenueValid: " + isListingVenueValid);
                 log.info("isListingDateValid: " + isListingDateValid);
-                var isListingStatusValid = true;
+                boolean isListingStatusValid = true;
                 if (!showAllHearingType(listingData)) {
                     isListingStatusValid = isListingStatusValid(dateListedTypeItem);
                     log.info("isListingStatusValid: " + isListingStatusValid);
@@ -267,8 +270,8 @@ public class ListingService {
                 if (!isListingVenueValid || !isListingDateValid || !isListingStatusValid) {
                     continue;
                 }
-                var listingTypeItem = new ListingTypeItem();
-                var listingType = ListingHelper.getListingTypeFromCaseData(
+                ListingTypeItem listingTypeItem = new ListingTypeItem();
+                ListingType listingType = ListingHelper.getListingTypeFromCaseData(
                         listingData, caseData, hearingTypeItem.getValue(), dateListedTypeItem.getValue(),
                         i, hearingDateCollectionSize);
                 listingTypeItem.setId(String.valueOf(dateListedTypeItem.getId()));
@@ -277,6 +280,14 @@ public class ListingService {
             }
         }
         return listingTypeItems;
+    }
+
+    private String getCaseTypeId(ListingData listingData, CaseData caseData, boolean singleCase) {
+        if (singleCase) {
+            return TribunalOffice.getCaseTypeId(getSelectedOfficeForPrintLists(caseData));
+        } else {
+            return TribunalOffice.getCaseTypeId(listingData.getManagingOffice());
+        }
     }
 
     public ListingData getDateRangeReport(ListingDetails listingDetails, String authToken) throws IOException {
@@ -316,7 +327,7 @@ public class ListingService {
 
     private List<SubmitEvent> getDateRangeReportSearch(ListingDetails listingDetails, String authToken)
             throws IOException {
-        var listingData = listingDetails.getCaseData();
+        ListingData listingData = listingDetails.getCaseData();
 
         String dateSearchFrom;
         String dateSearchTo;
@@ -328,8 +339,8 @@ public class ListingService {
             dateSearchTo = dateSearchFrom;
         }
 
-        var caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
-        var tribunalOffice = listingData.getManagingOffice() != null
+        String caseTypeId = UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId());
+        TribunalOffice tribunalOffice = listingData.getManagingOffice() != null
                 ? TribunalOffice.valueOfOfficeName(listingData.getManagingOffice()) : null;
         return ccdClient.retrieveCasesGenericReportElasticSearch(authToken, caseTypeId, tribunalOffice, dateSearchFrom,
                 dateSearchTo, listingData.getReportType());
@@ -341,9 +352,9 @@ public class ListingService {
         if (listingData.hasListingVenue()
                 && ALL_VENUES.equals(listingData.getListingVenue().getSelectedCode())) {
             return caseTypeId.equals(ENGLANDWALES_CASE_TYPE_ID)
-                    || (caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)
+                    || caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)
                     && listingData.getManagingOffice()
-                    .equals(dateListedTypeItem.getValue().getHearingVenueDayScotland()));
+                    .equals(dateListedTypeItem.getValue().getHearingVenueDayScotland());
         }
         return false;
     }
@@ -393,7 +404,7 @@ public class ListingService {
     }
 
     private boolean isListingStatusValid(DateListedTypeItem dateListedTypeItem) {
-        var dateListedType = dateListedTypeItem.getValue();
+        DateListedType dateListedType = dateListedTypeItem.getValue();
 
         if (dateListedType.getHearingStatus() != null) {
             List<String> invalidHearingStatuses = Arrays.asList(HEARING_STATUS_SETTLED,
@@ -419,7 +430,7 @@ public class ListingService {
                 && listingData.getHearingDocType().equals(HEARING_DOC_ETCL)
                 && !listingData.getHearingDocETCL().equals(HEARING_ETCL_STAFF)) {
 
-            var hearingType = hearingTypeItem.getValue();
+            HearingType hearingType = hearingTypeItem.getValue();
 
             if (hearingType.getHearingType() != null) {
                 if (hearingType.getHearingType().equals(HEARING_TYPE_PERLIMINARY_HEARING)
@@ -459,7 +470,7 @@ public class ListingService {
         listItems.add(DynamicValueType.create(ALL_VENUES, ALL_VENUES));
         listItems.addAll(venueService.getVenues(TribunalOffice.valueOfOfficeName(listingData.getManagingOffice())));
 
-        var dynamicListingVenues = new DynamicFixedListType();
+        DynamicFixedListType dynamicListingVenues = new DynamicFixedListType();
         dynamicListingVenues.setListItems(listItems);
         listingData.setListingVenue(dynamicListingVenues);
     }

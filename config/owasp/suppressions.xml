@@ -9,27 +9,6 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: poi-5.0.0.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org.apache.poi/poi@.*$</packageUrl>
-        <cve>CVE-2022-26336</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: poi-ooxml-5.0.0.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org.apache.poi/poi-ooxml@.*$</packageUrl>
-        <cve>CVE-2022-26336</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: poi-ooxml-lite-5.0.0.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org.apache.poi/poi-ooxml-lite@.*$</packageUrl>
-        <cve>CVE-2022-26336</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
    file name: spring-security-crypto-5.7.2.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org.springframework.security/spring-security-crypto@.*$</packageUrl>
@@ -58,10 +37,39 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: jackson-databind-2.13.4.jar
+   file name: vm2:3.9.10
    ]]></notes>
+        <packageUrl regex="true">^pkg:npm/vm2@.*$</packageUrl>
+        <vulnerabilityName>1084591</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: jackson-databind-2.13.4.jar
+    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
         <cve>CVE-2022-42003</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: poi-5.0.0.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.poi/poi@.*$</packageUrl>
+        <cve>CVE-2022-26336</cve>
+    </suppress>
+
+    <suppress>
+        <notes><![CDATA[
+   file name: poi-ooxml-lite-5.0.0.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.poi/poi\-ooxml\-lite@.*$</packageUrl>
+        <cpe>cpe:/a:apache:poi</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: poi-ooxml-5.0.0.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.poi/poi\-ooxml@.*$</packageUrl>
+        <cve>CVE-2022-26336</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -97,5 +105,131 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-websocket@.*$</packageUrl>
         <cve>CVE-2022-42252</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-beanutils-1.9.4.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-beanutils/commons\-beanutils@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-codec-1.15.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-codec/commons\-codec@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-collections-3.2.2.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-collections/commons\-collections@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-compress-1.21.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.commons/commons\-compress@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-digester-2.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-digester/commons\-digester@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-fileupload-1.4.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-fileupload/commons\-fileupload@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-io-2.11.0.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-io/commons\-io@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-logging-1.2.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-logging/commons\-logging@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-math3-3.6.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.commons/commons\-math3@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-validator-1.7.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-validator/commons\-validator@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: xmlgraphics-commons-2.7.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.xmlgraphics/xmlgraphics\-commons@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: LatencyUtils-2.0.3.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.latencyutils/LatencyUtils@.*$</packageUrl>
+        <cpe>cpe:/a:utils_project:utils</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: snakeyaml-1.33.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cve>CVE-2022-3064</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: snakeyaml-1.33.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cve>CVE-2021-4235</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.68.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-core@.*$</packageUrl>
+        <cve>CVE-2022-45143</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-websocket-9.0.68.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-websocket@.*$</packageUrl>
+        <cve>CVE-2022-45143</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: debug:2.6.9
+   ]]></notes>
+        <packageUrl regex="true">^pkg:npm/debug@.*$</packageUrl>
+        <vulnerabilityName>1087958</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: async-http-client-netty-utils-2.12.3.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async\-http\-client\-netty\-utils@.*$</packageUrl>
+        <cpe>cpe:/a:utils_project:utils</cpe>
     </suppress>
 </suppressions>

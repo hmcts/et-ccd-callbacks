@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -43,13 +44,15 @@ class VenueFixedListSheetImporterTest {
     @MockBean
     private RoomRepository roomRepository;
 
+    @SuppressWarnings({"PMD.UnusedPrivateField"})
     @Autowired
     private FixedListMappings fixedListMappings;
 
     @BeforeAll
     static void setup() throws IOException, InvalidFormatException {
-        var file = new File(VenueFixedListSheetImporterTest.class.getClassLoader()
-                .getResource("admin/VenuesImportFile.xlsx").getFile());
+        File file = new File(Thread.currentThread().getContextClassLoader()
+            .getResource("admin/VenuesImportFile.xlsx").getFile());
+
         workbook = new XSSFWorkbook(file);
     }
 
@@ -62,19 +65,19 @@ class VenueFixedListSheetImporterTest {
     @ParameterizedTest
     @MethodSource
     void testImportSheet(TribunalOffice tribunalOffice, String sheetName, int expectedVenues, int expectedRooms) {
-        var sheet = workbook.getSheet(sheetName);
+        XSSFSheet sheet = workbook.getSheet(sheetName);
 
         venueFixedListSheetImporter.importSheet(tribunalOffice, sheet);
 
-        var venuesArgumentCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List> venuesArgumentCaptor = ArgumentCaptor.forClass(List.class);
         verify(venueRepository, times(1)).saveAll(venuesArgumentCaptor.capture());
         assertEquals(expectedVenues, venuesArgumentCaptor.getValue().size());
-        var roomsArgumentCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List> roomsArgumentCaptor = ArgumentCaptor.forClass(List.class);
         verify(roomRepository, times(1)).saveAll(roomsArgumentCaptor.capture());
         assertEquals(expectedRooms, roomsArgumentCaptor.getValue().size());
     }
 
-    private static Stream<Arguments> testImportSheet() {
+    private static Stream<Arguments> testImportSheet() { //NOPMD - parameterized tests
         return Stream.of(
                 Arguments.of(TribunalOffice.ABERDEEN, "Scotland Scrubbed", 9, 11),
                 Arguments.of(TribunalOffice.BRISTOL, "Bristol Scrubbed", 41, 141),

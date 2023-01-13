@@ -15,6 +15,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UNABLE_TO_FIND_PARTY;
 
 @Service("depositOrderValidationService")
+@SuppressWarnings({"PMD.LiteralsFirstInComparisons"})
 public class DepositOrderValidationService {
 
     public List<String> validateDepositOrder(CaseData caseData) {
@@ -43,7 +44,7 @@ public class DepositOrderValidationService {
     private void validateDepositRefunded(List<String> errors, DepositTypeItem depositTypeItem) {
         if (!isNullOrEmpty(depositTypeItem.getValue().getDepositRefund())
                 && depositTypeItem.getValue().getDynamicDepositRefundedTo() != null) {
-            var dynamicRefundedTo = depositTypeItem.getValue().getDynamicDepositRefundedTo()
+            String dynamicRefundedTo = depositTypeItem.getValue().getDynamicDepositRefundedTo()
                     .getValue().getCode();
             if (dynamicRefundedTo.startsWith("R: ")) {
                 depositTypeItem.getValue().setDepositRefundedTo(RESPONDENT_TITLE);
@@ -57,7 +58,7 @@ public class DepositOrderValidationService {
 
     private void validateDepositRequestedBy(List<String> errors, DepositTypeItem depositTypeItem) {
         if (depositTypeItem.getValue().getDynamicDepositRequestedBy() != null) {
-            var dynamicRequestedBy = depositTypeItem.getValue().getDynamicDepositRequestedBy()
+            String dynamicRequestedBy = depositTypeItem.getValue().getDynamicDepositRequestedBy()
                     .getValue().getCode();
             if (dynamicRequestedBy.startsWith("R:")) {
                 depositTypeItem.getValue().setDepositRequestedBy(RESPONDENT_TITLE);
@@ -73,7 +74,7 @@ public class DepositOrderValidationService {
 
     private void validateDepositOrderAgainst(List<String> errors, DepositTypeItem depositTypeItem) {
         if (depositTypeItem.getValue().getDynamicDepositOrderAgainst() != null) {
-            var dynamicOrderAgainst = depositTypeItem.getValue().getDynamicDepositOrderAgainst()
+            String dynamicOrderAgainst = depositTypeItem.getValue().getDynamicDepositOrderAgainst()
                     .getValue().getCode();
             if (dynamicOrderAgainst.startsWith("R:")) {
                 depositTypeItem.getValue().setDepositOrderAgainst(RESPONDENT_TITLE);

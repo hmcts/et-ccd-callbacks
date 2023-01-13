@@ -32,6 +32,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@SuppressWarnings({"PMD.LooseCoupling"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleBatchUpdate3ServiceTest {
 
@@ -143,14 +144,14 @@ public class MultipleBatchUpdate3ServiceTest {
                 .generateDynamicList("Respondent Rep"));
         multipleDetails.getCaseData().setBatchRemoveRespondentRep(YES);
         multipleDetails.getCaseData().setBatchUpdateCase("245000/2020");
-        var representedTypeR = new RepresentedTypeR();
-        representedTypeR.setRespRepName("Andrew Smith");
-        representedTypeR.setNameOfRepresentative("Respondent Rep");
-        var representedTypeRItem = new RepresentedTypeRItem();
+        RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
+            .respRepName("Andrew Smith")
+            .nameOfRepresentative("Respondent Rep").build();
+        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId("Respondent Rep");
         representedTypeRItem.setValue(representedTypeR);
-        submitEvents.get(0).getCaseData().setRepCollection
-                (new ArrayList<>(Collections.singletonList(representedTypeRItem)));
+        submitEvents.get(0).getCaseData().setRepCollection(
+                new ArrayList<>(Collections.singletonList(representedTypeRItem)));
         assertEquals(3, multipleObjectsFlags.size());
 
         when(singleCasesReadingService.retrieveSingleCase(userToken,
@@ -167,7 +168,7 @@ public class MultipleBatchUpdate3ServiceTest {
                 multipleObjectsFlags);
 
         assertEquals(2, multipleObjectsFlags.size());
-        assertNull( submitEvents.get(0).getCaseData().getRepCollection().get(0).getValue());
+        assertNull(submitEvents.get(0).getCaseData().getRepCollection().get(0).getValue());
     }
 
     @Test

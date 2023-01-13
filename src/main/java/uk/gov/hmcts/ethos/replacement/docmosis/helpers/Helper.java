@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -47,7 +48,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POST
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @Slf4j
-public class Helper {
+@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.InsufficientStringBufferDeclaration",
+    "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions", "PMD.LawOfDemeter",
+    "PMD.SimpleDateFormatNeedsLocale", "PMD.ExcessiveImports", "PMD.CyclomaticComplexity"})
+public final class Helper {
 
     public static final String HEARING_CREATION_NUMBER_ERROR = "A new hearing can only "
             + "be added from the List Hearing menu item";
@@ -88,8 +93,8 @@ public class Helper {
         List<DynamicValueType> listItems = new ArrayList<>();
         if (respondentCollection != null) {
             for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
-                var dynamicValueType = new DynamicValueType();
-                var respondentSumType = respondentSumTypeItem.getValue();
+                DynamicValueType dynamicValueType = new DynamicValueType();
+                RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
                 dynamicValueType.setCode(respondentSumType.getRespondentName());
                 dynamicValueType.setLabel(respondentSumType.getRespondentName() + " - "
                         + respondentSumType.getRespondentAddress().toString());
@@ -105,7 +110,7 @@ public class Helper {
             if (caseData.getClaimantWorkAddressQRespondent() != null) {
                 caseData.getClaimantWorkAddressQRespondent().setListItems(listItems);
             } else {
-                var dynamicFixedListType = new DynamicFixedListType();
+                DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
                 dynamicFixedListType.setListItems(listItems);
                 caseData.setClaimantWorkAddressQRespondent(dynamicFixedListType);
             }
@@ -158,10 +163,10 @@ public class Helper {
         List<DynamicValueType> listItems = new ArrayList<>();
         if (respondentCollection != null) {
             for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
-                var respondentSumType = respondentSumTypeItem.getValue();
+                RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
                 if (respondentSumType.getResponseStruckOut() == null
                         || respondentSumType.getResponseStruckOut().equals(NO)) {
-                    var dynamicValueType = new DynamicValueType();
+                    DynamicValueType dynamicValueType = new DynamicValueType();
                     dynamicValueType.setCode(respondentSumType.getRespondentName());
                     dynamicValueType.setLabel(respondentSumType.getRespondentName());
                     listItems.add(dynamicValueType);
@@ -177,7 +182,7 @@ public class Helper {
             if (caseData.getRespondentECC() != null) {
                 caseData.getRespondentECC().setListItems(listItems);
             } else {
-                var dynamicFixedListType = new DynamicFixedListType();
+                DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
                 dynamicFixedListType.setListItems(listItems);
                 caseData.setRespondentECC(dynamicFixedListType);
             }
@@ -221,7 +226,7 @@ public class Helper {
                     for (DateListedTypeItem dateListedTypeItem
                             : hearingTypeItem.getValue().getHearingDateCollection()) {
 
-                        var dateListedType = dateListedTypeItem.getValue();
+                        DateListedType dateListedType = dateListedTypeItem.getValue();
                         if (isHearingStatusPostponed(dateListedType) && dateListedType.getPostponedDate() == null) {
                             dateListedType.setPostponedDate(UtilHelper.formatCurrentDate2(LocalDate.now()));
                         }

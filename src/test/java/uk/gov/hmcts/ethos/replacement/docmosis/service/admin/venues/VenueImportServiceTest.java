@@ -32,6 +32,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings({"PMD.LawOfDemeter"})
 class VenueImportServiceTest {
 
     private ExcelReadingService excelReadingService;
@@ -39,9 +40,9 @@ class VenueImportServiceTest {
     private FileLocationFixedListSheetImporter fileLocationFixedListSheetImporter;
     private UserService userService;
 
-    private final String userToken = "test-token";
-    private final String documentUrl = "test-document-url";
-    private final String userName = "Morris Johnson";
+    private static final String TEST_TOKEN = "test-token";
+    private static final String DOCUMENT_URL = "test-document-url";
+    private static final String USER_NAME = "Morris Johnson";
 
     @BeforeEach
     void setup() {
@@ -50,16 +51,16 @@ class VenueImportServiceTest {
         fileLocationFixedListSheetImporter = mock(FileLocationFixedListSheetImporter.class);
 
         userService = mock(UserService.class);
-        var userDetails = mock(UserDetails.class);
-        when(userDetails.getName()).thenReturn(userName);
-        when(userService.getUserDetails(userToken)).thenReturn(userDetails);
+        UserDetails userDetails = mock(UserDetails.class);
+        when(userDetails.getName()).thenReturn(USER_NAME);
+        when(userService.getUserDetails(TEST_TOKEN)).thenReturn(userDetails);
     }
 
     @Test
     void testInitImport() {
-        var adminData = createAdminData(TribunalOffice.MANCHESTER);
+        AdminData adminData = createAdminData(TribunalOffice.MANCHESTER);
 
-        var venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
+        VenueImportService venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
                 fileLocationFixedListSheetImporter, userService);
         venueImportService.initImport(adminData);
 
@@ -70,34 +71,36 @@ class VenueImportServiceTest {
     @ParameterizedTest
     @MethodSource
     void testImportVenuesEnglandWales(TribunalOffice tribunalOffice) throws FixedListSheetReaderException, IOException {
-        var adminData = createAdminData(tribunalOffice);
-        var workbook = createWorkbook(tribunalOffice);
-        when(excelReadingService.readWorkbook(userToken, documentUrl)).thenReturn(workbook);
+        AdminData adminData = createAdminData(tribunalOffice);
+        try (XSSFWorkbook workbook = createWorkbook(tribunalOffice)) {
+            when(excelReadingService.readWorkbook(TEST_TOKEN, DOCUMENT_URL)).thenReturn(workbook);
+        }
 
-        var venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
+        VenueImportService venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
                 fileLocationFixedListSheetImporter, userService);
-        venueImportService.importVenues(adminData, userToken);
+        venueImportService.importVenues(adminData, TEST_TOKEN);
 
         verify(venueFixedListSheetImporter, times(1)).importSheet(eq(tribunalOffice), any(XSSFSheet.class));
         verify(fileLocationFixedListSheetImporter, times(1)).importSheet(eq(tribunalOffice), any(XSSFSheet.class));
-        assertEquals(userName, adminData.getVenueImport().getVenueImportFile().getUser());
+        assertEquals(USER_NAME, adminData.getVenueImport().getVenueImportFile().getUser());
         assertNotNull(adminData.getVenueImport().getVenueImportFile().getLastImported());
     }
 
-    private static Stream<TribunalOffice> testImportVenuesEnglandWales() {
+    private static Stream<TribunalOffice> testImportVenuesEnglandWales() { //NOPMD - parameterized tests
         return TribunalOffice.ENGLANDWALES_OFFICES.stream();
     }
 
     @Test
     void testImportVenuesScotland() throws FixedListSheetReaderException, IOException {
-        var venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
+        VenueImportService venueImportService = new VenueImportService(excelReadingService, venueFixedListSheetImporter,
                 fileLocationFixedListSheetImporter, userService);
 
-        var adminData = createAdminData(TribunalOffice.SCOTLAND);
-        var workbook = createWorkbook(TribunalOffice.SCOTLAND);
-        when(excelReadingService.readWorkbook(userToken, documentUrl)).thenReturn(workbook);
+        AdminData adminData = createAdminData(TribunalOffice.SCOTLAND);
+        try (XSSFWorkbook workbook = createWorkbook(TribunalOffice.SCOTLAND)) {
+            when(excelReadingService.readWorkbook(TEST_TOKEN, DOCUMENT_URL)).thenReturn(workbook);
+        }
 
-        venueImportService.importVenues(adminData, userToken);
+        venueImportService.importVenues(adminData, TEST_TOKEN);
 
         for (TribunalOffice tribunalOffice : TribunalOffice.SCOTLAND_OFFICES) {
             verify(venueFixedListSheetImporter, times(1)).importSheet(eq(tribunalOffice), any(XSSFSheet.class));
@@ -107,12 +110,12 @@ class VenueImportServiceTest {
         verifyNoMoreInteractions(venueFixedListSheetImporter);
         verifyNoMoreInteractions(fileLocationFixedListSheetImporter);
 
-        assertEquals(userName, adminData.getVenueImport().getVenueImportFile().getUser());
+        assertEquals(USER_NAME, adminData.getVenueImport().getVenueImportFile().getUser());
         assertNotNull(adminData.getVenueImport().getVenueImportFile().getLastImported());
     }
 
     private XSSFWorkbook createWorkbook(TribunalOffice tribunalOffice) {
-        var workbook = new XSSFWorkbook();
+        XSSFWorkbook workbook = new XSSFWorkbook();
         workbook.createSheet("CaseField");
         workbook.createSheet(tribunalOffice.getOfficeName() + " Scrubbed");
         workbook.createSheet("ComplexTypes");
@@ -121,14 +124,14 @@ class VenueImportServiceTest {
     }
 
     private AdminData createAdminData(TribunalOffice tribunalOffice) {
-        var document = new Document();
-        document.setBinaryUrl(documentUrl);
-        var importFile = new ImportFile();
+        Document document = new Document();
+        document.setBinaryUrl(DOCUMENT_URL);
+        ImportFile importFile = new ImportFile();
         importFile.setFile(document);
-        var venueImport = new VenueImport();
+        VenueImport venueImport = new VenueImport();
         venueImport.setVenueImportOffice(tribunalOffice.getOfficeName());
         venueImport.setVenueImportFile(importFile);
-        var adminData = new AdminData();
+        AdminData adminData = new AdminData();
         adminData.setVenueImport(venueImport);
 
         return adminData;

@@ -10,7 +10,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 
 public class MultipleDataBuilder {
 
-    private MultipleData multipleData = new MultipleData();
+    private final MultipleData multipleData = new MultipleData();
 
     public static MultipleDataBuilder builder() {
         return new MultipleDataBuilder();
@@ -27,9 +27,9 @@ public class MultipleDataBuilder {
     }
 
     public MultipleDataBuilder withCaseImporterFile(String documentBinaryUrl) {
-        var uploadedDocument = new UploadedDocumentType();
+        UploadedDocumentType uploadedDocument = new UploadedDocumentType();
         uploadedDocument.setDocumentBinaryUrl(documentBinaryUrl);
-        var caseImporterFile = new CaseImporterFile();
+        CaseImporterFile caseImporterFile = new CaseImporterFile();
         caseImporterFile.setUploadedDocument(uploadedDocument);
         multipleData.setCaseImporterFile(caseImporterFile);
 
@@ -44,16 +44,16 @@ public class MultipleDataBuilder {
     }
 
     public MultipleRequest buildAsMultipleRequest() {
-        var multipleDetails = new MultipleDetails();
+        MultipleDetails multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(multipleData);
-        var multipleRequest = new MultipleRequest();
+        MultipleRequest multipleRequest = new MultipleRequest();
         multipleRequest.setCaseDetails(multipleDetails);
 
         return multipleRequest;
     }
 
     public MultipleDetails buildAsMultipleDetails(String caseId, String caseTypeId, String jurisdiction) {
-        var multipleDetails = new MultipleDetails();
+        MultipleDetails multipleDetails = new MultipleDetails();
         multipleDetails.setCaseId(caseId);
         multipleDetails.setCaseTypeId(caseTypeId);
         multipleDetails.setJurisdiction(jurisdiction);

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.reports.claimsbyhearingvenue.ClaimsByHearingVenueCaseData;
 import uk.gov.hmcts.ecm.common.model.reports.claimsbyhearingvenue.ClaimsByHearingVenueSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
@@ -15,7 +16,8 @@ import java.util.List;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_BY_HEARING_VENUE_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
-public class ClaimsByHearingVenueReport {
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
+public final class ClaimsByHearingVenueReport {
     private static final String NULL_STRING_VALUE = "Null";
     private final ClaimsByHearingVenueReportDataSource dataSource;
 
@@ -24,11 +26,12 @@ public class ClaimsByHearingVenueReport {
     }
 
     public ClaimsByHearingVenueReportData generateReport(ClaimsByHearingVenueReportParams reportParams) {
-        var submitEvents = dataSource.getData(
+        List<ClaimsByHearingVenueSubmitEvent> submitEvents = dataSource.getData(
             UtilHelper.getListingCaseTypeId(reportParams.getCaseTypeId()),
                 reportParams.getDateFrom(), reportParams.getDateTo());
-        var reportOffice = ReportHelper.getReportOffice(reportParams.getCaseTypeId(), reportParams.getManagingOffice());
-        var claimsByHearingVenueReportData = initReport(reportOffice);
+        String reportOffice = ReportHelper.getReportOffice(reportParams.getCaseTypeId(),
+            reportParams.getManagingOffice());
+        ClaimsByHearingVenueReportData claimsByHearingVenueReportData = initReport(reportOffice);
 
         setReportListingDate(claimsByHearingVenueReportData, reportParams.getDateFrom(),
                 reportParams.getDateTo(), reportParams.getHearingDateType());
@@ -43,7 +46,7 @@ public class ClaimsByHearingVenueReport {
     }
 
     private ClaimsByHearingVenueReportData initReport(String office) {
-        var reportData =  new ClaimsByHearingVenueReportData();
+        ClaimsByHearingVenueReportData reportData =  new ClaimsByHearingVenueReportData();
         reportData.setOffice(office);
         reportData.setReportType(CLAIMS_BY_HEARING_VENUE_REPORT);
         reportData.setDocumentName(CLAIMS_BY_HEARING_VENUE_REPORT);
@@ -65,7 +68,7 @@ public class ClaimsByHearingVenueReport {
             reportData.setListingDateFrom(null);
             reportData.setListingDateTo(null);
             reportData.setHearingDateType(hearingDateType);
-            var reportedOn = "On " + UtilHelper.listingFormatLocalDate(
+            String reportedOn = "On " + UtilHelper.listingFormatLocalDate(
                     ReportHelper.getFormattedLocalDate(listingDateFrom));
             reportData.setReportPeriodDescription(getReportTitle(reportedOn, reportData.getOffice()));
         } else {
@@ -73,7 +76,7 @@ public class ClaimsByHearingVenueReport {
             reportData.setListingDateFrom(ReportHelper.getFormattedLocalDate(listingDateFrom));
             reportData.setListingDateTo(ReportHelper.getFormattedLocalDate(listingDateTo));
             reportData.setHearingDateType(hearingDateType);
-            var reportedBetween = "Between " + UtilHelper.listingFormatLocalDate(reportData.getListingDateFrom())
+            String reportedBetween = "Between " + UtilHelper.listingFormatLocalDate(reportData.getListingDateFrom())
                     + " and " + UtilHelper.listingFormatLocalDate(reportData.getListingDateTo());
             reportData.setReportPeriodDescription(getReportTitle(reportedBetween, reportData.getOffice()));
         }
@@ -82,9 +85,9 @@ public class ClaimsByHearingVenueReport {
     private void setReportData(List<ClaimsByHearingVenueSubmitEvent> submitEvents,
                                ClaimsByHearingVenueReportData reportData) {
 
-        for (var submitEvent : submitEvents) {
-            var caseData = submitEvent.getCaseData();
-            var currentReportDetail = new ClaimsByHearingVenueReportDetail();
+        for (ClaimsByHearingVenueSubmitEvent submitEvent : submitEvents) {
+            ClaimsByHearingVenueCaseData caseData = submitEvent.getCaseData();
+            ClaimsByHearingVenueReportDetail currentReportDetail = new ClaimsByHearingVenueReportDetail();
             currentReportDetail.setCaseReference(caseData.getEthosCaseReference());
             currentReportDetail.setDateOfReceipt(caseData.getReceiptDate());
             currentReportDetail.setClaimantPostcode(getClaimantPostcode(caseData.getClaimantType()));
@@ -98,31 +101,30 @@ public class ClaimsByHearingVenueReport {
     }
 
     private String getClaimantPostcode(ClaimantType claimantType) {
-        return (claimantType != null && claimantType.getClaimantAddressUK() != null
-            && StringUtils.isNotBlank(claimantType.getClaimantAddressUK().getPostCode()))
+        return claimantType != null && claimantType.getClaimantAddressUK() != null
+            && StringUtils.isNotBlank(claimantType.getClaimantAddressUK().getPostCode())
             ? claimantType.getClaimantAddressUK().getPostCode() : NULL_STRING_VALUE;
     }
 
     private String getClaimantWorkPostcode(ClaimantWorkAddressType claimantWorkAddressType) {
-        return (claimantWorkAddressType != null && claimantWorkAddressType.getClaimantWorkAddress() != null
-            && StringUtils.isNotBlank(claimantWorkAddressType.getClaimantWorkAddress().getPostCode()))
+        return claimantWorkAddressType != null && claimantWorkAddressType.getClaimantWorkAddress() != null
+            && StringUtils.isNotBlank(claimantWorkAddressType.getClaimantWorkAddress().getPostCode())
             ? claimantWorkAddressType.getClaimantWorkAddress().getPostCode() : NULL_STRING_VALUE;
     }
 
     private String getRespondentPostcode(List<RespondentSumTypeItem> respondentItems) {
-        return (CollectionUtils.isNotEmpty(respondentItems)
+        return CollectionUtils.isNotEmpty(respondentItems)
             && respondentItems.get(0).getValue().getRespondentAddress() != null
             && StringUtils.isNotBlank(respondentItems.get(0).getValue()
-            .getRespondentAddress().getPostCode()))
+            .getRespondentAddress().getPostCode())
             ? respondentItems.get(0).getValue().getRespondentAddress().getPostCode() : NULL_STRING_VALUE;
     }
 
     private String getRespondentET3Postcode(List<RespondentSumTypeItem> respondentItems) {
 
-        return (CollectionUtils.isNotEmpty(respondentItems)
+        return CollectionUtils.isNotEmpty(respondentItems)
             && respondentItems.get(0).getValue().getResponseRespondentAddress() != null
-            && StringUtils.isNotBlank(respondentItems.get(0).getValue()
-            .getResponseRespondentAddress().getPostCode()))
+            && StringUtils.isNotBlank(respondentItems.get(0).getValue().getResponseRespondentAddress().getPostCode())
             ? respondentItems.get(0).getValue().getResponseRespondentAddress().getPostCode() : NULL_STRING_VALUE;
     }
 }

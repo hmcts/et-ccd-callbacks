@@ -20,6 +20,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_OPEN_TRACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_STANDARD_TRACK;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.UseProperClassLoader", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.TooManyMethods"})
 class ConciliationTrackServiceTest {
 
     private ConciliationTrackService conciliationTrackService;

@@ -14,13 +14,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 @Slf4j
 @RequiredArgsConstructor
 @Service("singleReferenceService")
+@SuppressWarnings({"PMD.AvoidSynchronizedAtMethodLevel"})
 public class SingleReferenceService {
 
     private final SingleRefScotlandRepository singleRefScotlandRepository;
     private final SingleRefEnglandWalesRepository singleRefEnglandWalesRepository;
 
     public synchronized String createReference(String caseTypeId) {
-        var currentYear = LocalDate.now().getYear();
+        int currentYear = LocalDate.now().getYear();
         switch (caseTypeId) {
             case ENGLANDWALES_CASE_TYPE_ID:
                 return singleRefEnglandWalesRepository.ethosCaseRefGen(currentYear);

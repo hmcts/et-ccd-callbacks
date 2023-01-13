@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.SchedulePayload;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.CaseImporterFile;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -29,6 +31,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.DATE_TIME_USER_FRIE
 @Slf4j
 @RequiredArgsConstructor
 @Service("excelDocManagementService")
+@SuppressWarnings({"PMD.LawOfDemeter"})
 public class ExcelDocManagementService {
 
     public static final String APPLICATION_EXCEL_VALUE =
@@ -46,7 +49,7 @@ public class ExcelDocManagementService {
     private final ScheduleCreationService scheduleCreationService;
 
     public void uploadExcelDocument(String userToken, MultipleDetails multipleDetails, byte[] excelBytes) {
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
         log.info("Multiple Name is: " + multipleData.getMultipleName() + "for multiple reference: "
                 + multipleData.getMultipleReference());
         URI documentSelfPath = documentManagementService.uploadDocument(userToken, excelBytes,
@@ -63,7 +66,7 @@ public class ExcelDocManagementService {
 
     public InputStream downloadExcelDocument(String userToken, String binaryUrl) throws IOException {
 
-        var uploadedDocument = documentManagementService.downloadFile(userToken, binaryUrl);
+        UploadedDocument uploadedDocument = documentManagementService.downloadFile(userToken, binaryUrl);
 
         log.info("Downloaded excel name: " + uploadedDocument.getName());
 
@@ -72,7 +75,7 @@ public class ExcelDocManagementService {
     }
 
     private void addDocumentToMultiple(String userToken, MultipleData multipleData, URI documentSelfPath) {
-        var uploadedDocumentType = new UploadedDocumentType();
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
         uploadedDocumentType.setDocumentBinaryUrl(ccdCaseDocumentUrl + documentSelfPath.getRawPath() + "/binary");
         uploadedDocumentType.setDocumentFilename(MultiplesHelper.generateExcelDocumentName(multipleData));
         uploadedDocumentType.setDocumentUrl(ccdCaseDocumentUrl + documentSelfPath.getRawPath());
@@ -88,7 +91,7 @@ public class ExcelDocManagementService {
 
     public void writeAndUploadExcelDocument(List<?> multipleCollection, String userToken,
                                             MultipleDetails multipleDetails, List<String> subMultipleCollection) {
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
         log.info("MultipleName is: " + multipleData.getMultipleName() + "for multiple reference: "
                 + multipleData.getMultipleReference());
         byte[] excelBytes = excelCreationService.writeExcel(multipleCollection, subMultipleCollection,
@@ -103,9 +106,9 @@ public class ExcelDocManagementService {
 
     public CaseImporterFile populateCaseImporterFile(String userToken, UploadedDocumentType uploadedDocumentType) {
 
-        var caseImporterFile = new CaseImporterFile();
-        var dateTime = LocalDateTime.now(ZoneId.of("Europe/London"));
-        var userDetails = userService.getUserDetails(userToken);
+        CaseImporterFile caseImporterFile = new CaseImporterFile();
+        LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Europe/London"));
+        UserDetails userDetails = userService.getUserDetails(userToken);
 
         caseImporterFile.setUploadedDocument(uploadedDocumentType);
         caseImporterFile.setUploadedDateTime(dateTime.format(DATE_TIME_USER_FRIENDLY_PATTERN));

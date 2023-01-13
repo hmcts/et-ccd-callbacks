@@ -13,6 +13,7 @@ import java.util.List;
 
 @Slf4j
 @Service("multipleUploadService")
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.LawOfDemeter"})
 public class MultipleUploadService {
 
     public static final String ERROR_SHEET_NUMBER_ROWS = "Number of rows expected ";
@@ -39,7 +40,7 @@ public class MultipleUploadService {
 
         try {
 
-            var multipleData = multipleDetails.getCaseData();
+            MultipleData multipleData = multipleDetails.getCaseData();
 
             XSSFSheet datatypeSheet = excelReadingService.checkExcelErrors(
                     userToken,
@@ -82,7 +83,7 @@ public class MultipleUploadService {
 
         if (datatypeSheet.getRow(0) != null) {
 
-            var collectionSize = Integer.parseInt(multipleData.getCaseCounter());
+            int collectionSize = Integer.parseInt(multipleData.getCaseCounter());
 
             log.info("Case Counter " + collectionSize);
 

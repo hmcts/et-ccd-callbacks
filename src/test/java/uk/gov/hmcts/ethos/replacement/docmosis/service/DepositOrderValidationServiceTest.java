@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepositOrder;
 
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEPOSIT_REFUNDED_GREATER_DEPOSIT_ERROR;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UNABLE_TO_FIND_PARTY;
 
+@SuppressWarnings({"PMD.UseProperClassLoader"})
 class DepositOrderValidationServiceTest {
 
     private DepositOrderValidationService depositOrderValidationService;
@@ -64,20 +66,20 @@ class DepositOrderValidationServiceTest {
         assertEquals(DEPOSIT_REFUNDED_GREATER_DEPOSIT_ERROR, errors.get(0));
     }
 
-
     @Test
     void shouldReturnNoErrorsForDepositValidation() {
-        var caseData = caseDetails1.getCaseData();
+        CaseData caseData = caseDetails1.getCaseData();
         caseData.getDepositCollection().get(0).getValue().setDepositAmount("300");
         DynamicDepositOrder.dynamicDepositOrder(caseData);
         List<String> errors = depositOrderValidationService.validateDepositOrder(caseData);
         assertEquals(0, errors.size());
-        assertEquals("Tribunal", caseDetails1.getCaseData().getDepositCollection().get(0).getValue().getDepositRequestedBy());
+        assertEquals("Tribunal", caseDetails1.getCaseData()
+                .getDepositCollection().get(0).getValue().getDepositRequestedBy());
     }
 
     @Test
     void shouldReturnErrorForDepositValidation() {
-        var caseData = caseDetails5.getCaseData();
+        CaseData caseData = caseDetails5.getCaseData();
         List<String> errors = depositOrderValidationService.validateDepositOrder(caseData);
         assertEquals(1, errors.size());
         assertEquals(UNABLE_TO_FIND_PARTY, errors.get(0));

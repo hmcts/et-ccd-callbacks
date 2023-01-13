@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.AdhocReportTypeItem;
@@ -32,14 +34,17 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Service
 @Slf4j
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.GodClass", "PMD.CognitiveComplexity",
+    "PMD.UnusedFormalParameter", "PMD.LiteralsFirstInComparisons", "PMD.LawOfDemeter", "PMD.CyclomaticComplexity",
+    "PMD.NPathComplexity", "PMD.CognitiveComplexity"})
 public class TimeToFirstHearingReport {
 
     static final String ZERO = "0";
     static final String ZERO_DECIMAL = "0.00";
 
     public ListingData generateReportData(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
-        var managingOffice = listingDetails.getCaseData().getManagingOffice();
-        var reportOffice = ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), managingOffice);
+        String managingOffice = listingDetails.getCaseData().getManagingOffice();
+        String reportOffice = ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), managingOffice);
 
         initReport(listingDetails, reportOffice);
 
@@ -53,7 +58,7 @@ public class TimeToFirstHearingReport {
 
     private void initReport(ListingDetails listingDetails, String reportOffice) {
 
-        var adhocReportType = new AdhocReportType();
+        AdhocReportType adhocReportType = new AdhocReportType();
 
         //LocalReportsSummary fields
         adhocReportType.setConNoneTotal(ZERO);
@@ -92,11 +97,11 @@ public class TimeToFirstHearingReport {
         adhocReportType.setHearingDate("");
         adhocReportType.setTotal("");
 
-        var listingData = listingDetails.getCaseData();
+        ListingData listingData = listingDetails.getCaseData();
         listingData.setLocalReportsDetailHdr(adhocReportType);
 
         // Init localReportSummary
-        var adhocReportTypeItem = new AdhocReportTypeItem();
+        AdhocReportTypeItem adhocReportTypeItem = new AdhocReportTypeItem();
         adhocReportTypeItem.setId(UUID.randomUUID().toString());
         adhocReportTypeItem.setValue(adhocReportType);
 
@@ -115,9 +120,9 @@ public class TimeToFirstHearingReport {
 
     private void populateLocalReportSummaryDetail(ListingDetails listingDetails, List<SubmitEvent> submitEvents,
                                                   String reportOffice) {
-        var localReportsDetailList = listingDetails.getCaseData().getLocalReportsDetail();
-        for (var submitEvent : submitEvents) {
-            var localReportsDetailItem =
+        List<AdhocReportTypeItem> localReportsDetailList = listingDetails.getCaseData().getLocalReportsDetail();
+        for (SubmitEvent submitEvent : submitEvents) {
+            AdhocReportTypeItem localReportsDetailItem =
                     getLocalReportsDetail(listingDetails, submitEvent.getCaseData(), reportOffice);
             if (localReportsDetailItem != null) {
                 localReportsDetailList.add(localReportsDetailItem);
@@ -129,22 +134,22 @@ public class TimeToFirstHearingReport {
     private AdhocReportTypeItem getLocalReportsDetail(ListingDetails listingDetails, CaseData caseData,
                                                       String reportOffice) {
 
-        var firstHearingDate = getFirstHearingDate(caseData);
+        LocalDate firstHearingDate = getFirstHearingDate(caseData);
         if (firstHearingDate == null || isFirstHearingWithin26Weeks(caseData, firstHearingDate)) {
             return null;
         }
-        var adhocReportType = new AdhocReportType();
+        AdhocReportType adhocReportType = new AdhocReportType();
         adhocReportType.setHearingDate(firstHearingDate.toString());
         adhocReportType.setReportOffice(reportOffice);
         adhocReportType.setCaseReference(caseData.getEthosCaseReference());
         adhocReportType.setConciliationTrack(getConciliationTrack(caseData));
         if (!Strings.isNullOrEmpty(caseData.getReceiptDate())) {
-            var duration = Duration.between(firstHearingDate.atStartOfDay(),
+            Duration duration = Duration.between(firstHearingDate.atStartOfDay(),
                     LocalDate.parse(caseData.getReceiptDate()).atStartOfDay()).abs();
             adhocReportType.setDelayedDaysForFirstHearing(String.valueOf(duration.toDays()));
             adhocReportType.setReceiptDate(caseData.getReceiptDate());
         }
-        var adhocReportTypeItem = new AdhocReportTypeItem();
+        AdhocReportTypeItem adhocReportTypeItem = new AdhocReportTypeItem();
         adhocReportTypeItem.setId(UUID.randomUUID().toString());
         adhocReportTypeItem.setValue(adhocReportType);
         return adhocReportTypeItem;
@@ -153,8 +158,8 @@ public class TimeToFirstHearingReport {
 
     private void populateLocalReportSummaryHdr(ListingDetails listingDetails, String reportOffice) {
 
-        var listingData = listingDetails.getCaseData();
-        var adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
+        ListingData listingData = listingDetails.getCaseData();
+        AdhocReportType adhocReportType = listingData.getLocalReportsSummary().get(0).getValue();
         adhocReportType.setReportOffice(reportOffice);
         int totalCases = Integer.parseInt(adhocReportType.getConOpenTotal())
                 + Integer.parseInt(adhocReportType.getConStdTotal())
@@ -201,10 +206,10 @@ public class TimeToFirstHearingReport {
 
     private void populateLocalReportSummary(ListingData listingData, List<SubmitEvent> submitEvents) {
 
-        var reportSummary = new ReportSummary();
-        var adhocReportType = listingData.getLocalReportsDetailHdr();
+        ReportSummary reportSummary = new ReportSummary();
+        AdhocReportType adhocReportType = listingData.getLocalReportsDetailHdr();
         LocalDate firstHearingDate;
-        for (var submitEvent : submitEvents) {
+        for (SubmitEvent submitEvent : submitEvents) {
             firstHearingDate = getFirstHearingDate(submitEvent.getCaseData());
             if (firstHearingDate == null) {
                 continue;
@@ -245,7 +250,7 @@ public class TimeToFirstHearingReport {
         adhocReportType.setNotConOpen26wkTotal(String.valueOf(reportSummary.notConOpen26WkTotal));
         setPercent(adhocReportType);
 
-        var adhocReportTypeItem = new AdhocReportTypeItem();
+        AdhocReportTypeItem adhocReportTypeItem = new AdhocReportTypeItem();
         adhocReportTypeItem.setId(UUID.randomUUID().toString());
         adhocReportTypeItem.setValue(adhocReportType);
         listingData.setLocalReportsSummary(Collections.singletonList(adhocReportTypeItem));
@@ -292,29 +297,29 @@ public class TimeToFirstHearingReport {
     }
 
     private void setPercent(AdhocReportType adhocReportType) {
-        var conNone26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConNoneTotal()) != 0)
+        double conNone26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConNoneTotal()) != 0)
                 ? (Double.parseDouble(adhocReportType.getConNone26wkTotal())
                 / Integer.parseInt(adhocReportType.getConNoneTotal())) * 100 : 0;
-        var conStd26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConStdTotal()) != 0)
+        double conStd26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConStdTotal()) != 0)
                 ? (Double.parseDouble(adhocReportType.getConStd26wkTotal())
                 / Integer.parseInt(adhocReportType.getConStdTotal())) * 100 : 0;
-        var conFast26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConFastTotal()) != 0)
+        double conFast26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConFastTotal()) != 0)
                 ? (Double.parseDouble(adhocReportType.getConFast26wkTotal())
                 / Integer.parseInt(adhocReportType.getConFastTotal())) * 100 : 0;
-        var conOpen26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConOpenTotal()) != 0)
+        double conOpen26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConOpenTotal()) != 0)
                 ? (Double.parseDouble(adhocReportType.getConOpen26wkTotal())
                 / Integer.parseInt(adhocReportType.getConOpenTotal())) * 100 : 0;
 
-        var notConNone26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConNoneTotal()) != 0)
+        double notConNone26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConNoneTotal()) != 0)
                 ? (Double.parseDouble(adhocReportType.getNotConNone26wkTotal())
                 / Integer.parseInt(adhocReportType.getConNoneTotal())) * 100 : 0;
-        var notConStd26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConStdTotal()) != 0)
+        double notConStd26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConStdTotal()) != 0)
                 ? (Double.parseDouble(adhocReportType.getNotConStd26wkTotal())
                 / Integer.parseInt(adhocReportType.getConStdTotal())) * 100 : 0;
-        var notConFast26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConFastTotal()) != 0)
+        double notConFast26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConFastTotal()) != 0)
                 ? (Double.parseDouble(adhocReportType.getNotConFast26wkTotal())
                 / Integer.parseInt(adhocReportType.getConFastTotal())) * 100 : 0;
-        var notConOpen26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConOpenTotal()) != 0)
+        float notConOpen26wkTotalPerCent = (Integer.parseInt(adhocReportType.getConOpenTotal()) != 0)
                 ? ((float)Double.parseDouble(adhocReportType.getNotConOpen26wkTotal())
                 / Integer.parseInt(adhocReportType.getConOpenTotal())) * 100 : 0;
 
@@ -339,7 +344,7 @@ public class TimeToFirstHearingReport {
         }
         List<LocalDate> mainDatesList = new ArrayList<>();
         List<LocalDate> datesList;
-        for (var hearingTypeItem : caseData.getHearingCollection()) {
+        for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
             datesList = getHearingDateList(hearingTypeItem);
             if (CollectionUtils.isNotEmpty(datesList)) {
                 mainDatesList.addAll(datesList);
@@ -353,17 +358,18 @@ public class TimeToFirstHearingReport {
     }
 
     private List<LocalDate> getHearingDateList(HearingTypeItem hearingTypeItem) {
-        var hearingType = hearingTypeItem.getValue();
+        HearingType hearingType = hearingTypeItem.getValue();
         List<LocalDate> datesList = new ArrayList<>();
         if (hearingType == null || CollectionUtils.isEmpty(hearingType.getHearingDateCollection())) {
             return datesList;
         }
         if (Constants.HEARING_TYPE_JUDICIAL_HEARING.equals(hearingType.getHearingType())
                 || HEARING_TYPE_PERLIMINARY_HEARING.equals(hearingType.getHearingType())) {
-            for (var dateListedItemType : hearingType.getHearingDateCollection()) {
+            for (DateListedTypeItem dateListedItemType : hearingType.getHearingDateCollection()) {
                 if (Constants.HEARING_STATUS_HEARD.equals(dateListedItemType.getValue().getHearingStatus())
                         && YES.equals(dateListedItemType.getValue().getHearingCaseDisposed())) {
-                    var date = LocalDate.parse(dateListedItemType.getValue().getListedDate(),  OLD_DATE_TIME_PATTERN);
+                    LocalDate date = LocalDate.parse(dateListedItemType.getValue().getListedDate(),
+                        OLD_DATE_TIME_PATTERN);
                     datesList.add(date);
                 }
             }
@@ -372,7 +378,7 @@ public class TimeToFirstHearingReport {
     }
 
     private boolean isFirstHearingWithin26Weeks(CaseData caseData, LocalDate firstHearingDate) {
-        var receiptDate = LocalDate.parse(caseData.getReceiptDate());
+        LocalDate receiptDate = LocalDate.parse(caseData.getReceiptDate());
         return receiptDate.plusWeeks(26).equals(firstHearingDate) || receiptDate.plusWeeks(26)
                 .isAfter(firstHearingDate);
     }

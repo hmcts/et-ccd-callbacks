@@ -36,12 +36,12 @@ public class CCDRequestBuilder {
     }
 
     public CCDRequest build() {
-        var caseDetails = new CaseDetails();
+        CaseDetails caseDetails = new CaseDetails();
         caseDetails.setState(state);
         caseDetails.setCaseTypeId(caseTypeId);
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(caseId);
-        var ccdRequest = new CCDRequest();
+        CCDRequest ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
         return ccdRequest;
     }

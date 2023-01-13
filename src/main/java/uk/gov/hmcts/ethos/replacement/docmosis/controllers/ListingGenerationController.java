@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.listing.ListingCallbackResponse;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
@@ -46,6 +48,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
+    "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
+    "PMD.ExcessiveImports", "PMD.ConfusingTernary", "PDM.UselessParentheses"})
 public class ListingGenerationController {
 
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
@@ -79,7 +84,7 @@ public class ListingGenerationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var listingData = listingService.listingCaseCreation(listingRequest.getCaseDetails());
+        ListingData listingData = listingService.listingCaseCreation(listingRequest.getCaseDetails());
 
         return ResponseEntity.ok(ListingCallbackResponse.builder()
                 .data(listingData)
@@ -107,7 +112,7 @@ public class ListingGenerationController {
         }
 
         List<String> errors = new ArrayList<>();
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         if (ListingHelper.isListingRangeValid(ccdRequest.getCaseDetails().getCaseData()
                 .getPrintHearingDetails(), errors)) {
@@ -140,13 +145,13 @@ public class ListingGenerationController {
         }
 
         List<String> errors = new ArrayList<>();
-        var listingData = listingRequest.getCaseDetails().getCaseData();
+        ListingData listingData = listingRequest.getCaseDetails().getCaseData();
 
         if (ListingHelper.isListingRangeValid(listingData, errors)) {
             listingData = listingService.processListingHearingsRequest(
                     listingRequest.getCaseDetails(), userToken);
 
-            var defaultValues = defaultValuesReaderService.getDefaultValues(
+            DefaultValues defaultValues = defaultValuesReaderService.getDefaultValues(
                     listingRequest.getCaseDetails().getCaseData().getManagingOffice());
             log.info("Post Default values loaded: " + defaultValues);
             listingData = defaultValuesReaderService.getListingData(listingData, defaultValues);
@@ -176,11 +181,11 @@ public class ListingGenerationController {
         }
 
         List<String> errors = new ArrayList<>();
-        var listingData = ccdRequest.getCaseDetails().getCaseData().getPrintHearingCollection();
+        ListingData listingData = ccdRequest.getCaseDetails().getCaseData().getPrintHearingCollection();
         if (listingData.getListingCollection() != null && !listingData.getListingCollection().isEmpty()) {
             listingData = listingService.setManagingOfficeAndCourtAddressFromCaseData(
                     ccdRequest.getCaseDetails().getCaseData());
-            var documentInfo = listingService.processHearingDocument(
+            DocumentInfo documentInfo = listingService.processHearingDocument(
                     listingData, ccdRequest.getCaseDetails().getCaseTypeId(), userToken);
             ccdRequest.getCaseDetails().getCaseData().setDocMarkUp(documentInfo.getMarkUp());
             return ResponseEntity.ok(CCDCallbackResponse.builder()
@@ -267,7 +272,7 @@ public class ListingGenerationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var listingData = reportDataService.generateReportData(listingRequest.getCaseDetails(), userToken);
+        ListingData listingData = reportDataService.generateReportData(listingRequest.getCaseDetails(), userToken);
 
         return getResponseEntity(listingData, listingRequest.getCaseDetails().getCaseTypeId(), userToken);
 
@@ -278,10 +283,9 @@ public class ListingGenerationController {
                                                                       String userToken) {
         List<String> errorsList = new ArrayList<>();
 
-        if (hasListings(listingData)
-                || (isAllowedReportType(listingData)
-                && (hasServedClaims(listingData) || hasSummaryAndDetails(listingData)))) {
-            var documentInfo = getDocumentInfo(listingData, caseTypeId, userToken);
+        if (hasListings(listingData) || isAllowedReportType(listingData)
+                && hasServedClaims(listingData) || hasSummaryAndDetails(listingData)) {
+            DocumentInfo documentInfo = getDocumentInfo(listingData, caseTypeId, userToken);
             updateListingDocMarkUp(listingData, documentInfo);
             return ResponseEntity.ok(ListingCallbackResponse.builder()
                     .data(listingData)
@@ -347,8 +351,8 @@ public class ListingGenerationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var listingData = listingRequest.getCaseDetails().getCaseData();
-        var caseTypeId = listingRequest.getCaseDetails().getCaseTypeId();
+        ListingData listingData = listingRequest.getCaseDetails().getCaseData();
+        String caseTypeId = listingRequest.getCaseDetails().getCaseTypeId();
 
         List<String> errorsList = new ArrayList<>();
         boolean invalidCharsExist = InvalidCharacterCheck.invalidCharactersExistAllListingTypes(
@@ -357,7 +361,7 @@ public class ListingGenerationController {
             errorsList.add("No cases with hearings have been found for your search criteria");
         }
         if (errorsList.isEmpty()) {
-            var documentInfo = getDocumentInfo(listingData, caseTypeId, userToken);
+            DocumentInfo documentInfo = getDocumentInfo(listingData, caseTypeId, userToken);
             updateListingDocMarkUp(listingData, documentInfo);
             return ResponseEntity.ok(ListingCallbackResponse.builder()
                     .data(listingData)
@@ -416,7 +420,7 @@ public class ListingGenerationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         printHearingListService.initPrintHearingLists(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -439,8 +443,8 @@ public class ListingGenerationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var caseTypeId = listingRequest.getCaseDetails().getCaseTypeId();
-        var listingData = listingRequest.getCaseDetails().getCaseData();
+        String caseTypeId = listingRequest.getCaseDetails().getCaseTypeId();
+        ListingData listingData = listingRequest.getCaseDetails().getCaseData();
         listingService.dynamicVenueListing(caseTypeId, listingData);
 
         return ResponseEntity.ok(ListingCallbackResponse.builder()

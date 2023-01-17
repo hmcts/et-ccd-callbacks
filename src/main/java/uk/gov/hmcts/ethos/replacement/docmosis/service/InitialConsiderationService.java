@@ -111,7 +111,6 @@ public class InitialConsiderationService {
                     (HearingType hearing) ->
                         getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection()).orElse(
                             LocalDate.now().plusYears(100))))
-                getHearingDuration(hearing)))
             .map(hearing -> getFormattedHearingDetails(hearing, formatter))
             .orElse(HEARING_MISSING);
     }

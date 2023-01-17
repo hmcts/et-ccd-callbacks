@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,6 +46,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 @ExtendWith(SpringExtension.class)
 class InitialConsiderationServiceTest {
+    private static final LocalDateTime EARLIEST_FUTURE_HEARING_DATE = LocalDateTime.now().plusDays(5);
     private static final String EXPECTED_RESPONDENT_NAME =
         "| Respondent  name given | |\r\n"
             + "|-------------|:------------|\r\n"
@@ -74,9 +76,11 @@ class InitialConsiderationServiceTest {
     private static final String EXPECTED_HEARING_STRING =
         "|Hearing details | |\r\n"
             + "|-------------|:------------|\r\n"
-            + "|Date | 01 Jul 2022|\r\n"
-            + "|Type | Preliminary Hearing(CM)|\r\n"
-            + "|Duration | 1.5 Hours|";
+            + "|Date | "
+            + EARLIEST_FUTURE_HEARING_DATE.toString("dd MMM yyyy")
+            + "|\r\n"
+            + "|Type | Hearing|\r\n"
+            + "|Duration | 3.5 Hours|";
 
     private static final String EXPECTED_HEARING_BLANK =
         "|Hearing details | |\r\n"
@@ -127,18 +131,41 @@ class InitialConsiderationServiceTest {
         doCallRealMethod().when(documentManagementService).addDocumentToDocumentField(documentInfo);
     }
 
+    private void setFutureHearingDate(CaseData caseData) {
+        DateListedType dateListed = caseData.getHearingCollection().get(0).getValue().getHearingDateCollection()
+            .get(0).getValue();
+        dateListed.setHearingStatus("Listed");
+        dateListed.setListedDate(EARLIEST_FUTURE_HEARING_DATE.toString());
+        dateListed.setHearingTimingDuration("3.5 Hours");
+    }
+
     @Test
     void getEarliestHearingDate() {
-        assertThat(initialConsiderationService.getEarliestHearingDate(new ArrayList<>()))
+        setFutureHearingDate(caseData);
+        assertThat(initialConsiderationService.getEarliestHearingDateForListedHearings(generateHearingDates()))
+            .isEqualTo(Optional.of(LocalDate.of(EARLIEST_FUTURE_HEARING_DATE.getYear(),
+                EARLIEST_FUTURE_HEARING_DATE.getMonthOfYear(),
+                EARLIEST_FUTURE_HEARING_DATE.getDayOfMonth())));
+    }
+
+    @Test
+    void getEarliestHearingDatWithEmptyDateListedTypeItem() {
+        setFutureHearingDate(caseData);
+        assertThat(initialConsiderationService.getEarliestHearingDateForListedHearings(generateHearingDatesWithEmpty()))
+            .isEqualTo(Optional.of(LocalDate.of(EARLIEST_FUTURE_HEARING_DATE.getYear(),
+                EARLIEST_FUTURE_HEARING_DATE.getMonthOfYear(),
+                EARLIEST_FUTURE_HEARING_DATE.getDayOfMonth())));
+    }
+
+    @Test
+    void getEarliestHearingDateWithEmptyHearingDatesCollection() {
+        assertThat(initialConsiderationService.getEarliestHearingDateForListedHearings(new ArrayList<>()))
             .isEmpty();
-        assertThat(initialConsiderationService.getEarliestHearingDate(generateHearingDates()))
-            .isEqualTo(Optional.of(LocalDate.of(2022, 1, 7)));
-        assertThat(initialConsiderationService.getEarliestHearingDate(generateHearingDatesWithEmpty()))
-            .isEqualTo(Optional.of(LocalDate.of(2022, 1, 7)));
     }
 
     @Test
     void getHearingDetailsTest() {
+        setFutureHearingDate(caseData);
         String hearingDetails = initialConsiderationService.getHearingDetails(caseData.getHearingCollection());
         assertThat(hearingDetails)
             .isEqualTo(EXPECTED_HEARING_STRING);
@@ -423,27 +450,30 @@ class InitialConsiderationServiceTest {
     }
 
     private List<DateListedTypeItem> generateHearingDates() {
-        return List.of(createDate("2022-07-15T10:00:00.000"),
-            createDate("2022-07-15T10:00:00.000"),
-            createDate("2022-05-20T10:00:00.000"),
-            createDate("2022-03-22T10:00:00.000"),
-            createDate("2022-01-07T10:00:00.000"));
+
+        return List.of(createDate("2022-07-15T10:00:00.000", null),
+            createDate("2022-07-15T10:00:00.000", null),
+            createDate("2022-05-20T10:00:00.000", null),
+            createDate("2022-03-22T10:00:00.000", null),
+            createDate("2022-01-07T10:00:00.000", null),
+            createDate("2022-01-07T10:00:00.000", null),
+            createDate(EARLIEST_FUTURE_HEARING_DATE.toString(), "Listed"));
     }
 
     private List<DateListedTypeItem> generateHearingDatesWithEmpty() {
-        return List.of(createDate("2022-07-15T10:00:00.000"),
-            createDate("2022-07-15T10:00:00.000"),
+        return List.of(createDate("2022-07-15T10:00:00.000", null),
+            createDate("2022-07-15T10:00:00.000", null),
             new DateListedTypeItem(),
-            createDate("2022-03-22T10:00:00.000"),
-            createDate("2022-01-07T10:00:00.000"));
+            createDate("2022-03-22T10:00:00.000", null),
+            createDate(EARLIEST_FUTURE_HEARING_DATE.toString(), "Listed"));
     }
 
-    private DateListedTypeItem createDate(String dateString) {
+    private DateListedTypeItem createDate(String dateString, String status) {
         DateListedTypeItem hearingDate = new DateListedTypeItem();
         DateListedType dateListedType = new DateListedType();
         dateListedType.setListedDate(dateString);
+        dateListedType.setHearingStatus(status);
         hearingDate.setValue(dateListedType);
-
         return hearingDate;
     }
 }

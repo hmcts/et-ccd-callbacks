@@ -62,6 +62,7 @@ public class InitialConsiderationService {
     private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "");
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
     private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
+    private static final String HEARING_STATUS_LISTED = "Listed";
 
     /**
      * Creates the respondent detail section for Initial Consideration.
@@ -87,10 +88,11 @@ public class InitialConsiderationService {
 
     /**
      * Creates hearing detail section for Initial Consideration.
-     * Display details of the hearing with the earliest hearing date from the collection of hearings
+     * Display details of the hearing with the earliest hearing date from the collection of hearings,
+     * where the selected hearing is of "Listed" status and hearing listed date is in the future
      *
      * @param hearingCollection the collection of hearings
-     * @return return table with details of hearing
+     * @return return table with details of hearing Listed status
      */
     public String getHearingDetails(List<HearingTypeItem> hearingCollection) {
         if (hearingCollection == null) {
@@ -107,22 +109,32 @@ public class InitialConsiderationService {
             .min(
                 Comparator.comparing(
                     (HearingType hearing) ->
-                        getEarliestHearingDate(hearing.getHearingDateCollection()).orElse(
+                        getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection()).orElse(
                             LocalDate.now().plusYears(100))))
             .map(hearing -> String.format(HEARING_DETAILS,
-                getEarliestHearingDate(hearing.getHearingDateCollection()).map(formatter::format).orElse(""),
+                getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection())
+                    .map(formatter::format).orElse(""),
                 hearing.getHearingType(),
                 getHearingDuration(hearing)))
             .orElse(HEARING_MISSING);
     }
 
-    public Optional<LocalDate> getEarliestHearingDate(List<DateListedTypeItem> hearingDates) {
+    /**
+     * Select and return the earliest future hearings date for Initial Consideration.
+     *
+     * @param hearingDates the list of hearing dates in the case
+     * @return earliest future hearing date
+     */
+    public Optional<LocalDate> getEarliestHearingDateForListedHearings(List<DateListedTypeItem> hearingDates) {
         return hearingDates.stream()
-            .filter(dateListedTypeItem -> dateListedTypeItem != null && dateListedTypeItem.getValue() != null)
-            .map(DateListedTypeItem::getValue)
-            .filter(hearingDate -> hearingDate.getListedDate() != null && !hearingDate.getListedDate().isEmpty())
-            .map(hearingDateItem -> LocalDateTime.parse(hearingDateItem.getListedDate()).toLocalDate())
-            .min(Comparator.naturalOrder());
+        .filter(dateListedTypeItem -> dateListedTypeItem != null && dateListedTypeItem.getValue() != null
+            && HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus())
+            && LocalDateTime.parse(dateListedTypeItem.getValue().getListedDate())
+            .toLocalDate().isAfter(LocalDate.now()))
+        .map(DateListedTypeItem::getValue)
+        .filter(hearingDate -> hearingDate.getListedDate() != null && !hearingDate.getListedDate().isEmpty())
+        .map(hearingDateItem -> LocalDateTime.parse(hearingDateItem.getListedDate()).toLocalDate())
+        .min(Comparator.naturalOrder());
     }
 
     /**

@@ -105,18 +105,26 @@ public class InitialConsiderationService {
             .filter(hearingTypeItem -> hearingTypeItem != null && hearingTypeItem.getValue() != null)
             .map(HearingTypeItem::getValue)
             .filter(
-                hearing -> hearing.getHearingDateCollection() != null && !hearing.getHearingDateCollection().isEmpty())
-            .min(
-                Comparator.comparing(
+                hearing -> hearing.getHearingDateCollection() != null
+                    && !hearing.getHearingDateCollection().isEmpty())
+            .min(Comparator.comparing(
                     (HearingType hearing) ->
                         getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection()).orElse(
                             LocalDate.now().plusYears(100))))
-            .map(hearing -> String.format(HEARING_DETAILS,
-                getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection())
-                    .map(formatter::format).orElse(""),
-                hearing.getHearingType(),
                 getHearingDuration(hearing)))
+            .map(hearing -> getFormattedHearingDetails(hearing, formatter))
             .orElse(HEARING_MISSING);
+    }
+
+    private String getFormattedHearingDetails(HearingType hearing, DateTimeFormatter formatter) {
+        Optional<LocalDate> earliestHearingDate = getEarliestHearingDateForListedHearings(
+            hearing.getHearingDateCollection());
+        if (earliestHearingDate.isPresent()) {
+            return String.format(HEARING_DETAILS, earliestHearingDate.map(formatter::format).orElse(""),
+                hearing.getHearingType(), getHearingDuration(hearing));
+        } else {
+            return String.format(HEARING_DETAILS, "-", "-", "-");
+        }
     }
 
     /**

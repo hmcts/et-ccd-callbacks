@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -62,7 +63,6 @@ public class InitialConsiderationService {
     private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "");
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
     private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
-    private static final String HEARING_STATUS_LISTED = "Listed";
 
     /**
      * Creates the respondent detail section for Initial Consideration.

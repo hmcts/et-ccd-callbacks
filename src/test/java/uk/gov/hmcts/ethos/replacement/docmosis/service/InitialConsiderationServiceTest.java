@@ -47,6 +47,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 class InitialConsiderationServiceTest {
     private static final LocalDateTime EARLIEST_FUTURE_HEARING_DATE = LocalDateTime.now().plusDays(5);
+    private static final LocalDateTime SECOND_FUTURE_HEARING_DATE = LocalDateTime.now().plusDays(9);
     private static final String EXPECTED_RESPONDENT_NAME =
         "| Respondent  name given | |\r\n"
             + "|-------------|:------------|\r\n"
@@ -149,7 +150,7 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void getEarliestHearingDatWithEmptyDateListedTypeItem() {
+    void getEarliestHearingDateWithEmptyDateListedTypeItem() {
         setFutureHearingDate(caseData);
         assertThat(initialConsiderationService.getEarliestHearingDateForListedHearings(generateHearingDatesWithEmpty()))
             .isEqualTo(Optional.of(LocalDate.of(EARLIEST_FUTURE_HEARING_DATE.getYear(),
@@ -457,7 +458,8 @@ class InitialConsiderationServiceTest {
             createDate("2022-03-22T10:00:00.000", null),
             createDate("2022-01-07T10:00:00.000", null),
             createDate("2022-01-07T10:00:00.000", null),
-            createDate(EARLIEST_FUTURE_HEARING_DATE.toString(), "Listed"));
+            createDate(EARLIEST_FUTURE_HEARING_DATE.toString(), "Listed"),
+            createDate(SECOND_FUTURE_HEARING_DATE.toString(), "Listed"));
     }
 
     private List<DateListedTypeItem> generateHearingDatesWithEmpty() {

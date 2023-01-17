@@ -99,28 +99,25 @@ public class TseAdmReplyService {
         );
     }
 
-    private String initialRespondDetails(GenericTseApplicationType applicationType, String authToken) {
-        if (applicationType.getRespondCollection() == null) {
+    private String initialRespondDetails(GenericTseApplicationType application, String authToken) {
+        if (application.getRespondCollection() == null) {
             return "";
         }
         IntWrapper respondCount = new IntWrapper(0);
-        return applicationType.getRespondCollection().stream()
+        return application.getRespondCollection().stream()
             .map(replyItem ->
-                formatTseAdmReplyRespondDetails(replyItem, respondCount.incrementAndReturnValue(), authToken))
+                FROM_ADMIN.equals(replyItem.getValue().getFrom())
+                ? formatAdminReply(
+                    replyItem.getValue(),
+                    respondCount.incrementAndReturnValue(),
+                    documentManagementService.displayDocNameTypeSizeLink(
+                        replyItem.getValue().getAddDocument(), authToken))
+                : formatRespondentReplyForReply(
+                    replyItem.getValue(),
+                    respondCount.incrementAndReturnValue(),
+                    application.getApplicant(),
+                    populateListDocWithInfoAndLink(replyItem.getValue().getSupportingMaterial(), authToken)))
             .collect(Collectors.joining(""));
-    }
-
-    private String formatTseAdmReplyRespondDetails(TseRespondTypeItem tseRespondTypeItem, int respondCount,
-                                                   String authToken) {
-        TseRespondType tseRespondType = tseRespondTypeItem.getValue();
-        if (FROM_ADMIN.equals(tseRespondType.getFrom())) {
-            String docInfo =
-                documentManagementService.displayDocNameTypeSizeLink(tseRespondType.getAddDocument(), authToken);
-            return formatAdminReply(tseRespondType, respondCount, docInfo);
-        } else {
-            String docInfo = populateListDocWithInfoAndLink(tseRespondType.getSupportingMaterial(), authToken);
-            return formatRespondentReplyForReply(tseRespondType, respondCount, docInfo);
-        }
     }
 
     private String populateListDocWithInfoAndLink(List<DocumentTypeItem> supportingMaterial, String authToken) {

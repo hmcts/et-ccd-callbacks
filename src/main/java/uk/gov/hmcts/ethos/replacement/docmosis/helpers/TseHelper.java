@@ -307,16 +307,18 @@ public final class TseHelper {
      * Format Respondent or Claimant response markup for Respond to an application.
      * @param reply Respond as TseRespondType
      * @param respondCount Respond count as incrementAndReturnValue()
+     * @param applicant GenericTseApplicationType getApplicant()
      * @param docInfo Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
      * @return Markup String
      */
-    public static String formatRespondentReplyForReply(TseRespondType reply, int respondCount, String docInfo) {
+    public static String formatRespondentReplyForReply(TseRespondType reply, int respondCount, String applicant,
+                                                       String docInfo) {
         return String.format(
             ADMIN_REPLY_MARKUP_FOR_REPLY,
             respondCount,
             reply.getFrom(),
             reply.getDate(),
-            reply.getFrom().toLowerCase(),
+            applicant.toLowerCase(),
             reply.getResponse(),
             docInfo,
             displayCopyToOtherPartyYesOrNo(reply.getCopyToOtherParty())

@@ -47,7 +47,7 @@ public class TseAdminService {
     private final EmailService emailService;
     private final DocumentManagementService documentManagementService;
 
-    private static final String APP_DETAILS = "| | |\r\n"
+    private static final String RESPONSE_APP_DETAILS = "| | |\r\n"
             + "|--|--|\r\n"
             + "|%s application | %s|\r\n"
             + "|Application date | %s|\r\n"
@@ -93,16 +93,14 @@ public class TseAdminService {
     public void initialTseAdminTableMarkUp(CaseData caseData, String authToken) {
         GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem != null) {
-            GenericTseApplicationType applicationType = applicationTypeItem.getValue();
-            String appDetails = initialTseAdminAppDetails(applicationType, authToken);
-            String responseDetails = initialTseAdminRespondDetails(applicationType, authToken);
-            caseData.setTseAdminTableMarkUp(appDetails + responseDetails);
+            caseData.setTseAdminTableMarkUp(initialTseAdminAppDetails(applicationTypeItem.getValue(), authToken)
+                + initialTseAdminRespondDetails(applicationTypeItem.getValue(), authToken));
         }
     }
 
     private String initialTseAdminAppDetails(GenericTseApplicationType applicationType, String authToken) {
         return String.format(
-            APP_DETAILS,
+            RESPONSE_APP_DETAILS,
             applicationType.getApplicant(),
             applicationType.getType(),
             applicationType.getDate(),
@@ -119,21 +117,17 @@ public class TseAdminService {
         IntWrapper respondCount = new IntWrapper(0);
         return applicationType.getRespondCollection().stream()
             .map(replyItem ->
-                formatTseAdminRespondDetails(replyItem, respondCount.incrementAndReturnValue(), authToken))
+                "Admin".equals(replyItem.getValue().getFrom())
+                    ? formatAdminReply(
+                        replyItem.getValue(),
+                        respondCount.incrementAndReturnValue(),
+                        documentManagementService.displayDocNameTypeSizeLink(
+                            replyItem.getValue().getAddDocument(), authToken))
+                    : formatRespondentReplyForDecision(
+                        replyItem.getValue(),
+                        respondCount.incrementAndReturnValue(),
+                        populateListDocWithInfoAndLink(replyItem.getValue().getSupportingMaterial(), authToken)))
             .collect(Collectors.joining(""));
-    }
-
-    private String formatTseAdminRespondDetails(TseRespondTypeItem tseRespondTypeItem, int respondCount,
-                                                String authToken) {
-        TseRespondType tseRespondType = tseRespondTypeItem.getValue();
-        if ("Admin".equals(tseRespondType.getFrom())) {
-            String docInfo =
-                documentManagementService.displayDocNameTypeSizeLink(tseRespondType.getAddDocument(), authToken);
-            return formatAdminReply(tseRespondType, respondCount, docInfo);
-        } else {
-            String docInfo = populateListDocWithInfoAndLink(tseRespondType.getSupportingMaterial(), authToken);
-            return formatRespondentReplyForDecision(tseRespondType, respondCount, docInfo);
-        }
     }
 
     private String populateListDocWithInfoAndLink(List<DocumentTypeItem> supportingMaterial, String authToken) {
@@ -301,8 +295,6 @@ public class TseAdminService {
             }
         }
 
-        // TODO - Stream the repliesList and format the markdown strings for Claimant/Respondent/Admin responses
-
         return String.format(
             CLOSE_APP_DETAILS,
             applicationTypeItem.getValue().getApplicant(),
@@ -311,7 +303,9 @@ public class TseAdminService {
             applicationTypeItem.getValue().getDetails(),
             getApplicationDocumentLink(applicationTypeItem, authToken),
             applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo()
-        ) + decisionsMarkdown;
+        )
+            + initialTseAdminRespondDetails(applicationTypeItem.getValue(), authToken)
+            + decisionsMarkdown;
 
     }
 

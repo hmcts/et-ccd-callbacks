@@ -53,7 +53,7 @@ public final class TseHelper {
     private static final String REPLY_OUTPUT_NAME = "%s Reply.pdf";
     private static final String REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-01212.docx";
 
-    private static final String ADMIN_REPLY_MARKUP_FOR_REPLY = "|Response %s | |\r\n"
+    private static final String RESPONDENT_REPLY_MARKUP_FOR_REPLY = "|Response %s | |\r\n"
         + "|--|--|\r\n"
         + "|Response from | %s|\r\n"
         + "|Response date | %s|\r\n"
@@ -68,7 +68,7 @@ public final class TseHelper {
         + "|Details | %s|\r\n"
         + "|Supporting material | %s|\r\n"
         + "\r\n";
-    private static final String ADMIN_REPLY_MARKUP_FOR_DECISION = "|Response %s | |\r\n"
+    private static final String ADMIN_REPLY_MARKUP = "|Response %s | |\r\n"
         + "|--|--|\r\n"
         + "|Response | %s|\r\n"
         + "|Date | %s|\r\n"
@@ -287,7 +287,7 @@ public final class TseHelper {
      */
     public static String formatAdminReply(TseRespondType reply, int respondCount, String docInfo) {
         return String.format(
-            ADMIN_REPLY_MARKUP_FOR_DECISION,
+            ADMIN_REPLY_MARKUP,
             respondCount,
             reply.getEnterResponseTitle(),
             reply.getDate(),
@@ -314,7 +314,7 @@ public final class TseHelper {
     public static String formatRespondentReplyForReply(TseRespondType reply, int respondCount, String applicant,
                                                        String docInfo) {
         return String.format(
-            ADMIN_REPLY_MARKUP_FOR_REPLY,
+            RESPONDENT_REPLY_MARKUP_FOR_REPLY,
             respondCount,
             reply.getFrom(),
             reply.getDate(),

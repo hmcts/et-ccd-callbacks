@@ -12,29 +12,25 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminReplyTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseReplyTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondentReplyTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRespondentReplyForDecision;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
@@ -58,13 +54,6 @@ public class TseAdminService {
             + "|%s | %s|\r\n"
             + "|Supporting material | %s|\r\n"
             + "\r\n";
-    private static final String RESPONSE_DETAILS = "|Response %s | |\r\n"
-            + "|--|--|\r\n"
-            + "|Response from | %s|\r\n"
-            + "|Response date | %s|\r\n"
-            + "|Details | %s|\r\n"
-            + "|Supporting material | %s|\r\n"
-            + "\r\n";
 
     private static final String CLOSE_APP_DETAILS = "| | |\r\n"
         + "|--|--|\r\n"
@@ -72,15 +61,6 @@ public class TseAdminService {
         + "|Type of application | %s|\r\n"
         + "|Application date | %s|\r\n"
         + "|What do you want to tell or ask the tribunal? | %s|\r\n"
-        + "|Supporting material | %s|\r\n"
-        + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
-        + "\r\n";
-
-    private static final String CLOSE_APP_RESPONSES_DETAILS = "| | |\r\n"
-        + "|--|--|\r\n"
-        + "|Response from | %s|\r\n"
-        + "|Response date | %s|\r\n"
-        + "|What’s your response to the respondent’s application? | %s|\r\n"
         + "|Supporting material | %s|\r\n"
         + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
         + "\r\n";
@@ -133,20 +113,27 @@ public class TseAdminService {
     }
 
     private String initialTseAdminRespondDetails(GenericTseApplicationType applicationType, String authToken) {
-        if (applicationType.getRespondentReply() == null) {
+        if (applicationType.getRespondCollection() == null) {
             return "";
         }
         IntWrapper respondCount = new IntWrapper(0);
-        return applicationType.getRespondentReply().stream()
-            .map(respondent -> String.format(
-                RESPONSE_DETAILS,
-                respondCount.incrementAndReturnValue(),
-                respondent.getValue().getFrom(),
-                respondent.getValue().getDate(),
-                respondent.getValue().getResponse(),
-                populateListDocWithInfoAndLink(respondent.getValue().getSupportingMaterial(), authToken)))
-            .findFirst()
-            .orElse(null);
+        return applicationType.getRespondCollection().stream()
+            .map(replyItem ->
+                formatTseAdminRespondDetails(replyItem, respondCount.incrementAndReturnValue(), authToken))
+            .collect(Collectors.joining(""));
+    }
+
+    private String formatTseAdminRespondDetails(TseRespondTypeItem tseRespondTypeItem, int respondCount,
+                                                String authToken) {
+        TseRespondType tseRespondType = tseRespondTypeItem.getValue();
+        if ("Admin".equals(tseRespondType.getFrom())) {
+            String docInfo =
+                documentManagementService.displayDocNameTypeSizeLink(tseRespondType.getAddDocument(), authToken);
+            return formatAdminReply(tseRespondType, respondCount, docInfo);
+        } else {
+            String docInfo = populateListDocWithInfoAndLink(tseRespondType.getSupportingMaterial(), authToken);
+            return formatRespondentReplyForDecision(tseRespondType, respondCount, docInfo);
+        }
     }
 
     private String populateListDocWithInfoAndLink(List<DocumentTypeItem> supportingMaterial, String authToken) {
@@ -314,18 +301,6 @@ public class TseAdminService {
             }
         }
 
-        List<? extends TseReplyTypeItem> repliesList = Stream.of(
-            Optional.ofNullable(applicationTypeItem.getValue().getAdminReply())
-                .orElse(Collections.<TseAdminReplyTypeItem>emptyList()),
-            Optional.ofNullable(applicationTypeItem.getValue().getRespondentReply())
-                .orElse(Collections.<TseRespondentReplyTypeItem>emptyList()))
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
-        repliesList.sort(
-            Comparator.comparing(tseReplyTypeItem -> LocalDate.parse(tseReplyTypeItem.getDate(), formatter)));
-
         // TODO - Stream the repliesList and format the markdown strings for Claimant/Respondent/Admin responses
 
         return String.format(
@@ -350,7 +325,6 @@ public class TseAdminService {
     }
 
     private String getApplicationDocumentLink(GenericTseApplicationTypeItem applicationTypeItem, String authToken) {
-        String documentLink;
         if (applicationTypeItem.getValue().getDocumentUpload() == null) {
             return "";
         }

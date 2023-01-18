@@ -71,20 +71,11 @@ public final class NocNotificationHelper {
         return respondentRepresentativeService.getRespondent(representedPerson.getValue().getRespRepName(), caseData);
     }
 
-    public static void addNameToPersonalisation(CaseData caseData, Map<String, String> personalisation) {
-        String firstName = caseData.getClaimantIndType().getClaimantFirstNames();
-        String lastName =  caseData.getClaimantIndType().getClaimantLastName();
-
-        personalisation.put("first_name", isNullOrEmpty(firstName) ? UNKNOWN : firstName);
-        personalisation.put("last_name", isNullOrEmpty(firstName) ? UNKNOWN : lastName);
-    }
-
     public static Map<String, String> buildClaimantPersonalisation(CaseData caseData, String partyName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
         personalisation.put("party_name", partyName);
-        addNameToPersonalisation(caseData, personalisation);
 
         return personalisation;
     }
@@ -93,8 +84,6 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
-        //TODO: Figure out correct values for personalisation field
-        addNameToPersonalisation(caseData, personalisation);
         personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? UNKNOWN :
             caseData.getEthosCaseReference());
 
@@ -105,10 +94,8 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
-        //TODO: Figure out correct values for personalisation field
         personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? UNKNOWN :
                 caseData.getEthosCaseReference());
-        addNameToPersonalisation(caseData, personalisation);
         personalisation.put("party_name", partyName);
 
         return personalisation;
@@ -118,7 +105,6 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
-        //TODO: Figure out correct values for personalisation field
         personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? UNKNOWN :
                 caseData.getEthosCaseReference());
         personalisation.put("respondent_name", respondent.getRespondentName());
@@ -144,7 +130,6 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
-        //TODO: Figure out correct values for personalisation field
         personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? UNKNOWN :
             caseData.getEthosCaseReference());
         personalisation.put("date",

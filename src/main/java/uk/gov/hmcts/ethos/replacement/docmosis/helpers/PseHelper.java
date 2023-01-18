@@ -9,10 +9,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import java.util.stream.Collectors;
 
 @Slf4j
-public final class PstHelper {
+public final class PseHelper {
     public static final String CLOSED = "Closed";
 
-    private PstHelper() {
+    private PseHelper() {
         // Access through static methods
     }
 

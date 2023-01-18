@@ -31,7 +31,7 @@ module.exports = async function (jurisdiction) {
     await I.fillField('#listedDate-month', today.getMonth() + 1);
     await I.fillField('#listedDate-year', today.getFullYear());
 
-    await I.navByClick(commonConfig.continue);
+    await I.click(commonConfig.continue);
     await I.click(commonConfig.submit);
     await I.waitForEnabled({css: '#next-step'}, testConfig.TestTimeToWaitForText || 5);
 };

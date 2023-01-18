@@ -22,12 +22,12 @@ module.exports = async function (jurisdiction) {
         year: 'numeric',
     });
     I.selectOption('#allocateHearingHearing', 'Hearing 1, '+ formattedDate + ' 00:00');
-    await I.navByClick(commonConfig.continue);
+    await I.click(commonConfig.continue);
     if (jurisdiction === 'Leeds')
     {
         I.selectOption('#allocateHearingJudge', 'Leeds Judge 1');
         I.selectOption('#allocateHearingClerk', 'Leeds Clerk 1');
-        await I.navByClick(commonConfig.continue);
+        await I.click(commonConfig.continue);
         I.selectOption('#allocateHearingRoom', 'Leeds Magistrates');
 
     }
@@ -35,7 +35,7 @@ module.exports = async function (jurisdiction) {
     {
         I.selectOption('#hearingCollection_0_hearingDateCollection_0_Hearing_room_M', 'Manchester');
     }
-    await I.navByClick(commonConfig.continue);
+    await I.click(commonConfig.continue);
     await I.click(commonConfig.submit);
     await I.waitForEnabled({css: '#next-step'}, testConfig.TestTimeToWaitForText || 5);
 };

@@ -21,15 +21,14 @@ module.exports = async function (jurisdictionOutcome) {
             I.waitForText(commonConfig.jurisdictionRule2, testConfig.TestTimeToWaitForText);
             await I.selectOption('#jurCodesCollection_0_judgmentOutcome', commonConfig.jurisdictionRule2);
             //Trying to get the pipeline to work
-            /*I.dontSeeElement('#disposalDate-day');
-            I.dontSee('Disposal date');*/
+            I.dontSee('Disposal date');
         break;
         //ensure this outcome doesn't display the date notified field
         case "Withdrawn or private settlement":
             I.waitForText(commonConfig.jurisdictionRule2, testConfig.TestTimeToWaitForText);
             await I.selectOption('#jurCodesCollection_0_judgmentOutcome', commonConfig.jurisdictionRule3);
             //I.dontSeeElement('#dateNotified-day');
-            //I.dontSee('Date notified');
+            I.dontSee('Date notified');
             I.fillField('#dateNotified-day','10');
             I.fillField('#dateNotified-month','06');
             I.fillField('#dateNotified-year','2022');
@@ -38,6 +37,6 @@ module.exports = async function (jurisdictionOutcome) {
         default:
             console.log("No jurisdiction code matched with" + jurisdictionOutcome);
     }
-    I.click(commonConfig.continue);
-    await I.click(commonConfig.submit);
+    // I.click(commonConfig.continue);
+    //await I.click(commonConfig.submit);
 };

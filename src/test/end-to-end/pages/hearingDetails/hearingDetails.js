@@ -14,7 +14,7 @@ module.exports = async function (caseDisposed) {
         year: 'numeric',
     });
     I.selectOption('#hearingDetailsHearing', 'Hearing 1, '+ formattedDate + ' 00:00');
-    await I.navByClick(commonConfig.continue);
+    await I.click(commonConfig.continue);
     I.selectOption('#hearingDetailsStatus', 'Heard');
     await I.waitForElement('#hearingDetailsCaseDisposed_Yes');
     if (caseDisposed === 'Yes') {
@@ -35,7 +35,7 @@ module.exports = async function (caseDisposed) {
     await I.fillField('#hearingDetailsTimingFinish-hour', '11');
     await I.fillField('#hearingDetailsTimingFinish-minute','00');
     await I.fillField('#hearingDetailsTimingFinish-second', '00');
-    await I.navByClick(commonConfig.continue);
+    await I.click(commonConfig.continue);
     await I.click(commonConfig.submit);
     await I.waitForEnabled({css: '#next-step'}, testConfig.TestTimeToWaitForText || 5);
 };

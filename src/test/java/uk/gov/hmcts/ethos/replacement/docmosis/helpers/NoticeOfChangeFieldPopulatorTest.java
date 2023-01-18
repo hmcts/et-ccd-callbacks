@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
@@ -33,6 +34,7 @@ class NoticeOfChangeFieldPopulatorTest {
     private static final RepresentedTypeRItem RESPONDENT_REP_1 = mock(RepresentedTypeRItem.class);
     private static final RepresentedTypeRItem RESPONDENT_REP_2 = mock(RepresentedTypeRItem.class);
     private static final RepresentedTypeRItem RESPONDENT_REP_3 = mock(RepresentedTypeRItem.class);
+    private static final ClaimantIndType CLAIMANT = mock(ClaimantIndType.class);
     private final NoticeOfChangeAnswersConverter answersConverter = mock(NoticeOfChangeAnswersConverter.class);
     private final RespondentPolicyConverter policyConverter = mock(RespondentPolicyConverter.class);
     private final NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator = new NoticeOfChangeFieldPopulator(
@@ -42,7 +44,8 @@ class NoticeOfChangeFieldPopulatorTest {
     @Test
     void shouldGenerateRespondentOrganisationPolicesAndNocAnswers() {
         when(caseData.getRepCollection()).thenReturn(List.of(RESPONDENT_REP_1, RESPONDENT_REP_2, RESPONDENT_REP_3));
-
+        when(caseData.getClaimantIndType()).thenReturn(CLAIMANT);
+        
         when(policyConverter.generate(SolicitorRole.SOLICITORA, Optional.of(RESPONDENT_REP_1))).thenReturn(
             ORG_POLICY_A);
         when(policyConverter.generate(SolicitorRole.SOLICITORB, Optional.of(RESPONDENT_REP_2))).thenReturn(
@@ -58,9 +61,9 @@ class NoticeOfChangeFieldPopulatorTest {
         when(policyConverter.generate(SolicitorRole.SOLICITORI, Optional.empty())).thenReturn(ORG_POLICY_I);
         when(policyConverter.generate(SolicitorRole.SOLICITORJ, Optional.empty())).thenReturn(ORG_POLICY_J);
 
-        when(answersConverter.generateForSubmission(RESPONDENT_REP_1)).thenReturn(ANSWERS_1);
-        when(answersConverter.generateForSubmission(RESPONDENT_REP_2)).thenReturn(ANSWERS_2);
-        when(answersConverter.generateForSubmission(RESPONDENT_REP_3)).thenReturn(ANSWERS_3);
+        when(answersConverter.generateForSubmission(RESPONDENT_REP_1, CLAIMANT)).thenReturn(ANSWERS_1);
+        when(answersConverter.generateForSubmission(RESPONDENT_REP_2, CLAIMANT)).thenReturn(ANSWERS_2);
+        when(answersConverter.generateForSubmission(RESPONDENT_REP_3, CLAIMANT)).thenReturn(ANSWERS_3);
 
         final Map<String, Object> data = noticeOfChangeFieldPopulator.generate(caseData);
 

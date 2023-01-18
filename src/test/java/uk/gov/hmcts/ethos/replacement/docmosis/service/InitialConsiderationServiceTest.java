@@ -140,6 +140,14 @@ class InitialConsiderationServiceTest {
         dateListed.setHearingTimingDuration("3.5 Hours");
     }
 
+    private void setFutureHearingDateWithSettledHearing(CaseData caseData) {
+        DateListedType dateListed = caseData.getHearingCollection().get(0).getValue().getHearingDateCollection()
+            .get(0).getValue();
+        dateListed.setHearingStatus("Settled");
+        dateListed.setListedDate(EARLIEST_FUTURE_HEARING_DATE.toString());
+        dateListed.setHearingTimingDuration("3.5 Hours");
+    }
+
     @Test
     void getEarliestHearingDate() {
         setFutureHearingDate(caseData);
@@ -162,6 +170,14 @@ class InitialConsiderationServiceTest {
     void getEarliestHearingDateWithEmptyHearingDatesCollection() {
         assertThat(initialConsiderationService.getEarliestHearingDateForListedHearings(new ArrayList<>()))
             .isEmpty();
+    }
+
+    @Test
+    void getHearingDetailsForSettledHearing() {
+        setFutureHearingDateWithSettledHearing(caseData);
+        String hearingDetails = initialConsiderationService.getHearingDetails(caseData.getHearingCollection());
+        assertThat(hearingDetails)
+            .isEqualTo(EXPECTED_HEARING_BLANK);
     }
 
     @Test
@@ -279,7 +295,6 @@ class InitialConsiderationServiceTest {
     @Test
     void clearHiddenValue_EtICCanProceed_No() {
         caseData.setEtICCanProceed(NO);
-
         caseData.setEtICHearingNotListedList(new ArrayList<>());
         caseData.setEtICHearingNotListedSeekComments(new EtICSeekComments());
         caseData.setEtICHearingNotListedListForPrelimHearing(new EtICListForPreliminaryHearing());
@@ -439,7 +454,6 @@ class InitialConsiderationServiceTest {
         JurCodesType code = new JurCodesType();
         code.setJuridictionCodesList(codeString);
         jurCodesTypeItem.setValue(code);
-
         return jurCodesTypeItem;
     }
 
@@ -451,7 +465,6 @@ class InitialConsiderationServiceTest {
     }
 
     private List<DateListedTypeItem> generateHearingDates() {
-
         return List.of(createDate("2022-07-15T10:00:00.000", null),
             createDate("2022-07-15T10:00:00.000", null),
             createDate("2022-05-20T10:00:00.000", null),

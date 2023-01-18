@@ -30,13 +30,14 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.LawOfDemeter"})
 public class CaseDataBuilder {
 
     private final CaseData caseData = new CaseData();
@@ -458,6 +459,16 @@ public class CaseDataBuilder {
         respondentList.setListItems(List.of(respondent));
         respondentList.setValue(respondent);
         caseData.setEt3ChooseRespondent(respondentList);
+        return this;
+    }
+
+    public CaseDataBuilder withAssignOffice(String selectedOffice) {
+        List<DynamicValueType> tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
+                .map(tribunalOffice ->
+                        DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
+                .collect(Collectors.toList());
+        caseData.setAssignOffice(DynamicFixedListType.from(tribunalOffices));
+        caseData.getAssignOffice().setValue(DynamicValueType.create(selectedOffice, selectedOffice));
         return this;
     }
 }

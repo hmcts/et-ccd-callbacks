@@ -23,7 +23,7 @@ module.exports = async function (hearingDisposalDate) {
             await I.fillField('#disposalDate-month', '11');
             await I.fillField('#disposalDate-year', '2022');
             await I.click(commonConfig.continue);
-            await I.see('Disposal Date must match one of the hearing dates for jurisdiction code ADT.');
+            await I.see('The date entered does not match any of the disposed hearing days on this case. Please check the hearing details for jurisdiction code ADT.');
             break;
         //for Non-hearing outcomes date can't be in the future -- these dates will be refactored
         case "Date in the future":
@@ -36,5 +36,4 @@ module.exports = async function (hearingDisposalDate) {
         default:
             console.log("Error with date entered:" + hearingDisposalDate);
     }
-    await I.click(commonConfig.cancelProcess);
 };

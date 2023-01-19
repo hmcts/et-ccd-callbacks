@@ -53,7 +53,7 @@ Scenario('User enters a disposal date outside of hearing collection - error mess
 
 }).tag('@e2e')
     .tag('@nightly')
-    .tag('@pats')
+    .tag('@pats');
 
 Scenario('User successfully enters a disposal date matching a date within hearing collection', async ({I}) => {
     let caseId = await processCaseToAcceptedState();

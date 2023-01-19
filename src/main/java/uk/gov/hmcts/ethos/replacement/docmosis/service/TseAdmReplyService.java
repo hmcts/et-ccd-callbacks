@@ -11,8 +11,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminReplyTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.TseAdminReplyType;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
@@ -24,8 +24,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.displayCopyToOtherPartyYesOrNo;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRespondentReplyForReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
@@ -51,22 +53,13 @@ public class TseAdmReplyService {
             + "|Supporting material | %s|\r\n"
             + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
             + "\r\n";
-    private static final String RESPONSE_DETAILS = "|Response %s | |\r\n"
-            + "|--|--|\r\n"
-            + "|Response from | %s|\r\n"
-            + "|Response date | %s|\r\n"
-            + "|What’s your response to the %s’s application? | %s|\r\n"
-            + "|Supporting material | %s|\r\n"
-            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
-            + "\r\n";
     private static final String STRING_BR = "<br>";
     private static final String APPLICATION_QUESTION = "Give details";
-    private static final String COPY_TO_OTHER_PARTY_YES = "I confirm I want to copy";
-    private static final String COPY_TO_OTHER_PARTY_NO = "I do not want to copy";
     private static final String BOTH_NOTIFY = "Both parties";
     private static final String CLAIMANT_NOTIFY_ONLY = "Claimant only";
     private static final String RESPONDENT_NOTIFY_ONLY = "Respondent only";
 
+    private static final String FROM_ADMIN = "Admin";
     private static final String IS_RESPONSE_REQUIRED = "Yes";
     private static final String BOTH_RESPOND = "Both parties";
     private static final String CLAIMANT_RESPOND_ONLY = "Claimant";
@@ -95,34 +88,36 @@ public class TseAdmReplyService {
 
     private String initialAppDetails(GenericTseApplicationType applicationType, String authToken) {
         return String.format(
-                APP_DETAILS,
-                applicationType.getApplicant(),
-                applicationType.getType(),
-                applicationType.getDate(),
-                APPLICATION_QUESTION,
-                applicationType.getDetails(),
-                documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken),
-                displayCopyToOtherPartyYesOrNo(applicationType.getCopyToOtherPartyYesOrNo())
+            APP_DETAILS,
+            applicationType.getApplicant(),
+            applicationType.getType(),
+            applicationType.getDate(),
+            APPLICATION_QUESTION,
+            applicationType.getDetails(),
+            documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken),
+            displayCopyToOtherPartyYesOrNo(applicationType.getCopyToOtherPartyYesOrNo())
         );
     }
 
-    private String initialRespondDetails(GenericTseApplicationType applicationType, String authToken) {
-        if (applicationType.getRespondentReply() == null) {
+    private String initialRespondDetails(GenericTseApplicationType application, String authToken) {
+        if (application.getRespondCollection() == null) {
             return "";
         }
         IntWrapper respondCount = new IntWrapper(0);
-        return applicationType.getRespondentReply().stream()
-                .map(respondent -> String.format(
-                        RESPONSE_DETAILS,
-                        respondCount.incrementAndReturnValue(),
-                        respondent.getValue().getFrom(),
-                        respondent.getValue().getDate(),
-                        respondent.getValue().getFrom().toLowerCase(),
-                        respondent.getValue().getResponse(),
-                        populateListDocWithInfoAndLink(respondent.getValue().getSupportingMaterial(), authToken),
-                        displayCopyToOtherPartyYesOrNo(respondent.getValue().getCopyToOtherParty())))
-                .findFirst()
-                .orElse(null);
+        return application.getRespondCollection().stream()
+            .map(replyItem ->
+                FROM_ADMIN.equals(replyItem.getValue().getFrom())
+                ? formatAdminReply(
+                    replyItem.getValue(),
+                    respondCount.incrementAndReturnValue(),
+                    documentManagementService.displayDocNameTypeSizeLink(
+                        replyItem.getValue().getAddDocument(), authToken))
+                : formatRespondentReplyForReply(
+                    replyItem.getValue(),
+                    respondCount.incrementAndReturnValue(),
+                    application.getApplicant(),
+                    populateListDocWithInfoAndLink(replyItem.getValue().getSupportingMaterial(), authToken)))
+            .collect(Collectors.joining(""));
     }
 
     private String populateListDocWithInfoAndLink(List<DocumentTypeItem> supportingMaterial, String authToken) {
@@ -130,22 +125,17 @@ public class TseAdmReplyService {
             return "";
         }
         return supportingMaterial.stream()
-                .map(documentTypeItem ->
-                        documentManagementService.displayDocNameTypeSizeLink(
-                                documentTypeItem.getValue().getUploadedDocument(), authToken) + STRING_BR)
-                .collect(Collectors.joining());
+            .map(documentTypeItem ->
+                documentManagementService.displayDocNameTypeSizeLink(
+                    documentTypeItem.getValue().getUploadedDocument(), authToken) + STRING_BR)
+            .collect(Collectors.joining());
     }
 
-    private String displayCopyToOtherPartyYesOrNo(String copyToOtherPartyYesOrNo) {
-        if (COPY_TO_OTHER_PARTY_YES.equals(copyToOtherPartyYesOrNo)) {
-            return YES;
-        } else if (COPY_TO_OTHER_PARTY_NO.equals(copyToOtherPartyYesOrNo)) {
-            return NO;
-        } else {
-            return null;
-        }
-    }
-
+    /**
+     * Validate user input.
+     * @param caseData in which the case details are extracted from
+     * @return Error message list
+     */
     public List<String> validateInput(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         if (addDocumentMissing(caseData)) {
@@ -156,9 +146,9 @@ public class TseAdmReplyService {
 
     private boolean addDocumentMissing(CaseData caseData) {
         return caseData.getTseAdmReplyAddDocument() == null
-                && (IS_CMO_OR_REQUEST_CMO.equals(caseData.getTseAdmReplyIsCmoOrRequest())
-                    || IS_CMO_OR_REQUEST_REQUEST.equals(caseData.getTseAdmReplyIsCmoOrRequest()))
-                && YES.equals(caseData.getTseAdmReplyIsResponseRequired());
+            && (IS_CMO_OR_REQUEST_CMO.equals(caseData.getTseAdmReplyIsCmoOrRequest())
+                || IS_CMO_OR_REQUEST_REQUEST.equals(caseData.getTseAdmReplyIsCmoOrRequest()))
+            && YES.equals(caseData.getTseAdmReplyIsResponseRequired());
     }
 
     /**
@@ -174,28 +164,29 @@ public class TseAdmReplyService {
         if (applicationTypeItem != null) {
 
             GenericTseApplicationType genericTseApplicationType = applicationTypeItem.getValue();
-            if (CollectionUtils.isEmpty(genericTseApplicationType.getAdminReply())) {
-                genericTseApplicationType.setAdminReply(new ArrayList<>());
+            if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
+                genericTseApplicationType.setRespondCollection(new ArrayList<>());
             }
 
-            genericTseApplicationType.getAdminReply().add(
-                    TseAdminReplyTypeItem.builder()
-                            .id(UUID.randomUUID().toString())
-                            .value(
-                                    TseAdminReplyType.builder()
-                                            .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                                            .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
-                                            .additionalInformation(caseData.getTseAdmReplyAdditionalInformation())
-                                            .addDocument(caseData.getTseAdmReplyAddDocument())
-                                            .isCmoOrRequest(caseData.getTseAdmReplyIsCmoOrRequest())
-                                            .cmoMadeBy(caseData.getTseAdmReplyCmoMadeBy())
-                                            .requestMadeBy(caseData.getTseAdmReplyRequestMadeBy())
-                                            .enterFullName(caseData.getTseAdmReplyEnterFullName())
-                                            .isResponseRequired(caseData.getTseAdmReplyIsResponseRequired())
-                                            .selectPartyRespond(caseData.getTseAdmReplySelectPartyRespond())
-                                            .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
-                                            .build()
-                            ).build());
+            genericTseApplicationType.getRespondCollection().add(
+                TseRespondTypeItem.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(
+                        TseRespondType.builder()
+                            .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+                            .from(FROM_ADMIN)
+                            .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
+                            .additionalInformation(caseData.getTseAdmReplyAdditionalInformation())
+                            .addDocument(caseData.getTseAdmReplyAddDocument())
+                            .isCmoOrRequest(caseData.getTseAdmReplyIsCmoOrRequest())
+                            .cmoMadeBy(caseData.getTseAdmReplyCmoMadeBy())
+                            .requestMadeBy(caseData.getTseAdmReplyRequestMadeBy())
+                            .madeByFullName(caseData.getTseAdmReplyEnterFullName())
+                            .isResponseRequired(caseData.getTseAdmReplyIsResponseRequired())
+                            .selectPartyRespond(caseData.getTseAdmReplySelectPartyRespond())
+                            .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
+                            .build()
+                    ).build());
         }
     }
 

@@ -27,7 +27,7 @@ public final class PseHelper {
 
         // TODO: change caseData.getGenericTseApplicationCollection() to get the correct object
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
-            .filter(r -> r.getValue().getAdminReply() == null
+            .filter(r -> r.getValue().getRespondCollection() == null
                 && r.getValue().getStatus() != null
                 && !CLOSED.equals(r.getValue().getStatus())
             ).map(r ->

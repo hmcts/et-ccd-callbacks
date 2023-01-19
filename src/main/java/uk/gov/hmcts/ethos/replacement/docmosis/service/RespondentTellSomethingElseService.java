@@ -39,7 +39,6 @@ public class RespondentTellSomethingElseService {
     private final EmailService emailService;
     private final UserService userService;
     private final TornadoService tornadoService;
-    private final DocumentManagementService documentManagementService;
 
     @Value("${respondent.tse.template.id}")
     private String emailTemplateId;

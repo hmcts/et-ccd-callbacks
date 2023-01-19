@@ -16,11 +16,9 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
-@SuppressWarnings({"squid:S5961", "PMD.ExcessiveImports", "PMD.GodClass", "PMD.TooManyMethods",
-    "PMD.FieldNamingConventions", "PMD.CyclomaticComplexity"})
 class PseRespondToTribunalServiceTest {
     private PseRespondToTribunalService pseRespondToTribService;
     private CaseData caseData;
@@ -52,7 +50,8 @@ class PseRespondToTribunalServiceTest {
         + "|Response date | [ToDo: Dependency on RET-2928]|\r\n"
         + "|What's your response to the tribunal? | [ToDo: Dependency on RET-2928]|\r\n"
         + "|Supporting material | [ToDo: Dependency on RET-2928]|\r\n"
-        + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | [ToDo: Dependency on RET-2928]|\r\n"
+        + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? "
+        + "| [ToDo: Dependency on RET-2928]|\r\n"
         + "\r\n";
 
     @BeforeEach

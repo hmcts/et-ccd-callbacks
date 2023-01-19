@@ -21,6 +21,7 @@ module.exports = async function (jurisdiction) {
         month: 'long',
         year: 'numeric',
     });
+    I.waitForClickable('#allocateHearingHearing');
     I.selectOption('#allocateHearingHearing', 'Hearing 1, '+ formattedDate + ' 00:00');
     await I.click(commonConfig.continue);
     if (jurisdiction === 'Leeds')

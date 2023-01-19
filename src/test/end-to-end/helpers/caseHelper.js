@@ -58,8 +58,7 @@ async function jurisdiction(I, eventName, jurisdictionOutcome) {
     await I.executeAddAmendJurisdiction(jurisdictionOutcome);
 }
 
-async function enterDisposalDateJurisdiction(I, eventName, hearingDisposalDate) {
-    await I.chooseNextStep(eventName, 3);
+async function enterDisposalDateJurisdiction(I, hearingDisposalDate) {
     await I.wait(2);
     await I.enterDisposalDate(hearingDisposalDate);
 }

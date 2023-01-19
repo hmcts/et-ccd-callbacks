@@ -48,12 +48,12 @@ Scenario('User enters a disposal date outside of hearing collection - error mess
     await allocateHearing(I, eventNames.ALLOCATE_HEARING, 'Leeds');
     await hearingDetails(I, eventNames.HEARING_DETAILS, 'Yes');
     await jurisdiction(I, eventNames.JURISDICTION, "Successful at hearing");
-    await enterDisposalDateJurisdiction(I, eventNames.JURISDICTION,'Date NOT contained in hearing collection');
+    await enterDisposalDateJurisdiction(I,'Date NOT contained in hearing collection');
     await enterDisposalDateJurisdiction(I,'Date contained in hearing collection');
 
 }).tag('@e2e')
     .tag('@nightly')
-    .tag('@wip')
+    .tag('@pats')
 
 Scenario('User successfully enters a disposal date matching a date within hearing collection', async ({I}) => {
     let caseId = await processCaseToAcceptedState();
@@ -62,7 +62,7 @@ Scenario('User successfully enters a disposal date matching a date within hearin
     await allocateHearing(I, eventNames.ALLOCATE_HEARING, 'Leeds');
     await hearingDetails(I, eventNames.HEARING_DETAILS, 'Yes');
     await jurisdiction(I, eventNames.JURISDICTION, "Withdrawn or private settlement");
-    await enterDisposalDateJurisdiction(I, eventNames.JURISDICTION, 'Date in the future');
+    await enterDisposalDateJurisdiction(I, 'Date in the future');
 
 }).tag('@e2e')
     .tag('@wip')

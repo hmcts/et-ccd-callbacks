@@ -35,7 +35,8 @@ module.exports = async function (caseDisposed) {
     await I.fillField('#hearingDetailsTimingFinish-hour', '11');
     await I.fillField('#hearingDetailsTimingFinish-minute','00');
     await I.fillField('#hearingDetailsTimingFinish-second', '00');
-    await I.click(commonConfig.continue);
-    await I.click(commonConfig.submit);
+    I.click(commonConfig.continue);
+    I.wait(2);
+    I.click(commonConfig.submit);
     await I.waitForEnabled({css: '#next-step'}, testConfig.TestTimeToWaitForText || 5);
 };

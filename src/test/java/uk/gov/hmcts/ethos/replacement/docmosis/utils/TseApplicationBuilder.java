@@ -1,7 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondentReplyTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.util.List;
@@ -71,8 +71,8 @@ public class TseApplicationBuilder {
         return this;
     }
 
-    public TseApplicationBuilder withRespondentReply(List<TseRespondentReplyTypeItem> respondentReply) {
-        genericTseApplicationType.setRespondentReply(respondentReply);
+    public TseApplicationBuilder withRespondCollection(List<TseRespondTypeItem> respondCollection) {
+        genericTseApplicationType.setRespondCollection(respondCollection);
         return this;
     }
 

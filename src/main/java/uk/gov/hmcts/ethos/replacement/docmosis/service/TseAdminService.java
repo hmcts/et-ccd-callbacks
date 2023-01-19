@@ -12,29 +12,23 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminReplyTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseReplyTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondentReplyTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRespondentReplyForDecision;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
@@ -51,18 +45,11 @@ public class TseAdminService {
     private final EmailService emailService;
     private final DocumentManagementService documentManagementService;
 
-    private static final String APP_DETAILS = "| | |\r\n"
+    private static final String RESPONSE_APP_DETAILS = "| | |\r\n"
             + "|--|--|\r\n"
             + "|%s application | %s|\r\n"
             + "|Application date | %s|\r\n"
             + "|%s | %s|\r\n"
-            + "|Supporting material | %s|\r\n"
-            + "\r\n";
-    private static final String RESPONSE_DETAILS = "|Response %s | |\r\n"
-            + "|--|--|\r\n"
-            + "|Response from | %s|\r\n"
-            + "|Response date | %s|\r\n"
-            + "|Details | %s|\r\n"
             + "|Supporting material | %s|\r\n"
             + "\r\n";
 
@@ -72,15 +59,6 @@ public class TseAdminService {
         + "|Type of application | %s|\r\n"
         + "|Application date | %s|\r\n"
         + "|What do you want to tell or ask the tribunal? | %s|\r\n"
-        + "|Supporting material | %s|\r\n"
-        + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
-        + "\r\n";
-
-    private static final String CLOSE_APP_RESPONSES_DETAILS = "| | |\r\n"
-        + "|--|--|\r\n"
-        + "|Response from | %s|\r\n"
-        + "|Response date | %s|\r\n"
-        + "|What’s your response to the respondent’s application? | %s|\r\n"
         + "|Supporting material | %s|\r\n"
         + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
         + "\r\n";
@@ -113,40 +91,41 @@ public class TseAdminService {
     public void initialTseAdminTableMarkUp(CaseData caseData, String authToken) {
         GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem != null) {
-            GenericTseApplicationType applicationType = applicationTypeItem.getValue();
-            String appDetails = initialTseAdminAppDetails(applicationType, authToken);
-            String responseDetails = initialTseAdminRespondDetails(applicationType, authToken);
-            caseData.setTseAdminTableMarkUp(appDetails + responseDetails);
+            caseData.setTseAdminTableMarkUp(initialTseAdminAppDetails(applicationTypeItem.getValue(), authToken)
+                + initialTseAdminRespondDetails(applicationTypeItem.getValue(), authToken));
         }
     }
 
     private String initialTseAdminAppDetails(GenericTseApplicationType applicationType, String authToken) {
         return String.format(
-                APP_DETAILS,
-                applicationType.getApplicant(),
-                applicationType.getType(),
-                applicationType.getDate(),
-                APPLICATION_QUESTION,
-                applicationType.getDetails(),
-                documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken)
+            RESPONSE_APP_DETAILS,
+            applicationType.getApplicant(),
+            applicationType.getType(),
+            applicationType.getDate(),
+            APPLICATION_QUESTION,
+            applicationType.getDetails(),
+            documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken)
         );
     }
 
     private String initialTseAdminRespondDetails(GenericTseApplicationType applicationType, String authToken) {
-        if (applicationType.getRespondentReply() == null) {
+        if (applicationType.getRespondCollection() == null) {
             return "";
         }
         IntWrapper respondCount = new IntWrapper(0);
-        return applicationType.getRespondentReply().stream()
-            .map(respondent -> String.format(
-                RESPONSE_DETAILS,
-                respondCount.incrementAndReturnValue(),
-                respondent.getValue().getFrom(),
-                respondent.getValue().getDate(),
-                respondent.getValue().getResponse(),
-                populateListDocWithInfoAndLink(respondent.getValue().getSupportingMaterial(), authToken)))
-            .findFirst()
-            .orElse(null);
+        return applicationType.getRespondCollection().stream()
+            .map(replyItem ->
+                "Admin".equals(replyItem.getValue().getFrom())
+                    ? formatAdminReply(
+                        replyItem.getValue(),
+                        respondCount.incrementAndReturnValue(),
+                        documentManagementService.displayDocNameTypeSizeLink(
+                            replyItem.getValue().getAddDocument(), authToken))
+                    : formatRespondentReplyForDecision(
+                        replyItem.getValue(),
+                        respondCount.incrementAndReturnValue(),
+                        populateListDocWithInfoAndLink(replyItem.getValue().getSupportingMaterial(), authToken)))
+            .collect(Collectors.joining(""));
     }
 
     private String populateListDocWithInfoAndLink(List<DocumentTypeItem> supportingMaterial, String authToken) {
@@ -154,10 +133,10 @@ public class TseAdminService {
             return "";
         }
         return supportingMaterial.stream()
-                .map(documentTypeItem ->
-                        documentManagementService.displayDocNameTypeSizeLink(
-                                documentTypeItem.getValue().getUploadedDocument(), authToken) + STRING_BR)
-                .collect(Collectors.joining());
+            .map(documentTypeItem ->
+                documentManagementService.displayDocNameTypeSizeLink(
+                    documentTypeItem.getValue().getUploadedDocument(), authToken) + STRING_BR)
+            .collect(Collectors.joining());
     }
 
     /**
@@ -178,24 +157,24 @@ public class TseAdminService {
             }
 
             genericTseApplicationType.getAdminDecision().add(
-                    TseAdminRecordDecisionTypeItem.builder()
-                            .id(UUID.randomUUID().toString())
-                            .value(
-                                    TseAdminRecordDecisionType.builder()
-                                            .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                                            .enterNotificationTitle(caseData.getTseAdminEnterNotificationTitle())
-                                            .decision(caseData.getTseAdminDecision())
-                                            .decisionDetails(caseData.getTseAdminDecisionDetails())
-                                            .typeOfDecision(caseData.getTseAdminTypeOfDecision())
-                                            .isResponseRequired(caseData.getTseAdminIsResponseRequired())
-                                            .selectPartyRespond(caseData.getTseAdminSelectPartyRespond())
-                                            .additionalInformation(caseData.getTseAdminAdditionalInformation())
-                                            .responseRequiredDoc(getResponseRequiredDocYesOrNo(caseData))
-                                            .decisionMadeBy(caseData.getTseAdminDecisionMadeBy())
-                                            .decisionMadeByFullName(caseData.getTseAdminDecisionMadeByFullName())
-                                            .selectPartyNotify(caseData.getTseAdminSelectPartyNotify())
-                                            .build()
-                            ).build());
+                TseAdminRecordDecisionTypeItem.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(
+                        TseAdminRecordDecisionType.builder()
+                            .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+                            .enterNotificationTitle(caseData.getTseAdminEnterNotificationTitle())
+                            .decision(caseData.getTseAdminDecision())
+                            .decisionDetails(caseData.getTseAdminDecisionDetails())
+                            .typeOfDecision(caseData.getTseAdminTypeOfDecision())
+                            .isResponseRequired(caseData.getTseAdminIsResponseRequired())
+                            .selectPartyRespond(caseData.getTseAdminSelectPartyRespond())
+                            .additionalInformation(caseData.getTseAdminAdditionalInformation())
+                            .responseRequiredDoc(getResponseRequiredDocYesOrNo(caseData))
+                            .decisionMadeBy(caseData.getTseAdminDecisionMadeBy())
+                            .decisionMadeByFullName(caseData.getTseAdminDecisionMadeByFullName())
+                            .selectPartyNotify(caseData.getTseAdminSelectPartyNotify())
+                            .build()
+                    ).build());
         }
     }
 
@@ -314,20 +293,6 @@ public class TseAdminService {
             }
         }
 
-        List<? extends TseReplyTypeItem> repliesList = Stream.of(
-            Optional.ofNullable(applicationTypeItem.getValue().getAdminReply())
-                .orElse(Collections.<TseAdminReplyTypeItem>emptyList()),
-            Optional.ofNullable(applicationTypeItem.getValue().getRespondentReply())
-                .orElse(Collections.<TseRespondentReplyTypeItem>emptyList()))
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
-        repliesList.sort(
-            Comparator.comparing(tseReplyTypeItem -> LocalDate.parse(tseReplyTypeItem.getDate(), formatter)));
-
-        // TODO - Stream the repliesList and format the markdown strings for Claimant/Respondent/Admin responses
-
         return String.format(
             CLOSE_APP_DETAILS,
             applicationTypeItem.getValue().getApplicant(),
@@ -336,7 +301,9 @@ public class TseAdminService {
             applicationTypeItem.getValue().getDetails(),
             getApplicationDocumentLink(applicationTypeItem, authToken),
             applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo()
-        ) + decisionsMarkdown;
+        )
+            + initialTseAdminRespondDetails(applicationTypeItem.getValue(), authToken)
+            + decisionsMarkdown;
 
     }
 
@@ -350,7 +317,6 @@ public class TseAdminService {
     }
 
     private String getApplicationDocumentLink(GenericTseApplicationTypeItem applicationTypeItem, String authToken) {
-        String documentLink;
         if (applicationTypeItem.getValue().getDocumentUpload() == null) {
             return "";
         }

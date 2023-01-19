@@ -15,8 +15,8 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondentReplyTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondentReplyType;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
@@ -210,11 +210,11 @@ class TseResponseControllerTest {
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
 
         caseData.getGenericTseApplicationCollection().get(0).getValue()
-            .setRespondentReply(List.of(
-                TseRespondentReplyTypeItem.builder()
+            .setRespondCollection(List.of(
+                TseRespondTypeItem.builder()
                     .id("c0bae193-ded6-4db8-a64d-b260847bcc9b")
                     .value(
-                        TseRespondentReplyType.builder()
+                        TseRespondType.builder()
                             .from("Claimant")
                             .date("16-May-1996")
                             .response("response")

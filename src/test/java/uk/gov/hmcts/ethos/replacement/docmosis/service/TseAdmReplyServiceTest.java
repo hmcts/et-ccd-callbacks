@@ -16,11 +16,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondentReplyTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseAdminReplyType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondentReplyType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
@@ -102,10 +101,10 @@ class TseAdmReplyServiceTest {
                                 .withDetails("Details Text")
                                 .withCopyToOtherPartyYesOrNo("I confirm I want to copy")
                                 .withStatus("Open")
-                                .withRespondentReply(List.of(TseRespondentReplyTypeItem.builder()
+                                .withRespondCollection(List.of(TseRespondTypeItem.builder()
                                         .id(UUID.randomUUID().toString())
                                         .value(
-                                                TseRespondentReplyType.builder()
+                                                TseRespondType.builder()
                                                         .from("Claimant")
                                                         .date("23 December 2022")
                                                         .response("Response Details")
@@ -152,7 +151,7 @@ class TseAdmReplyServiceTest {
                 + "|--|--|\r\n"
                 + "|Response from | Claimant|\r\n"
                 + "|Response date | 23 December 2022|\r\n"
-                + "|What’s your response to the claimant’s application? | Response Details|\r\n"
+                + "|What’s your response to the respondent’s application? | Response Details|\r\n"
                 + "|Supporting material | " + fileDisplay2 + "<br>" + fileDisplay3 + "<br>" + "|\r\n"
                 + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? "
                 + "| No|\r\n"
@@ -264,9 +263,9 @@ class TseAdmReplyServiceTest {
 
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
 
-        TseAdminReplyType actual =
+        TseRespondType actual =
                 caseData.getGenericTseApplicationCollection().get(0).getValue()
-                        .getAdminReply().get(0).getValue();
+                        .getRespondCollection().get(0).getValue();
 
         assertThat(actual.getDate())
                 .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
@@ -282,7 +281,7 @@ class TseAdmReplyServiceTest {
                 .isEqualTo("Legal Officer");
         assertThat(actual.getRequestMadeBy())
                 .isNull();
-        assertThat(actual.getEnterFullName())
+        assertThat(actual.getMadeByFullName())
                 .isEqualTo("Full Name");
         assertThat(actual.getIsResponseRequired())
                 .isEqualTo(YES);
@@ -315,9 +314,9 @@ class TseAdmReplyServiceTest {
 
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
 
-        TseAdminReplyType actual =
+        TseRespondType actual =
                 caseData.getGenericTseApplicationCollection().get(0).getValue()
-                        .getAdminReply().get(0).getValue();
+                        .getRespondCollection().get(0).getValue();
 
         assertThat(actual.getDate())
                 .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
@@ -333,7 +332,7 @@ class TseAdmReplyServiceTest {
                 .isNull();
         assertThat(actual.getRequestMadeBy())
                 .isEqualTo("Judge");
-        assertThat(actual.getEnterFullName())
+        assertThat(actual.getMadeByFullName())
                 .isEqualTo("Full Name");
         assertThat(actual.getIsResponseRequired())
                 .isEqualTo(NO);
@@ -362,9 +361,9 @@ class TseAdmReplyServiceTest {
 
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
 
-        TseAdminReplyType actual =
+        TseRespondType actual =
                 caseData.getGenericTseApplicationCollection().get(0).getValue()
-                        .getAdminReply().get(0).getValue();
+                        .getRespondCollection().get(0).getValue();
 
         assertThat(actual.getDate())
                 .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
@@ -380,7 +379,7 @@ class TseAdmReplyServiceTest {
                 .isNull();
         assertThat(actual.getRequestMadeBy())
                 .isNull();
-        assertThat(actual.getEnterFullName())
+        assertThat(actual.getMadeByFullName())
                 .isNull();
         assertThat(actual.getIsResponseRequired())
                 .isNull();

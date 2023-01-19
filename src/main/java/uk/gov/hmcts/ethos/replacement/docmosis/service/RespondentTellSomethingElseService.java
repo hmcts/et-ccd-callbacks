@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,7 +9,6 @@ import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
@@ -22,14 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.OPEN;
 
 @Slf4j
 @Service
@@ -194,94 +190,6 @@ public class RespondentTellSomethingElseService {
             "respondents", getRespondentNames(caseData),
             "linkToDocument", documentJson
         );
-    }
-
-    /**
-     * Creates a new Respondent TSE collection if it doesn't exist.
-     * Create a new element in the list and assign the TSE data from CaseData to it.
-     * At last, clears the existing TSE data from CaseData to ensure fields will be empty when user
-     * starts a new application in the same case.
-     * @param caseData contains all the case data
-     */
-    public void createRespondentApplication(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
-            caseData.setGenericTseApplicationCollection(new ArrayList<>());
-        }
-
-        GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
-
-        respondentTseType.setDate(UtilHelper.formatCurrentDate(LocalDate.now()));
-        respondentTseType.setDueDate(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
-        respondentTseType.setResponsesCount("0");
-        respondentTseType.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
-        respondentTseType.setApplicant(APPLICANT_RESPONDENT);
-        assignDataToFieldsFromApplicationType(respondentTseType, caseData);
-        respondentTseType.setType(caseData.getResTseSelectApplication());
-        respondentTseType.setCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
-        respondentTseType.setCopyToOtherPartyText(caseData.getResTseCopyToOtherPartyTextArea());
-        respondentTseType.setStatus(OPEN);
-
-        GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
-        tseApplicationTypeItem.setId(UUID.randomUUID().toString());
-        tseApplicationTypeItem.setValue(respondentTseType);
-
-        List<GenericTseApplicationTypeItem> tseApplicationCollection = caseData.getGenericTseApplicationCollection();
-        tseApplicationCollection.add(tseApplicationTypeItem);
-        caseData.setGenericTseApplicationCollection(tseApplicationCollection);
-
-        clearRespondentTseDataFromCaseData(caseData);
-    }
-
-    private void assignDataToFieldsFromApplicationType(GenericTseApplicationType respondentTseType, CaseData caseData) {
-        RespondentTSEApplicationTypeData selectedAppData =
-                RespondentTellSomethingElseHelper.getSelectedAppAppType(caseData);
-        if (selectedAppData != null) {
-            respondentTseType.setDetails(selectedAppData.getSelectedTextBox());
-            respondentTseType.setDocumentUpload(selectedAppData.getResTseDocument());
-        }
-    }
-
-    private void clearRespondentTseDataFromCaseData(CaseData caseData) {
-        caseData.setResTseSelectApplication(null);
-        caseData.setResTseCopyToOtherPartyYesOrNo(null);
-        caseData.setResTseCopyToOtherPartyTextArea(null);
-
-        caseData.setResTseTextBox1(null);
-        caseData.setResTseTextBox2(null);
-        caseData.setResTseTextBox3(null);
-        caseData.setResTseTextBox4(null);
-        caseData.setResTseTextBox5(null);
-        caseData.setResTseTextBox6(null);
-        caseData.setResTseTextBox7(null);
-        caseData.setResTseTextBox8(null);
-        caseData.setResTseTextBox9(null);
-        caseData.setResTseTextBox10(null);
-        caseData.setResTseTextBox11(null);
-        caseData.setResTseTextBox12(null);
-
-        caseData.setResTseDocument1(null);
-        caseData.setResTseDocument2(null);
-        caseData.setResTseDocument3(null);
-        caseData.setResTseDocument4(null);
-        caseData.setResTseDocument5(null);
-        caseData.setResTseDocument6(null);
-        caseData.setResTseDocument7(null);
-        caseData.setResTseDocument8(null);
-        caseData.setResTseDocument9(null);
-        caseData.setResTseDocument10(null);
-        caseData.setResTseDocument11(null);
-        caseData.setResTseDocument12(null);
-    }
-
-    /**
-     * Gets the number a new TSE application should be labelled as.
-     * @param caseData contains all the case data
-     */
-    private static int getNextApplicationNumber(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
-            return 1;
-        }
-        return caseData.getGenericTseApplicationCollection().size() + 1;
     }
 
     public String generateTableMarkdown(CaseData caseData) {

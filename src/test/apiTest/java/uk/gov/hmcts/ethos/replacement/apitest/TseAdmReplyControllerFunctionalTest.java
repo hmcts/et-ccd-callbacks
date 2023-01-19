@@ -7,8 +7,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
@@ -19,11 +29,25 @@ class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
     private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmReply/aboutToSubmit";
     private static final String SUBMITTED_URL = "/tseAdmReply/submitted";
 
+    private static final String APPLICATION_CODE = "1";
+    private static final String APPLICATION_LABEL = "1 - Amend response";
+
     private CCDRequest ccdRequest;
 
     @BeforeAll
     public void setUpCaseData() {
-        ccdRequest = CCDRequestBuilder.builder().build();
+        CaseData caseData = new CaseData();
+        caseData.setEthosCaseReference("testCaseReference");
+        caseData.setResTseSelectApplication("Amend response");
+        caseData.setGenericTseApplicationCollection(createApplicationCollection());
+        caseData.setTseAdminSelectApplication(
+            DynamicFixedListType.of(
+                DynamicValueType.create(APPLICATION_CODE, APPLICATION_LABEL)));
+
+        ccdRequest = CCDRequestBuilder.builder()
+            .withCaseData(caseData)
+            .withCaseId("123")
+            .build();
     }
 
     @Test
@@ -80,5 +104,16 @@ class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
             .statusCode(HttpStatus.SC_OK)
             .log()
             .all(true);
+    }
+
+    private List<GenericTseApplicationTypeItem> createApplicationCollection() {
+        GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
+        respondentTseType.setNumber(APPLICATION_CODE);
+
+        GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        tseApplicationTypeItem.setId(UUID.randomUUID().toString());
+        tseApplicationTypeItem.setValue(respondentTseType);
+
+        return new ArrayList<>(Collections.singletonList(tseApplicationTypeItem));
     }
 }

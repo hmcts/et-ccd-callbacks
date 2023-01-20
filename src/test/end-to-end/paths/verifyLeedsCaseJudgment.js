@@ -13,7 +13,5 @@ Scenario('Verify Leeds Case Judgment', async ({I}) => {
     await jurisdiction(I, eventNames.JURISDICTION);
     await judgment(I, eventNames.JUDGMENT);
 
-}).tag('@e2e')
-    .tag('@nightly')
-    .tag('@wip');
+}).tag('@biggerrefactoring');
     //.retry(testConfig.TestRetryScenarios);

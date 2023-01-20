@@ -9,9 +9,9 @@ Feature('ET3 Processing - England and Wales');
 Scenario('Verify ET3 Processing Journey', async ({I}) => {
     await processCaseToAcceptedState();
     await et3ProcessingPage(I,eventNames.ET3_PROCESSING);
-}).tag('@wip');
+}).tag('@biggerrefactoring');
 
 Scenario('Verify ET3 Processing Journey With No ET3 response', async ({I}) => {
     await processCaseToAcceptedState();
     await et3ProcessingPage(I,eventNames.ET3_PROCESSING);
-}).tag('@wip');
+}).tag('@biggerrefactoring');

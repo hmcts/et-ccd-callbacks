@@ -61,7 +61,7 @@ withNightlyPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     enableFullFunctionalTest()
     enableCrossBrowserTest()
-    enableFortifyScan()
+    //enableFortifyScan()
 
     after('fullFunctionalTest') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'

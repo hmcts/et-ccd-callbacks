@@ -7,14 +7,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
@@ -22,6 +28,9 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
     private static final String ABOUT_TO_START_URL = "/tseAdmin/aboutToStart";
     private static final String MID_DETAILS_TABLE = "/tseAdmin/midDetailsTable";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmin/aboutToSubmit";
+
+    private static final String APPLICATION_CODE = "1";
+    private static final String APPLICATION_LABEL = "1 - Amend response";
 
     private CCDRequest ccdRequest;
 
@@ -33,6 +42,10 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
         caseData.setResTseCopyToOtherPartyYesOrNo("I do not want to copy");
         caseData.setClaimant("claimant");
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
+        caseData.setGenericTseApplicationCollection(createApplicationCollection());
+        caseData.setTseAdminSelectApplication(
+            DynamicFixedListType.of(
+                DynamicValueType.create(APPLICATION_CODE, APPLICATION_LABEL)));
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)
@@ -103,5 +116,16 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
         respondentSumTypeItem.setValue(respondentSumType);
 
         return respondentSumTypeItem;
+    }
+
+    private List<GenericTseApplicationTypeItem> createApplicationCollection() {
+        GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
+        respondentTseType.setNumber(APPLICATION_CODE);
+
+        GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        tseApplicationTypeItem.setId(UUID.randomUUID().toString());
+        tseApplicationTypeItem.setValue(respondentTseType);
+
+        return new ArrayList<>(Collections.singletonList(tseApplicationTypeItem));
     }
 }

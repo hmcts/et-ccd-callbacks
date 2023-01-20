@@ -26,6 +26,8 @@ class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctional
     private static final String AUTHORIZATION = "Authorization";
     private static final String NO = "I do not want to copy";
 
+    private static final String APPLICANT_RESPONDENT = "Respondent";
+
     private CCDRequest ccdRequest;
 
     @BeforeAll
@@ -111,6 +113,7 @@ class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctional
 
     private List<GenericTseApplicationTypeItem> createApplicationCollection() {
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
+        respondentTseType.setApplicant(APPLICANT_RESPONDENT);
         respondentTseType.setCopyToOtherPartyYesOrNo(NO);
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();

@@ -14,5 +14,5 @@ Scenario('Verify Respondent Representative', async ({I}) => {
 
 }).tag('@e2e')
     .tag('@nightly')
-    .tag('RET-BAT')
+    .tag('@RET-BAT')
     .retry(testConfig.TestRetryScenarios);

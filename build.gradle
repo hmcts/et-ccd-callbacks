@@ -392,7 +392,7 @@ dependencies {
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '4.7.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
-    
+
     apiTestImplementation sourceSets.main.runtimeClasspath
     apiTestImplementation sourceSets.test.runtimeClasspath
 

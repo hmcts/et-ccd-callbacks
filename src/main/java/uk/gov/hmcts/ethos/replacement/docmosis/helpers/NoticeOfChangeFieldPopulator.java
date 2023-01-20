@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
@@ -56,7 +57,7 @@ public class NoticeOfChangeFieldPopulator {
             data.put(String.format(SolicitorRole.POLICY_FIELD_TEMPLATE, i), organisationPolicy);
 
             Optional<NoticeOfChangeAnswers> possibleAnswer = populateAnswer(
-                strategy, solicitorContainer
+                strategy, solicitorContainer, caseData.getClaimantIndType()
             );
 
             if (possibleAnswer.isPresent()) {
@@ -68,12 +69,13 @@ public class NoticeOfChangeFieldPopulator {
     }
 
     private Optional<NoticeOfChangeAnswers> populateAnswer(NoticeOfChangeAnswersPopulationStrategy strategy,
-                                                           Optional<RepresentedTypeRItem> element) {
+                                                           Optional<RepresentedTypeRItem> respondentRepresentative,
+                                                           ClaimantIndType claimant) {
         if (BLANK == strategy) {
             return Optional.of(NoticeOfChangeAnswers.builder().build());
         }
 
-        return element.map(answersConverter::generateForSubmission);
+        return respondentRepresentative.map(rep -> answersConverter.generateForSubmission(rep, claimant));
     }
 
     public enum NoticeOfChangeAnswersPopulationStrategy {

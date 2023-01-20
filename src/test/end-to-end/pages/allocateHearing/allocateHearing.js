@@ -6,17 +6,36 @@ module.exports = async function (jurisdiction) {
 
     const I = this;
     I.waitForText(commonConfig.allocateHearing, testConfig.TestTimeToWaitForText);
-    I.selectOption('#hearingCollection_0_judge', 'A Judge');
+    const date = new Date();
+    switch(date.getDay()){
+        case 0: //Sunday
+            date.setDate(date.getDate() + 1);
+            break;
+        case 6: //Saturday
+            date.setDate(date.getDate() + 2);
+            break;
+        default:
+    }
+    const formattedDate = date.toLocaleString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    });
+    I.selectOption('#allocateHearingHearing', 'Hearing 1, '+ formattedDate + ' 00:00');
+    await I.click(commonConfig.continue);
     if (jurisdiction === 'Leeds')
     {
-        I.selectOption('#hearingCollection_0_hearingDateCollection_0_hearingRoomLeeds', 'Leeds Magistrates');
+        I.selectOption('#allocateHearingJudge', 'Leeds Judge 1');
+        I.selectOption('#allocateHearingClerk', 'Leeds Clerk 1');
+        await I.click(commonConfig.continue);
+        I.selectOption('#allocateHearingRoom', 'Leeds Magistrates');
+
     }
     if (jurisdiction === 'Manchester')
     {
         I.selectOption('#hearingCollection_0_hearingDateCollection_0_Hearing_room_M', 'Manchester');
     }
-    I.selectOption('#hearingCollection_0_hearingDateCollection_0_Hearing_clerk', 'A Clerk');
-    await I.navByClick(commonConfig.continue);
+    await I.click(commonConfig.continue);
     await I.click(commonConfig.submit);
     await I.waitForEnabled({css: '#next-step'}, testConfig.TestTimeToWaitForText || 5);
 };

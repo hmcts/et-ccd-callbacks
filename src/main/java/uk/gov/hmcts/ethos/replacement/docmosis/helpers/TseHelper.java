@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -79,10 +80,13 @@ public final class TseHelper {
         + "|Additional information | %s|\r\n"
         + "|Description | %s|\r\n"
         + "|Document | %s|\r\n"
-        + "|Request made by | %s|\r\n"
+        + "%s"
         + "|Name | %s|\r\n"
         + "|Sent to | %s|\r\n"
         + "\r\n";
+    private static final String ADMIN_REPLY_MARKUP_MADE_BY = "|%s made by | %s|\r\n";
+    private static final String IS_CMO_OR_REQUEST_CMO = "Case management order";
+    private static final String IS_CMO_OR_REQUEST_REQUEST = "Request";
     private static final String COPY_TO_OTHER_PARTY_YES = "I confirm I want to copy";
     private static final String COPY_TO_OTHER_PARTY_NO = "I do not want to copy";
 
@@ -289,18 +293,34 @@ public final class TseHelper {
         return String.format(
             ADMIN_REPLY_MARKUP,
             respondCount,
-            reply.getEnterResponseTitle(),
+            defaultString(reply.getEnterResponseTitle()),
             reply.getDate(),
             "Tribunal",
-            reply.getIsCmoOrRequest(),
-            reply.getIsResponseRequired(),
-            reply.getSelectPartyRespond(),
-            reply.getAdditionalInformation(),
+            defaultString(reply.getIsCmoOrRequest()),
+            defaultString(reply.getIsResponseRequired()),
+            defaultString(reply.getSelectPartyRespond()),
+            defaultString(reply.getAdditionalInformation()),
             "description of document entered",
             docInfo,
-            reply.getRequestMadeBy(),
-            reply.getMadeByFullName(),
-            reply.getSelectPartyNotify());
+            formatAdminReplyMadeBy(reply),
+            defaultString(reply.getMadeByFullName()),
+            defaultString(reply.getSelectPartyNotify())
+        );
+    }
+
+    private static String formatAdminReplyMadeBy(TseRespondType reply) {
+        if (IS_CMO_OR_REQUEST_CMO.equals(reply.getIsCmoOrRequest())) {
+            return String.format(
+                ADMIN_REPLY_MARKUP_MADE_BY,
+                reply.getIsCmoOrRequest(),
+                reply.getCmoMadeBy());
+        } else if (IS_CMO_OR_REQUEST_REQUEST.equals(reply.getIsCmoOrRequest())) {
+            return String.format(
+                ADMIN_REPLY_MARKUP_MADE_BY,
+                reply.getIsCmoOrRequest(),
+                reply.getRequestMadeBy());
+        }
+        return "";
     }
 
     /**
@@ -319,7 +339,7 @@ public final class TseHelper {
             reply.getFrom(),
             reply.getDate(),
             applicant.toLowerCase(),
-            reply.getResponse(),
+            defaultString(reply.getResponse()),
             docInfo,
             displayCopyToOtherPartyYesOrNo(reply.getCopyToOtherParty())
         );
@@ -336,7 +356,7 @@ public final class TseHelper {
         } else if (COPY_TO_OTHER_PARTY_NO.equals(copyToOtherPartyYesOrNo)) {
             return NO;
         } else {
-            return copyToOtherPartyYesOrNo;
+            return defaultString(copyToOtherPartyYesOrNo);
         }
     }
 
@@ -353,7 +373,7 @@ public final class TseHelper {
             respondCount,
             reply.getFrom(),
             reply.getDate(),
-            reply.getResponse(),
+            defaultString(reply.getResponse()),
             docInfo
         );
     }

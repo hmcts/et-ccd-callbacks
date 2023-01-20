@@ -20,7 +20,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
@@ -152,7 +151,7 @@ class TseAdmReplyServiceTest {
                 + "|--|--|\r\n"
                 + "|Response from | Claimant|\r\n"
                 + "|Response date | 23 December 2022|\r\n"
-                + "|What’s your response to the claimant’s application? | Response Details|\r\n"
+                + "|What’s your response to the respondent’s application? | Response Details|\r\n"
                 + "|Supporting material | " + fileDisplay2 + "<br>" + fileDisplay3 + "<br>" + "|\r\n"
                 + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? "
                 + "| No|\r\n"

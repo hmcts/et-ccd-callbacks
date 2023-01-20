@@ -60,9 +60,6 @@ class RespondentTellSomethingElseServiceTest {
     @MockBean
     private TornadoService tornadoService;
 
-    @MockBean
-    private DocumentManagementService documentManagementService;
-
     @Captor
     ArgumentCaptor<Map<String, Object>> personalisationCaptor;
 
@@ -100,8 +97,6 @@ class RespondentTellSomethingElseServiceTest {
         + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
 
-    private static final String RES_TSE_FILE_NAME = "resTse.pdf";
-
     private static final String EXPECTED_TABLE_MARKDOWN = "| No | Application type | Applicant | Application date | "
         + "Response due | Number of responses | Status "
         + "|\r\n|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n|1|testType"
@@ -110,8 +105,7 @@ class RespondentTellSomethingElseServiceTest {
     @BeforeEach
     void setUp() {
         respondentTellSomethingElseService =
-                new RespondentTellSomethingElseService(emailService, userService, tornadoService,
-                        documentManagementService);
+                new RespondentTellSomethingElseService(emailService, userService, tornadoService);
         ReflectionTestUtils.setField(respondentTellSomethingElseService, "emailTemplateId", TEMPLATE_ID);
 
         UserDetails userDetails = HelperTest.getUserDetails();
@@ -261,7 +255,7 @@ class RespondentTellSomethingElseServiceTest {
     @ParameterizedTest
     @MethodSource("sendAcknowledgeEmailAndGeneratePdf")
     void sendAcknowledgeEmailAndGeneratePdf(String selectedApplication, String rule92Selection, String expectedAnswer,
-                                        Boolean emailSent) throws IOException {
+                                        Boolean emailSent) {
         CaseData caseData = createCaseData(selectedApplication, rule92Selection);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);

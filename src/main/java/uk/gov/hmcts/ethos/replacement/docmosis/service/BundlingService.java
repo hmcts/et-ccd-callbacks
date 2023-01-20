@@ -25,7 +25,7 @@ public class BundlingService {
     private AuthTokenGenerator authTokenGenerator;
 
     @Value("${bundle.config.default}")
-    private String DEFAULT_BUNDLE;
+    private String defaultBundle;
 
     public List<Bundle> createBundleRequest(CaseDetails caseDetails, String userToken) {
         setBundleConfig(caseDetails.getCaseData());
@@ -48,7 +48,7 @@ public class BundlingService {
 
     private void setBundleConfig(CaseData caseData) {
         if (isNullOrEmpty(caseData.getBundleConfiguration())) {
-            caseData.setBundleConfiguration(DEFAULT_BUNDLE);
+            caseData.setBundleConfiguration(defaultBundle);
         }
     }
 }

@@ -26,6 +26,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/bundle")
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class BundlingController {
 
     @Autowired

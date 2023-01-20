@@ -7,6 +7,7 @@ module.exports = async function (caseDisposed) {
 
     const I = this;
     I.waitForText(commonConfig.hearingDetails, testConfig.TestTimeToWaitForText);
+    I.waitForClickable('#hearingDetailsHearing');
     const date = new Date();
     const formattedDate = date.toLocaleString('en-GB', {
         day: 'numeric',
@@ -35,7 +36,8 @@ module.exports = async function (caseDisposed) {
     await I.fillField('#hearingDetailsTimingFinish-hour', '11');
     await I.fillField('#hearingDetailsTimingFinish-minute','00');
     await I.fillField('#hearingDetailsTimingFinish-second', '00');
-    await I.click(commonConfig.continue);
-    await I.click(commonConfig.submit);
+    I.click(commonConfig.continue);
+    I.wait(2);
+    I.click(commonConfig.submit);
     await I.waitForEnabled({css: '#next-step'}, testConfig.TestTimeToWaitForText || 5);
 };

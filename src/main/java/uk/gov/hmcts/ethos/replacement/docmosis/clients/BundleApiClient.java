@@ -6,8 +6,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import uk.gov.hmcts.et.common.model.bundle.BundleCreateRequest;
-import uk.gov.hmcts.et.common.model.bundle.BundleCreateResponse;
+import uk.gov.hmcts.et.common.model.ccd.bundle.BundleCreateRequest;
+import uk.gov.hmcts.et.common.model.ccd.bundle.BundleCreateResponse;
 
 @FeignClient(name = "bundle", url = "${bundle.api.url}",
         configuration = FeignClientProperties.FeignClientConfiguration.class)

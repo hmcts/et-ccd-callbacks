@@ -63,7 +63,7 @@ public class TseAdminService {
         + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
         + "\r\n";
 
-    private static final String CLOSE_APP_DECISION_DETAILS = "| | |\r\n"
+    private static final String CLOSE_APP_DECISION_DETAILS = "|Decision | |\r\n"
         + "|--|--|\r\n"
         + "|Notification | %s|\r\n"
         + "|Decision | %s|\r\n"

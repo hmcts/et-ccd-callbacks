@@ -268,6 +268,7 @@ public class ListingGenerationControllerTest {
         when(defaultValuesReaderService.getListingData(isA(ListingData.class), isA(DefaultValues.class)))
                 .thenReturn(singleListingRequest.getCaseDetails().getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        System.out.println();
         mvc.perform(post(LISTING_HEARINGS_URL)
                 .content(requestContent.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)

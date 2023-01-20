@@ -45,8 +45,9 @@ public class BundlingController {
     public ResponseEntity<CCDCallbackResponse> createBundle(@RequestBody CCDRequest ccdRequest,
                                                              @RequestHeader(value = HttpHeaders.AUTHORIZATION)
                                                              String userToken) {
-        ccdRequest.getCaseDetails().getCaseData().setCaseBundles(
-                bundlingService.createBundleRequest(ccdRequest.getCaseDetails(), userToken));
+        var bundleRequest = bundlingService.createBundleRequest(ccdRequest.getCaseDetails(), userToken);
+        log.info(bundleRequest.toString());
+        ccdRequest.getCaseDetails().getCaseData().setCaseBundles(bundleRequest);
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 }

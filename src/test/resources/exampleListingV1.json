@@ -128,6 +128,19 @@
           "id": "f4ef21b6-df93-4835-972b-ddcb6ac4122e"
         }
       ],
+      "documentCollection": [
+        {
+          "id": "12121",
+          "value": {
+            "typeOfDocument": "Doc",
+            "ownerDocument": "Juan Francisco",
+            "uploadedDocument": {
+              "document_binary_url": "http:google.com",
+              "document_filename": "Filename"
+            }
+          }
+        }
+      ],
       "listingVenue": "Manchester",
       "managingOffice": "Manchester",
       "docMarkUp": "test doc markup -example listing version 3",

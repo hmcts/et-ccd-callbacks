@@ -3,11 +3,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.bundle.Bundle;
 import uk.gov.hmcts.et.common.model.ccd.bundle.BundleCreateRequest;
 import uk.gov.hmcts.et.common.model.ccd.bundle.BundleCreateResponse;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.clients.BundleApiClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 

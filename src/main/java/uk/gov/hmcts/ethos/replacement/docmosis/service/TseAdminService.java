@@ -12,9 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
@@ -65,7 +63,7 @@ public class TseAdminService {
         + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
         + "\r\n";
 
-    private static final String CLOSE_APP_DECISION_DETAILS = "| | |\r\n"
+    private static final String CLOSE_APP_DECISION_DETAILS = "|Decision | |\r\n"
         + "|--|--|\r\n"
         + "|Notification | %s|\r\n"
         + "|Decision | %s|\r\n"

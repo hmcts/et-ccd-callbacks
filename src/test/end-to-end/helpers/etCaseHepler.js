@@ -157,10 +157,9 @@ async function performCaseVettingEvent(authToken, serviceToken, case_id) {
     console.log("vetiing body => " + executeEt1payload);
     const eventExecutionResponse = await I.sendPostRequest(execuEt1teUrl, executeEt1payload, completeVettingHeader);
     expect(eventExecutionResponse.status).to.eql(201);
-
 }
 
-async function acceptTheCaseEvent(authToken, serviceToken, case_id) {
+async function acceptTheCaseEvent(authToken, serviceToken, case_id, acceptedOrRejectedValue) {
 
     console.log("... application vetted, starting accept event...");
     const initiateNextEvent = `/cases/${case_id}/event-triggers/preAcceptanceCase?ignore-warning=false`;
@@ -183,7 +182,7 @@ async function acceptTheCaseEvent(authToken, serviceToken, case_id) {
     let acceptBody = {
         "data": {
             "preAcceptCase": {
-                "caseAccepted": "Yes",
+                "caseAccepted": `${acceptedOrRejectedValue}`,
                 "dateAccepted": "2022-07-24"
             }
         },
@@ -214,6 +213,20 @@ async function navigateToCaseDetailsScreen(case_id) {
     await I.amOnPage('/case-details/' + case_id);
 }
 
+async function processCaseToSubmittedState() {
+    // Login to IDAM to get the authentication token
+    const authToken = await getAuthToken();
+    const serviceToken = await getS2SServiceToken();
+
+    //Getting the User Id based on the Authentication Token that is passed for this User.
+    const userId = await getUserDetails(authToken);
+    const case_id = await createACase(authToken, serviceToken, userId);
+    await performCaseVettingEvent(authToken, serviceToken, case_id);
+    //Navigate to the Case Detail Page
+    await navigateToCaseDetailsScreen(case_id);
+    return case_id;
+}
+
 async function processCaseToAcceptedState() {
 
     // Login to IDAM to get the authentication token
@@ -226,7 +239,26 @@ async function processCaseToAcceptedState() {
     await performCaseVettingEvent(authToken, serviceToken, case_id);
 
     //Initiate accept case
-    await acceptTheCaseEvent(authToken, serviceToken, case_id);
+    await acceptTheCaseEvent(authToken, serviceToken, case_id, 'Yes');
+
+    //Navigate to the Case Detail Page
+    await navigateToCaseDetailsScreen(case_id);
+    return case_id;
+}
+
+async function processCaseToRejectedState() {
+
+    // Login to IDAM to get the authentication token
+    const authToken = await getAuthToken();
+    const serviceToken = await getS2SServiceToken();
+
+    //Getting the User Id based on the Authentication Token that is passed for this User.
+    const userId = await getUserDetails(authToken);
+    const case_id = await createACase(authToken, serviceToken, userId);
+    await performCaseVettingEvent(authToken, serviceToken, case_id);
+
+    //Initiate accept case
+    await acceptTheCaseEvent(authToken, serviceToken, case_id, 'No');
 
     //Navigate to the Case Detail Page
     await navigateToCaseDetailsScreen(case_id);
@@ -234,5 +266,7 @@ async function processCaseToAcceptedState() {
 }
 
 module.exports = {
-    processCaseToAcceptedState
+    processCaseToAcceptedState,
+    processCaseToRejectedState,
+    processCaseToSubmittedState
 };

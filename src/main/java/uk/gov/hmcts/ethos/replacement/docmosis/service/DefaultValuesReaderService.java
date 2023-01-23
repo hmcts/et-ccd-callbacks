@@ -43,13 +43,17 @@ public class DefaultValuesReaderService {
         return config.getPositionType();
     }
 
-    public void getCaseData(CaseData caseData, DefaultValues defaultValues) {
+    private void setPositionType(CaseData caseData, DefaultValues defaultValues) {
         if (caseData.getPositionType() == null) {
             caseData.setPositionType(defaultValues.getPositionType());
         }
         if (ET1_ONLINE_CASE_SOURCE.equals(caseData.getCaseSource())) {
             caseData.setPositionType(ET1_ONLINE_SUBMISSION_POSITION_TYPE);
         }
+    }
+
+    public void getCaseData(CaseData caseData, DefaultValues defaultValues) {
+        setPositionType(caseData, defaultValues);
         if (caseData.getCaseSource() == null || caseData.getCaseSource().trim().equals("")) {
             caseData.setCaseSource(defaultValues.getPositionType());
         }

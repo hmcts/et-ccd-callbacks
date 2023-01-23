@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -223,7 +224,7 @@ public class DocumentManagementService {
         int lastIndexDot = document.getDocumentFilename().lastIndexOf('.');
         if (lastIndexDot > 0) {
             documentName = document.getDocumentFilename().substring(0, lastIndexDot);
-            documentType = document.getDocumentFilename().substring(lastIndexDot + 1).toUpperCase();
+            documentType = document.getDocumentFilename().substring(lastIndexDot + 1).toUpperCase(Locale.ENGLISH);
         }
 
         ResponseEntity<DocumentDetails> documentDetails =

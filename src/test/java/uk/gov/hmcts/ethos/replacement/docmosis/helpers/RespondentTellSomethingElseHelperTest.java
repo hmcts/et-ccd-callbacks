@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@SuppressWarnings({"PMD.LinguisticNaming", "PMD.CyclomaticComplexity"})
 class RespondentTellSomethingElseHelperTest {
 
     private CaseData caseData;

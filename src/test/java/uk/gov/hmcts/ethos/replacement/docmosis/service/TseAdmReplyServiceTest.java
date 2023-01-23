@@ -42,7 +42,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
-@SuppressWarnings("squid:S5961")
+@SuppressWarnings({"squid:S5961", "PMD.ExcessiveImports", "PMD.TooManyMethods"})
 class TseAdmReplyServiceTest {
 
     private TseAdmReplyService tseAdmReplyService;

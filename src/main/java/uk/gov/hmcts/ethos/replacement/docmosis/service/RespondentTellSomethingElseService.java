@@ -34,7 +34,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.OPEN;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.GodClass", "PMD.CyclomaticComplexity", "PMD.LawOfDemeter"})
+@SuppressWarnings({"PMD.GodClass", "PMD.CyclomaticComplexity", "PMD.LawOfDemeter", "PMD.UselessParentheses"})
 public class RespondentTellSomethingElseService {
     private final EmailService emailService;
     private final UserService userService;
@@ -88,7 +88,7 @@ public class RespondentTellSomethingElseService {
     public List<String> validateGiveDetails(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         RespondentTSEApplicationTypeData selectedAppData =
-                RespondentTellSomethingElseHelper.getSelectedAppAppType(caseData);
+                RespondentTellSomethingElseHelper.getSelectedApplicationType(caseData);
         if (selectedAppData == null
                 || selectedAppData.getResTseDocument() == null && isNullOrEmpty(selectedAppData.getSelectedTextBox())) {
             errors.add(GIVE_DETAIL_MISSING);
@@ -234,7 +234,7 @@ public class RespondentTellSomethingElseService {
 
     private void assignDataToFieldsFromApplicationType(GenericTseApplicationType respondentTseType, CaseData caseData) {
         RespondentTSEApplicationTypeData selectedAppData =
-                RespondentTellSomethingElseHelper.getSelectedAppAppType(caseData);
+                RespondentTellSomethingElseHelper.getSelectedApplicationType(caseData);
         if (selectedAppData != null) {
             respondentTseType.setDetails(selectedAppData.getSelectedTextBox());
             respondentTseType.setDocumentUpload(selectedAppData.getResTseDocument());
@@ -298,9 +298,9 @@ public class RespondentTellSomethingElseService {
 
         String tableRowsMarkdown = genericApplicationList
             .stream()
-            .filter(a -> a.getValue().getApplicant().equals(APPLICANT_RESPONDENT)
-                || (a.getValue().getApplicant().equals(APPLICANT_CLAIMANT)
-                && a.getValue().getCopyToOtherPartyYesOrNo().equals(RULE92_YES)))
+            .filter(a -> APPLICANT_RESPONDENT.equals(a.getValue().getApplicant())
+                || (APPLICANT_CLAIMANT.equals(a.getValue().getApplicant())
+                && RULE92_YES.equals(a.getValue().getCopyToOtherPartyYesOrNo())))
             .map(a -> String.format(TABLE_ROW_MARKDOWN, atomicInteger.getAndIncrement(), a.getValue().getType(),
                 a.getValue().getApplicant(), a.getValue().getDate(), a.getValue().getDueDate(), 0,
                 Optional.ofNullable(a.getValue().getStatus()).orElse("Open")))

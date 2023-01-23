@@ -22,7 +22,7 @@ public class DefaultValuesReaderService {
 
     private final CaseDefaultValuesConfiguration config;
     private final TribunalOfficesService tribunalOfficesService;
-    private final String et1OnlineSubmissionPositionType = "ET1 Online submission";
+    private static final String ET1_ONLINE_SUBMISSION_POSITION_TYPE = "ET1 Online submission";
 
     public DefaultValuesReaderService(CaseDefaultValuesConfiguration config,
                                       TribunalOfficesService tribunalOfficesService) {
@@ -48,7 +48,7 @@ public class DefaultValuesReaderService {
             caseData.setPositionType(defaultValues.getPositionType());
         }
         if (ET1_ONLINE_CASE_SOURCE.equals(caseData.getCaseSource())) {
-            caseData.setPositionType(et1OnlineSubmissionPositionType);
+            caseData.setPositionType(ET1_ONLINE_SUBMISSION_POSITION_TYPE);
         }
         if (caseData.getCaseSource() == null || caseData.getCaseSource().trim().equals("")) {
             caseData.setCaseSource(defaultValues.getPositionType());

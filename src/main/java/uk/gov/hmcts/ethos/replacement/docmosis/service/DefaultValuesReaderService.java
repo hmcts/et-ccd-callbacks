@@ -12,9 +12,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfigura
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
 
 import java.util.Optional;
-
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @Service("defaultValuesReaderService")
@@ -23,7 +22,7 @@ public class DefaultValuesReaderService {
 
     private final CaseDefaultValuesConfiguration config;
     private final TribunalOfficesService tribunalOfficesService;
-    private final String ET1_ONLINE_SUBMISSION_POSITION_TYPE = "ET1 Online submission";
+    private final String et1OnlineSubmissionPositionType = "ET1 Online submission";
 
     public DefaultValuesReaderService(CaseDefaultValuesConfiguration config,
                                       TribunalOfficesService tribunalOfficesService) {
@@ -49,7 +48,7 @@ public class DefaultValuesReaderService {
             caseData.setPositionType(defaultValues.getPositionType());
         }
         if (ET1_ONLINE_CASE_SOURCE.equals(caseData.getCaseSource())) {
-            caseData.setPositionType(ET1_ONLINE_SUBMISSION_POSITION_TYPE);
+            caseData.setPositionType(et1OnlineSubmissionPositionType);
         }
         if (caseData.getCaseSource() == null || caseData.getCaseSource().trim().equals("")) {
             caseData.setCaseSource(defaultValues.getPositionType());

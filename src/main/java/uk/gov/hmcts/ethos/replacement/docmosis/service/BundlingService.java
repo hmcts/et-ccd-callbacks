@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.List;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Service
+@Slf4j
 public class BundlingService {
 
     @Autowired
@@ -36,7 +38,10 @@ public class BundlingService {
 
     private BundleCreateResponse createBundle(String authorization, String serviceAuthorization,
                                               BundleCreateRequest bundleCreateRequest) {
-        return bundleApiClient.createBundleServiceRequest(authorization, serviceAuthorization, bundleCreateRequest);
+        BundleCreateResponse bundleServiceRequest =
+                bundleApiClient.createBundleServiceRequest(authorization, serviceAuthorization, bundleCreateRequest);
+        log.info(String.valueOf(bundleServiceRequest));
+        return bundleServiceRequest;
     }
 
     private BundleCreateRequest bundleRequestMapper(CaseDetails caseDetails) {

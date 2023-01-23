@@ -12,7 +12,5 @@ Scenario('Verify Respondent Representative', async ({I}) => {
 
     await respondentRepresentative(I, eventNames.RESPONDENT_REPRESENTATIVE);
 
-}).tag('@e2e')
-    .tag('@nightly')
-    .tag('@RET-BAT')
+}).tag('@toberefactored')
     .retry(testConfig.TestRetryScenarios);

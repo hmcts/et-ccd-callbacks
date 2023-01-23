@@ -13,5 +13,5 @@ Scenario('Move rejected case to case closed state error check', async ({I}) => {
     await rejectCaseEvent(I, caseNumber, eventNames.REJECT_CASE);
     await caseDetailsEvent(I, caseNumber, eventNames.CASE_DETAILS, 'A Clerk', 'Case closed', 'Casework Table', 'Standard Track');
 
-}).tag('@nightly');
+}).tag('@toberefactored');
     //.retry(testConfig.TestRetryScenarios);

@@ -34,7 +34,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelec
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("squid:S1192")
+@SuppressWarnings({"squid:S1192", "PMD.AvoidInstantiatingObjectsInLoops"})
 public class TseAdminService {
 
     @Value("${tse.admin.record-a-decision.claimant.template.id}")
@@ -198,9 +198,10 @@ public class TseAdminService {
         // if respondent only or both parties: send Respondents Decision Emails
         if (RESPONDENT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
                 || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
+            TSEAdminEmailRecipientsData respondentDetails;
             for (RespondentSumTypeItem respondentSumTypeItem: caseData.getRespondentCollection()) {
                 if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
-                    TSEAdminEmailRecipientsData respondentDetails =
+                    respondentDetails =
                         new TSEAdminEmailRecipientsData(
                             emailToRespondentTemplateId,
                             respondentSumTypeItem.getValue().getRespondentEmail());

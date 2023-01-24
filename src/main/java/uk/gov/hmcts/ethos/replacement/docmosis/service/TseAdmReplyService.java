@@ -33,6 +33,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelec
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.AvoidInstantiatingObjectsInLoops"})
 public class TseAdmReplyService {
 
     @Value("${tse.admin.reply.claimant.template.id}")
@@ -214,9 +215,10 @@ public class TseAdmReplyService {
         // if respondent only or both parties: send Respondents Reply Emails
         if (RESPONDENT_NOTIFY_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())
             || BOTH_NOTIFY.equals(caseData.getTseAdmReplySelectPartyNotify())) {
+            TSEAdminEmailRecipientsData respondentDetails;
             for (RespondentSumTypeItem respondentSumTypeItem: caseData.getRespondentCollection()) {
                 if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
-                    TSEAdminEmailRecipientsData respondentDetails =
+                    respondentDetails =
                         new TSEAdminEmailRecipientsData(
                             emailToRespondentTemplateId,
                             respondentSumTypeItem.getValue().getRespondentEmail());

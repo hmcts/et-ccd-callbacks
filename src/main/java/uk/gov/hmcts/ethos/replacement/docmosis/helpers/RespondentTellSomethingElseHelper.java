@@ -9,7 +9,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTyp
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 
-public class RespondentTellSomethingElseHelper {
+@SuppressWarnings({"PMD.CyclomaticComplexity"})
+public final class RespondentTellSomethingElseHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -36,7 +37,7 @@ public class RespondentTellSomethingElseHelper {
     public static String getDocumentRequest(CaseData caseData, String accessKey)
             throws JsonProcessingException {
 
-        RespondentTSEApplicationTypeData selectedAppData = getSelectedAppAppType(caseData);
+        RespondentTSEApplicationTypeData selectedAppData = getSelectedApplicationType(caseData);
 
         RespondentTellSomethingElseData data = RespondentTellSomethingElseData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
@@ -55,7 +56,7 @@ public class RespondentTellSomethingElseHelper {
 
     }
 
-    public static RespondentTSEApplicationTypeData getSelectedAppAppType(CaseData caseData) {
+    public static RespondentTSEApplicationTypeData getSelectedApplicationType(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
             case SELECTED_APP_AMEND_RESPONSE:
                 return new RespondentTSEApplicationTypeData(
@@ -99,19 +100,19 @@ public class RespondentTellSomethingElseHelper {
     }
 
     private static String getDocumentName(RespondentTSEApplicationTypeData selectedAppData) {
-        if (selectedAppData != null && selectedAppData.getResTseDocument() != null) {
-            return selectedAppData.getResTseDocument().getDocumentFilename();
-        } else {
+        if (selectedAppData == null || selectedAppData.getResTseDocument() == null) {
             return null;
         }
+
+        return selectedAppData.getResTseDocument().getDocumentFilename();
     }
 
     private static String getTextBoxDetails(RespondentTSEApplicationTypeData selectedAppData) {
-        if (selectedAppData != null) {
-            return selectedAppData.getSelectedTextBox();
-        } else {
+        if (selectedAppData == null) {
             return null;
         }
+
+        return selectedAppData.getSelectedTextBox();
     }
 
 }

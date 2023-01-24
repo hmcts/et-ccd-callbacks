@@ -6,10 +6,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.util.List;
 
+
 /**
  * Contains helper methods to build a GenericTseApplicationType object. Each method returns an instance of itself for
  * chaining method calls to build the object.
  */
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class TseApplicationBuilder {
     private final GenericTseApplicationType genericTseApplicationType = new GenericTseApplicationType();
 

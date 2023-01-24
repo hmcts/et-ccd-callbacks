@@ -21,6 +21,7 @@ import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -34,6 +35,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
+@SuppressWarnings({"PMD.ExcessiveImports"})
 public final class TseHelper {
     public static final String INTRO = "The respondent has applied to <b>%s</b>.</br>%s</br> If you have any "
         + "objections or responses to their application you must send them to the tribunal as soon as possible and by "
@@ -338,7 +340,7 @@ public final class TseHelper {
             respondCount,
             reply.getFrom(),
             reply.getDate(),
-            applicant.toLowerCase(),
+            applicant.toLowerCase(Locale.ENGLISH),
             defaultString(reply.getResponse()),
             docInfo,
             displayCopyToOtherPartyYesOrNo(reply.getCopyToOtherParty())

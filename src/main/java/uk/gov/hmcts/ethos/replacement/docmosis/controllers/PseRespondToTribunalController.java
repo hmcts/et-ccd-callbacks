@@ -50,6 +50,38 @@ public class PseRespondToTribunalController {
      * @param userToken  used for authorization
      * @return Callback response entity with case data attached.
      */
+    @PostMapping(value = "/aboutToStartJon", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Populates the dynamic list for select an order or request to respond to")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToStartJon(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setPseRespondentSelectJudgmentOrderNotification(PseHelper.populateSelectJonDropdown(caseData));
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    /**
+     *  Populates the dynamic list for select an order or request to respond to.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates the dynamic list for select an order or request to respond to")
     @ApiResponses(value = {
@@ -71,8 +103,7 @@ public class PseRespondToTribunalController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setPseRespondentSelectOrderOrRequest(PseHelper.populateSelectJONDropdown(caseData));
-        caseData.setPseRespondentSelectJudgmentOrderNotification(caseData.getPseRespondentSelectOrderOrRequest());
+        caseData.setPseRespondentSelectOrderOrRequest(PseHelper.populateSelectOnDropdown(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 

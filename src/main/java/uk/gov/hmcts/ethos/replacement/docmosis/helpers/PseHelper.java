@@ -20,7 +20,29 @@ public final class PseHelper {
      * Create fields for application dropdown selector.
      * @param caseData contains all the case data
      */
-    public static DynamicFixedListType populateSelectJONDropdown(CaseData caseData) {
+    public static DynamicFixedListType populateSelectJonDropdown(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+            return null;
+        }
+
+        // TODO: change caseData.getGenericTseApplicationCollection() to get the correct object
+        return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
+            .filter(r -> r.getValue().getRespondCollection() == null
+                && r.getValue().getStatus() != null
+                && !CLOSED.equals(r.getValue().getStatus())
+            ).map(r ->
+                DynamicValueType.create(
+                    r.getValue().getNumber(),
+                    r.getValue().getNumber() + " " + r.getValue().getType()
+                )
+            ).collect(Collectors.toList()));
+    }
+
+    /**
+     * Create fields for application dropdown selector.
+     * @param caseData contains all the case data
+     */
+    public static DynamicFixedListType populateSelectOnDropdown(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
             return null;
         }

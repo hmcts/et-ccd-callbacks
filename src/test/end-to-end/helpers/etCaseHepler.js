@@ -159,7 +159,7 @@ async function performCaseVettingEvent(authToken, serviceToken, case_id) {
     expect(eventExecutionResponse.status).to.eql(201);
 }
 
-async function acceptTheCaseEvent(authToken, serviceToken, case_id, acceptedOrRejectedValue) {
+async function acceptTheCaseEvent(authToken, serviceToken, case_id) {
 
     console.log("... application vetted, starting accept event...");
     const initiateNextEvent = `/cases/${case_id}/event-triggers/preAcceptanceCase?ignore-warning=false`;
@@ -182,8 +182,61 @@ async function acceptTheCaseEvent(authToken, serviceToken, case_id, acceptedOrRe
     let acceptBody = {
         "data": {
             "preAcceptCase": {
-                "caseAccepted": `${acceptedOrRejectedValue}`,
+                "caseAccepted": "Yes",
                 "dateAccepted": "2022-07-24"
+            }
+        },
+        "event": {
+            "id": "preAcceptanceCase",
+            "summary": "",
+            "description": ""
+        },
+        "event_token": acceptEventToken
+    };
+
+    console.log("... This is the payload for triggering next event" + acceptBody);
+    let acceptUrl = `http://ccd-data-store-api-${env}.service.core-compute-${env}.internal/cases/${case_id}/events`
+    let acceptHeaders = {
+        'Authorization': `Bearer ${authToken}`,
+        'ServiceAuthorization': `Bearer ${serviceToken}`,
+        'experimental': true,
+        'Content-Type': 'application/json'
+    };
+    let acceptPayload = JSON.stringify(acceptBody)
+
+    const nextEventExecutionResponse = await I.sendPostRequest(acceptUrl, acceptPayload, acceptHeaders);
+    expect(nextEventExecutionResponse.status).to.eql(201);
+}
+
+async function rejectTheCaseEvent(authToken, serviceToken, case_id) {
+
+    console.log("... application vetted, starting accept event...");
+    const initiateNextEvent = `/cases/${case_id}/event-triggers/preAcceptanceCase?ignore-warning=false`;
+
+
+    let initiateAcceptUrl = ccdApiUrl + initiateNextEvent;
+    let startAcceptanceHeaders = {
+        'Authorization': `Bearer ${authToken}`,
+        'ServiceAuthorization': `Bearer ${serviceToken}`,
+        'experimental': true,
+        'Content-Type': 'application/json'
+    };
+
+    let startAcceptanceResponse = await I.sendGetRequest(initiateAcceptUrl, startAcceptanceHeaders);
+    expect(startAcceptanceResponse.status).to.eql(200);
+    let acceptEventToken = startAcceptanceResponse.data.token;
+
+
+    // execute case
+    let acceptBody = {
+        "data": {
+            "preAcceptCase": {
+                "caseAccepted": "No",
+                "dateAccepted": null,
+                "dateRejected": "2022-01-23",
+                "rejectReason": [
+                    "Not on Prescribed Form"
+                ]
             }
         },
         "event": {
@@ -253,7 +306,7 @@ async function processCaseToAcceptedState() {
     await performCaseVettingEvent(authToken, serviceToken, case_id);
 
     //Initiate accept case
-    await acceptTheCaseEvent(authToken, serviceToken, case_id, 'Yes');
+    await acceptTheCaseEvent(authToken, serviceToken, case_id);
 
     //Navigate to the Case Detail Page
     await navigateToCaseDetailsScreen(case_id);
@@ -271,8 +324,8 @@ async function processCaseToRejectedState() {
     const case_id = await createACase(authToken, serviceToken, userId);
     await performCaseVettingEvent(authToken, serviceToken, case_id);
 
-    //Initiate accept case
-    await acceptTheCaseEvent(authToken, serviceToken, case_id, 'No');
+    //Initiate reject case
+    await rejectTheCaseEvent(authToken, serviceToken, case_id);
 
     //Navigate to the Case Detail Page
     await navigateToCaseDetailsScreen(case_id);
@@ -284,5 +337,4 @@ module.exports = {
     processCaseToET1VettedState,
     processCaseToAcceptedState,
     processCaseToRejectedState,
-
 };

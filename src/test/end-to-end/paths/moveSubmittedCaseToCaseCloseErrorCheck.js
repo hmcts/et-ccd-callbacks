@@ -8,7 +8,6 @@ Feature('Verify whether the user able to move submitted case to case closed stat
 Scenario('error message validation check for when user move submitted case to case closed state ', async ({I}) => {
 
     const caseNumber = await processCaseToSubmittedState();
-    //  console.log('The value of the Case Number : '+caseNumber);
     await caseDetailsEvent(I, caseNumber, eventNames.CASE_DETAILS, 'A Clerk', 'Case closed', 'Casework Table', 'Standard Track');
 
 }).tag('@nightly').retry(testConfig.TestRetryScenarios);

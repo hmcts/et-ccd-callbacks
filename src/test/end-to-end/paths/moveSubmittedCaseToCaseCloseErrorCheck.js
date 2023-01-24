@@ -11,5 +11,4 @@ Scenario('error message validation check for when user move submitted case to ca
     //  console.log('The value of the Case Number : '+caseNumber);
     await caseDetailsEvent(I, caseNumber, eventNames.CASE_DETAILS, 'A Clerk', 'Case closed', 'Casework Table', 'Standard Track');
 
-}).tag('@RET_BAT').tag('@nightly');
-    //.retry(testConfig.TestRetryScenarios);
+}).tag('@nightly').retry(testConfig.TestRetryScenarios);

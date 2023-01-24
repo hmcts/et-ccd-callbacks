@@ -5,8 +5,6 @@ async function acceptCaseEvent(I, caseId, eventName) {
 }
 
 async function rejectCaseEvent(I, caseId, eventName) {
-    await I.authenticateWithIdam(username, password);
-    await I.amOnPage('/case-details/' + caseId);
     await I.chooseNextStep(eventName, 3);
     await I.rejectTheCase();
 }

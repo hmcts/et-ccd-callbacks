@@ -71,7 +71,7 @@ public class TseAdminController {
     }
 
     /**
-     * Record a Decision and send notify emails to claimant and/or respondent
+     * Record a Decision and send notify emails to claimant and/or respondent.
      *
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization

@@ -232,8 +232,8 @@ public class DocumentManagementService {
                 getDocumentDetails(authToken, UUID.fromString(getDocumentUUID(document.getDocumentUrl())));
 
         DocumentDetails docDetails = documentDetails.getBody();
-        String fileSize = (docDetails != null)
-            ? FileUtils.byteCountToDisplaySize(Long.parseLong(docDetails.getSize())) : "";
+        String fileSize = (docDetails == null) 
+            ? "" : FileUtils.byteCountToDisplaySize(Long.parseLong(docDetails.getSize()));
 
         return String.format(FILE_DISPLAY, documentLink, documentName, documentType, fileSize);
     }

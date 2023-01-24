@@ -177,7 +177,7 @@ class FileLocationServiceTest {
     }
 
     private FileLocation createFileLocation(AdminData adminData) {
-        var fileLocation =  new FileLocation();
+        FileLocation fileLocation =  new FileLocation();
         fileLocation.setCode(adminData.getFileLocationCode());
         fileLocation.setName(adminData.getFileLocationName());
         fileLocation.setTribunalOffice(TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice()));
@@ -186,7 +186,7 @@ class FileLocationServiceTest {
 
     @Test
     void testInitImport() {
-        var adminData = createAdminData();
+        AdminData adminData = createAdminData();
         fileLocationService.initAdminData(adminData);
 
         assertNull(adminData.getFileLocationCode());

@@ -33,7 +33,7 @@ public class ScotlandVenueSelectionService {
     }
 
     public DynamicFixedListType createVenueSelection(TribunalOffice tribunalOffice, DateListedType selectedListing) {
-        var dynamicFixedListType = new DynamicFixedListType();
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(venueService.getVenues(tribunalOffice));
 
         switch (tribunalOffice) {
@@ -65,11 +65,11 @@ public class ScotlandVenueSelectionService {
     }
 
     private HearingTypeItem createNewHearingTypeItem() {
-        var hearingTypeItem = new HearingTypeItem();
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setId(UUID.randomUUID().toString());
 
-        var hearingType = new HearingType();
-        var officeVenues = getOfficeVenues();
+        HearingType hearingType = new HearingType();
+        Map<TribunalOffice, List<DynamicValueType>> officeVenues = getOfficeVenues();
         hearingType.setHearingAberdeen(DynamicFixedListType.from(officeVenues.get(TribunalOffice.ABERDEEN)));
         hearingType.setHearingDundee(DynamicFixedListType.from(officeVenues.get(TribunalOffice.DUNDEE)));
         hearingType.setHearingEdinburgh(DynamicFixedListType.from(officeVenues.get(TribunalOffice.EDINBURGH)));
@@ -81,10 +81,10 @@ public class ScotlandVenueSelectionService {
     }
 
     private void updateHearingTypeItems(List<HearingTypeItem> hearingTypeItems) {
-        var officeVenues = getOfficeVenues();
+        Map<TribunalOffice, List<DynamicValueType>> officeVenues = getOfficeVenues();
 
-        for (var hearingItemType : hearingTypeItems) {
-            var hearingType = hearingItemType.getValue();
+        for (HearingTypeItem hearingItemType : hearingTypeItems) {
+            HearingType hearingType = hearingItemType.getValue();
 
             hearingType.setHearingAberdeen(DynamicFixedListType.from(officeVenues.get(TribunalOffice.ABERDEEN),
                     hearingType.getHearingAberdeen()));

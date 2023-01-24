@@ -18,7 +18,10 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
@@ -68,7 +71,7 @@ public class DocumentHelper {
                                                      MultipleData multipleData,
                                                      DefaultValues allocatedCourtAddress,
                                                      VenueAddressReaderService venueAddressReaderService) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         String templateName = getTemplateName(correspondenceType, correspondenceScotType);
 
         // Start building the instruction
@@ -129,7 +132,7 @@ public class DocumentHelper {
     }
 
     private static StringBuilder getClaimantAddressUK(Address address) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append("\"claimant_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE);
         sb.append("\"claimant_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE);
         sb.append("\"claimant_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE);
@@ -140,7 +143,7 @@ public class DocumentHelper {
     }
 
     private static StringBuilder getClaimantOrRepAddressUK(Address address) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append("\"claimant_or_rep_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE);
         sb.append("\"claimant_or_rep_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE);
         sb.append("\"claimant_or_rep_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE);
@@ -152,8 +155,8 @@ public class DocumentHelper {
 
     private static StringBuilder getClaimantData(CaseData caseData) {
         log.info("Getting Claimant Data for case: " + caseData.getEthosCaseReference());
-        var sb = new StringBuilder();
-        var representedTypeC = caseData.getRepresentativeClaimantType();
+        StringBuilder sb = new StringBuilder();
+        RepresentedTypeC representedTypeC = caseData.getRepresentativeClaimantType();
         Optional<ClaimantIndType> claimantIndType = Optional.ofNullable(caseData.getClaimantIndType());
         if (representedTypeC != null && caseData.getClaimantRepresentedQuestion() != null &&  caseData
                 .getClaimantRepresentedQuestion().equals(YES)) {
@@ -230,7 +233,7 @@ public class DocumentHelper {
     }
 
     private static StringBuilder getRespondentAddressUK(Address address) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append("\"respondent_addressLine1\":\"").append(nullCheck(address.getAddressLine1())).append(NEW_LINE);
         sb.append("\"respondent_addressLine2\":\"").append(nullCheck(address.getAddressLine2())).append(NEW_LINE);
         sb.append("\"respondent_addressLine3\":\"").append(nullCheck(address.getAddressLine3())).append(NEW_LINE);
@@ -241,7 +244,7 @@ public class DocumentHelper {
     }
 
     private static StringBuilder getRespondentOrRepAddressUK(Address address) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append("\"respondent_or_rep_addressLine1\":\"").append(nullCheck(address.getAddressLine1()))
                 .append(NEW_LINE);
         sb.append("\"respondent_or_rep_addressLine2\":\"").append(nullCheck(address.getAddressLine2()))
@@ -256,7 +259,7 @@ public class DocumentHelper {
 
     private static StringBuilder getRespondentData(CaseData caseData) {
         log.info("Respondent Data");
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         List<RespondentSumTypeItem> respondentSumTypeItemList = CollectionUtils.isNotEmpty(
                 caseData.getRespondentCollection())
                 ? caseData.getRespondentCollection() : new ArrayList<>();
@@ -265,10 +268,10 @@ public class DocumentHelper {
             log.error("No respondents present for case: " + caseData.getEthosCaseReference());
         }
 
-        var responseContinue = false;
-        var responseNotStruckOut = false;
+        boolean responseContinue = false;
+        boolean responseNotStruckOut = false;
 
-        var respondentToBeShown = new RespondentSumType();
+        RespondentSumType respondentToBeShown = new RespondentSumType();
 
         for (RespondentSumTypeItem respondentSumTypeItem: respondentSumTypeItemList) {
             responseContinue = Strings.isNullOrEmpty(respondentSumTypeItem.getValue().getResponseContinue())
@@ -311,7 +314,7 @@ public class DocumentHelper {
 
         if (representedTypeRItem.isPresent()) {
             log.info("Respondent represented");
-            var representedTypeR = representedTypeRItem.get().getValue();
+            RepresentedTypeR representedTypeR = representedTypeRItem.get().getValue();
             sb.append("\"respondent_or_rep_full_name\":\"").append(nullCheck(representedTypeR
                     .getNameOfRepresentative())).append(NEW_LINE);
             if (representedTypeR.getRepresentativeAddress() != null) {
@@ -372,8 +375,8 @@ public class DocumentHelper {
 
     private static StringBuilder getRespOthersName(CaseData caseData, String firstRespondentName) {
         log.info("Respondent Others Name");
-        var sb = new StringBuilder();
-        var atomicInteger = new AtomicInteger(2);
+        StringBuilder sb = new StringBuilder();
+        AtomicInteger atomicInteger = new AtomicInteger(2);
         List<String> respOthers = caseData.getRespondentCollection()
                 .stream()
                 .filter(respondentSumTypeItem -> respondentSumTypeItem.getValue().getResponseStruckOut() == null
@@ -390,8 +393,8 @@ public class DocumentHelper {
 
     private static StringBuilder getRespAddress(CaseData caseData) {
         log.info("Get Resp address");
-        var sb = new StringBuilder();
-        var atomicInteger = new AtomicInteger(1);
+        StringBuilder sb = new StringBuilder();
+        AtomicInteger atomicInteger = new AtomicInteger(1);
         int size = caseData.getRespondentCollection().size();
         List<String> respAddressList = caseData.getRespondentCollection()
                 .stream()
@@ -412,13 +415,13 @@ public class DocumentHelper {
                                                 CorrespondenceScotType correspondenceScotType,
                                                 VenueAddressReaderService venueAddressReaderService) {
         log.info("Hearing Data");
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         //Currently checking collection not the HearingType
         if (caseData.getHearingCollection() != null && !caseData.getHearingCollection().isEmpty()) {
             String correspondenceHearingNumber = getCorrespondenceHearingNumber(
                     correspondenceType, correspondenceScotType);
             log.info("Hearing Number: " + correspondenceHearingNumber);
-            var hearingType = getHearingByNumber(caseData.getHearingCollection(), correspondenceHearingNumber);
+            HearingType hearingType = getHearingByNumber(caseData.getHearingCollection(), correspondenceHearingNumber);
             log.info("Hearing type info by number");
             if (hearingType.getHearingDateCollection() != null && !hearingType.getHearingDateCollection().isEmpty()) {
                 log.info("Hearing dates collection");
@@ -460,7 +463,7 @@ public class DocumentHelper {
 
     public static HearingType getHearingByNumber(List<HearingTypeItem> hearingCollection,
                                                  String correspondenceHearingNumber) {
-        var hearingType = new HearingType();
+        HearingType hearingType = new HearingType();
 
         for (HearingTypeItem hearingTypeItem : hearingCollection) {
             hearingType = hearingTypeItem.getValue();
@@ -478,7 +481,7 @@ public class DocumentHelper {
     }
 
     private static String getHearingDates(List<DateListedTypeItem> hearingDateCollection) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
         List<String> dateListedList = new ArrayList<>();
         for (DateListedTypeItem dateListedTypeItem : hearingDateCollection) {
@@ -493,17 +496,17 @@ public class DocumentHelper {
     }
 
     private static String getHearingDatesAndTime(List<DateListedTypeItem> hearingDateCollection) {
-        var sb = new StringBuilder(getHearingDates(hearingDateCollection));
+        StringBuilder sb = new StringBuilder(getHearingDates(hearingDateCollection));
         Iterator<DateListedTypeItem> itr = hearingDateCollection.iterator();
-        var earliestTime = LocalTime.of(23, 59);
-        var isEmpty = true;
+        LocalTime earliestTime = LocalTime.of(23, 59);
+        boolean isEmpty = true;
 
         while (itr.hasNext()) {
-            var dateListedType = itr.next().getValue();
+            DateListedType dateListedType = itr.next().getValue();
             if (dateListedType.getHearingStatus() != null && dateListedType.getHearingStatus()
                     .equals(HEARING_STATUS_LISTED)) {
-                var listedDate = LocalDateTime.parse(dateListedType.getListedDate());
-                var listedTime = LocalTime.of(listedDate.getHour(), listedDate.getMinute());
+                LocalDateTime listedDate = LocalDateTime.parse(dateListedType.getListedDate());
+                LocalTime listedTime = LocalTime.of(listedDate.getHour(), listedDate.getMinute());
                 earliestTime = listedTime.isBefore(earliestTime) ? listedTime : earliestTime;
                 isEmpty = false;
             }
@@ -680,7 +683,7 @@ public class DocumentHelper {
     private static StringBuilder getCorrespondenceData(CorrespondenceType correspondence) {
         log.info("Correspondence data");
         String sectionName = getEWSectionName(correspondence);
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         if (!sectionName.equals("")) {
             sb.append("\"").append("t").append(sectionName.replace(".", "_"))
                     .append("\":\"").append("true").append(NEW_LINE);
@@ -691,7 +694,7 @@ public class DocumentHelper {
     private static StringBuilder getCorrespondenceScotData(CorrespondenceScotType correspondenceScotType) {
         log.info("Correspondence scot data");
         String scotSectionName = getScotSectionName(correspondenceScotType);
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         if (!scotSectionName.equals("")) {
             sb.append("\"").append("t_Scot_").append(scotSectionName.replace(".", "_"))
                     .append("\":\"").append("true").append(NEW_LINE);
@@ -700,7 +703,7 @@ public class DocumentHelper {
     }
 
     private static StringBuilder getCourtData(CaseData caseData, DefaultValues allocatedCourtAddress) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         log.info("Court data");
         if (allocatedCourtAddress != null) {
             sb.append("\"Court_addressLine1\":\"").append(nullCheck(allocatedCourtAddress
@@ -751,8 +754,8 @@ public class DocumentHelper {
 
     private static StringBuilder getAddressLabelsDataSingleCase(CaseData caseData) {
 
-        var numberOfCopies = Integer.parseInt(caseData.getAddressLabelsAttributesType().getNumberOfCopies());
-        var startingLabel = Integer.parseInt(caseData.getAddressLabelsAttributesType().getStartingLabel());
+        int numberOfCopies = Integer.parseInt(caseData.getAddressLabelsAttributesType().getNumberOfCopies());
+        int startingLabel = Integer.parseInt(caseData.getAddressLabelsAttributesType().getStartingLabel());
         String showTelFax = caseData.getAddressLabelsAttributesType().getShowTelFax();
         List<AddressLabelTypeItem> addressLabelCollection = caseData.getAddressLabelCollection();
 
@@ -762,8 +765,8 @@ public class DocumentHelper {
 
     private static StringBuilder getAddressLabelsDataMultipleCase(MultipleData multipleData) {
 
-        var numberOfCopies = Integer.parseInt(multipleData.getAddressLabelsAttributesType().getNumberOfCopies());
-        var startingLabel = Integer.parseInt(multipleData.getAddressLabelsAttributesType().getStartingLabel());
+        int numberOfCopies = Integer.parseInt(multipleData.getAddressLabelsAttributesType().getNumberOfCopies());
+        int startingLabel = Integer.parseInt(multipleData.getAddressLabelsAttributesType().getStartingLabel());
         String showTelFax = multipleData.getAddressLabelsAttributesType().getShowTelFax();
         List<AddressLabelTypeItem> addressLabelCollection = multipleData.getAddressLabelCollection();
 
@@ -778,12 +781,12 @@ public class DocumentHelper {
         List<AddressLabelTypeItem> copiedAddressLabelCollection =
                 getCopiedAddressLabels(selectedAddressLabelCollection, numberOfCopies);
 
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append("\"address_labels_page\":[\n");
 
-        var startingLabelAboveOne = true;
+        boolean startingLabelAboveOne = true;
 
-        for (var i = 0; i < copiedAddressLabelCollection.size(); i++) {
+        for (int i = 0; i < copiedAddressLabelCollection.size(); i++) {
             int pageLabelNumber = i + 1;
 
             if (startingLabel > 1) {
@@ -820,7 +823,7 @@ public class DocumentHelper {
 
     private static StringBuilder getAddressLabel(AddressLabelType addressLabelType,
                                                  String labelNumber, String showTelFax) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append("\"").append(LABEL).append(labelNumber).append("_Entity_Name_01\":\"")
                 .append(nullCheck(addressLabelType.getLabelEntityName01())).append(NEW_LINE);
         sb.append("\"").append(LABEL).append(labelNumber).append("_Entity_Name_02\":\"")
@@ -835,10 +838,10 @@ public class DocumentHelper {
     }
 
     private static StringBuilder getAddressLines(AddressLabelType addressLabelType, String labelNumber) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-        var lineNum = 0;
-        var addressLine = "";
+        int lineNum = 0;
+        String addressLine = "";
 
         if (!isNullOrEmpty(nullCheck(addressLabelType.getLabelEntityAddress().getAddressLine1()))) {
             lineNum++;
@@ -885,7 +888,7 @@ public class DocumentHelper {
     }
 
     private static StringBuilder getAddressLine(String addressLine, String labelNumber, int lineNum) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         String lineNumber = "0" + lineNum;
         sb.append("\"").append(LABEL).append(labelNumber).append("_Address_Line_").append(lineNumber)
                 .append("\":\"").append(addressLine).append(NEW_LINE);
@@ -894,10 +897,10 @@ public class DocumentHelper {
 
     private static StringBuilder getTelFaxLine(AddressLabelType addressLabelType, String labelNumber,
                                                String showTelFax) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         if (showTelFax.equals(YES)) {
-            var tel = "";
-            var fax = "";
+            String tel = "";
+            String fax = "";
 
             if (!isNullOrEmpty(addressLabelType.getLabelEntityTelephone())) {
                 tel = addressLabelType.getLabelEntityTelephone();
@@ -943,9 +946,9 @@ public class DocumentHelper {
         List<AddressLabelTypeItem> copiedAddressLabels = new ArrayList<>();
         if (!selectedAddressLabels.isEmpty() && numberOfCopies > 1) {
             for (AddressLabelTypeItem selectedAddressLabel : selectedAddressLabels) {
-                var addressLabelType = selectedAddressLabel.getValue();
-                for (var i = 0; i < numberOfCopies; i++) {
-                    var addressLabelTypeItem = new AddressLabelTypeItem();
+                AddressLabelType addressLabelType = selectedAddressLabel.getValue();
+                for (int i = 0; i < numberOfCopies; i++) {
+                    AddressLabelTypeItem addressLabelTypeItem = new AddressLabelTypeItem();
                     addressLabelTypeItem.setId(String.valueOf(copiedAddressLabels.size()));
                     addressLabelTypeItem.setValue(addressLabelType);
                     copiedAddressLabels.add(addressLabelTypeItem);

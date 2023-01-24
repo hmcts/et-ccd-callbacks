@@ -1,24 +1,32 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 @Service
+@RequiredArgsConstructor
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.UnusedPrivateField",
     "PMD.LiteralsFirstInComparisons"})
 public class ServingService {
     public static final String SERVING_DOCUMENT_OTHER_TYPE = "Another type of document";
     private static final String SERVING_RECIPIENT_CLAIMANT = "Claimant";
     private static final String SERVING_RECIPIENT_RESPONDENT = "Respondent";
-    private static final String ACAS_MAILTO_LINK = "mailto:ET3@acas.org.uk?subject={0}&body=Parties%20in%20claim"
+    private static final String ACAS_MAILTO_LINK = "mailto:etsmail@acas.org.uk?subject={0}&body=Parties%20in%20claim"
             + "%3A%20{1}%20vs%20{2}%0D%0ACase%20reference%20number%3A%20{3}%0D%0A%0D%0ADear%20Acas%2C%0D%0A%0D%0AThe%"
             + "20tribunal%20has%20completed%20{4}%20to%20the%20{5}.%0D%0A%0D%0AThe%20documents%20we"
             + "%20sent%20are%20attached%20to%20this%20email.%0D%0A%0D%0A";
@@ -30,6 +38,15 @@ public class ServingService {
     private static final String ET1_SERVING = "ET1%20serving";
     private static final String ET3_RELEVANT_PARTIES = "relevant%20parties";
     private static final String ET1_RESPONDENT = "respondent";
+    public static final String EMAIL_ADDRESS = "emailAddress";
+
+    @Value("${et1Serving.template.id}")
+    private String templateId;
+
+    @Value("${et1Serving.respondent.template.id}")
+    private String respondentTemplateId;
+
+    private final EmailService emailService;
 
     public String generateOtherTypeDocumentLink(List<DocumentTypeItem> docList) {
         String documentLinks = "";
@@ -37,7 +54,7 @@ public class ServingService {
             documentLinks = docList
                 .stream()
                 .filter(d -> d.getValue().getTypeOfDocument().equals(SERVING_DOCUMENT_OTHER_TYPE))
-                .map(d -> createDocLinkBinary(d))
+                .map(this::createDocLinkBinary)
                 .collect(Collectors.joining());
         }
 
@@ -88,6 +105,30 @@ public class ServingService {
                 claimantName.replaceAll("\\s+", "%20"),
                 respondentList, caseNumber, isET3 ? ET3_NOTIFICATION : ET1_SERVING,
                 isET3 ? ET3_RELEVANT_PARTIES : ET1_RESPONDENT);
+    }
+
+    /**
+     * Sends notifications to the relevant parties that their case has been updated.
+     * @param caseDetails object that holds the case data.
+     */
+    public void sendNotifications(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        Map<String, String> claimant = NotificationHelper.buildMapForClaimant(caseDetails);
+
+        caseData.getRespondentCollection()
+            .forEach(o -> {
+                Map<String, String> respondent = NotificationHelper.buildMapForRespondent(caseDetails, o.getValue());
+                if (isNullOrEmpty(respondent.get(EMAIL_ADDRESS))) {
+                    return;
+                }
+                emailService.sendEmail(respondentTemplateId, respondent.get(EMAIL_ADDRESS), respondent);
+            });
+
+        if (isNullOrEmpty(claimant.get(EMAIL_ADDRESS))) {
+            return;
+        }
+
+        emailService.sendEmail(templateId, claimant.get(EMAIL_ADDRESS), claimant);
     }
 
 }

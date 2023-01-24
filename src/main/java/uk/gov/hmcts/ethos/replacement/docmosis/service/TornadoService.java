@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.bulk.BulkData;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TornadoDocumentFilter;
@@ -71,7 +73,7 @@ public class TornadoService {
 
             buildInstruction(conn, caseData, authToken, caseTypeId,
                     correspondenceType, correspondenceScotType, multipleData);
-            var documentName = Helper.getDocumentName(correspondenceType, correspondenceScotType);
+            String documentName = Helper.getDocumentName(correspondenceType, correspondenceScotType);
             return checkResponseStatus(authToken, conn, documentName, caseTypeId);
         } catch (IOException e) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, e);
@@ -85,11 +87,11 @@ public class TornadoService {
                                   String caseTypeId, CorrespondenceType correspondenceType,
                                   CorrespondenceScotType correspondenceScotType,
                                   MultipleData multipleData) throws IOException {
-        try (var os = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
-            var allocatedCourtAddress = getAllocatedCourtAddress(caseData, caseTypeId, multipleData);
-            var userDetails = userService.getUserDetails(authToken);
+        try (OutputStreamWriter os = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
+            DefaultValues allocatedCourtAddress = getAllocatedCourtAddress(caseData, caseTypeId, multipleData);
+            UserDetails userDetails = userService.getUserDetails(authToken);
 
-            var documentContent = DocumentHelper.buildDocumentContent(caseData,
+            StringBuilder documentContent = DocumentHelper.buildDocumentContent(caseData,
                     tornadoConnection.getAccessKey(),
                     userDetails, caseTypeId, correspondenceType,
                     correspondenceScotType, multipleData, allocatedCourtAddress, venueAddressReaderService);
@@ -117,7 +119,7 @@ public class TornadoService {
         try {
             conn = createConnection();
 
-            var documentName = ListingHelper.getListingDocName(listingData);
+            String documentName = ListingHelper.getListingDocName(listingData);
             buildListingInstruction(conn, listingData, documentName, authToken, caseType);
             return checkResponseStatus(authToken, conn, documentName, caseType);
         } catch (IOException e) {
@@ -130,7 +132,7 @@ public class TornadoService {
 
     private void buildListingInstruction(HttpURLConnection conn, ListingData listingData,
                                          String documentName, String authToken, String caseType) throws IOException {
-        var userDetails = userService.getUserDetails(authToken);
+        UserDetails userDetails = userService.getUserDetails(authToken);
         StringBuilder sb;
 
         if (ListingHelper.isReportType(listingData.getReportType())) {
@@ -140,7 +142,8 @@ public class TornadoService {
             sb = ListingHelper.buildListingDocumentContent(listingData, tornadoConnection.getAccessKey(),
                     documentName, userDetails, caseType);
         }
-        try (var outputStreamWriter = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
+        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
+            conn.getOutputStream(), StandardCharsets.UTF_8)) {
             writeOutputStream(outputStreamWriter, sb);
         }
     }
@@ -150,7 +153,7 @@ public class TornadoService {
         try {
             conn = createConnection();
 
-            var documentName = BulkHelper.getScheduleDocName(bulkData.getScheduleDocName());
+            String documentName = BulkHelper.getScheduleDocName(bulkData.getScheduleDocName());
             buildScheduleInstruction(conn, bulkData);
             return checkResponseStatus(authToken, conn, documentName, caseTypeId);
         } catch (IOException e) {
@@ -162,9 +165,10 @@ public class TornadoService {
     }
 
     private void buildScheduleInstruction(HttpURLConnection conn, BulkData bulkData) throws IOException {
-        var sb = BulkHelper.buildScheduleDocumentContent(bulkData, tornadoConnection.getAccessKey());
+        StringBuilder sb = BulkHelper.buildScheduleDocumentContent(bulkData, tornadoConnection.getAccessKey());
 
-        try (var outputStreamWriter = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
+        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
+            conn.getOutputStream(), StandardCharsets.UTF_8)) {
             writeOutputStream(outputStreamWriter, sb);
         }
     }
@@ -182,8 +186,8 @@ public class TornadoService {
     private DocumentInfo checkResponseStatus(String authToken, HttpURLConnection conn, String documentName,
                                              String caseTypeId)
             throws IOException {
-        try (var os = new ByteArrayOutputStream()) {
-            var responseCode = conn.getResponseCode();
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            int responseCode = conn.getResponseCode();
             if (responseCode == HTTP_OK) {
                 return createDocument(authToken, conn, documentName, os, caseTypeId);
             } else {
@@ -197,13 +201,13 @@ public class TornadoService {
                                         ByteArrayOutputStream os, String caseTypeId) throws IOException {
 
         byte[] bytes;
-        try (var is = conn.getInputStream()) {
+        try (InputStream is = conn.getInputStream()) {
             bytes = getBytesFromInputStream(os, is);
         }
         URI documentSelfPath = uploadDocument(documentName, authToken, bytes, caseTypeId);
         log.info("URI documentSelfPath uploaded and created: " + documentSelfPath.toString());
-        var downloadUrl = documentManagementService.generateDownloadableURL(documentSelfPath);
-        var markup = documentManagementService.generateMarkupDocument(downloadUrl);
+        String downloadUrl = documentManagementService.generateDownloadableURL(documentSelfPath);
+        String markup = documentManagementService.generateMarkupDocument(downloadUrl);
         return generateDocumentInfo(documentName, documentSelfPath, markup);
     }
 
@@ -218,7 +222,7 @@ public class TornadoService {
     }
 
     private byte[] getBytesFromInputStream(ByteArrayOutputStream os, InputStream is) throws IOException {
-        var buffer = new byte[0xFFFF];
+        byte[] buffer = new byte[0xFFFF];
         for (int len = is.read(buffer); len != -1; len = is.read(buffer)) {
             os.write(buffer, 0, len);
         }
@@ -297,6 +301,8 @@ public class TornadoService {
             case "Initial Consideration.pdf" :
                 return InitialConsiderationHelper.getDocumentRequest(
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
+            case "Referral Summary.pdf":
+                return ReferralHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             default:
                 throw new IllegalArgumentException("Unexpected document name " + documentName);
         }

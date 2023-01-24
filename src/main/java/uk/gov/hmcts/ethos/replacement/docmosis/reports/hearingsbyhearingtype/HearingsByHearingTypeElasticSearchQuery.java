@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype;
 
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
@@ -18,7 +19,7 @@ public final class HearingsByHearingTypeElasticSearchQuery {
     }
 
     static String create(String managingOffice, String dateToSearchFrom, String dateToSearchTo) {
-        var boolQueryBuilder = boolQuery()
+        BoolQueryBuilder boolQueryBuilder = boolQuery()
                 .must(new ExistsQueryBuilder("data.hearingCollection"))
                 .filter(new RangeQueryBuilder(
                         "data.hearingCollection.value.hearingDateCollection.value.listedDate"

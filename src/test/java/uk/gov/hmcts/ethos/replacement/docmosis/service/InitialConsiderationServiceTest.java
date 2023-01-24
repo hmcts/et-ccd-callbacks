@@ -85,13 +85,25 @@ class InitialConsiderationServiceTest {
             + "|Type | -|\r\n"
             + "|Duration | -|";
 
-    private static final String EXPECTED_JURISDICTION_HTML = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
-        + "href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">View all "
-        + "jurisdiction codes and descriptors (opens in new tab)</a><br><br><strong>DAG</strong> - "
-        + "Discrimination, including indirect discrimination, harassment or victimisation or discrimination "
-        + "based on association or perception on grounds of age<br><br><strong>SXD</strong> - Discrimination, "
-        + "including indirect discrimination, discrimination based on association or perception, harassment "
-        + "or victimisation on grounds of sex, marriage and civil partnership or gender reassignment<br><br><hr>";
+    private static final String EXPECTED_JURISDICTION_HTML = "<h2>Jurisdiction codes</h2><a "
+        + "target=\"_blank\" href=\"https://judiciary.sharepoint"
+        + ".com/:b:/s/empjudgesew/EZowDqUAYpBEl9NkTirLUdYBjXdpi3-7b18HlsDqZNV3xA?e=tR7Wof\">View all jurisdiction "
+        + "codes and descriptors (opens in new tab)"
+        + "</a><br><br><strong>DAG</strong> - Discrimination, including indirect discrimination, harassment or "
+        + "victimisation or discrimination based on association or perception on grounds of "
+        + "age<br><br><strong>SXD</strong> - Discrimination, including indirect discrimination, discrimination based on"
+        + " association or perception, harassment or victimisation on grounds of sex, marriage and civil partnership or"
+        + " gender reassignment<br><br><hr>";
+
+    private static final String EXPECTED_JURISDICTION_SCOTLAND_HTML = "<h2>Jurisdiction codes</h2><a "
+        + "target=\"_blank\" href=\"https://judiciary.sharepoint"
+        + ".com/:b:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List/ET%20jurisdiction%20list%20"
+        + "(2019).pdf?csf=1&web=1&e=9bCQ8P\">View all jurisdiction codes and descriptors (opens in new tab)"
+        + "</a><br><br><strong>DAG</strong> - Discrimination, including indirect discrimination, harassment or "
+        + "victimisation or discrimination based on association or perception on grounds of "
+        + "age<br><br><strong>SXD</strong> - Discrimination, including indirect discrimination, discrimination based on"
+        + " association or perception, harassment or victimisation on grounds of sex, marriage and civil partnership or"
+        + " gender reassignment<br><br><hr>";
 
     private CaseData caseDataEmpty;
     private CaseData caseData;
@@ -153,9 +165,19 @@ class InitialConsiderationServiceTest {
     @Test
     void generateJurisdictionCodesHtmlTest() {
         String jurisdictionCodesHtml =
-            initialConsiderationService.generateJurisdictionCodesHtml(generateJurisdictionCodes());
+            initialConsiderationService.generateJurisdictionCodesHtml(generateJurisdictionCodes(),
+                ENGLANDWALES_CASE_TYPE_ID);
         assertThat(jurisdictionCodesHtml)
             .isEqualTo(EXPECTED_JURISDICTION_HTML);
+    }
+
+    @Test
+    void generateJurisdictionCodesHtmlScotlandTest() {
+        String jurisdictionCodesHtml =
+            initialConsiderationService.generateJurisdictionCodesHtml(generateJurisdictionCodes(),
+                SCOTLAND_CASE_TYPE_ID);
+        assertThat(jurisdictionCodesHtml)
+            .isEqualTo(EXPECTED_JURISDICTION_SCOTLAND_HTML);
     }
 
     @Test
@@ -168,7 +190,8 @@ class InitialConsiderationServiceTest {
     @Test
     void missingJurisdictionCollectionTest() {
         String jurisdictionCodesHtml =
-            initialConsiderationService.generateJurisdictionCodesHtml(caseDataEmpty.getJurCodesCollection());
+            initialConsiderationService.generateJurisdictionCodesHtml(caseDataEmpty.getJurCodesCollection(),
+                ENGLANDWALES_CASE_TYPE_ID);
         assertThat(jurisdictionCodesHtml)
             .isEmpty();
     }
@@ -176,7 +199,8 @@ class InitialConsiderationServiceTest {
     @Test
     void invalidJurisdictionCollectionTest() {
         String jurisdictionCodesHtml =
-            initialConsiderationService.generateJurisdictionCodesHtml(generateInvalidJurisdictionCodes());
+            initialConsiderationService.generateJurisdictionCodesHtml(generateInvalidJurisdictionCodes(),
+                ENGLANDWALES_CASE_TYPE_ID);
         assertThat(jurisdictionCodesHtml)
             .isEmpty();
     }
@@ -184,7 +208,8 @@ class InitialConsiderationServiceTest {
     @Test
     void invalidAndValidJurisdictionCollectionTest() {
         String jurisdictionCodesHtml =
-            initialConsiderationService.generateJurisdictionCodesHtml(generateValidInvalidJurisdictionCodes());
+            initialConsiderationService.generateJurisdictionCodesHtml(generateValidInvalidJurisdictionCodes(),
+                ENGLANDWALES_CASE_TYPE_ID);
         assertThat(jurisdictionCodesHtml)
             .isEqualTo(EXPECTED_JURISDICTION_HTML);
     }
@@ -326,6 +351,42 @@ class InitialConsiderationServiceTest {
         assertThat(caseData.getEtICPostponeGiveDetails()).isNull();
         assertThat(caseData.getEtICConvertPreliminaryGiveDetails()).isNull();
         assertThat(caseData.getEtICConvertF2fGiveDetails()).isNull();
+    }
+
+    @Test
+    void setIsHearingAlreadyListed_shouldBeSetToNo_whenNoHearings() {
+        caseData.setEtInitialConsiderationHearing("|Hearing details | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|Date | -|\r\n"
+            + "|Type | -|\r\n"
+            + "|Duration | -|");
+
+        initialConsiderationService.setIsHearingAlreadyListed(caseData, SCOTLAND_CASE_TYPE_ID);
+        assertThat(caseData.getEtICHearingAlreadyListed()).isEqualTo(NO);
+    }
+
+    @Test
+    void setIsHearingAlreadyListed_shouldBeSetToYes_whenThereAreHearings() {
+        caseData.setEtInitialConsiderationHearing("|Hearing details | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|Date | 16 May 2022|\r\n"
+            + "|Type | Hearing|\r\n"
+            + "|Duration | 60 Days|");
+
+        initialConsiderationService.setIsHearingAlreadyListed(caseData, SCOTLAND_CASE_TYPE_ID);
+        assertThat(caseData.getEtICHearingAlreadyListed()).isEqualTo(YES);
+    }
+
+    @Test
+    void setIsHearingAlreadyListed_shouldIgnoreEntirely_whenCaseTypeIsEnglandWales() {
+        caseData.setEtInitialConsiderationHearing("|Hearing details | |\r\n"
+            + "|-------------|:------------|\r\n"
+            + "|Date | 16 May 2022|\r\n"
+            + "|Type | Hearing|\r\n"
+            + "|Duration | 60 Days|");
+
+        initialConsiderationService.setIsHearingAlreadyListed(caseData, ENGLANDWALES_CASE_TYPE_ID);
+        assertThat(caseData.getEtICHearingAlreadyListed()).isNull();
     }
 
     private List<JurCodesTypeItem> generateJurisdictionCodes() {

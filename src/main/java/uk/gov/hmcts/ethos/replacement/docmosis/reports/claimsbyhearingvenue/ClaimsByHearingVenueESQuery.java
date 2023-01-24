@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue;
 
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -12,7 +13,7 @@ public final class ClaimsByHearingVenueESQuery {
     }
 
     static String create(String dateToSearchFrom, String dateToSearchTo) {
-        var boolQueryBuilder = boolQuery()
+        BoolQueryBuilder boolQueryBuilder = boolQuery()
             .filter(new RangeQueryBuilder("data.receiptDate").gte(dateToSearchFrom).lte(dateToSearchTo));
         return new SearchSourceBuilder()
             .size(MAX_ES_SIZE)

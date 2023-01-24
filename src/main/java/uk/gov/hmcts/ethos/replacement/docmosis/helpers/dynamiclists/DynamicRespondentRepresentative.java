@@ -21,16 +21,16 @@ public final class DynamicRespondentRepresentative {
         List<DynamicValueType> listItems = DynamicListHelper.createDynamicRespondentName(
                 caseData.getRespondentCollection());
         if (!listItems.isEmpty()) {
-            var dynamicFixedListType = new DynamicFixedListType();
+            DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
             dynamicFixedListType.setListItems(listItems);
             if (CollectionUtils.isNotEmpty(caseData.getRepCollection())) {
                 ListIterator<RepresentedTypeRItem> repItr = caseData.getRepCollection().listIterator();
                 while (repItr.hasNext()) {
-                    var respRepCollection = caseData.getRepCollection().get(repItr.nextIndex());
-                    var dynamicValueType = new DynamicValueType();
+                    RepresentedTypeRItem respRepCollection = caseData.getRepCollection().get(repItr.nextIndex());
+                    DynamicValueType dynamicValueType = new DynamicValueType();
                     if (respRepCollection.getValue().getDynamicRespRepName() == null) {
                         repItr.next().getValue().setDynamicRespRepName(dynamicFixedListType);
-                        var respRepName = respRepCollection.getValue().getRespRepName();
+                        String respRepName = respRepCollection.getValue().getRespRepName();
                         dynamicValueType.setLabel(respRepName);
                         dynamicValueType.setCode(respRepName);
                     } else {
@@ -40,11 +40,11 @@ public final class DynamicRespondentRepresentative {
                     respRepCollection.getValue().getDynamicRespRepName().setValue(dynamicValueType);
                 }
             } else {
-                var representedTypeR = new RepresentedTypeR();
-                representedTypeR.setDynamicRespRepName(dynamicFixedListType);
-                var representedTypeRItem = new RepresentedTypeRItem();
+                RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
+                    .dynamicRespRepName(dynamicFixedListType).build();
+                RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
                 representedTypeRItem.setValue(representedTypeR);
-                var collection = List.of(representedTypeRItem);
+                List<RepresentedTypeRItem> collection = List.of(representedTypeRItem);
                 caseData.setRepCollection(collection);
             }
         }

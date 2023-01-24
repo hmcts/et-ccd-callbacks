@@ -20,20 +20,20 @@ public final class SelectionServiceTestUtils {
     }
 
     public static CaseData createCaseData(TribunalOffice tribunalOffice) {
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setManagingOffice(tribunalOffice.getOfficeName());
         return caseData;
     }
 
     public static MultipleData createMultipleData(String tribunalOffice) {
-        var multipleData = new MultipleData();
+        MultipleData multipleData = new MultipleData();
         multipleData.setManagingOffice(tribunalOffice);
         return multipleData;
     }
 
     public static List<DynamicValueType> createListItems(String codeBase, String labelBase) {
-        var listItems = new ArrayList<DynamicValueType>();
-        for (var i = 1; i <= DEFAULT_LIST_SIZE; i++) {
+        List<DynamicValueType> listItems = new ArrayList<>();
+        for (int i = 1; i <= DEFAULT_LIST_SIZE; i++) {
             listItems.add(DynamicValueType.create(codeBase + i, labelBase + i));
         }
 
@@ -41,9 +41,9 @@ public final class SelectionServiceTestUtils {
     }
 
     public static DynamicFixedListType createSelectedDynamicList(String codeBase, String labelBase, int selectedIndex) {
-        var listItems = createListItems(codeBase, labelBase);
-        var selectedItem = listItems.get(selectedIndex);
-        var dynamicFixedListType = DynamicFixedListType
+        List<DynamicValueType> listItems = createListItems(codeBase, labelBase);
+        DynamicValueType selectedItem = listItems.get(selectedIndex);
+        DynamicFixedListType dynamicFixedListType = DynamicFixedListType
                 .of(DynamicValueType.create(selectedItem.getCode(), selectedItem.getLabel()));
         dynamicFixedListType.setListItems(listItems);
         return dynamicFixedListType;

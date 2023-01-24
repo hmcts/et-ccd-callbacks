@@ -16,16 +16,16 @@ public class JpaFileLocationServiceTest {
 
     @Test
     public void testGetFileLocations() {
-        var tribunalOffice = TribunalOffice.BRISTOL;
-        var fileLocations = List.of(
+        TribunalOffice tribunalOffice = TribunalOffice.BRISTOL;
+        List<FileLocation> fileLocations = List.of(
                 createFileLocation("fileLocation1", "FileLocation 1"),
                 createFileLocation("fileLocation2", "FileLocation 2"),
                 createFileLocation("fileLocation3", "FileLocation 3"));
-        var fileLocationRepository = mock(FileLocationRepository.class);
+        FileLocationRepository fileLocationRepository = mock(FileLocationRepository.class);
         when(fileLocationRepository.findByTribunalOffice(tribunalOffice)).thenReturn(fileLocations);
 
-        var fileLocationService = new JpaFileLocationService(fileLocationRepository);
-        var values = fileLocationService.getFileLocations(tribunalOffice);
+        JpaFileLocationService fileLocationService = new JpaFileLocationService(fileLocationRepository);
+        List<DynamicValueType> values = fileLocationService.getFileLocations(tribunalOffice);
 
         assertEquals(3, values.size());
         verifyValue(values.get(0), "fileLocation1", "FileLocation 1");
@@ -34,7 +34,7 @@ public class JpaFileLocationServiceTest {
     }
 
     private FileLocation createFileLocation(String code, String name) {
-        var fileLocation = new FileLocation();
+        FileLocation fileLocation = new FileLocation();
         fileLocation.setCode(code);
         fileLocation.setName(name);
         return fileLocation;

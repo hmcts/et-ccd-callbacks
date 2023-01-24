@@ -3,9 +3,12 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.VenueService;
+
+import java.util.List;
 
 @Service
 public class PrintHearingListService {
@@ -25,13 +28,13 @@ public class PrintHearingListService {
     }
 
     private void initEnglandWalesCase(CaseData caseData) {
-        var listingData = new ListingData();
+        ListingData listingData = new ListingData();
         listingData.setListingVenue(getVenueList(caseData.getManagingOffice()));
         caseData.setPrintHearingDetails(listingData);
     }
 
     private void initScotlandCase(CaseData caseData) {
-        var listingData = new ListingData();
+        ListingData listingData = new ListingData();
         listingData.setVenueAberdeen(getVenueList(TribunalOffice.ABERDEEN));
         listingData.setVenueDundee(getVenueList(TribunalOffice.DUNDEE));
         listingData.setVenueEdinburgh(getVenueList(TribunalOffice.EDINBURGH));
@@ -41,12 +44,12 @@ public class PrintHearingListService {
     }
 
     private DynamicFixedListType getVenueList(String managingOffice) {
-        var tribunalOffice = TribunalOffice.valueOfOfficeName(managingOffice);
+        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(managingOffice);
         return getVenueList(tribunalOffice);
     }
 
     private DynamicFixedListType getVenueList(TribunalOffice tribunalOffice) {
-        var listItems = venueService.getVenues(tribunalOffice);
+        List<DynamicValueType> listItems = venueService.getVenues(tribunalOffice);
         return DynamicFixedListType.from(listItems);
     }
 }

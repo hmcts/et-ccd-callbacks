@@ -12,5 +12,5 @@ Scenario('error message validation check for when user move submitted case to ca
     await submittedState(I, caseNumber);
     await caseDetailsEvent(I, caseNumber, eventNames.CASE_DETAILS, 'A Clerk', 'Case closed', 'Casework Table', 'Standard Track');
 
-}).tag('@nightly');
+}).tag('@toberefactored');
     //.retry(testConfig.TestRetryScenarios);

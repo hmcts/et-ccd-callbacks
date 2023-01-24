@@ -14,6 +14,6 @@ Scenario('ET1 Case Vetting', async ({I}) => {
     await I.amOnPage('/case-details/' + caseId);
     await et1Vetting(I, eventNames.ET1_VETTING);
   
-}).tag('@wip');
+}).tag('@wip').tag('@biggerrefactoring');
     //.retry(testConfig.TestRetryScenarios)   
   

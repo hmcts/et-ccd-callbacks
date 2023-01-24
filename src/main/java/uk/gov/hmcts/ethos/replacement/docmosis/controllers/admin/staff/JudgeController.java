@@ -109,7 +109,7 @@ public class JudgeController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
-        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = judgeService.updateJudgeMidEventSelectOffice(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
@@ -139,7 +139,7 @@ public class JudgeController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
-        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = judgeService.updateJudgeMidEventSelectJudge(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);
@@ -167,7 +167,7 @@ public class JudgeController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
         }
 
-        var adminData = ccdRequest.getCaseDetails().getAdminData();
+        AdminData adminData = ccdRequest.getCaseDetails().getAdminData();
         List<String> errors = judgeService.updateJudge(adminData);
 
         return CCDCallbackResponse.getCallbackRespEntityErrors(errors, adminData);

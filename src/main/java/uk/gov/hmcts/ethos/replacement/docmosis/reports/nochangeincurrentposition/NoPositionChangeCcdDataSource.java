@@ -24,11 +24,11 @@ public class NoPositionChangeCcdDataSource implements NoPositionChangeDataSource
     @Override
     public List<NoPositionChangeSubmitEvent> getData(String caseTypeId, String reportDate, String managingOffice) {
         try {
-            var reportDate3MonthsAgo = LocalDate.parse(reportDate, OLD_DATE_TIME_PATTERN2).minusMonths(3)
-                    .format(OLD_DATE_TIME_PATTERN2);
-            var query = NoPositionChangeElasticSearchQuery.create(reportDate3MonthsAgo, managingOffice);
-            var submitEvents = new ArrayList<NoPositionChangeSubmitEvent>();
-            var searchResult = ccdClient.runElasticSearch(authToken, caseTypeId, query,
+            String reportDate3MonthsAgo = LocalDate.parse(reportDate, OLD_DATE_TIME_PATTERN2)
+                .minusMonths(3).format(OLD_DATE_TIME_PATTERN2);
+            String query = NoPositionChangeElasticSearchQuery.create(reportDate3MonthsAgo, managingOffice);
+            List<NoPositionChangeSubmitEvent> submitEvents = new ArrayList<>();
+            NoPositionChangeSearchResult searchResult = ccdClient.runElasticSearch(authToken, caseTypeId, query,
                     NoPositionChangeSearchResult.class);
 
             if (searchResult != null && CollectionUtils.isNotEmpty(searchResult.getCases())) {
@@ -45,9 +45,10 @@ public class NoPositionChangeCcdDataSource implements NoPositionChangeDataSource
     @Override
     public List<SubmitMultipleEvent> getMultiplesData(String caseTypeId, List<String> multipleRefsList) {
         try {
-            var query = NoPositionChangeMultiplesElasticSearchQuery.create(multipleRefsList);
-            var submitEvents = new ArrayList<SubmitMultipleEvent>();
-            var searchResult = ccdClient.runElasticSearch(authToken, caseTypeId, query, MultipleCaseSearchResult.class);
+            String query = NoPositionChangeMultiplesElasticSearchQuery.create(multipleRefsList);
+            List<SubmitMultipleEvent> submitEvents = new ArrayList<>();
+            MultipleCaseSearchResult searchResult = ccdClient.runElasticSearch(authToken, caseTypeId, query,
+                MultipleCaseSearchResult.class);
 
             if (searchResult != null && CollectionUtils.isNotEmpty(searchResult.getCases())) {
                 submitEvents.addAll(searchResult.getCases());

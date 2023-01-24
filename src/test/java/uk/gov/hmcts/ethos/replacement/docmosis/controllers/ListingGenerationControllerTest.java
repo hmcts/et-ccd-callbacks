@@ -147,7 +147,7 @@ public class ListingGenerationControllerTest {
 
     private ListingRequest getListingData() {
 
-        var listingData = new ListingData();
+        ListingData listingData = new ListingData();
         listingData.setDocMarkUp("Test doc markup");
         listingData.setDocumentName("test listing doc name");
         listingData.setListingDate("2021-10-20");
@@ -156,10 +156,10 @@ public class ListingGenerationControllerTest {
         listingData.setListingDateTo("2021-10-18");
         listingData.setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());
 
-        var listingTypeItem1 = new ListingTypeItem();
+        ListingTypeItem listingTypeItem1 = new ListingTypeItem();
         listingTypeItem1.setId("97087d19-795a-4886-8cdb-06489b8b2ef5");
 
-        var listingTypeValues = new ListingType();
+        ListingType listingTypeValues = new ListingType();
         listingTypeValues.setCauseListTime("12 October 2020");
         listingTypeValues.setCauseListTime("00:00");
         listingTypeValues.setCauseListVenue("Manchester");
@@ -169,10 +169,10 @@ public class ListingGenerationControllerTest {
         listingTypeValues.setPositionType("Manually Created");
         listingTypeItem1.setValue(listingTypeValues);
 
-        var listingTypeItem2 = new ListingTypeItem();
+        ListingTypeItem listingTypeItem2 = new ListingTypeItem();
         listingTypeItem2.setId("97087d19-795a-4886-8cdb-46089b8b27ef");
 
-        var listingTypeValues2 = new ListingType();
+        ListingType listingTypeValues2 = new ListingType();
         listingTypeValues2.setCauseListTime("12 October 2020");
         listingTypeValues2.setCauseListTime("00:00");
         listingTypeValues2.setCauseListVenue("Manchester");
@@ -203,9 +203,9 @@ public class ListingGenerationControllerTest {
         address.setPostCode("L1 122");
         listingData.setTribunalCorrespondenceAddress(address);
 
-        var listingTypeItems = new ArrayList<ListingTypeItem>();
+        List<ListingTypeItem> listingTypeItems = new ArrayList<>();
         listingTypeItems.add(new ListingTypeItem());
-        var listingDetails = new ListingDetails();
+        ListingDetails listingDetails = new ListingDetails();
         listingData.setListingCollection(listingTypeItems);
         listingDetails.setCaseData(listingData);
         singleListingRequest = new ListingRequest();
@@ -413,8 +413,9 @@ public class ListingGenerationControllerTest {
 
     @Test
     public void generateHearingsToJudgmentsReportOk() throws Exception {
-        var reportSummary = new HearingsToJudgmentsReportSummary(TribunalOffice.LEEDS.getOfficeName());
-        var reportData = new HearingsToJudgmentsReportData(reportSummary);
+        HearingsToJudgmentsReportSummary reportSummary = new HearingsToJudgmentsReportSummary(
+            TribunalOffice.LEEDS.getOfficeName());
+        HearingsToJudgmentsReportData reportData = new HearingsToJudgmentsReportData(reportSummary);
         reportData.setReportType(HEARINGS_TO_JUDGEMENTS_REPORT);
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -435,8 +436,8 @@ public class ListingGenerationControllerTest {
 
     @Test
     public void generateCasesAwaitingJudgmentReportOk() throws Exception {
-        var reportSummary = new ReportSummary(ENGLANDWALES_CASE_TYPE_ID);
-        var reportData = new CasesAwaitingJudgmentReportData(reportSummary);
+        ReportSummary reportSummary = new ReportSummary(ENGLANDWALES_CASE_TYPE_ID);
+        CasesAwaitingJudgmentReportData reportData = new CasesAwaitingJudgmentReportData(reportSummary);
         reportData.setReportType(CASES_AWAITING_JUDGMENT_REPORT);
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -457,7 +458,7 @@ public class ListingGenerationControllerTest {
 
     @Test
     public void generateCMemberDaysReportOk() throws Exception {
-        var reportData = new MemberDaysReportData();
+        MemberDaysReportData reportData = new MemberDaysReportData();
         reportData.setReportType(MEMBER_DAYS_REPORT);
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN))

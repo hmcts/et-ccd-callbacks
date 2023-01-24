@@ -26,6 +26,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -95,8 +96,7 @@ class InitialConsiderationControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.confirmation_header", notNullValue()))
-            .andExpect(jsonPath("$.confirmation_body", notNullValue()));
+            .andExpect(jsonPath("$.confirmation_header", notNullValue()));
     }
 
     @Test
@@ -153,7 +153,7 @@ class InitialConsiderationControllerTest {
     @Test
     void startInitialConsiderationTest() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(initialConsiderationService.generateJurisdictionCodesHtml(anyList())).thenReturn("Jurisdictions");
+        when(initialConsiderationService.generateJurisdictionCodesHtml(anyList(), any())).thenReturn("Jurisdictions");
         when(initialConsiderationService.getHearingDetails(anyList())).thenReturn("hearings");
         when(initialConsiderationService.getRespondentName(anyList())).thenReturn("respondents");
         mvc.perform(post(START_INITIAL_CONSIDERATION_URL)

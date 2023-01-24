@@ -37,7 +37,7 @@ class CreateServiceTest {
 
     @Test
     void initCreateAdmin_Exist_shouldReturnError() throws IOException {
-        var submitEvent = new SubmitEvent();
+        SubmitEvent submitEvent = new SubmitEvent();
         when(ccdClient.executeElasticSearch(anyString(), anyString(), anyString())).thenReturn(List.of(submitEvent));
         List<String> errors = createService.initCreateAdmin(userToken);
         assertEquals(1, errors.size());

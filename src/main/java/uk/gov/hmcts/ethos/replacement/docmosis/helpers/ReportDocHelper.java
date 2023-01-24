@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.items.AdhocReportTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.AdhocReportType;
 import uk.gov.hmcts.et.common.model.listing.types.ClaimServedType;
+import uk.gov.hmcts.et.common.model.listing.types.ClaimServedTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReportDoc;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReportData;
@@ -78,7 +79,7 @@ public class ReportDocHelper {
                                                            String templateName, UserDetails userDetails) {
         log.info("Building {} report document data", listingData.getReportType());
 
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append("{\n");
         sb.append("\"accessKey\":\"").append(accessKey).append(NEW_LINE);
         sb.append("\"templateName\":\"").append(templateName).append(FILE_EXTENSION).append(NEW_LINE);
@@ -196,9 +197,9 @@ public class ReportDocHelper {
             throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "HearingsToJudgmentsReportData");
         }
 
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         try {
-            var reportData = (HearingsToJudgmentsReportData) listingData;
+            HearingsToJudgmentsReportData reportData = (HearingsToJudgmentsReportData) listingData;
             sb.append(reportData.toReportObjectString());
         } catch (JsonProcessingException e) {
             throw new ReportException(CANNOT_CREATE_REPORT_DATA_EXCEPTION, e);
@@ -211,9 +212,9 @@ public class ReportDocHelper {
             throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "NoPositionChangeReportData");
         }
 
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         try {
-            var reportData = (NoPositionChangeReportData) listingData;
+            NoPositionChangeReportData reportData = (NoPositionChangeReportData) listingData;
             sb.append(reportData.toReportObjectString());
         } catch (JsonProcessingException e) {
             throw new ReportException(CANNOT_CREATE_REPORT_DATA_EXCEPTION, e);
@@ -226,8 +227,8 @@ public class ReportDocHelper {
         if (!(listingData instanceof CasesAwaitingJudgmentReportData)) {
             throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "CasesAwaitingJudgmentReportData");
         }
-        var reportData = (CasesAwaitingJudgmentReportData) listingData;
-        var sb = new StringBuilder();
+        CasesAwaitingJudgmentReportData reportData = (CasesAwaitingJudgmentReportData) listingData;
+        StringBuilder sb = new StringBuilder();
         sb.append(REPORT_OFFICE).append(reportData.getReportSummary().getOffice()).append(NEW_LINE);
         addJsonCollection("positionTypes", reportData.getReportSummary().getPositionTypes().iterator(), sb);
         addJsonCollection("reportDetails", reportData.getReportDetails().iterator(), sb);
@@ -237,7 +238,7 @@ public class ReportDocHelper {
     public static void addJsonCollection(String name, Iterator<?> iterator, StringBuilder sb)
             throws JsonProcessingException {
         sb.append("\"").append(name).append("\":[\n");
-        var objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
         while (iterator.hasNext()) {
             sb.append(objectMapper.writeValueAsString(iterator.next()));
             if (iterator.hasNext()) {
@@ -249,7 +250,7 @@ public class ReportDocHelper {
     }
 
     private static StringBuilder getCasesAcceptedReport(ListingData listingData) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         AdhocReportType localReportDetailHdr = listingData.getLocalReportsDetailHdr();
         if (localReportDetailHdr != null) {
             sb.append("\"Multiple_Claims_Accepted\":\"").append(
@@ -268,7 +269,7 @@ public class ReportDocHelper {
     }
 
     private static StringBuilder getClaimsAcceptedByCaseType(ListingData listingData) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         Map<Boolean, List<AdhocReportTypeItem>> unsortedMap = listingData.getLocalReportsDetail().stream()
                 .collect(Collectors.partitioningBy(localReportDetail ->
                         localReportDetail.getValue().getMultipleRef() != null));
@@ -281,7 +282,7 @@ public class ReportDocHelper {
             sb.append("{\"Case_Type\":\"").append(singleOrMultiple).append(NEW_LINE);
             sb.append("\"Claims_Number\":\"").append(localReportEntry.getValue().size()).append(NEW_LINE);
             sb.append(REPORT_LIST);
-            for (var i = 0; i < localReportEntry.getValue().size(); i++) {
+            for (int i = 0; i < localReportEntry.getValue().size(); i++) {
                 sb.append(getAdhocReportCommonTypeRow(localReportEntry.getValue().get(i).getValue()));
                 if (i != localReportEntry.getValue().size() - 1) {
                     sb.append(",\n");
@@ -298,7 +299,7 @@ public class ReportDocHelper {
     }
 
     private static StringBuilder getAdhocReportCommonTypeRow(AdhocReportType adhocReportType) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(CASE_REFERENCE).append(
                 nullCheck(adhocReportType.getCaseReference())).append(NEW_LINE);
         sb.append("\"Date_Of_Acceptance\":\"").append(
@@ -319,11 +320,11 @@ public class ReportDocHelper {
     }
 
     private static StringBuilder getCaseSourceLocalReport(ListingData listingData) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         if (CollectionUtils.isEmpty(listingData.getLocalReportsSummary())) {
             return sb;
         }
-        var localReportSummary = listingData.getLocalReportsSummary().get(0).getValue();
+        AdhocReportType localReportSummary = listingData.getLocalReportsSummary().get(0).getValue();
         if (localReportSummary != null) {
 
             sb.append("\"Manually_Created\":\"").append(
@@ -347,7 +348,7 @@ public class ReportDocHelper {
     }
 
     private static StringBuilder getTimeToFirstHearingReport(ListingData listingData) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         AdhocReportType localReportDetailHdr = listingData.getLocalReportsDetailHdr();
         AdhocReportType localReportSummary = listingData.getLocalReportsSummary().get(0).getValue();
         if (localReportDetailHdr != null) {
@@ -405,9 +406,9 @@ public class ReportDocHelper {
         }
 
         if (CollectionUtils.isNotEmpty(listingData.getLocalReportsDetail())) {
-            var adhocReportTypeItems = listingData.getLocalReportsDetail();
+            List<AdhocReportTypeItem> adhocReportTypeItems = listingData.getLocalReportsDetail();
             sb.append(REPORT_LIST);
-            for (var i = 0; i < adhocReportTypeItems.size(); i++) {
+            for (int i = 0; i < adhocReportTypeItems.size(); i++) {
                 sb.append(getTimeToFirstHearingAdhocReportTypeRow(adhocReportTypeItems.get(i).getValue()));
                 if (i != adhocReportTypeItems.size() - 1) {
                     sb.append(",\n");
@@ -419,7 +420,7 @@ public class ReportDocHelper {
     }
 
     private static StringBuilder getCasesCompletedReport(ListingData listingData) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         AdhocReportType localReportDetailHdr = listingData.getLocalReportsDetailHdr();
         if (localReportDetailHdr != null) {
             sb.append("\"Cases_Completed_Hearing\":\"").append(
@@ -461,7 +462,7 @@ public class ReportDocHelper {
         if (listingData.getLocalReportsDetail() != null && !listingData.getLocalReportsDetail().isEmpty()) {
             List<AdhocReportTypeItem> adhocReportTypeItems = listingData.getLocalReportsDetail();
             sb.append(REPORT_LIST);
-            for (var i = 0; i < adhocReportTypeItems.size(); i++) {
+            for (int i = 0; i < adhocReportTypeItems.size(); i++) {
                 sb.append(getAdhocReportCompletedTypeRow(adhocReportTypeItems.get(i).getValue()));
                 if (i != adhocReportTypeItems.size() - 1) {
                     sb.append(",\n");
@@ -473,7 +474,7 @@ public class ReportDocHelper {
     }
 
     private static StringBuilder getAdhocReportCompletedTypeRow(AdhocReportType adhocReportType) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(CASE_REFERENCE).append(
                 nullCheck(adhocReportType.getCaseReference())).append(NEW_LINE);
         sb.append("\"Position\":\"").append(
@@ -496,7 +497,7 @@ public class ReportDocHelper {
     }
 
     private static StringBuilder getTimeToFirstHearingAdhocReportTypeRow(AdhocReportType adhocReportType) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append("{\"Office\":\"").append(
                 nullCheck(adhocReportType.getReportOffice())).append(NEW_LINE);
         sb.append("\"Case_Reference\":\"").append(
@@ -513,11 +514,11 @@ public class ReportDocHelper {
     }
 
     private static StringBuilder getLiveCaseLoadReportSummaryHdr(ListingData listingData) {
-        var sb = new StringBuilder();
-        var singlesTotal = "0";
-        var multiplesTotal = "0";
-        var total = "0";
-        var summaryHdr = listingData.getLocalReportsSummaryHdr();
+        StringBuilder sb = new StringBuilder();
+        String singlesTotal = "0";
+        String multiplesTotal = "0";
+        String total = "0";
+        AdhocReportType summaryHdr = listingData.getLocalReportsSummaryHdr();
 
         if (summaryHdr != null) {
             singlesTotal = nullCheck(summaryHdr.getSinglesTotal());
@@ -533,12 +534,12 @@ public class ReportDocHelper {
     }
 
     private static StringBuilder getLiveCaseLoadReport(ListingData listingData) {
-        var sb = getLiveCaseLoadReportSummaryHdr(listingData);
+        StringBuilder sb = getLiveCaseLoadReportSummaryHdr(listingData);
 
         if (CollectionUtils.isNotEmpty(listingData.getLocalReportsDetail())) {
             List<AdhocReportTypeItem> adhocReportTypeItems = listingData.getLocalReportsDetail();
             sb.append(REPORT_LIST);
-            for (var i = 0; i < adhocReportTypeItems.size(); i++) {
+            for (int i = 0; i < adhocReportTypeItems.size(); i++) {
                 sb.append(getAdhocReportCommonTypeRow(adhocReportTypeItems.get(i).getValue()));
                 if (i != adhocReportTypeItems.size() - 1) {
                     sb.append(",\n");
@@ -550,13 +551,13 @@ public class ReportDocHelper {
     }
 
     private static StringBuilder getServedClaimsReport(ListingData listingData) {
-        var reportContent = getServedClaimsReportSummary(listingData);
-        var claimsServedDayListUpperBoundary = 5;
+        StringBuilder reportContent = getServedClaimsReportSummary(listingData);
+        int claimsServedDayListUpperBoundary = 5;
 
         if (CollectionUtils.isNotEmpty(listingData.getLocalReportsDetail())) {
-            var listBlockOpeners = List.of(DAY_1_LIST, DAY_2_LIST, DAY_3_LIST, DAY_4_LIST,
+            List<String> listBlockOpeners = List.of(DAY_1_LIST, DAY_2_LIST, DAY_3_LIST, DAY_4_LIST,
                     DAY_5_LIST, DAY_6_LIST);
-            for (var dayIndex = 0; dayIndex <= claimsServedDayListUpperBoundary; dayIndex++) {
+            for (int dayIndex = 0; dayIndex <= claimsServedDayListUpperBoundary; dayIndex++) {
                 addEntriesByServingDay(dayIndex, listBlockOpeners.get(dayIndex),
                         reportContent, listingData);
             }
@@ -567,12 +568,12 @@ public class ReportDocHelper {
 
     private static void addEntriesByServingDay(int dayNumber, String listBlockOpener,
                                                StringBuilder reportContent, ListingData listingData) {
-        var itemsList = listingData.getLocalReportsDetail().get(0);
-        var claimServedTypeItems = itemsList.getValue().getClaimServedItems()
+        AdhocReportTypeItem itemsList = listingData.getLocalReportsDetail().get(0);
+        List<ClaimServedTypeItem> claimServedTypeItems = itemsList.getValue().getClaimServedItems()
                 .stream().filter(item -> Integer.parseInt(item.getValue().getReportedNumberOfDays()) == dayNumber)
                 .collect(Collectors.toList());
         int claimServedTypeItemsCount = claimServedTypeItems.size();
-        var claimServedTypeItemsListSize = String.valueOf(claimServedTypeItems.size());
+        String claimServedTypeItemsListSize = String.valueOf(claimServedTypeItems.size());
 
         if (dayNumber >= FIFTH_DAY) {
             claimServedTypeItems.sort(Comparator.comparingInt(item ->
@@ -592,7 +593,7 @@ public class ReportDocHelper {
             reportContent.append("\"}");
             reportContent.append(",\n");
         } else {
-            for (var i = 0; i < claimServedTypeItemsCount; i++) {
+            for (int i = 0; i < claimServedTypeItemsCount; i++) {
                 reportContent.append(getServedClaimsReportRow(claimServedTypeItems.get(i).getValue(), dayNumber));
                 if (i != claimServedTypeItemsCount - 1) {
                     reportContent.append(",\n");
@@ -601,14 +602,14 @@ public class ReportDocHelper {
         }
 
         reportContent.append("],\n");
-        var currentDayTotal = "\"day_" + (dayNumber + 1) + "_total_count\":\"";
+        String currentDayTotal = "\"day_" + (dayNumber + 1) + "_total_count\":\"";
         reportContent.append(currentDayTotal)
                 .append(claimServedTypeItemsListSize).append(NEW_LINE);
     }
 
     private static StringBuilder getServedClaimsReportRow(ClaimServedType claimServedTypeItem, int dayNumber) {
-        var reportRowContent = new StringBuilder();
-        var claimsServedDayListUpperBoundary = 5;
+        StringBuilder reportRowContent = new StringBuilder();
+        int claimsServedDayListUpperBoundary = 5;
 
         reportRowContent.append(CASE_REFERENCE)
                 .append(nullCheck(claimServedTypeItem.getClaimServedCaseNumber())).append(NEW_LINE);
@@ -628,11 +629,11 @@ public class ReportDocHelper {
     }
 
     private static StringBuilder getServedClaimsReportSummary(ListingData listingData) {
-        var reportSummaryContent = new StringBuilder();
+        StringBuilder reportSummaryContent = new StringBuilder();
 
         if (CollectionUtils.isNotEmpty(listingData.getLocalReportsDetail())) {
-            var adhocReportTypeItem = listingData.getLocalReportsDetail().get(0);
-            var adhocReportType = adhocReportTypeItem.getValue();
+            AdhocReportTypeItem adhocReportTypeItem = listingData.getLocalReportsDetail().get(0);
+            AdhocReportType adhocReportType = adhocReportTypeItem.getValue();
 
             reportSummaryContent.append("\"Day_1_Tot\":\"")
                     .append(adhocReportType.getClaimServedDay1Total()).append(NEW_LINE);
@@ -676,9 +677,9 @@ public class ReportDocHelper {
         if (!(listingData instanceof RespondentsReportData)) {
             throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "RespondentsReportData");
         }
-        var reportData = (RespondentsReportData) listingData;
+        RespondentsReportData reportData = (RespondentsReportData) listingData;
 
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(REPORT_OFFICE).append(reportData.getReportSummary().getOffice()).append(NEW_LINE);
         sb.append("\"MoreThan1Resp\":\"").append(
                 nullCheck(reportData.getReportSummary().getTotalCasesWithMoreThanOneRespondent())).append(NEW_LINE);
@@ -691,9 +692,9 @@ public class ReportDocHelper {
         if (!(listingData instanceof SessionDaysReportData)) {
             throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "SessionDaysReportData");
         }
-        var reportData = (SessionDaysReportData) listingData;
+        SessionDaysReportData reportData = (SessionDaysReportData) listingData;
 
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(REPORT_OFFICE).append(reportData.getReportSummary().getOffice()).append(NEW_LINE);
         sb.append("\"ftcSessionDays\":\"").append(
                 nullCheck(reportData.getReportSummary().getFtSessionDaysTotal())).append(NEW_LINE);
@@ -715,8 +716,8 @@ public class ReportDocHelper {
         if (!(listingData instanceof EccReportData)) {
             throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "EccReportData");
         }
-        var reportData = (EccReportData) listingData;
-        var sb = new StringBuilder();
+        EccReportData reportData = (EccReportData) listingData;
+        StringBuilder sb = new StringBuilder();
         sb.append(REPORT_OFFICE).append(reportData.getOffice()).append(NEW_LINE);
         if (CollectionUtils.isNotEmpty(reportData.getReportDetails())) {
             addJsonCollection("reportDetails", reportData.getReportDetails().iterator(), sb);
@@ -729,8 +730,8 @@ public class ReportDocHelper {
         if (!(listingData instanceof HearingsByHearingTypeReportData)) {
             throw new IllegalStateException(LISTING_DATA_STATE_EXCEPTION + "HearingsByHearingTypeReportData");
         }
-        var reportData = (HearingsByHearingTypeReportData) listingData;
-        var sb = new StringBuilder();
+        HearingsByHearingTypeReportData reportData = (HearingsByHearingTypeReportData) listingData;
+        StringBuilder sb = new StringBuilder();
         sb.append(REPORT_OFFICE).append(reportData.getReportSummaryHdr().getOffice()).append(NEW_LINE);
         sb.append("\"cm_SummaryHdr\":\"").append(
                 nullCheck(reportData.getReportSummaryHdr().getFields().getCmCount())).append(NEW_LINE);

@@ -57,7 +57,7 @@ public class EccReportCaseDataBuilder {
     }
 
     public EccReportSubmitEvent buildAsSubmitEvent() {
-        var submitEvent = new EccReportSubmitEvent();
+        EccReportSubmitEvent submitEvent = new EccReportSubmitEvent();
         caseData.setEthosCaseReference("111");
         submitEvent.setState("Accepted");
         submitEvent.setCaseData(caseData);

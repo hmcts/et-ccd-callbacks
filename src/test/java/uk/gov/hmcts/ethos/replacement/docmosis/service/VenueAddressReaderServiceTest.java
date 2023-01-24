@@ -38,7 +38,7 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setVenue("Manchester1");
         venueAddress.setAddress("Test Address1");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
-        var officeName = TribunalOffice.MANCHESTER.getOfficeName();
+        String officeName = TribunalOffice.MANCHESTER.getOfficeName();
         when(venueAddressesService.getTribunalVenueAddresses(officeName)).thenReturn(venueAddressList);
         HearingType hearingType = getHearingTypeForVenue_EnglandWales("Manchester1");
 
@@ -57,7 +57,7 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setVenue("Wales1");
         venueAddress.setAddress("Test Address2");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
-        var officeName = TribunalOffice.WALES.getOfficeName();
+        String officeName = TribunalOffice.WALES.getOfficeName();
         when(venueAddressesService.getTribunalVenueAddresses(officeName)).thenReturn(venueAddressList);
         HearingType hearingType = getHearingTypeForVenue_EnglandWales("Wales1");
 
@@ -76,7 +76,7 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setVenue("Glasgow1");
         venueAddress.setAddress("Test Address3");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
-        var officeName = TribunalOffice.GLASGOW.getOfficeName();
+        String officeName = TribunalOffice.GLASGOW.getOfficeName();
         when(venueAddressesService.getTribunalVenueAddresses(officeName))
                 .thenReturn(venueAddressList);
         HearingType hearingType = getHearingTypeForVenue_Scotland(
@@ -97,7 +97,7 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setVenue("Aberdeen1");
         venueAddress.setAddress("Test Address4");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
-        var officeName = TribunalOffice.ABERDEEN.getOfficeName();
+        String officeName = TribunalOffice.ABERDEEN.getOfficeName();
         when(venueAddressesService.getTribunalVenueAddresses(officeName))
                 .thenReturn(venueAddressList);
         HearingType hearingType = getHearingTypeForVenue_Scotland(
@@ -118,7 +118,7 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setVenue("Dundee1");
         venueAddress.setAddress("Test Address5");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
-        var officeName = TribunalOffice.DUNDEE.getOfficeName();
+        String officeName = TribunalOffice.DUNDEE.getOfficeName();
         when(venueAddressesService.getTribunalVenueAddresses(officeName)).thenReturn(venueAddressList);
         HearingType hearingType = getHearingTypeForVenue_Scotland(
                 TribunalOffice.DUNDEE.getOfficeName(), "Dundee1");
@@ -138,7 +138,7 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setVenue("Edinburgh1");
         venueAddress.setAddress("Test Address6");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
-        var officeName = TribunalOffice.EDINBURGH.getOfficeName();
+        String officeName = TribunalOffice.EDINBURGH.getOfficeName();
         when(venueAddressesService.getTribunalVenueAddresses(
                 officeName)).thenReturn(venueAddressList);
         HearingType hearingType = getHearingTypeForVenue_Scotland(
@@ -159,7 +159,7 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setVenue("Glasgow2");
         venueAddress.setAddress("");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
-        var officeName = TribunalOffice.GLASGOW.getOfficeName();
+        String officeName = TribunalOffice.GLASGOW.getOfficeName();
         when(venueAddressesService.getTribunalVenueAddresses(officeName))
                 .thenReturn(venueAddressList);
         HearingType hearingType = getHearingTypeForVenue_Scotland(
@@ -180,7 +180,7 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setVenue("OtherVenue");
         venueAddress.setAddress("Test Address");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
-        var officeName = TribunalOffice.MANCHESTER.getOfficeName();
+        String officeName = TribunalOffice.MANCHESTER.getOfficeName();
         when(venueAddressesService.getTribunalVenueAddresses(officeName)).thenReturn(venueAddressList);
         HearingType hearingType = getHearingTypeForVenue_EnglandWales("Manchester1");
 
@@ -199,7 +199,7 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setVenue("Glasgow3");
         venueAddress.setAddress("");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
-        var officeName = TribunalOffice.GLASGOW.getOfficeName();
+        String officeName = TribunalOffice.GLASGOW.getOfficeName();
         when(venueAddressesService.getTribunalVenueAddresses(officeName))
                 .thenReturn(venueAddressList);
         HearingType hearingType = getHearingTypeForVenue_ScotlandNotFound();
@@ -215,7 +215,7 @@ public class VenueAddressReaderServiceTest {
         venueAddress.setVenue("Glasgow4");
         venueAddress.setAddress("");
         List<VenueAddress> venueAddressList = List.of(venueAddress);
-        var officeName = TribunalOffice.GLASGOW.getOfficeName();
+        String officeName = TribunalOffice.GLASGOW.getOfficeName();
         when(venueAddressesService.getTribunalVenueAddresses(officeName))
                 .thenReturn(venueAddressList);
         HearingType hearing = new HearingType();
@@ -229,7 +229,7 @@ public class VenueAddressReaderServiceTest {
     public void getVenueAddressForHearing_ThrowsAddressReaderException() {
         // Arrange
         List<VenueAddress> venueAddressList = new ArrayList<>();
-        var officeName = TribunalOffice.MANCHESTER.getOfficeName();
+        String officeName = TribunalOffice.MANCHESTER.getOfficeName();
         when(venueAddressesService.getTribunalVenueAddresses(officeName))
                 .thenReturn(venueAddressList);
         HearingType hearing = getHearingTypeForVenue_EnglandWales(officeName);

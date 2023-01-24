@@ -52,10 +52,15 @@ async function respondentRepresentative(I, eventName) {
     await I.executeRespondentRepresentative();
 }
 
-async function jurisdiction(I, eventName) {
+async function jurisdiction(I, eventName, jurisdictionOutcome) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(2);
-    await I.executeAddAmendJurisdiction();
+    await I.executeAddAmendJurisdiction(jurisdictionOutcome);
+}
+
+async function enterDisposalDateJurisdiction(I, hearingDisposalDate) {
+    await I.wait(2);
+    await I.enterDisposalDate(hearingDisposalDate);
 }
 
 async function closeCase(I, eventName, clerkResponsible, physicalLocation) {
@@ -95,20 +100,20 @@ async function bfActionsOutstanding(I, eventName) {
 
 async function listHearing(I, eventName, jurisdiction) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
-    await I.executeAddAmendHearing(jurisdiction);
+    await I.wait(5);
+    await I.executeListHearing(jurisdiction);
 }
 
 async function allocateHearing(I, eventName, jurisdiction) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
+    await I.wait(5);
     await I.executeAllocateHearing(jurisdiction);
 }
 
-async function hearingDetails(I, eventName) {
+async function hearingDetails(I, eventName, caseDisposed) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
-    await I.executeHearingDetails();
+    await I.wait(5);
+    await I.executeHearingDetails(caseDisposed);
 }
 
 async function updateHearingDetails(I, eventName) {
@@ -279,5 +284,6 @@ module.exports = {
     et3Notification,
     et3Response,
     clickCreateCase,
-    verifyApplicationTabs
+    verifyApplicationTabs,
+    enterDisposalDateJurisdiction
 };

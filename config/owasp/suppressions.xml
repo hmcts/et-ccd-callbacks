@@ -106,4 +106,312 @@
         <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-websocket@.*$</packageUrl>
         <cve>CVE-2022-42252</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-beanutils-1.9.4.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-beanutils/commons\-beanutils@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-codec-1.15.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-codec/commons\-codec@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-collections-3.2.2.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-collections/commons\-collections@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-compress-1.21.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.commons/commons\-compress@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-digester-2.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-digester/commons\-digester@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-fileupload-1.4.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-fileupload/commons\-fileupload@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-io-2.11.0.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-io/commons\-io@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-logging-1.2.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-logging/commons\-logging@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-math3-3.6.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.commons/commons\-math3@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-validator-1.7.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-validator/commons\-validator@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: xmlgraphics-commons-2.7.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.xmlgraphics/xmlgraphics\-commons@.*$</packageUrl>
+        <cve>CVE-2021-37533</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: qs:6.9.3
+   ]]></notes>
+        <packageUrl regex="true">^pkg:npm/qs@.*$</packageUrl>
+        <vulnerabilityName>1085139</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-buffer-4.1.78.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-buffer@.*$</packageUrl>
+        <cve>CVE-2022-41881</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-codec-socks-4.1.78.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec\-socks@.*$</packageUrl>
+        <cve>CVE-2022-41915</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-buffer-4.1.78.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-buffer@.*$</packageUrl>
+        <cpe>cpe:/a:netty:netty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-codec-4.1.78.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec@.*$</packageUrl>
+        <cpe>cpe:/a:netty:netty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-codec-http-4.1.78.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec\-http@.*$</packageUrl>
+        <cpe>cpe:/a:netty:netty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-codec-socks-4.1.78.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec\-socks@.*$</packageUrl>
+        <cpe>cpe:/a:netty:netty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-common-4.1.78.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-common@.*$</packageUrl>
+        <cpe>cpe:/a:netty:netty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-handler-4.1.78.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-handler@.*$</packageUrl>
+        <cpe>cpe:/a:netty:netty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-handler-proxy-4.1.78.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-handler\-proxy@.*$</packageUrl>
+        <cpe>cpe:/a:netty:netty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-resolver-4.1.78.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-resolver@.*$</packageUrl>
+        <cpe>cpe:/a:netty:netty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-transport-4.1.78.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport@.*$</packageUrl>
+        <cpe>cpe:/a:netty:netty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-transport-classes-epoll-4.1.82.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-classes\-epoll@.*$</packageUrl>
+        <cpe>cpe:/a:netty:netty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-transport-classes-kqueue-4.1.82.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-classes\-kqueue@.*$</packageUrl>
+        <cpe>cpe:/a:netty:netty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-transport-native-epoll-4.1.78.Final-linux-x86_64.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-native\-epoll@.*$</packageUrl>
+        <cpe>cpe:/a:netty:netty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-transport-native-kqueue-4.1.78.Final-osx-x86_64.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-native\-kqueue@.*$</packageUrl>
+        <cpe>cpe:/a:netty:netty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-transport-native-unix-common-4.1.78.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-native\-unix\-common@.*$</packageUrl>
+        <cpe>cpe:/a:netty:netty</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: flat:4.1.1
+    ]]></notes>
+        <packageUrl regex="true">^pkg:npm/flat@.*$</packageUrl>
+        <vulnerabilityName>1085318</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: json5:1.0.1
+    ]]></notes>
+        <packageUrl regex="true">^pkg:npm/json5@.*$</packageUrl>
+        <vulnerabilityName>1085311</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: json5:1.0.1
+    ]]></notes>
+        <packageUrl regex="true">^pkg:npm/json5@.*$</packageUrl>
+        <vulnerabilityName>1085311</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: LatencyUtils-2.0.3.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.latencyutils/LatencyUtils@.*$</packageUrl>
+        <cpe>cpe:/a:utils_project:utils</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+        file name: LatencyUtils-2.0.3.jar
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.latencyutils/LatencyUtils@.*$</packageUrl>
+        <cve>CVE-2021-4277</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+        file name: async-http-client-netty-utils-2.12.1.jar
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async\-http\-client\-netty\-utils@.*$</packageUrl>
+        <cpe>cpe:/a:utils_project:utils</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: async-http-client-netty-utils-2.12.1.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async\-http\-client\-netty\-utils@.*$</packageUrl>
+        <cve>CVE-2021-4277</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+        file name: async-http-client-netty-utils-2.12.1.jar
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async\-http\-client\-netty\-utils@.*$</packageUrl>
+        <cve>CVE-2021-4277</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: snakeyaml-1.33.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cpe>cpe:/a:snakeyaml_project:snakeyaml</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: snakeyaml-1.33.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cpe>cpe:/a:yaml_project:yaml</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: snakeyaml-1.33.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cve>CVE-2022-3064</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+        file name: snakeyaml-1.33.jar
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cve>CVE-2021-4235</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: tomcat-embed-websocket-9.0.68.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-websocket@.*$</packageUrl>
+        <cve>CVE-2022-45143</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: debug:2.6.9
+    ]]></notes>
+        <packageUrl regex="true">^pkg:npm/debug@.*$</packageUrl>
+        <vulnerabilityName>1087958</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: tomcat-embed-core-9.0.68.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-core@.*$</packageUrl>
+        <cve>CVE-2022-45143</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: json5:1.0.1
+   ]]></notes>
+        <packageUrl regex="true">^pkg:npm/json5@.*$</packageUrl>
+        <vulnerabilityName>1088341</vulnerabilityName>
+    </suppress>
 </suppressions>

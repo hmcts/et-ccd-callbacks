@@ -14,16 +14,16 @@ import static org.mockito.Mockito.when;
 public class JpaRoomServiceTest {
     @Test
     public void testGetRooms() {
-        var venueCode = "Venue1";
-        var rooms = List.of(
+        String venueCode = "Venue1";
+        List<Room> rooms = List.of(
                 createRoom("room1", "Room 1"),
                 createRoom("room2", "Room 2"),
                 createRoom("room3", "Room 3"));
-        var roomRepository = mock(RoomRepository.class);
+        RoomRepository roomRepository = mock(RoomRepository.class);
         when(roomRepository.findByVenueCode(venueCode)).thenReturn(rooms);
 
-        var roomService = new JpaRoomService(roomRepository);
-        var values = roomService.getRooms(venueCode);
+        JpaRoomService roomService = new JpaRoomService(roomRepository);
+        List<DynamicValueType> values = roomService.getRooms(venueCode);
 
         assertEquals(3, values.size());
         verifyValue(values.get(0), "room1", "Room 1");
@@ -32,7 +32,7 @@ public class JpaRoomServiceTest {
     }
 
     private Room createRoom(String code, String name) {
-        var room = new Room();
+        Room room = new Room();
         room.setCode(code);
         room.setName(name);
         return room;

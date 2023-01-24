@@ -4,6 +4,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,37 +14,40 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class SimpleSheetHandlerTest {
 
     @Test
-    void testCreatesIteratorForExpectedSheets() {
-        var workbook = createWorkbook("Bristol", "Leeds", "LondonCentral", "LondonEast", "LondonSouth",
-                "Manchester", "MidlandsEast", "MidlandsWest", "Newcastle", "Scotland", "Wales", "Watford");
+    void testCreatesIteratorForExpectedSheets() throws IOException {
+        try (XSSFWorkbook workbook = createWorkbook("Bristol", "Leeds", "LondonCentral", "LondonEast",
+            "LondonSouth", "Manchester", "MidlandsEast", "MidlandsWest", "Newcastle", "Scotland", "Wales", "Watford")) {
 
-        var simpleSheetHandler = new SimpleSheetHandler();
-        var iterator = simpleSheetHandler.sheets(workbook);
-        var expectedOfficeSheets = List.of(TribunalOffice.BRISTOL, TribunalOffice.LEEDS, TribunalOffice.LONDON_CENTRAL,
+            SimpleSheetHandler simpleSheetHandler = new SimpleSheetHandler();
+            Iterator<OfficeSheet> iterator = simpleSheetHandler.sheets(workbook);
+            List<TribunalOffice> expectedOfficeSheets = List.of(TribunalOffice.BRISTOL, TribunalOffice.LEEDS,
+                TribunalOffice.LONDON_CENTRAL,
                 TribunalOffice.LONDON_EAST, TribunalOffice.LONDON_SOUTH, TribunalOffice.MANCHESTER,
                 TribunalOffice.MIDLANDS_EAST, TribunalOffice.MIDLANDS_WEST, TribunalOffice.NEWCASTLE,
                 TribunalOffice.SCOTLAND, TribunalOffice.WALES, TribunalOffice.WATFORD);
-        int index = 0;
-        while (iterator.hasNext()) {
-            var officeSheet = iterator.next();
-            var expectedTribunalOffice = expectedOfficeSheets.get(index++);
-            assertEquals(expectedTribunalOffice, officeSheet.getTribunalOffice());
+            int index = 0;
+            while (iterator.hasNext()) {
+                OfficeSheet officeSheet = iterator.next();
+                TribunalOffice expectedTribunalOffice = expectedOfficeSheets.get(index++);
+                assertEquals(expectedTribunalOffice, officeSheet.getTribunalOffice());
+            }
         }
     }
 
     @Test
-    void testCreatesIteratorForUnexpectedSheets() {
-        var workbook = createWorkbook("unexpected sheet name");
+    void testCreatesIteratorForUnexpectedSheets() throws IOException {
+        try (XSSFWorkbook workbook = createWorkbook("unexpected sheet name")) {
 
-        var simpleSheetHandler = new SimpleSheetHandler();
-        var iterator = simpleSheetHandler.sheets(workbook);
+            SimpleSheetHandler simpleSheetHandler = new SimpleSheetHandler();
+            Iterator<OfficeSheet> iterator = simpleSheetHandler.sheets(workbook);
 
-        assertFalse(iterator.hasNext());
+            assertFalse(iterator.hasNext());
+        }
     }
 
     private XSSFWorkbook createWorkbook(String... sheetNames) {
-        var workbook = new XSSFWorkbook();
-        for (var sheetName : sheetNames) {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        for (String sheetName : sheetNames) {
             workbook.createSheet(sheetName);
         }
         return workbook;

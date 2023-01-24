@@ -29,9 +29,9 @@ public class RespondentsReportCaseDataBuilder {
 
     public RepresentedTypeRItem getRepresentative(String respName, String repName) {
         RepresentedTypeRItem item = new RepresentedTypeRItem();
-        RepresentedTypeR type = new RepresentedTypeR();
-        type.setRespRepName(respName);
-        type.setNameOfRepresentative(repName);
+        RepresentedTypeR type = RepresentedTypeR.builder()
+            .respRepName(respName)
+            .nameOfRepresentative(repName).build();
         item.setId(UUID.randomUUID().toString());
         item.setValue(type);
         return item;
@@ -58,7 +58,7 @@ public class RespondentsReportCaseDataBuilder {
     }
 
     public RespondentsReportSubmitEvent buildAsSubmitEvent() {
-        var submitEvent = new RespondentsReportSubmitEvent();
+        RespondentsReportSubmitEvent submitEvent = new RespondentsReportSubmitEvent();
         caseData.setEthosCaseReference("111");
         submitEvent.setCaseData(caseData);
         return submitEvent;

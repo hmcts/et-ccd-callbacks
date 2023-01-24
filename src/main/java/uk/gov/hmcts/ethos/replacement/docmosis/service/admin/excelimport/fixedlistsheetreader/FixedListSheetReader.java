@@ -20,13 +20,13 @@ public final class FixedListSheetReader {
     }
 
     public void handle(TribunalOffice tribunalOffice, XSSFWorkbook workbook) throws FixedListSheetReaderException {
-        var sheet = getFixedListSheet(workbook);
+        XSSFSheet sheet = getFixedListSheet(workbook);
         sheetImporters.forEach(s -> s.importSheet(tribunalOffice, sheet));
     }
 
     private XSSFSheet getFixedListSheet(XSSFWorkbook workbook) throws FixedListSheetReaderException {
-        for (var i = 0; i < workbook.getNumberOfSheets(); i++) {
-            var sheet = workbook.getSheetAt(i);
+        for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+            XSSFSheet sheet = workbook.getSheetAt(i);
             if (sheet.getSheetName().contains(FIXED_LIST_SHEET_NAME)) {
                 return sheet;
             }

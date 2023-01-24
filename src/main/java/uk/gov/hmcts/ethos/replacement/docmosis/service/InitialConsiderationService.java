@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
@@ -50,8 +52,12 @@ public class InitialConsiderationService {
             + "|Duration | %s|";
 
     private static final String JURISDICTION_HEADER = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
-        + "href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">View all "
-        + "jurisdiction codes and descriptors (opens in new tab)</a><br><br>";
+        + "href=\"%s\">View all jurisdiction codes and descriptors (opens in new tab)</a><br><br>";
+    private static final String CODES_URL_ENGLAND = "https://judiciary.sharepoint"
+        + ".com/:b:/s/empjudgesew/EZowDqUAYpBEl9NkTirLUdYBjXdpi3-7b18HlsDqZNV3xA?e=tR7Wof";
+    private static final String CODES_URL_SCOTLAND = "https://judiciary.sharepoint"
+        + ".com/:b:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List/ET%20jurisdiction%20list%20"
+        + "(2019).pdf?csf=1&web=1&e=9bCQ8P";
     private static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
     private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "");
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
@@ -125,7 +131,7 @@ public class InitialConsiderationService {
      * @param jurisdictionCodes the list of jurisdiction codes assigned to the case
      * @return jurisdiction code section
      */
-    public String generateJurisdictionCodesHtml(List<JurCodesTypeItem> jurisdictionCodes) {
+    public String generateJurisdictionCodesHtml(List<JurCodesTypeItem> jurisdictionCodes, String caseTypeId) {
         if (jurisdictionCodes == null) {
             return "";
         }
@@ -140,7 +146,8 @@ public class InitialConsiderationService {
         }
 
         StringBuilder sb = new StringBuilder()
-            .append(JURISDICTION_HEADER);
+            .append(String.format(JURISDICTION_HEADER, caseTypeId.startsWith(ENGLANDWALES_CASE_TYPE_ID)
+                ? CODES_URL_ENGLAND : CODES_URL_SCOTLAND));
 
         validJurisdictionCodes
             .forEach(codeName -> sb.append("<strong>")
@@ -187,6 +194,19 @@ public class InitialConsiderationService {
                 removeEtICHearingAlreadyListedNoValue(caseData);
             }
         }
+    }
+
+    /**
+     * Sets etICHearingAlreadyListed if the case has a hearing listed.
+     * @param caseData data about the current case
+     */
+    public void setIsHearingAlreadyListed(CaseData caseData, String caseTypeId) {
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            return;
+        }
+        caseData.setEtICHearingAlreadyListed(HEARING_MISSING.equals(caseData.getEtInitialConsiderationHearing())
+            ? NO : YES
+        );
     }
 
     private void removeEtIcCanProceedYesValue(CaseData caseData) {

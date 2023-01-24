@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DataModelParent;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
@@ -50,7 +52,7 @@ public class MultipleHelperService {
 
         if (caseId.equals("")) {
 
-            var submitEvent = singleCasesReadingService.retrieveSingleCase(
+            SubmitEvent submitEvent = singleCasesReadingService.retrieveSingleCase(
                     userToken,
                     multipleCaseTypeId,
                     newLeadCase,
@@ -174,7 +176,7 @@ public class MultipleHelperService {
         List<MultipleObject> newMultipleObjectsUpdated = addCasesInMultiple(multipleObjectsFiltered,
                 multipleObjects, newSubMultipleName);
 
-        var multipleDetails = new MultipleDetails();
+        MultipleDetails multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(newMultipleData);
         multipleDetails.setCaseId(caseTypeId);
         excelDocManagementService.generateAndUploadExcel(newMultipleObjectsUpdated, userToken, multipleDetails);
@@ -226,7 +228,7 @@ public class MultipleHelperService {
                                                          List<String> errors,
                                                           SortedMap<String, Object> multipleObjects) {
         List<String> multipleObjectsFiltered = new ArrayList<>(multipleObjects.keySet());
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
         String username = userService.getUserDetails(userToken).getEmail();
 
         PersistentQHelper.sendSingleUpdatesPersistentQ(multipleDetails.getCaseTypeId(),
@@ -248,7 +250,7 @@ public class MultipleHelperService {
                                                      CaseData caseData) {
 
         List<String> multipleObjectsFiltered = new ArrayList<>(multipleObjects.keySet());
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
         String username = userService.getUserDetails(userToken).getEmail();
 
         PersistentQHelper.sendSingleUpdatesPersistentQ(multipleDetails.getCaseTypeId(),
@@ -267,8 +269,8 @@ public class MultipleHelperService {
     public void sendPreAcceptToSinglesWithConfirmation(String userToken, MultipleDetails multipleDetails,
                                                        List<String> errors) {
 
-        var multipleData = multipleDetails.getCaseData();
-        var casePreAcceptType = multipleData.getPreAcceptCase();
+        MultipleData multipleData = multipleDetails.getCaseData();
+        CasePreAcceptType casePreAcceptType = multipleData.getPreAcceptCase();
 
         sendTaskToSinglesWithConfirmation(userToken, multipleDetails,
                 PersistentQHelper.getPreAcceptDataModel(casePreAcceptType.getDateAccepted()),
@@ -280,8 +282,8 @@ public class MultipleHelperService {
     public void sendRejectToSinglesWithConfirmation(String userToken, MultipleDetails multipleDetails,
                                                     List<String> errors) {
 
-        var multipleData = multipleDetails.getCaseData();
-        var casePreAcceptType = multipleData.getPreAcceptCase();
+        MultipleData multipleData = multipleDetails.getCaseData();
+        CasePreAcceptType casePreAcceptType = multipleData.getPreAcceptCase();
 
         sendTaskToSinglesWithConfirmation(userToken, multipleDetails,
                 PersistentQHelper.getRejectDataModel(casePreAcceptType.getDateRejected(),
@@ -294,7 +296,7 @@ public class MultipleHelperService {
     public void sendCloseToSinglesWithoutConfirmation(String userToken, MultipleDetails multipleDetails,
                                                       List<String> errors) {
 
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
 
         sendTaskToSinglesWithConfirmation(userToken, multipleDetails,
                 PersistentQHelper.getCloseDataModel(multipleData),
@@ -307,7 +309,7 @@ public class MultipleHelperService {
                                                    DataModelParent dataModelParent,
                                                    List<String> errors, String confirmation) {
 
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
         List<String> ethosCaseRefCollection = getEthosCaseRefCollection(userToken, multipleData, errors);
         String username = userService.getUserDetails(userToken).getEmail();
 
@@ -372,14 +374,14 @@ public class MultipleHelperService {
     private void sendUpdatesToSinglesLogicCheckingLead(String userToken, MultipleDetails multipleDetails,
                                                        List<String> errors, String newLeadCase,
                                                        SortedMap<String, Object> multipleObjects) {
-        var multipleRef = multipleDetails.getCaseData().getMultipleReference();
+        String multipleRef = multipleDetails.getCaseData().getMultipleReference();
         String oldLeadCase = MultiplesHelper.getCurrentLead(multipleDetails.getCaseData().getLeadCase());
-        var leadCaseChanged = !oldLeadCase.equals(newLeadCase);
+        boolean leadCaseChanged = !oldLeadCase.equals(newLeadCase);
 
         if (leadCaseChanged && StringUtils.isNotBlank(oldLeadCase)) {
             log.info("Multiple {}: Sending update to {} as this is no longer the lead case", multipleRef, oldLeadCase);
 
-            var multipleReferenceLink = getFullLinkMarkUp(multipleDetails.getCaseId(),
+            String multipleReferenceLink = getFullLinkMarkUp(multipleDetails.getCaseId(),
                     multipleDetails.getCaseData().getMultipleReference());
             sendCreationUpdatesToSinglesWithoutConfirmation(userToken,
                     multipleDetails.getCaseTypeId(),
@@ -407,7 +409,7 @@ public class MultipleHelperService {
 
         sendUpdatesToSinglesLogicCheckingLead(userToken, multipleDetails, errors, newLeadCase, multipleObjects);
 
-        var multipleData  = multipleDetails.getCaseData();
+        MultipleData multipleData  = multipleDetails.getCaseData();
         sendCreationUpdatesToSinglesWithoutConfirmation(userToken, multipleDetails.getCaseTypeId(),
                 multipleDetails.getJurisdiction(), multipleData, errors,
                 newEthosCaseRefCollection, newLeadCase,

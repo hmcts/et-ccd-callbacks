@@ -226,6 +226,21 @@ async function processCaseToSubmittedState() {
     return case_id;
 }
 
+async function processCaseToET1VettedState() {
+    // Login to IDAM to get the authentication token
+    const authToken = await getAuthToken();
+    const serviceToken = await getS2SServiceToken();
+
+    //Getting the User Id based on the Authentication Token that is passed for this User.
+    const userId = await getUserDetails(authToken);
+    const case_id = await createACase(authToken, serviceToken, userId);
+    await performCaseVettingEvent(authToken, serviceToken, case_id);
+
+    //Navigate to the Case Detail Pages
+    await navigateToCaseDetailsScreen(case_id);
+    return case_id;
+}
+
 async function processCaseToAcceptedState() {
 
     // Login to IDAM to get the authentication token
@@ -265,7 +280,9 @@ async function processCaseToRejectedState() {
 }
 
 module.exports = {
+    processCaseToSubmittedState,
+    processCaseToET1VettedState,
     processCaseToAcceptedState,
     processCaseToRejectedState,
-    processCaseToSubmittedState
+
 };

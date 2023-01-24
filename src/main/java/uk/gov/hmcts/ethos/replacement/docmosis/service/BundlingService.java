@@ -44,6 +44,21 @@ public class BundlingService {
         return bundleServiceRequest;
     }
 
+    public List<Bundle> stitchBundle(CaseDetails caseDetails, String userToken) {
+        setBundleConfig(caseDetails.getCaseData());
+        BundleCreateResponse bundleCreateResponse = stitchBundle(userToken, authTokenGenerator.generate(),
+                bundleRequestMapper(caseDetails));
+        return bundleCreateResponse.getData().getCaseBundles();
+    }
+
+    private BundleCreateResponse stitchBundle(String authorization, String serviceAuthorization,
+                                              BundleCreateRequest bundleCreateRequest) {
+        BundleCreateResponse bundleServiceRequest =
+                bundleApiClient.stitchBundle(authorization, serviceAuthorization, bundleCreateRequest);
+        log.info(String.valueOf(bundleServiceRequest));
+        return bundleServiceRequest;
+    }
+
     private BundleCreateRequest bundleRequestMapper(CaseDetails caseDetails) {
         return BundleCreateRequest.builder()
                 .caseDetails(caseDetails)

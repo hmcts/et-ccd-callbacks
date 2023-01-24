@@ -18,4 +18,11 @@ public interface BundleApiClient {
             @RequestHeader("ServiceAuthorization") String serviceAuthorization,
             @RequestBody BundleCreateRequest bundleCreateRequest
             );
+
+    @PostMapping(value = "api/stitch-new-bundle", consumes = "application/json")
+    BundleCreateResponse stitchBundle(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+            @RequestHeader("ServiceAuthorization") String serviceAuthorization,
+            @RequestBody BundleCreateRequest bundleCreateRequest
+    );
 }

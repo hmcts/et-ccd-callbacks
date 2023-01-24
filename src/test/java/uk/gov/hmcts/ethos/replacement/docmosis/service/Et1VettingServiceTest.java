@@ -408,7 +408,7 @@ class Et1VettingServiceTest {
     @Test
     void testGettingHearingVenueAddressesHtml() {
         caseDetails.getCaseData().setManagingOffice("Manchester");
-
+        caseDetails.getCaseData().setClaimantWorkAddressQuestion("No");
         assertThat(et1VettingService.getAddressesHtml(caseDetails.getCaseData()))
             .isEqualTo(EXPECTED_ADDRESSES_HTML);
     }

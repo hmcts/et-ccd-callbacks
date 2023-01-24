@@ -72,6 +72,7 @@ public class PseRespondToTribunalController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setPseRespondentSelectOrderOrRequest(PseHelper.populateSelectJONDropdown(caseData));
+        caseData.setPseRespondentSelectJudgmentOrderNotification(caseData.getPseRespondentSelectOrderOrRequest());
         return getCallbackRespEntityNoErrors(caseData);
     }
 

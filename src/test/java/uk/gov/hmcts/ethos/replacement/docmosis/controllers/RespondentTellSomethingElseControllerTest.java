@@ -61,13 +61,13 @@ class RespondentTellSomethingElseControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private static final String NO = "I do not want to copy";
+    private static final String COPY_TO_OTHER_PARTY_NO = "I do not want to copy";
 
     @BeforeEach
     void setUp() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setResTseSelectApplication("caseRef");
-        caseData.setResTseCopyToOtherPartyYesOrNo(NO);
+        caseData.setResTseCopyToOtherPartyYesOrNo(COPY_TO_OTHER_PARTY_NO);
         caseData.setEthosCaseReference("test");
         caseData.setClaimant("claimant");
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
@@ -187,7 +187,7 @@ class RespondentTellSomethingElseControllerTest {
 
     private List<GenericTseApplicationTypeItem> createApplicationCollection() {
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
-        respondentTseType.setCopyToOtherPartyYesOrNo(NO);
+        respondentTseType.setCopyToOtherPartyYesOrNo(COPY_TO_OTHER_PARTY_NO);
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
         tseApplicationTypeItem.setId(UUID.randomUUID().toString());

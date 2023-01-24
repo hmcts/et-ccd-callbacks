@@ -45,8 +45,8 @@ public class RespondentTellSomethingElseService {
     @Value("${tse.respondent.to.claimant.template.id}")
     private String claimantTemplateId;
 
-    private static final String APPLICANT_RESPONDENT = "Respondent";
-    private static final String APPLICANT_CLAIMANT = "Claimant";
+    private static final String RESPONDENT_TITLE = "Respondent";
+    private static final String CLAIMANT_TITLE = "Claimant";
     private static final String RULE92_YES = "I confirm I want to copy";
     private static final String CHANGE_PERSONAL_DETAILS = "Change personal details";
     private static final String CONSIDER_A_DECISION_AFRESH = "Consider a decision afresh";
@@ -131,11 +131,9 @@ public class RespondentTellSomethingElseService {
     public void sendClaimantEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
 
-        if (ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
-            return;
-        }
-
-        if (NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())) {
+        if (ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())
+            || NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())
+            || caseData.getClaimantType().getClaimantEmailAddress() == null) {
             return;
         }
 
@@ -214,7 +212,7 @@ public class RespondentTellSomethingElseService {
         respondentTseType.setDueDate(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
         respondentTseType.setResponsesCount("0");
         respondentTseType.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
-        respondentTseType.setApplicant(APPLICANT_RESPONDENT);
+        respondentTseType.setApplicant(RESPONDENT_TITLE);
         assignDataToFieldsFromApplicationType(respondentTseType, caseData);
         respondentTseType.setType(caseData.getResTseSelectApplication());
         respondentTseType.setCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
@@ -286,7 +284,7 @@ public class RespondentTellSomethingElseService {
 
     public String generateTableMarkdown(CaseData caseData) {
         List<GenericTseApplicationTypeItem> genericApplicationList = caseData.getGenericTseApplicationCollection();
-        if (genericApplicationList == null) {
+        if (genericApplicationList == null || genericApplicationList.isEmpty()) {
             return "";
         }
 
@@ -298,8 +296,8 @@ public class RespondentTellSomethingElseService {
 
         String tableRowsMarkdown = genericApplicationList
             .stream()
-            .filter(a -> APPLICANT_RESPONDENT.equals(a.getValue().getApplicant())
-                || (APPLICANT_CLAIMANT.equals(a.getValue().getApplicant())
+            .filter(a -> RESPONDENT_TITLE.equals(a.getValue().getApplicant())
+                || (CLAIMANT_TITLE.equals(a.getValue().getApplicant())
                 && RULE92_YES.equals(a.getValue().getCopyToOtherPartyYesOrNo())))
             .map(a -> String.format(TABLE_ROW_MARKDOWN, atomicInteger.getAndIncrement(), a.getValue().getType(),
                 a.getValue().getApplicant(), a.getValue().getDate(), a.getValue().getDueDate(), 0,

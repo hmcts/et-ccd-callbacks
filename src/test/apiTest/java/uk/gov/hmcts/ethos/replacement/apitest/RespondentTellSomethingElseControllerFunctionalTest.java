@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -20,10 +21,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 @Slf4j
 class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctionalTest {
-    private static final String AUTHORIZATION = "Authorization";
     private static final String NO = "I do not want to copy";
 
     private static final String APPLICANT_RESPONDENT = "Respondent";

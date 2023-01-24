@@ -175,7 +175,7 @@ public final class UpdateDataModelBuilder {
             return null;
         }
 
-        var representedTypeC = caseData.getRepresentativeClaimantType();
+        RepresentedTypeC representedTypeC = caseData.getRepresentativeClaimantType();
         if (multipleData.getBatchUpdateClaimantRep() != null && representedTypeC != null) {
             String claimantRepresentative = multipleData.getBatchUpdateClaimantRep().getValue().getCode();
 

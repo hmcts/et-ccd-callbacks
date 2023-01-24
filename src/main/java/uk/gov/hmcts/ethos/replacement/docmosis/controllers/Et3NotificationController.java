@@ -7,14 +7,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3NotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -25,13 +29,17 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/et3Notification")
 @SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
-public class ET3NotificationController {
+public class Et3NotificationController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
+    private static final String SUBMITTED_HEADER =
+        "<h1>Documents submitted</h1>\r\n\r\n<h5>We have notified the following parties:</h5>\r\n\r\n<h3>%s</h3>";
 
     private final VerifyTokenService verifyTokenService;
     private final ServingService servingService;
+    private final Et3NotificationService et3NotificationService;
 
     /**
      * This service Gets userToken as a parameter for security validation
@@ -44,7 +52,7 @@ public class ET3NotificationController {
      *                          includes caseData which contains the upload document names of
      *                          type "Another type of document" in a html string format.
      */
-    @PostMapping(value = "/et3Notification", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/midUploadDocuments", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "return serving document other type names")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
@@ -71,6 +79,40 @@ public class ET3NotificationController {
         caseData.setEt3EmailLinkToAcas(servingService.generateEmailLinkToAcas(caseData, true));
 
         return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    /**
+     * Builds the confirmation screen and sends email notifications.
+     */
+    @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "display final screen and send notifications to relevant parties")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> et3NotificationSubmitted(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        et3NotificationService.sendNotifications(ccdRequest.getCaseDetails());
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+            .data(ccdRequest.getCaseDetails().getCaseData())
+            .confirmation_header(String.format(SUBMITTED_HEADER, NotificationHelper.getParties(caseData)))
+            .confirmation_body("<span></span>")
+            .build());
     }
 
 }

@@ -43,7 +43,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrac
 @RequiredArgsConstructor
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.LiteralsFirstInComparisons",
     "PMD.FieldNamingConventions", "PMD.LawOfDemeter", "PMD.TooManyMethods", "PMD.ImplicitSwitchFallThrough",
-    "PMD.SwitchStmtsShouldHaveDefault", "PMD.ExcessiveImports"})
+    "PMD.SwitchStmtsShouldHaveDefault", "PMD.ExcessiveImports", "PMD.GodClass"})
 public class Et1VettingService {
 
     private final TornadoService tornadoService;
@@ -127,6 +127,19 @@ public class Et1VettingService {
             caseData.setEt1TribunalRegion(caseData.getManagingOffice());
         }
         caseData.setEt1HearingVenues(getHearingVenuesList(caseData.getEt1TribunalRegion()));
+    }
+
+    /**
+     * Populates hearing venues for suggestedHearingVenues from the managing office.
+     * @param caseData data on the case.
+     */
+    public void populateSuggestedHearingVenues(CaseData caseData) {
+        DynamicFixedListType hearingVenuesList = getHearingVenuesList(caseData.getManagingOffice());
+        DynamicFixedListType suggestedHearingVenues = caseData.getSuggestedHearingVenues();
+        if (suggestedHearingVenues != null) {
+            hearingVenuesList.setValue(suggestedHearingVenues.getValue());
+        }
+        caseData.setSuggestedHearingVenues(hearingVenuesList);
     }
 
     /**

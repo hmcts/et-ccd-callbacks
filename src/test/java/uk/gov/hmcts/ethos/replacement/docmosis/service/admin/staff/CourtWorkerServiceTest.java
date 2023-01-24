@@ -52,7 +52,7 @@ class CourtWorkerServiceTest {
 
     @Test
     void initAddCourtWorker_shouldClearAdminData() {
-        var adminData = new AdminData();
+        AdminData adminData = new AdminData();
         courtWorkerService.initAddCourtWorker(adminData);
         assertNull(adminData.getAdminCourtWorker());
     }
@@ -60,7 +60,8 @@ class CourtWorkerServiceTest {
     @ParameterizedTest
     @EnumSource(CourtWorkerType.class)
     void addCourtWorker_shouldSaveCourtWorker(CourtWorkerType courtWorkerType) {
-        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(), "Code1", "Name1");
+        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(), "Code1",
+            "Name1");
         List<String> errors = courtWorkerService.addCourtWorker(adminData);
         assertEquals(0, errors.size());
         verify(courtWorkerRepository, times(1)).save(
@@ -70,7 +71,8 @@ class CourtWorkerServiceTest {
     @ParameterizedTest
     @EnumSource(CourtWorkerType.class)
     void addCourtWorker_shouldGiveCodeError(CourtWorkerType courtWorkerType) {
-        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(), "Code1", "Name1");
+        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(), "Code1",
+            "Name1");
         when(courtWorkerRepository.existsByTribunalOfficeAndTypeAndCode(any(TribunalOffice.class),
                 any(CourtWorkerType.class), anyString())).thenReturn(true);
         List<String> errors = courtWorkerService.addCourtWorker(adminData);
@@ -83,7 +85,8 @@ class CourtWorkerServiceTest {
     @ParameterizedTest
     @EnumSource(CourtWorkerType.class)
     void addCourtWorker_shouldGiveNameError(CourtWorkerType courtWorkerType) {
-        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(), "Code1", "Name1");
+        adminData = createAdminData(TribunalOffice.LEEDS.getOfficeName(), courtWorkerType.name(),
+            "Code1", "Name1");
         when(courtWorkerRepository.existsByTribunalOfficeAndTypeAndName(any(TribunalOffice.class),
                 any(CourtWorkerType.class), anyString())).thenReturn(true);
         List<String> errors = courtWorkerService.addCourtWorker(adminData);
@@ -96,15 +99,16 @@ class CourtWorkerServiceTest {
     @ParameterizedTest
     @EnumSource(CourtWorkerType.class)
     void updateCourtWorkerMidEventSelectOffice_shouldReturnDynamicList(CourtWorkerType courtWorkerType) {
-        var tribunalOffice = TribunalOffice.LEEDS;
-        var code = "Code1";
-        var name = "Name1";
+        TribunalOffice tribunalOffice = TribunalOffice.LEEDS;
+        String code = "Code1";
+        String name = "Name1";
 
         adminData = createAdminData(tribunalOffice.getOfficeName(), courtWorkerType.name(), code, name);
         adminData.setCourtWorkerOffice(tribunalOffice.getOfficeName());
         adminData.setCourtWorkerType(courtWorkerType.name());
 
-        var listCourtWorker = createListCourtWorker(1, TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name1");
+        List<CourtWorker> listCourtWorker = createListCourtWorker(1, TribunalOffice.LEEDS, courtWorkerType,
+            "Code1", "Name1");
         when(courtWorkerRepository.findByTribunalOfficeAndTypeOrderByNameAsc(any(TribunalOffice.class),
                 any(CourtWorkerType.class))).thenReturn(listCourtWorker);
 
@@ -116,9 +120,9 @@ class CourtWorkerServiceTest {
     @ParameterizedTest
     @EnumSource(CourtWorkerType.class)
     void updateCourtWorkerMidEventSelectOffice_shouldGiveNotFoundError(CourtWorkerType courtWorkerType) {
-        var tribunalOffice = TribunalOffice.LEEDS;
-        var code = "Code1";
-        var name = "Name1";
+        TribunalOffice tribunalOffice = TribunalOffice.LEEDS;
+        String code = "Code1";
+        String name = "Name1";
 
         adminData = createAdminData(tribunalOffice.getOfficeName(), courtWorkerType.name(), code, name);
         adminData.setCourtWorkerOffice(tribunalOffice.getOfficeName());
@@ -171,7 +175,8 @@ class CourtWorkerServiceTest {
                 "Code1", "Name1");
         adminData.setCourtWorkerName("Name2");
 
-        CourtWorker courtWorker = createCourtWorkerWithId(1, TribunalOffice.LEEDS, courtWorkerType, "Code1", "Name1");
+        CourtWorker courtWorker = createCourtWorkerWithId(1, TribunalOffice.LEEDS, courtWorkerType, "Code1",
+            "Name1");
         when(courtWorkerRepository.findByCodeAndTribunalOfficeAndType(anyString(), any(), any()))
                 .thenReturn(courtWorker);
 
@@ -227,13 +232,13 @@ class CourtWorkerServiceTest {
     }
 
     private AdminData createAdminData(String officeName, String courtWorkerType, String testCode, String testName) {
-        var adminCourtWorker = new AdminCourtWorker();
+        AdminCourtWorker adminCourtWorker = new AdminCourtWorker();
         adminCourtWorker.setTribunalOffice(officeName);
         adminCourtWorker.setCourtWorkerName(testName);
         adminCourtWorker.setCourtWorkerCode(testCode);
         adminCourtWorker.setCourtWorkerType(courtWorkerType);
 
-        var adminData = new AdminData();
+        AdminData adminData = new AdminData();
         adminData.setAdminCourtWorker(adminCourtWorker);
 
         return adminData;
@@ -241,18 +246,18 @@ class CourtWorkerServiceTest {
 
     private AdminData createAdminDataWithDynamicList(String id, String tribunalOffice, String courtWorkerType,
                                                      String code, String name) {
-        var adminData = createAdminData(tribunalOffice, courtWorkerType, code, name);
+        AdminData adminData = createAdminData(tribunalOffice, courtWorkerType, code, name);
         adminData.setCourtWorkerOffice(tribunalOffice);
         adminData.setCourtWorkerType(courtWorkerType);
 
         List<DynamicValueType> listDynamicValueType = new ArrayList<>();
         listDynamicValueType.add(DynamicValueType.create(id, name));
 
-        var courtWorkerDynamicList = new DynamicFixedListType();
+        DynamicFixedListType courtWorkerDynamicList = new DynamicFixedListType();
         courtWorkerDynamicList.setListItems(listDynamicValueType);
         adminData.setCourtWorkerSelectList(courtWorkerDynamicList);
 
-        var dynamicValueType = DynamicValueType.create(id, name);
+        DynamicValueType dynamicValueType = DynamicValueType.create(id, name);
         adminData.getCourtWorkerSelectList().setValue(dynamicValueType);
 
         return adminData;
@@ -260,7 +265,7 @@ class CourtWorkerServiceTest {
 
     private CourtWorker createCourtWorker(TribunalOffice tribunalOffice, CourtWorkerType courtWorkerType,
                                           String code, String name) {
-        var courtWorker = new CourtWorker();
+        CourtWorker courtWorker = new CourtWorker();
         courtWorker.setTribunalOffice(tribunalOffice);
         courtWorker.setType(courtWorkerType);
         courtWorker.setCode(code);
@@ -270,14 +275,14 @@ class CourtWorkerServiceTest {
 
     private CourtWorker createCourtWorkerWithId(int id, TribunalOffice tribunalOffice,
                                                 CourtWorkerType courtWorkerType, String code, String name) {
-        var courtWorker = createCourtWorker(tribunalOffice, courtWorkerType, code, name);
+        CourtWorker courtWorker = createCourtWorker(tribunalOffice, courtWorkerType, code, name);
         courtWorker.setId(id);
         return courtWorker;
     }
 
     private List<CourtWorker> createListCourtWorker(int id, TribunalOffice tribunalOffice,
                                                     CourtWorkerType courtWorkerType, String code, String name) {
-        var courtWorker = createCourtWorkerWithId(id, tribunalOffice, courtWorkerType, code, name);
+        CourtWorker courtWorker = createCourtWorkerWithId(id, tribunalOffice, courtWorkerType, code, name);
         List<CourtWorker> listCourtWorker = new ArrayList<>();
         listCourtWorker.add(courtWorker);
         return listCourtWorker;

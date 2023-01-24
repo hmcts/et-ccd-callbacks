@@ -3,9 +3,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
+import uk.gov.hmcts.et.common.model.multiples.types.MoveCasesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FilterExcelType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 
@@ -41,11 +43,11 @@ public class MultipleBatchUpdate2Service {
     public void batchUpdate2Logic(String userToken, MultipleDetails multipleDetails,
                                   List<String> errors, SortedMap<String, Object> multipleObjects) {
 
-        var multipleData = multipleDetails.getCaseData();
+        MultipleData multipleData = multipleDetails.getCaseData();
 
         log.info("Batch update type = 2");
 
-        var convertToSingle = multipleData.getMoveCases().getConvertToSingle();
+        String convertToSingle = multipleData.getMoveCases().getConvertToSingle();
 
         log.info("Convert to singles " + convertToSingle);
 
@@ -66,7 +68,7 @@ public class MultipleBatchUpdate2Service {
 
         } else {
 
-            var moveCasesType = multipleData.getMoveCases();
+            MoveCasesType moveCasesType = multipleData.getMoveCases();
             String updatedMultipleRef = moveCasesType.getUpdatedMultipleRef();
             String updatedSubMultipleRef = moveCasesType.getUpdatedSubMultipleRef();
             String currentMultipleRef = multipleData.getMultipleReference();
@@ -164,7 +166,7 @@ public class MultipleBatchUpdate2Service {
         SubmitMultipleEvent updatedMultiple = getUpdatedMultiple(userToken,
                 multipleDetails.getCaseTypeId(), updatedMultipleRef);
 
-        var updatedMultipleData = updatedMultiple.getCaseData();
+        MultipleData updatedMultipleData = updatedMultiple.getCaseData();
 
         String updatedCaseTypeId = multipleDetails.getCaseTypeId();
 
@@ -230,7 +232,7 @@ public class MultipleBatchUpdate2Service {
         List<MultipleObject> newMultipleObjectsUpdated = new ArrayList<>();
 
         multipleObjects.forEach((key, value) -> {
-            var multipleObject = (MultipleObject) value;
+            MultipleObject multipleObject = (MultipleObject) value;
             if (multipleObjectsFiltered.contains(key)) {
                 multipleObject.setSubMultiple(updatedSubMultipleRef);
             }
@@ -265,7 +267,7 @@ public class MultipleBatchUpdate2Service {
         List<MultipleObject> newMultipleObjectsUpdated = new ArrayList<>();
 
         multipleObjects.forEach((key, value) -> {
-            var multipleObject = (MultipleObject) value;
+            MultipleObject multipleObject = (MultipleObject) value;
             if (!multipleObjectsFiltered.contains(key)) {
                 newMultipleObjectsUpdated.add(multipleObject);
             }

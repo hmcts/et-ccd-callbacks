@@ -115,9 +115,9 @@ public class JudgeService {
      */
     public List<String> updateJudge(AdminData adminData) {
         List<String> errors = new ArrayList<>();
-        var selectedId = Integer.parseInt(adminData.getJudgeSelectList().getSelectedCode());
+        int selectedId = Integer.parseInt(adminData.getJudgeSelectList().getSelectedCode());
 
-        var findJudge = judgeRepository.findById(selectedId);
+        List<Judge> findJudge = judgeRepository.findById(selectedId);
         if (!findJudge.isEmpty()) {
             Judge thisJudge = findJudge.get(0);
             thisJudge.setName(adminData.getJudgeName());

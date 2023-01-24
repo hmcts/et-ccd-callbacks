@@ -15,16 +15,16 @@ import static org.mockito.Mockito.when;
 public class JpaJudgeServiceTest {
     @Test
     public void testGetJudges() {
-        var tribunalOffice = TribunalOffice.BRISTOL;
-        var judges = List.of(
+        TribunalOffice tribunalOffice = TribunalOffice.BRISTOL;
+        List<Judge> judges = List.of(
                 createJudge("judge1", "Judge 1"),
                 createJudge("judge2", "Judge 2"),
                 createJudge("judge3", "Judge 3"));
-        var judgeRepository = mock(JudgeRepository.class);
+        JudgeRepository judgeRepository = mock(JudgeRepository.class);
         when(judgeRepository.findByTribunalOffice(tribunalOffice)).thenReturn(judges);
 
-        var judgeService = new JpaJudgeService(judgeRepository);
-        var values = judgeService.getJudgesDynamicList(tribunalOffice);
+        JpaJudgeService judgeService = new JpaJudgeService(judgeRepository);
+        List<DynamicValueType> values = judgeService.getJudgesDynamicList(tribunalOffice);
 
         assertEquals(3, values.size());
         verifyValue(values.get(0), "judge1", "Judge 1");
@@ -33,7 +33,7 @@ public class JpaJudgeServiceTest {
     }
 
     private Judge createJudge(String code, String name) {
-        var judge = new Judge();
+        Judge judge = new Judge();
         judge.setCode(code);
         judge.setName(name);
         return judge;

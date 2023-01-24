@@ -2,6 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedl
 
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,46 +35,46 @@ class VenueRowHandlerTest {
 
     @Test
     void testAcceptTrue() {
-        var row = createRow("VenueDundee", "Tribunal", "Dundee Tribunal");
+        Row row = createRow("VenueDundee", "Tribunal", "Dundee Tribunal");
 
-        var venueRowHandler = new VenueRowHandler("VenueDundee");
+        VenueRowHandler venueRowHandler = new VenueRowHandler("VenueDundee");
         assertTrue(venueRowHandler.accept(row));
     }
 
     @Test
     void testAcceptFalse() {
-        var row = createRow("VenueDundee", "Tribunal", "Dundee Tribunal");
+        Row row = createRow("VenueDundee", "Tribunal", "Dundee Tribunal");
 
-        var venueRowHandler = new VenueRowHandler("VenueEdinburgh");
+        VenueRowHandler venueRowHandler = new VenueRowHandler("VenueEdinburgh");
         assertFalse(venueRowHandler.accept(row));
     }
 
     @Test
     void testHandleSingleRow() {
-        var row = createRow("VenueDundee", "Tribunal", "Dundee Tribunal");
-        var venueRowHandler = new VenueRowHandler("VenueDundee");
+        Row row = createRow("VenueDundee", "Tribunal", "Dundee Tribunal");
+        VenueRowHandler venueRowHandler = new VenueRowHandler("VenueDundee");
         venueRowHandler.handle(TribunalOffice.DUNDEE, row);
 
-        var venues = venueRowHandler.getVenues();
+        List<Venue> venues = venueRowHandler.getVenues();
         assertEquals(1, venues.size());
         verifyVenue(venues.get(0), "Tribunal", "Dundee Tribunal");
     }
 
     @Test
     void testHandleMultipleRows() {
-        var rows = List.of(
+        List<Row> rows = List.of(
             createRow("VenueDundee", "Tribunal", "Dundee Tribunal"),
             createRow("VenueEdinburgh", "OET Scotland", "OET Scotland"),
             createRow("VenueDundee", "1", "Room 1")
         );
 
-        var venueRowHandler = new VenueRowHandler("VenueDundee");
-        for (var row : rows) {
+        VenueRowHandler venueRowHandler = new VenueRowHandler("VenueDundee");
+        for (Row row : rows) {
             if (venueRowHandler.accept(row)) {
                 venueRowHandler.handle(TribunalOffice.DUNDEE, row);
             }
         }
-        var venues = venueRowHandler.getVenues();
+        List<Venue> venues = venueRowHandler.getVenues();
 
         assertEquals(2, venues.size());
         verifyVenue(venues.get(0), "Tribunal", "Dundee Tribunal");
@@ -80,8 +82,8 @@ class VenueRowHandlerTest {
     }
 
     private Row createRow(String listId, String code, String name) {
-        var sheet = workbook.getSheet("Test");
-        var row = sheet.createRow(sheet.getLastRowNum() + 1);
+        XSSFSheet sheet = workbook.getSheet("Test");
+        XSSFRow row = sheet.createRow(sheet.getLastRowNum() + 1);
         row.createCell(0, CellType.STRING);
         row.getCell(0).setCellValue(listId);
         row.createCell(1, CellType.STRING);

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import org.apache.http.HttpHeaders;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,15 +9,21 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferSameCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferToEcmService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,10 +35,13 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({CaseTransferController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.LawOfDemeter"})
 public class CaseTransferControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -43,6 +53,7 @@ public class CaseTransferControllerTest {
             "/caseTransfer/transferSameCountryEccLinkedCase";
     private static final String CASE_TRANSFER_DIFFERENT_COUNTRY_URL = "/caseTransfer/transferDifferentCountry";
     private static final String CASE_TRANSFER_TO_ECM = "/caseTransfer/transferToEcm";
+    private static final String ASSIGN_CASE = "/caseTransfer/assignCase";
 
     @MockBean
     VerifyTokenService verifyTokenService;
@@ -56,6 +67,9 @@ public class CaseTransferControllerTest {
     @MockBean
     CaseTransferToEcmService caseTransferToEcmService;
 
+    @MockBean
+    DefaultValuesReaderService defaultValuesReaderService;
+
     @Autowired
     JsonMapper jsonMapper;
 
@@ -64,7 +78,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testInitTransferToScotland() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(INIT_TRANSFER_TO_SCOTLAND_URL)
@@ -85,7 +99,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testInitTransferToScotlandForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(INIT_TRANSFER_TO_SCOTLAND_URL)
@@ -97,7 +111,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testInitTransferToEnglandWales() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(INIT_TRANSFER_TO_ENGLANDWALES_URL)
@@ -118,7 +132,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testInitTransferToEnglandWalesForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(INIT_TRANSFER_TO_ENGLANDWALES_URL)
@@ -130,7 +144,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testTransferSameCountry() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_URL)
@@ -158,7 +172,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testTransferSameCountryForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_URL)
@@ -172,7 +186,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testTransferSameCountryEccLinkedCase() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL)
@@ -200,7 +214,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testTransferSameCountryEccLinkedCaseForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_ECC_LINKED_CASE_URL)
@@ -214,7 +228,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testTransferDifferentCountry() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(CASE_TRANSFER_DIFFERENT_COUNTRY_URL)
@@ -242,7 +256,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testTransferDifferentCountryForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(CASE_TRANSFER_DIFFERENT_COUNTRY_URL)
@@ -256,7 +270,7 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testCaseTransferToECM() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(CASE_TRANSFER_TO_ECM)
@@ -277,13 +291,68 @@ public class CaseTransferControllerTest {
 
     @Test
     public void testCaseTransferToEcmForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(CASE_TRANSFER_TO_ECM)
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void assignCaseEnglandWales() throws Exception {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withManagingOffice(UNASSIGNED_OFFICE)
+                .withAssignOffice(TribunalOffice.LEEDS.getOfficeName())
+                .build();
+
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
+                .withCaseData(caseData)
+                .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
+                .build();
+
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(ASSIGN_CASE)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.managingOffice",
+                        hasToString(TribunalOffice.LEEDS.getOfficeName())));
+    }
+
+    @Test
+    public void assignCaseScotland() throws Exception {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withManagingOffice(UNASSIGNED_OFFICE)
+                .build();
+
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
+                .withCaseData(caseData)
+                .withCaseTypeId(SCOTLAND_CASE_TYPE_ID)
+                .build();
+
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(ASSIGN_CASE)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.managingOffice",
+                        hasToString(TribunalOffice.GLASGOW.getOfficeName())));
+    }
+
+    @Test
+    public void assignCaseForbidden() throws Exception {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+
+        mockMvc.perform(post(ASSIGN_CASE)
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isForbidden());
     }
 }

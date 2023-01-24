@@ -54,7 +54,7 @@ public class VenueAddressReaderService {
     }
 
     private String getHearingVenueScotland(HearingType hearingType) {
-        var venue = hearingType.getHearingVenueScotland();
+        String venue = hearingType.getHearingVenueScotland();
         if (StringUtils.isBlank(venue)) {
             throw new VenueAddressReaderException("No office found for hearing " + hearingType.getHearingNumber());
         }

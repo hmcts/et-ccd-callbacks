@@ -8,7 +8,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.MultipleTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.MultipleTransferSameCountryService;
@@ -58,7 +60,7 @@ class CaseTransferMultiplesControllerTest {
 
     @Test
     void testInitTransferToScotland() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(INIT_TRANSFER_TO_SCOTLAND_URL)
@@ -79,7 +81,7 @@ class CaseTransferMultiplesControllerTest {
 
     @Test
     void testInitTransferToScotlandForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(INIT_TRANSFER_TO_SCOTLAND_URL)
@@ -91,7 +93,7 @@ class CaseTransferMultiplesControllerTest {
 
     @Test
     void testInitTransferToEnglandWales() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(INIT_TRANSFER_TO_ENGLANDWALES_URL)
@@ -112,7 +114,7 @@ class CaseTransferMultiplesControllerTest {
 
     @Test
     void testInitTransferToEnglandWalesForbidden() throws Exception {
-        var ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(INIT_TRANSFER_TO_ENGLANDWALES_URL)
@@ -124,7 +126,7 @@ class CaseTransferMultiplesControllerTest {
 
     @Test
     void testTransferSameCountry() throws Exception {
-        var multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
+        MultipleRequest multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_URL)
@@ -153,7 +155,7 @@ class CaseTransferMultiplesControllerTest {
 
     @Test
     void testTransferSameCountryForbidden() throws Exception {
-        var multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
+        MultipleRequest multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_URL)
@@ -167,7 +169,7 @@ class CaseTransferMultiplesControllerTest {
 
     @Test
     void testTransferDifferentCountry() throws Exception {
-        var multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
+        MultipleRequest multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(CASE_TRANSFER_DIFFERENT_COUNTRY_URL)
@@ -197,7 +199,7 @@ class CaseTransferMultiplesControllerTest {
 
     @Test
     void testTransferDifferentCountryForbidden() throws Exception {
-        var multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
+        MultipleRequest multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(CASE_TRANSFER_DIFFERENT_COUNTRY_URL)

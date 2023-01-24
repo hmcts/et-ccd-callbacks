@@ -61,7 +61,7 @@ public class SessionDaysCaseDataBuilder {
     }
 
     public SessionDaysSubmitEvent buildAsSubmitEvent() {
-        var submitEvent = new SessionDaysSubmitEvent();
+        SessionDaysSubmitEvent submitEvent = new SessionDaysSubmitEvent();
         caseData.setEthosCaseReference("111");
         submitEvent.setCaseData(caseData);
         return submitEvent;

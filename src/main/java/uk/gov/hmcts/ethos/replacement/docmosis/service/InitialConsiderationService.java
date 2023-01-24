@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
@@ -50,8 +53,12 @@ public class InitialConsiderationService {
             + "|Duration | %s|";
 
     private static final String JURISDICTION_HEADER = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
-        + "href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">View all "
-        + "jurisdiction codes and descriptors (opens in new tab)</a><br><br>";
+        + "href=\"%s\">View all jurisdiction codes and descriptors (opens in new tab)</a><br><br>";
+    private static final String CODES_URL_ENGLAND = "https://judiciary.sharepoint"
+        + ".com/:b:/s/empjudgesew/EZowDqUAYpBEl9NkTirLUdYBjXdpi3-7b18HlsDqZNV3xA?e=tR7Wof";
+    private static final String CODES_URL_SCOTLAND = "https://judiciary.sharepoint"
+        + ".com/:b:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List/ET%20jurisdiction%20list%20"
+        + "(2019).pdf?csf=1&web=1&e=9bCQ8P";
     private static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
     private static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "");
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
@@ -81,10 +88,11 @@ public class InitialConsiderationService {
 
     /**
      * Creates hearing detail section for Initial Consideration.
-     * Display details of the hearing with the earliest hearing date from the collection of hearings
+     * Display details of the hearing with the earliest hearing date from the collection of hearings,
+     * where the selected hearing is of "Listed" status and hearing listed date is in the future
      *
      * @param hearingCollection the collection of hearings
-     * @return return table with details of hearing
+     * @return return table with details of hearing Listed status
      */
     public String getHearingDetails(List<HearingTypeItem> hearingCollection) {
         if (hearingCollection == null) {
@@ -97,26 +105,43 @@ public class InitialConsiderationService {
             .filter(hearingTypeItem -> hearingTypeItem != null && hearingTypeItem.getValue() != null)
             .map(HearingTypeItem::getValue)
             .filter(
-                hearing -> hearing.getHearingDateCollection() != null && !hearing.getHearingDateCollection().isEmpty())
-            .min(
-                Comparator.comparing(
+                hearing -> hearing.getHearingDateCollection() != null
+                    && !hearing.getHearingDateCollection().isEmpty())
+            .min(Comparator.comparing(
                     (HearingType hearing) ->
-                        getEarliestHearingDate(hearing.getHearingDateCollection()).orElse(
+                        getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection()).orElse(
                             LocalDate.now().plusYears(100))))
-            .map(hearing -> String.format(HEARING_DETAILS,
-                getEarliestHearingDate(hearing.getHearingDateCollection()).map(formatter::format).orElse(""),
-                hearing.getHearingType(),
-                getHearingDuration(hearing)))
+            .map(hearing -> getFormattedHearingDetails(hearing, formatter))
             .orElse(HEARING_MISSING);
     }
 
-    public Optional<LocalDate> getEarliestHearingDate(List<DateListedTypeItem> hearingDates) {
+    private String getFormattedHearingDetails(HearingType hearing, DateTimeFormatter formatter) {
+        Optional<LocalDate> earliestHearingDate = getEarliestHearingDateForListedHearings(
+            hearing.getHearingDateCollection());
+        if (earliestHearingDate.isPresent()) {
+            return String.format(HEARING_DETAILS, earliestHearingDate.map(formatter::format).orElse(""),
+                hearing.getHearingType(), getHearingDuration(hearing));
+        } else {
+            return String.format(HEARING_DETAILS, "-", "-", "-");
+        }
+    }
+
+    /**
+     * Select and return the earliest future hearings date for Initial Consideration.
+     *
+     * @param hearingDates the list of hearing dates in the case
+     * @return earliest future hearing date
+     */
+    public Optional<LocalDate> getEarliestHearingDateForListedHearings(List<DateListedTypeItem> hearingDates) {
         return hearingDates.stream()
-            .filter(dateListedTypeItem -> dateListedTypeItem != null && dateListedTypeItem.getValue() != null)
-            .map(DateListedTypeItem::getValue)
-            .filter(hearingDate -> hearingDate.getListedDate() != null && !hearingDate.getListedDate().isEmpty())
-            .map(hearingDateItem -> LocalDateTime.parse(hearingDateItem.getListedDate()).toLocalDate())
-            .min(Comparator.naturalOrder());
+        .filter(dateListedTypeItem -> dateListedTypeItem != null && dateListedTypeItem.getValue() != null
+            && HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus())
+            && LocalDateTime.parse(dateListedTypeItem.getValue().getListedDate())
+            .toLocalDate().isAfter(LocalDate.now()))
+        .map(DateListedTypeItem::getValue)
+        .filter(hearingDate -> hearingDate.getListedDate() != null && !hearingDate.getListedDate().isEmpty())
+        .map(hearingDateItem -> LocalDateTime.parse(hearingDateItem.getListedDate()).toLocalDate())
+        .min(Comparator.naturalOrder());
     }
 
     /**
@@ -125,7 +150,7 @@ public class InitialConsiderationService {
      * @param jurisdictionCodes the list of jurisdiction codes assigned to the case
      * @return jurisdiction code section
      */
-    public String generateJurisdictionCodesHtml(List<JurCodesTypeItem> jurisdictionCodes) {
+    public String generateJurisdictionCodesHtml(List<JurCodesTypeItem> jurisdictionCodes, String caseTypeId) {
         if (jurisdictionCodes == null) {
             return "";
         }
@@ -140,7 +165,8 @@ public class InitialConsiderationService {
         }
 
         StringBuilder sb = new StringBuilder()
-            .append(JURISDICTION_HEADER);
+            .append(String.format(JURISDICTION_HEADER, caseTypeId.startsWith(ENGLANDWALES_CASE_TYPE_ID)
+                ? CODES_URL_ENGLAND : CODES_URL_SCOTLAND));
 
         validJurisdictionCodes
             .forEach(codeName -> sb.append("<strong>")
@@ -187,6 +213,19 @@ public class InitialConsiderationService {
                 removeEtICHearingAlreadyListedNoValue(caseData);
             }
         }
+    }
+
+    /**
+     * Sets etICHearingAlreadyListed if the case has a hearing listed.
+     * @param caseData data about the current case
+     */
+    public void setIsHearingAlreadyListed(CaseData caseData, String caseTypeId) {
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            return;
+        }
+        caseData.setEtICHearingAlreadyListed(HEARING_MISSING.equals(caseData.getEtInitialConsiderationHearing())
+            ? NO : YES
+        );
     }
 
     private void removeEtIcCanProceedYesValue(CaseData caseData) {

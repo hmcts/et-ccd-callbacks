@@ -53,7 +53,7 @@ public final class PersistentQHelper {
                                               String updateSize, String multipleRefLinkMarkUp) {
         log.info("Case Ref collection: " + ethosCaseRefCollection);
         if (!ethosCaseRefCollection.isEmpty()) {
-            var createUpdatesDto = PersistentQHelper.getCreateUpdatesDto(bulkDetails,
+            CreateUpdatesDto createUpdatesDto = PersistentQHelper.getCreateUpdatesDto(bulkDetails,
                     ethosCaseRefCollection, username, multipleRef, multipleRefLinkMarkUp);
 
             createUpdatesBusSender.sendUpdatesToQueue(
@@ -79,7 +79,7 @@ public final class PersistentQHelper {
                                                     ) {
         log.info("Case Ref collection: " + ethosCaseRefCollection);
         if (!ethosCaseRefCollection.isEmpty()) {
-            var createUpdatesDto = PersistentQHelper.getMultipleCreateUpdatesDto(caseTypeId,
+            CreateUpdatesDto createUpdatesDto = PersistentQHelper.getMultipleCreateUpdatesDto(caseTypeId,
                     jurisdiction, ethosCaseRefCollection, username, multipleRef, confirmation,
                     multipleReferenceLinkMarkUp);
 

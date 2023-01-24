@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import com.google.common.base.Strings;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
@@ -22,17 +24,20 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.LawOfDemeter"})
 public class CaseDataBuilder {
 
     private final CaseData caseData = new CaseData();
@@ -170,8 +175,8 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withJudgment() {
-        var judgementType = new JudgementType();
-        var judgementTypeItem = new JudgementTypeItem();
+        JudgementType judgementType = new JudgementType();
+        JudgementTypeItem judgementTypeItem = new JudgementTypeItem();
         judgementTypeItem.setValue(judgementType);
 
         if (caseData.getJudgementCollection() == null) {
@@ -196,10 +201,10 @@ public class CaseDataBuilder {
         if (caseData.getEccCases() == null) {
             caseData.setEccCases(new ArrayList<>());
         }
-        var eccCases = caseData.getEccCases();
-        var eccCase = new EccCounterClaimType();
+        List<EccCounterClaimTypeItem> eccCases = caseData.getEccCases();
+        EccCounterClaimType eccCase = new EccCounterClaimType();
         eccCase.setCounterClaim(ethosCaseReference);
-        var eccCaseItem = new EccCounterClaimTypeItem();
+        EccCounterClaimTypeItem eccCaseItem = new EccCounterClaimTypeItem();
         eccCaseItem.setValue(eccCase);
         eccCases.add(eccCaseItem);
 
@@ -219,9 +224,9 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withBfAction(String cleared) {
-        var bfAction = new BFActionType();
+        BFActionType bfAction = new BFActionType();
         bfAction.setCleared(cleared);
-        var bfActionItem = new BFActionTypeItem();
+        BFActionTypeItem bfActionItem = new BFActionTypeItem();
         bfActionItem.setValue(bfAction);
 
         caseData.setBfActions(List.of(bfActionItem));
@@ -233,7 +238,7 @@ public class CaseDataBuilder {
     }
 
     public SubmitEvent buildAsSubmitEvent(String state) {
-        var submitEvent = new SubmitEvent();
+        SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         submitEvent.setState(state);
 
@@ -245,7 +250,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDetails buildAsCaseDetails(String caseTypeId, String jurisdiction) {
-        var caseDetails = new CaseDetails();
+        CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseTypeId(caseTypeId);
         caseDetails.setJurisdiction(jurisdiction);
         caseDetails.setCaseData(caseData);
@@ -272,11 +277,45 @@ public class CaseDataBuilder {
         return this;
     }
 
+    /**
+     * Add a ClaimantIndType with a first name, last name, title and preferred title.
+     */
+    public CaseDataBuilder withClaimantIndType(String firstName, String lastName, String title, String preferredTitle) {
+        ClaimantIndType claimantIndType = new ClaimantIndType();
+        claimantIndType.setClaimantFirstNames(firstName);
+        claimantIndType.setClaimantLastName(lastName);
+        claimantIndType.setClaimantTitle(title);
+        claimantIndType.setClaimantPreferredTitle(preferredTitle);
+        caseData.setClaimantIndType(claimantIndType);
+        return this;
+    }
+
+    /**
+     * Add a RepresentativeClaimantType with a name and email.
+     */
+    public CaseDataBuilder withRepresentativeClaimantType(String name, String email) {
+        RepresentedTypeC rep = new RepresentedTypeC();
+        rep.setNameOfRepresentative(name);
+        rep.setRepresentativeEmailAddress(email);
+        caseData.setRepresentativeClaimantType(rep);
+        return this;
+    }
+
     public CaseDataBuilder withClaimantType(String addressLine1, String addressLine2, String addressLine3,
                                             String postTown, String postCode, String country) {
         ClaimantType claimantType = new ClaimantType();
         claimantType.setClaimantAddressUK(
                 createAddress(addressLine1, addressLine2, addressLine3, postTown, null, postCode, country));
+        caseData.setClaimantType(claimantType);
+        return this;
+    }
+
+    /**
+     * Add a ClaimantType with an email.
+     */
+    public CaseDataBuilder withClaimantType(String email) {
+        ClaimantType claimantType = new ClaimantType();
+        claimantType.setClaimantEmailAddress(email);
         caseData.setClaimantType(claimantType);
         return this;
     }
@@ -349,6 +388,49 @@ public class CaseDataBuilder {
     }
 
     /**
+     * Add a respondent with an address and email.
+     */
+    public CaseDataBuilder withRespondentWithAddress(String respondentName, String addressLine1, String addressLine2,
+                                                     String addressLine3, String postTown, String postCode,
+                                                     String country, String responseAcas, String email) {
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName(respondentName);
+        respondentSumType.setRespondentEmail(email);
+        respondentSumType.setRespondentAddress(
+            createAddress(addressLine1, addressLine2, addressLine3, postTown, null, postCode, country));
+
+        if (!Strings.isNullOrEmpty(responseAcas)) {
+            respondentSumType.setRespondentAcas(responseAcas);
+        }
+
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(respondentSumType);
+
+        if (caseData.getRespondentCollection() == null) {
+            caseData.setRespondentCollection(new ArrayList<>());
+        }
+        caseData.getRespondentCollection().add(respondentSumTypeItem);
+        return this;
+    }
+
+    /**
+     * Add a respondent representative with names and an email.
+     */
+    public CaseDataBuilder withRespondentRepresentative(String respondentName, String repName, String email) {
+        RepresentedTypeR item = RepresentedTypeR.builder()
+            .respRepName(respondentName)
+            .nameOfRepresentative(repName)
+            .representativeEmailAddress(email).build();
+        RepresentedTypeRItem itemType = new RepresentedTypeRItem();
+        itemType.setValue(item);
+        if (CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            caseData.setRepCollection(new ArrayList<>());
+        }
+        caseData.getRepCollection().add(itemType);
+        return this;
+    }
+
+    /**
      * Creates an Address object from its properties.
      */
     public Address createAddress(String addressLine1, String addressLine2, String addressLine3,
@@ -377,6 +459,16 @@ public class CaseDataBuilder {
         respondentList.setListItems(List.of(respondent));
         respondentList.setValue(respondent);
         caseData.setEt3ChooseRespondent(respondentList);
+        return this;
+    }
+
+    public CaseDataBuilder withAssignOffice(String selectedOffice) {
+        List<DynamicValueType> tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
+                .map(tribunalOffice ->
+                        DynamicValueType.create(tribunalOffice.getOfficeName(), tribunalOffice.getOfficeName()))
+                .collect(Collectors.toList());
+        caseData.setAssignOffice(DynamicFixedListType.from(tribunalOffices));
+        caseData.getAssignOffice().setValue(DynamicValueType.create(selectedOffice, selectedOffice));
         return this;
     }
 }

@@ -3,10 +3,12 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.venues;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FileLocationFixedListSheetImporter;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FixedListSheetImporter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FixedListSheetReader;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.FixedListSheetReaderException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.fixedlistsheetreader.VenueFixedListSheetImporter;
@@ -45,30 +47,32 @@ public class VenueImportService {
 
     @Transactional
     public void importVenues(AdminData adminData, String userToken) throws IOException, FixedListSheetReaderException {
-        var workbook = getWorkbook(adminData, userToken);
-        var tribunalOffice = TribunalOffice.valueOfOfficeName(adminData.getVenueImport().getVenueImportOffice());
-        var sheetImporters = List.of(venueFixedListSheetImporter, fileLocationFixedListSheetImporter);
-        var sheetReader = FixedListSheetReader.create(sheetImporters);
+        TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(
+            adminData.getVenueImport().getVenueImportOffice());
+        List<FixedListSheetImporter> sheetImporters = List.of(
+            venueFixedListSheetImporter, fileLocationFixedListSheetImporter);
+        FixedListSheetReader sheetReader = FixedListSheetReader.create(sheetImporters);
 
-        var importOffices = new ArrayList<TribunalOffice>();
+        List<TribunalOffice> importOffices = new ArrayList<>();
         if (TribunalOffice.SCOTLAND.equals(tribunalOffice)) {
             importOffices.addAll(TribunalOffice.SCOTLAND_OFFICES);
         } else {
             importOffices.add(tribunalOffice);
         }
 
-        for (var office : importOffices) {
-            sheetReader.handle(office, workbook);
+        try (XSSFWorkbook workbook = getWorkbook(adminData, userToken)) {
+            for (TribunalOffice office : importOffices) {
+                sheetReader.handle(office, workbook);
+            }
         }
-        workbook.close();
 
-        var user = userService.getUserDetails(userToken);
+        UserDetails user = userService.getUserDetails(userToken);
         adminData.getVenueImport().getVenueImportFile().setUser(user.getName());
         adminData.getVenueImport().getVenueImportFile().setLastImported(LocalDateTime.now().toString());
     }
 
     private XSSFWorkbook getWorkbook(AdminData adminData, String userToken) throws IOException {
-        var documentUrl = adminData.getVenueImport().getVenueImportFile().getFile().getBinaryUrl();
+        String documentUrl = adminData.getVenueImport().getVenueImportFile().getFile().getBinaryUrl();
         return excelReadingService.readWorkbook(userToken, documentUrl);
     }
 }

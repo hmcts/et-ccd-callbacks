@@ -23,21 +23,21 @@ public class ClerkService {
     }
 
     public void initialiseClerkResponsible(CaseData caseData) {
-        var tribunalOffice = TribunalOffice.getOfficeForReferenceData(
+        TribunalOffice tribunalOffice = TribunalOffice.getOfficeForReferenceData(
                 TribunalOffice.valueOfOfficeName(caseData.getManagingOffice()));
-        var listItems = courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
+        List<DynamicValueType> listItems = courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
                 CourtWorkerType.CLERK);
-        var selectedClerk = caseData.getClerkResponsible();
+        DynamicFixedListType selectedClerk = caseData.getClerkResponsible();
 
         caseData.setClerkResponsible(DynamicFixedListType.from(listItems, selectedClerk));
     }
 
     public void initialiseClerkResponsible(MultipleData multipleData) {
-        var tribunalOffice = TribunalOffice.getOfficeForReferenceData(
+        TribunalOffice tribunalOffice = TribunalOffice.getOfficeForReferenceData(
                 TribunalOffice.valueOfOfficeName(multipleData.getManagingOffice()));
-        var listItems = courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
+        List<DynamicValueType> listItems = courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
                 CourtWorkerType.CLERK);
-        var selectedClerk = multipleData.getClerkResponsible();
+        DynamicFixedListType selectedClerk = multipleData.getClerkResponsible();
 
         multipleData.setClerkResponsible(DynamicFixedListType.from(listItems, selectedClerk));
     }
@@ -48,7 +48,7 @@ public class ClerkService {
             listItems = courtWorkerService.getCourtWorkerByTribunalOffice(TribunalOffice.SCOTLAND,
                     CourtWorkerType.CLERK);
         } else {
-            var tribunalOffice = TribunalOffice.valueOfOfficeName(listingData.getManagingOffice());
+            TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(listingData.getManagingOffice());
             listItems = courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice, CourtWorkerType.CLERK);
         }
 

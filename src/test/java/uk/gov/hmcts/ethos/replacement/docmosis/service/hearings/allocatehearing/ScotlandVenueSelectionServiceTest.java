@@ -100,7 +100,7 @@ public class ScotlandVenueSelectionServiceTest {
     }
 
     private DateListedType createSelectedListing(TribunalOffice tribunalOffice, DynamicFixedListType selectedValue) {
-        var dateListedType = new DateListedType();
+        DateListedType dateListedType = new DateListedType();
         switch (tribunalOffice) {
             case ABERDEEN:
                 dateListedType.setHearingAberdeen(selectedValue);
@@ -127,10 +127,10 @@ public class ScotlandVenueSelectionServiceTest {
     }
 
     private VenueService mockVenueService() {
-        var venueService = mock(VenueService.class);
+        VenueService venueService = mock(VenueService.class);
 
         for (TribunalOffice tribunalOffice : TribunalOffice.SCOTLAND_OFFICES) {
-            var venues = SelectionServiceTestUtils.createListItems(tribunalOffice.getOfficeName(),
+            List<DynamicValueType> venues = SelectionServiceTestUtils.createListItems(tribunalOffice.getOfficeName(),
                     tribunalOffice.getOfficeName() + " ");
             when(venueService.getVenues(tribunalOffice)).thenReturn(venues);
         }
@@ -141,9 +141,9 @@ public class ScotlandVenueSelectionServiceTest {
     private CaseData createCaseDataWithHearings() {
         CaseData caseData = new CaseData();
         caseData.setHearingCollection(new ArrayList<>());
-        for (var i = 0; i < 3; i++) {
-            var hearingType = new HearingType();
-            var hearingTypeItem = new HearingTypeItem();
+        for (int i = 0; i < 3; i++) {
+            HearingType hearingType = new HearingType();
+            HearingTypeItem hearingTypeItem = new HearingTypeItem();
             hearingTypeItem.setValue(hearingType);
             caseData.getHearingCollection().add(hearingTypeItem);
         }
@@ -155,17 +155,17 @@ public class ScotlandVenueSelectionServiceTest {
                                                                 DynamicValueType selectedDundee,
                                                                 DynamicValueType selectedEdinburgh,
                                                                 DynamicValueType selectedGlasgow) {
-        var caseData = new CaseData();
+        CaseData caseData = new CaseData();
         caseData.setHearingCollection(new ArrayList<>());
-        for (var i = 0; i < 3; i++) {
-            var hearingType = new HearingType();
+        for (int i = 0; i < 3; i++) {
+            HearingType hearingType = new HearingType();
 
             hearingType.setHearingAberdeen(DynamicFixedListType.of(selectedAberdeen));
             hearingType.setHearingDundee(DynamicFixedListType.of(selectedDundee));
             hearingType.setHearingEdinburgh(DynamicFixedListType.of(selectedEdinburgh));
             hearingType.setHearingGlasgow(DynamicFixedListType.of(selectedGlasgow));
 
-            var hearingTypeItem = new HearingTypeItem();
+            HearingTypeItem hearingTypeItem = new HearingTypeItem();
             hearingTypeItem.setValue(hearingType);
             caseData.getHearingCollection().add(hearingTypeItem);
         }
@@ -174,7 +174,7 @@ public class ScotlandVenueSelectionServiceTest {
     }
 
     private void verifyNoSelectedVenue(List<HearingTypeItem> hearings) {
-        for (var hearingTypeItem : hearings) {
+        for (HearingTypeItem hearingTypeItem : hearings) {
             assertNull(hearingTypeItem.getValue().getHearingAberdeen().getValue());
             assertNull(hearingTypeItem.getValue().getHearingAberdeen().getSelectedCode());
             assertNull(hearingTypeItem.getValue().getHearingAberdeen().getSelectedLabel());
@@ -196,7 +196,7 @@ public class ScotlandVenueSelectionServiceTest {
     private void verifySelectedVenues(List<HearingTypeItem> hearings, DynamicValueType selectedAberdeen,
                                       DynamicValueType selectedDundee, DynamicValueType selectedEdinburgh,
                                       DynamicValueType selectedGlasgow) {
-        for (var hearingTypeItem : hearings) {
+        for (HearingTypeItem hearingTypeItem : hearings) {
             verifySelectedVenue(hearingTypeItem.getValue().getHearingAberdeen(), selectedAberdeen);
             verifySelectedVenue(hearingTypeItem.getValue().getHearingDundee(), selectedDundee);
             verifySelectedVenue(hearingTypeItem.getValue().getHearingEdinburgh(), selectedEdinburgh);
@@ -213,8 +213,8 @@ public class ScotlandVenueSelectionServiceTest {
     }
 
     private void verifyVenueListItems(List<HearingTypeItem> hearings) {
-        for (var hearing : hearings) {
-            var hearingType = hearing.getValue();
+        for (HearingTypeItem hearing : hearings) {
+            HearingType hearingType = hearing.getValue();
             SelectionServiceTestUtils.verifyListItems(hearingType.getHearingAberdeen().getListItems(),
                     TribunalOffice.ABERDEEN.getOfficeName(), TribunalOffice.ABERDEEN.getOfficeName() + " ");
             SelectionServiceTestUtils.verifyListItems(hearingType.getHearingDundee().getListItems(),

@@ -53,7 +53,7 @@ public final class HearingsToJudgmentsReportData extends ListingData {
     }
 
     public StringBuilder toReportObjectString() throws JsonProcessingException {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(REPORT_OFFICE).append(reportSummary.getOffice()).append(NEW_LINE);
         sb.append(TOTAL_CASES).append(
                 StringUtils.defaultString(reportSummary.getTotalCases(), "0")).append(NEW_LINE);

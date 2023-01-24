@@ -7,6 +7,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DIGITAL_FILE;
@@ -54,8 +55,8 @@ public class FlagsImageHelper {
     }
 
     public static void buildFlagsImageFileName(String caseTypeId, CaseData caseData) {
-        var flagsImageFileName = new StringBuilder();
-        var flagsImageAltText = new StringBuilder();
+        StringBuilder flagsImageFileName = new StringBuilder();
+        StringBuilder flagsImageAltText = new StringBuilder();
 
         flagsImageFileName.append(IMAGE_FILE_PRECEDING);
         setFlagImageFor(FLAG_WITH_OUTSTATION, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
@@ -172,7 +173,7 @@ public class FlagsImageHelper {
         }
 
         for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-            var hearingType = hearingTypeItem.getValue();
+            HearingType hearingType = hearingTypeItem.getValue();
             if (CollectionUtils.isNotEmpty(hearingType.getHearingDateCollection())) {
                 for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
                     String hearingReservedJudgement = dateListedTypeItem.getValue().getHearingReservedJudgement();

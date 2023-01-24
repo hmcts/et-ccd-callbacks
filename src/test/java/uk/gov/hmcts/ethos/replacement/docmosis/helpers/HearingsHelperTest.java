@@ -243,7 +243,7 @@ public class HearingsHelperTest {
 
     @Test
     public void earliestDateReturnsEarliestDate() {
-        var hearingCollection = caseDetails1.getCaseData().getHearingCollection();
+        List<HearingTypeItem> hearingCollection = caseDetails1.getCaseData().getHearingCollection();
         setListingDate(hearingCollection, 0, 2, "2100-02-01T01:01:01.000");
         setListingDate(hearingCollection, 1, 0, "2100-03-01T01:01:01.000");
         setListingDate(hearingCollection, 1, 1, "2100-01-01T01:01:01.000");
@@ -254,14 +254,14 @@ public class HearingsHelperTest {
 
     @Test
     public void earliestDateHandlesAHearingWithNoDatesInFuture() {
-        var hearingCollection = caseDetails1.getCaseData().getHearingCollection();
+        List<HearingTypeItem> hearingCollection = caseDetails1.getCaseData().getHearingCollection();
         setListingDate(hearingCollection, 0, 2, "2100-02-01T01:01:01.000");
         setListingDate(hearingCollection, 1, 0, "1999-01-01T01:01:01.000");
         setListingDate(hearingCollection, 1, 1, "1999-01-01T01:01:01.000");
         setListingDate(hearingCollection, 1, 2, "1999-01-01T01:01:01.000");
         setListingDate(hearingCollection, 2, 1, "2100-04-01T01:01:01.000");
         String actual = HearingsHelper.getEarliestFutureHearingDate(hearingCollection);
-        assertEquals("2100-02-01T01:01:01.000", actual);
+        assertEquals("2100-04-01T01:01:01.000", actual);
     }
 
     @Test

@@ -59,7 +59,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_STAFF;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_SETTLED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_VACATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_WITHDRAWN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_MEDIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_MEDIATION_TCC;
@@ -101,6 +100,7 @@ public class ListingService {
     private static final String MESSAGE = "Failed to generate document for case id : ";
     public static final String ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND =
             "data.hearingCollection.value.Hearing_venue_Scotland";
+    public static final String HEARING_STATUS_VACATED = "Vacated";
 
     public ListingData listingCaseCreation(ListingDetails listingDetails) {
 

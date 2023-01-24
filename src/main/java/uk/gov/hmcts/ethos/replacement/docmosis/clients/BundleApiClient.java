@@ -19,7 +19,7 @@ public interface BundleApiClient {
             @RequestBody BundleCreateRequest bundleCreateRequest
             );
 
-    @PostMapping(value = "api/stitch-new-bundle", consumes = "application/json")
+    @PostMapping(value = "api/stitch-ccd-bundles", consumes = "application/json")
     BundleCreateResponse stitchBundle(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
             @RequestHeader("ServiceAuthorization") String serviceAuthorization,

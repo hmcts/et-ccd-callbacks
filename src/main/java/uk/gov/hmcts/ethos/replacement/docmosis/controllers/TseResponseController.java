@@ -42,11 +42,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class TseResponseController {
 
-    @Value("${tseRespondentResponse.template.id}")
+    @Value("${tse.respondent.respond.notify.claimant.template.id}")
     private String emailTemplateId;
-    @Value("${tseRespondentAcknowledgementRule92No.template.id}")
+    @Value("${tse.respondent.respond.acknowledgement.rule92no.template.id}")
     private String acknowledgementRule92NoEmailTemplateId;
-    @Value("${tseRespondentAcknowledgementRule92Yes.template.id}")
+    @Value("${tse.respondent.respond.acknowledgement.rule92yes.template.id}")
     private String acknowledgementRule92YesEmailTemplateId;
 
     private final VerifyTokenService verifyTokenService;

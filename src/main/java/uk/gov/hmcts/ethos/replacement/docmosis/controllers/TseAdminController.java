@@ -70,6 +70,13 @@ public class TseAdminController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * Record a Decision and send notify emails to claimant and/or respondent
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",

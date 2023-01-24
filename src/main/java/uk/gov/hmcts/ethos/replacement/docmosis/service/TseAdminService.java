@@ -37,9 +37,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelec
 @SuppressWarnings({"squid:S1192", "PMD.AvoidInstantiatingObjectsInLoops"})
 public class TseAdminService {
 
-    @Value("${tse.admin.record-a-decision.claimant.template.id}")
+    @Value("${tse.admin.record-a-decision.notify.claimant.template.id}")
     private String emailToClaimantTemplateId;
-    @Value("${tse.admin.record-a-decision.respondent.template.id}")
+    @Value("${tse.admin.record-a-decision.notify.respondent.template.id}")
     private String emailToRespondentTemplateId;
 
     private final EmailService emailService;

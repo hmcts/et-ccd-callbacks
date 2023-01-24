@@ -41,21 +41,10 @@ public class DocumentDetails {
     Map<String, Map<String, String>> links;
 
     /**
-     * Retrives the link for the document that has been uploaded to dm-store.
+     * Retrieves the link for the document that has been uploaded to dm-store.
      * @return a link to the document uploaded wrapped within a URI object
      */
     public URI getUri() {
         return URI.create(links.get("self").get("href"));
     }
-
-    /**
-     * verifies that the link for the document stored within dm-store exists.
-     * @return a boolean that is true if the document link exists
-     */
-    public boolean verifyUri() {
-        return !(links == null
-                || links.get("self") == null
-                || links.get("self").get("href") == null);
-    }
-
 }

@@ -9,7 +9,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTyp
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 
-@SuppressWarnings({"PMD.CyclomaticComplexity"})
 public final class RespondentTellSomethingElseHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();

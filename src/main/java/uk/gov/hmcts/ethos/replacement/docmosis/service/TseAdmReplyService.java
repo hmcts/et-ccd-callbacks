@@ -36,9 +36,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelec
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.AvoidInstantiatingObjectsInLoops"})
 public class TseAdmReplyService {
 
-    @Value("${tse.admin.reply.claimant.template.id}")
+    @Value("${tse.admin.reply.notify.claimant.template.id}")
     private String emailToClaimantTemplateId;
-    @Value("${tse.admin.reply.respondent.template.id}")
+    @Value("${tse.admin.reply.notify.respondent.template.id}")
     private String emailToRespondentTemplateId;
 
     private final EmailService emailService;

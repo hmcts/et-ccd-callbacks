@@ -34,15 +34,14 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.OPEN;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.GodClass", "PMD.CyclomaticComplexity", "PMD.LawOfDemeter", "PMD.UselessParentheses"})
 public class RespondentTellSomethingElseService {
     private final EmailService emailService;
     private final UserService userService;
     private final TornadoService tornadoService;
 
-    @Value("${respondent.tse.template.id}")
+    @Value("${tse.respondent.application.acknowledgement.template.id}")
     private String emailTemplateId;
-    @Value("${claimant.tse.template.id}")
+    @Value("${tse.respondent.application.notify.claimant.template.id}")
     private String claimantTemplateId;
 
     private static final String APPLICANT_RESPONDENT = "Respondent";
@@ -62,8 +61,7 @@ public class RespondentTellSomethingElseService {
         + "to the other party. \n \n"
         + "The tribunal will consider all correspondence and let you know what happens next.";
     private static final String RULE92_ANSWERED_YES_GROUP_A = "The other party will be notified that any objections to "
-        + "your %s application should be sent to the tribunal as soon as possible, and in any event "
-        + "within 7 days.";
+        + "your %s application should be sent to the tribunal as soon as possible, and in any event within 7 days.";
     private static final String RULE92_ANSWERED_YES_GROUP_B = "The other party is not expected to respond to this "
         + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
@@ -128,6 +126,10 @@ public class RespondentTellSomethingElseService {
         emailService.sendEmail(emailTemplateId, email, buildPersonalisation(caseDetails, customisedText));
     }
 
+    /**
+     * Uses {@link EmailService} to generate an email to Claimant.
+     * @param caseDetails in which the case details are extracted from
+     */
     public void sendClaimantEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
 
@@ -159,7 +161,7 @@ public class RespondentTellSomethingElseService {
         }
     }
 
-    public Map<String, String> buildPersonalisation(CaseDetails detail, String customisedText) {
+    private Map<String, String> buildPersonalisation(CaseDetails detail, String customisedText) {
         CaseData caseData = detail.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
@@ -284,6 +286,10 @@ public class RespondentTellSomethingElseService {
         return caseData.getGenericTseApplicationCollection().size() + 1;
     }
 
+    /**
+     * Create a table markdown of all the Respondent and Claimant applications.
+     * @param caseData contains the Application collection
+     */
     public String generateTableMarkdown(CaseData caseData) {
         List<GenericTseApplicationTypeItem> genericApplicationList = caseData.getGenericTseApplicationCollection();
         if (genericApplicationList == null) {
@@ -307,6 +313,5 @@ public class RespondentTellSomethingElseService {
             .collect(Collectors.joining());
 
         return String.format(TABLE_COLUMNS_MARKDOWN, tableRowsMarkdown);
-
     }
 }

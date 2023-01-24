@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_OP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_SH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_ST;
@@ -389,9 +389,14 @@ public class Et1VettingService {
     }
 
     public String getAddressesHtml(CaseData caseData) {
+        String claimantWorkAddress = "";
+        if (caseData.getClaimantWorkAddressQuestion() != null
+                && NO.equals(caseData.getClaimantWorkAddressQuestion())) {
+            claimantWorkAddress = toAddressWithTab(caseData.getClaimantWorkAddress().getClaimantWorkAddress());
+        }
         return String.format(CLAIMANT_AND_RESPONDENT_ADDRESSES,
             toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()),
-            toAddressWithTab(caseData.getClaimantWorkAddress().getClaimantWorkAddress()),
+            claimantWorkAddress,
             toAddressWithTab(caseData.getRespondentCollection().get(0).getValue().getRespondentAddress())
         );
     }

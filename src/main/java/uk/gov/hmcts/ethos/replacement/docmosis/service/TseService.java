@@ -90,7 +90,7 @@ public class TseService {
 
     private void assignDataToFieldsFromApplicationType(GenericTseApplicationType respondentTseType, CaseData caseData) {
         RespondentTSEApplicationTypeData selectedAppData =
-            RespondentTellSomethingElseHelper.getSelectedAppAppType(caseData);
+            RespondentTellSomethingElseHelper.getSelectedApplicationType(caseData);
         if (selectedAppData != null) {
             respondentTseType.setDetails(selectedAppData.getSelectedTextBox());
             respondentTseType.setDocumentUpload(selectedAppData.getResTseDocument());

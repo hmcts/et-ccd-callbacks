@@ -10,8 +10,7 @@ module.exports = async function () {
     I.fillField('#dateRejected-year', commonConfig.caseAcceptedYear);
     I.checkOption('#preAcceptCase_rejectReason-Not\\ on\\ Prescribed\\ Form');
     I.click(commonConfig.continue);
-    //await I.runAccessibilityTest(); //TBC
-    I.waitForClickable(commonConfig.submit);
+    I.waitForText('Accept/Reject Case');
     I.click(commonConfig.submit);
 };
 

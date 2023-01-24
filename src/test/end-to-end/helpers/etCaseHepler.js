@@ -221,7 +221,6 @@ async function processCaseToSubmittedState() {
     //Getting the User Id based on the Authentication Token that is passed for this User.
     const userId = await getUserDetails(authToken);
     const case_id = await createACase(authToken, serviceToken, userId);
-    await performCaseVettingEvent(authToken, serviceToken, case_id);
     //Navigate to the Case Detail Page
     await navigateToCaseDetailsScreen(case_id);
     return case_id;

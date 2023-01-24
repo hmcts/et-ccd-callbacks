@@ -40,9 +40,9 @@ public class RespondentTellSomethingElseService {
     private final UserService userService;
     private final TornadoService tornadoService;
 
-    @Value("${respondent.tse.template.id}")
+    @Value("${tse.respondent.to.respondent.template.id}")
     private String emailTemplateId;
-    @Value("${claimant.tse.template.id}")
+    @Value("${tse.respondent.to.claimant.template.id}")
     private String claimantTemplateId;
 
     private static final String APPLICANT_RESPONDENT = "Respondent";

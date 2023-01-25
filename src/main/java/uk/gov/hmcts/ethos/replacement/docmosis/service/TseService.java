@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.OPEN;
 
 @Slf4j
@@ -25,10 +27,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.OPEN;
 @SuppressWarnings({"PMD.GodClass", "PMD.CyclomaticComplexity", "PMD.LawOfDemeter"})
 public class TseService {
     private final DocumentManagementService documentManagementService;
-
-    private static final String APPLICANT_RESPONDENT = "Respondent";
-    private static final String APPLICANT_CLAIMANT = "Claimant";
-
     /**
      * Creates a new TSE collection if it doesn't exist.
      * Create a new application in the list and assign the TSE data from CaseData to it.
@@ -68,7 +66,7 @@ public class TseService {
     }
 
     private void addClaimantData(CaseData caseData, GenericTseApplicationType application) {
-        application.setApplicant(APPLICANT_CLAIMANT);
+        application.setApplicant(CLAIMANT_TITLE);
 
         ClaimantTse claimantTse = caseData.getClaimantTse();
         application.setType(claimantTse.getContactApplicationType());
@@ -79,7 +77,7 @@ public class TseService {
     }
 
     private void addRespondentData(CaseData caseData, GenericTseApplicationType application) {
-        application.setApplicant(APPLICANT_RESPONDENT);
+        application.setApplicant(RESPONDENT_TITLE);
         assignDataToFieldsFromApplicationType(application, caseData);
         application.setType(caseData.getResTseSelectApplication());
         application.setCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());

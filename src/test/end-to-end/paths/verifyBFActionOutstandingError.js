@@ -10,5 +10,4 @@ Scenario('Verify Close Case B/F Outstanding Actions Error Message', async ({I}) 
     console.log("... case id =>" +caseId);
     await bfActionsOutstanding(I, eventNames.BF_ACTION);
 
-}).tag('@wip');
-    //.retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);

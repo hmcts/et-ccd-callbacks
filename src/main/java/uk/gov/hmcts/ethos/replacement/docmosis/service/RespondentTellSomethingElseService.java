@@ -288,6 +288,7 @@ public class RespondentTellSomethingElseService {
      * Create a table markdown of all the Respondent and Claimant applications.
      * @param caseData contains the Application collection
      */
+    @SuppressWarnings({"PMD.UselessParentheses"})
     public String generateTableMarkdown(CaseData caseData) {
         List<GenericTseApplicationTypeItem> genericApplicationList = caseData.getGenericTseApplicationCollection();
         if (genericApplicationList == null || genericApplicationList.isEmpty()) {

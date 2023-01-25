@@ -288,29 +288,36 @@ public class RespondentTellSomethingElseService {
      * Create a table markdown of all the Respondent and Claimant applications.
      * @param caseData contains the Application collection
      */
-    @SuppressWarnings({"PMD.UselessParentheses"})
     public String generateTableMarkdown(CaseData caseData) {
         List<GenericTseApplicationTypeItem> genericApplicationList = caseData.getGenericTseApplicationCollection();
-        if (genericApplicationList == null || genericApplicationList.isEmpty()) {
+        if (CollectionUtils.isEmpty(genericApplicationList)) {
             return "";
         }
 
-        AtomicInteger atomicInteger = new AtomicInteger(1);
+        AtomicInteger applicationNumber = new AtomicInteger(1);
 
-        // Need to add logic for getting number of responses
-        // For Respondent applications - need to count both claimants and admins responses
-        // For Claimant applications (chosen yes in rule 92) - need to count both respondents and admins responses
-
-        String tableRowsMarkdown = genericApplicationList
-            .stream()
-            .filter(a -> RESPONDENT_TITLE.equals(a.getValue().getApplicant())
-                || (CLAIMANT_TITLE.equals(a.getValue().getApplicant())
-                && RULE92_YES.equals(a.getValue().getCopyToOtherPartyYesOrNo())))
-            .map(a -> String.format(TABLE_ROW_MARKDOWN, atomicInteger.getAndIncrement(), a.getValue().getType(),
-                a.getValue().getApplicant(), a.getValue().getDate(), a.getValue().getDueDate(), 0,
-                Optional.ofNullable(a.getValue().getStatus()).orElse("Open")))
+        String tableRows = genericApplicationList.stream()
+            .filter(this::applicationsSharedWithRespondent)
+            .map(o -> formatRow(o, applicationNumber))
             .collect(Collectors.joining());
 
-        return String.format(TABLE_COLUMNS_MARKDOWN, tableRowsMarkdown);
+        return String.format(TABLE_COLUMNS_MARKDOWN, tableRows);
+    }
+
+    private boolean applicationsSharedWithRespondent(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
+        String applicant = genericTseApplicationTypeItem.getValue().getApplicant();
+        String copyToRespondent = genericTseApplicationTypeItem.getValue().getCopyToOtherPartyYesOrNo();
+        boolean isClaimantAndRule92Shared = CLAIMANT_TITLE.equals(applicant) && RULE92_YES.equals(copyToRespondent);
+
+        return RESPONDENT_TITLE.equals(applicant) || isClaimantAndRule92Shared;
+    }
+
+    private String formatRow(GenericTseApplicationTypeItem genericTseApplicationTypeItem, AtomicInteger count) {
+        GenericTseApplicationType value = genericTseApplicationTypeItem.getValue();
+        int responses = value.getRespondCollection() == null ? 0 : value.getRespondCollection().size();
+        String status = Optional.ofNullable(value.getStatus()).orElse("Open");
+
+        return String.format(TABLE_ROW_MARKDOWN, count.getAndIncrement(), value.getType(), value.getApplicant(),
+            value.getDate(), value.getDueDate(), responses, status);
     }
 }

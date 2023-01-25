@@ -20,6 +20,7 @@ import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -106,13 +107,14 @@ public final class TseHelper {
         }
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
-            .filter(r -> r.getValue().getRespondCollection() == null
-                && r.getValue().getStatus() != null
-                && !CLOSED.equals(r.getValue().getStatus())
-            ).map(r -> DynamicValueType.create(
-                r.getValue().getNumber(),
-                r.getValue().getNumber() + " " + r.getValue().getType())
-            ).collect(Collectors.toList()));
+            .filter(o -> !CLOSED.equals(o.getValue().getStatus()))
+            .map(TseHelper::formatDropdownOption)
+            .collect(Collectors.toList()));
+    }
+
+    private static DynamicValueType formatDropdownOption(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
+        GenericTseApplicationType value = genericTseApplicationTypeItem.getValue();
+        return DynamicValueType.create(value.getNumber(), String.format("%s %s", value.getNumber(), value.getType()));
     }
 
     /**
@@ -169,7 +171,12 @@ public final class TseHelper {
         }
 
         GenericTseApplicationType genericTseApplicationType = getSelectedApplication(caseData);
-        genericTseApplicationType.setRespondCollection(List.of(TseRespondTypeItem.builder()
+
+        if (CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
+            genericTseApplicationType.setRespondCollection(new ArrayList<>());
+        }
+
+        genericTseApplicationType.getRespondCollection().add(TseRespondTypeItem.builder()
             .id(UUID.randomUUID().toString())
             .value(
                 TseRespondType.builder()
@@ -181,9 +188,11 @@ public final class TseHelper {
                     .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
                     .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
                     .build()
-            ).build()));
-        // TODO: This will need changing when we support admin decisions
-        genericTseApplicationType.setResponsesCount("1");
+            ).build());
+
+        genericTseApplicationType.setResponsesCount(
+            String.valueOf(genericTseApplicationType.getRespondCollection().size())
+        );
     }
 
     /**

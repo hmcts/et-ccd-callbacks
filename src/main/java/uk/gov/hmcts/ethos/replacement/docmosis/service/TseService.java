@@ -27,6 +27,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.OPEN;
 @SuppressWarnings({"PMD.GodClass", "PMD.CyclomaticComplexity", "PMD.LawOfDemeter"})
 public class TseService {
     private final DocumentManagementService documentManagementService;
+
     /**
      * Creates a new TSE collection if it doesn't exist.
      * Create a new application in the list and assign the TSE data from CaseData to it.
@@ -88,7 +89,7 @@ public class TseService {
 
     private void assignDataToFieldsFromApplicationType(GenericTseApplicationType respondentTseType, CaseData caseData) {
         RespondentTSEApplicationTypeData selectedAppData =
-            RespondentTellSomethingElseHelper.getSelectedAppAppType(caseData);
+            RespondentTellSomethingElseHelper.getSelectedApplicationType(caseData);
         if (selectedAppData != null) {
             respondentTseType.setDetails(selectedAppData.getSelectedTextBox());
             respondentTseType.setDocumentUpload(selectedAppData.getResTseDocument());

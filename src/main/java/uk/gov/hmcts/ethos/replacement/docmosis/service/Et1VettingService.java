@@ -70,7 +70,8 @@ public class Et1VettingService {
         + "<br><pre>Work address &#09&#09&#09 %s</pre><hr>"
         + "<h3>Respondent</h3>"
         + "<pre>Contact address &#09&#09 %s</pre><hr>";
-    private static final String CLAIMANT_AND_RESPONDENT_ADDRESSES_WITHOUT_WORK_ADDRESS = "<hr><h2>Listing details<hr><h3>Claimant</h3>"
+    private static final String CLAIMANT_AND_RESPONDENT_ADDRESSES_WITHOUT_WORK_ADDRESS = 
+            "<hr><h2>Listing details<hr><h3>Claimant</h3>"
             + "<pre>Contact address &#09&#09 %s</pre>"
             + "<hr><h3>Respondent</h3>"
             + "<pre>Contact address &#09&#09 %s</pre><hr>";

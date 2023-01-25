@@ -12,7 +12,4 @@ Scenario('Verify Letters', async ({I}) => {
 
     await letters(I, eventNames.LETTERS);
 
-}).tag('@e2e')
-    .tag('@nightly')
-    .tag('@wip');
-    //.retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);

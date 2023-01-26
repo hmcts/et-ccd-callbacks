@@ -41,18 +41,11 @@ module.exports = async function () {
     I.fillField('#responseReceivedDate-day', commonConfig.caseAcceptedDay);
     I.fillField('#responseReceivedDate-month', commonConfig.caseAcceptedMonth);
     I.fillField('#responseReceivedDate-year', commonConfig.caseAcceptedYear);
-    //I.see('05');
-    //I.see('05');
-    //I.see('2021');
-    //I.see('Title(Optional)');
-    //I.see('Reference(Optional)');
-    //I.see('Response Struck Out (Optional)');
+    //I.seeInField('#responseReceivedDate-day', '05');
+    //I.seeInField('#responseReceivedDate-month', '05');
+    //I.seeInField('#responseReceivedDate-year', '2021');
     I.click('#respondentCollection_0_responseStruckOut_No');
-    //I.see('Response (Optional)');
-    //I.see('Notes (Optional)');
 
-    //I.see('Dates referred to Judge (Optional)');
-    //I.see('Dates returned from Judge (Optional)');
 
     I.see('Respondent Address (from the ET3 form)');
     I.see('Enter a UK postcode');
@@ -64,26 +57,35 @@ module.exports = async function () {
     I.waitForText(commonConfig.respondentAddress, testConfig.TestTimeToWaitForText);
     I.selectOption('#respondentCollection_0_responseRespondentAddress_responseRespondentAddress_addressList', commonConfig.respondentAddress);
     I.see('Building and Street');
+    I.seeInField('Building and Street', '78 East Wonford Hill');
     I.see('Address Line 2 (Optional)');
     I.see('Address Line 3 (Optional)');
     I.see('Town or City (Optional)');
+    I.seeInField('Town or City (Optional)', 'Exeter');
     I.see('County (Optional)');
     I.see('Country (Optional)');
+    I.seeInField('Country (Optional)', 'United Kingdom');
     I.see('Postcode');
-    //I.seeInField('Postcode', 'EX1 3DD');
-    //I.seeInField({css: 'respondentCollection_0_respondent_address__detailPostCode'}, 'E14 3XA');
-    //I.click({css: 'nav.user .user-login'});
+  
     
-    //const firstValue = await I.grabValueFrom("//ccd-field-write[32]//ccd-field-write[7]//input[@class='form-control bottom-30 ng-pristine ng-valid ng-touched']");
-    //console.log(firstValue);
     I.see('Phone number (from the ET3 form) (Optional)');
     I.see('Alternative number (from the ET3 form) (Optional)');
     I.see('Email address (from the ET3 form) (Optional)');
     I.see('Contact preference (from the ET3 form) (Optional)');
+    
+    I.see('Is the claim against this Respondent continuing?');
+    I.see('Has there been a request for an extension? (Optional)');
+    I.click('#respondentCollection_0_extensionRequested_No');
+    I.see('Has the ET3 form been received?');
+    I.click('#respondentCollection_0_responseReceived_Yes');
+    I.see('Response received date');
+    I.seeInField('#responseReceivedDate-day', '05')
+    I.seeInField('#responseReceivedDate-month', '05')
+    I.seeInField('#responseReceivedDate-year', '2021')
+    I.see('Response Struck Out (Optional)');
+    I.click('#respondentCollection_0_responseStruckOut_Yes');
 
+    
     I.click(commonConfig.continue);
-    I.click(commonConfig.submit)
-
-    //Final Confirmation
-    I.waitForText('has been updated with event: Respondent Details'), testConfig.TestTimeToWaitForText;
+    I.click(commonConfig.submit);
 };

@@ -48,5 +48,6 @@ module.exports = async function () {
     I.click(commonConfig.continue);
     I.click(commonConfig.submit)
 
+    //Final Confirmation
     I.waitForText('has been updated with event: Respondent Details'), testConfig.TestTimeToWaitForText;
 };

@@ -135,8 +135,9 @@ public final class Helper {
             if (caseData.getRespondentCollection().size() == 1
                     && YES.equals(caseData.getRespondentCollection().get(0).getValue().getResponseStruckOut())
                     && YES.equals(caseData.getRespondentCollection().get(0).getValue().getResponseReceived())
-                    && !Strings.isNullOrEmpty(caseData.getRespondentCollection().get(0).getValue().getResponseReceivedDate())) {
-                 return caseData.getRespondentCollection();
+                    && !Strings.isNullOrEmpty(caseData.getRespondentCollection().get(0)
+                    .getValue().getResponseReceivedDate())) {
+                return caseData.getRespondentCollection();
             }
         }
         return activeRespondents;

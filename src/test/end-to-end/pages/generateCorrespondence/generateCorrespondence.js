@@ -5,6 +5,9 @@ const testConfig = require("../../../config");
 module.exports = async function () {
 
     const I = this;
+    //Before Letters Page Starts
+    I.waitForText('Letters', testConfig.TestTimeToWaitForText);
+    I.see('Case Number:')
     I.see('List of correspondence items');
     I.see('Top Level');
     I.waitForText(commonConfig.lettersCorrespondence, testConfig.TestTimeToWaitForText);
@@ -14,4 +17,6 @@ module.exports = async function () {
     I.see('Letters');
     I.click(commonConfig.continue);
     I.click(commonConfig.submit)
+    //After submitting letters
+    I.see('Please download the document from : ')
 };

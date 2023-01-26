@@ -34,12 +34,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelec
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("squid:S1192")
+@SuppressWarnings({"squid:S1192", "PMD.AvoidInstantiatingObjectsInLoops"})
 public class TseAdminService {
 
-    @Value("${tse.admin.record-a-decision.claimant.template.id}")
+    @Value("${tse.admin.record-a-decision.notify.claimant.template.id}")
     private String emailToClaimantTemplateId;
-    @Value("${tse.admin.record-a-decision.respondent.template.id}")
+    @Value("${tse.admin.record-a-decision.notify.respondent.template.id}")
     private String emailToRespondentTemplateId;
 
     private final EmailService emailService;
@@ -63,7 +63,7 @@ public class TseAdminService {
         + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
         + "\r\n";
 
-    private static final String CLOSE_APP_DECISION_DETAILS = "| | |\r\n"
+    private static final String CLOSE_APP_DECISION_DETAILS = "|Decision | |\r\n"
         + "|--|--|\r\n"
         + "|Notification | %s|\r\n"
         + "|Decision | %s|\r\n"
@@ -109,7 +109,7 @@ public class TseAdminService {
     }
 
     private String initialTseAdminRespondDetails(GenericTseApplicationType applicationType, String authToken) {
-        if (applicationType.getRespondCollection() == null) {
+        if (CollectionUtils.isEmpty(applicationType.getRespondCollection())) {
             return "";
         }
         IntWrapper respondCount = new IntWrapper(0);
@@ -129,7 +129,7 @@ public class TseAdminService {
     }
 
     private String populateListDocWithInfoAndLink(List<DocumentTypeItem> supportingMaterial, String authToken) {
-        if (supportingMaterial == null) {
+        if (CollectionUtils.isEmpty(supportingMaterial)) {
             return "";
         }
         return supportingMaterial.stream()
@@ -198,9 +198,10 @@ public class TseAdminService {
         // if respondent only or both parties: send Respondents Decision Emails
         if (RESPONDENT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
                 || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
+            TSEAdminEmailRecipientsData respondentDetails;
             for (RespondentSumTypeItem respondentSumTypeItem: caseData.getRespondentCollection()) {
                 if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
-                    TSEAdminEmailRecipientsData respondentDetails =
+                    respondentDetails =
                         new TSEAdminEmailRecipientsData(
                             emailToRespondentTemplateId,
                             respondentSumTypeItem.getValue().getRespondentEmail());
@@ -215,8 +216,7 @@ public class TseAdminService {
         if (CLAIMANT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
                 || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
-            String claimantName = caseData.getClaimantIndType().getClaimantFirstNames()
-                + " " + caseData.getClaimantIndType().getClaimantLastName();
+            String claimantName = caseData.getClaimantIndType().claimantFullNames();
 
             if (claimantEmail != null) {
                 TSEAdminEmailRecipientsData claimantDetails =
@@ -268,6 +268,9 @@ public class TseAdminService {
     //  display decision's document link (currently not sure if it is a list or just a single decision to display)
     //  display responses from admin and/or claimant/respondent
     public String generateCloseApplicationDetailsMarkdown(CaseData caseData, String authToken) {
+        if (getSelectedApplicationTypeItem(caseData) == null) {
+            return null;
+        }
         GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
         String decisionsMarkdown = "";
         if (applicationTypeItem.getValue().getAdminDecision() != null) {

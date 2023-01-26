@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 @Slf4j
 class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctionalTest {
-    private static final String AUTHORIZATION = "Authorization";
     private static final String NO = "I do not want to copy";
 
     private static final String APPLICANT_RESPONDENT = "Respondent";

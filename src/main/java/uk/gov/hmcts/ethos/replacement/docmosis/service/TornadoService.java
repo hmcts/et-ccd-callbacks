@@ -48,12 +48,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 @Slf4j
 @RequiredArgsConstructor
 @Service("tornadoService")
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.LawOfDemeter", "PMD.AvoidThrowingNullPointerException",
-    "PMD.ExcessiveImports", "PMD.CyclomaticComplexity", "PMD.GodClass"})
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.GodClass", "PMD.TooManyMethods"})
 public class TornadoService {
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
     private static final String RES_TSE_FILE_NAME = "resTse.pdf";
+    private static final String DOCUMENT_NAME = SignificantItemType.DOCUMENT.name();
 
     private final TornadoConnection tornadoConnection;
     private final DocumentManagementService documentManagementService;
@@ -242,7 +242,7 @@ public class TornadoService {
 
     private DocumentInfo generateDocumentInfo(String documentName, URI documentSelfPath, String markupURL) {
         return DocumentInfo.builder()
-                .type(SignificantItemType.DOCUMENT.name())
+                .type(DOCUMENT_NAME)
                 .description(documentName)
                 .markUp(markupURL)
                 .url(ccdGatewayBaseUrl + documentSelfPath.getRawPath() + "/binary")
@@ -310,9 +310,13 @@ public class TornadoService {
         }
     }
 
+    @SuppressWarnings({"PMD.AvoidThrowingNullPointerException"})
     private void buildDocumentInstruction(HttpURLConnection connection, CaseData caseData, String documentName,
                                           String caseTypeId)
             throws IOException {
+        if (isNullOrEmpty(documentName)) {
+            throw new NullPointerException("Document name cannot be null or empty");
+        }
         String documentContent = getDocumentContent(caseData, documentName, caseTypeId);
 
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream(),
@@ -324,9 +328,6 @@ public class TornadoService {
 
     private String getDocumentContent(CaseData caseData, String documentName, String caseTypeId)
             throws JsonProcessingException {
-        if (isNullOrEmpty(documentName)) {
-            throw new NullPointerException("Document name cannot be null or empty");
-        }
         switch (documentName) {
             case "ET1 Vetting.pdf":
                 return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());

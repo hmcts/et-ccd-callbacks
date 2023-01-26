@@ -33,11 +33,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelec
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.AvoidInstantiatingObjectsInLoops"})
 public class TseAdmReplyService {
 
-    @Value("${tse.admin.reply.claimant.template.id}")
+    @Value("${tse.admin.reply.notify.claimant.template.id}")
     private String emailToClaimantTemplateId;
-    @Value("${tse.admin.reply.respondent.template.id}")
+    @Value("${tse.admin.reply.notify.respondent.template.id}")
     private String emailToRespondentTemplateId;
 
     private final EmailService emailService;
@@ -60,7 +61,6 @@ public class TseAdmReplyService {
     private static final String RESPONDENT_NOTIFY_ONLY = "Respondent only";
 
     private static final String FROM_ADMIN = "Admin";
-    private static final String IS_RESPONSE_REQUIRED = "Yes";
     private static final String BOTH_RESPOND = "Both parties";
     private static final String CLAIMANT_RESPOND_ONLY = "Claimant";
     private static final String RESPONDENT_RESPOND_ONLY = "Respondent";
@@ -100,7 +100,7 @@ public class TseAdmReplyService {
     }
 
     private String initialRespondDetails(GenericTseApplicationType application, String authToken) {
-        if (application.getRespondCollection() == null) {
+        if (CollectionUtils.isEmpty(application.getRespondCollection())) {
             return "";
         }
         IntWrapper respondCount = new IntWrapper(0);
@@ -121,7 +121,7 @@ public class TseAdmReplyService {
     }
 
     private String populateListDocWithInfoAndLink(List<DocumentTypeItem> supportingMaterial, String authToken) {
-        if (supportingMaterial == null) {
+        if (CollectionUtils.isEmpty(supportingMaterial)) {
             return "";
         }
         return supportingMaterial.stream()
@@ -214,14 +214,15 @@ public class TseAdmReplyService {
         // if respondent only or both parties: send Respondents Reply Emails
         if (RESPONDENT_NOTIFY_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())
             || BOTH_NOTIFY.equals(caseData.getTseAdmReplySelectPartyNotify())) {
+            TSEAdminEmailRecipientsData respondentDetails;
             for (RespondentSumTypeItem respondentSumTypeItem: caseData.getRespondentCollection()) {
                 if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
-                    TSEAdminEmailRecipientsData respondentDetails =
+                    respondentDetails =
                         new TSEAdminEmailRecipientsData(
                             emailToRespondentTemplateId,
                             respondentSumTypeItem.getValue().getRespondentEmail());
 
-                    if (IS_RESPONSE_REQUIRED.equals(caseData.getTseAdmReplyIsResponseRequired())
+                    if (YES.equals(caseData.getTseAdmReplyIsResponseRequired())
                         && (BOTH_RESPOND.equals(caseData.getTseAdmReplySelectPartyRespond())
                         || RESPONDENT_RESPOND_ONLY.equals(caseData.getTseAdmReplySelectPartyRespond()))) {
                         respondentDetails.setCustomisedText(RESPONSE_REQUIRED);
@@ -245,7 +246,7 @@ public class TseAdmReplyService {
                 TSEAdminEmailRecipientsData claimantDetails =
                     new TSEAdminEmailRecipientsData(emailToClaimantTemplateId, claimantEmail);
 
-                if (IS_RESPONSE_REQUIRED.equals(caseData.getTseAdmReplyIsResponseRequired())
+                if (YES.equals(caseData.getTseAdmReplyIsResponseRequired())
                     && (BOTH_RESPOND.equals(caseData.getTseAdmReplySelectPartyRespond())
                     || CLAIMANT_RESPOND_ONLY.equals(caseData.getTseAdmReplySelectPartyRespond()))) {
                     claimantDetails.setCustomisedText(RESPONSE_REQUIRED);

@@ -56,11 +56,12 @@ class TseResponseControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/tseResponse/aboutToSubmit";
     private static final String MID_POPULATE_REPLY_URL = "/tseResponse/midPopulateReply";
     private static final String SUBMITTED_URL = "/tseResponse/submitted";
-    private static final String RESPONSE_TEMPLATE_ID = "responseToClaimantTemplateId";
+    // These will get picked from application-dev.properties
+    private static final String RESPONSE_TEMPLATE_ID = "b1249c5c-9d7c-4e39-bb81-9e95fa058ed3";
+    private static final String YES_COPY_TEMPLATE_ID = "580028e7-d9ff-49de-96c2-dc9595572ebb";
+    private static final String NO_COPY_TEMPLATE_ID = "84e64ff7-7c27-42b6-a7fa-ea29dd712223";
     private static final String YES_COPY = "I confirm I want to copy";
-    private static final String YES_COPY_TEMPLATE_ID = "acknowledgeResponseRule92YesTemplateId";
     private static final String NO_COPY = "I do not want to copy";
-    private static final String NO_COPY_TEMPLATE_ID = "acknowledgeResponseRule92NoTemplateId";
 
     @Autowired
     private MockMvc mockMvc;

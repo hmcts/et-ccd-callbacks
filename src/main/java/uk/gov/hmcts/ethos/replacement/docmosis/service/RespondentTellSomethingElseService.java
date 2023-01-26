@@ -34,19 +34,18 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.OPEN;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.GodClass", "PMD.CyclomaticComplexity", "PMD.LawOfDemeter"})
 public class RespondentTellSomethingElseService {
     private final EmailService emailService;
     private final UserService userService;
     private final TornadoService tornadoService;
 
-    @Value("${respondent.tse.template.id}")
+    @Value("${tse.respondent.application.acknowledgement.template.id}")
     private String emailTemplateId;
-    @Value("${claimant.tse.template.id}")
+    @Value("${tse.respondent.application.notify.claimant.template.id}")
     private String claimantTemplateId;
 
-    private static final String APPLICANT_RESPONDENT = "Respondent";
-    private static final String APPLICANT_CLAIMANT = "Claimant";
+    private static final String RESPONDENT_TITLE = "Respondent";
+    private static final String CLAIMANT_TITLE = "Claimant";
     private static final String RULE92_YES = "I confirm I want to copy";
     private static final String CHANGE_PERSONAL_DETAILS = "Change personal details";
     private static final String CONSIDER_A_DECISION_AFRESH = "Consider a decision afresh";
@@ -62,8 +61,7 @@ public class RespondentTellSomethingElseService {
         + "to the other party. \n \n"
         + "The tribunal will consider all correspondence and let you know what happens next.";
     private static final String RULE92_ANSWERED_YES_GROUP_A = "The other party will be notified that any objections to "
-        + "your %s application should be sent to the tribunal as soon as possible, and in any event "
-        + "within 7 days.";
+        + "your %s application should be sent to the tribunal as soon as possible, and in any event within 7 days.";
     private static final String RULE92_ANSWERED_YES_GROUP_B = "The other party is not expected to respond to this "
         + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
@@ -88,7 +86,7 @@ public class RespondentTellSomethingElseService {
     public List<String> validateGiveDetails(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         RespondentTSEApplicationTypeData selectedAppData =
-                RespondentTellSomethingElseHelper.getSelectedAppAppType(caseData);
+                RespondentTellSomethingElseHelper.getSelectedApplicationType(caseData);
         if (selectedAppData == null
                 || selectedAppData.getResTseDocument() == null && isNullOrEmpty(selectedAppData.getSelectedTextBox())) {
             errors.add(GIVE_DETAIL_MISSING);
@@ -128,14 +126,16 @@ public class RespondentTellSomethingElseService {
         emailService.sendEmail(emailTemplateId, email, buildPersonalisation(caseDetails, customisedText));
     }
 
+    /**
+     * Uses {@link EmailService} to generate an email to Claimant.
+     * @param caseDetails in which the case details are extracted from
+     */
     public void sendClaimantEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
 
-        if (ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
-            return;
-        }
-
-        if (NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())) {
+        if (ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())
+            || NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())
+            || caseData.getClaimantType().getClaimantEmailAddress() == null) {
             return;
         }
 
@@ -159,7 +159,7 @@ public class RespondentTellSomethingElseService {
         }
     }
 
-    public Map<String, String> buildPersonalisation(CaseDetails detail, String customisedText) {
+    private Map<String, String> buildPersonalisation(CaseDetails detail, String customisedText) {
         CaseData caseData = detail.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
@@ -214,7 +214,7 @@ public class RespondentTellSomethingElseService {
         respondentTseType.setDueDate(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
         respondentTseType.setResponsesCount("0");
         respondentTseType.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
-        respondentTseType.setApplicant(APPLICANT_RESPONDENT);
+        respondentTseType.setApplicant(RESPONDENT_TITLE);
         assignDataToFieldsFromApplicationType(respondentTseType, caseData);
         respondentTseType.setType(caseData.getResTseSelectApplication());
         respondentTseType.setCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
@@ -234,7 +234,7 @@ public class RespondentTellSomethingElseService {
 
     private void assignDataToFieldsFromApplicationType(GenericTseApplicationType respondentTseType, CaseData caseData) {
         RespondentTSEApplicationTypeData selectedAppData =
-                RespondentTellSomethingElseHelper.getSelectedAppAppType(caseData);
+                RespondentTellSomethingElseHelper.getSelectedApplicationType(caseData);
         if (selectedAppData != null) {
             respondentTseType.setDetails(selectedAppData.getSelectedTextBox());
             respondentTseType.setDocumentUpload(selectedAppData.getResTseDocument());
@@ -284,29 +284,40 @@ public class RespondentTellSomethingElseService {
         return caseData.getGenericTseApplicationCollection().size() + 1;
     }
 
+    /**
+     * Create a table markdown of all the Respondent and Claimant applications.
+     * @param caseData contains the Application collection
+     */
     public String generateTableMarkdown(CaseData caseData) {
         List<GenericTseApplicationTypeItem> genericApplicationList = caseData.getGenericTseApplicationCollection();
-        if (genericApplicationList == null) {
+        if (CollectionUtils.isEmpty(genericApplicationList)) {
             return "";
         }
 
-        AtomicInteger atomicInteger = new AtomicInteger(1);
+        AtomicInteger applicationNumber = new AtomicInteger(1);
 
-        // Need to add logic for getting number of responses
-        // For Respondent applications - need to count both claimants and admins responses
-        // For Claimant applications (chosen yes in rule 92) - need to count both respondents and admins responses
-
-        String tableRowsMarkdown = genericApplicationList
-            .stream()
-            .filter(a -> a.getValue().getApplicant().equals(APPLICANT_RESPONDENT)
-                || (a.getValue().getApplicant().equals(APPLICANT_CLAIMANT)
-                && a.getValue().getCopyToOtherPartyYesOrNo().equals(RULE92_YES)))
-            .map(a -> String.format(TABLE_ROW_MARKDOWN, atomicInteger.getAndIncrement(), a.getValue().getType(),
-                a.getValue().getApplicant(), a.getValue().getDate(), a.getValue().getDueDate(), 0,
-                Optional.ofNullable(a.getValue().getStatus()).orElse("Open")))
+        String tableRows = genericApplicationList.stream()
+            .filter(this::applicationsSharedWithRespondent)
+            .map(o -> formatRow(o, applicationNumber))
             .collect(Collectors.joining());
 
-        return String.format(TABLE_COLUMNS_MARKDOWN, tableRowsMarkdown);
+        return String.format(TABLE_COLUMNS_MARKDOWN, tableRows);
+    }
 
+    private boolean applicationsSharedWithRespondent(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
+        String applicant = genericTseApplicationTypeItem.getValue().getApplicant();
+        String copyToRespondent = genericTseApplicationTypeItem.getValue().getCopyToOtherPartyYesOrNo();
+        boolean isClaimantAndRule92Shared = CLAIMANT_TITLE.equals(applicant) && RULE92_YES.equals(copyToRespondent);
+
+        return RESPONDENT_TITLE.equals(applicant) || isClaimantAndRule92Shared;
+    }
+
+    private String formatRow(GenericTseApplicationTypeItem genericTseApplicationTypeItem, AtomicInteger count) {
+        GenericTseApplicationType value = genericTseApplicationTypeItem.getValue();
+        int responses = value.getRespondCollection() == null ? 0 : value.getRespondCollection().size();
+        String status = Optional.ofNullable(value.getStatus()).orElse("Open");
+
+        return String.format(TABLE_ROW_MARKDOWN, count.getAndIncrement(), value.getType(), value.getApplicant(),
+            value.getDate(), value.getDueDate(), responses, status);
     }
 }

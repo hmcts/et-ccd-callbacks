@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
@@ -38,7 +39,7 @@ class NoticeOfChangeAnswersConverterTest {
         NoticeOfChangeAnswers expectedNocAnswer =
             NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME).build();
 
-        assertThat(noticeOfChangeAnswersConverter.generateForSubmission(representedTypeRItem))
+        assertThat(noticeOfChangeAnswersConverter.generateForSubmission(representedTypeRItem, new ClaimantIndType()))
             .isEqualTo(expectedNocAnswer);
 
     }

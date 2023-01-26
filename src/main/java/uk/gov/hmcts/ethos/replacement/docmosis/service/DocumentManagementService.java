@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -49,6 +50,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 public class DocumentManagementService {
 
     private static final String FILES_NAME = "files";
+    private static final String BINARY = "/binary";
     public static final String APPLICATION_DOCX_VALUE =
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     private static final String JURISDICTION = "EMPLOYMENT";
@@ -135,7 +137,7 @@ public class DocumentManagementService {
     }
 
     public String generateDownloadableURL(URI documentSelf) {
-        return ccdGatewayBaseUrl + documentSelf.getRawPath() + "/binary";
+        return ccdGatewayBaseUrl + documentSelf.getRawPath() + BINARY;
     }
 
     public String generateMarkupDocument(String documentDownloadableURL) {
@@ -184,7 +186,7 @@ public class DocumentManagementService {
 
     public String getDocumentUUID(String urlString) {
         String documentUUID = urlString.replace(ccdDMStoreBaseUrl + "/documents/", "");
-        documentUUID = documentUUID.replace("/binary", "");
+        documentUUID = documentUUID.replace(BINARY, "");
         return documentUUID;
     }
 
@@ -198,7 +200,7 @@ public class DocumentManagementService {
         UploadedDocumentType document = new UploadedDocumentType();
         String documentId = documentInfo.getUrl().substring(documentInfo.getUrl().indexOf("/documents/"));
         document.setDocumentBinaryUrl(ccdDMStoreBaseUrl + documentId);
-        document.setDocumentUrl(document.getDocumentBinaryUrl().replace("/binary", ""));
+        document.setDocumentUrl(document.getDocumentBinaryUrl().replace(BINARY, ""));
         document.setDocumentFilename(documentInfo.getDescription());
         return document;
     }
@@ -223,19 +225,17 @@ public class DocumentManagementService {
         int lastIndexDot = document.getDocumentFilename().lastIndexOf('.');
         if (lastIndexDot > 0) {
             documentName = document.getDocumentFilename().substring(0, lastIndexDot);
-            documentType = document.getDocumentFilename().substring(lastIndexDot + 1).toUpperCase();
+            documentType = document.getDocumentFilename().substring(lastIndexDot + 1).toUpperCase(Locale.ENGLISH);
         }
 
         ResponseEntity<DocumentDetails> documentDetails =
                 getDocumentDetails(authToken, UUID.fromString(getDocumentUUID(document.getDocumentUrl())));
-        if (documentDetails.getBody() != null) {
-            return String.format(FILE_DISPLAY,
-                    documentLink,
-                    documentName,
-                    documentType,
-                    FileUtils.byteCountToDisplaySize(Long.parseLong(documentDetails.getBody().getSize())));
-        }
-        return String.format(FILE_DISPLAY, documentLink, documentName, documentType, "");
+
+        DocumentDetails docDetails = documentDetails.getBody();
+        String fileSize = (docDetails == null) 
+            ? "" : FileUtils.byteCountToDisplaySize(Long.parseLong(docDetails.getSize()));
+
+        return String.format(FILE_DISPLAY, documentLink, documentName, documentType, fileSize);
     }
 
     private ResponseEntity<DocumentDetails> getDocumentDetails(String authToken, UUID documentId) {

@@ -19,4 +19,7 @@ module.exports = async function () {
     I.click(commonConfig.submit)
     //After submitting letters
     I.see('Please download the document from : ')
+
+    //Final Confirmation
+    I.waitForText('has been updated with event: Letters', testConfig.TestTimeToWaitForText);
 };

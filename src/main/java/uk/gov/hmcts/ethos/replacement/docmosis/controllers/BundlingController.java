@@ -69,4 +69,24 @@ public class BundlingController {
         ccdRequest.getCaseDetails().getCaseData().setCaseBundles(bundleRequest);
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
+
+    @PostMapping(path = "/createAndStitch", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
+    @Operation(description = "Create bundle")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> createAndStitch(@RequestBody CCDRequest ccdRequest,
+                                                            @RequestHeader(value = HttpHeaders.AUTHORIZATION)
+                                                            String userToken) {
+        ccdRequest.getCaseDetails().getCaseData().setCaseBundles(
+                bundlingService.createBundleRequest(ccdRequest.getCaseDetails(), userToken));
+        ccdRequest.getCaseDetails().getCaseData().setCaseBundles(
+                bundlingService.stitchBundle(ccdRequest.getCaseDetails(), userToken));
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+    }
 }

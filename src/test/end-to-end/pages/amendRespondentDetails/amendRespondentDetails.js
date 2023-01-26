@@ -5,15 +5,14 @@ const testConfig = require("../../../config");
 module.exports = async function () {
 
     const I = this;
-    await I.fillField('#responseReceivedDate-day', commonConfig.caseAcceptedDay);
-    await I.fillField('#responseReceivedDate-month', commonConfig.caseAcceptedMonth);
-    await I.fillField('#responseReceivedDate-year', commonConfig.caseAcceptedYear);
-
-    await I.fillField('#respondentCollection_0_responseRespondentAddress_responseRespondentAddress_postcodeInput', commonConfig.respondentPostCode);
-    await I.click('#respondentCollection_0_responseRespondentAddress_responseRespondentAddress_postcodeLookup > button');
-    await I.wait(2);
+    I.fillField('#responseReceivedDate-day', commonConfig.caseAcceptedDay);
+    I.fillField('#responseReceivedDate-month', commonConfig.caseAcceptedMonth);
+    I.fillField('#responseReceivedDate-year', commonConfig.caseAcceptedYear);
+    I.fillField('#respondentCollection_0_responseRespondentAddress_responseRespondentAddress_postcodeInput', commonConfig.respondentPostCode);
+    I.click('#respondentCollection_0_responseRespondentAddress_responseRespondentAddress_postcodeLookup > button');
+    I.wait(2);
     I.waitForText(commonConfig.respondentAddress, testConfig.TestTimeToWaitForText);
-    await I.selectOption('#respondentCollection_0_responseRespondentAddress_responseRespondentAddress_addressList', commonConfig.respondentAddress);
-    await I.click(commonConfig.continue);
-    await I.click(commonConfig.submit)
+    I.selectOption('#respondentCollection_0_responseRespondentAddress_responseRespondentAddress_addressList', commonConfig.respondentAddress);
+    I.click(commonConfig.continue);
+    I.click(commonConfig.submit)
 };

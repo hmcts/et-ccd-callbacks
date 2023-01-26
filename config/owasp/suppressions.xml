@@ -421,4 +421,11 @@
         <packageUrl regex="true">^pkg:npm/ua\-parser\-js@.*$</packageUrl>
         <vulnerabilityName>1088674</vulnerabilityName>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: ua-parser-js:1.0.32
+   ]]></notes>
+        <packageUrl regex="true">^pkg:npm/ua\-parser\-js@.*$</packageUrl>
+        <vulnerabilityName>1088677</vulnerabilityName>
+    </suppress>
 </suppressions>

@@ -14,6 +14,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
@@ -42,7 +43,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
-@SuppressWarnings({"squid:S5961", "PMD.ExcessiveImports", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 class TseAdmReplyServiceTest {
 
     private TseAdmReplyService tseAdmReplyService;
@@ -89,78 +90,85 @@ class TseAdmReplyServiceTest {
 
     @Test
     void initialTseAdminTableMarkUp_ReturnString() {
+        TseRespondType tseRespondType = TseRespondType.builder()
+            .from("Claimant")
+            .date("23 December 2022")
+            .response("Response Details")
+            .hasSupportingMaterial(YES)
+            .supportingMaterial(List.of(
+                createDocumentTypeItem("image.png"),
+                createDocumentTypeItem("Form.pdf")))
+            .copyToOtherParty("I do not want to copy")
+            .build();
+
+        TseRespondTypeItem tseRespondTypeItem = TseRespondTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(tseRespondType)
+            .build();
+
+        GenericTseApplicationType genericTseApplicationType = TseApplicationBuilder.builder()
+            .withNumber("1")
+            .withType("Amend response")
+            .withApplicant("Respondent")
+            .withDate("13 December 2022")
+            .withDocumentUpload(createUploadedDocumentType("document.txt"))
+            .withDetails("Details Text")
+            .withCopyToOtherPartyYesOrNo("I confirm I want to copy")
+            .withStatus("Open")
+            .withRespondCollection(List.of(tseRespondTypeItem))
+            .build();
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = GenericTseApplicationTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(genericTseApplicationType)
+            .build();
+
         caseData.setGenericTseApplicationCollection(
-                List.of(GenericTseApplicationTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(TseApplicationBuilder.builder()
-                                .withNumber("1")
-                                .withType("Amend response")
-                                .withApplicant("Respondent")
-                                .withDate("13 December 2022")
-                                .withDocumentUpload(createUploadedDocumentType("document.txt"))
-                                .withDetails("Details Text")
-                                .withCopyToOtherPartyYesOrNo("I confirm I want to copy")
-                                .withStatus("Open")
-                                .withRespondCollection(List.of(TseRespondTypeItem.builder()
-                                        .id(UUID.randomUUID().toString())
-                                        .value(
-                                                TseRespondType.builder()
-                                                        .from("Claimant")
-                                                        .date("23 December 2022")
-                                                        .response("Response Details")
-                                                        .hasSupportingMaterial(YES)
-                                                        .supportingMaterial(List.of(
-                                                                createDocumentTypeItem("image.png"),
-                                                                createDocumentTypeItem("Form.pdf")))
-                                                        .copyToOtherParty("I do not want to copy")
-                                                        .build()
-                                        ).build()))
-                                .build())
-                        .build())
+            List.of(genericTseApplicationTypeItem)
         );
 
         caseData.setTseAdminSelectApplication(
-                DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
+            DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
 
         String fileDisplay1 = "<a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>";
         when(documentManagementService.displayDocNameTypeSizeLink(
-                createUploadedDocumentType("document.txt"), AUTH_TOKEN))
-                .thenReturn(fileDisplay1);
+            createUploadedDocumentType("document.txt"), AUTH_TOKEN))
+            .thenReturn(fileDisplay1);
 
         String fileDisplay2 = "<a href=\"/documents/%s\" target=\"_blank\">image (PNG, 2MB)</a>";
         when(documentManagementService.displayDocNameTypeSizeLink(
-                createUploadedDocumentType("image.png"), AUTH_TOKEN))
-                .thenReturn(fileDisplay2);
+            createUploadedDocumentType("image.png"), AUTH_TOKEN))
+            .thenReturn(fileDisplay2);
 
         String fileDisplay3 = "<a href=\"/documents/%s\" target=\"_blank\">Form (PDF, 3MB)</a>";
         when(documentManagementService.displayDocNameTypeSizeLink(
-                createUploadedDocumentType("Form.pdf"), AUTH_TOKEN))
-                .thenReturn(fileDisplay3);
+            createUploadedDocumentType("Form.pdf"), AUTH_TOKEN))
+            .thenReturn(fileDisplay3);
 
         String expected = "| | |\r\n"
-                + "|--|--|\r\n"
-                + "|Applicant | Respondent|\r\n"
-                + "|Type of application | Amend response|\r\n"
-                + "|Application date | 13 December 2022|\r\n"
-                + "|Give details | Details Text|\r\n"
-                + "|Supporting material | " + fileDisplay1 + "|\r\n"
-                + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? "
-                + "| Yes|\r\n"
-                + "\r\n"
-                + "|Response 1 | |\r\n"
-                + "|--|--|\r\n"
-                + "|Response from | Claimant|\r\n"
-                + "|Response date | 23 December 2022|\r\n"
-                + "|What’s your response to the respondent’s application? | Response Details|\r\n"
-                + "|Supporting material | " + fileDisplay2 + "<br>" + fileDisplay3 + "<br>" + "|\r\n"
-                + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? "
-                + "| No|\r\n"
-                + "\r\n";
+            + "|--|--|\r\n"
+            + "|Applicant | Respondent|\r\n"
+            + "|Type of application | Amend response|\r\n"
+            + "|Application date | 13 December 2022|\r\n"
+            + "|Give details | Details Text|\r\n"
+            + "|Supporting material | " + fileDisplay1 + "|\r\n"
+            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? "
+            + "| Yes|\r\n"
+            + "\r\n"
+            + "|Response 1 | |\r\n"
+            + "|--|--|\r\n"
+            + "|Response from | Claimant|\r\n"
+            + "|Response date | 23 December 2022|\r\n"
+            + "|What’s your response to the respondent’s application? | Response Details|\r\n"
+            + "|Supporting material | " + fileDisplay2 + "<br>" + fileDisplay3 + "<br>" + "|\r\n"
+            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? "
+            + "| No|\r\n"
+            + "\r\n";
 
         String actual = tseAdmReplyService.initialTseAdmReplyTableMarkUp(caseData, AUTH_TOKEN);
 
         assertThat(actual)
-                .isEqualTo(expected);
+            .isEqualTo(expected);
     }
 
     private UploadedDocumentType createUploadedDocumentType(String fileName) {
@@ -240,17 +248,17 @@ class TseAdmReplyServiceTest {
     @Test
     void saveTseAdmReplyDataFromCaseData_CmoYes_SaveString() {
         caseData.setGenericTseApplicationCollection(
-                List.of(GenericTseApplicationTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(TseApplicationBuilder.builder()
-                                .withNumber("2")
-                                .withType("Change personal details")
-                                .build())
-                        .build())
+            List.of(GenericTseApplicationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(TseApplicationBuilder.builder()
+                    .withNumber("2")
+                    .withType("Change personal details")
+                    .build())
+                .build())
         );
 
         caseData.setTseAdminSelectApplication(
-                DynamicFixedListType.of(DynamicValueType.create("2", "2 - Change personal details")));
+            DynamicFixedListType.of(DynamicValueType.create("2", "2 - Change personal details")));
         caseData.setTseAdmReplyEnterResponseTitle("Submit hearing agenda");
         caseData.setTseAdmReplyAdditionalInformation("Additional Information Details");
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
@@ -264,47 +272,47 @@ class TseAdmReplyServiceTest {
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
 
         TseRespondType actual =
-                caseData.getGenericTseApplicationCollection().get(0).getValue()
-                        .getRespondCollection().get(0).getValue();
+            caseData.getGenericTseApplicationCollection().get(0).getValue()
+                .getRespondCollection().get(0).getValue();
 
         assertThat(actual.getDate())
-                .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
+            .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
         assertThat(actual.getEnterResponseTitle())
-                .isEqualTo("Submit hearing agenda");
+            .isEqualTo("Submit hearing agenda");
         assertThat(actual.getAdditionalInformation())
-                .isEqualTo("Additional Information Details");
+            .isEqualTo("Additional Information Details");
         assertThat(actual.getAddDocument())
-                .isEqualTo(createUploadedDocumentType("document.txt"));
+            .isEqualTo(createUploadedDocumentType("document.txt"));
         assertThat(actual.getIsCmoOrRequest())
-                .isEqualTo("Case management order");
+            .isEqualTo("Case management order");
         assertThat(actual.getCmoMadeBy())
-                .isEqualTo("Legal Officer");
+            .isEqualTo("Legal Officer");
         assertThat(actual.getRequestMadeBy())
-                .isNull();
+            .isNull();
         assertThat(actual.getMadeByFullName())
-                .isEqualTo("Full Name");
+            .isEqualTo("Full Name");
         assertThat(actual.getIsResponseRequired())
-                .isEqualTo(YES);
+            .isEqualTo(YES);
         assertThat(actual.getSelectPartyRespond())
-                .isEqualTo("Both parties");
+            .isEqualTo("Both parties");
         assertThat(actual.getSelectPartyNotify())
-                .isEqualTo("Claimant only");
+            .isEqualTo("Claimant only");
     }
 
     @Test
     void saveTseAdmReplyDataFromCaseData_RequestNo_SaveString() {
         caseData.setGenericTseApplicationCollection(
-                List.of(GenericTseApplicationTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(TseApplicationBuilder.builder()
-                                .withNumber("3")
-                                .withType("Claimant not complied")
-                                .build())
-                        .build())
+            List.of(GenericTseApplicationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(TseApplicationBuilder.builder()
+                    .withNumber("3")
+                    .withType("Claimant not complied")
+                    .build())
+                .build())
         );
 
         caseData.setTseAdminSelectApplication(
-                DynamicFixedListType.of(DynamicValueType.create("3", "3 - Claimant not complied")));
+            DynamicFixedListType.of(DynamicValueType.create("3", "3 - Claimant not complied")));
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         caseData.setTseAdmReplyIsCmoOrRequest("Request");
         caseData.setTseAdmReplyRequestMadeBy("Judge");
@@ -315,78 +323,78 @@ class TseAdmReplyServiceTest {
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
 
         TseRespondType actual =
-                caseData.getGenericTseApplicationCollection().get(0).getValue()
-                        .getRespondCollection().get(0).getValue();
+            caseData.getGenericTseApplicationCollection().get(0).getValue()
+                .getRespondCollection().get(0).getValue();
 
         assertThat(actual.getDate())
-                .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
+            .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
         assertThat(actual.getEnterResponseTitle())
-                .isNull();
+            .isNull();
         assertThat(actual.getAdditionalInformation())
-                .isNull();
+            .isNull();
         assertThat(actual.getAddDocument())
-                .isEqualTo(createUploadedDocumentType("document.txt"));
+            .isEqualTo(createUploadedDocumentType("document.txt"));
         assertThat(actual.getIsCmoOrRequest())
-                .isEqualTo("Request");
+            .isEqualTo("Request");
         assertThat(actual.getCmoMadeBy())
-                .isNull();
+            .isNull();
         assertThat(actual.getRequestMadeBy())
-                .isEqualTo("Judge");
+            .isEqualTo("Judge");
         assertThat(actual.getMadeByFullName())
-                .isEqualTo("Full Name");
+            .isEqualTo("Full Name");
         assertThat(actual.getIsResponseRequired())
-                .isEqualTo(NO);
+            .isEqualTo(NO);
         assertThat(actual.getSelectPartyRespond())
-                .isNull();
+            .isNull();
         assertThat(actual.getSelectPartyNotify())
-                .isEqualTo("Respondent only");
+            .isEqualTo("Respondent only");
     }
 
     @Test
     void saveTseAdmReplyDataFromCaseData_Neither_SaveString() {
         caseData.setGenericTseApplicationCollection(
-                List.of(GenericTseApplicationTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(TseApplicationBuilder.builder()
-                                .withNumber("4")
-                                .withType("Consider a decision afresh")
-                                .build())
-                        .build())
+            List.of(GenericTseApplicationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(TseApplicationBuilder.builder()
+                    .withNumber("4")
+                    .withType("Consider a decision afresh")
+                    .build())
+                .build())
         );
 
         caseData.setTseAdminSelectApplication(
-                DynamicFixedListType.of(DynamicValueType.create("4", "4 - Consider a decision afresh")));
+            DynamicFixedListType.of(DynamicValueType.create("4", "4 - Consider a decision afresh")));
         caseData.setTseAdmReplyIsCmoOrRequest("Neither");
         caseData.setTseAdmReplySelectPartyNotify("Both parties");
 
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
 
         TseRespondType actual =
-                caseData.getGenericTseApplicationCollection().get(0).getValue()
-                        .getRespondCollection().get(0).getValue();
+            caseData.getGenericTseApplicationCollection().get(0).getValue()
+                .getRespondCollection().get(0).getValue();
 
         assertThat(actual.getDate())
-                .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
+            .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
         assertThat(actual.getEnterResponseTitle())
-                .isNull();
+            .isNull();
         assertThat(actual.getAdditionalInformation())
-                .isNull();
+            .isNull();
         assertThat(actual.getAddDocument())
-                .isNull();
+            .isNull();
         assertThat(actual.getIsCmoOrRequest())
-                .isEqualTo("Neither");
+            .isEqualTo("Neither");
         assertThat(actual.getCmoMadeBy())
-                .isNull();
+            .isNull();
         assertThat(actual.getRequestMadeBy())
-                .isNull();
+            .isNull();
         assertThat(actual.getMadeByFullName())
-                .isNull();
+            .isNull();
         assertThat(actual.getIsResponseRequired())
-                .isNull();
+            .isNull();
         assertThat(actual.getSelectPartyRespond())
-                .isNull();
+            .isNull();
         assertThat(actual.getSelectPartyNotify())
-                .isEqualTo("Both parties");
+            .isEqualTo("Both parties");
     }
 
     @ParameterizedTest
@@ -486,7 +494,7 @@ class TseAdmReplyServiceTest {
     @Test
     void clearTseAdminDataFromCaseData() {
         caseData.setTseAdminSelectApplication(
-                DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
+            DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
         caseData.setTseAdmReplyTableMarkUp("| | |\r\n|--|--|\r\n|%s application | %s|\r\n\r\n");
         caseData.setTseAdmReplyEnterResponseTitle("View notice of hearing");
         caseData.setTseAdmReplyAdditionalInformation("Additional information text");

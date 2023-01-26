@@ -109,7 +109,7 @@ public final class RespondentTellSomethingElseHelper {
 
     private static String getTextBoxDetails(RespondentTSEApplicationTypeData selectedAppData) {
         if (selectedAppData == null) {
-            return null;
+            return "";
         }
 
         return selectedAppData.getSelectedTextBox();

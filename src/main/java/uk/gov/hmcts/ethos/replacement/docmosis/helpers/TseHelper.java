@@ -123,7 +123,7 @@ public final class TseHelper {
      */
     public static void setDataForRespondingToApplication(CaseData caseData) {
         List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
-        if (CollectionUtils.isEmpty(applications)) {
+        if (CollectionUtils.isEmpty(applications) || getSelectedApplication(caseData) == null) {
             return;
         }
 

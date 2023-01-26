@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
@@ -79,70 +80,76 @@ class TseAdminServiceTest {
 
     @Test
     void initialTseAdminTableMarkUp_ReturnString() {
+        TseRespondTypeItem tseRespondTypeItem = TseRespondTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(
+                TseRespondType.builder()
+                    .from("Claimant")
+                    .date("23 December 2022")
+                    .response("Response Details")
+                    .hasSupportingMaterial(YES)
+                    .supportingMaterial(List.of(createDocumentTypeItem("image.png"),
+                        createDocumentTypeItem("Form.pdf")))
+                    .copyToOtherParty(YES)
+                    .build()
+            ).build();
+
+        GenericTseApplicationType genericTseApplicationType = TseApplicationBuilder.builder()
+            .withNumber("1")
+            .withType("Amend response")
+            .withApplicant("Respondent")
+            .withDate("13 December 2022")
+            .withDocumentUpload(createUploadedDocumentType("document.txt"))
+            .withDetails("Details Text")
+            .withStatus("Open")
+            .withRespondCollection(List.of(tseRespondTypeItem))
+            .build();
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = GenericTseApplicationTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(genericTseApplicationType)
+            .build();
+
         caseData.setGenericTseApplicationCollection(
-                List.of(GenericTseApplicationTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(TseApplicationBuilder.builder()
-                                .withNumber("1")
-                                .withType("Amend response")
-                                .withApplicant("Respondent")
-                                .withDate("13 December 2022")
-                                .withDocumentUpload(createUploadedDocumentType("document.txt"))
-                                .withDetails("Details Text")
-                                .withStatus("Open")
-                                .withRespondCollection(List.of(TseRespondTypeItem.builder()
-                                        .id(UUID.randomUUID().toString())
-                                        .value(
-                                                TseRespondType.builder()
-                                                        .from("Claimant")
-                                                        .date("23 December 2022")
-                                                        .response("Response Details")
-                                                        .hasSupportingMaterial(YES)
-                                                        .supportingMaterial(List.of(createDocumentTypeItem("image.png"),
-                                                                createDocumentTypeItem("Form.pdf")))
-                                                        .copyToOtherParty(YES)
-                                                        .build()
-                                        ).build()))
-                                .build())
-                        .build())
+            List.of(genericTseApplicationTypeItem)
         );
 
         caseData.setTseAdminSelectApplication(
-                DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
+            DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
 
         String fileDisplay1 = "<a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>";
         when(documentManagementService.displayDocNameTypeSizeLink(
-                createUploadedDocumentType("document.txt"), AUTH_TOKEN))
-                .thenReturn(fileDisplay1);
+            createUploadedDocumentType("document.txt"), AUTH_TOKEN))
+            .thenReturn(fileDisplay1);
 
         String fileDisplay2 = "<a href=\"/documents/%s\" target=\"_blank\">image (PNG, 2MB)</a>";
         when(documentManagementService.displayDocNameTypeSizeLink(
-                createUploadedDocumentType("image.png"), AUTH_TOKEN))
-                .thenReturn(fileDisplay2);
+            createUploadedDocumentType("image.png"), AUTH_TOKEN))
+            .thenReturn(fileDisplay2);
 
         String fileDisplay3 = "<a href=\"/documents/%s\" target=\"_blank\">Form (PDF, 3MB)</a>";
         when(documentManagementService.displayDocNameTypeSizeLink(
-                createUploadedDocumentType("Form.pdf"), AUTH_TOKEN))
-                .thenReturn(fileDisplay3);
+            createUploadedDocumentType("Form.pdf"), AUTH_TOKEN))
+            .thenReturn(fileDisplay3);
 
         String expected = "| | |\r\n"
-                + "|--|--|\r\n"
-                + "|Respondent application | Amend response|\r\n"
-                + "|Application date | 13 December 2022|\r\n"
-                + "|Give details | Details Text|\r\n"
-                + "|Supporting material | " + fileDisplay1 + "|\r\n"
-                + "\r\n"
-                + "|Response 1 | |\r\n"
-                + "|--|--|\r\n"
-                + "|Response from | Claimant|\r\n"
-                + "|Response date | 23 December 2022|\r\n"
-                + "|Details | Response Details|\r\n"
-                + "|Supporting material | " + fileDisplay2 + "<br>" + fileDisplay3 + "<br>" + "|\r\n"
-                + "\r\n";
+            + "|--|--|\r\n"
+            + "|Respondent application | Amend response|\r\n"
+            + "|Application date | 13 December 2022|\r\n"
+            + "|Give details | Details Text|\r\n"
+            + "|Supporting material | " + fileDisplay1 + "|\r\n"
+            + "\r\n"
+            + "|Response 1 | |\r\n"
+            + "|--|--|\r\n"
+            + "|Response from | Claimant|\r\n"
+            + "|Response date | 23 December 2022|\r\n"
+            + "|Details | Response Details|\r\n"
+            + "|Supporting material | " + fileDisplay2 + "<br>" + fileDisplay3 + "<br>" + "|\r\n"
+            + "\r\n";
 
         tseAdminService.initialTseAdminTableMarkUp(caseData, AUTH_TOKEN);
         assertThat(caseData.getTseAdminTableMarkUp())
-                .isEqualTo(expected);
+            .isEqualTo(expected);
     }
 
     private UploadedDocumentType createUploadedDocumentType(String fileName) {
@@ -163,17 +170,17 @@ class TseAdminServiceTest {
     @Test
     void saveTseAdminDataFromCaseData_Judgment_SaveString() {
         caseData.setGenericTseApplicationCollection(
-                List.of(GenericTseApplicationTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(TseApplicationBuilder.builder()
-                                .withNumber("2")
-                                .withType("Change personal details")
-                                .build())
-                        .build())
+            List.of(GenericTseApplicationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(TseApplicationBuilder.builder()
+                    .withNumber("2")
+                    .withType("Change personal details")
+                    .build())
+                .build())
         );
 
         caseData.setTseAdminSelectApplication(
-                DynamicFixedListType.of(DynamicValueType.create("2", "2 - Change personal details")));
+            DynamicFixedListType.of(DynamicValueType.create("2", "2 - Change personal details")));
 
         caseData.setTseAdminEnterNotificationTitle("Submit hearing agenda");
         caseData.setTseAdminDecision("Granted");
@@ -187,49 +194,49 @@ class TseAdminServiceTest {
         tseAdminService.saveTseAdminDataFromCaseData(caseData);
 
         TseAdminRecordDecisionType actual =
-                caseData.getGenericTseApplicationCollection().get(0).getValue()
-                        .getAdminDecision().get(0).getValue();
+            caseData.getGenericTseApplicationCollection().get(0).getValue()
+                .getAdminDecision().get(0).getValue();
 
         assertThat(actual.getDate())
-                .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
+            .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
         assertThat(actual.getEnterNotificationTitle())
-                .isEqualTo("Submit hearing agenda");
+            .isEqualTo("Submit hearing agenda");
         assertThat(actual.getDecision())
-                .isEqualTo("Granted");
+            .isEqualTo("Granted");
         assertThat(actual.getDecisionDetails())
-                .isNull();
+            .isNull();
         assertThat(actual.getTypeOfDecision())
-                .isEqualTo("Judgment");
+            .isEqualTo("Judgment");
         assertThat(actual.getIsResponseRequired())
-                .isNull();
+            .isNull();
         assertThat(actual.getSelectPartyRespond())
-                .isNull();
+            .isNull();
         assertThat(actual.getAdditionalInformation())
-                .isEqualTo("Additional information");
+            .isEqualTo("Additional information");
         assertThat(actual.getResponseRequiredDoc())
-                .isEqualTo(createUploadedDocumentType("document.txt"));
+            .isEqualTo(createUploadedDocumentType("document.txt"));
         assertThat(actual.getDecisionMadeBy())
-                .isEqualTo("Legal officer");
+            .isEqualTo("Legal officer");
         assertThat(actual.getDecisionMadeByFullName())
-                .isEqualTo("Legal Officer Full Name");
+            .isEqualTo("Legal Officer Full Name");
         assertThat(actual.getSelectPartyNotify())
-                .isEqualTo("Both parties");
+            .isEqualTo("Both parties");
     }
 
     @Test
     void saveTseAdminDataFromCaseData_CmoYes_SaveString() {
         caseData.setGenericTseApplicationCollection(
-                List.of(GenericTseApplicationTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(TseApplicationBuilder.builder()
-                                .withNumber("3")
-                                .withType("Claimant not complied")
-                                .build())
-                        .build())
+            List.of(GenericTseApplicationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(TseApplicationBuilder.builder()
+                    .withNumber("3")
+                    .withType("Claimant not complied")
+                    .build())
+                .build())
         );
 
         caseData.setTseAdminSelectApplication(
-                DynamicFixedListType.of(DynamicValueType.create("3", "3 - Claimant not complied")));
+            DynamicFixedListType.of(DynamicValueType.create("3", "3 - Claimant not complied")));
 
         caseData.setTseAdminEnterNotificationTitle("View notice of hearing");
         caseData.setTseAdminDecision("Other");
@@ -246,49 +253,49 @@ class TseAdminServiceTest {
         tseAdminService.saveTseAdminDataFromCaseData(caseData);
 
         TseAdminRecordDecisionType actual =
-                caseData.getGenericTseApplicationCollection().get(0).getValue()
-                        .getAdminDecision().get(0).getValue();
+            caseData.getGenericTseApplicationCollection().get(0).getValue()
+                .getAdminDecision().get(0).getValue();
 
         assertThat(actual.getDate())
-                .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
+            .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
         assertThat(actual.getEnterNotificationTitle())
-                .isEqualTo("View notice of hearing");
+            .isEqualTo("View notice of hearing");
         assertThat(actual.getDecision())
-                .isEqualTo("Other");
+            .isEqualTo("Other");
         assertThat(actual.getDecisionDetails())
-                .isEqualTo("Decision details text");
+            .isEqualTo("Decision details text");
         assertThat(actual.getTypeOfDecision())
-                .isEqualTo("Case management order");
+            .isEqualTo("Case management order");
         assertThat(actual.getIsResponseRequired())
-                .isEqualTo(YES);
+            .isEqualTo(YES);
         assertThat(actual.getSelectPartyRespond())
-                .isEqualTo("Claimant");
+            .isEqualTo("Claimant");
         assertThat(actual.getAdditionalInformation())
-                .isEqualTo("Additional information text");
+            .isEqualTo("Additional information text");
         assertThat(actual.getResponseRequiredDoc())
-                .isEqualTo(createUploadedDocumentType("document.txt"));
+            .isEqualTo(createUploadedDocumentType("document.txt"));
         assertThat(actual.getDecisionMadeBy())
-                .isEqualTo("Judge");
+            .isEqualTo("Judge");
         assertThat(actual.getDecisionMadeByFullName())
-                .isEqualTo("Judge Full Name");
+            .isEqualTo("Judge Full Name");
         assertThat(actual.getSelectPartyNotify())
-                .isEqualTo("Claimant only");
+            .isEqualTo("Claimant only");
     }
 
     @Test
     void saveTseAdminDataFromCaseData_CmoNo_SaveString() {
         caseData.setGenericTseApplicationCollection(
-                List.of(GenericTseApplicationTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(TseApplicationBuilder.builder()
-                                .withNumber("4")
-                                .withType("Consider a decision afresh")
-                                .build())
-                        .build())
+            List.of(GenericTseApplicationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(TseApplicationBuilder.builder()
+                    .withNumber("4")
+                    .withType("Consider a decision afresh")
+                    .build())
+                .build())
         );
 
         caseData.setTseAdminSelectApplication(
-                DynamicFixedListType.of(DynamicValueType.create("4", "4 - Consider a decision afresh")));
+            DynamicFixedListType.of(DynamicValueType.create("4", "4 - Consider a decision afresh")));
 
         caseData.setTseAdminDecision("Refused");
         caseData.setTseAdminTypeOfDecision("Case management order");
@@ -301,33 +308,33 @@ class TseAdminServiceTest {
         tseAdminService.saveTseAdminDataFromCaseData(caseData);
 
         TseAdminRecordDecisionType actual =
-                caseData.getGenericTseApplicationCollection().get(0).getValue()
-                        .getAdminDecision().get(0).getValue();
+            caseData.getGenericTseApplicationCollection().get(0).getValue()
+                .getAdminDecision().get(0).getValue();
 
         assertThat(actual.getDate())
-                .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
+            .isEqualTo(UtilHelper.formatCurrentDate(LocalDate.now()));
         assertThat(actual.getEnterNotificationTitle())
-                .isNull();
+            .isNull();
         assertThat(actual.getDecision())
-                .isEqualTo("Refused");
+            .isEqualTo("Refused");
         assertThat(actual.getDecisionDetails())
-                .isNull();
+            .isNull();
         assertThat(actual.getTypeOfDecision())
-                .isEqualTo("Case management order");
+            .isEqualTo("Case management order");
         assertThat(actual.getIsResponseRequired())
-                .isEqualTo(NO);
+            .isEqualTo(NO);
         assertThat(actual.getSelectPartyRespond())
-                .isNull();
+            .isNull();
         assertThat(actual.getAdditionalInformation())
-                .isNull();
+            .isNull();
         assertThat(actual.getResponseRequiredDoc())
-                .isEqualTo(createUploadedDocumentType("document.txt"));
+            .isEqualTo(createUploadedDocumentType("document.txt"));
         assertThat(actual.getDecisionMadeBy())
-                .isEqualTo("Judge");
+            .isEqualTo("Judge");
         assertThat(actual.getDecisionMadeByFullName())
-                .isEqualTo("Judge Full Name");
+            .isEqualTo("Judge Full Name");
         assertThat(actual.getSelectPartyNotify())
-                .isEqualTo("Respondent only");
+            .isEqualTo("Respondent only");
     }
 
     @ParameterizedTest
@@ -392,7 +399,7 @@ class TseAdminServiceTest {
     @Test
     void clearTseAdminDataFromCaseData() {
         caseData.setTseAdminSelectApplication(
-                DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
+            DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
         caseData.setTseAdminTableMarkUp("| | |\r\n|--|--|\r\n|%s application | %s|\r\n|Application date | %s|\r\n\r\n");
         caseData.setTseAdminEnterNotificationTitle("View notice of hearing");
         caseData.setTseAdminDecision("Other");

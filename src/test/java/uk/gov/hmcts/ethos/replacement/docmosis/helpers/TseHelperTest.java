@@ -6,7 +6,6 @@ import org.junit.Test;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
@@ -14,7 +13,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationBuilder;
@@ -32,8 +30,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @SuppressWarnings({"PMD.LinguisticNaming"})
 public class TseHelperTest {
-    CCDRequest ccdRequest;
-    CaseData caseData;
+    private CaseData caseData;
 
     @Before
     public void setUp() {
@@ -43,12 +40,6 @@ public class TseHelperTest {
             .build();
 
         caseData.setClaimant("First Last");
-
-        ccdRequest = CCDRequestBuilder.builder()
-            .withState("Accepted")
-            .withCaseId("1234")
-            .withCaseData(caseData)
-            .build();
 
         GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant("Claimant")
             .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")

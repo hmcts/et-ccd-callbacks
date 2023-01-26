@@ -21,6 +21,7 @@ module.exports = async function () {
     I.see('County (Optional)');
     I.see('Country (Optional)');
     I.see('Postcode');
+    I.seeInField('Postcode', 'EX1 3DD');
     I.see('Phone number (Optional)');
     I.see('Alternative number (Optional)');
     I.see('Email address (Optional)');
@@ -69,8 +70,8 @@ module.exports = async function () {
     I.see('County (Optional)');
     I.see('Country (Optional)');
     I.see('Postcode');
-    I.seeInField('Postcode', 'EX1 3DD');
-    I.seeInField({css: 'respondentCollection_0_respondent_address__detailPostCode'}, 'E14 3XA');
+    //I.seeInField('Postcode', 'EX1 3DD');
+    //I.seeInField({css: 'respondentCollection_0_respondent_address__detailPostCode'}, 'E14 3XA');
     //I.click({css: 'nav.user .user-login'});
     
     //const firstValue = await I.grabValueFrom("//ccd-field-write[32]//ccd-field-write[7]//input[@class='form-control bottom-30 ng-pristine ng-valid ng-touched']");

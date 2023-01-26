@@ -232,4 +232,11 @@
         <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async\-http\-client\-netty\-utils@.*$</packageUrl>
         <cpe>cpe:/a:utils_project:utils</cpe>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: ua-parser-js:1.0.32
+   ]]></notes>
+        <packageUrl regex="true">^pkg:npm/ua\-parser\-js@.*$</packageUrl>
+        <vulnerabilityName>1088677</vulnerabilityName>
+    </suppress>
 </suppressions>

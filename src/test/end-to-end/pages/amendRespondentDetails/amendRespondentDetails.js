@@ -83,9 +83,13 @@ module.exports = async function () {
     I.seeInField('#responseReceivedDate-month', '05')
     I.seeInField('#responseReceivedDate-year', '2021')
     I.see('Response Struck Out (Optional)');
-    I.click('#respondentCollection_0_responseStruckOut_Yes');
 
-    
     I.click(commonConfig.continue);
-    I.click(commonConfig.submit);
+    I.click(commonConfig.submit)
+
+    I.wait(5);
+
+    //Final Confirmation
+    I.waitForText('has been updated with event: Respondent Details', testConfig.TestTimeToWaitForText);
+
 };

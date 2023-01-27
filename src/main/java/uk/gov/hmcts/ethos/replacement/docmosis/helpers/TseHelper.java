@@ -31,9 +31,11 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultString;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -88,8 +90,6 @@ public final class TseHelper {
         + "|Sent to | %s|\r\n"
         + "\r\n";
     private static final String ADMIN_REPLY_MARKUP_MADE_BY = "|%s made by | %s|\r\n";
-    private static final String IS_CMO_OR_REQUEST_CMO = "Case management order";
-    private static final String IS_CMO_OR_REQUEST_REQUEST = "Request";
     private static final String COPY_TO_OTHER_PARTY_YES = "I confirm I want to copy";
     private static final String COPY_TO_OTHER_PARTY_NO = "I do not want to copy";
 
@@ -320,12 +320,12 @@ public final class TseHelper {
     }
 
     private static String formatAdminReplyMadeBy(TseRespondType reply) {
-        if (IS_CMO_OR_REQUEST_CMO.equals(reply.getIsCmoOrRequest())) {
+        if (CASE_MANAGEMENT_ORDER.equals(reply.getIsCmoOrRequest())) {
             return String.format(
                 ADMIN_REPLY_MARKUP_MADE_BY,
                 reply.getIsCmoOrRequest(),
                 reply.getCmoMadeBy());
-        } else if (IS_CMO_OR_REQUEST_REQUEST.equals(reply.getIsCmoOrRequest())) {
+        } else if (REQUEST.equals(reply.getIsCmoOrRequest())) {
             return String.format(
                 ADMIN_REPLY_MARKUP_MADE_BY,
                 reply.getIsCmoOrRequest(),

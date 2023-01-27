@@ -26,8 +26,10 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -68,8 +70,6 @@ public class TseAdmReplyService {
     private static final String RESPONSE_NOT_REQUIRED =
         "You have a new message from HMCTS about a claim made to an employment tribunal.";
     private static final String ERROR_MSG_ADD_DOC_MISSING = "Select or fill the required Add document field";
-    private static final String IS_CMO_OR_REQUEST_CMO = "Case management order";
-    private static final String IS_CMO_OR_REQUEST_REQUEST = "Request";
 
     /**
      * Initial Application and Respond details table.
@@ -145,8 +145,8 @@ public class TseAdmReplyService {
 
     private boolean addDocumentMissing(CaseData caseData) {
         return caseData.getTseAdmReplyAddDocument() == null
-            && (IS_CMO_OR_REQUEST_CMO.equals(caseData.getTseAdmReplyIsCmoOrRequest())
-                || IS_CMO_OR_REQUEST_REQUEST.equals(caseData.getTseAdmReplyIsCmoOrRequest()))
+            && (CASE_MANAGEMENT_ORDER.equals(caseData.getTseAdmReplyIsCmoOrRequest())
+                || REQUEST.equals(caseData.getTseAdmReplyIsCmoOrRequest()))
             && YES.equals(caseData.getTseAdmReplyIsResponseRequired());
     }
 

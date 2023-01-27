@@ -40,10 +40,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEITHER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
@@ -68,8 +71,6 @@ class TseAdmReplyServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer authToken";
     private static final String ERROR_MSG_ADD_DOC_MISSING = "Select or fill the required Add document field";
-    private static final String IS_CMO_OR_REQUEST_CMO = "Case management order";
-    private static final String IS_CMO_OR_REQUEST_REQUEST = "Request";
 
     private static final String TEMPLATE_ID = "someTemplateId";
     private static final String CASE_NUMBER = "Some Case Number";
@@ -191,7 +192,7 @@ class TseAdmReplyServiceTest {
 
     @Test
     void validateInput_Yes_NoDoc_ReturnErrorMsg() {
-        caseData.setTseAdmReplyIsCmoOrRequest(IS_CMO_OR_REQUEST_CMO);
+        caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyIsResponseRequired(YES);
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).hasSize(1);
@@ -200,7 +201,7 @@ class TseAdmReplyServiceTest {
 
     @Test
     void validateInput_CmoYes_HaveDoc_NoErrorMsg() {
-        caseData.setTseAdmReplyIsCmoOrRequest(IS_CMO_OR_REQUEST_CMO);
+        caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyIsResponseRequired(YES);
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         List<String> errors = tseAdmReplyService.validateInput(caseData);
@@ -209,7 +210,7 @@ class TseAdmReplyServiceTest {
 
     @Test
     void validateInput_RequestYes_HaveDoc_NoErrorMsg() {
-        caseData.setTseAdmReplyIsCmoOrRequest(IS_CMO_OR_REQUEST_REQUEST);
+        caseData.setTseAdmReplyIsCmoOrRequest(REQUEST);
         caseData.setTseAdmReplyIsResponseRequired(YES);
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         List<String> errors = tseAdmReplyService.validateInput(caseData);
@@ -218,7 +219,7 @@ class TseAdmReplyServiceTest {
 
     @Test
     void validateInput_No_HaveDoc_NoErrorMsg() {
-        caseData.setTseAdmReplyIsCmoOrRequest(IS_CMO_OR_REQUEST_CMO);
+        caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyIsResponseRequired(NO);
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         List<String> errors = tseAdmReplyService.validateInput(caseData);
@@ -227,7 +228,7 @@ class TseAdmReplyServiceTest {
 
     @Test
     void validateInput_No_NoDoc_NoErrorMsg() {
-        caseData.setTseAdmReplyIsCmoOrRequest(IS_CMO_OR_REQUEST_CMO);
+        caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyIsResponseRequired(NO);
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
@@ -235,7 +236,7 @@ class TseAdmReplyServiceTest {
 
     @Test
     void validateInput_Neither_HaveDoc_NoErrorMsg() {
-        caseData.setTseAdmReplyIsCmoOrRequest("Neither");
+        caseData.setTseAdmReplyIsCmoOrRequest(NEITHER);
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
@@ -243,7 +244,7 @@ class TseAdmReplyServiceTest {
 
     @Test
     void validateInput_Neither_NoDoc_NoErrorMsg() {
-        caseData.setTseAdmReplyIsCmoOrRequest("Neither");
+        caseData.setTseAdmReplyIsCmoOrRequest(NEITHER);
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
     }
@@ -265,7 +266,7 @@ class TseAdmReplyServiceTest {
         caseData.setTseAdmReplyEnterResponseTitle("Submit hearing agenda");
         caseData.setTseAdmReplyAdditionalInformation("Additional Information Details");
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
-        caseData.setTseAdmReplyIsCmoOrRequest("Case management order");
+        caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyCmoMadeBy("Legal Officer");
         caseData.setTseAdmReplyEnterFullName("Full Name");
         caseData.setTseAdmReplyIsResponseRequired(YES);
@@ -287,7 +288,7 @@ class TseAdmReplyServiceTest {
         assertThat(actual.getAddDocument())
             .isEqualTo(createUploadedDocumentType("document.txt"));
         assertThat(actual.getIsCmoOrRequest())
-            .isEqualTo("Case management order");
+            .isEqualTo(CASE_MANAGEMENT_ORDER);
         assertThat(actual.getCmoMadeBy())
             .isEqualTo("Legal Officer");
         assertThat(actual.getRequestMadeBy())
@@ -317,7 +318,7 @@ class TseAdmReplyServiceTest {
         caseData.setTseAdminSelectApplication(
             DynamicFixedListType.of(DynamicValueType.create("3", "3 - Claimant not complied")));
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
-        caseData.setTseAdmReplyIsCmoOrRequest("Request");
+        caseData.setTseAdmReplyIsCmoOrRequest(REQUEST);
         caseData.setTseAdmReplyRequestMadeBy("Judge");
         caseData.setTseAdmReplyEnterFullName("Full Name");
         caseData.setTseAdmReplyIsResponseRequired(NO);
@@ -338,7 +339,7 @@ class TseAdmReplyServiceTest {
         assertThat(actual.getAddDocument())
             .isEqualTo(createUploadedDocumentType("document.txt"));
         assertThat(actual.getIsCmoOrRequest())
-            .isEqualTo("Request");
+            .isEqualTo(REQUEST);
         assertThat(actual.getCmoMadeBy())
             .isNull();
         assertThat(actual.getRequestMadeBy())
@@ -367,7 +368,7 @@ class TseAdmReplyServiceTest {
 
         caseData.setTseAdminSelectApplication(
             DynamicFixedListType.of(DynamicValueType.create("4", "4 - Consider a decision afresh")));
-        caseData.setTseAdmReplyIsCmoOrRequest("Neither");
+        caseData.setTseAdmReplyIsCmoOrRequest(NEITHER);
         caseData.setTseAdmReplySelectPartyNotify(BOTH_PARTIES);
 
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
@@ -385,7 +386,7 @@ class TseAdmReplyServiceTest {
         assertThat(actual.getAddDocument())
             .isNull();
         assertThat(actual.getIsCmoOrRequest())
-            .isEqualTo("Neither");
+            .isEqualTo(NEITHER);
         assertThat(actual.getCmoMadeBy())
             .isNull();
         assertThat(actual.getRequestMadeBy())
@@ -502,7 +503,7 @@ class TseAdmReplyServiceTest {
         caseData.setTseAdmReplyEnterResponseTitle("View notice of hearing");
         caseData.setTseAdmReplyAdditionalInformation("Additional information text");
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
-        caseData.setTseAdmReplyIsCmoOrRequest("Case management order");
+        caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyCmoMadeBy("Legal Officer");
         caseData.setTseAdmReplyRequestMadeBy("Legal Officer");
         caseData.setTseAdmReplyEnterFullName("Enter Full Name");

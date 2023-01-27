@@ -40,6 +40,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -247,7 +248,7 @@ class TseAdminServiceTest {
         caseData.setTseAdminEnterNotificationTitle("View notice of hearing");
         caseData.setTseAdminDecision("Other");
         caseData.setTseAdminDecisionDetails("Decision details text");
-        caseData.setTseAdminTypeOfDecision("Case management order");
+        caseData.setTseAdminTypeOfDecision(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdminIsResponseRequired(YES);
         caseData.setTseAdminSelectPartyRespond(CLAIMANT_TITLE);
         caseData.setTseAdminAdditionalInformation("Additional information text");
@@ -271,7 +272,7 @@ class TseAdminServiceTest {
         assertThat(actual.getDecisionDetails())
             .isEqualTo("Decision details text");
         assertThat(actual.getTypeOfDecision())
-            .isEqualTo("Case management order");
+            .isEqualTo(CASE_MANAGEMENT_ORDER);
         assertThat(actual.getIsResponseRequired())
             .isEqualTo(YES);
         assertThat(actual.getSelectPartyRespond())
@@ -304,7 +305,7 @@ class TseAdminServiceTest {
             DynamicFixedListType.of(DynamicValueType.create("4", "4 - Consider a decision afresh")));
 
         caseData.setTseAdminDecision("Refused");
-        caseData.setTseAdminTypeOfDecision("Case management order");
+        caseData.setTseAdminTypeOfDecision(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdminIsResponseRequired(NO);
         caseData.setTseAdminResponseRequiredNoDoc(createUploadedDocumentType("document.txt"));
         caseData.setTseAdminDecisionMadeBy("Judge");
@@ -326,7 +327,7 @@ class TseAdminServiceTest {
         assertThat(actual.getDecisionDetails())
             .isNull();
         assertThat(actual.getTypeOfDecision())
-            .isEqualTo("Case management order");
+            .isEqualTo(CASE_MANAGEMENT_ORDER);
         assertThat(actual.getIsResponseRequired())
             .isEqualTo(NO);
         assertThat(actual.getSelectPartyRespond())
@@ -410,7 +411,7 @@ class TseAdminServiceTest {
         caseData.setTseAdminEnterNotificationTitle("View notice of hearing");
         caseData.setTseAdminDecision("Other");
         caseData.setTseAdminDecisionDetails("Decision details text");
-        caseData.setTseAdminTypeOfDecision("Case management order");
+        caseData.setTseAdminTypeOfDecision(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdminIsResponseRequired(YES);
         caseData.setTseAdminSelectPartyRespond(CLAIMANT_TITLE);
         caseData.setTseAdminAdditionalInformation("Additional information text");

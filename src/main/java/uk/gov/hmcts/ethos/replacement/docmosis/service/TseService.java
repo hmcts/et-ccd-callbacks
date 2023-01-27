@@ -17,17 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.OPEN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @SuppressWarnings({"PMD.GodClass", "PMD.CyclomaticComplexity", "PMD.LawOfDemeter"})
 public class TseService {
-    private final DocumentManagementService documentManagementService;
-
     /**
      * Creates a new TSE collection if it doesn't exist.
      * Create a new application in the list and assign the TSE data from CaseData to it.
@@ -47,7 +43,7 @@ public class TseService {
         application.setDueDate(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
         application.setResponsesCount("0");
         application.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
-        application.setStatus(OPEN);
+        application.setStatus(OPEN_STATE);
 
         if (isClaimant) {
             addClaimantData(caseData, application);

@@ -29,6 +29,13 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_JUDGEMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
 @Slf4j
@@ -45,14 +52,9 @@ public class RespondentTellSomethingElseService {
     private String claimantTemplateId;
 
     private static final String RULE92_YES = "I confirm I want to copy";
-    private static final String CHANGE_PERSONAL_DETAILS = "Change personal details";
-    private static final String CONSIDER_A_DECISION_AFRESH = "Consider a decision afresh";
-    private static final String ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE =
-            "Order a witness to attend to give evidence";
-    private static final String RECONSIDER_JUDGEMENT = "Reconsider judgement";
     private static final String GIVE_DETAIL_MISSING = "Use the text box or file upload to give details.";
-    private static final List<String> GROUP_B_TYPES = List.of(CHANGE_PERSONAL_DETAILS, CONSIDER_A_DECISION_AFRESH,
-        RECONSIDER_JUDGEMENT);
+    private static final List<String> GROUP_B_TYPES = List.of(TSE_APP_CHANGE_PERSONAL_DETAILS,
+        TSE_APP_CONSIDER_A_DECISION_AFRESH, TSE_APP_RECONSIDER_JUDGEMENT);
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
     private static final String NO = "I do not want to copy";
     private static final String RULE92_ANSWERED_NO = "You have said that you do not want to copy this correspondence "
@@ -101,7 +103,7 @@ public class RespondentTellSomethingElseService {
     public void sendAcknowledgeEmailAndGeneratePdf(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
 
-        if (ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
+        if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
             // No need to send email for Group C
             return;
         }
@@ -131,7 +133,7 @@ public class RespondentTellSomethingElseService {
     public void sendClaimantEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
 
-        if (ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())
+        if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())
             || NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())
             || caseData.getClaimantType().getClaimantEmailAddress() == null) {
             return;
@@ -221,7 +223,7 @@ public class RespondentTellSomethingElseService {
     private String formatRow(GenericTseApplicationTypeItem genericTseApplicationTypeItem, AtomicInteger count) {
         GenericTseApplicationType value = genericTseApplicationTypeItem.getValue();
         int responses = value.getRespondCollection() == null ? 0 : value.getRespondCollection().size();
-        String status = Optional.ofNullable(value.getStatus()).orElse("Open");
+        String status = Optional.ofNullable(value.getStatus()).orElse(OPEN_STATE);
 
         return String.format(TABLE_ROW_MARKDOWN, count.getAndIncrement(), value.getType(), value.getApplicant(),
             value.getDate(), value.getDueDate(), responses, status);

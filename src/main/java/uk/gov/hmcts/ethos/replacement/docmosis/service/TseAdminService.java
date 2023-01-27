@@ -26,6 +26,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRespondentReplyForDecision;
@@ -78,9 +82,6 @@ public class TseAdminService {
         + "|Sent to | %s|\r\n"
         + "\r\n";
 
-    private static final String BOTH = "Both parties";
-    private static final String CLAIMANT_ONLY = "Claimant only";
-    private static final String RESPONDENT_ONLY = "Respondent only";
     private static final String STRING_BR = "<br>";
     private static final String APPLICATION_QUESTION = "Give details";
 
@@ -115,7 +116,7 @@ public class TseAdminService {
         IntWrapper respondCount = new IntWrapper(0);
         return applicationType.getRespondCollection().stream()
             .map(replyItem ->
-                "Admin".equals(replyItem.getValue().getFrom())
+                ADMIN.equals(replyItem.getValue().getFrom())
                     ? formatAdminReply(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),
@@ -197,7 +198,7 @@ public class TseAdminService {
 
         // if respondent only or both parties: send Respondents Decision Emails
         if (RESPONDENT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
-                || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
+                || BOTH_PARTIES.equals(caseData.getTseAdminSelectPartyNotify())) {
             TSEAdminEmailRecipientsData respondentDetails;
             for (RespondentSumTypeItem respondentSumTypeItem: caseData.getRespondentCollection()) {
                 if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
@@ -214,7 +215,7 @@ public class TseAdminService {
 
         // if claimant only or both parties: send Claimant Decision Email
         if (CLAIMANT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
-                || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
+                || BOTH_PARTIES.equals(caseData.getTseAdminSelectPartyNotify())) {
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
             String claimantName = caseData.getClaimantIndType().claimantFullNames();
 

@@ -8,6 +8,18 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.RespondentTellSo
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CLAIMANT_NOT_COMPLIED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONTACT_THE_TRIBUNAL;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_OTHER_PARTY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_JUDGEMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PUBLICITY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_VARY_OR_REVOKE_AN_ORDER;
 
 public final class RespondentTellSomethingElseHelper {
 
@@ -15,20 +27,6 @@ public final class RespondentTellSomethingElseHelper {
 
     private static final String RES_TSE_FILE_NAME = "resTse.pdf";
     private static final String RES_TSE_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02822.docx";
-
-    private static final String SELECTED_APP_AMEND_RESPONSE = "Amend response";
-    private static final String SELECTED_APP_CHANGE_PERSONAL_DETAILS = "Change personal details";
-    private static final String SELECTED_APP_CLAIMANT_NOT_COMPLIED = "Claimant not complied";
-    private static final String SELECTED_APP_CONSIDER_A_DECISION_AFRESH = "Consider a decision afresh";
-    private static final String SELECTED_APP_CONTACT_THE_TRIBUNAL = "Contact the tribunal";
-    private static final String SELECTED_APP_ORDER_OTHER_PARTY = "Order other party";
-    private static final String SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE =
-            "Order a witness to attend to give evidence";
-    private static final String SELECTED_APP_POSTPONE_A_HEARING = "Postpone a hearing";
-    private static final String SELECTED_APP_RECONSIDER_JUDGEMENT = "Reconsider judgement";
-    private static final String SELECTED_APP_RESTRICT_PUBLICITY = "Restrict publicity";
-    private static final String SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM = "Strike out all or part of a claim";
-    private static final String SELECTED_APP_VARY_OR_REVOKE_AN_ORDER = "Vary or revoke an order";
 
     private RespondentTellSomethingElseHelper() {
     }
@@ -58,40 +56,40 @@ public final class RespondentTellSomethingElseHelper {
     @SuppressWarnings({"PMD.CyclomaticComplexity"})
     public static RespondentTSEApplicationTypeData getSelectedApplicationType(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
-            case SELECTED_APP_AMEND_RESPONSE:
+            case TSE_APP_AMEND_RESPONSE:
                 return new RespondentTSEApplicationTypeData(
                         caseData.getResTseDocument1(), caseData.getResTseTextBox1());
-            case SELECTED_APP_CHANGE_PERSONAL_DETAILS:
+            case TSE_APP_CHANGE_PERSONAL_DETAILS:
                 return new RespondentTSEApplicationTypeData(
                         caseData.getResTseDocument2(), caseData.getResTseTextBox2());
-            case SELECTED_APP_CLAIMANT_NOT_COMPLIED:
+            case TSE_APP_CLAIMANT_NOT_COMPLIED:
                 return new RespondentTSEApplicationTypeData(
                         caseData.getResTseDocument3(), caseData.getResTseTextBox3());
-            case SELECTED_APP_CONSIDER_A_DECISION_AFRESH:
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH:
                 return new RespondentTSEApplicationTypeData(
                         caseData.getResTseDocument4(), caseData.getResTseTextBox4());
-            case SELECTED_APP_CONTACT_THE_TRIBUNAL:
+            case TSE_APP_CONTACT_THE_TRIBUNAL:
                 return new RespondentTSEApplicationTypeData(
                         caseData.getResTseDocument5(), caseData.getResTseTextBox5());
-            case SELECTED_APP_ORDER_OTHER_PARTY:
+            case TSE_APP_ORDER_OTHER_PARTY:
                 return new RespondentTSEApplicationTypeData(
                         caseData.getResTseDocument6(), caseData.getResTseTextBox6());
-            case SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
                 return new RespondentTSEApplicationTypeData(
                         caseData.getResTseDocument7(), caseData.getResTseTextBox7());
-            case SELECTED_APP_POSTPONE_A_HEARING:
+            case TSE_APP_POSTPONE_A_HEARING:
                 return new RespondentTSEApplicationTypeData(
                         caseData.getResTseDocument8(), caseData.getResTseTextBox8());
-            case SELECTED_APP_RECONSIDER_JUDGEMENT:
+            case TSE_APP_RECONSIDER_JUDGEMENT:
                 return new RespondentTSEApplicationTypeData(
                         caseData.getResTseDocument9(), caseData.getResTseTextBox9());
-            case SELECTED_APP_RESTRICT_PUBLICITY:
+            case TSE_APP_RESTRICT_PUBLICITY:
                 return new RespondentTSEApplicationTypeData(
                         caseData.getResTseDocument10(), caseData.getResTseTextBox10());
-            case SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
                 return new RespondentTSEApplicationTypeData(
                         caseData.getResTseDocument11(), caseData.getResTseTextBox11());
-            case SELECTED_APP_VARY_OR_REVOKE_AN_ORDER:
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
                 return new RespondentTSEApplicationTypeData(
                         caseData.getResTseDocument12(), caseData.getResTseTextBox12());
             default:
@@ -109,7 +107,7 @@ public final class RespondentTellSomethingElseHelper {
 
     private static String getTextBoxDetails(RespondentTSEApplicationTypeData selectedAppData) {
         if (selectedAppData == null) {
-            return null;
+            return "";
         }
 
         return selectedAppData.getSelectedTextBox();

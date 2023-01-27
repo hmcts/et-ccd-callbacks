@@ -169,7 +169,6 @@ public class EventValidationService {
         return errors;
     }
 
-    @SuppressWarnings("checkstyle:Indentation")
     public List<String> validateAndSetRespRepNames(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())
@@ -185,15 +184,15 @@ public class EventValidationService {
                 if (isValidRespondentName(caseData, tempCollCurrentName)) {
                     if (!repCollection.isEmpty()
                         && updatedRepList.stream()
-                           .filter(r -> r.getValue().getDynamicRespRepName().getValue().getLabel()
-                               .equals(tempCollCurrentName)).collect(Collectors.toList()).isEmpty()) {
+                        .noneMatch(r -> r.getValue().getDynamicRespRepName().getValue().getLabel()
+                            .equals(tempCollCurrentName))) {
                         repCollection.get(index).getValue().setRespRepName(tempCollCurrentName);
                         updatedRepList.add(repCollection.get(index));
-                   }
+                    }
                 } else {
                     errors.add(RESP_REP_NAME_MISMATCH_ERROR_MESSAGE + " - " + tempCollCurrentName);
                     return errors;
-               }
+                }
             }
 
             //clear the old rep collection

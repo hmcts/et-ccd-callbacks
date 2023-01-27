@@ -433,7 +433,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = eventValidationService.validateRespRepNames(caseData);
+        List<String> errors = eventValidationService.validateAndSetRespRepNames(caseData);
 
         log.info(EVENT_FIELDS_VALIDATION + errors);
 

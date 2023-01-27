@@ -17,11 +17,11 @@ module.exports = async function () {
     I.see('Letters');
 
     I.click(commonConfig.continue);
-    I.click(commonConfig.submit)
+    I.click(commonConfig.submit);
 
     //After submitting letters
     I.waitForText('Please download the document from : ', testConfig.TestTimeToWaitForText);
-    I.click('.button')
+    I.click('.button');
 
     //Final Confirmation
     I.waitForText('has been updated with event: Letters', testConfig.TestTimeToWaitForText);

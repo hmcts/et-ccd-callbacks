@@ -6,22 +6,26 @@ module.exports = async function () {
 
     const I = this;
     //Before Letters Page Starts
-    I.waitForText('Letters', testConfig.TestTimeToWaitForText);
+    I.waitForText('Letters', testConfig.TestTimeToWaitForText); //Wait for Letters Heading loaded top of the page
+    I.waitForText('Top Level', testConfig.TestTimeToWaitForText); //Wait for Top Level sub-heading loaded top of the page
     I.see('Case Number:')
     I.see('List of correspondence items');
-    I.see('Top Level');
-    I.waitForText(commonConfig.lettersCorrespondence, testConfig.TestTimeToWaitForText);
     I.selectOption('#correspondenceType_topLevel_Documents', commonConfig.lettersCorrespondence);
-    I.waitForText(commonConfig.lettersCorrespondence1, testConfig.TestTimeToWaitForText);
+    I.waitForClickable('#correspondenceType_part_2_Documents');
     I.selectOption('#correspondenceType_part_2_Documents', commonConfig.lettersCorrespondence1);
-    I.see('Letters');
+
 
     I.click(commonConfig.continue);
+    I.waitForText('Letters', testConfig.TestTimeToWaitForText);
+    I.see('Case Number:');
+
     I.click(commonConfig.submit);
 
     //After submitting letters
-    I.waitForText('Please download the document from : ', testConfig.TestTimeToWaitForText);
-    I.click('.button');
+    I.waitForText('Letters', testConfig.TestTimeToWaitForText); //Wait for Letters on the top of the page
+    I.see('Case Number:');
+    I.see('Please download the document from : Document');
+    I.click('Close and Return to case details');
 
     //Final Confirmation
     I.waitForText('has been updated with event: Letters', testConfig.TestTimeToWaitForText);

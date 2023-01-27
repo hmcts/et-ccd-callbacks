@@ -6,8 +6,8 @@ module.exports = async function () {
 
     const I = this;
     //Before Letters Page Starts
-    I.waitForText('Letters', testConfig.TestTimeToWaitForText); //Wait for Letters Heading loaded top of the page
-    I.waitForText('Top Level', testConfig.TestTimeToWaitForText); //Wait for Top Level sub-heading loaded top of the page
+    I.waitForText('Letters', testConfig.TestTimeToWaitForText); 
+    I.waitForText('Top Level', testConfig.TestTimeToWaitForText); 
     I.see('Case Number:')
     I.see('List of correspondence items');
     I.selectOption('#correspondenceType_topLevel_Documents', commonConfig.lettersCorrespondence);
@@ -22,7 +22,7 @@ module.exports = async function () {
     I.click(commonConfig.submit);
 
     //After submitting letters
-    I.waitForText('Letters', testConfig.TestTimeToWaitForText); //Wait for Letters on the top of the page
+    I.waitForText('Letters', testConfig.TestTimeToWaitForText);
     I.see('Case Number:');
     I.see('Please download the document from : Document');
     I.click('Close and Return to case details');

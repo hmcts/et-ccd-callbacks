@@ -22,12 +22,15 @@ public class DefaultValuesReaderService {
 
     private final CaseDefaultValuesConfiguration config;
     private final TribunalOfficesService tribunalOfficesService;
+    private final ConciliationTrackService conciliationTrackService;
     private static final String ET1_ONLINE_SUBMISSION_POSITION_TYPE = "ET1 Online submission";
 
     public DefaultValuesReaderService(CaseDefaultValuesConfiguration config,
-                                      TribunalOfficesService tribunalOfficesService) {
+                                      TribunalOfficesService tribunalOfficesService,
+                                      ConciliationTrackService conciliationTrackService) {
         this.config = config;
         this.tribunalOfficesService = tribunalOfficesService;
+        this.conciliationTrackService = conciliationTrackService;
     }
 
     public DefaultValues getDefaultValues(String managingOffice) {
@@ -54,6 +57,7 @@ public class DefaultValuesReaderService {
 
     public void getCaseData(CaseData caseData, DefaultValues defaultValues) {
         setPositionType(caseData, defaultValues);
+        conciliationTrackService.populateConciliationTrackForJurisdiction(caseData);
         if (caseData.getCaseSource() == null || caseData.getCaseSource().trim().equals("")) {
             caseData.setCaseSource(defaultValues.getPositionType());
         }

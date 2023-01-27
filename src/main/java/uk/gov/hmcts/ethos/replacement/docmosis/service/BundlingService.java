@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Service
 @Slf4j
@@ -50,6 +49,7 @@ public class BundlingService {
                             .build();
                     count++;
                     bundleDocument.toBuilder().value(bundleDocumentDetails).build();
+                    log.info(bundle.toString());
                 }
             }
         }
@@ -81,17 +81,10 @@ public class BundlingService {
     }
 
     private BundleCreateRequest bundleRequestMapper(CaseDetails caseDetails) {
-        bundleStitchSet(caseDetails);
         return BundleCreateRequest.builder()
                 .caseDetails(caseDetails)
                 .caseTypeId(caseDetails.getCaseTypeId())
                 .build();
-    }
-
-    private void bundleStitchSet(CaseDetails caseDetails) {
-        for (Bundle bundle : caseDetails.getCaseData().getCaseBundles()) {
-            bundle.getValue().setEligibleForStitching(YES);
-        }
     }
 
     private void setBundleConfig(CaseData caseData) {

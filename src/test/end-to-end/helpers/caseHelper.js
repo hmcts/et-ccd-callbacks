@@ -189,8 +189,8 @@ async function et3Response(I, eventName) {
 async function et1Vetting(I, eventName) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(3);
-    await I.startet1Vetting();
-    await I.minReqInfoET1Vetting();
+    await I.et1VettingJourney();
+    /*await I.minReqInfoET1Vetting();
     await I.minReqInfo2ET1Vetting();
     await I.et1CaseVettingOptions1();
     await I.caseDetails1ET1Vetting();
@@ -202,7 +202,7 @@ async function et1Vetting(I, eventName) {
     await I.possibleReferal2ET1Vetting();
     await I.otherFactorsET1Vetting();
     await I.finalNotesET1Vetting();
-    await I.checkYourAnswersET1Vetting();
+    await I.checkYourAnswersET1Vetting();*/
 }
 
 async function createAdminReferral(emailAddress, details) {

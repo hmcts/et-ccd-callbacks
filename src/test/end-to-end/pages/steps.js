@@ -36,7 +36,7 @@ module.exports = () => {
         startInitialConsideration: steps.initialConsideration.initialConsiderationStartPage,
         initialConsiderationRule26: steps.initialConsideration.initialConsiderationRule26Page,
         initialConsiderationCheckYourAnswers: steps.initialConsideration.initialConsiderationCheckYourAnswersPage,
-        startet1Vetting: steps.et1Vetting.et1VettingBeforeYouStart,
+        et1VettingJourney: steps.et1Vetting.et1VettingJourney,
         minReqInfoET1Vetting: steps.et1Vetting.minReqInfoET1Vetting,
         minReqInfo2ET1Vetting: steps.et1Vetting.minReqInfo2ET1Vetting,
         et1CaseVettingOptions1: steps.et1Vetting.et1CaseVettingOptions1,

@@ -39,7 +39,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CLAIMANT_NOT_COMPLIED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
@@ -58,15 +68,11 @@ class TseAdminServiceTest {
     private static final String CASE_NUMBER = "Some Case Number";
     private static final String CASE_ID = "4321";
 
-    private static final String BOTH = "Both parties";
-    private static final String CLAIMANT_ONLY = "Claimant only";
-    private static final String RESPONDENT_ONLY = "Respondent only";
     private static final String CLAIMANT_EMAIL = "Claimant@mail.com";
     private static final String CLAIMANT_FIRSTNAME = "Claim";
     private static final String CLAIMANT_LASTNAME = "Ant";
 
     private static final String RESPONDENT_EMAIL = "Respondent@mail.com";
-    private static final String RESPONDENT_NAME = "Respondent";
 
     private static final String AUTH_TOKEN = "Bearer authToken";
 
@@ -84,7 +90,7 @@ class TseAdminServiceTest {
             .id(UUID.randomUUID().toString())
             .value(
                 TseRespondType.builder()
-                    .from("Claimant")
+                    .from(CLAIMANT_TITLE)
                     .date("23 December 2022")
                     .response("Response Details")
                     .hasSupportingMaterial(YES)
@@ -96,12 +102,12 @@ class TseAdminServiceTest {
 
         GenericTseApplicationType genericTseApplicationType = TseApplicationBuilder.builder()
             .withNumber("1")
-            .withType("Amend response")
-            .withApplicant("Respondent")
+            .withType(TSE_APP_AMEND_RESPONSE)
+            .withApplicant(RESPONDENT_TITLE)
             .withDate("13 December 2022")
             .withDocumentUpload(createUploadedDocumentType("document.txt"))
             .withDetails("Details Text")
-            .withStatus("Open")
+            .withStatus(OPEN_STATE)
             .withRespondCollection(List.of(tseRespondTypeItem))
             .build();
 
@@ -174,7 +180,7 @@ class TseAdminServiceTest {
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("2")
-                    .withType("Change personal details")
+                    .withType(TSE_APP_CHANGE_PERSONAL_DETAILS)
                     .build())
                 .build())
         );
@@ -189,7 +195,7 @@ class TseAdminServiceTest {
         caseData.setTseAdminResponseRequiredNoDoc(createUploadedDocumentType("document.txt"));
         caseData.setTseAdminDecisionMadeBy("Legal officer");
         caseData.setTseAdminDecisionMadeByFullName("Legal Officer Full Name");
-        caseData.setTseAdminSelectPartyNotify("Both parties");
+        caseData.setTseAdminSelectPartyNotify(BOTH_PARTIES);
 
         tseAdminService.saveTseAdminDataFromCaseData(caseData);
 
@@ -220,7 +226,7 @@ class TseAdminServiceTest {
         assertThat(actual.getDecisionMadeByFullName())
             .isEqualTo("Legal Officer Full Name");
         assertThat(actual.getSelectPartyNotify())
-            .isEqualTo("Both parties");
+            .isEqualTo(BOTH_PARTIES);
     }
 
     @Test
@@ -230,7 +236,7 @@ class TseAdminServiceTest {
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("3")
-                    .withType("Claimant not complied")
+                    .withType(TSE_APP_CLAIMANT_NOT_COMPLIED)
                     .build())
                 .build())
         );
@@ -243,12 +249,12 @@ class TseAdminServiceTest {
         caseData.setTseAdminDecisionDetails("Decision details text");
         caseData.setTseAdminTypeOfDecision("Case management order");
         caseData.setTseAdminIsResponseRequired(YES);
-        caseData.setTseAdminSelectPartyRespond("Claimant");
+        caseData.setTseAdminSelectPartyRespond(CLAIMANT_TITLE);
         caseData.setTseAdminAdditionalInformation("Additional information text");
         caseData.setTseAdminResponseRequiredYesDoc(createUploadedDocumentType("document.txt"));
         caseData.setTseAdminDecisionMadeBy("Judge");
         caseData.setTseAdminDecisionMadeByFullName("Judge Full Name");
-        caseData.setTseAdminSelectPartyNotify("Claimant only");
+        caseData.setTseAdminSelectPartyNotify(CLAIMANT_ONLY);
 
         tseAdminService.saveTseAdminDataFromCaseData(caseData);
 
@@ -269,7 +275,7 @@ class TseAdminServiceTest {
         assertThat(actual.getIsResponseRequired())
             .isEqualTo(YES);
         assertThat(actual.getSelectPartyRespond())
-            .isEqualTo("Claimant");
+            .isEqualTo(CLAIMANT_TITLE);
         assertThat(actual.getAdditionalInformation())
             .isEqualTo("Additional information text");
         assertThat(actual.getResponseRequiredDoc())
@@ -279,7 +285,7 @@ class TseAdminServiceTest {
         assertThat(actual.getDecisionMadeByFullName())
             .isEqualTo("Judge Full Name");
         assertThat(actual.getSelectPartyNotify())
-            .isEqualTo("Claimant only");
+            .isEqualTo(CLAIMANT_ONLY);
     }
 
     @Test
@@ -289,7 +295,7 @@ class TseAdminServiceTest {
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("4")
-                    .withType("Consider a decision afresh")
+                    .withType(TSE_APP_CONSIDER_A_DECISION_AFRESH)
                     .build())
                 .build())
         );
@@ -303,7 +309,7 @@ class TseAdminServiceTest {
         caseData.setTseAdminResponseRequiredNoDoc(createUploadedDocumentType("document.txt"));
         caseData.setTseAdminDecisionMadeBy("Judge");
         caseData.setTseAdminDecisionMadeByFullName("Judge Full Name");
-        caseData.setTseAdminSelectPartyNotify("Respondent only");
+        caseData.setTseAdminSelectPartyNotify(RESPONDENT_ONLY);
 
         tseAdminService.saveTseAdminDataFromCaseData(caseData);
 
@@ -334,11 +340,11 @@ class TseAdminServiceTest {
         assertThat(actual.getDecisionMadeByFullName())
             .isEqualTo("Judge Full Name");
         assertThat(actual.getSelectPartyNotify())
-            .isEqualTo("Respondent only");
+            .isEqualTo(RESPONDENT_ONLY);
     }
 
     @ParameterizedTest
-    @CsvSource({BOTH, CLAIMANT_ONLY, RESPONDENT_ONLY})
+    @CsvSource({BOTH_PARTIES, CLAIMANT_ONLY, RESPONDENT_ONLY})
     void sendRecordADecisionEmails(String partyNotified) {
         caseData.setEthosCaseReference(CASE_NUMBER);
         createClaimant(caseData);
@@ -348,7 +354,7 @@ class TseAdminServiceTest {
         Map<String, String> expectedPersonalisationClaimant =
             createPersonalisation(caseData, CLAIMANT_FIRSTNAME + " " + CLAIMANT_LASTNAME);
         Map<String, String> expectedPersonalisationRespondent =
-            createPersonalisation(caseData, RESPONDENT_NAME);
+            createPersonalisation(caseData, RESPONDENT_TITLE);
 
         tseAdminService.sendRecordADecisionEmails(CASE_ID, caseData);
 
@@ -378,7 +384,7 @@ class TseAdminServiceTest {
 
     private void createRespondent(CaseData caseData) {
         RespondentSumType respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentName(RESPONDENT_NAME);
+        respondentSumType.setRespondentName(RESPONDENT_TITLE);
         respondentSumType.setRespondentEmail(RESPONDENT_EMAIL);
 
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
@@ -406,13 +412,13 @@ class TseAdminServiceTest {
         caseData.setTseAdminDecisionDetails("Decision details text");
         caseData.setTseAdminTypeOfDecision("Case management order");
         caseData.setTseAdminIsResponseRequired(YES);
-        caseData.setTseAdminSelectPartyRespond("Claimant");
+        caseData.setTseAdminSelectPartyRespond(CLAIMANT_TITLE);
         caseData.setTseAdminAdditionalInformation("Additional information text");
         caseData.setTseAdminResponseRequiredYesDoc(createUploadedDocumentType("document.txt"));
         caseData.setTseAdminResponseRequiredNoDoc(null);
         caseData.setTseAdminDecisionMadeBy("Judge");
         caseData.setTseAdminDecisionMadeByFullName("Judge Full Name");
-        caseData.setTseAdminSelectPartyNotify("Claimant only");
+        caseData.setTseAdminSelectPartyNotify(CLAIMANT_ONLY);
 
         tseAdminService.clearTseAdminDataFromCaseData(caseData);
 

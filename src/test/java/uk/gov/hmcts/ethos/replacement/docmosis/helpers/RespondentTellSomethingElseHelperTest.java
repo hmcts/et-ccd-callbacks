@@ -12,6 +12,18 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CLAIMANT_NOT_COMPLIED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONTACT_THE_TRIBUNAL;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_OTHER_PARTY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_JUDGEMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PUBLICITY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_VARY_OR_REVOKE_AN_ORDER;
 
 @SuppressWarnings({"PMD.LinguisticNaming", "PMD.CyclomaticComplexity"})
 class RespondentTellSomethingElseHelperTest {
@@ -20,20 +32,6 @@ class RespondentTellSomethingElseHelperTest {
 
     private static final String RES_TSE_FILE_NAME = "resTse.pdf";
     private static final String RES_TSE_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02822.docx";
-
-    private static final String SELECTED_APP_AMEND_RESPONSE = "Amend response";
-    private static final String SELECTED_APP_CHANGE_PERSONAL_DETAILS = "Change personal details";
-    private static final String SELECTED_APP_CLAIMANT_NOT_COMPLIED = "Claimant not complied";
-    private static final String SELECTED_APP_CONSIDER_A_DECISION_AFRESH = "Consider a decision afresh";
-    private static final String SELECTED_APP_CONTACT_THE_TRIBUNAL = "Contact the tribunal";
-    private static final String SELECTED_APP_ORDER_OTHER_PARTY = "Order other party";
-    private static final String SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE =
-            "Order a witness to attend to give evidence";
-    private static final String SELECTED_APP_POSTPONE_A_HEARING = "Postpone a hearing";
-    private static final String SELECTED_APP_RECONSIDER_JUDGEMENT = "Reconsider judgement";
-    private static final String SELECTED_APP_RESTRICT_PUBLICITY = "Restrict publicity";
-    private static final String SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM = "Strike out all or part of a claim";
-    private static final String SELECTED_APP_VARY_OR_REVOKE_AN_ORDER = "Vary or revoke an order";
 
     @BeforeEach
     void setUp() {
@@ -65,56 +63,56 @@ class RespondentTellSomethingElseHelperTest {
 
     private static Stream<Arguments> selectedApplicationList() {
         return Stream.of(
-                Arguments.of(SELECTED_APP_AMEND_RESPONSE),
-                Arguments.of(SELECTED_APP_CHANGE_PERSONAL_DETAILS),
-                Arguments.of(SELECTED_APP_CLAIMANT_NOT_COMPLIED),
-                Arguments.of(SELECTED_APP_CONSIDER_A_DECISION_AFRESH),
-                Arguments.of(SELECTED_APP_CONTACT_THE_TRIBUNAL),
-                Arguments.of(SELECTED_APP_ORDER_OTHER_PARTY),
-                Arguments.of(SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE),
-                Arguments.of(SELECTED_APP_POSTPONE_A_HEARING),
-                Arguments.of(SELECTED_APP_RECONSIDER_JUDGEMENT),
-                Arguments.of(SELECTED_APP_RESTRICT_PUBLICITY),
-                Arguments.of(SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM),
-                Arguments.of(SELECTED_APP_VARY_OR_REVOKE_AN_ORDER));
+                Arguments.of(TSE_APP_AMEND_RESPONSE),
+                Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS),
+                Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED),
+                Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH),
+                Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL),
+                Arguments.of(TSE_APP_ORDER_OTHER_PARTY),
+                Arguments.of(TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE),
+                Arguments.of(TSE_APP_POSTPONE_A_HEARING),
+                Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT),
+                Arguments.of(TSE_APP_RESTRICT_PUBLICITY),
+                Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM),
+                Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER));
     }
 
     private void setTextBoxForSelectedApplication(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
-            case SELECTED_APP_AMEND_RESPONSE:
+            case TSE_APP_AMEND_RESPONSE:
                 caseData.setResTseTextBox1("Not Blank");
                 break;
-            case SELECTED_APP_CHANGE_PERSONAL_DETAILS:
+            case TSE_APP_CHANGE_PERSONAL_DETAILS:
                 caseData.setResTseTextBox2("Not Blank");
                 break;
-            case SELECTED_APP_CLAIMANT_NOT_COMPLIED:
+            case TSE_APP_CLAIMANT_NOT_COMPLIED:
                 caseData.setResTseTextBox3("Not Blank");
                 break;
-            case SELECTED_APP_CONSIDER_A_DECISION_AFRESH:
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH:
                 caseData.setResTseTextBox4("Not Blank");
                 break;
-            case SELECTED_APP_CONTACT_THE_TRIBUNAL:
+            case TSE_APP_CONTACT_THE_TRIBUNAL:
                 caseData.setResTseTextBox5("Not Blank");
                 break;
-            case SELECTED_APP_ORDER_OTHER_PARTY:
+            case TSE_APP_ORDER_OTHER_PARTY:
                 caseData.setResTseTextBox6("Not Blank");
                 break;
-            case SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
                 caseData.setResTseTextBox7("Not Blank");
                 break;
-            case SELECTED_APP_POSTPONE_A_HEARING:
+            case TSE_APP_POSTPONE_A_HEARING:
                 caseData.setResTseTextBox8("Not Blank");
                 break;
-            case SELECTED_APP_RECONSIDER_JUDGEMENT:
+            case TSE_APP_RECONSIDER_JUDGEMENT:
                 caseData.setResTseTextBox9("Not Blank");
                 break;
-            case SELECTED_APP_RESTRICT_PUBLICITY:
+            case TSE_APP_RESTRICT_PUBLICITY:
                 caseData.setResTseTextBox10("Not Blank");
                 break;
-            case SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
                 caseData.setResTseTextBox11("Not Blank");
                 break;
-            case SELECTED_APP_VARY_OR_REVOKE_AN_ORDER:
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
                 caseData.setResTseTextBox12("Not Blank");
                 break;
             default:
@@ -146,40 +144,40 @@ class RespondentTellSomethingElseHelperTest {
 
     private void setDocForSelectedApplication(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
-            case SELECTED_APP_AMEND_RESPONSE:
+            case TSE_APP_AMEND_RESPONSE:
                 caseData.setResTseDocument1(createDocumentType());
                 break;
-            case SELECTED_APP_CHANGE_PERSONAL_DETAILS:
+            case TSE_APP_CHANGE_PERSONAL_DETAILS:
                 caseData.setResTseDocument2(createDocumentType());
                 break;
-            case SELECTED_APP_CLAIMANT_NOT_COMPLIED:
+            case TSE_APP_CLAIMANT_NOT_COMPLIED:
                 caseData.setResTseDocument3(createDocumentType());
                 break;
-            case SELECTED_APP_CONSIDER_A_DECISION_AFRESH:
+            case TSE_APP_CONSIDER_A_DECISION_AFRESH:
                 caseData.setResTseDocument4(createDocumentType());
                 break;
-            case SELECTED_APP_CONTACT_THE_TRIBUNAL:
+            case TSE_APP_CONTACT_THE_TRIBUNAL:
                 caseData.setResTseDocument5(createDocumentType());
                 break;
-            case SELECTED_APP_ORDER_OTHER_PARTY:
+            case TSE_APP_ORDER_OTHER_PARTY:
                 caseData.setResTseDocument6(createDocumentType());
                 break;
-            case SELECTED_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
+            case TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE:
                 caseData.setResTseDocument7(createDocumentType());
                 break;
-            case SELECTED_APP_POSTPONE_A_HEARING:
+            case TSE_APP_POSTPONE_A_HEARING:
                 caseData.setResTseDocument8(createDocumentType());
                 break;
-            case SELECTED_APP_RECONSIDER_JUDGEMENT:
+            case TSE_APP_RECONSIDER_JUDGEMENT:
                 caseData.setResTseDocument9(createDocumentType());
                 break;
-            case SELECTED_APP_RESTRICT_PUBLICITY:
+            case TSE_APP_RESTRICT_PUBLICITY:
                 caseData.setResTseDocument10(createDocumentType());
                 break;
-            case SELECTED_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
+            case TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM:
                 caseData.setResTseDocument11(createDocumentType());
                 break;
-            case SELECTED_APP_VARY_OR_REVOKE_AN_ORDER:
+            case TSE_APP_VARY_OR_REVOKE_AN_ORDER:
                 caseData.setResTseDocument12(createDocumentType());
                 break;
             default:

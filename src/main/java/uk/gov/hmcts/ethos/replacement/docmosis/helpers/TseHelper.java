@@ -31,8 +31,10 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultString;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
@@ -51,8 +53,6 @@ public final class TseHelper {
     public static final String GROUP_B = "You do not need to respond to this application.<br>";
     public static final List<String> GROUP_B_TYPES = List.of("Change my personal details", "Consider a decision "
         + "afresh", "Reconsider a judgment", "Withdraw my claim");
-    public static final String OPEN = "Open";
-    public static final String CLOSED = "Closed";
 
     private static final String REPLY_OUTPUT_NAME = "%s Reply.pdf";
     private static final String REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-01212.docx";
@@ -107,7 +107,7 @@ public final class TseHelper {
         }
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
-            .filter(o -> !CLOSED.equals(o.getValue().getStatus()))
+            .filter(o -> !CLOSED_STATE.equals(o.getValue().getStatus()))
             .map(TseHelper::formatDropdownOption)
             .collect(Collectors.toList()));
     }
@@ -183,7 +183,7 @@ public final class TseHelper {
                     .response(caseData.getTseResponseText())
                     .supportingMaterial(caseData.getTseResponseSupportingMaterial())
                     .hasSupportingMaterial(caseData.getTseResponseHasSupportingMaterial())
-                    .from("Respondent")
+                    .from(RESPONDENT_TITLE)
                     .date(UtilHelper.formatCurrentDate(LocalDate.now()))
                     .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
                     .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())

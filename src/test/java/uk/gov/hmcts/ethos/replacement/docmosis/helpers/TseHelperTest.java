@@ -25,7 +25,11 @@ import java.util.UUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @SuppressWarnings({"PMD.LinguisticNaming"})
@@ -41,9 +45,9 @@ public class TseHelperTest {
 
         caseData.setClaimant("First Last");
 
-        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant("Claimant")
+        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
             .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
-            .withDetails("Text").withNumber("1").withResponsesCount("0").withStatus("Open").build();
+            .withDetails("Text").withNumber("1").withResponsesCount("0").withStatus(OPEN_STATE).build();
 
         GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
@@ -87,7 +91,7 @@ public class TseHelperTest {
 
     @Test
     public void setDataForRespondingToApplication_withAGroupAApplication_restoresData() {
-        caseData.getGenericTseApplicationCollection().get(0).getValue().setType("Postpone a hearing");
+        caseData.getGenericTseApplicationCollection().get(0).getValue().setType(TSE_APP_POSTPONE_A_HEARING);
         caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
         TseHelper.setDataForRespondingToApplication(caseData);
@@ -146,7 +150,7 @@ public class TseHelperTest {
         assertThat(replyType.getCopyNoGiveDetails(), is("It's a secret"));
         assertThat(replyType.getHasSupportingMaterial(), is(YES));
         assertThat(replyType.getCopyToOtherParty(), is(NO));
-        assertThat(replyType.getFrom(), is("Respondent"));
+        assertThat(replyType.getFrom(), is(RESPONDENT_TITLE));
         assertThat(replyType.getSupportingMaterial().get(0).getValue().getUploadedDocument().getDocumentFilename(),
             is("image.png"));
     }
@@ -182,7 +186,7 @@ public class TseHelperTest {
                     .id("c0bae193-ded6-4db8-a64d-b260847bcc9b")
                     .value(
                         TseRespondType.builder()
-                            .from("Claimant")
+                            .from(CLAIMANT_TITLE)
                             .date("16-May-1996")
                             .response("response")
                             .hasSupportingMaterial(YES)

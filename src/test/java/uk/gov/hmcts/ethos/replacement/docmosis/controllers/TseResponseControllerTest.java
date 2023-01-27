@@ -42,8 +42,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
@@ -130,7 +132,7 @@ class TseResponseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
     }
-    
+
     @Test
     void midPopulateReply_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -198,9 +200,9 @@ class TseResponseControllerTest {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseResponseCopyToOtherParty(YES_COPY);
 
-        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant("Claimant")
+        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
             .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
-            .withDetails("Text").withNumber("1").withResponsesCount("0").withStatus("Open").build();
+            .withDetails("Text").withNumber("1").withResponsesCount("0").withStatus(OPEN_STATE).build();
 
         GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
@@ -216,7 +218,7 @@ class TseResponseControllerTest {
                     .id("c0bae193-ded6-4db8-a64d-b260847bcc9b")
                     .value(
                         TseRespondType.builder()
-                            .from("Claimant")
+                            .from(CLAIMANT_TITLE)
                             .date("16-May-1996")
                             .response("response")
                             .hasSupportingMaterial(NO)
@@ -320,5 +322,5 @@ class TseResponseControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
-    }    
+    }
 }

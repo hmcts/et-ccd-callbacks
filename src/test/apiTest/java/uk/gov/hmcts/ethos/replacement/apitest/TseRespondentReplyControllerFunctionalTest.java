@@ -22,7 +22,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationBuilder;
 import java.util.List;
 import java.util.UUID;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
@@ -44,9 +46,9 @@ class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
 
         caseData.setTseResponseCopyToOtherParty(YES_COPY);
 
-        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant("Claimant")
+        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
             .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
-            .withDetails("Text").withNumber("1").withResponsesCount("0").withStatus("Open").build();
+            .withDetails("Text").withNumber("1").withResponsesCount("0").withStatus(OPEN_STATE).build();
 
         GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
@@ -62,7 +64,7 @@ class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
                     .id("c0bae193-ded6-4db8-a64d-b260847bcc9b")
                     .value(
                         TseRespondType.builder()
-                            .from("Claimant")
+                            .from(CLAIMANT_TITLE)
                             .date("16-May-1996")
                             .response("response")
                             .hasSupportingMaterial(NO)

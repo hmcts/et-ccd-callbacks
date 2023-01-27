@@ -17,6 +17,8 @@ import java.util.UUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 
 public class TseAdminHelperTest {
     CCDRequest ccdRequest;
@@ -38,14 +40,14 @@ public class TseAdminHelperTest {
             .build();
 
         GenericTseApplicationType build = TseApplicationBuilder.builder()
-            .withApplicant("Claimant")
+            .withApplicant(CLAIMANT_TITLE)
             .withDate("13 December 2022")
             .withDue("20 December 2022")
             .withType("Withdraw my claim")
             .withDetails("Text")
             .withNumber("1")
             .withResponsesCount("0")
-            .withStatus("Open")
+            .withStatus(OPEN_STATE)
             .build();
 
         GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();

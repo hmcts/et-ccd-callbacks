@@ -24,6 +24,12 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.displayCopyToOtherPartyYesOrNo;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
@@ -56,14 +62,7 @@ public class TseAdmReplyService {
             + "\r\n";
     private static final String STRING_BR = "<br>";
     private static final String APPLICATION_QUESTION = "Give details";
-    private static final String BOTH_NOTIFY = "Both parties";
-    private static final String CLAIMANT_NOTIFY_ONLY = "Claimant only";
-    private static final String RESPONDENT_NOTIFY_ONLY = "Respondent only";
 
-    private static final String FROM_ADMIN = "Admin";
-    private static final String BOTH_RESPOND = "Both parties";
-    private static final String CLAIMANT_RESPOND_ONLY = "Claimant";
-    private static final String RESPONDENT_RESPOND_ONLY = "Respondent";
     private static final String RESPONSE_REQUIRED =
         "The tribunal requires some information from you about an application.";
     private static final String RESPONSE_NOT_REQUIRED =
@@ -106,7 +105,7 @@ public class TseAdmReplyService {
         IntWrapper respondCount = new IntWrapper(0);
         return application.getRespondCollection().stream()
             .map(replyItem ->
-                FROM_ADMIN.equals(replyItem.getValue().getFrom())
+                ADMIN.equals(replyItem.getValue().getFrom())
                 ? formatAdminReply(
                     replyItem.getValue(),
                     respondCount.incrementAndReturnValue(),
@@ -174,7 +173,7 @@ public class TseAdmReplyService {
                     .value(
                         TseRespondType.builder()
                             .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                            .from(FROM_ADMIN)
+                            .from(ADMIN)
                             .enterResponseTitle(caseData.getTseAdmReplyEnterResponseTitle())
                             .additionalInformation(caseData.getTseAdmReplyAdditionalInformation())
                             .addDocument(caseData.getTseAdmReplyAddDocument())
@@ -212,8 +211,8 @@ public class TseAdmReplyService {
 
     private void collectRespondents(CaseData caseData, List<TSEAdminEmailRecipientsData> emailsToSend) {
         // if respondent only or both parties: send Respondents Reply Emails
-        if (RESPONDENT_NOTIFY_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())
-            || BOTH_NOTIFY.equals(caseData.getTseAdmReplySelectPartyNotify())) {
+        if (RESPONDENT_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())
+            || BOTH_PARTIES.equals(caseData.getTseAdmReplySelectPartyNotify())) {
             TSEAdminEmailRecipientsData respondentDetails;
             for (RespondentSumTypeItem respondentSumTypeItem: caseData.getRespondentCollection()) {
                 if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
@@ -223,8 +222,8 @@ public class TseAdmReplyService {
                             respondentSumTypeItem.getValue().getRespondentEmail());
 
                     if (YES.equals(caseData.getTseAdmReplyIsResponseRequired())
-                        && (BOTH_RESPOND.equals(caseData.getTseAdmReplySelectPartyRespond())
-                        || RESPONDENT_RESPOND_ONLY.equals(caseData.getTseAdmReplySelectPartyRespond()))) {
+                        && (BOTH_PARTIES.equals(caseData.getTseAdmReplySelectPartyRespond())
+                        || RESPONDENT_TITLE.equals(caseData.getTseAdmReplySelectPartyRespond()))) {
                         respondentDetails.setCustomisedText(RESPONSE_REQUIRED);
                     } else {
                         respondentDetails.setCustomisedText(RESPONSE_NOT_REQUIRED);
@@ -238,8 +237,8 @@ public class TseAdmReplyService {
 
     private void collectClaimants(CaseData caseData, List<TSEAdminEmailRecipientsData> emailsToSend) {
         // if claimant only or both parties: send Claimant Reply Email
-        if (CLAIMANT_NOTIFY_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())
-            || BOTH_NOTIFY.equals(caseData.getTseAdmReplySelectPartyNotify())) {
+        if (CLAIMANT_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())
+            || BOTH_PARTIES.equals(caseData.getTseAdmReplySelectPartyNotify())) {
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
 
             if (claimantEmail != null) {
@@ -247,8 +246,8 @@ public class TseAdmReplyService {
                     new TSEAdminEmailRecipientsData(emailToClaimantTemplateId, claimantEmail);
 
                 if (YES.equals(caseData.getTseAdmReplyIsResponseRequired())
-                    && (BOTH_RESPOND.equals(caseData.getTseAdmReplySelectPartyRespond())
-                    || CLAIMANT_RESPOND_ONLY.equals(caseData.getTseAdmReplySelectPartyRespond()))) {
+                    && (BOTH_PARTIES.equals(caseData.getTseAdmReplySelectPartyRespond())
+                    || CLAIMANT_TITLE.equals(caseData.getTseAdmReplySelectPartyRespond()))) {
                     claimantDetails.setCustomisedText(RESPONSE_REQUIRED);
                 } else {
                     claimantDetails.setCustomisedText(RESPONSE_NOT_REQUIRED);

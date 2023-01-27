@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
@@ -50,12 +52,10 @@ public class RespondentTellSomethingElseService {
     @Value("${tse.respondent.application.notify.claimant.template.id}")
     private String claimantTemplateId;
 
-    private static final String RULE92_YES = "I confirm I want to copy";
     private static final String GIVE_DETAIL_MISSING = "Use the text box or file upload to give details.";
     private static final List<String> GROUP_B_TYPES = List.of(TSE_APP_CHANGE_PERSONAL_DETAILS,
         TSE_APP_CONSIDER_A_DECISION_AFRESH, TSE_APP_RECONSIDER_JUDGEMENT);
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
-    private static final String NO = "I do not want to copy";
     private static final String RULE92_ANSWERED_NO = "You have said that you do not want to copy this correspondence "
         + "to the other party. \n \n"
         + "The tribunal will consider all correspondence and let you know what happens next.";
@@ -109,7 +109,7 @@ public class RespondentTellSomethingElseService {
 
         String email = userService.getUserDetails(userToken).getEmail();
 
-        if (NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())) {
+        if (I_DO_NOT_WANT_TO_COPY.equals(caseData.getResTseCopyToOtherPartyYesOrNo())) {
             emailService.sendEmail(emailTemplateId, email, buildPersonalisation(caseDetails, RULE92_ANSWERED_NO));
             return;
         }
@@ -133,7 +133,7 @@ public class RespondentTellSomethingElseService {
         CaseData caseData = caseDetails.getCaseData();
 
         if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())
-            || NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())
+            || I_DO_NOT_WANT_TO_COPY.equals(caseData.getResTseCopyToOtherPartyYesOrNo())
             || caseData.getClaimantType().getClaimantEmailAddress() == null) {
             return;
         }
@@ -306,7 +306,8 @@ public class RespondentTellSomethingElseService {
     private boolean applicationsSharedWithRespondent(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
         String applicant = genericTseApplicationTypeItem.getValue().getApplicant();
         String copyToRespondent = genericTseApplicationTypeItem.getValue().getCopyToOtherPartyYesOrNo();
-        boolean isClaimantAndRule92Shared = CLAIMANT_TITLE.equals(applicant) && RULE92_YES.equals(copyToRespondent);
+        boolean isClaimantAndRule92Shared = CLAIMANT_TITLE.equals(applicant)
+            && I_CONFIRM_I_WANT_TO_COPY.equals(copyToRespondent);
 
         return RESPONDENT_TITLE.equals(applicant) || isClaimantAndRule92Shared;
     }

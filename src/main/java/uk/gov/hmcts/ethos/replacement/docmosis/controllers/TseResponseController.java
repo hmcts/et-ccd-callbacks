@@ -29,6 +29,7 @@ import java.util.Map;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -58,7 +59,6 @@ public class TseResponseController {
     private static final String SUBMITTED_BODY = "### What happens next \r\n\r\nYou have sent your response to the"
         + " tribunal%s.\r\n\r\nThe tribunal will consider all correspondence and let you know what happens next.";
     private static final String SUBMITTED_COPY = " and copied it to the claimant";
-    private static final String YES_COPY = "I confirm I want to copy";
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
     /**
@@ -156,7 +156,7 @@ public class TseResponseController {
         CaseData caseData = caseDetails.getCaseData();
         TseHelper.saveReplyToApplication(caseData);
 
-        if (YES_COPY.equals(caseData.getTseResponseCopyToOtherParty())) {
+        if (I_CONFIRM_I_WANT_TO_COPY.equals(caseData.getTseResponseCopyToOtherParty())) {
             try {
                 byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", "TSE Reply.pdf");
                 String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
@@ -169,7 +169,7 @@ public class TseResponseController {
 
         String legalRepEmail = userService.getUserDetails(userToken).getEmail();
         emailService.sendEmail(
-            YES_COPY.equals(caseData.getTseResponseCopyToOtherParty())
+            I_CONFIRM_I_WANT_TO_COPY.equals(caseData.getTseResponseCopyToOtherParty())
                 ? acknowledgementRule92YesEmailTemplateId
                 : acknowledgementRule92NoEmailTemplateId,
             legalRepEmail,

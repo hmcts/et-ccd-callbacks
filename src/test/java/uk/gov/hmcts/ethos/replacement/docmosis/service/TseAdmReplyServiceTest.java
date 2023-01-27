@@ -43,6 +43,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEITHER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
@@ -102,7 +104,7 @@ class TseAdmReplyServiceTest {
             .supportingMaterial(List.of(
                 createDocumentTypeItem("image.png"),
                 createDocumentTypeItem("Form.pdf")))
-            .copyToOtherParty("I do not want to copy")
+            .copyToOtherParty(I_DO_NOT_WANT_TO_COPY)
             .build();
 
         TseRespondTypeItem tseRespondTypeItem = TseRespondTypeItem.builder()
@@ -117,7 +119,7 @@ class TseAdmReplyServiceTest {
             .withDate("13 December 2022")
             .withDocumentUpload(createUploadedDocumentType("document.txt"))
             .withDetails("Details Text")
-            .withCopyToOtherPartyYesOrNo("I confirm I want to copy")
+            .withCopyToOtherPartyYesOrNo(I_CONFIRM_I_WANT_TO_COPY)
             .withStatus(OPEN_STATE)
             .withRespondCollection(List.of(tseRespondTypeItem))
             .build();

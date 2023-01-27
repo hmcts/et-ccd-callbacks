@@ -28,6 +28,7 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -46,7 +47,6 @@ public class RespondentTellSomethingElseController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
-    private static final String YES = "I confirm I want to copy";
     private static final String APPLICATION_COMPLETE_RULE92_ANSWERED_NO = "<hr>"
         + "<h3>What happens next</h3>"
         + "<p>The tribunal will consider all correspondence and let you know what happens next.</p>";
@@ -179,7 +179,7 @@ public class RespondentTellSomethingElseController {
             tseApplicationCollection.get(tseApplicationCollection.size() - 1);
 
         String body;
-        if (YES.equals(latestTSEApplication.getValue().getCopyToOtherPartyYesOrNo())) {
+        if (I_CONFIRM_I_WANT_TO_COPY.equals(latestTSEApplication.getValue().getCopyToOtherPartyYesOrNo())) {
             body = String.format(APPLICATION_COMPLETE_RULE92_ANSWERED_YES,
                 UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
         } else {

@@ -22,6 +22,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
+
 @Slf4j
 class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
@@ -38,8 +41,8 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
     public void setUpCaseData() {
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("testCaseReference");
-        caseData.setResTseSelectApplication("Amend response");
-        caseData.setResTseCopyToOtherPartyYesOrNo("I do not want to copy");
+        caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
+        caseData.setResTseCopyToOtherPartyYesOrNo(I_DO_NOT_WANT_TO_COPY);
         caseData.setClaimant("claimant");
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());

@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
+
 @Slf4j
 class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
 
@@ -38,7 +40,7 @@ class TseAdmReplyControllerFunctionalTest extends BaseFunctionalTest  {
     public void setUpCaseData() {
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("testCaseReference");
-        caseData.setResTseSelectApplication("Amend response");
+        caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
         caseData.setTseAdminSelectApplication(
             DynamicFixedListType.of(

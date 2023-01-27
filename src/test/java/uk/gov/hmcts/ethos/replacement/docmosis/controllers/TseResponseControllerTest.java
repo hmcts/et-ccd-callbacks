@@ -44,6 +44,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -62,8 +64,6 @@ class TseResponseControllerTest {
     private static final String RESPONSE_TEMPLATE_ID = "b1249c5c-9d7c-4e39-bb81-9e95fa058ed3";
     private static final String YES_COPY_TEMPLATE_ID = "580028e7-d9ff-49de-96c2-dc9595572ebb";
     private static final String NO_COPY_TEMPLATE_ID = "84e64ff7-7c27-42b6-a7fa-ea29dd712223";
-    private static final String YES_COPY = "I confirm I want to copy";
-    private static final String NO_COPY = "I do not want to copy";
 
     @Autowired
     private MockMvc mockMvc;
@@ -198,7 +198,7 @@ class TseResponseControllerTest {
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setTseResponseCopyToOtherParty(YES_COPY);
+        caseData.setTseResponseCopyToOtherParty(I_CONFIRM_I_WANT_TO_COPY);
 
         GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
             .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
@@ -254,7 +254,7 @@ class TseResponseControllerTest {
         genericTseApplicationTypeItem.setValue(build);
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setTseResponseCopyToOtherParty(NO_COPY);
+        caseData.setTseResponseCopyToOtherParty(I_DO_NOT_WANT_TO_COPY);
         caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
 
         caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));

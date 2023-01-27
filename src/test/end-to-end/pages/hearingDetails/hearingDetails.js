@@ -24,13 +24,13 @@ module.exports = async function (caseDisposed) {
         await I.checkOption('#hearingDetailsCaseDisposed_No')
     }
     let currentDate = await utilsComponent.getCurrentDay();
-    await I.fillField('#hearingDetailsTimingFinish-day', currentDate.split('-')[2]);
+    await I.fillField('#hearingDetailsTimingStart-day', currentDate.split('-')[2]);
     await I.fillField('#hearingDetailsTimingStart-month', currentDate.split('-')[1]);
     await I.fillField('#hearingDetailsTimingStart-year', currentDate.split('-')[0]);
-    await I.fillField('#hearingDetailsTimingStart-hour', '9');
+    await I.fillField('#hearingDetailsTimingStart-hour', currentDate.split('-')[3]);
     await I.fillField('#hearingDetailsTimingStart-minute', '00');
     await I.fillField('#hearingDetailsTimingStart-second', '00');
-    await I.fillField('#hearingDetailsTimingStart-day', currentDate.split('-')[2]);
+    await I.fillField('#hearingDetailsTimingFinish-day', currentDate.split('-')[2]);
     await I.fillField('#hearingDetailsTimingFinish-month', currentDate.split('-')[1]);
     await I.fillField('#hearingDetailsTimingFinish-year', currentDate.split('-')[0]);
     await I.fillField('#hearingDetailsTimingFinish-hour', '11');

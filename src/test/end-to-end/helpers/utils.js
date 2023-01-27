@@ -18,7 +18,6 @@ class utilsComponent {
         return currentMonth;
     }
 
-
     static async getCurrentYear() {
         let currentTime = new Date();
         let year = currentTime.getFullYear();
@@ -30,8 +29,20 @@ class utilsComponent {
         let month = currentTime.getMonth() + 1;
         let day = currentTime.getDate();
         let year = currentTime.getFullYear();
-        let presentDay = year + "-" + month + "-" + day;
+        let hour = currentTime.getHours() - 2 ;
+        let presentDay = year + "-" + month + "-" + day + "-" + hour ;
         return presentDay;
+    }
+
+    static async getTomorrowDate() {
+        let todayDate = new Date();
+        console.log("Today date > ", todayDate);
+
+        let tomorrowDate = new Date();
+        tomorrowDate.setDate(todayDate.getDate() +1 );
+
+        console.log("Today date > ", tomorrowDate);
+
     }
 
     static async isWeekend() {

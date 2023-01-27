@@ -342,8 +342,8 @@ public final class TseHelper {
      * @param docInfo Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
      * @return Markup String
      */
-    public static String formatRespondentReplyForReply(TseRespondType reply, int respondCount, String applicant,
-                                                       String docInfo) {
+    public static String formatLegalRepReplyForReply(TseRespondType reply, int respondCount, String applicant,
+                                                     String docInfo) {
         return String.format(
             RESPONDENT_REPLY_MARKUP_FOR_REPLY,
             respondCount,
@@ -378,7 +378,7 @@ public final class TseHelper {
      * @param docInfo Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
      * @return Markup String
      */
-    public static String formatRespondentReplyForDecision(TseRespondType reply, int respondCount, String docInfo) {
+    public static String formatLegalRepReplyForDecision(TseRespondType reply, int respondCount, String docInfo) {
         return String.format(
             RESPONDENT_REPLY_MARKUP_FOR_DECISION,
             respondCount,

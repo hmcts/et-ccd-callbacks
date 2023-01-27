@@ -32,7 +32,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRespondentReplyForDecision;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyForDecision;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
@@ -53,7 +53,7 @@ public class TseAdminService {
             + "|--|--|\r\n"
             + "|%s application | %s|\r\n"
             + "|Application date | %s|\r\n"
-            + "|%s | %s|\r\n"
+            + "|Give details | %s|\r\n"
             + "|Supporting material | %s|\r\n"
             + "\r\n";
 
@@ -83,7 +83,6 @@ public class TseAdminService {
         + "\r\n";
 
     private static final String STRING_BR = "<br>";
-    private static final String APPLICATION_QUESTION = "Give details";
 
     /**
      * Initial Application and Respond details table.
@@ -103,7 +102,6 @@ public class TseAdminService {
             applicationType.getApplicant(),
             applicationType.getType(),
             applicationType.getDate(),
-            APPLICATION_QUESTION,
             applicationType.getDetails(),
             documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken)
         );
@@ -122,7 +120,7 @@ public class TseAdminService {
                         respondCount.incrementAndReturnValue(),
                         documentManagementService.displayDocNameTypeSizeLink(
                             replyItem.getValue().getAddDocument(), authToken))
-                    : formatRespondentReplyForDecision(
+                    : formatLegalRepReplyForDecision(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),
                         populateListDocWithInfoAndLink(replyItem.getValue().getSupportingMaterial(), authToken)))

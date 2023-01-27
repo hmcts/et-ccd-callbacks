@@ -35,7 +35,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.displayCopyToOtherPartyYesOrNo;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRespondentReplyForReply;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyForReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
@@ -58,12 +58,11 @@ public class TseAdmReplyService {
             + "|Applicant | %s|\r\n"
             + "|Type of application | %s|\r\n"
             + "|Application date | %s|\r\n"
-            + "|%s | %s|\r\n"
+            + "|Give details | %s|\r\n"
             + "|Supporting material | %s|\r\n"
             + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
             + "\r\n";
     private static final String STRING_BR = "<br>";
-    private static final String APPLICATION_QUESTION = "Give details";
 
     private static final String RESPONSE_REQUIRED =
         "The tribunal requires some information from you about an application.";
@@ -91,7 +90,6 @@ public class TseAdmReplyService {
             applicationType.getApplicant(),
             applicationType.getType(),
             applicationType.getDate(),
-            APPLICATION_QUESTION,
             applicationType.getDetails(),
             documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken),
             displayCopyToOtherPartyYesOrNo(applicationType.getCopyToOtherPartyYesOrNo())
@@ -111,7 +109,7 @@ public class TseAdmReplyService {
                     respondCount.incrementAndReturnValue(),
                     documentManagementService.displayDocNameTypeSizeLink(
                         replyItem.getValue().getAddDocument(), authToken))
-                : formatRespondentReplyForReply(
+                : formatLegalRepReplyForReply(
                     replyItem.getValue(),
                     respondCount.incrementAndReturnValue(),
                     application.getApplicant(),

@@ -15,10 +15,15 @@ module.exports = async function () {
     I.waitForText(commonConfig.lettersCorrespondence1, testConfig.TestTimeToWaitForText);
     I.selectOption('#correspondenceType_part_2_Documents', commonConfig.lettersCorrespondence1);
     I.see('Letters');
+
     I.click(commonConfig.continue);
     I.click(commonConfig.submit)
+    I.wait(5);
+
     //After submitting letters
     I.see('Please download the document from : ')
+    I.click('.button')
+    I.wait(5);
 
     //Final Confirmation
     I.waitForText('has been updated with event: Letters', testConfig.TestTimeToWaitForText);

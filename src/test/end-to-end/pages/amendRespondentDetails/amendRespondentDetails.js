@@ -31,7 +31,7 @@ module.exports = async function () {
     I.click('#respondentCollection_0_responseContinue_Yes');
     I.see('Has there been a request for an extension? (Optional)')
     I.click('#respondentCollection_0_extensionRequested_No');
-    I.see('Has the ET3 form been received?')
+    I.see('Has the ET3 form been received?');
     I.click('#respondentCollection_0_responseReceived_Yes');
     
     I.see('Response received date');
@@ -79,15 +79,13 @@ module.exports = async function () {
     I.see('Has the ET3 form been received?');
     I.click('#respondentCollection_0_responseReceived_Yes');
     I.see('Response received date');
-    I.seeInField('#responseReceivedDate-day', '05')
-    I.seeInField('#responseReceivedDate-month', '05')
-    I.seeInField('#responseReceivedDate-year', '2021')
+    I.seeInField('#responseReceivedDate-day', '05');
+    I.seeInField('#responseReceivedDate-month', '05');
+    I.seeInField('#responseReceivedDate-year', '2021');
     I.see('Response Struck Out (Optional)');
 
     I.click(commonConfig.continue);
-    I.click(commonConfig.submit)
-
-    I.wait(5);
+    I.click(commonConfig.submit);
 
     //Final Confirmation
     I.waitForText('has been updated with event: Respondent Details', testConfig.TestTimeToWaitForText);

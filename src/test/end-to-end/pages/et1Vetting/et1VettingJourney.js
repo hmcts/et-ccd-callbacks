@@ -1,229 +1,30 @@
 'use strict';
 const testConfig = require('./../../../config');
 const commonConfig = require('../../data/commonConfig.json');
+const beforeYouStartVetting = require('./beforeYouStartVetting');
+const canWeServeTheClaim = require('./canWeServeTheClaim');
+const isThereAnACASCertificate = require('./isThereAnACASCertificate');
+const possibleSubstantiveDefects = require('./possibleSubstantiveDefects');
+const jurisdictionCodes = require('./jurisdictionCodes');
+const trackAllocation = require('./trackAllocation');
+const tribunalLocation = require('./tribunalLocation');
+const listingDetails = require('./listingDetails');
+const furtherDetails = require('./furtherDetails');
+const referalToJudgeOrLegalOfficer = require('./referalToJudgeOrLegalOfficer');
 
 module.exports = async function () {
 
     const I = this;
-    //The start page for the ET1 Journey - Open your Documents page....
-    I.waitForText('Check the Documents tab for additional ET1 documents the claimant may have uploaded.', testConfig.TestTimeToWaitForText);
-    I.see('ET1 case vetting');
-    I.see('Case Number:');
-    I.see('Before you start');
-    I.see('Open these documents to help you complete this form:');
-    //I.see('ET1 form (opens in new tab)'); //Does this Link Not always appear....?
-    I.click(commonConfig.continue);
-
-    //Can we serve the claim with the
-    I.waitForText('General notes (Optional)', testConfig.TestTimeToWaitForText);
-    I.see('ET1 case vetting');
-    I.see('Case Number:');
-    I.see('Minimum required information');
-    I.see('Contact Details');
-    //Claimant Section
-    I.see('Claimant');
-    I.see('First name');
-    I.see('Grayson');
-    I.see('Last name');
-    I.see('Becker');
-    I.see('Contact address');
-    I.see('4 Little Meadows');
-    I.see('Bradley');
-    I.see('LL11 4AR');
-    //Respondent Section
-    I.see('Respondent');
-    I.see('Name');
-    I.see('Mrs Test Auto');
-    I.see('Contact address');
-    I.see('78 East Wonford Hill');
-    I.see('Exeter');
-    I.see('EX1 3DD');
-    //Other Section
-    I.see('Can we serve the claim with these contact details?');
-
-    I.click('#et1VettingCanServeClaimYesOrNo_Yes');
-    I.fillField('#et1VettingCanServeClaimGeneralNote', 'ET1 Vetting can be served for this Customer...');
-    I.click(commonConfig.continue);
-
-    //The minimum reqired information....
-    I.waitForText('General notes (Optional)', testConfig.TestTimeToWaitForText);
-    I.see('ET1 case vetting');
-    I.see('Case Number:');
-    I.see('Minimum required information');
-    //Claimant Section
-    I.see('Claimant');
-    I.see('First name');
-    I.see('Last name');
-    I.see('Contact address');
-    I.see('Respondent 1');
-    I.see('Name');
-    I.see('Contact address');
-    I.see('Acas certificate');
-    I.see('Certificate number 15678 has been provided.');
-    I.see('Is there an Acas certificate?');
-    I.click('#et1VettingAcasCertIsYesOrNo1_Yes');
-    I.click(commonConfig.continue);
-
-    I.waitForText('General notes (Optional)', testConfig.TestTimeToWaitForText);
-    I.see('ET1 case vetting');
-    I.see('Case Number:');
-    I.see('Possible substantive defects (Optional)');
-    I.see('Select all that apply. Does the claim, or part of it, appear to be a claim which:');
-    I.see('The tribunal has no jurisdiction to consider - Rule 12(1)(a)');
-    I.see('Is in a form which cannot sensibly be responded to or otherwise an abuse of process - Rule 12 (1)(b)');
-    I.see('Has neither an EC number nor claims one of the EC exemptions - Rule 12 (1)(c)');
-    I.see('States that one of the EC exceptions applies but it might not - Rule 12 (1)(d)');
-    I.see('Institutes relevant proceedings and the EC number on the claim form does not match the EC number on the Acas certificate - Rule 12 (1)(da)');
-    I.see('Has a different claimant name on the ET1 to the claimant name on the Acas certificate - Rule 12 (1)(e)');
-    I.see('Has a different claimant name on the ET1 to the claimant name on the Acas certificate - Rule 12 (1)(e)');
-    I.see('Has a different respondent name on the ET1 to the respondent name on the Acas certificate - Rule 12 (1)(f)');
-    I.see('General notes (Optional)')
-
-    I.checkOption("[value='rule121a']");
-    I.checkOption("[value='rule121b']");
-    I.checkOption("[value='rule121c']");
-    I.checkOption("[value='rule121d']");
-    I.checkOption("[value='rule121 da'] ");
-    I.checkOption("[value='rule121e']");
-    I.checkOption("[value='rule121f']");
-
-    I.see('The tribunal has no jurisdiction to consider');
-    I.see('Is in a form which cannot sensibly be responded to or otherwise an abuse of process');
-    I.see('Has neither an EC number nor claims one of the EC exemptions');
-    I.see('States that one of the EC exceptions applies but it might not');
-    I.see('Institutes relevant proceedings and the EC number on the claim form does not match the EC number on the Acas certificate');
-    I.see('Has a different claimant name on the ET1 to the claimant name on the Acas certificate');
-    I.see('Has a different respondent name on the ET1 to the respondent name on the Acas certificate');
-    I.see('Give details');
-
-    I.fillField('#rule121aTextArea', 'Rule 121 a - Give Details Text');
-    I.fillField('#rule121bTextArea', 'Rule 121 b - Give Details Text');
-    I.fillField('#rule121cTextArea', 'Rule 121 c - Give Details Text');
-    I.fillField('#rule121dTextArea', 'Rule 121 d - Give Details Text');
-    I.fillField('#rule121daTextArea', 'Rule 121 da - Give Details Text');
-    I.fillField('#rule121eTextArea', 'Rule 121 e - Give Details Text');
-    I.fillField('#rule121fTextArea', 'Rule 121 f - Give Details Text');
-    I.fillField('#et1SubstantiveDefectsGeneralNotes',"General Notes for Possible substantive defects");
-    I.click(commonConfig.continue);
-
-    I.waitForText('General notes (Optional)', testConfig.TestTimeToWaitForText);
-    I.see('ET1 case vetting');
-    I.see('Case details');
-    I.see('Case Number:');
-    I.see('Are these codes correct?');
-    I.see('Jurisdiction code (Optional)');
-
-    I.click('#areTheseCodesCorrect_Yes');
-    I.fillField('#et1JurisdictionCodeGeneralNotes','General Notes for Jurisdiction Codes');
-    I.click(commonConfig.continue);
-
-    I.waitForText('General notes (Optional)', testConfig.TestTimeToWaitForText);
-    I.see('ET1 case vetting');
-    I.see('Case details');
-    I.see('Case Number:');
-   /* I.see('Track allocation');
-    I.see('Open');*/ //How do we check for this Data piece...?
-    I.see('Is the track allocation correct?');
-    I.see('Yes');
-    I.see('No - suggest another track');
-    I.click('#isTrackAllocationCorrect-Yes');
-    I.fillField('#trackAllocationGeneralNotes', 'General Notes for Track Allocation');
-    I.click(commonConfig.continue);
-
-    I.waitForText('General notes (Optional)', testConfig.TestTimeToWaitForText);
-    I.see('ET1 case vetting');
-    I.see('Case details');
-    I.see('Case Number:');
-    I.see('Tribunal location');
-    I.see('Tribunal');
-    I.see('England & Wales');
-    I.see('Office');
-    I.see('Leeds');
-    I.see('Yes');
-    I.see('No - suggest another location');
-    I.click('#isLocationCorrect-Yes');
-    I.fillField('#et1LocationGeneralNotes', 'General Notes for Tribunal Location');
-    I.click(commonConfig.continue);
-
-    I.waitForText('General notes (Optional)', testConfig.TestTimeToWaitForText);
-    I.see('ET1 case vetting');
-    I.see('Case details');
-    I.see('Case Number:');
-    I.see('Listing details');
-    I.see('Claimant');
-    I.see('Contact address');
-    I.see('4 Little Meadows');
-    I.see('Bradley');
-    I.see('LL11 4AR');
-    I.see('Contact address');
-    I.see('Work address');
-    I.see('78 East Wonford Hill');
-    I.see('Exeter')
-    I.see('EX1 3DD');
-    I.see('Respondent');
-    I.see('Contact address');
-    I.see('Do you want to suggest a hearing venue?');
-    I.click('#et1SuggestHearingVenue_Yes');
-    I.see('Leeds hearing venues');
-    I.see('Hearing venue selected');
-    I.selectOption('#et1HearingVenues',"2: Hull");
-    I.fillField("#et1HearingVenues","General Notes for the Hearing Venues");
-    I.click(commonConfig.continue);
-
-    //Further Questions Page
-    I.waitForText('General notes (Optional)', testConfig.TestTimeToWaitForText);
-    I.see('ET1 case vetting');
-    I.see('Further questions');
-    I.see('Case Number:');
-    I.see('Is the respondent a government agency or a major employer?');
-    I.see('Are reasonable adjustments required?');
-    I.see('Can the claimant attend a video hearing?');
-
-    I.click('#et1GovOrMajorQuestion_Yes');
-    I.click('#et1ReasonableAdjustmentsQuestion_Yes');
-    I.click('#et1VideoHearingQuestion_No');
-    I.see('Give details');
-    I.fillField('#et1ReasonableAdjustmentsTextArea', 'Reasonable adjustments are required');
-    I.fillField('#et1VideoHearingTextArea', 'Video Hearing Required');
-    I.fillField('#et1FurtherQuestionsGeneralNotes', 'General Notes for Further Questions....');
-    I.click(commonConfig.continue);
-
-    I.waitForText('General notes (Optional)', testConfig.TestTimeToWaitForText);
-    I.see('ET1 case vetting');
-    I.see('Possible referral to a judge or legal officer');
-    I.see('Case Number:');
-    I.see('Possible referral to a judge or legal officer (Optional)');
-    I.see('Does the claim include any of the following?');
-    I.see('A claim of interim relief');
-    I.see('A statutory appeal');
-    I.see('An allegation of commission of sexual offence');
-    I.see('Insolvency');
-    I.see('Jurisdictions unclear');
-    I.see('Potentially linked cases in the ECM');
-    I.see('Rule 50 issues');
-    I.see('Another reason for judicial referral');
-
-    I.click('#referralToJudgeOrLOList-aClaimOfInterimRelief');
-    I.click('#referralToJudgeOrLOList-aStatutoryAppeal');
-    I.click('#referralToJudgeOrLOList-anAllegationOfCommissionOfSexualOffence');
-    I.click('#referralToJudgeOrLOList-insolvency');
-    I.click('#referralToJudgeOrLOList-jurisdictionsUnclear');
-    I.click('#referralToJudgeOrLOList-lengthOfService');
-    I.click('#referralToJudgeOrLOList-potentiallyLinkedCasesInTheEcm');
-    I.click('[value=\'rule50Issues\']');
-    I.click('#referralToJudgeOrLOList-anotherReasonForJudicialReferral');
-
-    I.fillField('#aClaimOfInterimReliefTextArea','Internal Releief - Give Details Notes...');
-    I.fillField('#aStatutoryAppealTextArea','Statutory Appeal - Give Details Notes...');
-    I.fillField('#anAllegationOfCommissionOfSexualOffenceTextArea','Allegation Commission of Sexual Offence - Give Details Notes...');
-    I.fillField('#insolvencyTextArea','Insolvency - Give Details Notes...');
-    I.fillField('#jurisdictionsUnclearTextArea', 'Jurisdiction Unclear - Give Details Notes...');
-    I.fillField('#lengthOfServiceTextArea', 'Length of Service - Give Details Notes...');
-    I.fillField('#potentiallyLinkedCasesInTheEcmTextArea', 'Potentially Linked Cases - Give Details Notes...');
-    I.fillField('#rule50IssuesTextArea','Rule 50 Issues -  Give Details Notes...');
-    I.fillField('#anotherReasonForJudicialReferralTextArea','Another reason for Judicial Referall -  Give Details Notes...');
-    I.fillField('[field_id=\'et1JudgeReferralGeneralNotes\'] .form-control','General Notes for Possible referral to a judge or legal officer');
-    I.click(commonConfig.continue);
+    beforeYouStartVetting.verifyBeforeYouStartVetting();
+    canWeServeTheClaim.canWeServeTheClaim();
+    isThereAnACASCertificate.isThereAnACASCertificate();
+    possibleSubstantiveDefects.possibleSubstantiveDefects();
+    jurisdictionCodes.jurisdictionCodes();
+    trackAllocation.trackAllocation();
+    tribunalLocation.tribunalLocation();
+    listingDetails.listingDetails();
+    furtherDetails.verifyFurtherDetails();
+    referalToJudgeOrLegalOfficer.verifyReferalToAJudgeOrALegalOfficer();
 
     I.waitForText('General notes (Optional)', testConfig.TestTimeToWaitForText);
     I.see('ET1 case vetting');

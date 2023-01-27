@@ -29,20 +29,10 @@ class utilsComponent {
         let month = currentTime.getMonth() + 1;
         let day = currentTime.getDate();
         let year = currentTime.getFullYear();
-        let hour = currentTime.getHours() - 2 ;
-        let presentDay = year + "-" + month + "-" + day + "-" + hour ;
+        let hour = currentTime.getHours() ;
+        let minutes = currentTime.getMinutes() ;
+        let presentDay = year + "-" + month + "-" + day + "-" + hour + "-" + minutes;
         return presentDay;
-    }
-
-    static async getTomorrowDate() {
-        let todayDate = new Date();
-        console.log("Today date > ", todayDate);
-
-        let tomorrowDate = new Date();
-        tomorrowDate.setDate(todayDate.getDate() +1 );
-
-        console.log("Today date > ", tomorrowDate);
-
     }
 
     static async isWeekend() {

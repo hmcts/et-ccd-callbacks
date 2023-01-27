@@ -105,7 +105,7 @@ class RespondentTellSomethingElseServiceTest {
     void setUp() {
         respondentTellSomethingElseService =
                 new RespondentTellSomethingElseService(emailService, userService, tornadoService);
-        tseService = new TseService(documentManagementService);
+        tseService = new TseService();
 
         ReflectionTestUtils.setField(respondentTellSomethingElseService, "emailTemplateId", TEMPLATE_ID);
 

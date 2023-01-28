@@ -1,8 +1,8 @@
-const testConfig = require('./../../../config');
-const commonConfig = require('../../data/commonConfig.json');
+const testConfig = require('../../../../config');
+const commonConfig = require('../../../data/commonConfig.json');
 const { I } = inject();
 
-function tribunalLocation() {
+function verifyTribunalLocation() {
 
     I.waitForText('General notes (Optional)', testConfig.TestTimeToWaitForText);
     I.see('ET1 case vetting');
@@ -20,4 +20,4 @@ function tribunalLocation() {
     I.click(commonConfig.continue);
 }
 
-module.exports = { tribunalLocation };
+module.exports = { verifyTribunalLocation };

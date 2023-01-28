@@ -1,8 +1,8 @@
-const testConfig = require('./../../../config');
-const commonConfig = require('../../data/commonConfig.json');
+const testConfig = require('../../../../config');
+const commonConfig = require('../../../data/commonConfig.json');
 const { I } = inject();
 
-function canWeServeTheClaim() {
+function verifyCanWeServeTheClaim() {
     //Can we serve the claim with the
     I.waitForText('General notes (Optional)', testConfig.TestTimeToWaitForText);
     I.see('ET1 case vetting');
@@ -35,4 +35,4 @@ function canWeServeTheClaim() {
     I.click(commonConfig.continue);
 }
 
-module.exports = { canWeServeTheClaim };
+module.exports = { verifyCanWeServeTheClaim };

@@ -1,6 +1,5 @@
 'use strict';
 const testConfig = require('./../../../config');
-const commonConfig = require('../../data/commonConfig.json');
 const beforeYouStartVetting = require('./helpers/beforeYouStartVetting');
 const canWeServeTheClaim = require('./helpers/canWeServeTheClaim');
 const isThereAnACASCertificate = require('./helpers/isThereAnACASCertificate');

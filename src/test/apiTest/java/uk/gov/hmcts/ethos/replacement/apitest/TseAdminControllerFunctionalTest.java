@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,11 +40,13 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
 
     @BeforeAll
     public void setUpCaseData() {
-        CaseData caseData = new CaseData();
-        caseData.setEthosCaseReference("testCaseReference");
+        CaseData caseData = CaseDataBuilder.builder()
+            .withEthosCaseReference("testCaseReference")
+            .withClaimant("claimant")
+            .build();
+
         caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
         caseData.setResTseCopyToOtherPartyYesOrNo(I_DO_NOT_WANT_TO_COPY);
-        caseData.setClaimant("claimant");
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
         caseData.setTseAdminSelectApplication(

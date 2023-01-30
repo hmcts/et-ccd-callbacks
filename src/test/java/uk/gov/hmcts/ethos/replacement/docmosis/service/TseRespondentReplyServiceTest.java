@@ -25,13 +25,12 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 class TseRespondentReplyServiceTest {
-    private static final String YES_COPY = "I confirm I want to copy";
-    private static final String NO_COPY = "I do not want to copy";
-
     private TseRespondentReplyService tseRespondentReplyService;
     @MockBean
     private TornadoService tornadoService;
@@ -71,7 +70,7 @@ class TseRespondentReplyServiceTest {
 
     @Test
     void sendAcknowledgementAndClaimantEmail_rule92Yes() throws IOException {
-        caseData.setTseResponseCopyToOtherParty(YES_COPY);
+        caseData.setTseResponseCopyToOtherParty(I_CONFIRM_I_WANT_TO_COPY);
         
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
@@ -86,7 +85,7 @@ class TseRespondentReplyServiceTest {
 
     @Test
     void sendAcknowledgementAndClaimantEmail_rule92No() throws IOException {
-        caseData.setTseResponseCopyToOtherParty(NO_COPY);
+        caseData.setTseResponseCopyToOtherParty(I_DO_NOT_WANT_TO_COPY);
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");

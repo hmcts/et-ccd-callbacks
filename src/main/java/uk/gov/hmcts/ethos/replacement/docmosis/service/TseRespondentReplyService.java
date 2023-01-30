@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
 import java.util.Map;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
 
 @Service
 @RequiredArgsConstructor
@@ -24,12 +25,11 @@ public class TseRespondentReplyService {
     private final EmailService emailService;
     private final UserService userService;
 
-    private static final String YES_COPY = "I confirm I want to copy";
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
     public void sendAcknowledgementAndClaimantEmail(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
-        if (YES_COPY.equals(caseData.getTseResponseCopyToOtherParty())) {
+        if (I_CONFIRM_I_WANT_TO_COPY.equals(caseData.getTseResponseCopyToOtherParty())) {
             try {
                 byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", "TSE Reply.pdf");
                 String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
@@ -42,7 +42,7 @@ public class TseRespondentReplyService {
 
         String legalRepEmail = userService.getUserDetails(userToken).getEmail();
         emailService.sendEmail(
-            YES_COPY.equals(caseData.getTseResponseCopyToOtherParty())
+            I_CONFIRM_I_WANT_TO_COPY.equals(caseData.getTseResponseCopyToOtherParty())
                 ? acknowledgementRule92YesEmailTemplateId
                 : acknowledgementRule92NoEmailTemplateId,
             legalRepEmail,

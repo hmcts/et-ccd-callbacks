@@ -40,9 +40,8 @@ class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
             .withClaimantType("person@email.com")
             .withRespondent(
                 "respondent", YES, "01-Jan-2003", false)
+            .withClaimant("claimant Lastname")
             .build();
-
-        caseData.setClaimant("claimant Lastname");
 
         caseData.setTseResponseCopyToOtherParty(YES_COPY);
 

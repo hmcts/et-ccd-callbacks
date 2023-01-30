@@ -3,11 +3,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationBuilder;
 
@@ -21,8 +19,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 
 public class TseAdminHelperTest {
-    CCDRequest ccdRequest;
-    CaseData caseData;
+    private CaseData caseData;
 
     @Before
     public void setUp() {
@@ -30,12 +27,6 @@ public class TseAdminHelperTest {
             .withClaimantIndType("First", "Last")
             .withEthosCaseReference("1234")
             .withClaimant("First Last")
-            .build();
-
-        ccdRequest = CCDRequestBuilder.builder()
-            .withState("Accepted")
-            .withCaseId("1234")
-            .withCaseData(caseData)
             .build();
 
         GenericTseApplicationType build = TseApplicationBuilder.builder()

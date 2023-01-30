@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -81,7 +82,7 @@ public class TseAdmReplyService {
             return initialAppDetails(applicationTypeItem.getValue(), authToken)
                     + initialRespondDetails(applicationTypeItem.getValue(), authToken);
         }
-        return null;
+        throw new NotFoundException("No selected application type item found.");
     }
 
     private String initialAppDetails(GenericTseApplicationType applicationType, String authToken) {

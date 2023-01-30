@@ -10,12 +10,18 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdminService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationBuilder;
+
+import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -26,10 +32,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({TseAdminController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
 class TseAdminControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -57,9 +64,18 @@ class TseAdminControllerTest {
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseDetails.setCaseId("4321");
+        CaseData caseData = caseDetails.getCaseData();
+        caseData.setGenericTseApplicationCollection(
+            List.of(GenericTseApplicationTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(TseApplicationBuilder.builder()
+                .withNumber("2")
+                .withType(TSE_APP_CHANGE_PERSONAL_DETAILS)
+                .build())
+            .build()));
 
         ccdRequest = CCDRequestBuilder.builder()
-            .withCaseData(caseDetails.getCaseData())
+            .withCaseData(caseData)
             .build();
     }
 

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -22,7 +21,7 @@ public final class TseAdminHelper {
      */
     public static DynamicFixedListType populateSelectApplicationAdminDropdown(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
-            throw new NotFoundException("GenericTseApplicationCollection not found.");
+            return null;
         }
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()

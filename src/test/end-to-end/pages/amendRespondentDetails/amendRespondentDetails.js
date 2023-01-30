@@ -13,6 +13,9 @@ module.exports = async function () {
     //I.see('#respondentCollection_0_respondent_name')
     I.see('Is there an ACAS Certificate number? (Optional)');
     I.click('#respondentCollection_0_respondent_ACAS_question_Yes');
+    I.see('ACAS Certificate Number? (Optional)');
+    //I.seeInField('ACAS Certificate Number? (Optional)', '156787');
+    I.seeInField('#responseReceivedDate .form-group-year', '156787');
     I.see('Enter a UK postcode');
     I.see('Building and Street');
     I.see('Address Line 2 (Optional)');
@@ -41,9 +44,6 @@ module.exports = async function () {
     I.fillField('#responseReceivedDate-day', commonConfig.caseAcceptedDay);
     I.fillField('#responseReceivedDate-month', commonConfig.caseAcceptedMonth);
     I.fillField('#responseReceivedDate-year', commonConfig.caseAcceptedYear);
-    //I.seeInField('#responseReceivedDate-day', '05');
-    //I.seeInField('#responseReceivedDate-month', '05');
-    //I.seeInField('#responseReceivedDate-year', '2021');
     I.click('#respondentCollection_0_responseStruckOut_No');
 
 

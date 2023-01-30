@@ -23,6 +23,7 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.DocumentDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClient;
 import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
@@ -37,8 +38,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
@@ -216,9 +215,7 @@ public class DocumentManagementService {
             return "";
         }
 
-        Pattern pattern = Pattern.compile("^.+?/documents/");
-        Matcher matcher = pattern.matcher(document.getDocumentBinaryUrl());
-        String documentLink = matcher.replaceFirst("");
+        String documentLink = Helper.getDocumentMatcher(document.getDocumentBinaryUrl()).replaceFirst("");
 
         String documentName = document.getDocumentFilename();
         String documentType = document.getDocumentFilename();

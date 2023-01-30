@@ -26,6 +26,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
@@ -279,5 +281,10 @@ public final class Helper {
         return caseData.getRespondentCollection().stream()
             .map(o -> o.getValue().getRespondentName())
             .collect(Collectors.joining(", "));
+    }
+
+    public static Matcher getDocumentMatcher(String url) {
+        Pattern pattern = Pattern.compile("^.+?/documents/");
+        return pattern.matcher(url);
     }
 }

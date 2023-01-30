@@ -7,9 +7,9 @@ Feature('Create A Leeds Singles Case & Execute Claimant Respondent Details...');
 
 Scenario('Verify Respondent Details', async ({I}) => {
 
-    let caseId = processCaseToAcceptedState();
+    let caseId = await processCaseToAcceptedState();
     console.log("... case id =>" +caseId);
 
-    claimantRespondentDetails(I, eventNames.CLAIMANT_RESPONDENT_DETAILS);
+    await claimantRespondentDetails(I, eventNames.CLAIMANT_RESPONDENT_DETAILS);
 
 }).tag('@nightly').retry(testConfig.TestRetryScenarios);

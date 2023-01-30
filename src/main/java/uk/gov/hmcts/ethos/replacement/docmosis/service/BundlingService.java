@@ -37,23 +37,6 @@ public class BundlingService {
         setBundleConfig(caseDetails.getCaseData());
         BundleCreateResponse bundleCreateResponse = createBundle(userToken, authTokenGenerator.generate(),
                 bundleRequestMapper(caseDetails));
-
-        for (Bundle bundle : bundleCreateResponse.getData().getCaseBundles()) {
-            for (BundleFolder bundleFolder : bundle.getValue().getFolders()) {
-                int count = 0;
-                for (BundleDocument bundleDocument : bundleFolder.getValue().getDocuments()) {
-                    BundleDocumentDetails bundleDocumentDetails = BundleDocumentDetails.builder()
-                            .name(bundleDocument.getValue().getName().substring(0,
-                                    bundleDocument.getValue().getName().lastIndexOf('.')))
-                            .sourceDocument(bundleDocument.getValue().getSourceDocument())
-                            .sortIndex(count)
-                            .build();
-                    count++;
-                    bundleDocument.toBuilder().value(bundleDocumentDetails).build();
-                }
-            }
-        }
-
         return bundleCreateResponse.getData().getCaseBundles();
     }
 
@@ -81,17 +64,10 @@ public class BundlingService {
     }
 
     private BundleCreateRequest bundleRequestMapper(CaseDetails caseDetails) {
-        bundleStitchSet(caseDetails);
         return BundleCreateRequest.builder()
                 .caseDetails(caseDetails)
                 .caseTypeId(caseDetails.getCaseTypeId())
                 .build();
-    }
-
-    private void bundleStitchSet(CaseDetails caseDetails) {
-        for (Bundle bundle : caseDetails.getCaseData().getCaseBundles()) {
-            bundle.getValue().setEligibleForStitching(YES);
-        }
     }
 
     private void setBundleConfig(CaseData caseData) {

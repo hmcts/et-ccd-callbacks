@@ -178,3 +178,9 @@ public class TseRespondentReplyController {
             SUBMITTED_BODY,
             YES.equals(caseData.getTseResponseCopyToOtherParty()) ? SUBMITTED_COPY : ""
         );
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+            .confirmation_body(body)
+            .build());
+    }
+}

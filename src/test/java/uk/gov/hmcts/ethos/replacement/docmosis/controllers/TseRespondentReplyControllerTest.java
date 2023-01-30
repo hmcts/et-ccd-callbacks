@@ -9,10 +9,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TseRespondentReplyService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
@@ -44,6 +43,8 @@ class TseRespondentReplyControllerTest {
 
     @MockBean
     private VerifyTokenService verifyTokenService;
+    @MockBean
+    private TseRespondentReplyService tseRespondentReplyService;
     private CCDRequest ccdRequest;
 
     @BeforeEach
@@ -61,9 +62,6 @@ class TseRespondentReplyControllerTest {
             .withCaseId("1234")
             .withCaseData(caseData)
             .build();
-
-        UserDetails userDetails = HelperTest.getUserDetails();
-        // when(userService.getUserDetails(anyString())).thenReturn(userDetails);
     }
 
     @Test

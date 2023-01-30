@@ -100,6 +100,9 @@ public class ListingService {
     private static final String MESSAGE = "Failed to generate document for case id : ";
     public static final String ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND =
             "data.hearingCollection.value.Hearing_venue_Scotland";
+    public static final String HEARING_STATUS_VACATED = "Vacated";
+    public static final String ELASTICSEARCH_FIELD_MANAGING_OFFICE = "data.managingOffice";
+
 
     public ListingData listingCaseCreation(ListingDetails listingDetails) {
 
@@ -213,14 +216,21 @@ public class ListingService {
             dateFrom = listingData.getListingDate();
             dateTo = listingData.getListingDate();
         }
-        if (ALL_VENUES.equals(venueToSearch)
-                && UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()).equals(SCOTLAND_CASE_TYPE_ID)) {
+        if (ALL_VENUES.equals(venueToSearch)) {
             venueToSearch = listingData.getManagingOffice();
-            venueToSearchMapping = ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND;
+            venueToSearchMapping = getFieldNameForVenueToSearch(listingDetails.getCaseTypeId());
         }
         return ccdClient.buildAndGetElasticSearchRequest(authToken,
                 UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()),
                 getESQuery(dateFrom, dateTo, venueToSearchMapping, venueToSearch));
+    }
+
+    private String getFieldNameForVenueToSearch(String caseTypeId) {
+        if (SCOTLAND_CASE_TYPE_ID.equals(UtilHelper.getListingCaseTypeId(caseTypeId))) {
+            return ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND;
+        } else {
+            return ELASTICSEARCH_FIELD_MANAGING_OFFICE;
+        }
     }
 
     private String getESQuery(String dateFrom, String dateTo, String key, String venue) {
@@ -228,9 +238,8 @@ public class ListingService {
                 .filter(new RangeQueryBuilder(
                         ELASTICSEARCH_FIELD_HEARING_LISTED_DATE)
                         .gte(dateFrom).lte(dateTo));
-        if (!venue.equals(ALL_VENUES)) {
-            boolQueryBuilder.must(new MatchQueryBuilder(key, venue));
-        }
+
+        boolQueryBuilder.must(new MatchQueryBuilder(key, venue));
         return new SearchSourceBuilder()
                 .size(MAX_ES_SIZE)
                 .query(boolQueryBuilder).toString();

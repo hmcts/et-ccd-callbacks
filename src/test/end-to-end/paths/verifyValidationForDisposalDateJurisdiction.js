@@ -50,4 +50,4 @@ Scenario('User enters a disposal date - check error scenarios and completes juri
     await enterDisposalDateJurisdiction(I,'Date contained in hearing collection');
 
 }).tag('@nightly')
-    .tag('@RET-BAT');
+    .retry(testConfig.TestRetryScenarios);

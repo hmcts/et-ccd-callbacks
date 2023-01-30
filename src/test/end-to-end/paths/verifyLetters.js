@@ -12,5 +12,4 @@ Scenario('Verify Letters', async ({I}) => {
 
     await letters(I, eventNames.LETTERS);
 
-}).tag('@biggerrefactoring');
-    //.retry(testConfig.TestRetryScenarios);
+}).tag('@nightly').retry(testConfig.TestRetryScenarios);

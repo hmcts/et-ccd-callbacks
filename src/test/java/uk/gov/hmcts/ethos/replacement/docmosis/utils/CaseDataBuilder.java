@@ -214,6 +214,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withClaimant(String claimant) {
+        caseData.setClaimant(claimant);
+        return this;
+    }
+
     public CaseDataBuilder withCaseTransfer(String officeCT, String reasonForCT) {
         caseData.setOfficeCT(DynamicFixedListType.of(DynamicValueType.create(officeCT, officeCT)));
         caseData.setReasonForCT(reasonForCT);

@@ -34,6 +34,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondentTellSomethingElseController.class, JsonMapper.class})
@@ -57,15 +58,14 @@ class RespondentTellSomethingElseControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private static final String COPY_TO_OTHER_PARTY_NO = "I do not want to copy";
-
     @BeforeEach
     void setUp() {
-        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .withEthosCaseReference("test")
+            .withClaimant("claimant")
+            .build();
         caseData.setResTseSelectApplication("caseRef");
-        caseData.setResTseCopyToOtherPartyYesOrNo(COPY_TO_OTHER_PARTY_NO);
-        caseData.setEthosCaseReference("test");
-        caseData.setClaimant("claimant");
+        caseData.setResTseCopyToOtherPartyYesOrNo(I_DO_NOT_WANT_TO_COPY);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
 
@@ -182,7 +182,7 @@ class RespondentTellSomethingElseControllerTest {
 
     private List<GenericTseApplicationTypeItem> createApplicationCollection() {
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
-        respondentTseType.setCopyToOtherPartyYesOrNo(COPY_TO_OTHER_PARTY_NO);
+        respondentTseType.setCopyToOtherPartyYesOrNo(I_DO_NOT_WANT_TO_COPY);
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
         tseApplicationTypeItem.setId(UUID.randomUUID().toString());

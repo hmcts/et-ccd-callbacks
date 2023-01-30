@@ -33,6 +33,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
@@ -90,8 +92,6 @@ public final class TseHelper {
         + "|Sent to | %s|\r\n"
         + "\r\n";
     private static final String ADMIN_REPLY_MARKUP_MADE_BY = "|%s made by | %s|\r\n";
-    private static final String COPY_TO_OTHER_PARTY_YES = "I confirm I want to copy";
-    private static final String COPY_TO_OTHER_PARTY_NO = "I do not want to copy";
 
     private TseHelper() {
         // Access through static methods
@@ -342,8 +342,8 @@ public final class TseHelper {
      * @param docInfo Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
      * @return Markup String
      */
-    public static String formatRespondentReplyForReply(TseRespondType reply, int respondCount, String applicant,
-                                                       String docInfo) {
+    public static String formatLegalRepReplyForReply(TseRespondType reply, int respondCount, String applicant,
+                                                     String docInfo) {
         return String.format(
             RESPONDENT_REPLY_MARKUP_FOR_REPLY,
             respondCount,
@@ -362,9 +362,9 @@ public final class TseHelper {
      * @return Yes or No
      */
     public static String displayCopyToOtherPartyYesOrNo(String copyToOtherPartyYesOrNo) {
-        if (COPY_TO_OTHER_PARTY_YES.equals(copyToOtherPartyYesOrNo)) {
+        if (I_CONFIRM_I_WANT_TO_COPY.equals(copyToOtherPartyYesOrNo)) {
             return YES;
-        } else if (COPY_TO_OTHER_PARTY_NO.equals(copyToOtherPartyYesOrNo)) {
+        } else if (I_DO_NOT_WANT_TO_COPY.equals(copyToOtherPartyYesOrNo)) {
             return NO;
         } else {
             return defaultString(copyToOtherPartyYesOrNo);
@@ -378,7 +378,7 @@ public final class TseHelper {
      * @param docInfo Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
      * @return Markup String
      */
-    public static String formatRespondentReplyForDecision(TseRespondType reply, int respondCount, String docInfo) {
+    public static String formatLegalRepReplyForDecision(TseRespondType reply, int respondCount, String docInfo) {
         return String.format(
             RESPONDENT_REPLY_MARKUP_FOR_DECISION,
             respondCount,

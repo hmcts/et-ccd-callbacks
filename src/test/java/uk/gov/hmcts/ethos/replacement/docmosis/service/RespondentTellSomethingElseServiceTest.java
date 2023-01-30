@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
@@ -43,6 +42,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
@@ -77,8 +77,7 @@ class RespondentTellSomethingElseServiceTest {
     ArgumentCaptor<Map<String, Object>> personalisationCaptor;
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String YES = "I do want to copy";
-    private static final String NO = "I do not want to copy";
+    private static final String I_DO_WANT_TO_COPY = "I do want to copy";
     private static final String TEMPLATE_ID = "someTemplateId";
     private static final String LEGAL_REP_EMAIL = "mail@mail.com";
     private static final String CASE_ID = "669718251103419";
@@ -273,29 +272,29 @@ class RespondentTellSomethingElseServiceTest {
 
     private static Stream<Arguments> sendAcknowledgeEmailAndGeneratePdf() {
         return Stream.of(
-            Arguments.of(TSE_APP_AMEND_RESPONSE, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_POSTPONE_A_HEARING, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, NO, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_AMEND_RESPONSE, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_POSTPONE_A_HEARING, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
 
-            Arguments.of(TSE_APP_AMEND_RESPONSE, YES, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, YES, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, YES, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_POSTPONE_A_HEARING, YES, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, YES, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, YES, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, YES, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, YES, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, YES, rule92AnsweredYesGroupB, true),
-            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, YES, rule92AnsweredYesGroupB, true),
-            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, YES, rule92AnsweredYesGroupB, true),
+            Arguments.of(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
+            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
+            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
+            Arguments.of(TSE_APP_POSTPONE_A_HEARING, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
+            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
+            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
+            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
+            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
+            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupB, true),
+            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupB, true),
+            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupB, true),
 
             Arguments.of(TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE, null, null, false)
         );
@@ -303,7 +302,7 @@ class RespondentTellSomethingElseServiceTest {
 
     @Test
     void claimantPersonalisation_buildsCorrectData() throws NotificationClientException {
-        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, YES);
+        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
@@ -323,7 +322,7 @@ class RespondentTellSomethingElseServiceTest {
 
     @Test
     void sendClaimantEmail_rule92No_doesNothing() {
-        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
+        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, I_DO_NOT_WANT_TO_COPY);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
@@ -334,7 +333,7 @@ class RespondentTellSomethingElseServiceTest {
 
     @Test
     void sendClaimantEmail_groupC_doesNothing() {
-        CaseData caseData = createCaseData(TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE, NO);
+        CaseData caseData = createCaseData(TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE, I_DO_NOT_WANT_TO_COPY);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
@@ -345,7 +344,7 @@ class RespondentTellSomethingElseServiceTest {
 
     @Test
     void sendClaimantEmail_groupA_sendsEmail() throws IOException {
-        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, YES);
+        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
@@ -361,7 +360,7 @@ class RespondentTellSomethingElseServiceTest {
 
     @Test
     void sendClaimantEmail_groupB_sendsEmail() throws IOException {
-        CaseData caseData = createCaseData(TSE_APP_CHANGE_PERSONAL_DETAILS, YES);
+        CaseData caseData = createCaseData(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_WANT_TO_COPY);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
@@ -436,7 +435,7 @@ class RespondentTellSomethingElseServiceTest {
 
     @Test
     void displayRespondentApplicationsTable_hasApplications() {
-        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
+        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, I_DO_NOT_WANT_TO_COPY);
         caseData.setGenericTseApplicationCollection(generateGenericTseApplicationList());
 
         assertThat(respondentTellSomethingElseService.generateTableMarkdown(caseData), is(EXPECTED_TABLE_MARKDOWN));
@@ -444,7 +443,7 @@ class RespondentTellSomethingElseServiceTest {
 
     @Test
     void displayRespondentApplicationsTable_hasNoApplications() {
-        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
+        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, I_DO_NOT_WANT_TO_COPY);
 
         assertThat(respondentTellSomethingElseService.generateTableMarkdown(caseData), is(""));
     }
@@ -547,14 +546,13 @@ class RespondentTellSomethingElseServiceTest {
     }
 
     private CaseData createCaseData(String selectedApplication, String selectedRule92Answer) {
-        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .withEthosCaseReference("test")
+            .withClaimant("claimant")
+            .withClaimantType("person@email.com")
+            .build();
         caseData.setResTseSelectApplication(selectedApplication);
         caseData.setResTseCopyToOtherPartyYesOrNo(selectedRule92Answer);
-        caseData.setEthosCaseReference("test");
-        caseData.setClaimant("claimant");
-        ClaimantType claimantType = new ClaimantType();
-        claimantType.setClaimantEmailAddress("person@email.com");
-        caseData.setClaimantType(claimantType);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
 
         return caseData;

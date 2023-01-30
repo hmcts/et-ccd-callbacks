@@ -41,9 +41,8 @@ public class TseHelperTest {
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("First", "Last")
             .withEthosCaseReference("1234")
+            .withClaimant("First Last")
             .build();
-
-        caseData.setClaimant("First Last");
 
         GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
             .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")

@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -85,7 +87,7 @@ public class PseRespondToTribunalService {
                 .id(UUID.randomUUID().toString())
                 .value(
                     PseResponseType.builder()
-                        .from("Respondent")
+                        .from(RESPONDENT_TITLE)
                         .date(UtilHelper.formatCurrentDate(LocalDate.now()))
                         .response(caseData.getPseRespondentOrdReqResponseText())
                         .hasSupportingMaterial(caseData.getPseRespondentOrdReqHasSupportingMaterial())

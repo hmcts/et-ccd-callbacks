@@ -25,6 +25,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class PseRespondToTribunalServiceTest {
@@ -121,6 +122,7 @@ class PseRespondToTribunalServiceTest {
 
         PseResponseType savedResponse = caseData.getPseOrdReqResponses().get(0).getValue();
 
+        assertEquals(savedResponse.getFrom(), RESPONDENT_TITLE);
         assertEquals(savedResponse.getResponse(), response);
         assertEquals(savedResponse.getHasSupportingMaterial(), hasSupportingMaterial);
         assertEquals(savedResponse.getCopyToOtherParty(), copyOtherParty);

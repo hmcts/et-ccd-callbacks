@@ -8,15 +8,23 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class PseRespondToTribunalServiceTest {
@@ -26,6 +34,10 @@ class PseRespondToTribunalServiceTest {
     private static final String RESPONSE = "Some Response";
     private static final String YES = "Yes";
     private static final String NO = "No";
+    private static final String RULE92_YES = "I do want to copy";
+    private static final String RULE92_NO = "I do not want to copy";
+
+    private static final String RULE92_NO_DETAILS = "Rule 92 Reasons";
 
     private static final String EXPECTED_TABLE_MARKDOWN = "|Hearing, case management order or request | |\r\n"
         + "|--|--|\r\n"
@@ -86,5 +98,83 @@ class PseRespondToTribunalServiceTest {
             Arguments.of(RESPONSE, NO, 0),
             Arguments.of(RESPONSE, YES, 0)
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource("createRespondentResponses")
+    void addRespondentResponseToJON(String response, String hasSupportingMaterial,
+                                                int supportingDocsSize, String copyOtherParty, String copyDetails) {
+        caseData.setPseRespondentOrdReqResponseText(response);
+        caseData.setPseRespondentOrdReqHasSupportingMaterial(hasSupportingMaterial);
+        caseData.setPseRespondentOrdReqCopyToOtherParty(copyOtherParty);
+        caseData.setPseRespondentOrdReqCopyNoGiveDetails(copyDetails);
+
+        if (supportingDocsSize > 0) {
+            List<DocumentTypeItem> supportingMaterials = new ArrayList<>();
+            for (int i = 0; i < supportingDocsSize; i++) {
+                supportingMaterials.add(createDocumentType(Integer.toString(i)));
+            }
+            caseData.setPseRespondentOrdReqUploadDocument(supportingMaterials);
+        }
+
+        pseRespondToTribService.addRespondentResponseToJON(caseData);
+
+        PseResponseType savedResponse = caseData.getPseOrdReqResponses().get(0).getValue();
+
+        assertEquals(savedResponse.getResponse(), response);
+        assertEquals(savedResponse.getHasSupportingMaterial(), hasSupportingMaterial);
+        assertEquals(savedResponse.getCopyToOtherParty(), copyOtherParty);
+        assertEquals(savedResponse.getCopyNoGiveDetails(), copyDetails);
+
+        if (supportingDocsSize > 0) {
+            assertEquals(savedResponse.getSupportingMaterial().size(), supportingDocsSize);
+        } else {
+            assertNull(savedResponse.getSupportingMaterial());
+        }
+    }
+
+    private static Stream<Arguments> createRespondentResponses() {
+        return Stream.of(
+            Arguments.of(RESPONSE, YES, 2, RULE92_YES, null),
+            Arguments.of(RESPONSE, YES, 1, RULE92_NO, RULE92_NO_DETAILS),
+            Arguments.of(RESPONSE, NO, 0, RULE92_YES, null),
+            Arguments.of(RESPONSE, NO, 0, RULE92_NO, RULE92_NO_DETAILS)
+        );
+    }
+
+    private DocumentTypeItem createDocumentType(String id) {
+        DocumentType documentType = new DocumentType();
+        documentType.setUploadedDocument(new UploadedDocumentType());
+        documentType.getUploadedDocument().setDocumentBinaryUrl("binaryUrl/documents/");
+        documentType.getUploadedDocument().setDocumentFilename("testFileName");
+
+        DocumentTypeItem document = new DocumentTypeItem();
+        document.setId(id);
+        document.setValue(documentType);
+
+        return document;
+    }
+
+    @Test
+    void clearRespondentResponse() {
+        DynamicFixedListType newType = new DynamicFixedListType("Hello World");
+        caseData.setPseRespondentSelectOrderOrRequest(newType);
+        caseData.setPseRespondentOrdReqTableMarkUp(EXPECTED_TABLE_MARKDOWN);
+        caseData.setPseRespondentOrdReqResponseText(RESPONSE);
+        caseData.setPseRespondentOrdReqHasSupportingMaterial(YES);
+        caseData.setPseRespondentOrdReqUploadDocument(
+            new ArrayList<>(Collections.singletonList(createDocumentType("documentId"))));
+        caseData.setPseRespondentOrdReqCopyToOtherParty(RULE92_NO);
+        caseData.setPseRespondentOrdReqCopyNoGiveDetails(RULE92_NO_DETAILS);
+
+        pseRespondToTribService.clearRespondentResponse(caseData);
+
+        assertNull(caseData.getPseRespondentSelectOrderOrRequest());
+        assertNull(caseData.getPseRespondentOrdReqTableMarkUp());
+        assertNull(caseData.getPseRespondentOrdReqResponseText());
+        assertNull(caseData.getPseRespondentOrdReqHasSupportingMaterial());
+        assertNull(caseData.getPseRespondentOrdReqUploadDocument());
+        assertNull(caseData.getPseRespondentOrdReqCopyToOtherParty());
+        assertNull(caseData.getPseRespondentOrdReqCopyNoGiveDetails());
     }
 }

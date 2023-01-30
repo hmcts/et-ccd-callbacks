@@ -42,12 +42,13 @@ class PseRespondToTribunalControllerTest {
     private static final String ABOUT_TO_START_URL = "/pseRespondToTribunal/aboutToStart";
     private static final String MID_TABLE_DETAILS = "/pseRespondToTribunal/midDetailsTable";
     private static final String MID_VALIDATE_INPUT = "/pseRespondToTribunal/midValidateInput";
+    private static final String ABOUT_TO_SUBMIT_URL = "/pseRespondToTribunal/aboutToSubmit";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
 
     @MockBean
-    private PseRespondToTribunalService pstRespondToTribunalService;
+    private PseRespondToTribunalService pseRespondToTribunalService;
 
     @Autowired
     private JsonMapper jsonMapper;
@@ -104,7 +105,7 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(pstRespondToTribunalService).initialOrdReqDetailsTableMarkUp(ccdRequest.getCaseDetails().getCaseData());
+        verify(pseRespondToTribunalService).initialOrdReqDetailsTableMarkUp(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -128,13 +129,36 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", notNullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(pstRespondToTribunalService).validateInput(ccdRequest.getCaseDetails().getCaseData());
+        verify(pseRespondToTribunalService).validateInput(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
     void midValidateInput_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(MID_VALIDATE_INPUT)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void aboutToSubmit_Success() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void aboutToSubmit_invalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .content(jsonMapper.toJson(ccdRequest)))

@@ -18,6 +18,7 @@ class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
     private static final String ABOUT_TO_START_URL = "/pseRespondToTribunal/aboutToStart";
     private static final String MID_TABLE_DETAILS = "/pseRespondToTribunal/midDetailsTable";
     private static final String MID_VALIDATE_INPUT = "/pseRespondToTribunal/midValidateInput";
+    private static final String ABOUT_TO_SUBMIT_URL = "/pseRespondToTribunal/aboutToSubmit";
 
     private CCDRequest ccdRequest;
 
@@ -25,7 +26,6 @@ class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
     public void setUpCaseData() {
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("testCaseReference");
-        caseData.setResTseSelectApplication("Amend response");
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)
@@ -69,6 +69,20 @@ class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
             .header(new Header(AUTHORIZATION, userToken))
             .body(ccdRequest)
             .post(MID_VALIDATE_INPUT)
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log()
+            .all(true);
+    }
+
+    @Test
+    void shouldReceiveSuccessResponseWhenAboutToSubmitInvoked() {
+        RestAssured.given()
+            .spec(spec)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(ccdRequest)
+            .post(ABOUT_TO_SUBMIT_URL)
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log()

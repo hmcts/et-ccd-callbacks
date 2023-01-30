@@ -2,12 +2,18 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.PseResponseItem;
+import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -53,12 +59,6 @@ public class PseRespondToTribunalService {
      */
     public String initialOrdReqDetailsTableMarkUp(CaseData caseData) {
         return initialOrdReqDetails() + responses();
-
-        /*GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
-        if (applicationTypeItem != null) {
-            return initialAppDetails() + responses();
-        }
-        return null;*/
     }
 
     public List<String> validateInput(CaseData caseData) {
@@ -69,6 +69,45 @@ public class PseRespondToTribunalService {
             errors.add(GIVE_MISSING_DETAIL);
         }
         return errors;
+    }
+
+    /**
+     * Create a new element in the responses list and assign the PSE data from CaseData to it.
+     * @param caseData contains all the case data
+     */
+    public void addRespondentResponseToJON(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getPseOrdReqResponses())) {
+            caseData.setPseOrdReqResponses(new ArrayList<>());
+        }
+
+        caseData.getPseOrdReqResponses().add(
+            PseResponseItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(
+                    PseResponseType.builder()
+                        .from("Respondent")
+                        .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+                        .response(caseData.getPseRespondentOrdReqResponseText())
+                        .hasSupportingMaterial(caseData.getPseRespondentOrdReqHasSupportingMaterial())
+                        .supportingMaterial(caseData.getPseRespondentOrdReqUploadDocument())
+                        .copyToOtherParty(caseData.getPseRespondentOrdReqCopyToOtherParty())
+                        .copyNoGiveDetails(caseData.getPseRespondentOrdReqCopyNoGiveDetails())
+                        .build()
+                ).build());
+    }
+
+    /**
+     * Clears fields that are used when responding to a JON, so they can be used in subsequent responses to JONs.
+     * @param caseData contains all the case data
+     */
+    public void clearRespondentResponse(CaseData caseData) {
+        caseData.setPseRespondentSelectOrderOrRequest(null);
+        caseData.setPseRespondentOrdReqTableMarkUp(null);
+        caseData.setPseRespondentOrdReqResponseText(null);
+        caseData.setPseRespondentOrdReqHasSupportingMaterial(null);
+        caseData.setPseRespondentOrdReqUploadDocument(null);
+        caseData.setPseRespondentOrdReqCopyToOtherParty(null);
+        caseData.setPseRespondentOrdReqCopyNoGiveDetails(null);
     }
 
     private String initialOrdReqDetails() {

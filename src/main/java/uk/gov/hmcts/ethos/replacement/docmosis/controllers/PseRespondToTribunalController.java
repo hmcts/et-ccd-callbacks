@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondToTribunalService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -39,7 +40,7 @@ public class PseRespondToTribunalController {
 
     private final VerifyTokenService verifyTokenService;
 
-    private final PseRespondToTribunalService pstRespondToTribunalService;
+    private final PseRespondToTribunalService pseRespondToTribunalService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
@@ -138,7 +139,7 @@ public class PseRespondToTribunalController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setPseRespondentOrdReqTableMarkUp(
-            pstRespondToTribunalService.initialOrdReqDetailsTableMarkUp(caseData)
+            pseRespondToTribunalService.initialOrdReqDetailsTableMarkUp(caseData)
         );
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -173,7 +174,48 @@ public class PseRespondToTribunalController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = pstRespondToTribunalService.validateInput(caseData);
+        List<String> errors = pseRespondToTribunalService.validateInput(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    /**
+     * Save the Response.
+     *
+     * @param ccdRequest        CaseData which is a generic data type for most of the
+     *                          methods which holds case data
+     * @param  userToken        Used for authorisation
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse that
+     *                          includes caseData which contains the upload document names of
+     *                          type "Another type of document" in a html string format.
+     */
+    @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        pseRespondToTribunalService.addRespondentResponseToJON(caseDetails.getCaseData());
+
+        // TODO: RET-2962
+        //pseRespondToTribunalService.sendAcknowledgeEmail(caseDetails, userToken)
+        // TODO: RET-2969
+        //pseRespondToTribunalService.sendClaimantEmail(caseDetails)
+
+        pseRespondToTribunalService.clearRespondentResponse(caseDetails.getCaseData());
+
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 }

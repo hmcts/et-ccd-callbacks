@@ -10,11 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlingService;
@@ -52,7 +48,7 @@ public class BundlingController {
     }
 
     @PostMapping(path = "/stitchBundle", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
-    @Operation(description = "Create bundle")
+    @Operation(description = "Stitch bundle")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
                 content = {

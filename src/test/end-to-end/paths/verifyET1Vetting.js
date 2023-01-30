@@ -13,5 +13,5 @@ Scenario('ET1 Case Vetting', async ({I}) => {
     const caseNumber = await processCaseToSubmittedState();
     await et1Vetting(I, eventNames.ET1_VETTING);
   
-}).tag('@RET-BAT').tag('@nightly').tag('@pats').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);
   

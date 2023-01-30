@@ -7,25 +7,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TseRespondentReplyService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-
-import java.util.Map;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -40,26 +34,15 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequiredArgsConstructor
 @SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
-public class TseResponseController {
-
-    @Value("${tse.respondent.respond.notify.claimant.template.id}")
-    private String emailTemplateId;
-    @Value("${tse.respondent.respond.acknowledgement.rule92no.template.id}")
-    private String acknowledgementRule92NoEmailTemplateId;
-    @Value("${tse.respondent.respond.acknowledgement.rule92yes.template.id}")
-    private String acknowledgementRule92YesEmailTemplateId;
+public class TseRespondentReplyController {
 
     private final VerifyTokenService verifyTokenService;
-    private final TornadoService tornadoService;
-    private final EmailService emailService;
-    private final UserService userService;
+    private final TseRespondentReplyService tseRespondentReplyService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String SUBMITTED_BODY = "### What happens next \r\n\r\nYou have sent your response to the"
         + " tribunal%s.\r\n\r\nThe tribunal will consider all correspondence and let you know what happens next.";
     private static final String SUBMITTED_COPY = " and copied it to the claimant";
-    private static final String YES_COPY = "I confirm I want to copy";
-    private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
     /**
      *  Populates the dynamic list for select an application to respond to.
@@ -156,24 +139,7 @@ public class TseResponseController {
         CaseData caseData = caseDetails.getCaseData();
         TseHelper.saveReplyToApplication(caseData);
 
-        if (YES_COPY.equals(caseData.getTseResponseCopyToOtherParty())) {
-            try {
-                byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", "TSE Reply.pdf");
-                String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
-                Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails, bytes);
-                emailService.sendEmail(emailTemplateId, claimantEmail, personalisation);
-            } catch (Exception e) {
-                throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
-            }
-        }
-
-        String legalRepEmail = userService.getUserDetails(userToken).getEmail();
-        emailService.sendEmail(
-            YES_COPY.equals(caseData.getTseResponseCopyToOtherParty())
-                ? acknowledgementRule92YesEmailTemplateId
-                : acknowledgementRule92NoEmailTemplateId,
-            legalRepEmail,
-            TseHelper.getPersonalisationForAcknowledgement(caseDetails));
+        tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, userToken);
 
         TseHelper.resetReplyToApplicationPage(caseData);
         return getCallbackRespEntityNoErrors(caseData);

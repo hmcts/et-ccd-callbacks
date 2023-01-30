@@ -190,19 +190,6 @@ async function et1Vetting(I, eventName) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(3);
     await I.et1VettingJourney();
-    /*await I.minReqInfoET1Vetting();
-    await I.minReqInfo2ET1Vetting();
-    await I.et1CaseVettingOptions1();
-    await I.caseDetails1ET1Vetting();
-    await I.caseDetails2ET1Vetting();
-    await I.caseDetails3ET1Vetting();
-    await I.caseDetails4ET1Vetting();
-    await I.furtherQET1Vetting();
-    await I.possibleReferal1ET1Vetting();
-    await I.possibleReferal2ET1Vetting();
-    await I.otherFactorsET1Vetting();
-    await I.finalNotesET1Vetting();
-    await I.checkYourAnswersET1Vetting();*/
 }
 
 async function createAdminReferral(emailAddress, details) {

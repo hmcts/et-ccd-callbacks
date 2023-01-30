@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
@@ -547,14 +546,13 @@ class RespondentTellSomethingElseServiceTest {
     }
 
     private CaseData createCaseData(String selectedApplication, String selectedRule92Answer) {
-        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .withEthosCaseReference("test")
+            .withClaimant("claimant")
+            .withClaimantType("person@email.com")
+            .build();
         caseData.setResTseSelectApplication(selectedApplication);
         caseData.setResTseCopyToOtherPartyYesOrNo(selectedRule92Answer);
-        caseData.setEthosCaseReference("test");
-        caseData.setClaimant("claimant");
-        ClaimantType claimantType = new ClaimantType();
-        claimantType.setClaimantEmailAddress("person@email.com");
-        caseData.setClaimantType(claimantType);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
 
         return caseData;

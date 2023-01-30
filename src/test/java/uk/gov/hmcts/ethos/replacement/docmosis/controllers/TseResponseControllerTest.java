@@ -87,9 +87,8 @@ class TseResponseControllerTest {
             .withEthosCaseReference("9876")
             .withClaimantType("person@email.com")
             .withRespondent("respondent", YES, "01-Jan-2003", false)
+            .withClaimant("Claimant LastName")
             .build();
-
-        caseData.setClaimant("Claimant LastName");
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)

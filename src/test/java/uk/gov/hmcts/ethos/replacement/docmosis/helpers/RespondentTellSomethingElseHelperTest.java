@@ -35,8 +35,9 @@ class RespondentTellSomethingElseHelperTest {
 
     @BeforeEach
     void setUp() {
-        caseData = CaseDataBuilder.builder().build();
-        caseData.setEthosCaseReference("6000001/2022");
+        caseData = CaseDataBuilder.builder()
+            .withEthosCaseReference("6000001/2022")
+            .build();
     }
 
     @ParameterizedTest

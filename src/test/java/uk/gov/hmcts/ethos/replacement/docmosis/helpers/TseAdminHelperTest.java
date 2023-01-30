@@ -29,9 +29,8 @@ public class TseAdminHelperTest {
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("First", "Last")
             .withEthosCaseReference("1234")
+            .withClaimant("First Last")
             .build();
-
-        caseData.setClaimant("First Last");
 
         ccdRequest = CCDRequestBuilder.builder()
             .withState("Accepted")

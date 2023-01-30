@@ -53,9 +53,9 @@ class TseAdminControllerTest {
     @BeforeEach
     void setUp() throws Exception {
         CaseDetails caseDetails = CaseDataBuilder.builder()
+            .withEthosCaseReference("1234")
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
-        caseDetails.getCaseData().setEthosCaseReference("1234");
         caseDetails.setCaseId("4321");
 
         ccdRequest = CCDRequestBuilder.builder()

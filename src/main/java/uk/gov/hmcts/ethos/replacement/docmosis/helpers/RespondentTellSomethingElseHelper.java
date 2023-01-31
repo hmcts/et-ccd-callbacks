@@ -93,7 +93,8 @@ public final class RespondentTellSomethingElseHelper {
                 return new RespondentTSEApplicationTypeData(
                         caseData.getResTseDocument12(), caseData.getResTseTextBox12());
             default:
-                return null;
+                throw new IllegalArgumentException(String.format("Unexpected application type %s",
+                    caseData.getResTseSelectApplication()));
         }
     }
 

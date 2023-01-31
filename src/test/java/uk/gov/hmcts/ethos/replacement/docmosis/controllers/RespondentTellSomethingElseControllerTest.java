@@ -60,11 +60,12 @@ class RespondentTellSomethingElseControllerTest {
 
     @BeforeEach
     void setUp() {
-        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .withEthosCaseReference("test")
+            .withClaimant("claimant")
+            .build();
         caseData.setResTseSelectApplication("caseRef");
         caseData.setResTseCopyToOtherPartyYesOrNo(I_DO_NOT_WANT_TO_COPY);
-        caseData.setEthosCaseReference("test");
-        caseData.setClaimant("claimant");
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
 

@@ -26,7 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -143,8 +142,8 @@ public final class TseHelper {
         String document = "N/A";
 
         if (genericTseApplicationType.getDocumentUpload() != null) {
-            Pattern pattern = Pattern.compile("^.+?/documents/");
-            Matcher matcher = pattern.matcher(genericTseApplicationType.getDocumentUpload().getDocumentBinaryUrl());
+            Matcher matcher = Helper.getDocumentMatcher(
+                genericTseApplicationType.getDocumentUpload().getDocumentBinaryUrl());
             String documentLink = matcher.replaceFirst("");
             String documentName = genericTseApplicationType.getDocumentUpload().getDocumentFilename();
             document = String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
@@ -342,8 +341,8 @@ public final class TseHelper {
      * @param docInfo Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
      * @return Markup String
      */
-    public static String formatRespondentReplyForReply(TseRespondType reply, int respondCount, String applicant,
-                                                       String docInfo) {
+    public static String formatLegalRepReplyForReply(TseRespondType reply, int respondCount, String applicant,
+                                                     String docInfo) {
         return String.format(
             RESPONDENT_REPLY_MARKUP_FOR_REPLY,
             respondCount,
@@ -378,7 +377,7 @@ public final class TseHelper {
      * @param docInfo Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
      * @return Markup String
      */
-    public static String formatRespondentReplyForDecision(TseRespondType reply, int respondCount, String docInfo) {
+    public static String formatLegalRepReplyForDecision(TseRespondType reply, int respondCount, String docInfo) {
         return String.format(
             RESPONDENT_REPLY_MARKUP_FOR_DECISION,
             respondCount,

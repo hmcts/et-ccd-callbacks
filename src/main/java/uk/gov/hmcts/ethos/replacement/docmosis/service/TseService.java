@@ -73,6 +73,8 @@ public class TseService {
         application.setType(claimantTse.getContactApplicationType());
         application.setDetails(claimantTse.getContactApplicationText());
         application.setDocumentUpload(claimantTse.getContactApplicationFile());
+        application.setCopyToOtherPartyYesOrNo(claimantTse.getCopyToOtherPartyYesOrNo());
+        application.setCopyToOtherPartyText(claimantTse.getCopyToOtherPartyText());
 
         caseData.setClaimantTse(null);
     }

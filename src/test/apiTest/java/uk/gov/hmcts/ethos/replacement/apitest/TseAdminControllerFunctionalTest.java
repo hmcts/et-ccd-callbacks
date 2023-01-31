@@ -16,11 +16,15 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
 @Slf4j
 class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
@@ -36,11 +40,13 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
 
     @BeforeAll
     public void setUpCaseData() {
-        CaseData caseData = new CaseData();
-        caseData.setEthosCaseReference("testCaseReference");
-        caseData.setResTseSelectApplication("Amend response");
-        caseData.setResTseCopyToOtherPartyYesOrNo("I do not want to copy");
-        caseData.setClaimant("claimant");
+        CaseData caseData = CaseDataBuilder.builder()
+            .withEthosCaseReference("testCaseReference")
+            .withClaimant("claimant")
+            .build();
+
+        caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
+        caseData.setResTseCopyToOtherPartyYesOrNo(I_DO_NOT_WANT_TO_COPY);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
         caseData.setTseAdminSelectApplication(

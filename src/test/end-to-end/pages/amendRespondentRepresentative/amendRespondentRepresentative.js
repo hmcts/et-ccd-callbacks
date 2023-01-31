@@ -37,8 +37,7 @@ module.exports = async function (myHMMCTSOrganisation = false) {
         I.fillField('#repCollection_0_representative_address_representative_address_postcodeInput', 'BR1 4NN');
         I.click('Find address');
         I.wait(15);
-        //I.waitForEnabled('[name='address']', 60);
-        //I.selectOption('[name=\'address\']', '55: Object');
+        //I.waitForVisible('[name=\'address\']', testConfig.TestTimeToWaitForText);
         I.selectOption('[name=\'address\']', '15 Arcus Road, Bromley');
         I.waitForText('Postcode', testConfig.TestTimeToWaitForText);
         I.see('Building and Street');

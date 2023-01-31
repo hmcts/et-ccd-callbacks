@@ -19,7 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.io.IOException;
@@ -34,7 +34,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class NoticeOfChangeController {
     private final VerifyTokenService verifyTokenService;
     private final NocNotificationService nocNotificationService;
-    private final RespondentRepresentativeService respondentRepresentativeService;
+    private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final CcdCaseAssignment ccdCaseAssignment;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String APPLY_NOC_DECISION = "applyNocDecision";
@@ -49,7 +49,7 @@ public class NoticeOfChangeController {
         }
 
         CaseData caseData =
-            respondentRepresentativeService
+            nocRespondentRepresentativeService
                 .updateRepresentation(callbackRequest.getCaseDetails());
 
         callbackRequest.getCaseDetails().setCaseData(caseData);

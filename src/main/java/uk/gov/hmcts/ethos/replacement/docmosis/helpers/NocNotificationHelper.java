@@ -66,7 +66,7 @@ public final class NocNotificationHelper {
     }
 
     public static RespondentSumType getRespondent(CallbackRequest callbackRequest, CaseData caseData,
-                                                  RespondentService respondentService) {
+                                                  NocRespondentHelper nocRespondentHelper) {
         String selectedRole =
             callbackRequest.getCaseDetailsBefore().getCaseData().getChangeOrganisationRequestField().getCaseRoleId()
                 .getSelectedCode();
@@ -75,7 +75,7 @@ public final class NocNotificationHelper {
 
         RespondentSumTypeItem respondentSumTypeItem = solicitorRole.getRepresentationItem(caseData).orElseThrow();
 
-        return respondentService.getRespondent(respondentSumTypeItem.getValue().getRespondentName(),
+        return nocRespondentHelper.getRespondent(respondentSumTypeItem.getValue().getRespondentName(),
             caseData);
     }
 

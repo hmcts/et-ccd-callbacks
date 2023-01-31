@@ -21,7 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentService;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
@@ -37,7 +37,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
@@ -183,10 +183,10 @@ public class CaseActionsForCaseWorkerControllerTest {
     private Et1VettingService et1VettingService;
 
     @MockBean
-    private RespondentRepresentativeService respondentRepresentativeService;
+    private NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     @MockBean
-    private RespondentService respondentService;
+    private NocRespondentHelper nocRespondentHelper;
 
     private MockMvc mvc;
     private JsonNode requestContent;
@@ -318,7 +318,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
         when(singleReferenceService.createReference(isA(String.class))).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(respondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent.toString())
@@ -335,7 +335,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenReturn(defaultValues);
         when(singleReferenceService.createReference(isA(String.class))).thenReturn("5100001/2019");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(respondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent2.toString())
@@ -395,9 +395,9 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(caseManagementForCaseWorkerService.struckOutRespondents(isA(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(respondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
-        doNothing().when(respondentService).amendRespondentNameRepresentativeNames(any());
+        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any());
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -413,9 +413,9 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(caseManagementForCaseWorkerService.continuingRespondent(isA(CCDRequest.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(respondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
             .thenReturn(ccdRequest.getCaseDetails().getCaseData());
-        doNothing().when(respondentService).amendRespondentNameRepresentativeNames(any());
+        doNothing().when(nocRespondentHelper).amendRespondentNameRepresentativeNames(any());
         mvc.perform(post(AMEND_RESPONDENT_DETAILS_URL)
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -430,7 +430,7 @@ public class CaseActionsForCaseWorkerControllerTest {
     public void amendRespondentRepresentative() throws Exception {
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(respondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
                 .thenReturn(ccdRequest.getCaseDetails().getCaseData());
 
         mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)

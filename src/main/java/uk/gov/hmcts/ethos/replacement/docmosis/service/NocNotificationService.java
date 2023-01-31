@@ -8,8 +8,8 @@ import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentService;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -21,7 +21,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @Slf4j
 public class NocNotificationService {
     private final EmailService emailService;
-    private final RespondentService respondentService;
+    private final NocRespondentHelper nocRespondentHelper;
     @Value("${nocNotification.template.respondent.id}")
     private String respondentTemplateId;
     @Value("${nocNotification.template.claimant.id}")
@@ -80,7 +80,7 @@ public class NocNotificationService {
         }
 
         RespondentSumType respondent =
-            NocNotificationHelper.getRespondent(callbackRequest, caseData, respondentService);
+            NocNotificationHelper.getRespondent(callbackRequest, caseData, nocRespondentHelper);
         String respondentEmail = respondent.getRespondentEmail();
         if (isNullOrEmpty(respondentEmail)) {
             log.warn("Missing respondentEmail");

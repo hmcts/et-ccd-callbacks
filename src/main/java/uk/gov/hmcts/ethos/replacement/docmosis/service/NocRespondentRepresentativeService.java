@@ -15,8 +15,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class RespondentRepresentativeService {
+public class NocRespondentRepresentativeService {
     public static final String NOC_REQUEST = "nocRequest";
     private final NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
 
@@ -42,7 +42,7 @@ public class RespondentRepresentativeService {
 
     private final AdminUserService adminUserService;
 
-    private final RespondentService respondentService;
+    private final NocRespondentHelper nocRespondentHelper;
 
     /**
      * Add respondent organisation policy and notice of change answer fields to the case data.
@@ -91,11 +91,11 @@ public class RespondentRepresentativeService {
 
         RespondentSumTypeItem respondent = caseData.getRespondentCollection().get(role.getIndex());
 
-        RepresentedTypeR addedSolicitor = respondentService.generateNewRepDetails(change, userDetails, respondent);
+        RepresentedTypeR addedSolicitor = nocRespondentHelper.generateNewRepDetails(change, userDetails, respondent);
 
         List<RepresentedTypeRItem> repCollection = defaultIfNull(caseData.getRepCollection(), new ArrayList<>());
 
-        int repIndex = respondentService.getIndexOfRep(respondent, repCollection);
+        int repIndex = nocRespondentHelper.getIndexOfRep(respondent, repCollection);
 
         if (repIndex >= 0) {
             repCollection.get(repIndex).setValue(addedSolicitor);
@@ -142,9 +142,9 @@ public class RespondentRepresentativeService {
         final List<RespondentSumTypeItem> newRespondents =
             defaultIfNull(after.getRespondentCollection(), new ArrayList<>());
         final Map<String, Organisation> newRespondentsOrganisations =
-            respondentService.getRespondentOrganisations(after);
+            nocRespondentHelper.getRespondentOrganisations(after);
         final Map<String, Organisation> oldRespondentsOrganisations =
-            respondentService.getRespondentOrganisations(before);
+            nocRespondentHelper.getRespondentOrganisations(before);
         final List<ChangeOrganisationRequest> changeRequests = new ArrayList<>();
 
         for (int i = 0; i < newRespondents.size(); i++) {
@@ -155,7 +155,7 @@ public class RespondentRepresentativeService {
             Organisation oldOrganisation = oldRespondentsOrganisations.get(respondentId);
 
             if (!Objects.equals(newOrganisation, oldOrganisation)) {
-                changeRequests.add(respondentService
+                changeRequests.add(nocRespondentHelper
                     .createChangeRequest(newOrganisation, oldOrganisation, solicitorRole));
             }
         }

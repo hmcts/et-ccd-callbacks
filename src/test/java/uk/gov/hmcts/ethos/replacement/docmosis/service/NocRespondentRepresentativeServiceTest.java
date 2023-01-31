@@ -23,8 +23,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentService;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalS
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CaseConverter.class, NoticeOfChangeFieldPopulator.class, ObjectMapper.class})
 @SuppressWarnings({"PMD.ExcessiveImports"})
-class RespondentRepresentativeServiceTest {
+class NocRespondentRepresentativeServiceTest {
     private static final String RESPONDENT_NAME = "Harry Johnson";
     private static final String RESPONDENT_NAME_TWO = "Jane Green";
     private static final String RESPONDENT_NAME_THREE = "Bad Company Inc";
@@ -82,23 +83,24 @@ class RespondentRepresentativeServiceTest {
     private static final String AUTH_TOKEN = "someToken";
     @Autowired
     private ObjectMapper objectMapper;
-    private RespondentRepresentativeService respondentRepresentativeService;
+    private NocRespondentRepresentativeService nocRespondentRepresentativeService;
     @MockBean
     private NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
     @MockBean
     private AdminUserService adminUserService;
     @MockBean
     private NocCcdService nocCcdService;
-    private RespondentService respondentService;
+    private NocRespondentHelper nocRespondentHelper;
     private CaseData caseData;
 
     @BeforeEach
     void setUp() {
-        respondentService = new RespondentService();
+        nocRespondentHelper = new NocRespondentHelper();
         caseData = new CaseData();
         CaseConverter converter = new CaseConverter(objectMapper);
-        respondentRepresentativeService = new RespondentRepresentativeService(noticeOfChangeFieldPopulator, converter,
-            nocCcdService, adminUserService, respondentService);
+        nocRespondentRepresentativeService =
+            new NocRespondentRepresentativeService(noticeOfChangeFieldPopulator, converter, nocCcdService,
+                adminUserService, nocRespondentHelper);
 
         // Respondent
         caseData.setRespondentCollection(new ArrayList<>());
@@ -183,7 +185,7 @@ class RespondentRepresentativeServiceTest {
 
     @Test
     void shouldPrepopulateWithOrganisationPolicyAndNoc() {
-        caseData = respondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+        caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
 
         assertThat(caseData.getRespondentOrganisationPolicy0()).isNotNull();
         assertThat(caseData.getRespondentOrganisationPolicy0().getOrgPolicyCaseAssignedRole()).isNotNull()
@@ -218,7 +220,7 @@ class RespondentRepresentativeServiceTest {
         when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(
             Optional.of(mockAuditEvent()));
 
-        respondentRepresentativeService.updateRepresentation(caseDetails);
+        nocRespondentRepresentativeService.updateRepresentation(caseDetails);
 
         assertThat(
             caseData.getRepCollection().get(1).getValue().getRespondentOrganisation().getOrganisationID()).isEqualTo(
@@ -245,8 +247,8 @@ class RespondentRepresentativeServiceTest {
                                                                       Organisation organisationToRemove) {
         DynamicFixedListType caseRole = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode(RespondentRepresentativeServiceTest.SOLICITORB);
-        dynamicValueType.setLabel(RespondentRepresentativeServiceTest.SOLICITORB);
+        dynamicValueType.setCode(NocRespondentRepresentativeServiceTest.SOLICITORB);
+        dynamicValueType.setLabel(NocRespondentRepresentativeServiceTest.SOLICITORB);
         caseRole.setValue(dynamicValueType);
 
         return ChangeOrganisationRequest.builder()
@@ -266,7 +268,7 @@ class RespondentRepresentativeServiceTest {
 
     @Test
     void shouldReturnDetailsOfRespondentAssociatedWithRepCollectionItem() {
-        RespondentSumType respondent = respondentService.getRespondent(RESPONDENT_NAME_THREE, caseData);
+        RespondentSumType respondent = nocRespondentHelper.getRespondent(RESPONDENT_NAME_THREE, caseData);
         assertThat(respondent.getResponseReference()).isEqualTo(RESPONDENT_REF_THREE);
     }
 
@@ -277,7 +279,7 @@ class RespondentRepresentativeServiceTest {
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         doNothing().when(nocCcdService).updateCaseRepresentation(any(), any(), any(), any(), any());
 
-        respondentRepresentativeService.updateRepresentativesAccess(callbackRequest);
+        nocRespondentRepresentativeService.updateRepresentativesAccess(callbackRequest);
 
         verify(nocCcdService, times(2))
             .updateCaseRepresentation(any(), any(), any(), any(), any());
@@ -300,7 +302,7 @@ class RespondentRepresentativeServiceTest {
         CaseData caseDataAfter = getCaseDataAfter();
 
         List<ChangeOrganisationRequest> representationChanges =
-            respondentRepresentativeService.getRepresentationChanges(caseDataAfter, caseDataBefore);
+            nocRespondentRepresentativeService.getRepresentationChanges(caseDataAfter, caseDataBefore);
 
         assertThat(representationChanges).usingRecursiveComparison()
             .ignoringFields("requestTimestamp")

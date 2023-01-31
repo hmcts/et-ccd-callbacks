@@ -69,7 +69,8 @@ class NoticeOfChangeControllerTest {
 
     private JsonNode requestContent;
     private MockMvc mvc;
-    private CallbackRequest callbackRequest;
+
+    private CaseData caseData;
 
     @BeforeEach
     public void setUp() throws URISyntaxException, IOException {
@@ -77,13 +78,13 @@ class NoticeOfChangeControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
             .getResource("/exampleV1.json")).toURI()));
-        callbackRequest = objectMapper.treeToValue(requestContent, CallbackRequest.class);
+        CallbackRequest callbackRequest = objectMapper.treeToValue(requestContent, CallbackRequest.class);
+        caseData = callbackRequest.getCaseDetails().getCaseData();
     }
 
     @Test
     void handleAboutToSubmit() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
         when(respondentRepresentativeService
             .updateRepresentation(any())).thenReturn(caseData);
         when(ccdCaseAssignment.applyNoc(any(), any())).thenReturn(CCDCallbackResponse.builder()
@@ -103,6 +104,10 @@ class NoticeOfChangeControllerTest {
     @Test
     void updateNocRespondents() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        when(ccdCaseAssignment.applyNocAsAdmin(any())).thenReturn(CCDCallbackResponse.builder()
+            .data(caseData)
+            .build());
 
         mvc.perform(post(UPDATE_RESPONDENTS_URL)
                 .content(requestContent.toString())

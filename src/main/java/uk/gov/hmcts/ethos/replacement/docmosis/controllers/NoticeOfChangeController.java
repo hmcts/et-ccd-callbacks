@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
@@ -27,7 +26,6 @@ import java.io.IOException;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @RestController
 @RequestMapping("/noc-decision")
@@ -42,11 +40,12 @@ public class NoticeOfChangeController {
     private static final String APPLY_NOC_DECISION = "applyNocDecision";
 
     @PostMapping("/about-to-submit")
-    public CCDCallbackResponse handleAboutToSubmit(@RequestBody CallbackRequest callbackRequest,
+    public ResponseEntity<CCDCallbackResponse> handleAboutToSubmit(@RequestBody CallbackRequest callbackRequest,
                                                       @RequestHeader("Authorization")
                                                       String userToken) throws IOException {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
         CaseData caseData =
@@ -55,7 +54,7 @@ public class NoticeOfChangeController {
 
         callbackRequest.getCaseDetails().setCaseData(caseData);
 
-        return ccdCaseAssignment.applyNoc(callbackRequest, userToken);
+        return ResponseEntity.ok(ccdCaseAssignment.applyNoc(callbackRequest, userToken));
 
     }
 
@@ -65,7 +64,7 @@ public class NoticeOfChangeController {
         @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> updateNocRespondents(@RequestBody CCDRequest callbackRequest,
+    public ResponseEntity<CCDCallbackResponse> updateNocRespondents(@RequestBody CallbackRequest callbackRequest,
                                                                     @RequestHeader("Authorization")
                                                                     String userToken) {
         log.info("Noc update respondents ---> {}", callbackRequest.getCaseDetails().getCaseId());
@@ -75,9 +74,7 @@ public class NoticeOfChangeController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
-
-        return getCallbackRespEntityNoErrors(caseData);
+        return ResponseEntity.ok(ccdCaseAssignment.applyNocAsAdmin(callbackRequest));
     }
 
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)

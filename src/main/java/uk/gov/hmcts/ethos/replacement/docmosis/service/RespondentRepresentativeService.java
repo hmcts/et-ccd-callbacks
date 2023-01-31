@@ -2,12 +2,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -15,46 +13,36 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentService;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Function;
+
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
-import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus.APPROVED;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class RespondentRepresentativeService {
-    public static final String BEARER = "Bearer";
     public static final String NOC_REQUEST = "nocRequest";
     private final NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
 
-    private final UserService userService;
-
     private final CaseConverter caseConverter;
 
-    private final AuditEventService auditEventService;
+    private final NocCcdService nocCcdService;
 
-    @Value("${etcos.system.username}")
-    private String systemUserName;
+    private final AdminUserService adminUserService;
 
-    @Value("${etcos.system.password}")
-    private String systemUserPassword;
+    private final RespondentService respondentService;
 
     /**
      * Add respondent organisation policy and notice of change answer fields to the case data.
@@ -91,125 +79,87 @@ public class RespondentRepresentativeService {
             throw new IllegalStateException("Invalid or missing ChangeOrganisationRequest: " + change);
         }
 
-        String accessToken = String.join(" ", BEARER, userService.getAccessToken(systemUserName, systemUserPassword));
+        String accessToken = adminUserService.getAdminUserToken();
 
         Optional<AuditEvent> auditEvent =
-            auditEventService.getLatestAuditEventByName(accessToken, caseId, NOC_REQUEST);
+            nocCcdService.getLatestAuditEventByName(accessToken, caseId, NOC_REQUEST);
 
         Optional<UserDetails> userDetails = auditEvent
-            .map(event -> userService.getUserDetailsById(accessToken, event.getUserId()));
+            .map(event -> adminUserService.getUserDetails(event.getUserId()));
 
         final SolicitorRole role = SolicitorRole.from(change.getCaseRoleId().getSelectedCode()).orElseThrow();
 
-        RepresentedTypeR container = caseData.getRepCollection().get(role.getIndex()).getValue();
+        RespondentSumTypeItem respondent = caseData.getRespondentCollection().get(role.getIndex());
 
-        RepresentedTypeR addedSolicitor = RepresentedTypeR.builder()
-            .nameOfRepresentative(userDetails
-                .map(user -> String.join(" ", user.getFirstName(), user.getLastName()))
-                .orElse(null))
-            .representativeEmailAddress(userDetails.map(UserDetails::getEmail).orElse(null))
-            .respondentOrganisation(change.getOrganisationToAdd())
-            .respRepName(container.getRespRepName())
-            .myHmctsYesNo("Yes")
-            .build();
+        RepresentedTypeR addedSolicitor = respondentService.generateNewRepDetails(change, userDetails, respondent);
 
-        caseData.getRepCollection().get(role.getIndex()).setValue(addedSolicitor);
+        List<RepresentedTypeRItem> repCollection = defaultIfNull(caseData.getRepCollection(), new ArrayList<>());
 
-        return Map.of(SolicitorRole.CASE_FIELD, caseData.getRepCollection());
+        int repIndex = respondentService.getIndexOfRep(respondent, repCollection);
 
+        if (repIndex >= 0) {
+            repCollection.get(repIndex).setValue(addedSolicitor);
+        } else {
+            //assumption is NOC will take care of replacing value in org policy
+            RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
+            representedTypeRItem.setValue(addedSolicitor);
+            repCollection.add(representedTypeRItem);
+        }
+
+        return Map.of(SolicitorRole.CASE_FIELD, repCollection);
     }
 
     /**
      * Gets the case data before and after and checks respondent org policies for differences.
      * For each difference creates a change organisation request to remove old organisation and add new.
      * For each change request trigger the updateRepresentation event against CCD
-     * @param caseId case id of case being modified
-     * @param caseData case date before the update event occurred
-     * @param caseDataBefore case data after the update event occurred
+     * @param callbackRequest - containing case details before event and after the event
+     * @throws IOException - exception thrown by ccd
      */
-    public void updateRepresentativesAccess(String caseId, CaseData caseData, CaseData caseDataBefore) {
+    public void updateRepresentativesAccess(CallbackRequest callbackRequest) throws IOException {
+        CaseDetails caseDetails = callbackRequest.getCaseDetails();
+        CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore().getCaseData();
+        CaseData caseData = caseDetails.getCaseData();
 
-        List<ChangeOrganisationRequest> changeRequests = getRepresentationChanges(caseData.getRepCollection(),
-            caseDataBefore.getRepCollection()) ;
+        List<ChangeOrganisationRequest> changeRequests = getRepresentationChanges(caseData,
+            caseDataBefore);
 
-        log.info("{} representation changes detected", changeRequests.size());
+        String accessToken = adminUserService.getAdminUserToken();
 
         for (ChangeOrganisationRequest changeRequest : changeRequests) {
             log.info("About to apply representation change {}", changeRequest);
 
-//            coreCaseDataService.triggerEvent(caseId, "updateRepresentation",
-//                Map.of("changeOrganisationRequestField", changeRequest));
+            nocCcdService.updateCaseRepresentation(accessToken, changeRequest,
+                caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
 
             log.info("Representation change applied {}", changeRequest);
         }
 
     }
-    public List<ChangeOrganisationRequest> getRepresentationChanges(List<RepresentedTypeRItem>  after,
-                                                                    List<RepresentedTypeRItem>  before) {
 
-        final List<RepresentedTypeRItem> newRespondents = defaultIfNull(after, new ArrayList<>());
-        final List<RepresentedTypeRItem> oldRespondents = defaultIfNull(before, new ArrayList<>());
-
-        final Map<UUID, Organisation> newRespondentsOrganisations = organisationByRespondentId(newRespondents);
-        final Map<UUID, Organisation> oldRespondentsOrganisations = organisationByRespondentId(oldRespondents);
-
+    public List<ChangeOrganisationRequest> getRepresentationChanges(CaseData  after,
+                                                                    CaseData before) {
+        final List<RespondentSumTypeItem> newRespondents =
+            defaultIfNull(after.getRespondentCollection(), new ArrayList<>());
+        final Map<String, Organisation> newRespondentsOrganisations =
+            respondentService.getRespondentOrganisations(after);
+        final Map<String, Organisation> oldRespondentsOrganisations =
+            respondentService.getRespondentOrganisations(before);
         final List<ChangeOrganisationRequest> changeRequests = new ArrayList<>();
 
         for (int i = 0; i < newRespondents.size(); i++) {
-
             SolicitorRole solicitorRole = Arrays.asList(SolicitorRole.values()).get(i);
-            UUID respondentId = newRespondents.get(i).getValue().getId();
+            String respondentId = newRespondents.get(i).getId();
 
             Organisation newOrganisation = newRespondentsOrganisations.get(respondentId);
             Organisation oldOrganisation = oldRespondentsOrganisations.get(respondentId);
 
             if (!Objects.equals(newOrganisation, oldOrganisation)) {
-                changeRequests.add(changeRequest(newOrganisation, oldOrganisation, solicitorRole));
+                changeRequests.add(respondentService
+                    .createChangeRequest(newOrganisation, oldOrganisation, solicitorRole));
             }
         }
 
         return changeRequests;
-    }
-
-    private Map<UUID, Organisation> organisationByRespondentId(List<RepresentedTypeRItem> respondents) {
-        return respondents.stream().collect(
-            HashMap::new,
-            (container, respondent) -> container.put(respondent.getValue().getId(), getOrganisation(respondent)),
-            HashMap::putAll
-        );
-    }
-
-    private Organisation getOrganisation(RepresentedTypeRItem respondent) {
-        return Optional.ofNullable(respondent)
-            .map(respItem -> respItem.getValue().getRespondentOrganisation())
-            .filter(org -> isNotEmpty(org.getOrganisationID()))
-            .orElse(null);
-    }
-
-    private ChangeOrganisationRequest changeRequest(Organisation newOrganisation,
-                                                    Organisation oldOrganisation,
-                                                    SolicitorRole solicitorRole) {
-
-        DynamicFixedListType roleItem = new DynamicFixedListType();
-        DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode(solicitorRole.getCaseRoleLabel());
-        dynamicValueType.setLabel(solicitorRole.getCaseRoleLabel());
-        roleItem.setValue(dynamicValueType);
-
-
-        return ChangeOrganisationRequest.builder()
-            .approvalStatus(APPROVED)
-            .requestTimestamp(LocalDateTime.now())
-            .caseRoleId(roleItem)
-            .organisationToRemove(oldOrganisation)
-            .organisationToAdd(newOrganisation)
-            .build();
-    }
-
-    public RespondentSumType getRespondent(String respName, CaseData caseData) {
-        return caseData.getRespondentCollection().stream()
-            .filter(respondent -> respondent.getValue().getRespondentName().equals(respName))
-            .findFirst().map(RespondentSumTypeItem::getValue)
-            .orElse(new RespondentSumType());
     }
 }

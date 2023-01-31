@@ -4,10 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -58,17 +57,17 @@ public final class NocNotificationHelper {
     }
 
     public static RespondentSumType getRespondent(CallbackRequest callbackRequest, CaseData caseData,
-                                                  RespondentRepresentativeService respondentRepresentativeService) {
+                                                  RespondentService respondentService) {
         String selectedRole =
             callbackRequest.getCaseDetailsBefore().getCaseData().getChangeOrganisationRequestField().getCaseRoleId()
                 .getSelectedCode();
 
         SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
 
-        RepresentedTypeRItem representedPerson =
-            solicitorRole.getRepresentationItem(caseData).orElseThrow();
+        RespondentSumTypeItem respondentSumTypeItem = solicitorRole.getRepresentationItem(caseData).orElseThrow();
 
-        return respondentRepresentativeService.getRespondent(representedPerson.getValue().getRespRepName(), caseData);
+        return respondentService.getRespondent(respondentSumTypeItem.getValue().getRespondentName(),
+            caseData);
     }
 
     public static Map<String, String> buildClaimantPersonalisation(CaseData caseData, String partyName) {

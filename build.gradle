@@ -204,10 +204,6 @@ rootProject.tasks.named("processContractTestResources") {
     duplicatesStrategy = 'include'
 }
 
-rootProject.tasks.named("processApiTestResources") {
-    duplicatesStrategy = 'include'
-}
-
 runAndPublishConsumerPactTests.finalizedBy pactPublish
 
 pact {

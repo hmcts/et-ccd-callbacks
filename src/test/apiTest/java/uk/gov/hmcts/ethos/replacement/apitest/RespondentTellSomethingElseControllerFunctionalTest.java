@@ -12,34 +12,33 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
 @Slf4j
 class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctionalTest {
-    private static final String NO = "I do not want to copy";
-
-    private static final String APPLICANT_RESPONDENT = "Respondent";
 
     private CCDRequest ccdRequest;
 
     @BeforeAll
     public void setUpCaseData() {
-        CaseData caseData = new CaseData();
-        caseData.setEthosCaseReference("testCaseReference");
-        caseData.setResTseSelectApplication("Amend response");
-        caseData.setResTseCopyToOtherPartyYesOrNo(NO);
-        caseData.setClaimant("claimant");
-        ClaimantType claimantType = new ClaimantType();
-        claimantType.setClaimantEmailAddress("person@email.com");
-        caseData.setClaimantType(claimantType);
+        CaseData caseData = CaseDataBuilder.builder()
+            .withEthosCaseReference("testCaseReference")
+            .withClaimant("claimant")
+            .withClaimantType("person@email.com")
+            .build();
+        caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
+        caseData.setResTseCopyToOtherPartyYesOrNo(I_DO_NOT_WANT_TO_COPY);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
 
@@ -113,8 +112,8 @@ class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctional
 
     private List<GenericTseApplicationTypeItem> createApplicationCollection() {
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
-        respondentTseType.setApplicant(APPLICANT_RESPONDENT);
-        respondentTseType.setCopyToOtherPartyYesOrNo(NO);
+        respondentTseType.setApplicant(RESPONDENT_TITLE);
+        respondentTseType.setCopyToOtherPartyYesOrNo(I_DO_NOT_WANT_TO_COPY);
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
         tseApplicationTypeItem.setId(UUID.randomUUID().toString());

@@ -95,6 +95,7 @@ configurations {
     contractTestRuntimeOnly.extendsFrom testRuntimeOnly
     integrationTestImplementation.extendsFrom testImplementation
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
 
 test {
     exclude '**/*ComponentTest*'

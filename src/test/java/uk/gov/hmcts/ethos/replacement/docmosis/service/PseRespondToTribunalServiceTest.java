@@ -122,11 +122,11 @@ class PseRespondToTribunalServiceTest {
 
         PseResponseType savedResponse = caseData.getPseOrdReqResponses().get(0).getValue();
 
-        assertEquals(savedResponse.getFrom(), RESPONDENT_TITLE);
-        assertEquals(savedResponse.getResponse(), response);
-        assertEquals(savedResponse.getHasSupportingMaterial(), hasSupportingMaterial);
-        assertEquals(savedResponse.getCopyToOtherParty(), copyOtherParty);
-        assertEquals(savedResponse.getCopyNoGiveDetails(), copyDetails);
+        assertEquals(RESPONDENT_TITLE, savedResponse.getFrom());
+        assertEquals(response, savedResponse.getResponse());
+        assertEquals(hasSupportingMaterial, savedResponse.getHasSupportingMaterial());
+        assertEquals(copyOtherParty, savedResponse.getCopyToOtherParty());
+        assertEquals(copyDetails, savedResponse.getCopyNoGiveDetails());
 
         if (supportingDocsSize > 0) {
             assertEquals(savedResponse.getSupportingMaterial().size(), supportingDocsSize);

@@ -17,19 +17,23 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.PseResponseItem;
+import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondToTribunalService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
- * REST controller for the "Respond to an Application" event.
+ * REST controller for the "Respond to an Order or Request" event.
  */
 @Slf4j
 @RequestMapping("/pseRespondToTribunal")
@@ -43,6 +47,11 @@ public class PseRespondToTribunalController {
     private final PseRespondToTribunalService pseRespondToTribunalService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
+    private static final String SUBMITTED_BODY = "### What happens next\r\n\r\n" + "%s"
+        + "The tribunal will consider all correspondence and let you know what happens next.";
+    private static final String RULE92_ANSWERED_YES =
+        "You have responded to the tribunal and copied your response to the other party.\r\n\r\n";
+    private static final String RULE92_YES = "I confirm I want to copy";
 
     /**
      *  Populates the dynamic list for select an order or request to respond to.
@@ -217,5 +226,51 @@ public class PseRespondToTribunalController {
         pseRespondToTribunalService.clearRespondentResponse(caseDetails.getCaseData());
 
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+    }
+
+    /**
+     * Informs Respondent about Response Submitted.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Informs Respondent about Response Submitted")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> submitted(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        List<PseResponseItem> pseRespondentResponseCollection =
+            caseData.getPseOrdReqResponses().stream()
+                .filter(o -> RESPONDENT_TITLE.equals(o.getValue().getFrom()))
+                .collect(Collectors.toList());
+        PseResponseType latestRespondentResponse =
+            pseRespondentResponseCollection.get(pseRespondentResponseCollection.size() - 1).getValue();
+
+        String body = String.format(
+            SUBMITTED_BODY,
+            RULE92_YES.equals(latestRespondentResponse.getCopyToOtherParty()) ? RULE92_ANSWERED_YES : ""
+        );
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+            .confirmation_body(body)
+            .build());
     }
 }

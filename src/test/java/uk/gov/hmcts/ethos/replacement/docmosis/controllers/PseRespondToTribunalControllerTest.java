@@ -13,7 +13,9 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.PseResponseItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondToTribunalService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -34,15 +36,19 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({PseRespondToTribunalController.class, JsonMapper.class})
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 class PseRespondToTribunalControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_START_URL = "/pseRespondToTribunal/aboutToStart";
     private static final String MID_TABLE_DETAILS = "/pseRespondToTribunal/midDetailsTable";
     private static final String MID_VALIDATE_INPUT = "/pseRespondToTribunal/midValidateInput";
     private static final String ABOUT_TO_SUBMIT_URL = "/pseRespondToTribunal/aboutToSubmit";
+    private static final String SUBMITTED_URL = "/pseRespondToTribunal/submitted";
+    private static final String RULE92_YES = "I confirm I want to copy";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -64,6 +70,7 @@ class PseRespondToTribunalControllerTest {
         caseData.setClaimant("claimant");
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
+        caseData.setPseOrdReqResponses(createResponseCollection());
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)
@@ -165,6 +172,30 @@ class PseRespondToTribunalControllerTest {
             .andExpect(status().isForbidden());
     }
 
+    @Test
+    void submitted_Success() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(SUBMITTED_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.confirmation_body", notNullValue()))
+            .andExpect(jsonPath("$.data", nullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void submitted_invalidToken() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(SUBMITTED_URL)
+                .contentType(APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isForbidden());
+    }
+
     private RespondentSumTypeItem createRespondentType() {
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName("Boris Johnson");
@@ -180,5 +211,17 @@ class PseRespondToTribunalControllerTest {
         tseApplicationTypeItem.setId(UUID.randomUUID().toString());
         tseApplicationTypeItem.setValue(respondentTseType);
         return new ArrayList<>(Collections.singletonList(tseApplicationTypeItem));
+    }
+
+    private List<PseResponseItem> createResponseCollection() {
+        PseResponseType pseRespondentReply = new PseResponseType();
+        pseRespondentReply.setFrom(RESPONDENT_TITLE);
+        pseRespondentReply.setCopyToOtherParty(RULE92_YES);
+
+        PseResponseItem pseResponseItem = new PseResponseItem();
+        pseResponseItem.setId(UUID.randomUUID().toString());
+        pseResponseItem.setValue(pseRespondentReply);
+
+        return new ArrayList<>(Collections.singletonList(pseResponseItem));
     }
 }

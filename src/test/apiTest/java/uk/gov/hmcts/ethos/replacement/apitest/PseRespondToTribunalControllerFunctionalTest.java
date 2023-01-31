@@ -9,7 +9,16 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.PseResponseItem;
+import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 
 @Slf4j
 class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
@@ -19,6 +28,8 @@ class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
     private static final String MID_TABLE_DETAILS = "/pseRespondToTribunal/midDetailsTable";
     private static final String MID_VALIDATE_INPUT = "/pseRespondToTribunal/midValidateInput";
     private static final String ABOUT_TO_SUBMIT_URL = "/pseRespondToTribunal/aboutToSubmit";
+    private static final String SUBMITTED_URL = "/pseRespondToTribunal/submitted";
+    private static final String RULE92_YES = "I confirm I want to copy";
 
     private CCDRequest ccdRequest;
 
@@ -26,6 +37,7 @@ class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
     public void setUpCaseData() {
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("testCaseReference");
+        caseData.setPseOrdReqResponses(createResponseCollection());
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)
@@ -87,5 +99,31 @@ class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
             .statusCode(HttpStatus.SC_OK)
             .log()
             .all(true);
+    }
+
+    @Test
+    void shouldReceiveSuccessResponseWhenSubmittedInvoked() {
+        RestAssured.given()
+            .spec(spec)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(ccdRequest)
+            .post(SUBMITTED_URL)
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log()
+            .all(true);
+    }
+
+    private List<PseResponseItem> createResponseCollection() {
+        PseResponseType pseRespondentReply = new PseResponseType();
+        pseRespondentReply.setFrom(RESPONDENT_TITLE);
+        pseRespondentReply.setCopyToOtherParty(RULE92_YES);
+
+        PseResponseItem pseResponseItem = new PseResponseItem();
+        pseResponseItem.setId(UUID.randomUUID().toString());
+        pseResponseItem.setValue(pseRespondentReply);
+
+        return new ArrayList<>(Collections.singletonList(pseResponseItem));
     }
 }

@@ -44,6 +44,7 @@ class TseAdminControllerTest {
     private static final String MID_DETAILS_TABLE = "/tseAdmin/midDetailsTable";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmin/aboutToSubmit";
     private static final String SUBMITTED_URL = "/tseAdmin/submitted";
+    private static final String ABOUT_TO_SUBMIT_CLOSE_APP_URL = "/tseAdmin/aboutToSubmitCloseApplication";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -236,4 +237,43 @@ class TseAdminControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void aboutToSubmitCloseApplication_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_CLOSE_APP_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(tseAdminService).aboutToSubmitCloseApplication(
+            ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    void aboutToSubmitCloseApplication_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_CLOSE_APP_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+        verify(tseAdminService, never()).aboutToSubmitCloseApplication(
+            ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    void aboutToSubmitCloseApplication_badRequest() throws Exception {
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_CLOSE_APP_URL)
+                .content("garbage content")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+        verify(tseAdminService, never()).aboutToSubmitCloseApplication(
+            ccdRequest.getCaseDetails().getCaseData());
+    }
+
 }

@@ -12,5 +12,5 @@ Scenario('Verify B/F Action', async ({I}) => {
     console.log("... case id =>" +caseId);
     await bfAction(I, eventNames.BF_ACTION);
 
-}).tag('@RET-BAT')
-    .tag('@nightly').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);
+//.tag('@SC');

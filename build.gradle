@@ -65,7 +65,10 @@ sourceSets {
             srcDir 'src/test/functional/java'
             srcDir 'src/test/apiTest/java'
         }
-        resources.srcDir 'src/test/functional/resources'
+        resources {
+            srcDir 'src/test/functional/resources'
+            srcDir 'src/test/apiTest/resources'
+        }
         compileClasspath += main.output + test.output
         runtimeClasspath += main.output + test.output
     }

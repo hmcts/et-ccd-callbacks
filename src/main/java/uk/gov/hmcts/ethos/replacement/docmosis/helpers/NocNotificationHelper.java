@@ -51,9 +51,18 @@ public final class NocNotificationHelper {
 
     public static String getRespondentNameForNewSolicitor(CallbackRequest callbackRequest) {
         CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
-        String organisationName =
-            caseData.getChangeOrganisationRequestField().getOrganisationToAdd().getOrganisationName();
-        return isNullOrEmpty(organisationName) ? UNKNOWN : organisationName;
+
+        String selectedRole =
+            callbackRequest.getCaseDetailsBefore().getCaseData().getChangeOrganisationRequestField().getCaseRoleId()
+                .getSelectedCode();
+
+        SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
+
+        RepresentedTypeRItem representedPerson =
+            solicitorRole.getRepresentationItem(caseData).orElseThrow();
+        String respondentName = representedPerson.getValue().getRespRepName();
+
+        return isNullOrEmpty(respondentName) ? UNKNOWN : respondentName;
     }
 
     public static RespondentSumType getRespondent(CallbackRequest callbackRequest, CaseData caseData,
@@ -83,9 +92,6 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
-        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? UNKNOWN :
-            caseData.getEthosCaseReference());
-
         return personalisation;
     }
 
@@ -93,8 +99,6 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
-        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? UNKNOWN :
-                caseData.getEthosCaseReference());
         personalisation.put("party_name", partyName);
 
         return personalisation;
@@ -104,8 +108,6 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
-        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? UNKNOWN :
-                caseData.getEthosCaseReference());
         personalisation.put("respondent_name", respondent.getRespondentName());
 
         String nextHearingDate = HearingsHelper.getEarliestFutureHearingDate(caseData.getHearingCollection());
@@ -129,8 +131,6 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
-        personalisation.put("email_flag", isNullOrEmpty(caseData.getEthosCaseReference()) ? UNKNOWN :
-            caseData.getEthosCaseReference());
         personalisation.put("date",
             LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")));
         personalisation.put("tribunal", isNullOrEmpty(caseData.getTribunalAndOfficeLocation()) ? UNKNOWN :

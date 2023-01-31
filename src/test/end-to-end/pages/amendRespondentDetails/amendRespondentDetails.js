@@ -5,7 +5,7 @@ const testConfig = require("../../../config");
 module.exports = async function () {
 
     const I = this;
-    //Before Respondents Page Starts
+    //Before Respondents Page Starts.
     I.waitForText('Respondent Details'), testConfig.TestTimeToWaitForText;
     I.see('Case Number');
     I.see('Respondents');

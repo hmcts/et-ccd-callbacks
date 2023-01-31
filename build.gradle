@@ -61,7 +61,10 @@ sourceSets {
         java.srcDir 'src/test/java'
     }
     functional {
-        java.srcDir 'src/test/functional/java'
+        java {
+            srcDir 'src/test/functional/java'
+            srcDir 'src/test/apiTest/java'
+        }
         resources.srcDir 'src/test/functional/resources'
         compileClasspath += main.output + test.output
         runtimeClasspath += main.output + test.output
@@ -83,14 +86,6 @@ sourceSets {
         }
         resources.srcDir file('src/test/integration/resources')
     }
-    apiTest {
-        java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
-            srcDir file('src/test/apiTest/java')
-        }
-        resources.srcDir file('src/test/apiTest/resources')
-    }
 }
 
 configurations {
@@ -100,9 +95,6 @@ configurations {
     contractTestRuntimeOnly.extendsFrom testRuntimeOnly
     integrationTestImplementation.extendsFrom testImplementation
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
-    apiTestImplementation.extendsFrom testImplementation
-    apiTestRuntimeOnly.extendsFrom testRuntimeOnly
-}
 
 test {
     exclude '**/*ComponentTest*'
@@ -175,14 +167,6 @@ task integration(type: Test) {
     group = "Verification"
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
-    failFast = true
-}
-
-task apiTest(type: Test) {
-    description = "Runs API tests"
-    useJUnitPlatform()
-    testClassesDirs = sourceSets.apiTest.output.classesDirs
-    classpath = sourceSets.apiTest.runtimeClasspath
     failFast = true
 }
 
@@ -358,6 +342,7 @@ dependencies {
         exclude module: 'commons-io'
     }
 
+    testImplementation group: 'com.github.hmcts', name: 'et-common', version:'1.0.9'
     testImplementation group: 'com.auth0', name: 'java-jwt', version: '4.0.0'
     testImplementation group: 'com.warrenstrange', name: 'googleauth', version: '1.5.0'
     testImplementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
@@ -393,10 +378,6 @@ dependencies {
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '4.7.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
-
-    apiTestImplementation group: 'com.github.hmcts', name: 'et-common', version:'1.0.9'
-    apiTestImplementation sourceSets.main.runtimeClasspath
-    apiTestImplementation sourceSets.test.runtimeClasspath
 
 }
 

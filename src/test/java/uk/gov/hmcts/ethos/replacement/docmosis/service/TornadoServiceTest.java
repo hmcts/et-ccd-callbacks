@@ -31,6 +31,8 @@ import java.util.Collections;
 
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -232,7 +234,15 @@ public class TornadoServiceTest {
     public void generateDocument_noDocumentName() throws IOException {
         mockConnectionSuccess();
         tornadoService.generateEventDocument(new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
-                null);
+            null);
+    }
+
+    @Test
+    public void generateDocumentAsBytes() throws IOException {
+        mockConnectionSuccess();
+        byte[] bytes = tornadoService.generateEventDocumentBytes(new CaseData(), ENGLANDWALES_CASE_TYPE_ID, "Initial "
+            + "Consideration" + ".pdf");
+        assertThat(bytes.length, is(0));
     }
 
     private void createUserService() {

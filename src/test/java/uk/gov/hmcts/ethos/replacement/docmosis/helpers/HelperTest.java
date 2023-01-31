@@ -106,4 +106,10 @@ public class HelperTest {
         Matcher matcher = pattern.matcher(currentDate);
         assertTrue(matcher.matches());
     }
+
+    @Test
+    public void getDocumentMatcher() {
+        Matcher matcher = Helper.getDocumentMatcher("testUrl");
+        assertEquals("^.+?/documents/", matcher.pattern().toString());
+    }
 }

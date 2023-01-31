@@ -58,9 +58,9 @@ public final class NocNotificationHelper {
 
         SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
 
-        RepresentedTypeRItem representedPerson =
-            solicitorRole.getRepresentationItem(caseData).orElseThrow();
-        String respondentName = representedPerson.getValue().getRespRepName();
+        String respondentName =
+            solicitorRole.getRepresentationItem(caseData).map(respondentSumTypeItem ->
+                respondentSumTypeItem.getValue().getRespondentName()).orElseThrow();
 
         return isNullOrEmpty(respondentName) ? UNKNOWN : respondentName;
     }

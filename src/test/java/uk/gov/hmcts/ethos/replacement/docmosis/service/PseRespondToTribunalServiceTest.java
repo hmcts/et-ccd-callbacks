@@ -25,7 +25,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class PseRespondToTribunalServiceTest {
@@ -33,10 +37,6 @@ class PseRespondToTribunalServiceTest {
     private CaseData caseData;
 
     private static final String RESPONSE = "Some Response";
-    private static final String YES = "Yes";
-    private static final String NO = "No";
-    private static final String RULE92_YES = "I do want to copy";
-    private static final String RULE92_NO = "I do not want to copy";
 
     private static final String RULE92_NO_DETAILS = "Rule 92 Reasons";
 
@@ -137,10 +137,10 @@ class PseRespondToTribunalServiceTest {
 
     private static Stream<Arguments> createRespondentResponses() {
         return Stream.of(
-            Arguments.of(RESPONSE, YES, 2, RULE92_YES, null),
-            Arguments.of(RESPONSE, YES, 1, RULE92_NO, RULE92_NO_DETAILS),
-            Arguments.of(RESPONSE, NO, 0, RULE92_YES, null),
-            Arguments.of(RESPONSE, NO, 0, RULE92_NO, RULE92_NO_DETAILS)
+            Arguments.of(RESPONSE, YES, 2, I_CONFIRM_I_WANT_TO_COPY, null),
+            Arguments.of(RESPONSE, YES, 1, I_DO_NOT_WANT_TO_COPY, RULE92_NO_DETAILS),
+            Arguments.of(RESPONSE, NO, 0, I_CONFIRM_I_WANT_TO_COPY, null),
+            Arguments.of(RESPONSE, NO, 0, I_DO_NOT_WANT_TO_COPY, RULE92_NO_DETAILS)
         );
     }
 
@@ -166,7 +166,7 @@ class PseRespondToTribunalServiceTest {
         caseData.setPseRespondentOrdReqHasSupportingMaterial(YES);
         caseData.setPseRespondentOrdReqUploadDocument(
             new ArrayList<>(Collections.singletonList(createDocumentType("documentId"))));
-        caseData.setPseRespondentOrdReqCopyToOtherParty(RULE92_NO);
+        caseData.setPseRespondentOrdReqCopyToOtherParty(I_DO_NOT_WANT_TO_COPY);
         caseData.setPseRespondentOrdReqCopyNoGiveDetails(RULE92_NO_DETAILS);
 
         pseRespondToTribService.clearRespondentResponse(caseData);

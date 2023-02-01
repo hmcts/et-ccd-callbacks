@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 
 @Slf4j
@@ -29,7 +30,6 @@ class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
     private static final String MID_VALIDATE_INPUT = "/pseRespondToTribunal/midValidateInput";
     private static final String ABOUT_TO_SUBMIT_URL = "/pseRespondToTribunal/aboutToSubmit";
     private static final String SUBMITTED_URL = "/pseRespondToTribunal/submitted";
-    private static final String RULE92_YES = "I confirm I want to copy";
 
     private CCDRequest ccdRequest;
 
@@ -118,7 +118,7 @@ class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
     private List<PseResponseItem> createResponseCollection() {
         PseResponseType pseRespondentReply = new PseResponseType();
         pseRespondentReply.setFrom(RESPONDENT_TITLE);
-        pseRespondentReply.setCopyToOtherParty(RULE92_YES);
+        pseRespondentReply.setCopyToOtherParty(I_CONFIRM_I_WANT_TO_COPY);
 
         PseResponseItem pseResponseItem = new PseResponseItem();
         pseResponseItem.setId(UUID.randomUUID().toString());

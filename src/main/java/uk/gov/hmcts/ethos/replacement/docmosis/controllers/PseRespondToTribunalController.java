@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -47,11 +48,11 @@ public class PseRespondToTribunalController {
     private final PseRespondToTribunalService pseRespondToTribunalService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
-    private static final String SUBMITTED_BODY = "### What happens next\r\n\r\n" + "%s"
+    private static final String SUBMITTED_BODY = "### What happens next\r\n\r\n"
+        + "%s"
         + "The tribunal will consider all correspondence and let you know what happens next.";
     private static final String RULE92_ANSWERED_YES =
         "You have responded to the tribunal and copied your response to the other party.\r\n\r\n";
-    private static final String RULE92_YES = "I confirm I want to copy";
 
     /**
      *  Populates the dynamic list for select an order or request to respond to.
@@ -266,7 +267,7 @@ public class PseRespondToTribunalController {
 
         String body = String.format(
             SUBMITTED_BODY,
-            RULE92_YES.equals(latestRespondentResponse.getCopyToOtherParty()) ? RULE92_ANSWERED_YES : ""
+            I_CONFIRM_I_WANT_TO_COPY.equals(latestRespondentResponse.getCopyToOtherParty()) ? RULE92_ANSWERED_YES : ""
         );
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()

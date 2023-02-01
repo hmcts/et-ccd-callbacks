@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 
 @Slf4j
@@ -53,7 +54,6 @@ public class PseRespondToTribunalService {
         + "\r\n";
     private static final String GIVE_MISSING_DETAIL =
         "Use the text box or supporting materials to give details.";
-    private static final String NO = "No";
 
     /**
      * Initial Application and Respond details table.

@@ -36,6 +36,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 
 @ExtendWith(SpringExtension.class)
@@ -48,7 +49,6 @@ class PseRespondToTribunalControllerTest {
     private static final String MID_VALIDATE_INPUT = "/pseRespondToTribunal/midValidateInput";
     private static final String ABOUT_TO_SUBMIT_URL = "/pseRespondToTribunal/aboutToSubmit";
     private static final String SUBMITTED_URL = "/pseRespondToTribunal/submitted";
-    private static final String RULE92_YES = "I confirm I want to copy";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -216,7 +216,7 @@ class PseRespondToTribunalControllerTest {
     private List<PseResponseItem> createResponseCollection() {
         PseResponseType pseRespondentReply = new PseResponseType();
         pseRespondentReply.setFrom(RESPONDENT_TITLE);
-        pseRespondentReply.setCopyToOtherParty(RULE92_YES);
+        pseRespondentReply.setCopyToOtherParty(I_CONFIRM_I_WANT_TO_COPY);
 
         PseResponseItem pseResponseItem = new PseResponseItem();
         pseResponseItem.setId(UUID.randomUUID().toString());

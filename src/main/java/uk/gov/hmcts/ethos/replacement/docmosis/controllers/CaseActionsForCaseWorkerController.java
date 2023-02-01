@@ -20,8 +20,6 @@ import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
@@ -56,9 +54,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -463,7 +459,7 @@ public class CaseActionsForCaseWorkerController {
 
         if (errors.isEmpty()) {
             //add org policy and NOC elements
-            caseData.setRepCollection(updateWithRespondentIds(caseData));
+            caseData.setRepCollection(nocRespondentHelper.updateWithRespondentIds(caseData));
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
         }
 
@@ -1206,20 +1202,5 @@ public class CaseActionsForCaseWorkerController {
                     ccdRequest.getCaseDetails().getCaseId()));
             caseData.setEthosCaseReference(reference);
         }
-    }
-
-    private List<RepresentedTypeRItem> updateWithRespondentIds(CaseData caseData) {
-        return caseData.getRepCollection().stream()
-            .peek(respondentRep -> {
-                final List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
-                Optional<RespondentSumTypeItem> matchedRespondent = respondentCollection.stream()
-                    .filter(resp ->
-                        resp.getValue().getRespondentName()
-                            .equals(respondentRep.getValue().getRespRepName())).findFirst();
-
-                matchedRespondent.ifPresent(respondent ->
-                    respondentRep.getValue().setRespondentId(respondent.getId()));
-
-            }).collect(toList());
     }
 }

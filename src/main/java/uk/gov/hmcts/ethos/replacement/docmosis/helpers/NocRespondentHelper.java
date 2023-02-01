@@ -87,10 +87,25 @@ public class NocRespondentHelper {
             .orElse(new RespondentSumType());
     }
 
-    public void amendRespondentNameRepresentativeNames(CaseData caseData) {
-        List<DynamicValueType> listItems = DynamicListHelper.createDynamicRespondentName(
-            caseData.getRespondentCollection());
+    public Optional<RespondentSumTypeItem> getRespondentSumTypeItem(CaseData caseData,
+                                                                    RepresentedTypeRItem respondentRep) {
+        final List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+        return respondentCollection.stream()
+            .filter(resp ->
+                resp.getValue().getRespondentName()
+                    .equals(respondentRep.getValue().getRespRepName())).findFirst();
+    }
 
+    public List<RepresentedTypeRItem> updateWithRespondentIds(CaseData caseData) {
+        return caseData.getRepCollection().stream()
+            .peek(respondentRep ->
+                getRespondentSumTypeItem(caseData, respondentRep)
+                    .ifPresent(respondent ->
+                        respondentRep.getValue().setRespondentId(respondent.getId())))
+            .collect(toList());
+    }
+
+    public void amendRespondentNameRepresentativeNames(CaseData caseData) {
         List<RepresentedTypeRItem> repCollection = emptyIfNull(caseData.getRepCollection()).stream()
             .peek(respondentRep -> {
                 final List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
@@ -98,23 +113,29 @@ public class NocRespondentHelper {
                     .filter(resp ->
                         resp.getId().equals(respondentRep.getValue().getRespondentId())).findFirst();
 
-                matchedRespondent.ifPresent(respondent -> {
-                    DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
-                    dynamicFixedListType.setListItems(listItems);
-
-                    DynamicValueType dynamicValueType = new DynamicValueType();
-                    dynamicValueType.setCode("R: " + respondent.getValue().getRespondentName());
-                    dynamicValueType.setLabel(respondent.getValue().getRespondentName());
-                    dynamicFixedListType.setValue(dynamicValueType);
-
-                    respondentRep.getValue().setDynamicRespRepName(dynamicFixedListType);
-                    respondentRep.getValue().setRespondentId(respondent.getId());
-                    respondentRep.getValue().setRespRepName(respondent.getValue().getRespondentName());
-                });
+                matchedRespondent.ifPresent(respondent ->
+                    updateRepWithRespondentDetails(respondent, respondentRep, respondentCollection));
 
             }).collect(toList());
 
         caseData.setRepCollection(repCollection);
+    }
+
+    public void updateRepWithRespondentDetails(RespondentSumTypeItem respondent, RepresentedTypeRItem respondentRep,
+                          List<RespondentSumTypeItem> respondents) {
+        List<DynamicValueType> respondentNameList = DynamicListHelper.createDynamicRespondentName(
+            respondents);
+
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        dynamicFixedListType.setListItems(respondentNameList);
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setCode("R: " + respondent.getValue().getRespondentName());
+        dynamicValueType.setLabel(respondent.getValue().getRespondentName());
+        dynamicFixedListType.setValue(dynamicValueType);
+
+        respondentRep.getValue().setDynamicRespRepName(dynamicFixedListType);
+        respondentRep.getValue().setRespondentId(respondent.getId());
+        respondentRep.getValue().setRespRepName(respondent.getValue().getRespondentName());
     }
 
     public RepresentedTypeR generateNewRepDetails(ChangeOrganisationRequest change,

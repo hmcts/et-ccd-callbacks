@@ -17,3 +17,4 @@ Scenario('Verify B/F Action', async ({I}) => {
     await bfAction(I, eventNames.BF_ACTION);
 
 }).tag('RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);
+//.tag('@sc1')

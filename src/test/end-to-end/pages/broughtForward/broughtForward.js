@@ -5,13 +5,48 @@ const testConfig = require("../../../config");
 module.exports = async function () {
 
     const I = this;
-    await I.click(commonConfig.addNewButton);
-    await I.waitForText(commonConfig.bfActionDescription, testConfig.TestTimeToWaitForText);
-    await I.selectOption('#bfActions_0_cwActions', commonConfig.bfActionDescription);
+    //Before BF Action Page Starts
+    I.waitForText('B/F Action', testConfig.TestTimeToWaitForText);
+    I.see('Case Number:')
+    I.see('Add new');
+    I.click(commonConfig.addNewButton);
+    I.waitForText(commonConfig.bfActionDescription, testConfig.TestTimeToWaitForText);
+    I.selectOption('#bfActions_0_cwActions', commonConfig.bfActionDescription);
+    I.seeInField('Description', 'Enquiry letter issued');
+    I.see('B/F Date');
+    
+    I.see('Day');
+    I.see('Month');
+    I.see('Year');
+    I.fillField('#bfDate-day', commonConfig.bfDateDay);
+    I.fillField('#bfDate-month', commonConfig.bfDateMonth);
+    I.fillField('#bfDate-year', commonConfig.bfDateYear);
+    I.seeInField('Day', '10');
+    I.seeInField('Month', '11');
+    I.seeInField('Year', '2021');
+    
+    I.see('Date Cleared (Optional)');
+    I.see('Day');
+    I.see('Month');
+    I.see('Year');
+  
 
-    await I.fillField('#bfDate-day', commonConfig.bfDateDay);
-    await I.fillField('#bfDate-month', commonConfig.bfDateMonth);
-    await I.fillField('#bfDate-year', commonConfig.bfDateYear);
-    await I.click(commonConfig.continue);
-    await I.click(commonConfig.submit)
+    I.see('Comments (Optional)');
+    I.seeInField('Comments', '');
+   
+    
+    I.see('B/F Action');
+    I.see('Case Number:')
+    I.waitForText('Cancel', testConfig.TestTimeToWaitForText);
+
+    I.click(commonConfig.continue);
+    I.see('B/F Action');
+    I.see('Case Number:');
+    I.see('Previous');
+    I.waitForText('Cancel', testConfig.TestTimeToWaitForText);
+
+    I.click(commonConfig.submit);
+
+    //Final Confirmation
+    I.waitForText('has been updated with event: B/F Action', testConfig.TestTimeToWaitForText);
 };

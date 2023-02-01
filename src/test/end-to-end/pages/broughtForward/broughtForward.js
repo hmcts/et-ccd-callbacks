@@ -5,7 +5,7 @@ const testConfig = require("../../../config");
 module.exports = async function () {
 
     const I = this;
-    I.wait();
+    //I.wait();
     //Before BF Action Page Starts
     I.waitForText('B/F Action', testConfig.TestTimeToWaitForText);
     

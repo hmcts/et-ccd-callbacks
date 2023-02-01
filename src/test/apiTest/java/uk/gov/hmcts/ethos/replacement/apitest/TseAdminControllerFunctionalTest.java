@@ -32,6 +32,7 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
     private static final String ABOUT_TO_START_URL = "/tseAdmin/aboutToStart";
     private static final String MID_DETAILS_TABLE = "/tseAdmin/midDetailsTable";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmin/aboutToSubmit";
+    private static final String ABOUT_TO_SUBMIT_CLOSE_APP_URL = "/tseAdmin/aboutToSubmitCloseApplication";
 
     private static final String APPLICATION_CODE = "1";
     private static final String APPLICATION_LABEL = "1 - Amend response";
@@ -109,6 +110,20 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
             .header(new Header(AUTHORIZATION, userToken))
             .body(ccdRequest)
             .post("/tseAdmin/submitted")
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log()
+            .all(true);
+    }
+
+    @Test
+    void aboutToSubmitCloseApplicationSuccessResponse() {
+        RestAssured.given()
+            .spec(spec)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(ccdRequest)
+            .post(ABOUT_TO_SUBMIT_CLOSE_APP_URL)
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log()

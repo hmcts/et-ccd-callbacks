@@ -173,6 +173,12 @@ public class TseAdminController {
             .build());
     }
 
+    /**
+     * Display the selected application details for close application event.
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
     @PostMapping(value = "/displayCloseApplicationTable", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "To display the selected application details for close application event.")
     @ApiResponses(value = {
@@ -200,4 +206,34 @@ public class TseAdminController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * About to Submit Close Application.
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/aboutToSubmitCloseApplication", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "About to Submit Close Application")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmitCloseApplication(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        tseAdminService.aboutToSubmitCloseApplication(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
 }

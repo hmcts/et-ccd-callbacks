@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
@@ -231,7 +232,8 @@ public class HearingsHelper {
 
     private static List<DateListedTypeItem> filterFutureHearings(List<DateListedTypeItem> hearingDateCollection) {
         return hearingDateCollection.stream()
-            .filter(d -> isDateInFuture(d.getValue().getListedDate(), LocalDateTime.now()))
+            .filter(d -> isDateInFuture(d.getValue().getListedDate(), LocalDateTime.now())
+                    && HEARING_STATUS_LISTED.equals(d.getValue().getHearingStatus()))
             .collect(Collectors.toList());
     }
 }

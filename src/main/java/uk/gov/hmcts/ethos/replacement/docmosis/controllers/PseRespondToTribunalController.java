@@ -223,6 +223,8 @@ public class PseRespondToTribunalController {
         //pseRespondToTribunalService.sendAcknowledgeEmail(caseDetails, userToken)
         // TODO: RET-2969
         //pseRespondToTribunalService.sendClaimantEmail(caseDetails)
+        // TODO: RET-2964
+        //pseRespondToTribunalService.sendTribunalEmail(caseDetails)
 
         pseRespondToTribunalService.clearRespondentResponse(caseDetails.getCaseData());
 

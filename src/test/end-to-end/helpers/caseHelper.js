@@ -44,10 +44,10 @@ async function claimantRespondentDetails(I, eventName) {
     await I.executeRespondentDetails();
 }
 
-async function respondentRepresentative(I, eventName) {
+async function respondentRepresentative(I, eventName, myHMCTSFlag) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(3);
-    await I.executeRespondentRepresentative();
+    await I.executeRespondentRepresentative(myHMCTSFlag);
 }
 
 async function jurisdiction(I, eventName, jurisdictionOutcome) {

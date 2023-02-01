@@ -47,6 +47,6 @@ module.exports = async function () {
 
     I.click(commonConfig.submit);
 
-    //Final Confirmation
+    //Final Confirmation.
     I.waitForText('has been updated with event: B/F Action', testConfig.TestTimeToWaitForText);
 };

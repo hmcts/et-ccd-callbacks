@@ -207,6 +207,10 @@ rootProject.tasks.named("processContractTestResources") {
     duplicatesStrategy = 'include'
 }
 
+rootProject.tasks.named("processFunctionalResources") {
+    duplicatesStrategy = 'include'
+}
+
 runAndPublishConsumerPactTests.finalizedBy pactPublish
 
 pact {

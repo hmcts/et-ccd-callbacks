@@ -7,6 +7,7 @@ module.exports = async function () {
     const I = this;
     //Before BF Action Page Starts
     I.waitForText('B/F Action', testConfig.TestTimeToWaitForText);
+    
     I.see('Case Number:')
     I.see('Add new');
     I.click(commonConfig.addNewButton);

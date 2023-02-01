@@ -10,6 +10,10 @@ Scenario('Verify B/F Action', async ({I}) => {
     let caseId = await processCaseToAcceptedState();
 
     console.log("... case id =>" +caseId);
+    await I.authenticateWithIdam(testConfig.TestEnvCWUser, testConfig.TestEnvCWPassword);
+    I.refreshPage();
+    I.wait(commonConfig.time_interval_30_second);
+
     await bfAction(I, eventNames.BF_ACTION);
 
-}).tag('@nightly').retry(testConfig.TestRetryScenarios);
+}).tag('RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);

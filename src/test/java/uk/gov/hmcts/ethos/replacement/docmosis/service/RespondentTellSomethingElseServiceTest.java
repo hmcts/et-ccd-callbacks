@@ -63,6 +63,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getResponde
     "PMD.FieldNamingConventions", "PMD.CyclomaticComplexity"})
 class RespondentTellSomethingElseServiceTest {
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
+    private TseService tseService;
 
     @MockBean
     private EmailService emailService;
@@ -103,6 +104,8 @@ class RespondentTellSomethingElseServiceTest {
     void setUp() {
         respondentTellSomethingElseService =
                 new RespondentTellSomethingElseService(emailService, userService, tornadoService);
+        tseService = new TseService();
+
         ReflectionTestUtils.setField(respondentTellSomethingElseService, "emailTemplateId", TEMPLATE_ID);
 
         UserDetails userDetails = HelperTest.getUserDetails();
@@ -386,7 +389,7 @@ class RespondentTellSomethingElseServiceTest {
         caseData.setResTseCopyToOtherPartyYesOrNo("copyToOtherPartyYesOrNo");
         caseData.setResTseCopyToOtherPartyTextArea("copyToOtherPartyTextArea");
 
-        respondentTellSomethingElseService.createRespondentApplication(caseData);
+        tseService.createApplication(caseData, false);
 
         assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue().getDetails(), is(textBoxData));
         assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.time.LocalDate;
@@ -31,6 +33,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/respondentTSE")
 @SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
@@ -39,6 +42,8 @@ public class RespondentTellSomethingElseController {
     private final VerifyTokenService verifyTokenService;
 
     private final RespondentTellSomethingElseService resTseService;
+
+    private final TseService tseService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
@@ -52,13 +57,6 @@ public class RespondentTellSomethingElseController {
         + "<p>If they do respond, they are expected to copy their response to you.</p>"
         + "<p>You may be asked to supply further information. "
         + "The tribunal will consider all correspondence and let you know what happens next.</p>";
-
-    public RespondentTellSomethingElseController(
-        VerifyTokenService verifyTokenService,
-        RespondentTellSomethingElseService respondentTellSomethingElseService) {
-        this.verifyTokenService = verifyTokenService;
-        this.resTseService = respondentTellSomethingElseService;
-    }
 
     /**
      * This service is for validate Give Details are not all blank.
@@ -119,7 +117,7 @@ public class RespondentTellSomethingElseController {
         resTseService.sendAcknowledgeEmailAndGeneratePdf(caseDetails, userToken);
         resTseService.sendClaimantEmail(caseDetails);
 
-        resTseService.createRespondentApplication(caseDetails.getCaseData());
+        tseService.createApplication(caseDetails.getCaseData(), false);
 
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }

@@ -5,7 +5,7 @@ plugins {
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.0.14.RELEASE'
     id 'org.springframework.boot' version '2.7.4'
-    id 'org.owasp.dependencycheck' version '7.2.1'
+    id 'org.owasp.dependencycheck' version '8.0.2'
     id 'com.github.ben-manes.versions' version '0.42.0'
     id 'au.com.dius.pact' version '4.3.15'
     id 'io.freefair.lombok' version '6.5.1'
@@ -163,7 +163,7 @@ task codeceptFunctionalSauce(type: Exec, dependsOn: ':yarnInstall') {
 }
 
 task codeceptFunctionalNightly(type: Exec, dependsOn :'yarnInstall') {
-    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@RET-BAT', '--steps', '--reporter', 'mocha-multi'
+    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@nightly', '--steps', '--reporter', 'mocha-multi'
 }
 
 task integration(type: Test) {

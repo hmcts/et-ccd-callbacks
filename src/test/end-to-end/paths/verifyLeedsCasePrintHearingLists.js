@@ -14,6 +14,5 @@ Scenario('Verify Print Hearing Lists', async ({I}) => {
     await allocateHearing(I, eventNames.ALLOCATE_HEARING, 'Leeds');
     await printHearingLists(I, eventNames.PRINT_HEARING_LISTS, 'Leeds');
 
-}).tag('@printHearing')
-    .tag('@wip');
+}).tag('@biggerrefactoring');
     //.retry(testConfig.TestRetryScenarios);

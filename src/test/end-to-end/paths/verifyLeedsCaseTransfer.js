@@ -13,6 +13,5 @@ Scenario('Verify Leeds Case Transfer', async ({I}) => {
     await I.amOnPage('/case-details/' + caseNumber);
     await caseTransfer(I, eventNames.CASE_TRANSFER);
 
-}).tag('@e2e')
-    .tag('@nightly');
+}).tag('@biggerrefactoring');
     //.retry(testConfig.TestRetryScenarios);

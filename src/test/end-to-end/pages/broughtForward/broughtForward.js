@@ -5,6 +5,8 @@ const testConfig = require("../../../config");
 module.exports = async function () {
 
     const I = this;
+    I.refreshPage();
+    I.wait(commonConfig.time_interval_30_second);
     //Before BF Action Page Starts
     I.waitForText('B/F Action', testConfig.TestTimeToWaitForText);
     

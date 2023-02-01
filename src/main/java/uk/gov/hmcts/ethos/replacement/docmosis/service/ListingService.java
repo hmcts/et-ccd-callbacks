@@ -100,6 +100,7 @@ public class ListingService {
     private static final String MESSAGE = "Failed to generate document for case id : ";
     public static final String ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND =
             "data.hearingCollection.value.Hearing_venue_Scotland";
+    public static final String HEARING_STATUS_VACATED = "Vacated";
     public static final String ELASTICSEARCH_FIELD_MANAGING_OFFICE = "data.managingOffice";
 
     public ListingData listingCaseCreation(ListingDetails listingDetails) {
@@ -240,7 +241,6 @@ public class ListingService {
                         .gte(dateFrom).lte(dateTo));
 
         boolQueryBuilder.must(new MatchQueryBuilder(key, venue));
-
         return new SearchSourceBuilder()
                 .size(MAX_ES_SIZE)
                 .query(boolQueryBuilder).toString();
@@ -418,7 +418,7 @@ public class ListingService {
 
         if (dateListedType.getHearingStatus() != null) {
             List<String> invalidHearingStatuses = Arrays.asList(HEARING_STATUS_SETTLED,
-                    HEARING_STATUS_WITHDRAWN, HEARING_STATUS_POSTPONED);
+                    HEARING_STATUS_WITHDRAWN, HEARING_STATUS_POSTPONED, HEARING_STATUS_VACATED);
             return invalidHearingStatuses.stream().noneMatch(str -> str.equals(dateListedType.getHearingStatus()));
         } else {
             return true;

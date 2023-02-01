@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.domain;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -35,8 +35,8 @@ public enum SolicitorRole {
             .findFirst();
     }
 
-    public Optional<RepresentedTypeRItem> getRepresentationItem(CaseData caseData) {
-        List<RepresentedTypeRItem> parties = caseData.getRepCollection();
+    public Optional<RespondentSumTypeItem> getRepresentationItem(CaseData caseData) {
+        List<RespondentSumTypeItem> parties = caseData.getRespondentCollection();
         if (this.index < parties.size()) {
             return Optional.of(parties.get(this.index));
         } else {

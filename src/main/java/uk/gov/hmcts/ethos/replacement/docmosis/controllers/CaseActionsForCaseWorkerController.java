@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepositOrder;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
@@ -42,16 +44,18 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
@@ -98,7 +102,9 @@ public class CaseActionsForCaseWorkerController {
     private final DepositOrderValidationService depositOrderValidationService;
     private final JudgmentValidationService judgmentValidationService;
     private final Et1VettingService et1VettingService;
-    private final RespondentRepresentativeService respondentRepresentativeService;
+    private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
+
+    private final NocRespondentHelper nocRespondentHelper;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a case for a caseWorker.")
@@ -266,6 +272,9 @@ public class CaseActionsForCaseWorkerController {
             FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
             caseData.setMultipleFlag(caseData.getEcmCaseType() != null
                     && caseData.getEcmCaseType().equals(MULTIPLE_CASE_TYPE) ? YES : NO);
+
+            //create NOC answers section
+            caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
         }
 
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
@@ -409,6 +418,16 @@ public class CaseActionsForCaseWorkerController {
             }
         }
 
+        eventValidationService.validateMaximumSize(caseData).ifPresent(errors::add);
+
+        if (errors.isEmpty()) {
+            //Needed to keep the respondent names in the rep collection sync
+            if (!isEmpty(caseData.getRepCollection())) {
+                nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData);
+            }
+            caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+        }
+
         log.info(EVENT_FIELDS_VALIDATION + errors);
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -438,14 +457,33 @@ public class CaseActionsForCaseWorkerController {
 
         List<String> errors = eventValidationService.validateRespRepNames(caseData);
 
-        //add org policy and NOC elements
-        caseData = respondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
-
-        eventValidationService.validateMaximumSize(caseData).ifPresent(errors::add);
+        if (errors.isEmpty()) {
+            //add org policy and NOC elements
+            caseData.setRepCollection(nocRespondentHelper.updateWithRespondentIds(caseData));
+            caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+        }
 
         log.info(EVENT_FIELDS_VALIDATION + errors);
 
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping("/amendRespondentRepSubmitted")
+    @Operation(summary = "processes notice of change update after amending respondent representatives")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public void amendRespondentRepSubmitted(@RequestBody CallbackRequest callbackRequest) {
+        log.info("AMEND RESPONDENT REPRESENTATIVE SUBMITTED ---> "
+            + LOG_MESSAGE + callbackRequest.getCaseDetails().getCaseId());
+        try {
+            nocRespondentRepresentativeService.updateRepresentativesAccess(callbackRequest);
+        } catch (IOException e) {
+            log.error("Failed to update respondent representatives accesses");
+            throw new RuntimeException(e);
+        }
     }
 
     @PostMapping(value = "/dynamicRespondentRepresentativeNames", consumes = APPLICATION_JSON_VALUE)
@@ -1165,5 +1203,4 @@ public class CaseActionsForCaseWorkerController {
             caseData.setEthosCaseReference(reference);
         }
     }
-
 }

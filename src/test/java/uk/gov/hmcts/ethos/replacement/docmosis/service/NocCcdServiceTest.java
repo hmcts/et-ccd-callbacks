@@ -9,6 +9,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.AuditEventsResponse;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -16,23 +19,30 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
-    AuditEventService.class,
+    NocCcdService.class,
     CcdClient.class
 })
-class AuditEventServiceTest {
+class NocCcdServiceTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+    private static final String JURISDICTION = "EMPLOYMENT";
+    public static final String CASE_TYPE = "ET_EnglandWales";
+    public static final String CASE_ID = "12345";
     @MockBean
     private CcdClient ccdClient;
 
-    private AuditEventService auditEventService;
+    private NocCcdService nocCcdService;
 
     @BeforeEach
     void setUp() {
-        auditEventService = new AuditEventService(ccdClient);
+        nocCcdService = new NocCcdService(ccdClient);
     }
 
     private AuditEventsResponse getAuditEventsResponse() {
@@ -62,8 +72,24 @@ class AuditEventServiceTest {
     @Test
     void shouldGetLatestAuditEventByName() throws IOException {
         AuditEventsResponse auditEventsResponse = getAuditEventsResponse();
-        when(ccdClient.retrieveCaseEvents(AUTH_TOKEN, "12345")).thenReturn(auditEventsResponse);
-        Optional<AuditEvent> event = auditEventService.getLatestAuditEventByName(AUTH_TOKEN, "12345", "nocRequest");
+        when(ccdClient.retrieveCaseEvents(AUTH_TOKEN, CASE_ID)).thenReturn(auditEventsResponse);
+        Optional<AuditEvent> event = nocCcdService.getLatestAuditEventByName(AUTH_TOKEN, CASE_ID, "nocRequest");
         assertThat(event).isPresent().hasValue(getAuditEventsResponse().getAuditEvents().get(1));
+    }
+
+    @Test
+    void shouldCallCcdUpdateCaseRepresentation() throws IOException {
+        ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder().build();
+        CCDRequest request = new CCDRequest();
+        when(ccdClient.startEventForUpdateRep(AUTH_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID)).thenReturn(request);
+        when(ccdClient.submitUpdateRepEvent(eq(AUTH_TOKEN), any(), eq(CASE_TYPE), eq(JURISDICTION),
+            eq(request), eq(CASE_ID))).thenReturn(new SubmitEvent());
+
+        nocCcdService.updateCaseRepresentation(AUTH_TOKEN, changeOrganisationRequest, JURISDICTION, CASE_TYPE,
+            CASE_ID);
+
+        verify(ccdClient, times(1)).startEventForUpdateRep(AUTH_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID);
+        verify(ccdClient, times(1)).submitUpdateRepEvent(eq(AUTH_TOKEN), any(), eq(CASE_TYPE), eq(JURISDICTION),
+            eq(request), eq(CASE_ID));
     }
 }

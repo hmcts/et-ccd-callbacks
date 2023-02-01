@@ -11,8 +11,7 @@ Scenario('Ensure disposal date is not present for jurisdiction outcomes allocate
     console.log("... case id =>" +caseId);
     await jurisdiction(I, eventNames.JURISDICTION, "Not allocated");
 
-}).tag('@e2e')
-    .tag('@nightly')
+}).tag('@nightly')
     .tag('@RET-BAT')
     .retry(testConfig.TestRetryScenarios);
 
@@ -22,8 +21,7 @@ Scenario('Ensure disposal date is present for jurisdiction outcomes successful h
     console.log("... case id =>" +caseId);
     await jurisdiction(I, eventNames.JURISDICTION, "Successful at hearing");
 
-}).tag('@e2e')
-    .tag('@RET-BAT')
+}).tag('@RET-BAT')
     .tag('@nightly')
     .retry(testConfig.TestRetryScenarios);
 
@@ -34,13 +32,12 @@ Scenario('Ensure date notified field is not present for "withdrawn or private se
     console.log("... case id =>" +caseId);
     await jurisdiction(I, eventNames.JURISDICTION, "Withdrawn or private settlement");
 
-}).tag('@e2e')
-    .tag('@RET-BAT')
+}).tag('@RET-BAT')
     .tag('@nightly')
 .retry(testConfig.TestRetryScenarios);
 
 
-Scenario('User enters a disposal date outside of hearing collection - error message displayed', async ({I}) => {
+Scenario('User enters a disposal date - check error scenarios and completes jurisdiction event', async ({I}) => {
 
     let caseId = await processCaseToAcceptedState();
     console.log("... case id =>" +caseId);
@@ -48,22 +45,9 @@ Scenario('User enters a disposal date outside of hearing collection - error mess
     await allocateHearing(I, eventNames.ALLOCATE_HEARING, 'Leeds');
     await hearingDetails(I, eventNames.HEARING_DETAILS, 'Yes');
     await jurisdiction(I, eventNames.JURISDICTION, "Successful at hearing");
-    await enterDisposalDateJurisdiction(I, eventNames.JURISDICTION,'Date NOT contained in hearing collection');
+    await enterDisposalDateJurisdiction(I,'Date NOT contained in hearing collection');
+    await enterDisposalDateJurisdiction(I, 'Date in the future');
     await enterDisposalDateJurisdiction(I,'Date contained in hearing collection');
 
-}).tag('@e2e')
-    .tag('@nightly')
-    .tag('@wip')
-
-Scenario('User successfully enters a disposal date matching a date within hearing collection', async ({I}) => {
-    let caseId = await processCaseToAcceptedState();
-    console.log("... case id =>" +caseId);
-    await listHearing(I, eventNames.LIST_HEARING, 'Leeds');
-    await allocateHearing(I, eventNames.ALLOCATE_HEARING, 'Leeds');
-    await hearingDetails(I, eventNames.HEARING_DETAILS, 'Yes');
-    await jurisdiction(I, eventNames.JURISDICTION, "Withdrawn or private settlement");
-    await enterDisposalDateJurisdiction(I, eventNames.JURISDICTION, 'Date in the future');
-
-}).tag('@e2e')
-    .tag('@wip')
-    .tag('@nightly');
+}).tag('@nightly')
+    .retry(testConfig.TestRetryScenarios);

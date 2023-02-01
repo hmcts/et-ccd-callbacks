@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
@@ -51,6 +52,8 @@ class RespondentTellSomethingElseControllerTest {
 
     @MockBean
     private RespondentTellSomethingElseService resTseService;
+    @MockBean
+    private TseService tseService;
 
     @Autowired
     private JsonMapper jsonMapper;

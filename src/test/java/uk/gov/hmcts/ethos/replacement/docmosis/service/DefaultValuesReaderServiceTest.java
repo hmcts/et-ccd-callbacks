@@ -39,7 +39,10 @@ public class DefaultValuesReaderServiceTest {
     public void setup() {
         config = mock(CaseDefaultValuesConfiguration.class);
         tribunalOfficesService = mock(TribunalOfficesService.class);
-        defaultValuesReaderService = new DefaultValuesReaderService(config, tribunalOfficesService);
+        ConciliationTrackService conciliationTrackService = mock(ConciliationTrackService.class);
+        defaultValuesReaderService = new DefaultValuesReaderService(config,
+                tribunalOfficesService,
+                conciliationTrackService);
     }
 
     @Test

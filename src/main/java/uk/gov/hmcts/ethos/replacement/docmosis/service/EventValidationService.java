@@ -170,7 +170,7 @@ public class EventValidationService {
     }
 
     public Optional<String> validateMaximumSize(CaseData caseData) {
-        if (caseData.getRepCollection().size() > MAX_RESPONDENTS) {
+        if (caseData.getRespondentCollection().size() > MAX_RESPONDENTS) {
             return Optional.of(String.format("Maximum number of respondents is %s", MAX_RESPONDENTS));
         }
         return Optional.empty();

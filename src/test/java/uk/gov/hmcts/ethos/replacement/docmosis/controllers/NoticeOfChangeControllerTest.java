@@ -19,7 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.io.File;
@@ -40,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(NoticeOfChangeController.class)
 @ContextConfiguration(classes = {
     NoticeOfChangeController.class,
-    RespondentRepresentativeService.class,
+    NocRespondentRepresentativeService.class,
     VerifyTokenService.class,
     CcdCaseAssignment.class
 })
@@ -50,7 +50,7 @@ class NoticeOfChangeControllerTest {
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
-    private RespondentRepresentativeService respondentRepresentativeService;
+    private NocRespondentRepresentativeService nocRespondentRepresentativeService;
     @MockBean
     private CcdCaseAssignment ccdCaseAssignment;
 
@@ -69,7 +69,8 @@ class NoticeOfChangeControllerTest {
 
     private JsonNode requestContent;
     private MockMvc mvc;
-    private CallbackRequest callbackRequest;
+
+    private CaseData caseData;
 
     @BeforeEach
     public void setUp() throws URISyntaxException, IOException {
@@ -77,14 +78,14 @@ class NoticeOfChangeControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
             .getResource("/exampleV1.json")).toURI()));
-        callbackRequest = objectMapper.treeToValue(requestContent, CallbackRequest.class);
+        CallbackRequest callbackRequest = objectMapper.treeToValue(requestContent, CallbackRequest.class);
+        caseData = callbackRequest.getCaseDetails().getCaseData();
     }
 
     @Test
     void handleAboutToSubmit() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
-        when(respondentRepresentativeService
+        when(nocRespondentRepresentativeService
             .updateRepresentation(any())).thenReturn(caseData);
         when(ccdCaseAssignment.applyNoc(any(), any())).thenReturn(CCDCallbackResponse.builder()
             .data(caseData)
@@ -103,6 +104,10 @@ class NoticeOfChangeControllerTest {
     @Test
     void updateNocRespondents() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        when(ccdCaseAssignment.applyNocAsAdmin(any())).thenReturn(CCDCallbackResponse.builder()
+            .data(caseData)
+            .build());
 
         mvc.perform(post(UPDATE_RESPONDENTS_URL)
                 .content(requestContent.toString())

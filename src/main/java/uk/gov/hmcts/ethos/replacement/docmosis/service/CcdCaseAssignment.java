@@ -30,13 +30,17 @@ public class CcdCaseAssignment {
 
     private final String applyNocAssignmentsApiPath;
 
+    private final AdminUserService adminUserService;
+
     public CcdCaseAssignment(RestTemplate restTemplate,
                              AuthTokenGenerator serviceAuthTokenGenerator,
+                             AdminUserService adminUserService,
                              @Value("${assign_case_access_api_url}") String aacUrl,
                              @Value("${apply_noc_access_api_assignments_path}") String applyNocAssignmentsApiPath
     ) {
         this.restTemplate = restTemplate;
         this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
+        this.adminUserService = adminUserService;
         this.aacUrl = aacUrl;
         this.applyNocAssignmentsApiPath = applyNocAssignmentsApiPath;
     }
@@ -73,6 +77,10 @@ public class CcdCaseAssignment {
             response.getStatusCodeValue(), callback.getCaseDetails().getCaseId());
 
         return response.getBody();
+    }
+
+    public CCDCallbackResponse applyNocAsAdmin(CallbackRequest callbackRequest) {
+        return this.applyNoc(callbackRequest, adminUserService.getAdminUserToken());
     }
 
     private HttpHeaders createHeaders(String serviceAuthorizationToken, String accessToken) {

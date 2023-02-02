@@ -43,6 +43,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
@@ -437,5 +438,35 @@ class TseAdminServiceTest {
         assertThat(caseData.getTseAdminDecisionMadeBy()).isNull();
         assertThat(caseData.getTseAdminDecisionMadeByFullName()).isNull();
         assertThat(caseData.getTseAdminSelectPartyNotify()).isNull();
+    }
+
+    @Test
+    void updateStatusToClose() {
+        caseData.setGenericTseApplicationCollection(
+            List.of(GenericTseApplicationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(TseApplicationBuilder.builder()
+                    .withNumber("1")
+                    .withType(TSE_APP_AMEND_RESPONSE)
+                    .withStatus(OPEN_STATE)
+                    .build())
+                .build())
+        );
+
+        caseData.setTseAdminSelectApplication(
+            DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
+        caseData.setTseAdminCloseApplicationTable("| | |\r\n|--|--|\r\n|%s application | %s|\r\n");
+        caseData.setTseAdminCloseApplicationText("General notes");
+
+        tseAdminService.aboutToSubmitCloseApplication(caseData);
+
+        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue().getStatus())
+            .isEqualTo(CLOSED_STATE);
+        assertThat(caseData.getTseAdminSelectApplication())
+            .isNull();
+        assertThat(caseData.getTseAdminCloseApplicationTable())
+            .isNull();
+        assertThat(caseData.getTseAdminCloseApplicationText())
+            .isNull();
     }
 }

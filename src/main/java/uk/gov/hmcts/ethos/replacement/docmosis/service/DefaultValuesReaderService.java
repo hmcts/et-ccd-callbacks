@@ -22,11 +22,14 @@ public class DefaultValuesReaderService {
 
     private final CaseDefaultValuesConfiguration config;
     private final TribunalOfficesService tribunalOfficesService;
+    private final ConciliationTrackService conciliationTrackService;
 
     public DefaultValuesReaderService(CaseDefaultValuesConfiguration config,
-                                      TribunalOfficesService tribunalOfficesService) {
+                                      TribunalOfficesService tribunalOfficesService,
+                                      ConciliationTrackService conciliationTrackService) {
         this.config = config;
         this.tribunalOfficesService = tribunalOfficesService;
+        this.conciliationTrackService = conciliationTrackService;
     }
 
     public DefaultValues getDefaultValues(String managingOffice) {
@@ -42,10 +45,15 @@ public class DefaultValuesReaderService {
         return config.getPositionType();
     }
 
-    public void getCaseData(CaseData caseData, DefaultValues defaultValues) {
+    private void setPositionType(CaseData caseData, DefaultValues defaultValues) {
         if (caseData.getPositionType() == null) {
             caseData.setPositionType(defaultValues.getPositionType());
         }
+    }
+
+    public void getCaseData(CaseData caseData, DefaultValues defaultValues) {
+        setPositionType(caseData, defaultValues);
+        conciliationTrackService.populateConciliationTrackForJurisdiction(caseData);
         if (caseData.getCaseSource() == null || caseData.getCaseSource().trim().equals("")) {
             caseData.setCaseSource(defaultValues.getPositionType());
         }

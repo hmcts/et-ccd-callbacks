@@ -197,6 +197,7 @@
             {
               "id" : "123346",
               "value" : {
+                "Hearing_status": "Listed",
                 "listedDate": "2019-12-22T10:30:00.000"
               }
             },

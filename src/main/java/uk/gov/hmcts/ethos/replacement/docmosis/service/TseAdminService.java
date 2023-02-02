@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
@@ -325,6 +326,21 @@ public class TseAdminService {
 
         return documentManagementService
             .displayDocNameTypeSizeLink(applicationTypeItem.getValue().getDocumentUpload(), authToken);
+    }
+
+    /**
+     * About to Submit Close Application.
+     * @param caseData in which the case details are extracted from
+     */
+    public void aboutToSubmitCloseApplication(CaseData caseData) {
+        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
+        if (applicationTypeItem != null) {
+            applicationTypeItem.getValue().setCloseApplicationNotes(caseData.getTseAdminCloseApplicationText());
+            applicationTypeItem.getValue().setStatus(CLOSED_STATE);
+            caseData.setTseAdminCloseApplicationTable(null);
+            caseData.setTseAdminCloseApplicationText(null);
+            caseData.setTseAdminSelectApplication(null);
+        }
     }
 
 }

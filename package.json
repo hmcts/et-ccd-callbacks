@@ -109,6 +109,7 @@
     "resolutions": {
         "async": "^3.2.3",
         "ansi-regex": "^5.0.1",
+        "http-cache-semantics": "^4.1.1",
         "json-schema": "^0.4.0",
         "lodash": "^4.17.21",
         "mem": "^9.0.2",

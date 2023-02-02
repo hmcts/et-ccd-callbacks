@@ -63,7 +63,7 @@ withNightlyPipeline(type, product, component) {
     enableCrossBrowserTest()
     enableFortifyScan()
 
-    afterSuccess('fullFunctionalTest') {
+    afterAlways('fullFunctionalTest') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
 
         publishHTML target: [
@@ -76,7 +76,7 @@ withNightlyPipeline(type, product, component) {
         ]
     }
 
-    afterSuccess('fortify-scan') {
+    afterAlways('fortify-scan') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     }
 

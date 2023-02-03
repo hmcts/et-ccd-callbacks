@@ -13,6 +13,7 @@ module.exports = async function () {
     I.click("//button[@class='button write-collection-add-item__top']");
     I.see('Case documentation');
     I.see('Type of Document (Optional)'); 
+    I.see('Document (Optional)');      
     I.attachFile('#documentCollection_0_uploadedDocument', 'data/fileUpload.txt');
     I.wait(5);
     I.see('Short Description (Optional)');

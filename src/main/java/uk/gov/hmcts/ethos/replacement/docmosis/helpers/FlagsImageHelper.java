@@ -236,7 +236,8 @@ public class FlagsImageHelper {
     }
 
     private static boolean welshColor(CaseData caseData) {
-        return caseData.getClaimantHearingPreference() != null && (YES.equals(caseData.getClaimantHearingPreference().getContactLanguage())
+        return caseData.getClaimantHearingPreference() != null
+                && (YES.equals(caseData.getClaimantHearingPreference().getContactLanguage())
                 || YES.equals(caseData.getClaimantHearingPreference().getHearingLanguage()));
     }
 

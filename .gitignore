@@ -43,8 +43,8 @@ yarn-error.log*
 ### VSCode ###
 bin/
 
+.pnp.*
 .yarn/*
-!.yarn/cache
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases

@@ -4,6 +4,7 @@ const commonConfig = require('../../data/commonConfig.json');
 module.exports = async function () {
 
     const I = this;
+    //Start of Upload document page
     I.see('Upload Document');
     I.see('Case Number:');
     I.see('Case documentation (Optional)');
@@ -24,6 +25,7 @@ module.exports = async function () {
     I.seeElement("//div[@class='alert-message']");
     I.wait(5);
     
+    //Document Upload Confirmation
     I.click("//div[text()='Documents']");
     I.see('Case documentation 1');
     I.see('Document');

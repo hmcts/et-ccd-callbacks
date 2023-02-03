@@ -5,6 +5,7 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 
 import java.util.ArrayList;
@@ -29,6 +30,21 @@ public class FlagsImageHelperTest {
 
             assertEquals("<font color='DeepPink' size='5'> WITH OUTSTATION </font>", caseData.getFlagsImageAltText());
             assertEquals("EMP-TRIB-10000000000.jpg", caseData.getFlagsImageFileName());
+        }
+    }
+
+    @Test
+    public void testAddWelshFlag() {
+        ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
+        for (TribunalOffice tribunalOffice : tribunalOffices) {
+            CaseData caseData = new CaseData();
+            caseData.setManagingOffice(tribunalOffice.getOfficeName());
+            ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
+            hearingPreference.setContactLanguage("Yes");
+            caseData.setClaimantHearingPreference(hearingPreference);
+            CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
+            FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+            assertEquals("<font color='Red' size='5'> Cymraeg </font>", caseData.getFlagsImageAltText());
         }
     }
 

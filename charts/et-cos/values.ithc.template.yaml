@@ -1,0 +1,51 @@
+java:
+  image: ${IMAGE_NAME}
+  ingressHost: ${SERVICE_FQDN}
+  environment:
+    ET_COS_DB_HOST: "{{ .Release.Name }}-postgresql"
+    ET_COS_DB_NAME: "{{ .Values.postgresql.auth.database}}"
+    ET_COS_DB_USER_NAME: "{{ .Values.postgresql.auth.username}}"
+    ET_COS_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+    ET_COS_DB_CONN_OPTIONS: ""
+    REFERRAL_TEMPLATE_ID: 6ad8c05b-5c0b-4d10-a5e3-f39fdea4647e
+    REJECTED_TEMPLATE_ID: 3f932a27-3960-4135-9ef5-5f2b9ec35da0
+    ET1SERVING_TEMPLATE_ID: 43477bad-e63f-44a7-a0e5-39e984987044
+    ET1SERVING_RESPONDENT_TEMPLATE_ID: bf00082e-2709-472a-b0e8-11e53473741e
+    ET3NOTIFICATION_TEMPLATE_MYHMCTS_ID: 6983b7cf-a492-46da-8eaf-9751191eb736
+    ET3NOTIFICATION_TEMPLATE_CITIZEN_ID: dd211d08-ba0a-4e9e-8502-31b4ed5515e9
+    NOC_NOTIFICATION_TEMPLATE_RESPONDENT_ID: a3539d79-65c0-491c-b578-b58cf321f83e
+    NOC_NOTIFICATION_TEMPLATE_CLAIMANT_ID: 3d0c5784-0055-4863-9c03-7d37d9b2ad8d
+    NOC_NOTIFICATION_TEMPLATE_OLD_REP_ID: fe52b39f-852c-43ca-a42a-b9a27c43b130
+    NOC_NOTIFICATION_TEMPLATE_NEW_REP_ID: 8fe52f24-40b2-4986-8f86-4dd1af311cbd
+    NOC_NOTIFICATION_TEMPLATE_TRIBUNAL_ID: 1d5efcbd-1971-4ebe-bfe8-72ba36b5abac
+    TSE_RESPONDENT_RESPONSE_TEMPLATE_ID: b1249c5c-9d7c-4e39-bb81-9e95fa058ed3
+    TSE_RESPONDENT_TO_CLAIMANT_TEMPLATE_ID: c815d073-ee7e-4a22-b119-e313e4e4023e
+    TSE_RESPONDENT_TO_RESPONDENT_TEMPLATE_ID: 91db4e44-ce62-44d2-af41-791341a067a6
+    TSE_ADMIN_RECORD_A_DECISION_CLAIMANT_TEMPLATE_ID: 4d0fdc95-8f48-4a67-9713-3c8474044ad2
+    TSE_ADMIN_RECORD_A_DECISION_RESPONDENT_TEMPLATE_ID: 9cfc6f59-2c89-4fa3-a8f2-a4bdb3500146
+    TSE_ADMIN_REPLY_CLAIMANT_TEMPLATE_ID: 5baee9e9-e8c3-4518-a834-7f3bb336ca64
+    TSE_ADMIN_REPLY_RESPONDENT_TEMPLATE_ID: ac13a3d3-3de6-4574-a52c-cc70e943dcac
+    TSE_RESPONDENT_ACKNOWLEDGEMENT_NO_TEMPLATE_ID: 84e64ff7-7c27-42b6-a7fa-ea29dd712223
+    TSE_RESPONDENT_ACKNOWLEDGEMENT_YES_TEMPLATE_ID: 580028e7-d9ff-49de-96c2-dc9595572ebb
+
+  keyVaults:
+    et-cos:
+      secrets:
+        - name: et-cos-s2s-secret
+          alias: ET_COS_S2S_SECRET
+        - name: idam-client-secret
+          alias: IDAM_CLIENT_SECRET
+    et:
+      secrets:
+        - name: create-updates-queue-send-connection-string
+          alias: CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING
+        - name: tornado-access-key
+          alias: TORNADO_ACCESS_KEY
+        - name: gov-notify-api-key
+          alias: GOV_NOTIFY_API_KEY
+        - name: cos-system-user
+          alias: ET_COS_SYSTEM_USER
+        - name: cos-system-user-password
+          alias: ET_COS_SYSTEM_USER_PASSWORD
+  postgresql:
+    enabled: true

@@ -47,6 +47,9 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationWhoCaseOrder(caseData.getSendNotificationWhoCaseOrder());
         sendNotificationType.setSendNotificationSelectParties(caseData.getSendNotificationSelectParties());
         sendNotificationType.setSendNotificationFullName(caseData.getSendNotificationFullName());
+        sendNotificationType.setSendNotificationFullName2(caseData.getSendNotificationFullName2());
+        sendNotificationType.setSendNotificationDetails(caseData.getSendNotificationDetails());
+        sendNotificationType.setSendNotificationRequestMadeBy(caseData.getSendNotificationRequestMadeBy());
 
         SendNotificationTypeItem sendNotificationTypeItem = new SendNotificationTypeItem();
         sendNotificationTypeItem.setId(UUID.randomUUID().toString());
@@ -69,5 +72,8 @@ public class SendNotificationService {
         caseData.setSendNotificationWhoCaseOrder(null);
         caseData.setSendNotificationSelectParties(null);
         caseData.setSendNotificationFullName(null);
+        caseData.setSendNotificationFullName2(null);
+        caseData.setSendNotificationDetails(null);
+        caseData.setSendNotificationRequestMadeBy(null);
     }
 }

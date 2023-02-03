@@ -5,13 +5,35 @@ const testConfig = require("../../../config");
 module.exports = async function () {
 
     const I = this;
-    await I.click(commonConfig.addNewButton);
-    await I.waitForText(commonConfig.bfActionDescription, testConfig.TestTimeToWaitForText);
-    await I.selectOption('#bfActions_0_cwActions', commonConfig.bfActionDescription);
+    I.waitForText('B/F Action', testConfig.TestTimeToWaitForText);
+    
+    I.see('Case Number:')
+    I.see('Add new');
+    I.click(commonConfig.addNewButton);
 
-    await I.fillField('#bfDate-day', commonConfig.bfDateDay);
-    await I.fillField('#bfDate-month', commonConfig.bfDateMonth);
-    await I.fillField('#bfDate-year', commonConfig.bfDateYear);
-    await I.click(commonConfig.continue);
-    await I.click(commonConfig.submit)
+    I.waitForText(commonConfig.bfActionDescription, testConfig.TestTimeToWaitForText);
+    I.see('B/F Date');
+    I.see('Day');
+    I.see('Month');
+    I.see('Year');
+    I.see('Date Cleared (Optional)');
+    I.see('Comments (Optional)');
+
+    I.selectOption('#bfActions_0_cwActions', commonConfig.bfActionDescription);
+    I.fillField('#bfDate-day', commonConfig.bfDateDay);
+    I.fillField('#bfDate-month', commonConfig.bfDateMonth);
+    I.fillField('#bfDate-year', commonConfig.bfDateYear);
+
+    I.fillField('#cleared-day', commonConfig.bfDateDay);
+    I.fillField('#cleared-month', commonConfig.bfDateMonth);
+    I.fillField('#cleared-year', commonConfig.bfDateYear);
+    I.fillField('#bfActions_0_notes', 'Automated Testing Notes for BF Action');
+    I.click(commonConfig.continue);
+
+    I.waitForText('B/F Action');
+    I.see('Case Number:')
+    I.click(commonConfig.submit);
+
+    //Final Confirmation
+    I.waitForText('has been updated with event: B/F Action', testConfig.TestTimeToWaitForText);
 };

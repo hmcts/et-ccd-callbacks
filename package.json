@@ -109,6 +109,7 @@
     "resolutions": {
         "async": "^3.2.3",
         "ansi-regex": "^5.0.1",
+        "http-cache-semantics": "^4.1.1",
         "json-schema": "^0.4.0",
         "lodash": "^4.17.21",
         "mem": "^9.0.2",
@@ -121,7 +122,8 @@
         "electron" : "21.3.1",
         "got" : "11.8.5",
         "qs" : ">=6.10.3",
-        "ua-parser-js" : "1.0.33",
-        "flat" : ">=1.0.33"
+        "**/**/flat": ">=5.0.1",
+        "**/**/json5": ">=2.2.2",
+        "ua-parser-js": "^1.0.33"
     }
 }

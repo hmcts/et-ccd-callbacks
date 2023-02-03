@@ -16,11 +16,16 @@ function verifyListingDetails() {
     I.see('LL11 4AR');
     I.see('Contact address');
     I.see('Work address');
+    I.see('The Burnt Oak');
+    I.see('Egerton Gate');
+    I.see('Shenley Brook End');
+    I.see('Milton Keynes');
+    I.see('MK5 7HH');
+    I.see('Respondent');
+    I.see('Contact address');
     I.see('78 East Wonford Hill');
     I.see('Exeter')
     I.see('EX1 3DD');
-    I.see('Respondent');
-    I.see('Contact address');
     I.see('Do you want to suggest a hearing venue?');
     I.click('#et1SuggestHearingVenue_Yes');
     I.see('Leeds hearing venues');

@@ -13,7 +13,7 @@ Scenario('Create a new referral for admin', async ({ I }) => {
 
     await createAdminReferral(emailaddress, details);
 
-}).tag('@wip');
+}).tag('@biggerrefactoring');
 
 Scenario('Create a new referral for a Judge', async ({ I }) => {
 
@@ -23,7 +23,7 @@ Scenario('Create a new referral for a Judge', async ({ I }) => {
 
     await createJudgeReferral(emailaddress, details);
 
-}).tag('@wip');
+}).tag('@biggerrefactoring');
 
 Scenario('Create a new referral for a legal Rep', async ({ I }) => {
 

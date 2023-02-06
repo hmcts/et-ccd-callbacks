@@ -34,15 +34,11 @@ public final class NotificationHelper {
         return String.format("%s, %s", getNameForClaimant(caseData), getNameOfRespondents(caseData));
     }
 
-    /**
-     * Builds personalisation object for sending an email to the claimant or claimant rep.
-     */
-    public static Map<String, String> buildMapForClaimant(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
+    public static Map<String, String> buildMapForClaimant(CaseData caseData, String caseId) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
         personalisation.put("emailAddress", getEmailAddressForClaimant(caseData));
-        personalisation.put("ccdId", caseDetails.getCaseId());
+        personalisation.put("ccdId", caseId);
         RepresentedTypeC representativeClaimantType = caseData.getRepresentativeClaimantType();
 
         String initialTitle;
@@ -70,6 +66,16 @@ public final class NotificationHelper {
         personalisation.put("name", buildName(repName.substring(0, 1), getLastName(repName)));
 
         return personalisation;
+
+    }
+
+    /**
+     * Builds personalisation object for sending an email to the claimant or claimant rep.
+     */
+    public static Map<String, String> buildMapForClaimant(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        return buildMapForClaimant(caseData, caseDetails.getCaseId());
+
     }
 
     /**

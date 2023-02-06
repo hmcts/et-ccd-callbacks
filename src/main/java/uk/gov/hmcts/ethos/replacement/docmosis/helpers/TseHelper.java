@@ -253,14 +253,13 @@ public final class TseHelper {
         throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
-        TseRespondType replyType = selectedApplication.getRespondCollection().get(0).getValue();
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
         return Map.of(
             "ccdId", caseDetails.getCaseId(),
             "caseNumber", caseData.getEthosCaseReference(),
             "applicationType", selectedApplication.getType(),
-            "response", isNullOrEmpty(replyType.getResponse()) ? "" : replyType.getResponse(),
+            "response", caseData.getTseResponseText(),
             "claimant", caseData.getClaimant(),
             "respondents", Helper.getRespondentNames(caseData),
             "linkToDocument", documentJson

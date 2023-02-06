@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -8,15 +9,19 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.DocumentDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -32,6 +37,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -39,6 +45,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService.APPLICATION_DOCX_VALUE;
@@ -60,6 +67,8 @@ public class DocumentManagementServiceTest {
     private DocumentDownloadClientApi documentDownloadClientApi;
     @Mock
     private CaseDocumentClient caseDocumentClient;
+    @Mock
+    private RestTemplate restTemplate;
     @InjectMocks
     private DocumentManagementService documentManagementService;
     @Rule
@@ -68,6 +77,9 @@ public class DocumentManagementServiceTest {
     private File file;
     private String markup;
     private ResponseEntity<Resource> responseEntity;
+
+    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    private static final String AUTH_TOKEN = "Bearer authToken";
 
     @Before
     public void setUp() {
@@ -181,5 +193,33 @@ public class DocumentManagementServiceTest {
         UploadedDocumentType uploadedDocumentType = documentManagementService.addDocumentToDocumentField(documentInfo);
         assertThat(uploadedDocumentType.getDocumentFilename()).isEqualTo(documentInfo.getDescription());
         assertThat(uploadedDocumentType.getDocumentBinaryUrl()).isEqualTo(documentInfo.getUrl());
+    }
+
+    @Test
+    public void displayDocNameTypeSizeLink_GetSuccess_ReturnString() {
+        DocumentDetails documentDetails = DocumentDetails.builder()
+                .size("2000").mimeType("mimeType").hashToken("token").createdOn("createdOn").createdBy("createdBy")
+                .lastModifiedBy("lastModifiedBy").modifiedOn("modifiedOn").ttl("ttl")
+                .metadata(Map.of("test", "test"))
+                .originalDocumentName("docName.txt").classification("PUBLIC")
+                .links(Map.of("self", Map.of("href", "TestURL.com")))
+                .build();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, AUTH_TOKEN);
+        headers.add(SERVICE_AUTHORIZATION, authTokenGenerator.generate());
+        ResponseEntity<DocumentDetails> response = new ResponseEntity<>(documentDetails, headers, HttpStatus.OK);
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), eq(DocumentDetails.class)))
+                .thenReturn(response);
+
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setDescription("Test.txt");
+        documentInfo.setUrl("http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
+        UploadedDocumentType uploadedDocumentType = documentManagementService.addDocumentToDocumentField(documentInfo);
+        String actual = documentManagementService.displayDocNameTypeSizeLink(uploadedDocumentType, AUTH_TOKEN);
+
+        String size = FileUtils.byteCountToDisplaySize(Long.parseLong("2000"));
+        String expected = "<a href=\"/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary\" target=\"_blank\">Test (TXT, " + size + ")</a>";
+
+        assertEquals(expected, actual);
     }
 }

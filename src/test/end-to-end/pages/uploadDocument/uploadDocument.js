@@ -24,8 +24,10 @@ module.exports = async function () {
     I.click(commonConfig.continue);
     I.see('Upload Document');
     I.see('Case Number:');
-    I.click('Submit');
-
+    I.click(commonConfig.submit);
+    
+    //Wait for Case Details to correctly load
+    I.waitForElement('#case-viewer-control-print', testConfig.TestTimeToWaitForText);
     I.see('has been updated with event: Upload Document');
     
     //Document Upload Confirmation

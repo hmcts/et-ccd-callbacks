@@ -132,7 +132,7 @@ task yarnAudit(type: Exec,  dependsOn: ':yarnInstall') {
 }
 
 task codeceptSmoke(type: Exec, dependsOn: ':yarnInstall') {
-    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@smoke', '--npm -steps', '--reporter', 'mocha-multi'
+    commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@smoke', '--steps', '--reporter', 'mocha-multi'
 }
 
 task codeceptFunctional(type: Exec, dependsOn :'yarnInstall') {

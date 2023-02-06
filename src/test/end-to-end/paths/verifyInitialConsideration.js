@@ -9,5 +9,5 @@ Scenario('Verify Initial Consideration Journey', async ({I}) => {
     console.log("... case id =>" +caseId);
     await initialConsideration(I,eventNames.INITIAL_CONSIDERATION);
 
-}).tag('@RET-WIP');
+}).tag('@toberefactored');
     //.retry(testConfig.TestRetryScenarios)

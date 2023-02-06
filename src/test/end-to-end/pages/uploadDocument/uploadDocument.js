@@ -23,7 +23,7 @@ module.exports = async function () {
     I.click(commonConfig.continue);
     I.see('Upload Document');
     I.see('Case Number:');
-    I.click(commonConfig.submit);
+    I.click('Submit');
 
     I.see('has been updated with event: Upload Document');
     

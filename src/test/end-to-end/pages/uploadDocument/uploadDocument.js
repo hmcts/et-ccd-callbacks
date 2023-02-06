@@ -11,19 +11,21 @@ module.exports = async function () {
     I.see('Add new');
     I.see('Upload documentation for the case');
 
-    I.click("//button[@class='button write-collection-add-item__top']");
+    I.click('Add new');
     I.see('Case documentation');
     I.see('Type of Document (Optional)'); 
-    I.see('Document (Optional)');      
-    I.attachFile('#documentCollection_0_uploadedDocument', 'data/fileUpload.txt');
-    I.wait(5);
+    I.see('Document (Optional)');
     I.see('Short Description (Optional)');
+    I.selectOption('Type of Document (Optional)', 'ET1');    
+    I.attachFile('#documentCollection_0_uploadedDocument', 'data/fileUpload.txt');
     I.fillField('#documentCollection_0_shortDescription', commonConfig.shortDescription);
 
     I.click(commonConfig.continue);
-    I.click("//button[@class='button']");
-    I.seeElement("//div[@class='alert-message']");
-    I.wait(5);
+    I.see('Upload Document');
+    I.see('Case Number:');
+    I.click(commonConfig.submit);
+
+    I.see('has been updated with event: Upload Document');
     
     //Document Upload Confirmation
     I.click("//div[text()='Documents']");

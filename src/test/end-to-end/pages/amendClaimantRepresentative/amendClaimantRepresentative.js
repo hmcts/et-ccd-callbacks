@@ -45,35 +45,37 @@ module.exports = async function () {
     I.see('has been updated with event: Claimant Representative');
 
     I.click("//div[text()='Claimant Representative']");
+    I.waitForText('Claimant Representative Details', testConfig.TestTimeToWaitForText);
     I.see('Claimant Representative Details');
     I.see('Name of Representative');
-    I.see('Name of Organisation');
-    I.see('Reference');
-    I.see('Occupation');
     I.see('ECMRep1');
+    I.see('Name of Organisation');
     I.see('Organisation');
+    I.see('Reference');
     I.see('ReferenceOptional');
+    I.see('Occupation');
     I.see('Solicitor');
 
     I.see('Address');
     I.see('Building and Street');
-    I.see('Address Line 2');
-    I.see('Address Line 3');
-    I.see('Town or City');
-    I.see('Postcode/Zipcode');
-    I.see('Country');
     I.see('Flat 13');
+    I.see('Address Line 2');
     I.see('Vermeer Court');
+    I.see('Address Line 3');
     I.see('1 Rembrandt Close');
+    I.see('Town or City');
     I.see('London');
+    I.see('Postcode/Zipcode');
+    I.see('E14 3XA');
+    I.see('Country');
     I.see('United Kingdom');
 
     I.see('Phone number');
-    I.see('Alternative number');
-    I.see('Email address');
-    I.see('Contact preference');
     I.see('07912345678');
+    I.see('Alternative number');
     I.see('07998765432');
+    I.see('Email address');
     I.see('test@email.com');
+    I.see('Contact preference');
     I.see('Email');
 };

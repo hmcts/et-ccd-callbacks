@@ -27,7 +27,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({SendNotificationController.class, JsonMapper.class})
-public class SendNotificationControllerTest {
+@SuppressWarnings({"PMD.UnusedPrivateField"})
+class SendNotificationControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_SUBMIT_URL = "/sendNotification/aboutToSubmit";
@@ -119,6 +120,5 @@ public class SendNotificationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
-
 
 }

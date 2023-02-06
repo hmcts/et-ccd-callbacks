@@ -19,7 +19,7 @@ public class HearingSelectionService {
 
     public List<DynamicValueType> getHearingSelection(CaseData caseData, String format) {
         List<DynamicValueType> values = new ArrayList<>();
-        int i = 1;
+        int index = 1;
 
         if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearing : caseData.getHearingCollection()) {
@@ -28,12 +28,12 @@ public class HearingSelectionService {
 
                     String date = UtilHelper.formatLocalDateTime(listing.getValue().getListedDate());
                     String label = String.format(format,
-                            i,
+                            index,
                             hearing.getValue().getHearingType(),
                             hearing.getValue().getHearingVenue().getValue().getLabel(),
                             date);
                     values.add(DynamicValueType.create(code, label));
-                    i++;
+                    index++;
                 }
             }
         }

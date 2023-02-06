@@ -1,16 +1,16 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -19,13 +19,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
-public class SendNotificationServiceTest {
+class SendNotificationServiceTest {
 
     @Mock
     private HearingSelectionService hearingSelectionService;
     private CaseData caseData;
     private SendNotificationService sendNotificationService;
-
 
     @BeforeEach
     public void setUp() {
@@ -34,10 +33,8 @@ public class SendNotificationServiceTest {
 
         caseData.setSendNotificationTitle("title");
         caseData.setSendNotificationLetter("no");
-        caseData.setSendNotificationUploadDocument(new ArrayList<DocumentTypeItem>());
-        caseData.setSendNotificationSubject(new ArrayList<String>() {{
-            add("Hearing");
-        }});
+        caseData.setSendNotificationUploadDocument(new ArrayList<>());
+        caseData.setSendNotificationSubject(List.of("Hearing"));
         caseData.setSendNotificationAdditionalInfo("info");
         caseData.setSendNotificationNotify("Both parties");
         caseData.setSendNotificationAnotherLetter("no");
@@ -74,7 +71,6 @@ public class SendNotificationServiceTest {
         assertEquals("John Doe", sendNotificationType.getSendNotificationFullName2());
         assertEquals("details", sendNotificationType.getSendNotificationDetails());
         assertEquals("Judge", sendNotificationType.getSendNotificationRequestMadeBy());
-
 
     }
 

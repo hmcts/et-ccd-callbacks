@@ -4,7 +4,7 @@ const {claimantRepresentative} = require("../helpers/caseHelper");
 const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 
 
-Feature('Validate Claimant Representative...');
+Feature('Validate Claimant Representative');
 
 Scenario('Verify Claimant Representative', async ({I}) => {
 

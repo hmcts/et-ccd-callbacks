@@ -1,18 +1,19 @@
 'use strict';
 const commonConfig = require('../../data/commonConfig.json');
+const testConfig = require("../../../config");
 
 module.exports = async function () {
 
     const I = this;
     //Start of Upload document page
-    I.see('Upload Document');
+    I.waitForText('Upload Document', testConfig.TestTimeToWaitForText);
     I.see('Case Number:');
     I.see('Case documentation (Optional)');
     I.see('Add new');
     I.see('Upload documentation for the case');
 
     I.click('Add new');
-    I.see('Case documentation');
+    I.waitForText('Case documentation', testConfig.TestTimeToWaitForText);
     I.see('Type of Document (Optional)'); 
     I.see('Document (Optional)');
     I.see('Short Description (Optional)');
@@ -29,9 +30,9 @@ module.exports = async function () {
     
     //Document Upload Confirmation
     I.click("//div[text()='Documents']");
-    I.see('Case documentation 1');
+    I.waitForText('Case documentation 1', testConfig.TestTimeToWaitForText);
     I.see('Document');
-    I.see('Short Description');
     I.see('fileUpload.txt');
+    I.see('Short Description');
     I.see('Upload Document Check');
 };

@@ -246,6 +246,7 @@ dependencyCheck {
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
     suppressionFile = 'config/owasp/suppressions.xml'
     analyzers.assemblyEnabled = false
+    analyzers.nodeAudit.yarnEnabled = false
 }
 
 repositories {

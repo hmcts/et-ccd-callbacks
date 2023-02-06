@@ -13,7 +13,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelection
 import java.util.ArrayList;
 import java.util.UUID;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -27,11 +26,10 @@ public class SendNotificationService {
         caseData.setSendNotificationSelectHearing(dynamicFixedListType);
     }
 
-
     public void createSendNotification(CaseData caseData) {
 
         if (caseData.getSendNotificationCollection() == null) {
-            caseData.setSendNotificationCollection(new ArrayList<SendNotificationTypeItem>());
+            caseData.setSendNotificationCollection(new ArrayList<>());
         }
         SendNotificationType sendNotificationType = new SendNotificationType();
         sendNotificationType.setSendNotificationTitle(caseData.getSendNotificationTitle());
@@ -58,7 +56,7 @@ public class SendNotificationService {
 
     }
 
-    public void clearSendNotificaitonFields(CaseData caseData){
+    public void clearSendNotificaitonFields(CaseData caseData) {
         caseData.setSendNotificationTitle(null);
         caseData.setSendNotificationLetter(null);
         caseData.setSendNotificationUploadDocument(null);

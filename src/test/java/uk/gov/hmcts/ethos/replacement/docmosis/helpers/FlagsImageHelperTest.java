@@ -49,6 +49,49 @@ public class FlagsImageHelperTest {
     }
 
     @Test
+    public void testAddWelshFlagHearingLang() {
+        ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
+        for (TribunalOffice tribunalOffice : tribunalOffices) {
+            CaseData caseData = new CaseData();
+            caseData.setManagingOffice(tribunalOffice.getOfficeName());
+            ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
+            hearingPreference.setHearingLanguage("Yes");
+            caseData.setClaimantHearingPreference(hearingPreference);
+            CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
+            FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+            assertEquals("<font color='Red' size='5'> Cymraeg </font>", caseData.getFlagsImageAltText());
+        }
+    }
+
+    @Test
+    public void testAddWelshFlagBothOptions() {
+        ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
+        for (TribunalOffice tribunalOffice : tribunalOffices) {
+            CaseData caseData = new CaseData();
+            caseData.setManagingOffice(tribunalOffice.getOfficeName());
+            ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
+            hearingPreference.setHearingLanguage("Yes");
+            hearingPreference.setContactLanguage("Yes");
+            caseData.setClaimantHearingPreference(hearingPreference);
+            CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
+            FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+            assertEquals("<font color='Red' size='5'> Cymraeg </font>", caseData.getFlagsImageAltText());
+        }
+    }
+
+    @Test
+    public void testAddWelshFlagNoOptions() {
+        ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
+        for (TribunalOffice tribunalOffice : tribunalOffices) {
+            CaseData caseData = new CaseData();
+            caseData.setManagingOffice(tribunalOffice.getOfficeName());
+            CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
+            FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+            assertEquals("", caseData.getFlagsImageAltText());
+        }
+    }
+
+    @Test
     public void testDoesNotAddOutstationForGlasgow() {
         CaseData caseData = new CaseData();
         caseData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());

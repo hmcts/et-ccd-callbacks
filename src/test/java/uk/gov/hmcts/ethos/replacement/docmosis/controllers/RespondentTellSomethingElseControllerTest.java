@@ -35,7 +35,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondentTellSomethingElseController.class, JsonMapper.class})
@@ -68,7 +68,7 @@ class RespondentTellSomethingElseControllerTest {
             .withClaimant("claimant")
             .build();
         caseData.setResTseSelectApplication("caseRef");
-        caseData.setResTseCopyToOtherPartyYesOrNo(I_DO_NOT_WANT_TO_COPY);
+        caseData.setResTseCopyToOtherPartyYesOrNo(NO);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
 
@@ -186,7 +186,7 @@ class RespondentTellSomethingElseControllerTest {
 
     private List<GenericTseApplicationTypeItem> createApplicationCollection() {
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
-        respondentTseType.setCopyToOtherPartyYesOrNo(I_DO_NOT_WANT_TO_COPY);
+        respondentTseType.setCopyToOtherPartyYesOrNo(NO);
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
         tseApplicationTypeItem.setId(UUID.randomUUID().toString());

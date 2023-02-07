@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
@@ -38,7 +38,7 @@ class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctional
             .withClaimantType("person@email.com")
             .build();
         caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
-        caseData.setResTseCopyToOtherPartyYesOrNo(I_DO_NOT_WANT_TO_COPY);
+        caseData.setResTseCopyToOtherPartyYesOrNo(NO);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
 
@@ -113,7 +113,7 @@ class RespondentTellSomethingElseControllerFunctionalTest extends BaseFunctional
     private List<GenericTseApplicationTypeItem> createApplicationCollection() {
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
         respondentTseType.setApplicant(RESPONDENT_TITLE);
-        respondentTseType.setCopyToOtherPartyYesOrNo(I_DO_NOT_WANT_TO_COPY);
+        respondentTseType.setCopyToOtherPartyYesOrNo(NO);
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
         tseApplicationTypeItem.setId(UUID.randomUUID().toString());

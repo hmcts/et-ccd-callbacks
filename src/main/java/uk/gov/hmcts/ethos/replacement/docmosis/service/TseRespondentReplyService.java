@@ -9,7 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
 import java.util.Map;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +29,7 @@ public class TseRespondentReplyService {
 
     public void sendAcknowledgementAndClaimantEmail(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
-        if (I_CONFIRM_I_WANT_TO_COPY.equals(caseData.getTseResponseCopyToOtherParty())) {
+        if (YES.equals(caseData.getTseResponseCopyToOtherParty())) {
             try {
                 byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", "TSE Reply.pdf");
                 String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
@@ -42,7 +42,7 @@ public class TseRespondentReplyService {
 
         String legalRepEmail = userService.getUserDetails(userToken).getEmail();
         emailService.sendEmail(
-            I_CONFIRM_I_WANT_TO_COPY.equals(caseData.getTseResponseCopyToOtherParty())
+            YES.equals(caseData.getTseResponseCopyToOtherParty())
                 ? acknowledgementRule92YesEmailTemplateId
                 : acknowledgementRule92NoEmailTemplateId,
             legalRepEmail,

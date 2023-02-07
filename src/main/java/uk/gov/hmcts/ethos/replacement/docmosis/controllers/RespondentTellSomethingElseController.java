@@ -28,7 +28,7 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -179,7 +179,7 @@ public class RespondentTellSomethingElseController {
             tseApplicationCollection.get(tseApplicationCollection.size() - 1);
 
         String body;
-        if (I_CONFIRM_I_WANT_TO_COPY.equals(latestTSEApplication.getValue().getCopyToOtherPartyYesOrNo())) {
+        if (YES.equals(latestTSEApplication.getValue().getCopyToOtherPartyYesOrNo())) {
             body = String.format(APPLICATION_COMPLETE_RULE92_ANSWERED_YES,
                 UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
         } else {

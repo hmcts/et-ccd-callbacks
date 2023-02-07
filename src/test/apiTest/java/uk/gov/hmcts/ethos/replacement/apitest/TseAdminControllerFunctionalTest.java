@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
 @Slf4j
@@ -47,7 +47,7 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
             .build();
 
         caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
-        caseData.setResTseCopyToOtherPartyYesOrNo(I_DO_NOT_WANT_TO_COPY);
+        caseData.setResTseCopyToOtherPartyYesOrNo(NO);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
         caseData.setTseAdminSelectApplication(

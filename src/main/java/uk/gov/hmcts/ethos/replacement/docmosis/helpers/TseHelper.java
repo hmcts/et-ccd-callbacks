@@ -247,18 +247,24 @@ public final class TseHelper {
         return new ObjectMapper().writeValueAsString(document);
     }
 
+    /**
+     * Personalisation for sending Acknowledgement for Response.
+     * @param caseDetails contains all the case data
+     * @param document TSE Reply.pdf
+     * @return Personalisation For Response
+     * @throws NotificationClientException Throw Exception
+     */
     public static Map<String, Object> getPersonalisationForResponse(CaseDetails caseDetails, byte[] document)
         throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
-        TseRespondType replyType = selectedApplication.getRespondCollection().get(0).getValue();
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
         return Map.of(
             "ccdId", caseDetails.getCaseId(),
             "caseNumber", caseData.getEthosCaseReference(),
             "applicationType", selectedApplication.getType(),
-            "response", isNullOrEmpty(replyType.getResponse()) ? "" : replyType.getResponse(),
+            "response", isNullOrEmpty(caseData.getTseResponseText()) ? "" : caseData.getTseResponseText(),
             "claimant", caseData.getClaimant(),
             "respondents", Helper.getRespondentNames(caseData),
             "linkToDocument", documentJson

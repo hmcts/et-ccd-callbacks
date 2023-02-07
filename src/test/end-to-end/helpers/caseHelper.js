@@ -139,6 +139,7 @@ async function caseTransfer(I, eventName) {
             await I.executeCaseTransferECM();
             break;
         default:
+            throw new Error("Control arrived at default block");
     }
 }
 

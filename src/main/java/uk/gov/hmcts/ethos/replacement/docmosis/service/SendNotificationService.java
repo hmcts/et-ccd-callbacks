@@ -56,7 +56,7 @@ public class SendNotificationService {
 
     }
 
-    public void clearSendNotificaitonFields(CaseData caseData) {
+    public void clearSendNotificationFields(CaseData caseData) {
         caseData.setSendNotificationTitle(null);
         caseData.setSendNotificationLetter(null);
         caseData.setSendNotificationUploadDocument(null);

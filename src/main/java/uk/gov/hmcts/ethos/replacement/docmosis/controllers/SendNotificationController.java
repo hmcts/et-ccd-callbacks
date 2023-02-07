@@ -99,7 +99,7 @@ public class SendNotificationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         sendNotificationService.createSendNotification(caseData);
-        sendNotificationService.clearSendNotificaitonFields(caseData);
+        sendNotificationService.clearSendNotificationFields(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

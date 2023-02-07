@@ -29,7 +29,7 @@ public class HearingSelectionService {
 
                     DynamicFixedListType hearingVenue = hearingValue.getHearingVenue();
 
-                    String venue = hearingVenue == null? hearingValue.getHearingVenueScotland() :
+                    String venue = hearingVenue == null ? hearingValue.getHearingVenueScotland() :
                         hearingVenue.getValue().getLabel();
 
                     String date = UtilHelper.formatLocalDateTime(listing.getValue().getListedDate());

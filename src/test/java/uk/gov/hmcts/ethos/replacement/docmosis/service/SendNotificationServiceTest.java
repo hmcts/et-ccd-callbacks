@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -62,7 +63,7 @@ class SendNotificationServiceTest {
         assertEquals("info", sendNotificationType.getSendNotificationAdditionalInfo());
         assertEquals("Both parties", sendNotificationType.getSendNotificationNotify());
         assertEquals("no", sendNotificationType.getSendNotificationAnotherLetter());
-        assertEquals(null, sendNotificationType.getSendNotificationSelectHearing());
+        assertNull(sendNotificationType.getSendNotificationSelectHearing());
         assertEquals("", sendNotificationType.getSendNotificationCaseManagement());
         assertEquals("no", sendNotificationType.getSendNotificationResponseTribunal());
         assertEquals("Judge", sendNotificationType.getSendNotificationWhoCaseOrder());
@@ -76,24 +77,24 @@ class SendNotificationServiceTest {
 
     @Test
     void testClearSendNotificaitonFields() {
-        sendNotificationService.clearSendNotificaitonFields(caseData);
+        sendNotificationService.clearSendNotificationFields(caseData);
 
-        assertEquals(null, caseData.getSendNotificationTitle());
-        assertEquals(null, caseData.getSendNotificationLetter());
-        assertEquals(null, caseData.getSendNotificationUploadDocument());
-        assertEquals(null, caseData.getSendNotificationSubject());
-        assertEquals(null, caseData.getSendNotificationAdditionalInfo());
-        assertEquals(null, caseData.getSendNotificationNotify());
-        assertEquals(null, caseData.getSendNotificationAnotherLetter());
-        assertEquals(null, caseData.getSendNotificationSelectHearing());
-        assertEquals(null, caseData.getSendNotificationCaseManagement());
-        assertEquals(null, caseData.getSendNotificationResponseTribunal());
-        assertEquals(null, caseData.getSendNotificationWhoCaseOrder());
-        assertEquals(null, caseData.getSendNotificationSelectParties());
-        assertEquals(null, caseData.getSendNotificationFullName());
-        assertEquals(null, caseData.getSendNotificationFullName2());
-        assertEquals(null, caseData.getSendNotificationDetails());
-        assertEquals(null, caseData.getSendNotificationRequestMadeBy());
+        assertNull(caseData.getSendNotificationTitle());
+        assertNull(caseData.getSendNotificationLetter());
+        assertNull(caseData.getSendNotificationUploadDocument());
+        assertNull(caseData.getSendNotificationSubject());
+        assertNull(caseData.getSendNotificationAdditionalInfo());
+        assertNull(caseData.getSendNotificationNotify());
+        assertNull(caseData.getSendNotificationAnotherLetter());
+        assertNull(caseData.getSendNotificationSelectHearing());
+        assertNull(caseData.getSendNotificationCaseManagement());
+        assertNull(caseData.getSendNotificationResponseTribunal());
+        assertNull(caseData.getSendNotificationWhoCaseOrder());
+        assertNull(caseData.getSendNotificationSelectParties());
+        assertNull(caseData.getSendNotificationFullName());
+        assertNull(caseData.getSendNotificationFullName2());
+        assertNull(caseData.getSendNotificationDetails());
+        assertNull(caseData.getSendNotificationRequestMadeBy());
     }
 
     @Test

@@ -25,8 +25,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
@@ -70,8 +69,8 @@ class TseRespondentReplyServiceTest {
 
     @Test
     void sendAcknowledgementAndClaimantEmail_rule92Yes() throws IOException {
-        caseData.setTseResponseCopyToOtherParty(I_CONFIRM_I_WANT_TO_COPY);
-        
+        caseData.setTseResponseCopyToOtherParty(YES);
+
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
@@ -85,7 +84,7 @@ class TseRespondentReplyServiceTest {
 
     @Test
     void sendAcknowledgementAndClaimantEmail_rule92No() throws IOException {
-        caseData.setTseResponseCopyToOtherParty(I_DO_NOT_WANT_TO_COPY);
+        caseData.setTseResponseCopyToOtherParty(NO);
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");

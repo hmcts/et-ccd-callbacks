@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
@@ -34,7 +35,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondentTellSomethingElseController.class, JsonMapper.class})
@@ -51,6 +52,8 @@ class RespondentTellSomethingElseControllerTest {
 
     @MockBean
     private RespondentTellSomethingElseService resTseService;
+    @MockBean
+    private TseService tseService;
 
     @Autowired
     private JsonMapper jsonMapper;
@@ -65,7 +68,7 @@ class RespondentTellSomethingElseControllerTest {
             .withClaimant("claimant")
             .build();
         caseData.setResTseSelectApplication("caseRef");
-        caseData.setResTseCopyToOtherPartyYesOrNo(I_DO_NOT_WANT_TO_COPY);
+        caseData.setResTseCopyToOtherPartyYesOrNo(NO);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
 
@@ -111,6 +114,7 @@ class RespondentTellSomethingElseControllerTest {
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
         verify(resTseService).sendAcknowledgeEmailAndGeneratePdf(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(tseService).createApplication(ccdRequest.getCaseDetails().getCaseData(), false);
     }
 
     @Test
@@ -182,7 +186,7 @@ class RespondentTellSomethingElseControllerTest {
 
     private List<GenericTseApplicationTypeItem> createApplicationCollection() {
         GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
-        respondentTseType.setCopyToOtherPartyYesOrNo(I_DO_NOT_WANT_TO_COPY);
+        respondentTseType.setCopyToOtherPartyYesOrNo(NO);
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
         tseApplicationTypeItem.setId(UUID.randomUUID().toString());

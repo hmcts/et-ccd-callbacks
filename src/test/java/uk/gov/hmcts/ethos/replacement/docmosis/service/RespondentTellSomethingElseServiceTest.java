@@ -42,7 +42,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
@@ -63,6 +63,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getResponde
     "PMD.FieldNamingConventions", "PMD.CyclomaticComplexity"})
 class RespondentTellSomethingElseServiceTest {
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
+    private TseService tseService;
 
     @MockBean
     private EmailService emailService;
@@ -103,6 +104,8 @@ class RespondentTellSomethingElseServiceTest {
     void setUp() {
         respondentTellSomethingElseService =
                 new RespondentTellSomethingElseService(emailService, userService, tornadoService);
+        tseService = new TseService();
+
         ReflectionTestUtils.setField(respondentTellSomethingElseService, "emailTemplateId", TEMPLATE_ID);
 
         UserDetails userDetails = HelperTest.getUserDetails();
@@ -272,17 +275,17 @@ class RespondentTellSomethingElseServiceTest {
 
     private static Stream<Arguments> sendAcknowledgeEmailAndGeneratePdf() {
         return Stream.of(
-            Arguments.of(TSE_APP_AMEND_RESPONSE, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_POSTPONE_A_HEARING, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, I_DO_NOT_WANT_TO_COPY, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_AMEND_RESPONSE, NO, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, NO, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, NO, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_POSTPONE_A_HEARING, NO, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, NO, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, NO, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, NO, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, NO, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, NO, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, NO, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, NO, rule92AnsweredNoText, true),
 
             Arguments.of(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
             Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
@@ -322,7 +325,7 @@ class RespondentTellSomethingElseServiceTest {
 
     @Test
     void sendClaimantEmail_rule92No_doesNothing() {
-        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, I_DO_NOT_WANT_TO_COPY);
+        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
@@ -333,7 +336,7 @@ class RespondentTellSomethingElseServiceTest {
 
     @Test
     void sendClaimantEmail_groupC_doesNothing() {
-        CaseData caseData = createCaseData(TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE, I_DO_NOT_WANT_TO_COPY);
+        CaseData caseData = createCaseData(TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE, NO);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
@@ -386,7 +389,7 @@ class RespondentTellSomethingElseServiceTest {
         caseData.setResTseCopyToOtherPartyYesOrNo("copyToOtherPartyYesOrNo");
         caseData.setResTseCopyToOtherPartyTextArea("copyToOtherPartyTextArea");
 
-        respondentTellSomethingElseService.createRespondentApplication(caseData);
+        tseService.createApplication(caseData, false);
 
         assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue().getDetails(), is(textBoxData));
         assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
@@ -435,7 +438,7 @@ class RespondentTellSomethingElseServiceTest {
 
     @Test
     void displayRespondentApplicationsTable_hasApplications() {
-        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, I_DO_NOT_WANT_TO_COPY);
+        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
         caseData.setGenericTseApplicationCollection(generateGenericTseApplicationList());
 
         assertThat(respondentTellSomethingElseService.generateTableMarkdown(caseData), is(EXPECTED_TABLE_MARKDOWN));
@@ -443,7 +446,7 @@ class RespondentTellSomethingElseServiceTest {
 
     @Test
     void displayRespondentApplicationsTable_hasNoApplications() {
-        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, I_DO_NOT_WANT_TO_COPY);
+        CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
 
         assertThat(respondentTellSomethingElseService.generateTableMarkdown(caseData), is(""));
     }

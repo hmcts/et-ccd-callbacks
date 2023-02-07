@@ -7,6 +7,7 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
@@ -17,9 +18,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
+import uk.gov.service.notify.NotificationClient;
+import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -42,6 +46,7 @@ public class TseHelperTest {
             .withClaimantIndType("First", "Last")
             .withEthosCaseReference("1234")
             .withClaimant("First Last")
+            .withRespondent("Respondent Name", YES, "13 December 2022", false)
             .build();
 
         GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
@@ -215,4 +220,54 @@ public class TseHelperTest {
         documentTypeItem.setValue(DocumentTypeBuilder.builder().withUploadedDocument("image.png", "1234").build());
         return List.of(documentTypeItem);
     }
+
+    @Test
+    public void getPersonalisationForResponse_withResponse() throws NotificationClientException {
+        caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
+        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
+        caseData.setTseResponseText("TseResponseText");
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("CaseId");
+        caseDetails.setCaseData(caseData);
+        byte[] document = new byte[] {};
+        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(caseDetails, document);
+
+        Map<String, Object> expected = Map.of(
+            "ccdId", "CaseId",
+            "caseNumber", "1234",
+            "applicationType", "Withdraw my claim",
+            "response", "TseResponseText",
+            "claimant", "First Last",
+            "respondents", "Respondent Name",
+            "linkToDocument", NotificationClient.prepareUpload(document, false, true, "52 weeks")
+        );
+
+        assertThat(actual.toString(), is(expected.toString()));
+    }
+
+    @Test
+    public void getPersonalisationForResponse_withoutResponse() throws NotificationClientException {
+        caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
+        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("CaseId");
+        caseDetails.setCaseData(caseData);
+        byte[] document = new byte[] {};
+        Map<String, Object> actual = TseHelper.getPersonalisationForResponse(caseDetails, document);
+
+        Map<String, Object> expected = Map.of(
+            "ccdId", "CaseId",
+            "caseNumber", "1234",
+            "applicationType", "Withdraw my claim",
+            "response", "",
+            "claimant", "First Last",
+            "respondents", "Respondent Name",
+            "linkToDocument", NotificationClient.prepareUpload(document, false, true, "52 weeks")
+        );
+
+        assertThat(actual.toString(), is(expected.toString()));
+    }
+
 }

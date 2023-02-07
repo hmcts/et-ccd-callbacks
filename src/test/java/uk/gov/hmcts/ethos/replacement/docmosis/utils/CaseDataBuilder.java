@@ -17,6 +17,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
@@ -24,10 +26,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -342,10 +346,20 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withRespondent(String respondent, String responseReceived, String receivedDate,
+    public CaseDataBuilder withRespondent(String respondentName, String responseReceived, String receivedDate,
+                                          String respondentEmail, boolean extension) {
+        withRespondent(respondentName, responseReceived, receivedDate, extension);
+        RespondentSumTypeItem respondentSumTypeItem = caseData.getRespondentCollection()
+            .get(caseData.getRespondentCollection().size() - 1);
+        respondentSumTypeItem.getValue().setRespondentEmail(respondentEmail);
+        return this;
+
+    }
+
+    public CaseDataBuilder withRespondent(String respondentName, String responseReceived, String receivedDate,
                                           boolean extension) {
         RespondentSumType respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentName(respondent);
+        respondentSumType.setRespondentName(respondentName);
         respondentSumType.setResponseReceived(responseReceived);
         respondentSumType.setResponseReceivedDate(receivedDate);
         if (extension) {
@@ -462,6 +476,29 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withChangeOrganisationRequestField(Organisation organisationToAdd,
+                                                              Organisation organisationToRemove,
+                                                              DynamicFixedListType caseRoleID,
+                                                              LocalDateTime requestTimestamp,
+                                                              ChangeOrganisationApprovalStatus approvalStatus) {
+        DynamicValueType caseRoleIDValue = DynamicValueType.create("[SOLICITORA]", "Respondent Solicitor");
+
+        DynamicFixedListType caseRoleIDList = new DynamicFixedListType();
+        caseRoleIDList.setValue(caseRoleIDValue);
+        caseRoleIDList.setListItems(List.of(caseRoleIDValue));
+
+        ChangeOrganisationRequest cor = ChangeOrganisationRequest.builder()
+            .organisationToAdd(organisationToAdd)
+            .organisationToRemove(organisationToRemove)
+            .caseRoleId(caseRoleIDList)
+            .requestTimestamp(requestTimestamp)
+            .approvalStatus(approvalStatus)
+            .build();
+
+        caseData.setChangeOrganisationRequestField(cor);
+        return this;
+    }
+        
     public CaseDataBuilder withAssignOffice(String selectedOffice) {
         List<DynamicValueType> tribunalOffices = TribunalOffice.ENGLANDWALES_OFFICES.stream()
                 .map(tribunalOffice ->

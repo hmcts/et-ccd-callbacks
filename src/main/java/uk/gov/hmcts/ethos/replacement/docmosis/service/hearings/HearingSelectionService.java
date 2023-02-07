@@ -23,14 +23,20 @@ public class HearingSelectionService {
 
         if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearing : caseData.getHearingCollection()) {
-                for (DateListedTypeItem listing : hearing.getValue().getHearingDateCollection()) {
+                HearingType hearingValue = hearing.getValue();
+                for (DateListedTypeItem listing : hearingValue.getHearingDateCollection()) {
                     String code = listing.getId();
+
+                    DynamicFixedListType hearingVenue = hearingValue.getHearingVenue();
+
+                    String venue = hearingVenue == null? hearingValue.getHearingVenueScotland() :
+                        hearingVenue.getValue().getLabel();
 
                     String date = UtilHelper.formatLocalDateTime(listing.getValue().getListedDate());
                     String label = String.format(format,
                             index,
-                            hearing.getValue().getHearingType(),
-                            hearing.getValue().getHearingVenue().getValue().getLabel(),
+                            hearingValue.getHearingType(),
+                            venue,
                             date);
                     values.add(DynamicValueType.create(code, label));
                     index++;

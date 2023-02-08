@@ -27,9 +27,9 @@ public class CreateService {
 
     public List<String> initCreateAdmin(String userToken) {
         List<String> errors = new ArrayList<>();
-        if (existEcmAdminCaseTypeId(userToken)) {
-            errors.add(CREATE_EXIST_ERROR_MESSAGE);
-        }
+        //        if (existEcmAdminCaseTypeId(userToken)) {
+        //            errors.add(CREATE_EXIST_ERROR_MESSAGE);
+        //        }
         return errors;
     }
 

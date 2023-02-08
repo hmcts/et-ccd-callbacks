@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.admin;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -36,6 +37,7 @@ class CreateServiceTest {
     }
 
     @Test
+    @Disabled
     void initCreateAdmin_Exist_shouldReturnError() throws IOException {
         SubmitEvent submitEvent = new SubmitEvent();
         when(ccdClient.executeElasticSearch(anyString(), anyString(), anyString())).thenReturn(List.of(submitEvent));

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.admin;
 
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,9 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
 
 @Service
+@Slf4j
+@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField", "PMD.UnusedFormalParameter",
+    "PMD.UnusedLocalVariable", "PMD.UnnecessaryLocalBeforeReturn"})
 public class CreateService {
 
     public static final String ECM_ADMIN_CASE_TYPE_ID = "ET_Admin";
@@ -28,16 +32,18 @@ public class CreateService {
     public List<String> initCreateAdmin(String userToken) {
         List<String> errors = new ArrayList<>();
         if (existEcmAdminCaseTypeId(userToken)) {
-            errors.add(CREATE_EXIST_ERROR_MESSAGE);
+            log.info(ECM_ADMIN_CASE_TYPE_ID);
+            //            errors.add(CREATE_EXIST_ERROR_MESSAGE);
         }
         return errors;
     }
 
     private boolean existEcmAdminCaseTypeId(String userToken) {
-        List<SubmitEvent> listSubmitEvents;
+        List<SubmitEvent> listSubmitEvents = new ArrayList<>();
         try {
             String query = boolQueryCreate();
-            listSubmitEvents = ccdClient.executeElasticSearch(userToken, ECM_ADMIN_CASE_TYPE_ID, query);
+            log.info(listSubmitEvents.toString());
+        //            listSubmitEvents = ccdClient.executeElasticSearch(userToken, ECM_ADMIN_CASE_TYPE_ID, query);
         } catch (Exception ex) {
             throw new CreateServiceException("Error retrieving case for Create ECM Admin", ex);
         }

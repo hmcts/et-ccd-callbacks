@@ -12,7 +12,4 @@ Scenario('Verify Respondent Details', async ({I}) => {
 
     await claimantRespondentDetails(I, eventNames.CLAIMANT_RESPONDENT_DETAILS);
 
-}).tag('@e2e')
-    .tag('@nightly')
-    .tag('@RET-BAT')
-    .retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);

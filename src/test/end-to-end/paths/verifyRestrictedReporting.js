@@ -12,7 +12,5 @@ Scenario('Verify Restricted Reporting', async ({I}) => {
 
     await restrictedReporting(I, eventNames.RESTRICTED_REPORTING);
 
-}).tag('@e2e')
-    .tag('@nightly')
-    .tag('@wip');
+}).tag('@biggerrefactoring');
     //.retry(testConfig.TestRetryScenarios);

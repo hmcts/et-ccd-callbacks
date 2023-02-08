@@ -11,7 +11,5 @@ Scenario('Verify Fix Case API', async ({I}) => {
     console.log("... case id =>" +caseId);
     await fixCaseAPI(I, eventNames.FIX_CASE_API);
 
-}).tag('@e2e')
-    .tag('@nightly')
-    .tag('@wip');
+}).tag('@toberefactored');
     //.retry(testConfig.TestRetryScenarios);

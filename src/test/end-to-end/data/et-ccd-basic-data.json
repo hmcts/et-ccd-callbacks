@@ -91,7 +91,17 @@
         "id": "e764f874-e937-4642-ac67-4af2e2fd05f6"
       }
     ],
-    "claimantWorkAddressQuestion": "Yes",
+    "claimantWorkAddressQuestion": "No",
+    "claimantWorkAddress": {
+      "claimant_work_address": {
+        "Country": "United Kingdom",
+        "PostCode": "MK5 7HH",
+        "PostTown": "Milton Keynes",
+        "AddressLine1": "The Burnt Oak",
+        "AddressLine2": "Egerton Gate",
+        "AddressLine3": "Shenley Brook End"
+      }
+    },
     "claimantWorkAddressQRespondent": {
       "value": {
         "code": "Mrs Test Auto",

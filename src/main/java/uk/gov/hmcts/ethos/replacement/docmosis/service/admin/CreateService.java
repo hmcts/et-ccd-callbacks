@@ -16,8 +16,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
 
 @Service
 @Slf4j
-@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField", "PMD.UnusedFormalParameter",
-    "PMD.UnusedLocalVariable", "PMD.UnnecessaryLocalBeforeReturn"})
 public class CreateService {
 
     public static final String ECM_ADMIN_CASE_TYPE_ID = "ET_Admin";
@@ -32,18 +30,16 @@ public class CreateService {
     public List<String> initCreateAdmin(String userToken) {
         List<String> errors = new ArrayList<>();
         if (existEcmAdminCaseTypeId(userToken)) {
-            log.info(ECM_ADMIN_CASE_TYPE_ID);
-            //            errors.add(CREATE_EXIST_ERROR_MESSAGE);
+            errors.add(CREATE_EXIST_ERROR_MESSAGE);
         }
         return errors;
     }
 
     private boolean existEcmAdminCaseTypeId(String userToken) {
-        List<SubmitEvent> listSubmitEvents = new ArrayList<>();
+        List<SubmitEvent> listSubmitEvents;
         try {
             String query = boolQueryCreate();
-            log.info(listSubmitEvents.toString());
-        //            listSubmitEvents = ccdClient.executeElasticSearch(userToken, ECM_ADMIN_CASE_TYPE_ID, query);
+            listSubmitEvents = ccdClient.executeElasticSearch(userToken, ECM_ADMIN_CASE_TYPE_ID, query);
         } catch (Exception ex) {
             throw new CreateServiceException("Error retrieving case for Create ECM Admin", ex);
         }

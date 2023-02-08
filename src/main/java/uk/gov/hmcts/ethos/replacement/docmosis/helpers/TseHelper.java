@@ -32,8 +32,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
@@ -249,18 +247,24 @@ public final class TseHelper {
         return new ObjectMapper().writeValueAsString(document);
     }
 
+    /**
+     * Personalisation for sending Acknowledgement for Response.
+     * @param caseDetails contains all the case data
+     * @param document TSE Reply.pdf
+     * @return Personalisation For Response
+     * @throws NotificationClientException Throw Exception
+     */
     public static Map<String, Object> getPersonalisationForResponse(CaseDetails caseDetails, byte[] document)
         throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
-        TseRespondType replyType = selectedApplication.getRespondCollection().get(0).getValue();
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
         return Map.of(
             "ccdId", caseDetails.getCaseId(),
             "caseNumber", caseData.getEthosCaseReference(),
             "applicationType", selectedApplication.getType(),
-            "response", isNullOrEmpty(replyType.getResponse()) ? "" : replyType.getResponse(),
+            "response", isNullOrEmpty(caseData.getTseResponseText()) ? "" : caseData.getTseResponseText(),
             "claimant", caseData.getClaimant(),
             "respondents", Helper.getRespondentNames(caseData),
             "linkToDocument", documentJson
@@ -361,9 +365,9 @@ public final class TseHelper {
      * @return Yes or No
      */
     public static String displayCopyToOtherPartyYesOrNo(String copyToOtherPartyYesOrNo) {
-        if (I_CONFIRM_I_WANT_TO_COPY.equals(copyToOtherPartyYesOrNo)) {
+        if (YES.equals(copyToOtherPartyYesOrNo)) {
             return YES;
-        } else if (I_DO_NOT_WANT_TO_COPY.equals(copyToOtherPartyYesOrNo)) {
+        } else if (NO.equals(copyToOtherPartyYesOrNo)) {
             return NO;
         } else {
             return defaultString(copyToOtherPartyYesOrNo);

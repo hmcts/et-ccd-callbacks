@@ -28,14 +28,14 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_JUDGEMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
 @Slf4j
@@ -109,7 +109,7 @@ public class RespondentTellSomethingElseService {
 
         String email = userService.getUserDetails(userToken).getEmail();
 
-        if (I_DO_NOT_WANT_TO_COPY.equals(caseData.getResTseCopyToOtherPartyYesOrNo())) {
+        if (NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())) {
             emailService.sendEmail(emailTemplateId, email, buildPersonalisation(caseDetails, RULE92_ANSWERED_NO));
             return;
         }
@@ -133,7 +133,7 @@ public class RespondentTellSomethingElseService {
         CaseData caseData = caseDetails.getCaseData();
 
         if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())
-            || I_DO_NOT_WANT_TO_COPY.equals(caseData.getResTseCopyToOtherPartyYesOrNo())
+            || NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())
             || caseData.getClaimantType().getClaimantEmailAddress() == null) {
             return;
         }
@@ -215,7 +215,7 @@ public class RespondentTellSomethingElseService {
         String applicant = genericTseApplicationTypeItem.getValue().getApplicant();
         String copyToRespondent = genericTseApplicationTypeItem.getValue().getCopyToOtherPartyYesOrNo();
         boolean isClaimantAndRule92Shared = CLAIMANT_TITLE.equals(applicant)
-            && I_CONFIRM_I_WANT_TO_COPY.equals(copyToRespondent);
+            && YES.equals(copyToRespondent);
 
         return RESPONDENT_TITLE.equals(applicant) || isClaimantAndRule92Shared;
     }

@@ -9,7 +9,6 @@ Scenario('Verify Claimant Details', async ({I}) => {
 
     let caseNumber = await processCaseToAcceptedState();
     console.log("... case id =>" + caseNumber);
-
     await claimantDetails(I, eventNames.CLAIMANT_DETAILS);
 
 }).tag('@nightly').tag('@RET-BAT').retry(testConfig.TestRetryScenarios);

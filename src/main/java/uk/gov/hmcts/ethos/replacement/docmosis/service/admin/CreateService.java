@@ -16,17 +16,18 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
 
 @Service
 @Slf4j
-@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField", "PMD.UnusedFormalParameter", "PMD.UnusedLocalVariable", "PMD.UnnecessaryLocalBeforeReturn"})
+@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField", "PMD.UnusedFormalParameter",
+    "PMD.UnusedLocalVariable", "PMD.UnnecessaryLocalBeforeReturn"})
 public class CreateService {
 
     public static final String ECM_ADMIN_CASE_TYPE_ID = "ET_Admin";
     public static final String CREATE_EXIST_ERROR_MESSAGE = "ECM Admin already exists.";
 
-        private final CcdClient ccdClient;
+    private final CcdClient ccdClient;
 
-        public CreateService(CcdClient ccdClient) {
-            this.ccdClient = ccdClient;
-        }
+    public CreateService(CcdClient ccdClient) {
+        this.ccdClient = ccdClient;
+    }
 
     public List<String> initCreateAdmin(String userToken) {
         List<String> errors = new ArrayList<>();

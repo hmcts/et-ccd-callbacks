@@ -38,7 +38,6 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationSubject(List.of("Hearing"));
         caseData.setSendNotificationAdditionalInfo("info");
         caseData.setSendNotificationNotify("Both parties");
-        caseData.setSendNotificationAnotherLetter("no");
         caseData.setSendNotificationSelectHearing(null);
         caseData.setSendNotificationCaseManagement("");
         caseData.setSendNotificationResponseTribunal("no");
@@ -62,7 +61,6 @@ class SendNotificationServiceTest {
         assertEquals("Hearing", sendNotificationType.getSendNotificationSubject().get(0));
         assertEquals("info", sendNotificationType.getSendNotificationAdditionalInfo());
         assertEquals("Both parties", sendNotificationType.getSendNotificationNotify());
-        assertEquals("no", sendNotificationType.getSendNotificationAnotherLetter());
         assertNull(sendNotificationType.getSendNotificationSelectHearing());
         assertEquals("", sendNotificationType.getSendNotificationCaseManagement());
         assertEquals("no", sendNotificationType.getSendNotificationResponseTribunal());
@@ -85,7 +83,6 @@ class SendNotificationServiceTest {
         assertNull(caseData.getSendNotificationSubject());
         assertNull(caseData.getSendNotificationAdditionalInfo());
         assertNull(caseData.getSendNotificationNotify());
-        assertNull(caseData.getSendNotificationAnotherLetter());
         assertNull(caseData.getSendNotificationSelectHearing());
         assertNull(caseData.getSendNotificationCaseManagement());
         assertNull(caseData.getSendNotificationResponseTribunal());

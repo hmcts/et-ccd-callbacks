@@ -17,7 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.IN_PROGRESS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 
 @Slf4j
 @Service

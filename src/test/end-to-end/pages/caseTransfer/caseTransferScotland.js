@@ -23,4 +23,7 @@ module.exports = async function () {
     I.click('Transfer Case');
     I.see('Case Transfer: Transferred to Glasgow');
     I.waitForText('has been updated with event: Case Transfer (Scotland)');
+
+    I.click("//div[text()='History']");
+    I.see('Case Transfer (Scotland)');
 };

@@ -17,4 +17,7 @@ module.exports = async function () {
     I.click(commonConfig.submit);
     I.see('Case Transfer: Transferred to ECM');
     I.waitForText('has been updated with event: Case Transfer to ECM');
+
+    I.click("//div[text()='History']");
+    I.see('Case Transfer to ECM');
 };

@@ -24,4 +24,4 @@ Scenario('Verify a Case Transfer for an ECM Case', async ({I}) => {
     console.log("... case id =>" +caseId);
     await caseTransfer(I, eventNames.CASE_TRANSFER_ECM);
 
-}).tag('@RET-BAT').tag('@nightly').tag('SC3').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);

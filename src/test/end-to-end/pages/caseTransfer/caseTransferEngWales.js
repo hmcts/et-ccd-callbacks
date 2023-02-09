@@ -22,4 +22,7 @@ module.exports = async function () {
     I.see('Claimant lives near to the selected Jurisdiction');
     I.click('Transfer Case');
     I.waitForText('has been updated with event: Case Transfer (Eng/Wales)');
+
+    I.click("//div[text()='History']");
+    I.see('Case Transfer (Eng/Wales)');
 };

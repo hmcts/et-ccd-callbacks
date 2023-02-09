@@ -128,7 +128,7 @@ task yarnInstall(type: Exec) {
 
 task yarnAudit(type: Exec,  dependsOn: ':yarnInstall') {
     workingDir '.'
-    commandLine 'yarn', 'audit', '--groups', 'dependencies', '--json', '|', 'grep', 'auditAdvisory', '>', 'yarn-audit-known-issues'
+    commandLine 'yarn', 'npm', 'audit', '--groups', 'dependencies', '--json', '|', 'grep', 'auditAdvisory', '>', 'yarn-audit-known-issues'
 }
 
 task codeceptSmoke(type: Exec, dependsOn: ':yarnInstall') {
@@ -246,6 +246,7 @@ dependencyCheck {
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
     suppressionFile = 'config/owasp/suppressions.xml'
     analyzers.assemblyEnabled = false
+    analyzers.nodeAudit.yarnEnabled = false
 }
 
 repositories {

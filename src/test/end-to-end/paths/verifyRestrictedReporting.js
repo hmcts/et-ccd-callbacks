@@ -13,4 +13,3 @@ Scenario('Verify Restricted Reporting', async ({I}) => {
     await restrictedReporting(I, eventNames.RESTRICTED_REPORTING);
 
 }).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);
-

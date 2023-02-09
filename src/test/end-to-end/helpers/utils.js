@@ -18,7 +18,6 @@ class utilsComponent {
         return currentMonth;
     }
 
-
     static async getCurrentYear() {
         let currentTime = new Date();
         let year = currentTime.getFullYear();
@@ -30,7 +29,9 @@ class utilsComponent {
         let month = currentTime.getMonth() + 1;
         let day = currentTime.getDate();
         let year = currentTime.getFullYear();
-        let presentDay = year + "-" + month + "-" + day;
+        let hour = currentTime.getHours() ;
+        let minutes = currentTime.getMinutes() ;
+        let presentDay = year + "-" + month + "-" + day + "-" + hour + "-" + minutes;
         return presentDay;
     }
 

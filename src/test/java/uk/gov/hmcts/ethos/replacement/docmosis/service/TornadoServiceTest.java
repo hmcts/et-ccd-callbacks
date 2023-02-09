@@ -14,6 +14,9 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.items.ListingTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.ListingType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.OAuth2Configuration;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
@@ -55,6 +58,7 @@ public class TornadoServiceTest {
     private MockHttpURLConnection mockConnection;
     private static final String AUTH_TOKEN = "a-test-auth-token";
     private static final String DOCUMENT_INFO_MARKUP = "<a>some test markup</a>";
+    private OAuth2Configuration oauth2Configuration;
 
     @Before
     public void setUp() throws IOException {
@@ -232,9 +236,25 @@ public class TornadoServiceTest {
     }
 
     private void createUserService() {
-        UserDetails userDetails = HelperTest.getUserDetails();
-        IdamApi idamApi = authorisation -> userDetails;
-        userService = new UserService(idamApi);
+        IdamApi idamApi = new IdamApi() {
+            @Override
+            public UserDetails retrieveUserDetails(String authorisation) {
+                return HelperTest.getUserDetails();
+            }
+
+            @Override
+            public UserDetails getUserByUserId(String authorisation, String userId) {
+                return HelperTest.getUserDetails();
+            }
+
+            @Override
+            public TokenResponse generateOpenIdToken(TokenRequest tokenRequest) {
+                return null;
+            }
+        };
+
+        mockOauth2Configuration();
+        userService = new UserService(idamApi, oauth2Configuration);
     }
 
     private void mockTornadoConnection() throws IOException {
@@ -306,5 +326,13 @@ public class TornadoServiceTest {
     private void verifyDocumentInfo(DocumentInfo documentInfo) {
         assertEquals(DOCUMENT_INFO_MARKUP, documentInfo.getMarkUp());
         assertEquals(SignificantItemType.DOCUMENT.name(), documentInfo.getType());
+    }
+
+    private void mockOauth2Configuration() {
+        oauth2Configuration = mock(OAuth2Configuration.class);
+        when(oauth2Configuration.getClientId()).thenReturn("111");
+        when(oauth2Configuration.getClientSecret()).thenReturn("AAAAA");
+        when(oauth2Configuration.getRedirectUri()).thenReturn("http://localhost:8080/test");
+        when(oauth2Configuration.getClientScope()).thenReturn("roles");
     }
 }

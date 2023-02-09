@@ -73,7 +73,6 @@ module.exports = async function (myHMMCTSOrganisation = false) {
         I.see('Reference');
         I.see('Tester Reference');
         I.see('Occupation');
-        I.see('Occupation');
         I.see('Solicitor');
         I.see('Address');
         I.see('Building and Street');

@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
@@ -13,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator.NoticeOfChangeAnswersPopulationStrategy.BLANK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator.NoticeOfChangeAnswersPopulationStrategy.POPULATE;
 
@@ -37,8 +40,9 @@ public class NoticeOfChangeFieldPopulator {
                                         NoticeOfChangeAnswersPopulationStrategy strategy) {
         Map<String, Object> data = new ConcurrentHashMap<>();
 
-        List<RepresentedTypeRItem> repTypeItem = caseData.getRepCollection();
-        int numElements = repTypeItem.size();
+        List<RespondentSumTypeItem> respondentType = caseData.getRespondentCollection();
+
+        int numElements = respondentType.size();
 
         List<SolicitorRole> solicitorRoles = Arrays.asList(SolicitorRole.values());
 
@@ -46,7 +50,11 @@ public class NoticeOfChangeFieldPopulator {
             SolicitorRole solicitorRole = solicitorRoles.get(i);
 
             Optional<RepresentedTypeRItem> solicitorContainer = i < numElements
-                ? Optional.of(repTypeItem.get(i))
+                ? getRepItem(caseData.getRepCollection(), respondentType.get(i))
+                : Optional.empty();
+
+            Optional<RespondentSumTypeItem> respondent = i < numElements
+                ? Optional.of(respondentType.get(i))
                 : Optional.empty();
 
             OrganisationPolicy organisationPolicy = policyConverter.generate(
@@ -56,7 +64,7 @@ public class NoticeOfChangeFieldPopulator {
             data.put(String.format(SolicitorRole.POLICY_FIELD_TEMPLATE, i), organisationPolicy);
 
             Optional<NoticeOfChangeAnswers> possibleAnswer = populateAnswer(
-                strategy, solicitorContainer
+                strategy, respondent, caseData.getClaimantIndType()
             );
 
             if (possibleAnswer.isPresent()) {
@@ -67,13 +75,22 @@ public class NoticeOfChangeFieldPopulator {
         return data;
     }
 
+    private Optional<RepresentedTypeRItem> getRepItem(List<RepresentedTypeRItem> repCollection,
+                                                      RespondentSumTypeItem respondent) {
+        return emptyIfNull(repCollection).stream()
+            .filter(representedTypeRItem ->
+                representedTypeRItem.getValue().getRespondentId().equals(respondent.getId()))
+            .findFirst();
+    }
+
     private Optional<NoticeOfChangeAnswers> populateAnswer(NoticeOfChangeAnswersPopulationStrategy strategy,
-                                                           Optional<RepresentedTypeRItem> element) {
+                                                           Optional<RespondentSumTypeItem> respondentRepresentative,
+                                                           ClaimantIndType claimant) {
         if (BLANK == strategy) {
             return Optional.of(NoticeOfChangeAnswers.builder().build());
         }
 
-        return element.map(answersConverter::generateForSubmission);
+        return respondentRepresentative.map(rep -> answersConverter.generateForSubmission(rep, claimant));
     }
 
     public enum NoticeOfChangeAnswersPopulationStrategy {

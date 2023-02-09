@@ -5,10 +5,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
-import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
-import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,29 +16,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ContextConfiguration(classes = { NoticeOfChangeAnswersConverter.class })
 class NoticeOfChangeAnswersConverterTest {
     private static final String RESPONDENT_NAME = "Harry Johnson";
-    private static final String RESPONDENT_REP_ID = "1111-2222-3333-1111";
-    private static final String RESPONDENT_REP_NAME = "Legal One";
+    private static final String CLAIMANT_FIRST_NAME = "Mary";
+    private static final String CLAIMANT_LAST_NAME = "Clyde";
 
     @Autowired
     private NoticeOfChangeAnswersConverter noticeOfChangeAnswersConverter;
 
     @Test
     void shouldConvertToNoticeOfChangeAnswer() {
-        Organisation org1 = Organisation.builder().organisationID("ORG1").organisationName("ET Org 1").build();
+        ClaimantIndType claimantIndType = new ClaimantIndType();
+        claimantIndType.setClaimantFirstNames(CLAIMANT_FIRST_NAME);
+        claimantIndType.setClaimantLastName(CLAIMANT_LAST_NAME);
 
-        RepresentedTypeR representedType =
-            RepresentedTypeR.builder()
-                .nameOfRepresentative(RESPONDENT_REP_NAME)
-                .respRepName(RESPONDENT_NAME)
-                .respondentOrganisation(org1).build();
-        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId(RESPONDENT_REP_ID);
-        representedTypeRItem.setValue(representedType);
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME)
+            .build());
 
         NoticeOfChangeAnswers expectedNocAnswer =
-            NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME).build();
+            NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME)
+                .claimantFirstName(CLAIMANT_FIRST_NAME)
+                .claimantLastName(CLAIMANT_LAST_NAME).build();
 
-        assertThat(noticeOfChangeAnswersConverter.generateForSubmission(representedTypeRItem))
+        assertThat(noticeOfChangeAnswersConverter.generateForSubmission(respondentSumTypeItem, claimantIndType))
             .isEqualTo(expectedNocAnswer);
 
     }

@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_OP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_SH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_ST;
@@ -70,6 +70,11 @@ public class Et1VettingService {
         + "<br><pre>Work address &#09&#09&#09 %s</pre><hr>"
         + "<h3>Respondent</h3>"
         + "<pre>Contact address &#09&#09 %s</pre><hr>";
+    private static final String CLAIMANT_AND_RESPONDENT_ADDRESSES_WITHOUT_WORK_ADDRESS = 
+            "<hr><h2>Listing details<hr><h3>Claimant</h3>"
+            + "<pre>Contact address &#09&#09 %s</pre>"
+            + "<hr><h3>Respondent</h3>"
+            + "<pre>Contact address &#09&#09 %s</pre><hr>";
 
     private static final String RESPONDENT_DETAILS = "<h3>Respondent %s</h3>"
         + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
@@ -389,11 +394,19 @@ public class Et1VettingService {
     }
 
     public String getAddressesHtml(CaseData caseData) {
-        return String.format(CLAIMANT_AND_RESPONDENT_ADDRESSES,
-            toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()),
-            toAddressWithTab(caseData.getClaimantWorkAddress().getClaimantWorkAddress()),
-            toAddressWithTab(caseData.getRespondentCollection().get(0).getValue().getRespondentAddress())
-        );
+        if (caseData.getClaimantWorkAddressQuestion() != null
+                && NO.equals(caseData.getClaimantWorkAddressQuestion())) {
+            return String.format(CLAIMANT_AND_RESPONDENT_ADDRESSES,
+                    toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()),
+                    toAddressWithTab(caseData.getClaimantWorkAddress().getClaimantWorkAddress()),
+                    toAddressWithTab(caseData.getRespondentCollection().get(0).getValue().getRespondentAddress()));
+        } else {
+            return String.format(CLAIMANT_AND_RESPONDENT_ADDRESSES_WITHOUT_WORK_ADDRESS,
+                    toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()),
+                    toAddressWithTab(caseData.getRespondentCollection().get(0).getValue().getRespondentAddress())
+            );
+        }
+
     }
 
     /**

@@ -24,8 +24,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelpe
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TornadoDocumentFilter;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,11 +48,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagement
 @Slf4j
 @RequiredArgsConstructor
 @Service("tornadoService")
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.LawOfDemeter", "PMD.AvoidThrowingNullPointerException",
-    "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.GodClass", "PMD.TooManyMethods"})
 public class TornadoService {
     private static final String UNABLE_TO_CONNECT_TO_DOCMOSIS = "Unable to connect to Docmosis: ";
     private static final String OUTPUT_FILE_NAME_PDF = "document.pdf";
+    private static final String RES_TSE_FILE_NAME = "resTse.pdf";
+    private static final String DOCUMENT_NAME = SignificantItemType.DOCUMENT.name();
 
     private final TornadoConnection tornadoConnection;
     private final DocumentManagementService documentManagementService;
@@ -74,7 +77,8 @@ public class TornadoService {
             buildInstruction(conn, caseData, authToken, caseTypeId,
                     correspondenceType, correspondenceScotType, multipleData);
             String documentName = Helper.getDocumentName(correspondenceType, correspondenceScotType);
-            return checkResponseStatus(authToken, conn, documentName, caseTypeId);
+            byte[] bytes = getDocumentByteArray(conn);
+            return createDocumentInfoFromBytes(authToken, bytes, documentName, caseTypeId);
         } catch (IOException e) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, e);
             throw e;
@@ -121,7 +125,8 @@ public class TornadoService {
 
             String documentName = ListingHelper.getListingDocName(listingData);
             buildListingInstruction(conn, listingData, documentName, authToken, caseType);
-            return checkResponseStatus(authToken, conn, documentName, caseType);
+            byte[] bytes = getDocumentByteArray(conn);
+            return createDocumentInfoFromBytes(authToken, bytes, documentName, caseType);
         } catch (IOException e) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, e);
             throw e;
@@ -155,7 +160,8 @@ public class TornadoService {
 
             String documentName = BulkHelper.getScheduleDocName(bulkData.getScheduleDocName());
             buildScheduleInstruction(conn, bulkData);
-            return checkResponseStatus(authToken, conn, documentName, caseTypeId);
+            byte[] bytes = getDocumentByteArray(conn);
+            return createDocumentInfoFromBytes(authToken, bytes, documentName, caseTypeId);
         } catch (IOException e) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, e);
             throw e;
@@ -183,27 +189,32 @@ public class TornadoService {
         }
     }
 
-    private DocumentInfo checkResponseStatus(String authToken, HttpURLConnection conn, String documentName,
-                                             String caseTypeId)
-            throws IOException {
+    private byte[] getDocumentByteArray(HttpURLConnection conn)
+        throws IOException {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             int responseCode = conn.getResponseCode();
             if (responseCode == HTTP_OK) {
-                return createDocument(authToken, conn, documentName, os, caseTypeId);
+                try (InputStream is = conn.getInputStream()) {
+                    return getBytesFromInputStream(os, is);
+                }
             } else {
                 throw new IOException(String.format("Invalid response code %d received from Tornado: %s", responseCode,
-                        conn.getResponseMessage()));
+                    conn.getResponseMessage()));
             }
         }
     }
 
-    private DocumentInfo createDocument(String authToken, HttpURLConnection conn, String documentName,
-                                        ByteArrayOutputStream os, String caseTypeId) throws IOException {
+    /**
+     * Creates a DocumentInfo object from the provided byte array and uploads to dm store.
+     * @param authToken contains the user authentication token
+     * @param bytes byte array representing the document
+     * @param documentName name of the document
+     * @param caseTypeId reference for which casetype the document is being uploaded to
+     * @return DocumentInfo which contains the URL and markup of the uploaded document
+     */
+    public DocumentInfo createDocumentInfoFromBytes(String authToken, byte[] bytes, String documentName,
+                                                     String caseTypeId) {
 
-        byte[] bytes;
-        try (InputStream is = conn.getInputStream()) {
-            bytes = getBytesFromInputStream(os, is);
-        }
         URI documentSelfPath = uploadDocument(documentName, authToken, bytes, caseTypeId);
         log.info("URI documentSelfPath uploaded and created: " + documentSelfPath.toString());
         String downloadUrl = documentManagementService.generateDownloadableURL(documentSelfPath);
@@ -231,7 +242,7 @@ public class TornadoService {
 
     private DocumentInfo generateDocumentInfo(String documentName, URI documentSelfPath, String markupURL) {
         return DocumentInfo.builder()
-                .type(SignificantItemType.DOCUMENT.name())
+                .type(DOCUMENT_NAME)
                 .description(documentName)
                 .markUp(markupURL)
                 .url(ccdGatewayBaseUrl + documentSelfPath.getRawPath() + "/binary")
@@ -253,7 +264,7 @@ public class TornadoService {
      * @param documentName name of the document
      * @return DocumentInfo which contains the URL and markup of the uploaded document
      * @throws IOException if the call to Tornado has failed, an exception will be thrown. This could be due to
-     timeout or maybe a bad gateway.
+    timeout or maybe a bad gateway.
      */
     public DocumentInfo generateEventDocument(CaseData caseData, String userToken, String caseTypeId,
                                               String documentName)
@@ -263,7 +274,8 @@ public class TornadoService {
             dmStoreDocumentName = documentName;
             connection = createConnection();
             buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
-            return checkResponseStatus(userToken, connection, dmStoreDocumentName, caseTypeId);
+            byte[] bytes = getDocumentByteArray(connection);
+            return createDocumentInfoFromBytes(userToken, bytes, dmStoreDocumentName, caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
             throw exception;
@@ -272,9 +284,39 @@ public class TornadoService {
         }
     }
 
+    /**
+     * This method calls the helper method to create the data to be passed through to Tornado and then checks whether
+     * it can reach the service.
+     * @param caseData contains the data needed to generate the PDF
+     * @param caseTypeId reference for which casetype the document is being uploaded to
+     * @param documentName name of the document
+     * @return byte array representing the uploaded document
+     * @throws IOException if the call to Tornado has failed, an exception will be thrown. This could be due to
+    timeout or maybe a bad gateway.
+     */
+    public byte[] generateEventDocumentBytes(CaseData caseData, String caseTypeId, String documentName)
+        throws IOException {
+        HttpURLConnection connection = null;
+        try {
+            dmStoreDocumentName = documentName;
+            connection = createConnection();
+            buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
+            return getDocumentByteArray(connection);
+        } catch (IOException exception) {
+            log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
+            throw exception;
+        } finally {
+            closeConnection(connection);
+        }
+    }
+
+    @SuppressWarnings({"PMD.AvoidThrowingNullPointerException"})
     private void buildDocumentInstruction(HttpURLConnection connection, CaseData caseData, String documentName,
                                           String caseTypeId)
             throws IOException {
+        if (isNullOrEmpty(documentName)) {
+            throw new NullPointerException("Document name cannot be null or empty");
+        }
         String documentContent = getDocumentContent(caseData, documentName, caseTypeId);
 
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream(),
@@ -286,9 +328,6 @@ public class TornadoService {
 
     private String getDocumentContent(CaseData caseData, String documentName, String caseTypeId)
             throws JsonProcessingException {
-        if (isNullOrEmpty(documentName)) {
-            throw new NullPointerException("Document name cannot be null or empty");
-        }
         switch (documentName) {
             case "ET1 Vetting.pdf":
                 return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
@@ -301,8 +340,12 @@ public class TornadoService {
             case "Initial Consideration.pdf" :
                 return InitialConsiderationHelper.getDocumentRequest(
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
+            case RES_TSE_FILE_NAME:
+                return RespondentTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             case "Referral Summary.pdf":
                 return ReferralHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            case "TSE Reply.pdf":
+                return TseHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
             default:
                 throw new IllegalArgumentException("Unexpected document name " + documentName);
         }

@@ -15,6 +15,8 @@ import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -44,6 +46,7 @@ import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalS
 @ContextConfiguration(classes = {CaseConverter.class, NoticeOfChangeFieldPopulator.class, ObjectMapper.class})
 @SuppressWarnings({"PMD.ExcessiveImports"})
 class NocRespondentRepresentativeServiceTest {
+    public static final String CASE_ID_ONE = "723";
     private static final String RESPONDENT_NAME = "Harry Johnson";
     private static final String RESPONDENT_NAME_TWO = "Jane Green";
     private static final String RESPONDENT_NAME_THREE = "Bad Company Inc";
@@ -81,6 +84,8 @@ class NocRespondentRepresentativeServiceTest {
     private static final String RESPONDENT_REP_NAME_NEW = "New Dawn Solicitors";
     private static final String RESPONDENT_REP_ID_NEW = "1111-5555-8888-1113";
     private static final String AUTH_TOKEN = "someToken";
+    public static final String USER_ID_ONE = "891-456";
+    public static final String USER_ID_TWO = "123-456";
     @Autowired
     private ObjectMapper objectMapper;
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
@@ -302,7 +307,7 @@ class NocRespondentRepresentativeServiceTest {
         CaseData caseDataAfter = getCaseDataAfter();
 
         List<ChangeOrganisationRequest> representationChanges =
-            nocRespondentRepresentativeService.getRepresentationChanges(caseDataAfter, caseDataBefore);
+            nocRespondentRepresentativeService.identifyRepresentationChanges(caseDataAfter, caseDataBefore);
 
         assertThat(representationChanges).usingRecursiveComparison()
             .ignoringFields("requestTimestamp")
@@ -509,5 +514,47 @@ class NocRespondentRepresentativeServiceTest {
         representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_THREE);
         caseDataAfter.getRepCollection().add(representedTypeRItem);
         return caseDataAfter;
+    }
+
+    @Test
+    void removeOrganisationRepresentativeAccess() throws IOException {
+        UserDetails mockUser = getMockUser();
+        when(adminUserService.getUserDetails(any())).thenReturn(mockUser);
+        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
+        when(nocCcdService.getCaseAssignments(any(), any())).thenReturn(
+            mockCaseAssignmentData());
+        doNothing().when(nocCcdService).revokeCaseAssignments(any(), any());
+
+        Organisation oldOrganisation =
+            Organisation.builder().organisationID(ORGANISATION_ID_TWO)
+                .organisationName(ET_ORG_2).build();
+
+        Organisation newOrganisation =
+            Organisation.builder().organisationID(ORGANISATION_ID_NEW)
+                .organisationName(ET_ORG_NEW).build();
+
+        ChangeOrganisationRequest changeOrganisationRequest =
+            createChangeOrganisationRequest(newOrganisation, oldOrganisation);
+
+        nocRespondentRepresentativeService
+            .removeOrganisationRepresentativeAccess(CASE_ID_ONE, changeOrganisationRequest);
+
+        verify(nocCcdService, times(1))
+            .revokeCaseAssignments(any(), any());
+    }
+
+    private CaseUserAssignmentData mockCaseAssignmentData() {
+        List<CaseUserAssignment> caseUserAssignments = List.of(CaseUserAssignment.builder().userId(USER_ID_ONE)
+                .organisationId(ET_ORG_2)
+                .caseRole(SOLICITORB)
+                .caseId(CASE_ID_ONE)
+                .build(),
+            CaseUserAssignment.builder().userId(USER_ID_TWO)
+                .organisationId(ET_ORG_2)
+                .caseRole(SOLICITORB)
+                .caseId(CASE_ID_ONE)
+                .build());
+
+        return CaseUserAssignmentData.builder().caseUserAssignments(caseUserAssignments).build();
     }
 }

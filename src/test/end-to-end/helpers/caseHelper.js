@@ -7,8 +7,6 @@ async function acceptCaseEvent(I, caseId, eventName) {
 }
 
 async function rejectCaseEvent(I, caseId, eventName) {
-    await I.authenticateWithIdam(username, password);
-    await I.amOnPage('/case-details/' + caseId);
     await I.chooseNextStep(eventName, 3);
     await I.rejectTheCase();
 }
@@ -48,16 +46,21 @@ async function claimantRespondentDetails(I, eventName) {
     await I.executeRespondentDetails();
 }
 
-async function respondentRepresentative(I, eventName) {
+async function respondentRepresentative(I, eventName, myHMCTSFlag) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(3);
-    await I.executeRespondentRepresentative();
+    await I.executeRespondentRepresentative(myHMCTSFlag);
 }
 
-async function jurisdiction(I, eventName) {
+async function jurisdiction(I, eventName, jurisdictionOutcome) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(2);
-    await I.executeAddAmendJurisdiction();
+    await I.executeAddAmendJurisdiction(jurisdictionOutcome);
+}
+
+async function enterDisposalDateJurisdiction(I, hearingDisposalDate) {
+    await I.wait(2);
+    await I.enterDisposalDate(hearingDisposalDate);
 }
 
 async function closeCase(I, eventName, clerkResponsible, physicalLocation) {
@@ -97,20 +100,20 @@ async function bfActionsOutstanding(I, eventName) {
 
 async function listHearing(I, eventName, jurisdiction) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
-    await I.executeAddAmendHearing(jurisdiction);
+    await I.wait(5);
+    await I.executeListHearing(jurisdiction);
 }
 
 async function allocateHearing(I, eventName, jurisdiction) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
+    await I.wait(5);
     await I.executeAllocateHearing(jurisdiction);
 }
 
-async function hearingDetails(I, eventName) {
+async function hearingDetails(I, eventName, caseDisposed) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
-    await I.executeHearingDetails();
+    await I.wait(5);
+    await I.executeHearingDetails(caseDisposed);
 }
 
 async function updateHearingDetails(I, eventName) {
@@ -200,20 +203,7 @@ async function et3Response(I, eventName) {
 async function et1Vetting(I, eventName) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(3);
-    await I.startet1Vetting();
-    await I.minReqInfoET1Vetting();
-    await I.minReqInfo2ET1Vetting();
-    await I.et1CaseVettingOptions1();
-    await I.caseDetails1ET1Vetting();
-    await I.caseDetails2ET1Vetting();
-    await I.caseDetails3ET1Vetting();
-    await I.caseDetails4ET1Vetting();
-    await I.furtherQET1Vetting();
-    await I.possibleReferal1ET1Vetting();
-    await I.possibleReferal2ET1Vetting();
-    await I.otherFactorsET1Vetting();
-    await I.finalNotesET1Vetting();
-    await I.checkYourAnswersET1Vetting();
+    await I.et1VettingJourney();
 }
 
 async function createAdminReferral(emailAddress, details) {
@@ -293,5 +283,6 @@ module.exports = {
     et3Notification,
     et3Response,
     clickCreateCase,
-    verifyApplicationTabs
+    verifyApplicationTabs,
+    enterDisposalDateJurisdiction
 };

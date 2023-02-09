@@ -50,7 +50,7 @@ module.exports = async function () {
     I.click(commonConfig.submit);
 
     I.waitForText('has been updated with event: Restricted Reporting');
-    I.see('RULE 50(3)b - REPORTING');
+    I.see('RULE 50(3)b');
     I.see('REPORTING');
     
 

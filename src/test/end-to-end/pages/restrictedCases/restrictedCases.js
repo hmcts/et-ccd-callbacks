@@ -28,7 +28,8 @@ module.exports = async function () {
     I.see('Deleted from Physical Register');
     I.see('Yes');
     I.see('No');
-    I.see('Names not for public release (Optional)')
+    I.see('Names not for public release (Optional)');
+
     I.selectOption('#restrictedReporting_dynamicRequestedBy', commonConfig.requestedBy);
     I.click('#restrictedReporting_imposed_Yes');
     I.fillField('#dateCeased-day', '08');
@@ -47,9 +48,12 @@ module.exports = async function () {
     I.waitForText('Restricted Reporting');
     I.see('Case Number');
     I.click(commonConfig.submit);
-    
+
     I.waitForText('has been updated with event: Restricted Reporting');
     I.see('RULE 50(3)b - REPORTING');
+    I.see('REPORTING');
+    
+
     I.click("//div[text()='Restricted Reporting']");
     I.see('Restricted Case');
     I.see('Requested By');

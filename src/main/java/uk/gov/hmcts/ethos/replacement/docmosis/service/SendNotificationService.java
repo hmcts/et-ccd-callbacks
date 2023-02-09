@@ -38,7 +38,6 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationSubject(caseData.getSendNotificationSubject());
         sendNotificationType.setSendNotificationAdditionalInfo(caseData.getSendNotificationAdditionalInfo());
         sendNotificationType.setSendNotificationNotify(caseData.getSendNotificationNotify());
-        sendNotificationType.setSendNotificationAnotherLetter(caseData.getSendNotificationAnotherLetter());
         sendNotificationType.setSendNotificationSelectHearing(caseData.getSendNotificationSelectHearing());
         sendNotificationType.setSendNotificationCaseManagement(caseData.getSendNotificationCaseManagement());
         sendNotificationType.setSendNotificationResponseTribunal(caseData.getSendNotificationResponseTribunal());
@@ -63,7 +62,6 @@ public class SendNotificationService {
         caseData.setSendNotificationSubject(null);
         caseData.setSendNotificationAdditionalInfo(null);
         caseData.setSendNotificationNotify(null);
-        caseData.setSendNotificationAnotherLetter(null);
         caseData.setSendNotificationSelectHearing(null);
         caseData.setSendNotificationCaseManagement(null);
         caseData.setSendNotificationResponseTribunal(null);

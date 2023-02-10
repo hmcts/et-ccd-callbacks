@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.IN_PROGRESS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 
 @Slf4j
@@ -45,7 +45,7 @@ public class TseService {
         application.setDueDate(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
         application.setResponsesCount("0");
         application.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
-        application.setStatus(OPEN_STATE);
+        application.setStatus(IN_PROGRESS);
 
         if (isClaimant) {
             addClaimantData(caseData, application);

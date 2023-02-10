@@ -22,7 +22,7 @@ module.exports = async function () {
     I.fillField('#documentCollection_0_shortDescription', commonConfig.shortDescription);
 
     I.click(commonConfig.continue);
-    I.waitForVisible(commonConfig.submit, testConfig.TestTimeToWaitForText);
+    I.waitForText(commonConfig.submit, testConfig.TestTimeToWaitForText);
     I.see('Upload Document');
     I.see('Case Number:');
     I.click(commonConfig.submit);

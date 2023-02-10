@@ -81,7 +81,7 @@ public class NocNotificationService {
 
         RespondentSumType respondent =
             NocNotificationHelper.getRespondent(callbackRequest, caseData, nocRespondentHelper);
-        String respondentEmail = respondent.getRespondentEmail();
+        String respondentEmail = respondent == null ? null : respondent.getRespondentEmail();
         if (isNullOrEmpty(respondentEmail)) {
             log.warn("Missing respondentEmail");
         } else {

@@ -75,7 +75,12 @@ public class NoticeOfChangeController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        //send emails here
+        try {
+            nocNotificationService.sendNotificationOfChangeEmails(callbackRequest,
+                    callbackRequest.getCaseDetails().getCaseData());
+        } catch (Exception exception) {
+            log.error(exception.getMessage(), exception);
+        }
 
         ChangeOrganisationRequest changeOrganisationRequestField =
             callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField();

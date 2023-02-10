@@ -60,8 +60,7 @@ module.exports = async function (jurisdiction) {
     I.see('Case Number:');
     I.click(commonConfig.submit);
 
-    I.waitForNavigation();
-    I.see('has been updated with event: List Hearing');
+    I.waitForText('has been updated with event: List Hearing', testConfig.TestTimeToWaitForText);
     I.click("//div[text()='Hearings']");
     I.see('Hearing type');
     I.see('Hearing');

@@ -1,3 +1,5 @@
+const caseTransferScotland = require("../pages/caseTransfer/caseTransferScotland");
+
 async function acceptCaseEvent(I, caseId, eventName) {
     await I.wait(5);
     await I.chooseNextStep(eventName, 3);
@@ -14,10 +16,10 @@ async function submittedState(I, caseId) {
     await I.amOnPage('/case-details/' + caseId);
 }
 
-async function caseDetails(I, caseId, eventName, clerkResponsible, physicalLocation, conciliationTrack) {
+async function caseDetails(I, caseId, eventName, clerkResponsible, physicalLocation, suggestedHearingVenue) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(3);
-    await I.amendTheCaseDetails(clerkResponsible, physicalLocation, conciliationTrack);
+    await I.amendTheCaseDetails(clerkResponsible, physicalLocation, suggestedHearingVenue);
 }
 
 async function caseDetailsEvent(I, caseId, eventName, clerkResponsible, currentPosition, physicalLocation, conciliationTrack) {
@@ -129,7 +131,19 @@ async function printHearingLists(I, eventName, jurisdiction) {
 async function caseTransfer(I, eventName) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(2);
-    await I.executeCaseTransfer();
+    switch (eventName){
+        case "Case Transfer (Eng/Wales)":
+            await I.executeCaseTransferEngWales();
+            break;
+        case "Case Transfer (Scotland)":
+            await I.executeCaseTransferScotland();
+            break;
+        case "Case Transfer to ECM":
+            await I.executeCaseTransferECM();
+            break;
+        default:
+            throw new Error("Control arrived at default block");
+    }
 }
 
 async function judgment(I, eventName) {

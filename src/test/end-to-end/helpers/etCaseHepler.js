@@ -183,7 +183,7 @@ async function acceptTheCaseEvent(authToken, serviceToken, case_id) {
         "data": {
             "preAcceptCase": {
                 "caseAccepted": "Yes",
-                "dateAccepted": "2022-07-24"
+                "dateAccepted": "2022-08-18"
             }
         },
         "event": {

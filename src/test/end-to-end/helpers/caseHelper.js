@@ -16,10 +16,10 @@ async function submittedState(I, caseId) {
     await I.amOnPage('/case-details/' + caseId);
 }
 
-async function caseDetails(I, caseId, eventName, clerkResponsible, physicalLocation, conciliationTrack) {
+async function caseDetails(I, caseId, eventName, clerkResponsible, physicalLocation, suggestedHearingVenue) {
     await I.chooseNextStep(eventName, 3);
     await I.wait(3);
-    await I.amendTheCaseDetails(clerkResponsible, physicalLocation, conciliationTrack);
+    await I.amendTheCaseDetails(clerkResponsible, physicalLocation, suggestedHearingVenue);
 }
 
 async function caseDetailsEvent(I, caseId, eventName, clerkResponsible, currentPosition, physicalLocation, conciliationTrack) {

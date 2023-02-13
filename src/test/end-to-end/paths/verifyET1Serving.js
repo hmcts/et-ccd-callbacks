@@ -11,4 +11,4 @@ Scenario('progress application through et1 serving - happy path England and Wale
    console.log("... case id =>" +caseId);
 
     await et1Serving(I,eventNames.ET1_SERVING);
-}).tag('@RET-BAT').tag('@nightly').tag('@pats').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);

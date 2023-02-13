@@ -62,5 +62,5 @@ module.exports =  async function () {
     I.waitForText('Event', testConfig.TestTimeToWaitForText);
     I.see('ET3 notification');
 
-    //Looks like that there is not Document that is Updated on the Documents Section even if the Notification process had a docuent that was uploaded...
+    //Looks like that there is not Document that is Updated on the Documents Section even if the Notification process had a document that was uploaded...
 }

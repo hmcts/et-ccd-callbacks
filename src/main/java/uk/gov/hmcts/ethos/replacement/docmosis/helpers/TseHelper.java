@@ -200,6 +200,72 @@ public final class TseHelper {
         return null;
     }
 
+    public static String createResponseTable(List<TseRespondTypeItem> respondList){
+        AtomicInteger i = new AtomicInteger(1);
+
+        return respondList.stream().map((TseRespondTypeItem response)-> {
+            String RESPONSES_TABLE = "";
+
+            RESPONSES_TABLE+="|Response " + String.valueOf(i.get()) + "\r\n";
+
+            if(response.getValue().getResponse() != null ){
+                RESPONSES_TABLE +=("|Response |" + String.valueOf(response.getValue().getResponse())) + "\r\n";
+            }
+            if(response.getValue().getEnterResponseTitle() != null ){
+                RESPONSES_TABLE +=("|Response title |" + String.valueOf(response.getValue().getEnterResponseTitle()))+ "\r\n";
+            }
+
+            if(response.getValue().getFrom() != null ){
+                RESPONSES_TABLE +=("|From |" + String.valueOf(response.getValue().getFrom()))+ "\r\n";
+            }
+
+            ArrayList<String> links = getDocumentUrls(response);
+            AtomicInteger j = new AtomicInteger(1);
+
+            if (links != null){
+                String linky = links.stream().map(link->{
+                    if(j.get() ==1) {
+                        j.getAndIncrement();
+                        return "|Supporting Material |" + link + "\r\n";
+                    }
+                    return "| |"+link+ "\r\n";
+                }).collect(Collectors.joining(""));
+                RESPONSES_TABLE += linky;
+
+            }
+
+            if(response.getValue().getDate() != null ){
+                RESPONSES_TABLE +=("|Date |" +String.valueOf(response.getValue().getDate()))+ "\r\n";
+            }
+
+            if(response.getValue().getCopyToOtherParty() != null ){
+                RESPONSES_TABLE +=("|Copy to other party |" +String.valueOf(response.getValue().getCopyToOtherParty()))+ "\r\n";
+            }
+            if(response.getValue().getCopyNoGiveDetails() != null ){
+                RESPONSES_TABLE +=("|Copy no give details |" +String.valueOf(response.getValue().getCopyNoGiveDetails()))+ "\r\n";
+            }
+            if(response.getValue().getIsCmoOrRequest() != null ){
+                RESPONSES_TABLE +=("|Case management or order request? |" +String.valueOf(response.getValue().getIsCmoOrRequest())) + "\r\n";
+            }
+            if(response.getValue().getRequestMadeBy() != null ){
+                RESPONSES_TABLE +=("|Request made by |" +String.valueOf(response.getValue().getRequestMadeBy())) + "\r\n";
+            }
+            if(response.getValue().getSelectPartyRespond() != null ){
+                RESPONSES_TABLE +=("|Parties or parties to respond |" +String.valueOf(response.getValue().getSelectPartyRespond())) + "\r\n";
+            }
+            if(response.getValue().getSelectPartyNotify() != null ){
+                RESPONSES_TABLE +=("|Sent to |" +String.valueOf(response.getValue().getSelectPartyNotify())) + "\r\n";
+            }
+            if(response.getValue().getAdditionalInformation() != null ){
+                RESPONSES_TABLE +=("|Additional information |" +String.valueOf(response.getValue().getAdditionalInformation())) + "\r\n";
+            }
+
+            RESPONSES_TABLE +="|  &nbsp;  |   | \r\n";
+            i.getAndIncrement();
+            return RESPONSES_TABLE;
+
+        }).collect(Collectors.joining(""));
+    }
 
     private static final String APPLICATION_DETAILS = "<hr><h3>Application</h3>"
             + "<pre>Applicant               &#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
@@ -228,75 +294,13 @@ public final class TseHelper {
                     + "|--|--|\r\n"+
                     "|Responses |\r\n";
 
-            AtomicInteger i = new AtomicInteger(1);
             List<TseRespondTypeItem> respondList = genericTseApplicationType.getRespondCollection();
 
             if (CollectionUtils.isEmpty(respondList)) {
                 // handle empty list
             }
+            String respondTablesCollection = createResponseTable(respondList);
 
-            String respondTablesCollection = respondList.stream().map((TseRespondTypeItem response)-> {
-                String RESPONSES_TABLE = "";
-
-                RESPONSES_TABLE+="|Response " + String.valueOf(i.get()) + "\r\n";
-
-                if(response.getValue().getResponse() != null ){
-                    RESPONSES_TABLE +=("|Response |" + String.valueOf(response.getValue().getResponse())) + "\r\n";
-                }
-                if(response.getValue().getEnterResponseTitle() != null ){
-                    RESPONSES_TABLE +=("|Response title |" + String.valueOf(response.getValue().getEnterResponseTitle()))+ "\r\n";
-                }
-
-                if(response.getValue().getFrom() != null ){
-                    RESPONSES_TABLE +=("|From |" + String.valueOf(response.getValue().getFrom()))+ "\r\n";
-                }
-
-                ArrayList<String> links = getDocumentUrls(response);
-                            AtomicInteger j = new AtomicInteger(1);
-
-                if (links != null){
-                            String linky = links.stream().map(link->{
-                                    if(j.get() ==1) {
-                                        j.getAndIncrement();
-                                        return "|Supporting Material |" + link + "\r\n";
-                                    }
-                                    return "| |"+link+ "\r\n";
-                            }).collect(Collectors.joining(""));
-                            RESPONSES_TABLE += linky;
-
-                }
-
-                if(response.getValue().getDate() != null ){
-                    RESPONSES_TABLE +=("|Date |" +String.valueOf(response.getValue().getDate()))+ "\r\n";
-                }
-
-                if(response.getValue().getCopyToOtherParty() != null ){
-                    RESPONSES_TABLE +=("|Copy to other party |" +String.valueOf(response.getValue().getCopyToOtherParty()))+ "\r\n";
-                }
-                if(response.getValue().getCopyNoGiveDetails() != null ){
-                    RESPONSES_TABLE +=("|Copy no give details |" +String.valueOf(response.getValue().getCopyNoGiveDetails()))+ "\r\n";
-                }
-                if(response.getValue().getIsCmoOrRequest() != null ){
-                    RESPONSES_TABLE +=("|Case management or order request? |" +String.valueOf(response.getValue().getIsCmoOrRequest())) + "\r\n";
-                }
-                if(response.getValue().getRequestMadeBy() != null ){
-                    RESPONSES_TABLE +=("|Request made by |" +String.valueOf(response.getValue().getRequestMadeBy())) + "\r\n";
-                }
-                if(response.getValue().getSelectPartyRespond() != null ){
-                    RESPONSES_TABLE +=("|Parties or parties to respond |" +String.valueOf(response.getValue().getSelectPartyRespond())) + "\r\n";
-                }
-                if(response.getValue().getSelectPartyNotify() != null ){
-                    RESPONSES_TABLE +=("|Sent to |" +String.valueOf(response.getValue().getSelectPartyNotify())) + "\r\n";
-                }
-                if(response.getValue().getAdditionalInformation() != null ){
-                    RESPONSES_TABLE +=("|Additional information |" +String.valueOf(response.getValue().getAdditionalInformation())) + "\r\n";
-                }
-
-                RESPONSES_TABLE +="|  &nbsp;  |   | \r\n";
-                i.getAndIncrement();
-                return RESPONSES_TABLE;
-
-            }).collect(Collectors.joining(""));
             caseData.setTseApplicationResponsesTable(RESPONSES_TABLE_BEGIN + respondTablesCollection);
 
         }

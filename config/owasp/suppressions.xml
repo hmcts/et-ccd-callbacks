@@ -442,4 +442,18 @@
         <packageUrl regex="true">^pkg:npm/flat@.*$</packageUrl>
         <vulnerabilityName>1089152</vulnerabilityName>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: woodstox-core-6.2.8.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.woodstox/woodstox\-core@.*$</packageUrl>
+        <cpe>cpe:/a:fasterxml:woodstox</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: woodstox-core-6.2.8.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.woodstox/woodstox\-core@.*$</packageUrl>
+        <cve>CVE-2022-40152</cve>
+    </suppress>
 </suppressions>

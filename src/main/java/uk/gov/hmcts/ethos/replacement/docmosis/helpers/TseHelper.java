@@ -203,10 +203,13 @@ public final class TseHelper {
     public static String createResponseTable(List<TseRespondTypeItem> respondList){
         AtomicInteger i = new AtomicInteger(1);
 
-        return respondList.stream().map((TseRespondTypeItem response)-> {
-            String RESPONSES_TABLE = "";
+        String RESPONSES_TABLE_START = "| | |\r\n"
+                + "|--|--|\r\n"+
+                "|Responses |\r\n";
 
-            RESPONSES_TABLE+="|Response " + String.valueOf(i.get()) + "\r\n";
+        String RESPONSE_TABLE_BODY = respondList.stream().map((TseRespondTypeItem response)-> {
+
+            String RESPONSES_TABLE = "|Response " + String.valueOf(i.get()) + "\r\n";
 
             if(response.getValue().getResponse() != null ){
                 RESPONSES_TABLE +=("|Response |" + String.valueOf(response.getValue().getResponse())) + "\r\n";
@@ -265,6 +268,8 @@ public final class TseHelper {
             return RESPONSES_TABLE;
 
         }).collect(Collectors.joining(""));
+
+        return RESPONSES_TABLE_START + RESPONSE_TABLE_BODY;
     }
 
     private static final String APPLICATION_DETAILS = "<hr><h3>Application</h3>"
@@ -279,30 +284,20 @@ public final class TseHelper {
 
     public static void getDataSetViewForSelectedApplication(CaseData caseData) {
 
-        // get the applications
+        // get every application on the case
         List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
         // return null if no applications
         if (CollectionUtils.isEmpty(applications) || getChosenApplication(caseData) == null) {
             return;
         }
-        // get the selected application
+        // get the selected application picked from dropdown
         GenericTseApplicationType genericTseApplicationType = getChosenApplication(caseData);
 
-         // Check if the chosen application has a response collection
+         // if the chosen application has a response collection create a table and set
         if (!CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
-            String RESPONSES_TABLE_BEGIN = "| | |\r\n"
-                    + "|--|--|\r\n"+
-                    "|Responses |\r\n";
-
             List<TseRespondTypeItem> respondList = genericTseApplicationType.getRespondCollection();
-
-            if (CollectionUtils.isEmpty(respondList)) {
-                // handle empty list
-            }
             String respondTablesCollection = createResponseTable(respondList);
-
-            caseData.setTseApplicationResponsesTable(RESPONSES_TABLE_BEGIN + respondTablesCollection);
-
+            caseData.setTseApplicationResponsesTable(respondTablesCollection);
         }
 
         String document = "N/A";

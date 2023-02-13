@@ -180,9 +180,6 @@ public final class TseHelper {
 
 
     public static GenericTseApplicationType getChosenApplication(CaseData caseData) {
-        log.info("begin choose application");
-        log.info("Integer: "+ (caseData.getTseSelectOpenOrClosedApplications().getValue()) );
-        log.info("end choose application");
         return caseData.getGenericTseApplicationCollection()
                 .get(Integer.parseInt(caseData.getTseSelectOpenOrClosedApplications().getValue().getCode()) - 1).getValue();
     }

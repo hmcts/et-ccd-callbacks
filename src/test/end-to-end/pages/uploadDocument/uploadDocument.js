@@ -22,9 +22,9 @@ module.exports = async function () {
     I.fillField('#documentCollection_0_shortDescription', commonConfig.shortDescription);
 
     I.click(commonConfig.continue);
-    I.waitForText(commonConfig.submit, testConfig.TestTimeToWaitForText);
     I.see('Upload Document');
     I.see('Case Number:');
+    I.wait(5); //Hard wait put in as we are having issues with the Submit button loading....
     I.click(commonConfig.submit);
     
     //Wait for Case Details to correctly load

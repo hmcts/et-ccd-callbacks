@@ -6,19 +6,43 @@ const {utilsComponent} = require("../../helpers/utils");
 module.exports = async function (jurisdiction) {
 
     const I = this;
-    I.waitForText(commonConfig.listHearing, testConfig.TestTimeToWaitForText);
-    //await I.click(commonConfig.addNewButton);
-    await I.fillField('#hearingCollection_0_hearingNumber', commonConfig.hearingNumber);
-    await I.selectOption('#hearingCollection_0_Hearing_type', commonConfig.hearingType);
-    await I.click('#hearingCollection_0_hearingFormat-Video');
-    await I.selectOption('#hearingCollection_0_Hearing_venue', jurisdiction);
-    await I.fillField('#hearingCollection_0_hearingEstLengthNum', commonConfig.hearingLength);
-    await I.selectOption('#hearingCollection_0_hearingEstLengthNumType', commonConfig.hearingLengthType);
-    await I.click('//input[@id=\'hearingCollection_0_hearingSitAlone-Sit Alone\']');
-    await I.click('//div[@id=\'hearingCollection_0_hearingDateCollection\']/div/button');
+    I.waitForText('Day', testConfig.TestTimeToWaitForText); //End of the Page Loading Verification Check...
+    I.see(commonConfig.listHearing);
+    I.see('Case Number');
+    I.see('Hearing number');
+    I.see('Hearing type');
+    //I.see('Public or Private? (Optional)');
+    I.see('Hearing Format');
+    I.see('Judicial Mediation (Optional)');
+    I.see('Hearing Venue');
+    I.see('Estimated hearing length');
+    I.see('Days, Hours or Minutes');
+    I.see('Sit Alone or Full Panel');
+    I.see('Sit Alone');
+    I.see('Full Panel');
+    I.see('EQP Stage Hearing (Optional)');
+    I.see('Hearing Notes (Optional)');
+    I.see('Day');
+
+    I.fillField('#hearingCollection_0_hearingNumber', commonConfig.hearingNumber);
+    I.selectOption('#hearingCollection_0_Hearing_type', commonConfig.hearingType); //Can we make this Preliminary Hearing so that the next Optional Field can be input....
+
+    I.click('//input[@value=\'In person\']'); //Using this Locator as the CSS has a Space in the name making the Tests to Fail...
+    I.click('#hearingCollection_0_hearingFormat-Video');
+    I.click('#hearingCollection_0_hearingFormat-Telephone');
+    I.click('#hearingCollection_0_hearingFormat-Hybrid');
+    I.click('#hearingCollection_0_judicialMediation_Yes');
+
+    I.selectOption('#hearingCollection_0_Hearing_venue', jurisdiction);
+    I.fillField('#hearingCollection_0_hearingEstLengthNum', commonConfig.hearingLength);
+    I.selectOption('#hearingCollection_0_hearingEstLengthNumType', commonConfig.hearingLengthType);
+    I.click('//input[@id=\'hearingCollection_0_hearingSitAlone-Sit Alone\']'); //Using this Locator as the CSS has a Space in the name making the Tests to Fail...
+    I.selectOption('#hearingCollection_0_Hearing_stage', '1: Stage 1');
+    I.fillField('#hearingCollection_0_Hearing_notes', 'The hearing should be help as soon as possible....');
+    I.click('//div[@id=\'hearingCollection_0_hearingDateCollection\']/div/button');
 
     const today = new Date();
-    switch(today.getDay()){
+    switch (today.getDay()) {
         case 0: //Sunday
             today.setDate(today.getDate() + 1);
             break;
@@ -27,12 +51,46 @@ module.exports = async function (jurisdiction) {
             break;
         default:
     }
-    await I.fillField('#listedDate-day', today.getDate());
-    await I.fillField('#listedDate-month', today.getMonth() + 1);
-    await I.fillField('#listedDate-year', today.getFullYear());
+    I.fillField('#listedDate-day', today.getDate());
+    I.fillField('#listedDate-month', today.getMonth() + 1);
+    I.fillField('#listedDate-year', today.getFullYear());
 
     I.click(commonConfig.continue);
-    I.wait(2);
+    I.waitForText('List Hearing', testConfig.TestTimeToWaitForText);
+    I.see('Case Number:');
     I.click(commonConfig.submit);
-    await I.waitForEnabled({css: '#next-step'}, testConfig.TestTimeToWaitForText || 5);
+
+    I.waitForText('has been updated with event: List Hearing', testConfig.TestTimeToWaitForText);
+    I.click("//div[text()='Hearings']");
+    I.see('Hearing type');
+    I.see('Hearing');
+    I.see('Hearing Venue');
+    I.see('Leeds');
+    I.click('[alt=\'image\']');
+    I.waitForText('Hearing Format', testConfig.TestTimeToWaitForText);
+    I.see('In person');
+    I.see('Telephone');
+    I.see('Video');
+    I.see('Hybrid');
+    I.see('Judicial Mediation');
+    I.see('Yes');
+    I.see('Hearing Number');
+    I.see('2');
+    I.see('Estimated hearing length');
+    I.see('1');
+    I.see('Days, Hours or Minutes');
+    I.see('Hours');
+    I.see('Sit Alone or Full Panel');
+    I.see('Sit Alone');
+    I.see('EQP Stage Hearing');
+    I.see('Stage 1');
+    I.see('Hearing Notes');
+    I.see('The hearing should be help as soon as possible....');
+    I.see('Day');
+    I.see('Day 1');
+    I.see('Hearing Date');
+    I.see('Hearing Status');
+    I.see('Listed');
+    I.see('Hearing Venue');
+    I.see('Leeds');
 };

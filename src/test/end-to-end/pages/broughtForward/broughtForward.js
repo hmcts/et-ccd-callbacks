@@ -36,4 +36,13 @@ module.exports = async function () {
 
     //Final Confirmation
     I.waitForText('has been updated with event: B/F Action', testConfig.TestTimeToWaitForText);
+    I.click("//div[text()='BF Actions']");
+    I.see('B/F Date');
+    I.click('[alt=\'image\']');
+    I.waitForText('Date/Time', testConfig.TestTimeToWaitForText);
+    I.see('Description');
+    I.see('Enquiry letter issued')
+    I.see('Date Cleared');
+    I.see('Comments');
+    I.see('Automated Testing Notes for BF Action');
 };

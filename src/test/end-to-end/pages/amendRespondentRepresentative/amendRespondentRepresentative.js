@@ -56,8 +56,8 @@ module.exports = async function (myHMMCTSOrganisation = false) {
         I.see('Case Number:');
         I.click(commonConfig.submit);
 
-        I.waitForNavigation();
-        I.see('has been updated with event: Respondent Representative');
+
+        I.waitForText('has been updated with event: Respondent Representative', testConfig.TestTimeToWaitForText);
 
         I.click("//div[text()='Respondent Representative']");
         I.waitForText('Respondent Representative(s)', testConfig.TestTimeToWaitForText);

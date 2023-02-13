@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
@@ -19,12 +20,15 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -173,6 +177,154 @@ public final class TseHelper {
             )
         );
     }
+
+
+    public static GenericTseApplicationType getChosenApplication(CaseData caseData) {
+        log.info("begin choose application");
+        log.info("Integer: "+ (caseData.getTseSelectOpenOrClosedApplications().getValue()) );
+        log.info("end choose application");
+        return caseData.getGenericTseApplicationCollection()
+                .get(Integer.parseInt(caseData.getTseSelectOpenOrClosedApplications().getValue().getCode()) - 1).getValue();
+    }
+
+    public static ArrayList<String> getDocumentUrls(TseRespondTypeItem tseRespondType){
+        if (tseRespondType.getValue().getSupportingMaterial() != null) {
+            Pattern pattern = Pattern.compile("^.+?/documents/");
+
+            ArrayList<String> links = tseRespondType.getValue().getSupportingMaterial().stream()
+                    .map(doc -> {
+                        Matcher matcher = pattern.matcher(doc.getValue().getUploadedDocument().getDocumentBinaryUrl());
+                        String documentLink = matcher.replaceFirst("");
+                        String documentName = doc.getValue().getUploadedDocument().getDocumentFilename();
+                        return String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
+                    }).collect(Collectors.toCollection(ArrayList::new));
+            return links;
+        }
+        return null;
+    }
+
+
+    private static final String APPLICATION_DETAILS = "<hr><h3>Application</h3>"
+            + "<pre>Applicant               &#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
+            + "<br><br>Type of application  &#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp;&nbsp;&nbsp; %s"
+            + "<br><br>Application date     &#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 %s"
+            + "<br><br>What do you want to tell or ask the tribunal? &#09&nbsp;&nbsp;&nbsp; %s"
+            + "<br><br>Supporting material                          &#09&#09&#09&#09&#09&nbsp; %s"
+            + "<br><br>Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? &#09&#09 %s</pre> "
+            + "<br><br>";
+
+
+    public static void getDataSetViewForSelectedApplication(CaseData caseData) {
+
+        // get the applications
+        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
+        // return null if no applications
+        if (CollectionUtils.isEmpty(applications) || getChosenApplication(caseData) == null) {
+            return;
+        }
+        // get the selected application
+        GenericTseApplicationType genericTseApplicationType = getChosenApplication(caseData);
+
+         // Check if the chosen application has a response collection
+        if (!CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
+            String RESPONSES_TABLE_BEGIN = "| | |\r\n"
+                    + "|--|--|\r\n"+
+                    "|Responses |\r\n";
+
+            AtomicInteger i = new AtomicInteger(1);
+            List<TseRespondTypeItem> respondList = genericTseApplicationType.getRespondCollection();
+
+            if (CollectionUtils.isEmpty(respondList)) {
+                // handle empty list
+            }
+
+            String respondTablesCollection = respondList.stream().map((TseRespondTypeItem response)-> {
+                String RESPONSES_TABLE = "";
+
+                RESPONSES_TABLE+="|Response " + String.valueOf(i.get()) + "\r\n";
+
+                if(response.getValue().getResponse() != null ){
+                    RESPONSES_TABLE +=("|Response |" + String.valueOf(response.getValue().getResponse())) + "\r\n";
+                }
+                if(response.getValue().getEnterResponseTitle() != null ){
+                    RESPONSES_TABLE +=("|Response title |" + String.valueOf(response.getValue().getEnterResponseTitle()))+ "\r\n";
+                }
+
+                if(response.getValue().getFrom() != null ){
+                    RESPONSES_TABLE +=("|From |" + String.valueOf(response.getValue().getFrom()))+ "\r\n";
+                }
+
+                ArrayList<String> links = getDocumentUrls(response);
+                            AtomicInteger j = new AtomicInteger(1);
+
+                if (links != null){
+                            String linky = links.stream().map(link->{
+                                    if(j.get() ==1) {
+                                        j.getAndIncrement();
+                                        return "|Supporting Material |" + link + "\r\n";
+                                    }
+                                    return "| |"+link+ "\r\n";
+                            }).collect(Collectors.joining(""));
+                            RESPONSES_TABLE += linky;
+
+                }
+
+                if(response.getValue().getDate() != null ){
+                    RESPONSES_TABLE +=("|Date |" +String.valueOf(response.getValue().getDate()))+ "\r\n";
+                }
+
+                if(response.getValue().getCopyToOtherParty() != null ){
+                    RESPONSES_TABLE +=("|Copy to other party |" +String.valueOf(response.getValue().getCopyToOtherParty()))+ "\r\n";
+                }
+                if(response.getValue().getCopyNoGiveDetails() != null ){
+                    RESPONSES_TABLE +=("|Copy no give details |" +String.valueOf(response.getValue().getCopyNoGiveDetails()))+ "\r\n";
+                }
+                if(response.getValue().getIsCmoOrRequest() != null ){
+                    RESPONSES_TABLE +=("|Case management or order request? |" +String.valueOf(response.getValue().getIsCmoOrRequest())) + "\r\n";
+                }
+                if(response.getValue().getRequestMadeBy() != null ){
+                    RESPONSES_TABLE +=("|Request made by |" +String.valueOf(response.getValue().getRequestMadeBy())) + "\r\n";
+                }
+                if(response.getValue().getSelectPartyRespond() != null ){
+                    RESPONSES_TABLE +=("|Parties or parties to respond |" +String.valueOf(response.getValue().getSelectPartyRespond())) + "\r\n";
+                }
+                if(response.getValue().getSelectPartyNotify() != null ){
+                    RESPONSES_TABLE +=("|Sent to |" +String.valueOf(response.getValue().getSelectPartyNotify())) + "\r\n";
+                }
+                if(response.getValue().getAdditionalInformation() != null ){
+                    RESPONSES_TABLE +=("|Additional information |" +String.valueOf(response.getValue().getAdditionalInformation())) + "\r\n";
+                }
+
+                RESPONSES_TABLE +="|  &nbsp;  |   | \r\n";
+                i.getAndIncrement();
+                return RESPONSES_TABLE;
+
+            }).collect(Collectors.joining(""));
+            caseData.setTseApplicationResponsesTable(RESPONSES_TABLE_BEGIN + respondTablesCollection);
+
+        }
+
+        String document = "N/A";
+
+        if (genericTseApplicationType.getDocumentUpload() != null) {
+            Pattern pattern = Pattern.compile("^.+?/documents/");
+            Matcher matcher = pattern.matcher(genericTseApplicationType.getDocumentUpload().getDocumentBinaryUrl());
+            String documentLink = matcher.replaceFirst("");
+            String documentName = genericTseApplicationType.getDocumentUpload().getDocumentFilename();
+            document = String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
+        }
+        caseData.setTseApplicationSummary(String.format(
+                APPLICATION_DETAILS,
+                "Applicant",
+                genericTseApplicationType.getType(),
+                genericTseApplicationType.getDate(),
+                isNullOrEmpty(genericTseApplicationType.getDetails()) ? "N/A" : genericTseApplicationType.getDetails(),
+                document,
+                genericTseApplicationType.getCopyToOtherPartyYesOrNo()
+        ));
+
+    }
+
 
     /**
      * Saves the data on the reply page onto the application object.

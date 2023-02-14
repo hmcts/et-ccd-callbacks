@@ -14,28 +14,29 @@ module.exports = async function () {
 
     I.click('Add new');
     I.waitForText('Case documentation', testConfig.TestTimeToWaitForText);
-    I.see('Type of Document (Optional)'); 
+    I.see('Type of Document (Optional)');
     I.see('Document (Optional)');
     I.see('Short Description (Optional)');
-    I.selectOption('Type of Document (Optional)', 'ET1');    
+    I.selectOption('Type of Document (Optional)', 'ET1');
     I.attachFile('#documentCollection_0_uploadedDocument', 'data/fileUpload.txt');
     I.fillField('#documentCollection_0_shortDescription', commonConfig.shortDescription);
+    I.forceClick('//button[contains(text(),\'Continue\')]');
 
-    I.click(commonConfig.continue);
-    I.see('Upload Document');
+    I.waitForInvisible('.spinner-container', testConfig.TestTimeToWaitForText);
+    I.waitForText('Upload Document', testConfig.TestTimeToWaitForText);
     I.see('Case Number:');
-    I.wait(5); //Hard wait put in as we are having issues with the Submit button loading....
     I.click(commonConfig.submit);
-    
+
     //Wait for Case Details to correctly load
+    I.waitForInvisible('.spinner-container', testConfig.TestTimeToWaitForText);
     I.waitForElement('#case-viewer-control-print', testConfig.TestTimeToWaitForText);
     I.see('has been updated with event: Upload Document');
-    
+
     //Document Upload Confirmation
     I.click("//div[text()='Documents']");
-    I.waitForText('Case documentation 1', testConfig.TestTimeToWaitForText);
+    I.waitForText('Upload Document Check', testConfig.TestTimeToWaitForText);
+    I.see('Case documentation 1', testConfig.TestTimeToWaitForText);
     I.see('Document');
     I.see('fileUpload.txt');
     I.see('Short Description');
-    I.see('Upload Document Check');
 };

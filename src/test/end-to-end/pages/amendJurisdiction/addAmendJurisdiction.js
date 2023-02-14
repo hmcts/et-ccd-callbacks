@@ -5,6 +5,7 @@ const testConfig = require("../../../config");
 module.exports = async function (jurisdictionOutcome) {
 
     const I = this;
+    I.waitForText('Jurisdiction',5);
     await I.click(commonConfig.addNewButton);
     I.waitForText(commonConfig.jurisdictionCode, testConfig.TestTimeToWaitForText);
     await I.selectOption('#jurCodesCollection_0_juridictionCodesList', commonConfig.jurisdictionCode);

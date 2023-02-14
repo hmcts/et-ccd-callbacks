@@ -16,11 +16,15 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
 
 @Slf4j
 class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
@@ -28,6 +32,7 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
     private static final String ABOUT_TO_START_URL = "/tseAdmin/aboutToStart";
     private static final String MID_DETAILS_TABLE = "/tseAdmin/midDetailsTable";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmin/aboutToSubmit";
+    private static final String ABOUT_TO_SUBMIT_CLOSE_APP_URL = "/tseAdmin/aboutToSubmitCloseApplication";
 
     private static final String APPLICATION_CODE = "1";
     private static final String APPLICATION_LABEL = "1 - Amend response";
@@ -36,11 +41,13 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
 
     @BeforeAll
     public void setUpCaseData() {
-        CaseData caseData = new CaseData();
-        caseData.setEthosCaseReference("testCaseReference");
-        caseData.setResTseSelectApplication("Amend response");
-        caseData.setResTseCopyToOtherPartyYesOrNo("I do not want to copy");
-        caseData.setClaimant("claimant");
+        CaseData caseData = CaseDataBuilder.builder()
+            .withEthosCaseReference("testCaseReference")
+            .withClaimant("claimant")
+            .build();
+
+        caseData.setResTseSelectApplication(TSE_APP_AMEND_RESPONSE);
+        caseData.setResTseCopyToOtherPartyYesOrNo(NO);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
         caseData.setGenericTseApplicationCollection(createApplicationCollection());
         caseData.setTseAdminSelectApplication(
@@ -103,6 +110,20 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
             .header(new Header(AUTHORIZATION, userToken))
             .body(ccdRequest)
             .post("/tseAdmin/submitted")
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log()
+            .all(true);
+    }
+
+    @Test
+    void aboutToSubmitCloseApplicationSuccessResponse() {
+        RestAssured.given()
+            .spec(spec)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(ccdRequest)
+            .post(ABOUT_TO_SUBMIT_CLOSE_APP_URL)
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log()

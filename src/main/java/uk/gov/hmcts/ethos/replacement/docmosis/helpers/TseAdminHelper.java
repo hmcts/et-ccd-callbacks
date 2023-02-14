@@ -7,8 +7,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
+
 public final class TseAdminHelper {
-    public static final String CLOSED = "Closed";
 
     private TseAdminHelper() {
         // Sonar Lint: Utility classes should not have public constructors
@@ -24,7 +25,7 @@ public final class TseAdminHelper {
         }
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
-            .filter(r -> r.getValue().getStatus() != null && !CLOSED.equals(r.getValue().getStatus()))
+            .filter(r -> r.getValue().getStatus() != null && !CLOSED_STATE.equals(r.getValue().getStatus()))
             .map(r -> DynamicValueType.create(r.getValue().getNumber(),
                 r.getValue().getNumber() + " " + r.getValue().getType())
             )

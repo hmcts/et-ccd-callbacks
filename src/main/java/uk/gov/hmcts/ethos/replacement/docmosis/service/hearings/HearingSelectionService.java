@@ -17,6 +17,35 @@ import java.util.List;
 @Service
 public class HearingSelectionService {
 
+    public List<DynamicValueType> getHearingSelection(CaseData caseData, String format) {
+        List<DynamicValueType> values = new ArrayList<>();
+        int index = 1;
+
+        if (CollectionUtils.isNotEmpty(caseData.getHearingCollection())) {
+            for (HearingTypeItem hearing : caseData.getHearingCollection()) {
+                HearingType hearingValue = hearing.getValue();
+                for (DateListedTypeItem listing : hearingValue.getHearingDateCollection()) {
+                    String code = listing.getId();
+
+                    DynamicFixedListType hearingVenue = hearingValue.getHearingVenue();
+
+                    String venue = hearingVenue == null ? hearingValue.getHearingVenueScotland() :
+                        hearingVenue.getValue().getLabel();
+
+                    String date = UtilHelper.formatLocalDateTime(listing.getValue().getListedDate());
+                    String label = String.format(format,
+                            index,
+                            hearingValue.getHearingType(),
+                            venue,
+                            date);
+                    values.add(DynamicValueType.create(code, label));
+                    index++;
+                }
+            }
+        }
+        return values;
+    }
+
     public List<DynamicValueType> getHearingSelection(CaseData caseData) {
         List<DynamicValueType> values = new ArrayList<>();
 

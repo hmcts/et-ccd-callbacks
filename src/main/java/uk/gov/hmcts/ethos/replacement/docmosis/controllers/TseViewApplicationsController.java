@@ -72,7 +72,7 @@ public class TseViewApplicationsController {
          }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setTseSelectOpenOrClosedApplications(TseHelper.populateOpenOrClosedApplications(caseData));
+        caseData.setTseViewApplicationSelect(TseHelper.populateOpenOrClosedApplications(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

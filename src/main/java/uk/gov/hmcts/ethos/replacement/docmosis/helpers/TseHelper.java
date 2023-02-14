@@ -118,7 +118,7 @@ public final class TseHelper {
             return null;
         }
 
-        String selectedOpenOrClosed = caseData.getViewRespondentTSEApplicationsOpenClosed();
+        String selectedOpenOrClosed = caseData.getTseViewApplicationOpenOrClosed();
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
                 .filter(o -> o.getValue().getStatus().equals(selectedOpenOrClosed))

@@ -24,6 +24,7 @@ module.exports = async function () {
     I.click(commonConfig.continue);
     I.see('Upload Document');
     I.see('Case Number:');
+    I.wait(5); //Hard wait put in as we are having issues with the Submit button loading....
     I.click(commonConfig.submit);
     
     //Wait for Case Details to correctly load

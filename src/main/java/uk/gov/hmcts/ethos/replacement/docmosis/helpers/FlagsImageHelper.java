@@ -46,7 +46,6 @@ public class FlagsImageHelper {
     private static final String COLOR_SLATE_GRAY = "SlateGray";
     private static final String COLOR_DARK_SLATE_BLUE = "DarkSlateBlue";
     private static final String FLAG_REASONABLE_ADJUSTMENT = "REASONABLE ADJUSTMENT";
-    //private static final String FLAG_WELSH_LANGUAGE = "Cymraeg";
 
     private FlagsImageHelper() {
     }
@@ -70,7 +69,6 @@ public class FlagsImageHelper {
         setFlagImageFor(FLAG_ECC, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
         setFlagImageFor(FLAG_DIGITAL_FILE, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
         setFlagImageFor(FLAG_REASONABLE_ADJUSTMENT, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
-        //setFlagImageFor(FLAG_WELSH_LANGUAGE, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
         flagsImageFileName.append(IMAGE_FILE_EXTENSION);
 
         caseData.setFlagsImageAltText(flagsImageAltText.toString());
@@ -123,10 +121,6 @@ public class FlagsImageHelper {
                 flagRequired = reasonableAdjustment(caseData);
                 flagColor = COLOR_DARK_SLATE_BLUE;
                 break;
-            //            case FLAG_WELSH_LANGUAGE:
-            //                flagRequired = welshColor(caseData);
-            //                flagColor = COLOR_RED;
-            //                break;
             default:
                 flagRequired = false;
                 flagColor = COLOR_WHITE;
@@ -233,12 +227,6 @@ public class FlagsImageHelper {
         } else {
             return false;
         }
-    }
-
-    private static boolean welshColor(CaseData caseData) {
-        return caseData.getClaimantHearingPreference() != null
-                && (YES.equals(caseData.getClaimantHearingPreference().getContactLanguage())
-                || YES.equals(caseData.getClaimantHearingPreference().getHearingLanguage()));
     }
 
     private static boolean digitalFile(CaseData caseData) {

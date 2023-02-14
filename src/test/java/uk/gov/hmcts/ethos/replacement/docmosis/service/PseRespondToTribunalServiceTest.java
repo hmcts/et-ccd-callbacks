@@ -44,6 +44,11 @@ class PseRespondToTribunalServiceTest {
     private static final String RESPONSE = "Some Response";
 
     private static final String RULE92_NO_DETAILS = "Rule 92 Reasons";
+    private static final String SUBMITTED_BODY = "### What happens next\r\n\r\n"
+        + "%s"
+        + "The tribunal will consider all correspondence and let you know what happens next.";
+    private static final String RULE92_ANSWERED_YES =
+            "You have responded to the tribunal and copied your response to the other party.\r\n\r\n";
 
     @BeforeEach
     void setUp() {
@@ -253,12 +258,47 @@ class PseRespondToTribunalServiceTest {
 
         pseRespondToTribService.clearRespondentResponse(caseData);
 
-        assertNull(caseData.getPseRespondentSelectOrderOrRequest());
         assertNull(caseData.getPseRespondentOrdReqTableMarkUp());
         assertNull(caseData.getPseRespondentOrdReqResponseText());
         assertNull(caseData.getPseRespondentOrdReqHasSupportingMaterial());
         assertNull(caseData.getPseRespondentOrdReqUploadDocument());
         assertNull(caseData.getPseRespondentOrdReqCopyToOtherParty());
         assertNull(caseData.getPseRespondentOrdReqCopyNoGiveDetails());
+    }
+
+    @Test
+    void getSubmittedBody_NoCopy() {
+        DynamicFixedListType newType = new DynamicFixedListType("1");
+        caseData.setPseRespondentSelectOrderOrRequest(newType);
+
+        caseData.setSendNotificationCollection(List.of(
+                SendNotificationTypeItem.builder().id(UUID.randomUUID().toString()).value(
+                        SendNotificationType.builder().number("1").respondCollection(
+                                        List.of(PseResponseTypeItem.builder().value(
+                                                PseResponseType.builder().copyToOtherParty(NO).build()
+                                        ).build()))
+                                .build()).build()));
+
+        String actual = pseRespondToTribService.getSubmittedBody(caseData);
+
+        assertEquals(actual, String.format(SUBMITTED_BODY, ""));
+    }
+
+    @Test
+    void getSubmittedBody_YesCopy() {
+        DynamicFixedListType newType = new DynamicFixedListType("1");
+        caseData.setPseRespondentSelectOrderOrRequest(newType);
+
+        caseData.setSendNotificationCollection(List.of(
+                SendNotificationTypeItem.builder().id(UUID.randomUUID().toString()).value(
+                        SendNotificationType.builder().number("1").respondCollection(
+                                        List.of(PseResponseTypeItem.builder().value(
+                                                PseResponseType.builder().copyToOtherParty(YES).build()
+                                        ).build()))
+                                .build()).build()));
+
+        String actual = pseRespondToTribService.getSubmittedBody(caseData);
+
+        assertEquals(actual, String.format(SUBMITTED_BODY, RULE92_ANSWERED_YES));
     }
 }

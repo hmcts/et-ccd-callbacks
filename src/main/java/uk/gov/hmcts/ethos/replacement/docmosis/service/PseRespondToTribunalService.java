@@ -107,7 +107,6 @@ public class PseRespondToTribunalService {
      * @param caseData contains all the case data
      */
     public void clearRespondentResponse(CaseData caseData) {
-        caseData.setPseRespondentSelectOrderOrRequest(null);
         caseData.setPseRespondentOrdReqTableMarkUp(null);
         caseData.setPseRespondentOrdReqResponseText(null);
         caseData.setPseRespondentOrdReqHasSupportingMaterial(null);
@@ -122,25 +121,15 @@ public class PseRespondToTribunalService {
      * @return Submitted Body String
      */
     public String getSubmittedBody(CaseData caseData) {
-        // TODO: RET-2960
-        /*
-        List<PseResponseTypeItem> pseRespondentResponseCollection =
-            caseData.getPseOrdReqResponses().stream()
-                .filter(o -> RESPONDENT_TITLE.equals(o.getValue().getFrom()))
-                .collect(Collectors.toList());
+        SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
+        if (sendNotificationType == null || CollectionUtils.isEmpty(sendNotificationType.getRespondCollection())) {
+            return SUBMITTED_BODY;
+        }
 
-        PseResponseType latestRespondentResponse =
-            pseRespondentResponseCollection.get(pseRespondentResponseCollection.size() - 1).getValue();
+        List<PseResponseTypeItem> respondCollection = sendNotificationType.getRespondCollection();
 
-        return String.format(
-            SUBMITTED_BODY,
-            YES.equals(latestRespondentResponse.getCopyToOtherParty()) ? RULE92_ANSWERED_YES : ""
-        );
-         */
-        return String.format(
-            SUBMITTED_BODY,
-            "TODO: RET-2960"
-        );
+        PseResponseType response = respondCollection.get(respondCollection.size() - 1).getValue();
+        return String.format(SUBMITTED_BODY, YES.equals(response.getCopyToOtherParty()) ? RULE92_ANSWERED_YES : "");
     }
 
 }

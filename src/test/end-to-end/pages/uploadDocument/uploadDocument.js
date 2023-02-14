@@ -20,11 +20,11 @@ module.exports = async function () {
     I.selectOption('Type of Document (Optional)', 'ET1');
     I.attachFile('#documentCollection_0_uploadedDocument', 'data/fileUpload.txt');
     I.fillField('#documentCollection_0_shortDescription', commonConfig.shortDescription);
+    I.click('//button[contains(text(),\'Continue\')]');
 
-    I.click(commonConfig.continue);
+
     I.waitForText('Upload Document', testConfig.TestTimeToWaitForText);
     I.see('Case Number:');
-    I.wait(5); //Hard wait put in as we are having issues with the Submit button loading....
     I.click(commonConfig.submit);
 
     //Wait for Case Details to correctly load

@@ -22,20 +22,21 @@ module.exports = async function () {
     I.fillField('#documentCollection_0_shortDescription', commonConfig.shortDescription);
     I.click('//button[contains(text(),\'Continue\')]');
 
-
+    I.waitForInvisible('.spinner-container', testConfig.TestTimeToWaitForText);
     I.waitForText('Upload Document', testConfig.TestTimeToWaitForText);
     I.see('Case Number:');
     I.click(commonConfig.submit);
 
     //Wait for Case Details to correctly load
+    I.waitForInvisible('.spinner-container', testConfig.TestTimeToWaitForText);
     I.waitForElement('#case-viewer-control-print', testConfig.TestTimeToWaitForText);
     I.see('has been updated with event: Upload Document');
 
     //Document Upload Confirmation
     I.click("//div[text()='Documents']");
-    I.waitForText('Case documentation 1', testConfig.TestTimeToWaitForText);
+    I.waitForText('Upload Document Check', testConfig.TestTimeToWaitForText);
+    I.see('Case documentation 1', testConfig.TestTimeToWaitForText);
     I.see('Document');
     I.see('fileUpload.txt');
     I.see('Short Description');
-    I.see('Upload Document Check');
 };

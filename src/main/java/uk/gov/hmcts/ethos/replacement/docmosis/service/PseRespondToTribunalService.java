@@ -7,62 +7,65 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.PseResponseItem;
+import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatLegalRepReply;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatOrdReqDetails;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelectedSendNotificationTypeItem;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PseRespondToTribunalService {
 
-    private static final String TODO_ISSUE_REQUEST_ORDER = "[ToDo: Dependency on RET-2949]";
-    private static final String TODO_RESPONSE = "[ToDo: Dependency on RET-2928]";
-
-    private static final String APP_DETAILS = "|Hearing, case management order or request | |\r\n"
-        + "|--|--|\r\n"
-        + "|Notification | %s|\r\n"
-        + "|Hearing | %s|\r\n"
-        + "|Date sent | %s|\r\n"
-        + "|Sent by | %s|\r\n"
-        + "|Case management order or request? | %s|\r\n"
-        + "|Response due | %s|\r\n"
-        + "|Party or parties to respond | %s|\r\n"
-        + "|Additional information | %s|\r\n"
-        + "|Description | %s|\r\n"
-        + "|Document | %s|\r\n"
-        + "|Case management order made by | %s|\r\n"
-        + "|Name | %s|\r\n"
-        + "|Sent to | %s|\r\n"
-        + "\r\n"
-        + "\r\n";
-
-    private static final String RESPONSE_DETAILS = "|Response %s | |\r\n"
-        + "|--|--|\r\n"
-        + "|Response from | %s|\r\n"
-        + "|Response date | %s|\r\n"
-        + "|What's your response to the tribunal? | %s|\r\n"
-        + "|Supporting material | %s|\r\n"
-        + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
-        + "\r\n";
     private static final String GIVE_MISSING_DETAIL =
         "Use the text box or supporting materials to give details.";
+
+    private static final String SUBMITTED_BODY = "### What happens next\r\n\r\n"
+        + "%s"
+        + "The tribunal will consider all correspondence and let you know what happens next.";
+
+    private static final String RULE92_ANSWERED_YES =
+        "You have responded to the tribunal and copied your response to the other party.\r\n\r\n";
 
     /**
      * Initial Application and Respond details table.
      * @param caseData contains all the case data
      */
     public String initialOrdReqDetailsTableMarkUp(CaseData caseData) {
-        return initialOrdReqDetails() + responses();
+        SendNotificationType sendNotificationType =
+            getSelectedSendNotificationTypeItem(caseData).getValue();
+        return formatOrdReqDetails(sendNotificationType)
+            + initialRespondDetails(sendNotificationType);
     }
 
+    private String initialRespondDetails(SendNotificationType sendNotificationType) {
+        if (CollectionUtils.isEmpty(sendNotificationType.getRespondCollection())) {
+            return "";
+        }
+        IntWrapper respondCount = new IntWrapper(0);
+        return sendNotificationType.getRespondCollection().stream()
+            .map(r -> formatLegalRepReply(r.getValue(), respondCount.incrementAndReturnValue()))
+            .collect(Collectors.joining(""));
+    }
+
+    /**
+     * Validate user input.
+     * @param caseData contains all the case data
+     * @return Error Message List
+     */
     public List<String> validateInput(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         if (StringUtils.isEmpty(caseData.getPseRespondentOrdReqResponseText())
@@ -78,12 +81,13 @@ public class PseRespondToTribunalService {
      * @param caseData contains all the case data
      */
     public void addRespondentResponseToJON(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getPseOrdReqResponses())) {
-            caseData.setPseOrdReqResponses(new ArrayList<>());
+        SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
+        if (CollectionUtils.isEmpty(sendNotificationType.getRespondCollection())) {
+            sendNotificationType.setRespondCollection(new ArrayList<>());
         }
 
-        caseData.getPseOrdReqResponses().add(
-            PseResponseItem.builder()
+        sendNotificationType.getRespondCollection().add(
+            PseResponseTypeItem.builder()
                 .id(UUID.randomUUID().toString())
                 .value(
                     PseResponseType.builder()
@@ -112,34 +116,31 @@ public class PseRespondToTribunalService {
         caseData.setPseRespondentOrdReqCopyNoGiveDetails(null);
     }
 
-    private String initialOrdReqDetails() {
+    /**
+     * Generate Submitted Body String.
+     * @param caseData contains all the case data
+     * @return Submitted Body String
+     */
+    public String getSubmittedBody(CaseData caseData) {
+        // TODO: RET-2960
+        /*
+        List<PseResponseTypeItem> pseRespondentResponseCollection =
+            caseData.getPseOrdReqResponses().stream()
+                .filter(o -> RESPONDENT_TITLE.equals(o.getValue().getFrom()))
+                .collect(Collectors.toList());
+
+        PseResponseType latestRespondentResponse =
+            pseRespondentResponseCollection.get(pseRespondentResponseCollection.size() - 1).getValue();
+
         return String.format(
-            APP_DETAILS,
-            TODO_ISSUE_REQUEST_ORDER,
-            TODO_ISSUE_REQUEST_ORDER,
-            TODO_ISSUE_REQUEST_ORDER,
-            TODO_ISSUE_REQUEST_ORDER,
-            TODO_ISSUE_REQUEST_ORDER,
-            TODO_ISSUE_REQUEST_ORDER,
-            TODO_ISSUE_REQUEST_ORDER,
-            TODO_ISSUE_REQUEST_ORDER,
-            TODO_ISSUE_REQUEST_ORDER,
-            TODO_ISSUE_REQUEST_ORDER,
-            TODO_ISSUE_REQUEST_ORDER,
-            TODO_ISSUE_REQUEST_ORDER,
-            TODO_ISSUE_REQUEST_ORDER
+            SUBMITTED_BODY,
+            YES.equals(latestRespondentResponse.getCopyToOtherParty()) ? RULE92_ANSWERED_YES : ""
+        );
+         */
+        return String.format(
+            SUBMITTED_BODY,
+            "TODO: RET-2960"
         );
     }
 
-    private String responses() {
-        return String.format(
-            RESPONSE_DETAILS,
-            TODO_RESPONSE,
-            TODO_RESPONSE,
-            TODO_RESPONSE,
-            TODO_RESPONSE,
-            TODO_RESPONSE,
-            TODO_RESPONSE
-        );
-    }
 }

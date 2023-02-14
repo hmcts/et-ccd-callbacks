@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.PseResponseItem;
+import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
 
@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_CONFIRM_I_WANT_TO_COPY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 
 @Slf4j
@@ -115,12 +115,12 @@ class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
             .all(true);
     }
 
-    private List<PseResponseItem> createResponseCollection() {
+    private List<PseResponseTypeItem> createResponseCollection() {
         PseResponseType pseRespondentReply = new PseResponseType();
         pseRespondentReply.setFrom(RESPONDENT_TITLE);
-        pseRespondentReply.setCopyToOtherParty(I_CONFIRM_I_WANT_TO_COPY);
+        pseRespondentReply.setCopyToOtherParty(YES);
 
-        PseResponseItem pseResponseItem = new PseResponseItem();
+        PseResponseTypeItem pseResponseItem = new PseResponseTypeItem();
         pseResponseItem.setId(UUID.randomUUID().toString());
         pseResponseItem.setValue(pseRespondentReply);
 

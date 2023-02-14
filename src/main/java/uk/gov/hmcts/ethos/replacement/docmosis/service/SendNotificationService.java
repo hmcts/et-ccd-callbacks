@@ -3,13 +3,16 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -32,6 +35,8 @@ public class SendNotificationService {
             caseData.setSendNotificationCollection(new ArrayList<>());
         }
         SendNotificationType sendNotificationType = new SendNotificationType();
+        sendNotificationType.setNumber(String.valueOf(getNextNotificationNumber(caseData)));
+        sendNotificationType.setDate(UtilHelper.formatCurrentDate(LocalDate.now()));
         sendNotificationType.setSendNotificationTitle(caseData.getSendNotificationTitle());
         sendNotificationType.setSendNotificationLetter(caseData.getSendNotificationLetter());
         sendNotificationType.setSendNotificationUploadDocument(caseData.getSendNotificationUploadDocument());
@@ -53,6 +58,13 @@ public class SendNotificationService {
         sendNotificationTypeItem.setValue(sendNotificationType);
         caseData.getSendNotificationCollection().add(sendNotificationTypeItem);
 
+    }
+
+    private static int getNextNotificationNumber(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getSendNotificationCollection())) {
+            return 1;
+        }
+        return caseData.getSendNotificationCollection().size() + 1;
     }
 
     public void clearSendNotificationFields(CaseData caseData) {

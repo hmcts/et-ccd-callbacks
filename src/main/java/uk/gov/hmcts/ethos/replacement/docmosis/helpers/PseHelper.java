@@ -5,12 +5,48 @@ import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
+
 @Slf4j
 public final class PseHelper {
-    public static final String CLOSED = "Closed";
+
+    private static final String ORDER_APP_MARKUP = "|Hearing, case management order or request | |\r\n"
+        + "|--|--|\r\n"
+        + "|Notification | %s|\r\n"
+        + "|Hearing | %s|\r\n"
+        + "|Date sent | %s|\r\n"
+        + "|Sent by | Tribunal|\r\n"
+        + "|Case management order or request? | %s|\r\n"
+        + "|Response due | %s|\r\n"
+        + "|Party or parties to respond | %s|\r\n"
+        + "|Additional information | %s|\r\n"
+        + "%s" // APP_DETAILS_DOC
+        + "|%s made by | %s|\r\n" // Case management order / Request
+        + "|Name | %s|\r\n"
+        + "|Sent to | %s|\r\n"
+        + "\r\n"
+        + "\r\n";
+
+    private static final String ORDER_APP_DOC_MARKUP = "|Description | %s|\r\n"
+        + "|Document | <a href=\"/documents/%s\" target=\"_blank\">%s</a>|\r\n";
+
+    private static final String LEGAL_REP_REPLY_MARKUP = "|Response %s | |\r\n"
+        + "|--|--|\r\n"
+        + "|Response from | %s|\r\n"
+        + "|Response date | %s|\r\n"
+        + "|What's your response to the tribunal? | %s|\r\n"
+        + "|Supporting material | %s|\r\n"
+        + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
+        + "\r\n";
+
+    private static final String DOC_MARKUP = "<a href=\"/documents/%s\" target=\"_blank\">%s</a>\r\n";
 
     private PseHelper() {
         // Access through static methods
@@ -20,43 +56,94 @@ public final class PseHelper {
      * Create fields for application dropdown selector.
      * @param caseData contains all the case data
      */
-    public static DynamicFixedListType populateSelectJonDropdown(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+    public static DynamicFixedListType populateSelectDropdownNoReply(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getSendNotificationCollection())) {
             return null;
         }
 
-        // TODO: change caseData.getGenericTseApplicationCollection() to get the correct object
-        return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
-            .filter(r -> r.getValue().getRespondCollection() == null
-                && r.getValue().getStatus() != null
-                && !CLOSED.equals(r.getValue().getStatus())
-            ).map(r ->
+        return DynamicFixedListType.from(caseData.getSendNotificationCollection().stream()
+            .filter(r -> r.getValue().getRespondCollection() == null)
+            .map(r ->
                 DynamicValueType.create(
                     r.getValue().getNumber(),
-                    r.getValue().getNumber() + " " + r.getValue().getType()
+                    r.getValue().getNumber() + " " + r.getValue().getSendNotificationTitle()
                 )
-            ).collect(Collectors.toList()));
+            )
+            .collect(Collectors.toList()));
     }
 
     /**
-     * Create fields for application dropdown selector.
+     * Gets the selected SendNotificationTypeItem.
      * @param caseData contains all the case data
+     * @return the select application in GenericTseApplicationTypeItem
      */
-    public static DynamicFixedListType populateSelectOnDropdown(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
-            return null;
-        }
-
-        // TODO: change caseData.getGenericTseApplicationCollection() to get the correct object
-        return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
-            .filter(r -> r.getValue().getRespondCollection() == null
-                && r.getValue().getStatus() != null
-                && !CLOSED.equals(r.getValue().getStatus())
-            ).map(r ->
-                DynamicValueType.create(
-                    r.getValue().getNumber(),
-                    r.getValue().getNumber() + " " + r.getValue().getType()
-                )
-            ).collect(Collectors.toList()));
+    public static SendNotificationTypeItem getSelectedSendNotificationTypeItem(CaseData caseData) {
+        String selectedAppId = caseData.getPseRespondentSelectOrderOrRequest().getSelectedCode();
+        return caseData.getSendNotificationCollection().stream()
+            .filter(s -> s.getValue().getNumber().equals(selectedAppId))
+            .findFirst()
+            .orElse(null);
     }
+
+    /**
+     * Format Markup for displaying Hearing, case management order or request.
+     * @param sendNotificationType Target SendNotification Subject
+     * @return Hearing, case management order or request Markup
+     */
+    public static String formatOrdReqDetails(SendNotificationType sendNotificationType) {
+        return String.format(
+            ORDER_APP_MARKUP,
+            sendNotificationType.getSendNotificationTitle(),
+            sendNotificationType.getSendNotificationSelectHearing() != null
+                ? sendNotificationType.getSendNotificationSelectHearing().getSelectedLabel()
+                : "",
+            sendNotificationType.getDate(),
+            defaultString(sendNotificationType.getSendNotificationCaseManagement()),
+            defaultString(sendNotificationType.getSendNotificationResponseTribunal()),
+            defaultString(sendNotificationType.getSendNotificationSelectParties()),
+            defaultString(sendNotificationType.getSendNotificationAdditionalInfo()),
+            sendNotificationType.getSendNotificationUploadDocument() != null
+                ? sendNotificationType.getSendNotificationUploadDocument().stream()
+                    .map(d -> String.format(
+                        ORDER_APP_DOC_MARKUP,
+                        d.getValue().getShortDescription(),
+                        Helper.getDocumentMatcher(d.getValue().getUploadedDocument().getDocumentBinaryUrl())
+                            .replaceFirst(""),
+                        d.getValue().getUploadedDocument().getDocumentFilename()
+                    ))
+                    .collect(Collectors.joining())
+                : "",
+            defaultString(sendNotificationType.getSendNotificationCaseManagement()),
+            CASE_MANAGEMENT_ORDER.equals(sendNotificationType.getSendNotificationCaseManagement())
+                ? defaultString(sendNotificationType.getSendNotificationWhoCaseOrder())
+                : defaultString(sendNotificationType.getSendNotificationRequestMadeBy()),
+            defaultString(sendNotificationType.getSendNotificationFullName()),
+            sendNotificationType.getSendNotificationNotify()
+        );
+    }
+
+    /**
+     * Markup for displaying Response(s).
+     * @param pseResponseType Legal Rep Respond
+     * @return Response(s) Markup
+     */
+    public static String formatLegalRepReply(PseResponseType pseResponseType, int respondCount) {
+        return String.format(
+            LEGAL_REP_REPLY_MARKUP,
+            respondCount,
+            pseResponseType.getFrom(),
+            pseResponseType.getDate(),
+            pseResponseType.getResponse(),
+            pseResponseType.getSupportingMaterial().stream()
+                .map(d -> String.format(
+                    DOC_MARKUP,
+                    Helper.getDocumentMatcher(d.getValue().getUploadedDocument().getDocumentBinaryUrl())
+                        .replaceFirst(""),
+                    d.getValue().getUploadedDocument().getDocumentFilename()
+                ))
+                .collect(Collectors.joining()),
+            pseResponseType.getCopyToOtherParty()
+        );
+    }
+
 }

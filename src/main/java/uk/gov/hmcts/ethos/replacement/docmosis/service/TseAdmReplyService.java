@@ -34,7 +34,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.displayCopyToOtherPartyYesOrNo;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyForReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
@@ -93,7 +92,7 @@ public class TseAdmReplyService {
             applicationType.getDate(),
             applicationType.getDetails(),
             documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken),
-            displayCopyToOtherPartyYesOrNo(applicationType.getCopyToOtherPartyYesOrNo())
+            applicationType.getCopyToOtherPartyYesOrNo()
         );
     }
 

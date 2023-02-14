@@ -20,7 +20,7 @@ module.exports = async function () {
     I.selectOption('Type of Document (Optional)', 'ET1');
     I.attachFile('#documentCollection_0_uploadedDocument', 'data/fileUpload.txt');
     I.fillField('#documentCollection_0_shortDescription', commonConfig.shortDescription);
-    I.click('//button[contains(text(),\'Continue\')]');
+    I.forceClick('//button[contains(text(),\'Continue\')]');
 
     I.waitForInvisible('.spinner-container', testConfig.TestTimeToWaitForText);
     I.waitForText('Upload Document', testConfig.TestTimeToWaitForText);

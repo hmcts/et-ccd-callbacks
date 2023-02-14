@@ -1,13 +1,26 @@
 {
   "data": {
+    "jurCodesCollection": [
+      {
+        "id": "f7f10b22-88c0-43b9-a917-f7fff81e006y",
+        "value": {
+          "juridictionCodesList": "DAG"
+        }
+      }
+    ],
+    "typesOfClaim": [
+      "discrimination"
+    ],
+    "positionType": "ET1 Online submission",
+    "conciliationTrack": "Open Track",
     "receiptDate": "2022-08-17",
-    "feeGroupReference": "946403697619",
+    "feeGroupReference": "1675930663464973",
     "managingOffice": "Leeds",
     "stateAPI": null,
     "caseRefNumberCount": null,
     "startCaseRefNumber": null,
     "multipleRefNumber": null,
-    "caseType": null,
+    "caseType": "Single",
     "multipleReference": null,
     "leadClaimant": null,
     "claimant_TypeOfClaimant": "Individual",

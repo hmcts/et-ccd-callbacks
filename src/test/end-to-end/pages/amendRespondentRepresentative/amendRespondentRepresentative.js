@@ -20,7 +20,7 @@ module.exports = async function (myHMMCTSOrganisation = false) {
     I.selectOption('#repCollection_0_dynamic_resp_rep_name', commonConfig.respondentName);
     I.fillField('#repCollection_0_name_of_representative', commonConfig.respondentRepresentativeName);
     I.fillField('#repCollection_0_representative_phone_number', '01234567890');
-    I.fillField('#repCollection_0_representative_mobile_number', '01234657890');
+    I.fillField('#repCollection_0_representative_mobile_number', '01234657895');
     I.fillField('#repCollection_0_representative_email_address', 'test.xxx@hmcts.net');
     I.selectOption('#repCollection_0_representative_preference', '1: Email');
     if (!myHMMCTSOrganisation) {
@@ -56,8 +56,41 @@ module.exports = async function (myHMMCTSOrganisation = false) {
         I.see('Case Number:');
         I.click(commonConfig.submit);
 
-        I.waitForNavigation();
-        I.see('has been updated with event: Respondent Representative');
+
+        I.waitForText('has been updated with event: Respondent Representative', testConfig.TestTimeToWaitForText);
+
+        I.click("//div[text()='Respondent Representative']");
+        I.waitForText('Respondent Representative(s)', testConfig.TestTimeToWaitForText);
+        I.see('Respondent Representative(s) 1');
+        I.see('Respondent who is being represented');
+        I.see(commonConfig.respondentName);
+        I.see('Name of Representative');
+        I.see(commonConfig.respondentRepresentativeName);
+        I.see('Name of Organisation');
+        I.see('ECMGita');
+        I.see('Does the representative have a MyHMCTS account?');
+        I.see('No');
+        I.see('Reference');
+        I.see('Tester Reference');
+        I.see('Occupation');
+        I.see('Solicitor');
+        I.see('Address');
+        I.see('Building and Street');
+        I.see('15 Arcus Road');
+        I.see('Town or City');
+        I.see('Bromley');
+        I.see('Postcode/Zipcode');
+        I.see('BR1 4NN');
+        I.see('Country');
+        I.see('United Kingdom');
+        I.see('Phone number');
+        I.see('01234567890');
+        I.see('Alternative number');
+        I.see('01234657895');
+        I.see('Email address');
+        I.see('test.xxx@hmcts.net');
+        I.see('Contact preference');
+        I.see('Email');
     }
 
     //Click of the Respondent Representative is not working....So Further verification Code is not working...

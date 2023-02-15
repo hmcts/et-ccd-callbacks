@@ -19,7 +19,7 @@ module.exports = async function () {
     I.see('Short Description (Optional)');
     I.selectOption('Type of Document (Optional)', 'ET1');
     I.attachFile('#documentCollection_0_uploadedDocument', 'data/fileUpload.txt');
-    I.wait(commonConfig.time_interval_5_seconds);
+    I.wait(commonConfig.time_interval_5_seconds); //Wait for 5 Seconds for the File Upload to take place and complete before proceeding otherwise other issues would come up...
     I.fillField('#documentCollection_0_shortDescription', commonConfig.shortDescription);
     I.click('//button[contains(text(),\'Continue\')]');
 

@@ -39,7 +39,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEITHER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CLAIMANT_NOT_COMPLIED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
@@ -58,22 +71,13 @@ class TseAdmReplyServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer authToken";
     private static final String ERROR_MSG_ADD_DOC_MISSING = "Select or fill the required Add document field";
-    private static final String IS_CMO_OR_REQUEST_CMO = "Case management order";
-    private static final String IS_CMO_OR_REQUEST_REQUEST = "Request";
 
     private static final String TEMPLATE_ID = "someTemplateId";
     private static final String CASE_NUMBER = "Some Case Number";
     private static final String CASE_ID = "someCaseId";
 
-    private static final String BOTH_NOTIFY = "Both parties";
-    private static final String CLAIMANT_NOTIFY_ONLY = "Claimant only";
-    private static final String RESPONDENT_NOTIFY_ONLY = "Respondent only";
-
     private static final String CLAIMANT_EMAIL = "Claimant@mail.com";
     private static final String RESPONDENT_EMAIL = "Respondent@mail.com";
-    private static final String BOTH_RESPOND = "Both parties";
-    private static final String CLAIMANT_RESPOND_ONLY = "Claimant";
-    private static final String RESPONDENT_RESPOND_ONLY = "Respondent";
     private static final String RESPONSE_REQUIRED =
         "The tribunal requires some information from you about an application.";
     private static final String RESPONSE_NOT_REQUIRED =
@@ -91,14 +95,14 @@ class TseAdmReplyServiceTest {
     @Test
     void initialTseAdminTableMarkUp_ReturnString() {
         TseRespondType tseRespondType = TseRespondType.builder()
-            .from("Claimant")
+            .from(CLAIMANT_TITLE)
             .date("23 December 2022")
             .response("Response Details")
             .hasSupportingMaterial(YES)
             .supportingMaterial(List.of(
                 createDocumentTypeItem("image.png"),
                 createDocumentTypeItem("Form.pdf")))
-            .copyToOtherParty("I do not want to copy")
+            .copyToOtherParty(NO)
             .build();
 
         TseRespondTypeItem tseRespondTypeItem = TseRespondTypeItem.builder()
@@ -108,13 +112,13 @@ class TseAdmReplyServiceTest {
 
         GenericTseApplicationType genericTseApplicationType = TseApplicationBuilder.builder()
             .withNumber("1")
-            .withType("Amend response")
-            .withApplicant("Respondent")
+            .withType(TSE_APP_AMEND_RESPONSE)
+            .withApplicant(RESPONDENT_TITLE)
             .withDate("13 December 2022")
             .withDocumentUpload(createUploadedDocumentType("document.txt"))
             .withDetails("Details Text")
-            .withCopyToOtherPartyYesOrNo("I confirm I want to copy")
-            .withStatus("Open")
+            .withCopyToOtherPartyYesOrNo(YES)
+            .withStatus(OPEN_STATE)
             .withRespondCollection(List.of(tseRespondTypeItem))
             .build();
 
@@ -188,7 +192,7 @@ class TseAdmReplyServiceTest {
 
     @Test
     void validateInput_Yes_NoDoc_ReturnErrorMsg() {
-        caseData.setTseAdmReplyIsCmoOrRequest(IS_CMO_OR_REQUEST_CMO);
+        caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyIsResponseRequired(YES);
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).hasSize(1);
@@ -197,7 +201,7 @@ class TseAdmReplyServiceTest {
 
     @Test
     void validateInput_CmoYes_HaveDoc_NoErrorMsg() {
-        caseData.setTseAdmReplyIsCmoOrRequest(IS_CMO_OR_REQUEST_CMO);
+        caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyIsResponseRequired(YES);
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         List<String> errors = tseAdmReplyService.validateInput(caseData);
@@ -206,7 +210,7 @@ class TseAdmReplyServiceTest {
 
     @Test
     void validateInput_RequestYes_HaveDoc_NoErrorMsg() {
-        caseData.setTseAdmReplyIsCmoOrRequest(IS_CMO_OR_REQUEST_REQUEST);
+        caseData.setTseAdmReplyIsCmoOrRequest(REQUEST);
         caseData.setTseAdmReplyIsResponseRequired(YES);
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         List<String> errors = tseAdmReplyService.validateInput(caseData);
@@ -215,7 +219,7 @@ class TseAdmReplyServiceTest {
 
     @Test
     void validateInput_No_HaveDoc_NoErrorMsg() {
-        caseData.setTseAdmReplyIsCmoOrRequest(IS_CMO_OR_REQUEST_CMO);
+        caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyIsResponseRequired(NO);
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         List<String> errors = tseAdmReplyService.validateInput(caseData);
@@ -224,7 +228,7 @@ class TseAdmReplyServiceTest {
 
     @Test
     void validateInput_No_NoDoc_NoErrorMsg() {
-        caseData.setTseAdmReplyIsCmoOrRequest(IS_CMO_OR_REQUEST_CMO);
+        caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyIsResponseRequired(NO);
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
@@ -232,7 +236,7 @@ class TseAdmReplyServiceTest {
 
     @Test
     void validateInput_Neither_HaveDoc_NoErrorMsg() {
-        caseData.setTseAdmReplyIsCmoOrRequest("Neither");
+        caseData.setTseAdmReplyIsCmoOrRequest(NEITHER);
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
@@ -240,7 +244,7 @@ class TseAdmReplyServiceTest {
 
     @Test
     void validateInput_Neither_NoDoc_NoErrorMsg() {
-        caseData.setTseAdmReplyIsCmoOrRequest("Neither");
+        caseData.setTseAdmReplyIsCmoOrRequest(NEITHER);
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
     }
@@ -252,7 +256,7 @@ class TseAdmReplyServiceTest {
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("2")
-                    .withType("Change personal details")
+                    .withType(TSE_APP_CHANGE_PERSONAL_DETAILS)
                     .build())
                 .build())
         );
@@ -262,12 +266,12 @@ class TseAdmReplyServiceTest {
         caseData.setTseAdmReplyEnterResponseTitle("Submit hearing agenda");
         caseData.setTseAdmReplyAdditionalInformation("Additional Information Details");
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
-        caseData.setTseAdmReplyIsCmoOrRequest("Case management order");
+        caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyCmoMadeBy("Legal Officer");
         caseData.setTseAdmReplyEnterFullName("Full Name");
         caseData.setTseAdmReplyIsResponseRequired(YES);
-        caseData.setTseAdmReplySelectPartyRespond("Both parties");
-        caseData.setTseAdmReplySelectPartyNotify("Claimant only");
+        caseData.setTseAdmReplySelectPartyRespond(BOTH_PARTIES);
+        caseData.setTseAdmReplySelectPartyNotify(CLAIMANT_ONLY);
 
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
 
@@ -284,7 +288,7 @@ class TseAdmReplyServiceTest {
         assertThat(actual.getAddDocument())
             .isEqualTo(createUploadedDocumentType("document.txt"));
         assertThat(actual.getIsCmoOrRequest())
-            .isEqualTo("Case management order");
+            .isEqualTo(CASE_MANAGEMENT_ORDER);
         assertThat(actual.getCmoMadeBy())
             .isEqualTo("Legal Officer");
         assertThat(actual.getRequestMadeBy())
@@ -294,9 +298,9 @@ class TseAdmReplyServiceTest {
         assertThat(actual.getIsResponseRequired())
             .isEqualTo(YES);
         assertThat(actual.getSelectPartyRespond())
-            .isEqualTo("Both parties");
+            .isEqualTo(BOTH_PARTIES);
         assertThat(actual.getSelectPartyNotify())
-            .isEqualTo("Claimant only");
+            .isEqualTo(CLAIMANT_ONLY);
     }
 
     @Test
@@ -306,7 +310,7 @@ class TseAdmReplyServiceTest {
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("3")
-                    .withType("Claimant not complied")
+                    .withType(TSE_APP_CLAIMANT_NOT_COMPLIED)
                     .build())
                 .build())
         );
@@ -314,11 +318,11 @@ class TseAdmReplyServiceTest {
         caseData.setTseAdminSelectApplication(
             DynamicFixedListType.of(DynamicValueType.create("3", "3 - Claimant not complied")));
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
-        caseData.setTseAdmReplyIsCmoOrRequest("Request");
+        caseData.setTseAdmReplyIsCmoOrRequest(REQUEST);
         caseData.setTseAdmReplyRequestMadeBy("Judge");
         caseData.setTseAdmReplyEnterFullName("Full Name");
         caseData.setTseAdmReplyIsResponseRequired(NO);
-        caseData.setTseAdmReplySelectPartyNotify("Respondent only");
+        caseData.setTseAdmReplySelectPartyNotify(RESPONDENT_ONLY);
 
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
 
@@ -335,7 +339,7 @@ class TseAdmReplyServiceTest {
         assertThat(actual.getAddDocument())
             .isEqualTo(createUploadedDocumentType("document.txt"));
         assertThat(actual.getIsCmoOrRequest())
-            .isEqualTo("Request");
+            .isEqualTo(REQUEST);
         assertThat(actual.getCmoMadeBy())
             .isNull();
         assertThat(actual.getRequestMadeBy())
@@ -347,7 +351,7 @@ class TseAdmReplyServiceTest {
         assertThat(actual.getSelectPartyRespond())
             .isNull();
         assertThat(actual.getSelectPartyNotify())
-            .isEqualTo("Respondent only");
+            .isEqualTo(RESPONDENT_ONLY);
     }
 
     @Test
@@ -357,15 +361,15 @@ class TseAdmReplyServiceTest {
                 .id(UUID.randomUUID().toString())
                 .value(TseApplicationBuilder.builder()
                     .withNumber("4")
-                    .withType("Consider a decision afresh")
+                    .withType(TSE_APP_CONSIDER_A_DECISION_AFRESH)
                     .build())
                 .build())
         );
 
         caseData.setTseAdminSelectApplication(
             DynamicFixedListType.of(DynamicValueType.create("4", "4 - Consider a decision afresh")));
-        caseData.setTseAdmReplyIsCmoOrRequest("Neither");
-        caseData.setTseAdmReplySelectPartyNotify("Both parties");
+        caseData.setTseAdmReplyIsCmoOrRequest(NEITHER);
+        caseData.setTseAdmReplySelectPartyNotify(BOTH_PARTIES);
 
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
 
@@ -382,7 +386,7 @@ class TseAdmReplyServiceTest {
         assertThat(actual.getAddDocument())
             .isNull();
         assertThat(actual.getIsCmoOrRequest())
-            .isEqualTo("Neither");
+            .isEqualTo(NEITHER);
         assertThat(actual.getCmoMadeBy())
             .isNull();
         assertThat(actual.getRequestMadeBy())
@@ -394,7 +398,7 @@ class TseAdmReplyServiceTest {
         assertThat(actual.getSelectPartyRespond())
             .isNull();
         assertThat(actual.getSelectPartyNotify())
-            .isEqualTo("Both parties");
+            .isEqualTo(BOTH_PARTIES);
     }
 
     @ParameterizedTest
@@ -436,46 +440,46 @@ class TseAdmReplyServiceTest {
 
     private static Stream<Arguments> sendEmails() {
         return Stream.of(
-            Arguments.of(BOTH_NOTIFY, "Yes", BOTH_RESPOND,
+            Arguments.of(BOTH_PARTIES, "Yes", BOTH_PARTIES,
                 true, RESPONSE_REQUIRED, true, RESPONSE_REQUIRED),
-            Arguments.of(BOTH_NOTIFY, "Yes", CLAIMANT_RESPOND_ONLY,
+            Arguments.of(BOTH_PARTIES, "Yes", CLAIMANT_TITLE,
                 true, RESPONSE_REQUIRED, true, RESPONSE_NOT_REQUIRED),
-            Arguments.of(BOTH_NOTIFY, "Yes", RESPONDENT_RESPOND_ONLY,
+            Arguments.of(BOTH_PARTIES, "Yes", RESPONDENT_TITLE,
                 true, RESPONSE_NOT_REQUIRED, true, RESPONSE_REQUIRED),
 
-            Arguments.of(BOTH_NOTIFY, "No", BOTH_RESPOND,
+            Arguments.of(BOTH_PARTIES, "No", BOTH_PARTIES,
                 true, RESPONSE_NOT_REQUIRED, true, RESPONSE_NOT_REQUIRED),
-            Arguments.of(BOTH_NOTIFY, "No", CLAIMANT_RESPOND_ONLY,
+            Arguments.of(BOTH_PARTIES, "No", CLAIMANT_TITLE,
                 true, RESPONSE_NOT_REQUIRED, true, RESPONSE_NOT_REQUIRED),
-            Arguments.of(BOTH_NOTIFY, "No", RESPONDENT_RESPOND_ONLY,
+            Arguments.of(BOTH_PARTIES, "No", RESPONDENT_TITLE,
                 true, RESPONSE_NOT_REQUIRED, true, RESPONSE_NOT_REQUIRED),
 
-            Arguments.of(CLAIMANT_NOTIFY_ONLY, "Yes", BOTH_RESPOND,
+            Arguments.of(CLAIMANT_ONLY, "Yes", BOTH_PARTIES,
                 true, RESPONSE_REQUIRED, false, "never sent"),
-            Arguments.of(CLAIMANT_NOTIFY_ONLY, "Yes", CLAIMANT_RESPOND_ONLY,
+            Arguments.of(CLAIMANT_ONLY, "Yes", CLAIMANT_TITLE,
                 true, RESPONSE_REQUIRED, false, "never sent"),
-            Arguments.of(CLAIMANT_NOTIFY_ONLY, "Yes", RESPONDENT_RESPOND_ONLY,
+            Arguments.of(CLAIMANT_ONLY, "Yes", RESPONDENT_TITLE,
                 true, RESPONSE_NOT_REQUIRED, false, "never sent"),
 
-            Arguments.of(CLAIMANT_NOTIFY_ONLY, "No", BOTH_RESPOND,
+            Arguments.of(CLAIMANT_ONLY, "No", BOTH_PARTIES,
                 true, RESPONSE_NOT_REQUIRED, false, "never sent"),
-            Arguments.of(CLAIMANT_NOTIFY_ONLY, "No", CLAIMANT_RESPOND_ONLY,
+            Arguments.of(CLAIMANT_ONLY, "No", CLAIMANT_TITLE,
                 true, RESPONSE_NOT_REQUIRED, false, "never sent"),
-            Arguments.of(CLAIMANT_NOTIFY_ONLY, "No", RESPONDENT_RESPOND_ONLY,
+            Arguments.of(CLAIMANT_ONLY, "No", RESPONDENT_TITLE,
                 true, RESPONSE_NOT_REQUIRED, false, "never sent"),
 
-            Arguments.of(RESPONDENT_NOTIFY_ONLY, "Yes", BOTH_RESPOND,
+            Arguments.of(RESPONDENT_ONLY, "Yes", BOTH_PARTIES,
                 false, "never sent", true, RESPONSE_REQUIRED),
-            Arguments.of(RESPONDENT_NOTIFY_ONLY, "Yes", CLAIMANT_RESPOND_ONLY,
+            Arguments.of(RESPONDENT_ONLY, "Yes", CLAIMANT_TITLE,
                 false, "never sent", true, RESPONSE_NOT_REQUIRED),
-            Arguments.of(RESPONDENT_NOTIFY_ONLY, "Yes", RESPONDENT_RESPOND_ONLY,
+            Arguments.of(RESPONDENT_ONLY, "Yes", RESPONDENT_TITLE,
                 false, "never sent", true, RESPONSE_REQUIRED),
 
-            Arguments.of(RESPONDENT_NOTIFY_ONLY, "No", BOTH_RESPOND,
+            Arguments.of(RESPONDENT_ONLY, "No", BOTH_PARTIES,
                 false, "never sent", true, RESPONSE_NOT_REQUIRED),
-            Arguments.of(RESPONDENT_NOTIFY_ONLY, "No", CLAIMANT_RESPOND_ONLY,
+            Arguments.of(RESPONDENT_ONLY, "No", CLAIMANT_TITLE,
                 false, "never sent", true, RESPONSE_NOT_REQUIRED),
-            Arguments.of(RESPONDENT_NOTIFY_ONLY, "No", RESPONDENT_RESPOND_ONLY,
+            Arguments.of(RESPONDENT_ONLY, "No", RESPONDENT_TITLE,
                 false, "never sent", true, RESPONSE_NOT_REQUIRED)
         );
     }
@@ -499,13 +503,13 @@ class TseAdmReplyServiceTest {
         caseData.setTseAdmReplyEnterResponseTitle("View notice of hearing");
         caseData.setTseAdmReplyAdditionalInformation("Additional information text");
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
-        caseData.setTseAdmReplyIsCmoOrRequest("Case management order");
+        caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyCmoMadeBy("Legal Officer");
         caseData.setTseAdmReplyRequestMadeBy("Legal Officer");
         caseData.setTseAdmReplyEnterFullName("Enter Full Name");
         caseData.setTseAdmReplyIsResponseRequired(YES);
-        caseData.setTseAdmReplySelectPartyRespond("Both parties");
-        caseData.setTseAdmReplySelectPartyNotify("Claimant only");
+        caseData.setTseAdmReplySelectPartyRespond(BOTH_PARTIES);
+        caseData.setTseAdmReplySelectPartyNotify(CLAIMANT_ONLY);
 
         tseAdmReplyService.clearTseAdmReplyDataFromCaseData(caseData);
 

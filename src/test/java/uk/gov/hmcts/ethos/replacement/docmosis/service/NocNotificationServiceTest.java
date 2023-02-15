@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -28,11 +29,12 @@ class NocNotificationServiceTest {
     private NocNotificationService nocNotificationService;
     @Mock
     private EmailService emailService;
-    @Mock
-    private RespondentRepresentativeService respondentRepresentativeService;
     private CaseData caseData;
     private CaseDetails caseDetailsBefore;
     private CallbackRequest callbackRequest;
+
+    @Mock
+    private NocRespondentHelper nocRespondentHelper;
 
     @BeforeEach
     void setUp() {
@@ -107,7 +109,7 @@ class NocNotificationServiceTest {
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName("Respondent");
         respondentSumType.setRespondentEmail("res@rep.com");
-        when(respondentRepresentativeService.getRespondent(any(), any())).thenReturn(respondentSumType);
+        when(nocRespondentHelper.getRespondent(any(), any())).thenReturn(respondentSumType);
         nocNotificationService.sendNotificationOfChangeEmails(callbackRequest, caseData);
         // Claimant
         verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), any());
@@ -134,7 +136,8 @@ class NocNotificationServiceTest {
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName("Respondent");
         respondentSumType.setRespondentEmail(null);
-        when(respondentRepresentativeService.getRespondent(any(), any())).thenReturn(respondentSumType);
+
+        when(nocRespondentHelper.getRespondent(any(), any())).thenReturn(respondentSumType);
 
         nocNotificationService.sendNotificationOfChangeEmails(callbackRequest, caseData);
         verify(emailService, times(0)).sendEmail(any(), any(), any());

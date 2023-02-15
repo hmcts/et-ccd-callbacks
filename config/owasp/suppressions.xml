@@ -428,4 +428,32 @@
         <packageUrl regex="true">^pkg:npm/ua\-parser\-js@.*$</packageUrl>
         <vulnerabilityName>1088677</vulnerabilityName>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+    file name: ua-parser-js:1.0.32
+    ]]></notes>
+        <packageUrl regex="true">^pkg:npm/ua\-parser\-js@.*$</packageUrl>
+        <vulnerabilityName>1088696</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: flat:4.1.1
+   ]]></notes>
+        <packageUrl regex="true">^pkg:npm/flat@.*$</packageUrl>
+        <vulnerabilityName>1089152</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: woodstox-core-6.2.8.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.woodstox/woodstox\-core@.*$</packageUrl>
+        <cpe>cpe:/a:fasterxml:woodstox</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: woodstox-core-6.2.8.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.woodstox/woodstox\-core@.*$</packageUrl>
+        <cve>CVE-2022-40152</cve>
+    </suppress>
 </suppressions>

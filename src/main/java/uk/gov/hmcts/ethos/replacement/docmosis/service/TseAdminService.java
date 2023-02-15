@@ -26,15 +26,20 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRespondentReplyForDecision;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyForDecision;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings({"squid:S1192", "PMD.AvoidInstantiatingObjectsInLoops"})
+@SuppressWarnings({"squid:S1192", "PMD.AvoidInstantiatingObjectsInLoops", "PMD.ExcessiveImports"})
 public class TseAdminService {
 
     @Value("${tse.admin.record-a-decision.notify.claimant.template.id}")
@@ -49,7 +54,7 @@ public class TseAdminService {
             + "|--|--|\r\n"
             + "|%s application | %s|\r\n"
             + "|Application date | %s|\r\n"
-            + "|%s | %s|\r\n"
+            + "|Give details | %s|\r\n"
             + "|Supporting material | %s|\r\n"
             + "\r\n";
 
@@ -78,11 +83,7 @@ public class TseAdminService {
         + "|Sent to | %s|\r\n"
         + "\r\n";
 
-    private static final String BOTH = "Both parties";
-    private static final String CLAIMANT_ONLY = "Claimant only";
-    private static final String RESPONDENT_ONLY = "Respondent only";
     private static final String STRING_BR = "<br>";
-    private static final String APPLICATION_QUESTION = "Give details";
 
     /**
      * Initial Application and Respond details table.
@@ -102,7 +103,6 @@ public class TseAdminService {
             applicationType.getApplicant(),
             applicationType.getType(),
             applicationType.getDate(),
-            APPLICATION_QUESTION,
             applicationType.getDetails(),
             documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken)
         );
@@ -115,13 +115,13 @@ public class TseAdminService {
         IntWrapper respondCount = new IntWrapper(0);
         return applicationType.getRespondCollection().stream()
             .map(replyItem ->
-                "Admin".equals(replyItem.getValue().getFrom())
+                ADMIN.equals(replyItem.getValue().getFrom())
                     ? formatAdminReply(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),
                         documentManagementService.displayDocNameTypeSizeLink(
                             replyItem.getValue().getAddDocument(), authToken))
-                    : formatRespondentReplyForDecision(
+                    : formatLegalRepReplyForDecision(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),
                         populateListDocWithInfoAndLink(replyItem.getValue().getSupportingMaterial(), authToken)))
@@ -197,7 +197,7 @@ public class TseAdminService {
 
         // if respondent only or both parties: send Respondents Decision Emails
         if (RESPONDENT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
-                || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
+                || BOTH_PARTIES.equals(caseData.getTseAdminSelectPartyNotify())) {
             TSEAdminEmailRecipientsData respondentDetails;
             for (RespondentSumTypeItem respondentSumTypeItem: caseData.getRespondentCollection()) {
                 if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
@@ -214,7 +214,7 @@ public class TseAdminService {
 
         // if claimant only or both parties: send Claimant Decision Email
         if (CLAIMANT_ONLY.equals(caseData.getTseAdminSelectPartyNotify())
-                || BOTH.equals(caseData.getTseAdminSelectPartyNotify())) {
+                || BOTH_PARTIES.equals(caseData.getTseAdminSelectPartyNotify())) {
             String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
             String claimantName = caseData.getClaimantIndType().claimantFullNames();
 
@@ -326,6 +326,21 @@ public class TseAdminService {
 
         return documentManagementService
             .displayDocNameTypeSizeLink(applicationTypeItem.getValue().getDocumentUpload(), authToken);
+    }
+
+    /**
+     * About to Submit Close Application.
+     * @param caseData in which the case details are extracted from
+     */
+    public void aboutToSubmitCloseApplication(CaseData caseData) {
+        GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
+        if (applicationTypeItem != null) {
+            applicationTypeItem.getValue().setCloseApplicationNotes(caseData.getTseAdminCloseApplicationText());
+            applicationTypeItem.getValue().setStatus(CLOSED_STATE);
+            caseData.setTseAdminCloseApplicationTable(null);
+            caseData.setTseAdminCloseApplicationText(null);
+            caseData.setTseAdminSelectApplication(null);
+        }
     }
 
 }

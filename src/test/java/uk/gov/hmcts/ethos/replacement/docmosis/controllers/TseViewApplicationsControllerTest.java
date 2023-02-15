@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
@@ -23,12 +22,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({TseViewApplicationsController.class, JsonMapper.class})
@@ -36,7 +35,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 class TseViewApplicationsControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
-    private static final String MID_POPULATE_CHOOSE_APPLICATION_URL = "/viewRespondentTSEApplications/midPopulateChooseApplication";
+    private static final String MID_POPULATE_CHOOSE_APPLICATION_URL =
+            "/viewRespondentTSEApplications/midPopulateChooseApplication";
 
     @Autowired
     private MockMvc mockMvc;
@@ -68,7 +68,7 @@ class TseViewApplicationsControllerTest {
             .build();
 
         UserDetails userDetails = HelperTest.getUserDetails();
-        when(userService.getUserDetails(anyString())).thenReturn(userDetails);
+        when(userService.getUserDetails("")).thenReturn(userDetails);
     }
 
     @Test

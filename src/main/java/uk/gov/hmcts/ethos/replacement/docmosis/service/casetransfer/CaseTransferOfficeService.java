@@ -25,6 +25,7 @@ public final class CaseTransferOfficeService {
 
         DynamicFixedListType offices = getOffices(managingOffice);
         caseData.setOfficeCT(offices);
+        caseData.setAssignOffice(offices);
     }
 
     public static void populateTransferToEnglandWalesOfficeOptions(MultipleData multipleData) {

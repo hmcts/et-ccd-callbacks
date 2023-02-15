@@ -10,12 +10,18 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdminService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationBuilder;
+
+import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -26,10 +32,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({TseAdminController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
 class TseAdminControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -37,6 +44,7 @@ class TseAdminControllerTest {
     private static final String MID_DETAILS_TABLE = "/tseAdmin/midDetailsTable";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmin/aboutToSubmit";
     private static final String SUBMITTED_URL = "/tseAdmin/submitted";
+    private static final String ABOUT_TO_SUBMIT_CLOSE_APP_URL = "/tseAdmin/aboutToSubmitCloseApplication";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -53,13 +61,22 @@ class TseAdminControllerTest {
     @BeforeEach
     void setUp() throws Exception {
         CaseDetails caseDetails = CaseDataBuilder.builder()
+            .withEthosCaseReference("1234")
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
-        caseDetails.getCaseData().setEthosCaseReference("1234");
         caseDetails.setCaseId("4321");
+        CaseData caseData = caseDetails.getCaseData();
+        caseData.setGenericTseApplicationCollection(
+            List.of(GenericTseApplicationTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(TseApplicationBuilder.builder()
+                .withNumber("2")
+                .withType(TSE_APP_CHANGE_PERSONAL_DETAILS)
+                .build())
+            .build()));
 
         ccdRequest = CCDRequestBuilder.builder()
-            .withCaseData(caseDetails.getCaseData())
+            .withCaseData(caseData)
             .build();
     }
 
@@ -220,4 +237,43 @@ class TseAdminControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void aboutToSubmitCloseApplication_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_CLOSE_APP_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(tseAdminService).aboutToSubmitCloseApplication(
+            ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    void aboutToSubmitCloseApplication_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_CLOSE_APP_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+        verify(tseAdminService, never()).aboutToSubmitCloseApplication(
+            ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    void aboutToSubmitCloseApplication_badRequest() throws Exception {
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_CLOSE_APP_URL)
+                .content("garbage content")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+        verify(tseAdminService, never()).aboutToSubmitCloseApplication(
+            ccdRequest.getCaseDetails().getCaseData());
+    }
+
 }

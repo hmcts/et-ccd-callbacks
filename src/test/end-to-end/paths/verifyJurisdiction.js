@@ -11,7 +11,5 @@ Scenario('Verify Jurisdiction', async ({I}) => {
     console.log("... case id =>" +caseId);
     await jurisdiction(I, eventNames.JURISDICTION);
 
-}).tag('@e2e')
-    .tag('@nightly')
-    .tag('@wip');
+}).tag('@biggerrefactoring');
     //.retry(testConfig.TestRetryScenarios);

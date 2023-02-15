@@ -22,18 +22,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_JUDGEMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.OPEN;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("PMD.ExcessiveImports")
 public class RespondentTellSomethingElseService {
     private final EmailService emailService;
     private final UserService userService;
@@ -44,19 +52,10 @@ public class RespondentTellSomethingElseService {
     @Value("${tse.respondent.application.notify.claimant.template.id}")
     private String claimantTemplateId;
 
-    private static final String RESPONDENT_TITLE = "Respondent";
-    private static final String CLAIMANT_TITLE = "Claimant";
-    private static final String RULE92_YES = "I confirm I want to copy";
-    private static final String CHANGE_PERSONAL_DETAILS = "Change personal details";
-    private static final String CONSIDER_A_DECISION_AFRESH = "Consider a decision afresh";
-    private static final String ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE =
-            "Order a witness to attend to give evidence";
-    private static final String RECONSIDER_JUDGEMENT = "Reconsider judgement";
     private static final String GIVE_DETAIL_MISSING = "Use the text box or file upload to give details.";
-    private static final List<String> GROUP_B_TYPES = List.of(CHANGE_PERSONAL_DETAILS, CONSIDER_A_DECISION_AFRESH,
-        RECONSIDER_JUDGEMENT);
+    private static final List<String> GROUP_B_TYPES = List.of(TSE_APP_CHANGE_PERSONAL_DETAILS,
+        TSE_APP_CONSIDER_A_DECISION_AFRESH, TSE_APP_RECONSIDER_JUDGEMENT);
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
-    private static final String NO = "I do not want to copy";
     private static final String RULE92_ANSWERED_NO = "You have said that you do not want to copy this correspondence "
         + "to the other party. \n \n"
         + "The tribunal will consider all correspondence and let you know what happens next.";
@@ -103,7 +102,7 @@ public class RespondentTellSomethingElseService {
     public void sendAcknowledgeEmailAndGeneratePdf(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
 
-        if (ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
+        if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
             // No need to send email for Group C
             return;
         }
@@ -133,7 +132,7 @@ public class RespondentTellSomethingElseService {
     public void sendClaimantEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
 
-        if (ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())
+        if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())
             || NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())
             || caseData.getClaimantType().getClaimantEmailAddress() == null) {
             return;
@@ -196,98 +195,6 @@ public class RespondentTellSomethingElseService {
         );
     }
 
-    /**
-     * Creates a new Respondent TSE collection if it doesn't exist.
-     * Create a new element in the list and assign the TSE data from CaseData to it.
-     * At last, clears the existing TSE data from CaseData to ensure fields will be empty when user
-     * starts a new application in the same case.
-     * @param caseData contains all the case data
-     */
-    public void createRespondentApplication(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
-            caseData.setGenericTseApplicationCollection(new ArrayList<>());
-        }
-
-        GenericTseApplicationType respondentTseType = new GenericTseApplicationType();
-
-        respondentTseType.setDate(UtilHelper.formatCurrentDate(LocalDate.now()));
-        respondentTseType.setDueDate(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
-        respondentTseType.setResponsesCount("0");
-        respondentTseType.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
-        respondentTseType.setApplicant(RESPONDENT_TITLE);
-        assignDataToFieldsFromApplicationType(respondentTseType, caseData);
-        respondentTseType.setType(caseData.getResTseSelectApplication());
-        respondentTseType.setCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
-        respondentTseType.setCopyToOtherPartyText(caseData.getResTseCopyToOtherPartyTextArea());
-        respondentTseType.setStatus(OPEN);
-
-        GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
-        tseApplicationTypeItem.setId(UUID.randomUUID().toString());
-        tseApplicationTypeItem.setValue(respondentTseType);
-
-        List<GenericTseApplicationTypeItem> tseApplicationCollection = caseData.getGenericTseApplicationCollection();
-        tseApplicationCollection.add(tseApplicationTypeItem);
-        caseData.setGenericTseApplicationCollection(tseApplicationCollection);
-
-        clearRespondentTseDataFromCaseData(caseData);
-    }
-
-    private void assignDataToFieldsFromApplicationType(GenericTseApplicationType respondentTseType, CaseData caseData) {
-        RespondentTSEApplicationTypeData selectedAppData =
-                RespondentTellSomethingElseHelper.getSelectedApplicationType(caseData);
-        if (selectedAppData != null) {
-            respondentTseType.setDetails(selectedAppData.getSelectedTextBox());
-            respondentTseType.setDocumentUpload(selectedAppData.getResTseDocument());
-        }
-    }
-
-    private void clearRespondentTseDataFromCaseData(CaseData caseData) {
-        caseData.setResTseSelectApplication(null);
-        caseData.setResTseCopyToOtherPartyYesOrNo(null);
-        caseData.setResTseCopyToOtherPartyTextArea(null);
-
-        caseData.setResTseTextBox1(null);
-        caseData.setResTseTextBox2(null);
-        caseData.setResTseTextBox3(null);
-        caseData.setResTseTextBox4(null);
-        caseData.setResTseTextBox5(null);
-        caseData.setResTseTextBox6(null);
-        caseData.setResTseTextBox7(null);
-        caseData.setResTseTextBox8(null);
-        caseData.setResTseTextBox9(null);
-        caseData.setResTseTextBox10(null);
-        caseData.setResTseTextBox11(null);
-        caseData.setResTseTextBox12(null);
-
-        caseData.setResTseDocument1(null);
-        caseData.setResTseDocument2(null);
-        caseData.setResTseDocument3(null);
-        caseData.setResTseDocument4(null);
-        caseData.setResTseDocument5(null);
-        caseData.setResTseDocument6(null);
-        caseData.setResTseDocument7(null);
-        caseData.setResTseDocument8(null);
-        caseData.setResTseDocument9(null);
-        caseData.setResTseDocument10(null);
-        caseData.setResTseDocument11(null);
-        caseData.setResTseDocument12(null);
-    }
-
-    /**
-     * Gets the number a new TSE application should be labelled as.
-     * @param caseData contains all the case data
-     */
-    private static int getNextApplicationNumber(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
-            return 1;
-        }
-        return caseData.getGenericTseApplicationCollection().size() + 1;
-    }
-
-    /**
-     * Create a table markdown of all the Respondent and Claimant applications.
-     * @param caseData contains the Application collection
-     */
     public String generateTableMarkdown(CaseData caseData) {
         List<GenericTseApplicationTypeItem> genericApplicationList = caseData.getGenericTseApplicationCollection();
         if (CollectionUtils.isEmpty(genericApplicationList)) {
@@ -307,7 +214,8 @@ public class RespondentTellSomethingElseService {
     private boolean applicationsSharedWithRespondent(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
         String applicant = genericTseApplicationTypeItem.getValue().getApplicant();
         String copyToRespondent = genericTseApplicationTypeItem.getValue().getCopyToOtherPartyYesOrNo();
-        boolean isClaimantAndRule92Shared = CLAIMANT_TITLE.equals(applicant) && RULE92_YES.equals(copyToRespondent);
+        boolean isClaimantAndRule92Shared = CLAIMANT_TITLE.equals(applicant)
+            && YES.equals(copyToRespondent);
 
         return RESPONDENT_TITLE.equals(applicant) || isClaimantAndRule92Shared;
     }
@@ -315,7 +223,7 @@ public class RespondentTellSomethingElseService {
     private String formatRow(GenericTseApplicationTypeItem genericTseApplicationTypeItem, AtomicInteger count) {
         GenericTseApplicationType value = genericTseApplicationTypeItem.getValue();
         int responses = value.getRespondCollection() == null ? 0 : value.getRespondCollection().size();
-        String status = Optional.ofNullable(value.getStatus()).orElse("Open");
+        String status = Optional.ofNullable(value.getStatus()).orElse(OPEN_STATE);
 
         return String.format(TABLE_ROW_MARKDOWN, count.getAndIncrement(), value.getType(), value.getApplicant(),
             value.getDate(), value.getDueDate(), responses, status);

@@ -11,15 +11,16 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.apitest.utils.CCDRequestBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
@@ -35,9 +36,24 @@ class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
 
     @BeforeAll
     public void setUpCaseData() {
-        CaseData caseData = new CaseData();
-        caseData.setEthosCaseReference("testCaseReference");
-        caseData.setPseOrdReqResponses(createResponseCollection());
+        CaseData caseData = CaseDataBuilder.builder()
+            .withEthosCaseReference("testCaseReference")
+            .build();
+
+        caseData.setSendNotificationCollection(List.of(
+            SendNotificationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(SendNotificationType.builder()
+                    .respondCollection(List.of(PseResponseTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(PseResponseType.builder()
+                            .from(RESPONDENT_TITLE)
+                            .copyToOtherParty(YES)
+                            .build())
+                        .build()))
+                    .build())
+                .build()
+        ));
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseData)
@@ -115,15 +131,4 @@ class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
             .all(true);
     }
 
-    private List<PseResponseTypeItem> createResponseCollection() {
-        PseResponseType pseRespondentReply = new PseResponseType();
-        pseRespondentReply.setFrom(RESPONDENT_TITLE);
-        pseRespondentReply.setCopyToOtherParty(YES);
-
-        PseResponseTypeItem pseResponseItem = new PseResponseTypeItem();
-        pseResponseItem.setId(UUID.randomUUID().toString());
-        pseResponseItem.setValue(pseRespondentReply);
-
-        return new ArrayList<>(Collections.singletonList(pseResponseItem));
-    }
 }

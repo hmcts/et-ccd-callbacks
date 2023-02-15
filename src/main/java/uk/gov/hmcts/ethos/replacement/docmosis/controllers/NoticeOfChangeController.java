@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
@@ -72,6 +73,25 @@ public class NoticeOfChangeController {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        try {
+            nocNotificationService.sendNotificationOfChangeEmails(callbackRequest,
+                    callbackRequest.getCaseDetails().getCaseData());
+        } catch (Exception exception) {
+            log.error(exception.getMessage(), exception);
+        }
+
+        ChangeOrganisationRequest changeOrganisationRequestField =
+            callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField();
+
+        if (changeOrganisationRequestField != null) {
+            try {
+                nocRespondentRepresentativeService.removeOrganisationRepresentativeAccess(
+                    callbackRequest.getCaseDetails().getCaseId(), changeOrganisationRequestField);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         return ResponseEntity.ok(ccdCaseAssignment.applyNocAsAdmin(callbackRequest));

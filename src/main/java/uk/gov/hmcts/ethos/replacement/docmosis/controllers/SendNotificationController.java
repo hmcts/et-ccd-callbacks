@@ -48,13 +48,13 @@ public class SendNotificationController {
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "aboutToStart")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CCDCallbackResponse.class))
-                }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToStart(
             @RequestBody CCDRequest ccdRequest,
@@ -80,13 +80,13 @@ public class SendNotificationController {
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "aboutToSubmit")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json",
-                        schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
@@ -104,45 +104,45 @@ public class SendNotificationController {
     }
 
 
-         /**
-         * JavaDocs.
-         *
-         * @param ccdRequest holds the request and case data
-         * @param userToken  used for authorization
-         * @return Callback response entity with case data attached.
-         */
-        @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
-        @Operation(summary = "submitted")
-        @ApiResponses(value = {
+    /**
+     * JavaDocs.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "submitted")
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                        schema = @Schema(implementation = CCDCallbackResponse.class))
-                }),
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
             @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
-        })
-        public ResponseEntity<CCDCallbackResponse> submitted(
+    })
+    public ResponseEntity<CCDCallbackResponse> submitted(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(value = "Authorization") String userToken) {
-    
-            if (!verifyTokenService.verifyTokenSignature(userToken)) {
-                log.error(INVALID_TOKEN, userToken);
-                return ResponseEntity.status(FORBIDDEN.value()).build();
-            }
-            String caseId = ccdRequest.getCaseDetails().getCaseId();
-            String body = String.format("### What happens next\r\n\r\n"
-                            + "The selected parties will recive the notification.\r\n\r\n"
-                            + "You can view the notification in the <a href"
-                            + "=\"/cases/case-details/%s#Notifications\" target=\"_blank\">"
-                            +  "Notifications tab (opens in a new tab)</a>\r\n\r\n"
-                            + "Another notification can be sent <a href"
-                            + "=\"/cases/case-details/%s#sendNotification\" target=\"_blank\">using this link</a>",
-                    caseId,caseId);
 
-            return ResponseEntity.ok(CCDCallbackResponse.builder()
-                    .confirmation_body(body)
-                    .build());
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
         }
+        String caseId = ccdRequest.getCaseDetails().getCaseId();
+        String body = String.format("### What happens next\r\n\r\n"
+                        + "The selected parties will receive the notification.\r\n\r\n"
+                        + "You can view the notification in the <a href"
+                        + "=\"/cases/case-details/%s#Notifications\" target=\"_blank\">"
+                        + "Notifications tab (opens in a new tab)</a>\r\n\r\n"
+                        + "Another notification can be sent <a href"
+                        + "=\"/cases/case-details/%s/trigger/sendNotification/sendNotification1\">using this link</a>",
+                caseId, caseId);
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .confirmation_body(body)
+                .build());
+    }
 
 }

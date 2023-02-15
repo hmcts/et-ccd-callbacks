@@ -153,8 +153,7 @@ async function judgment(I, eventName) {
 }
 
 async function generateReport(I, jurisdiction, caseType, eventName, userName, password) {
-    await I.authenticateWithIdam(userName, password);
-    await I.wait(2);
+    I.wait(2);
     await I.executeCreateReport(jurisdiction, caseType, eventName);
 }
 
@@ -244,6 +243,19 @@ async function clickCreateCase(I) {
     await I.caseClaimantHearingPreferences();
     I.wait(2);
 }
+
+async function clickCreateCase2(I, jurisdiction, caseType, eventName, userName, password) {
+    //I.wait(3);
+    //await I.caseListForCreateCase();
+    //I.wait(2);
+    await I.executeCreateReport(jurisdiction, caseType, eventName);
+    
+}
+
+//async function generateReport(I, jurisdiction, caseType, eventName, userName, password) {
+  //  await I.authenticateWithIdam(userName, password);
+    //await I.wait(2);
+    //await I.executeCreateReport(jurisdiction, caseType, eventName);
 
 async function verifyApplicationTabs(I) {
     await I.caseApplicationTabs();

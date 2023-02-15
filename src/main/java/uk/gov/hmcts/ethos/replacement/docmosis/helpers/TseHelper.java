@@ -33,10 +33,8 @@ import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @SuppressWarnings({"PMD.ExcessiveImports"})
@@ -77,12 +75,11 @@ public final class TseHelper {
         + "|--|--|\r\n"
         + "|Response | %s|\r\n"
         + "|Date | %s|\r\n"
-        + "|Sent by | %s|\r\n"
+        + "|Sent by | Tribunal|\r\n"
         + "|Case management order or request? | %s|\r\n"
         + "|Response due | %s|\r\n"
         + "|Party or parties to respond | %s|\r\n"
         + "|Additional information | %s|\r\n"
-        + "|Description | %s|\r\n"
         + "|Document | %s|\r\n"
         + "%s"
         + "|Name | %s|\r\n"
@@ -323,12 +320,10 @@ public final class TseHelper {
             respondCount,
             defaultString(reply.getEnterResponseTitle()),
             reply.getDate(),
-            "Tribunal",
             defaultString(reply.getIsCmoOrRequest()),
             defaultString(reply.getIsResponseRequired()),
             defaultString(reply.getSelectPartyRespond()),
             defaultString(reply.getAdditionalInformation()),
-            "description of document entered",
             docInfo,
             formatAdminReplyMadeBy(reply),
             defaultString(reply.getMadeByFullName()),
@@ -369,23 +364,8 @@ public final class TseHelper {
             applicant.toLowerCase(Locale.ENGLISH),
             defaultString(reply.getResponse()),
             docInfo,
-            displayCopyToOtherPartyYesOrNo(reply.getCopyToOtherParty())
+            reply.getCopyToOtherParty()
         );
-    }
-
-    /**
-     * Return getCopyToOtherPartyYesOrNo as Yes or No.
-     * @param copyToOtherPartyYesOrNo getCopyToOtherPartyYesOrNo()
-     * @return Yes or No
-     */
-    public static String displayCopyToOtherPartyYesOrNo(String copyToOtherPartyYesOrNo) {
-        if (YES.equals(copyToOtherPartyYesOrNo)) {
-            return YES;
-        } else if (NO.equals(copyToOtherPartyYesOrNo)) {
-            return NO;
-        } else {
-            return defaultString(copyToOtherPartyYesOrNo);
-        }
     }
 
     /**

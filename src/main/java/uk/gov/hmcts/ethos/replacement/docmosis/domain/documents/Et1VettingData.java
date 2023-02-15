@@ -200,4 +200,9 @@ public class Et1VettingData {
     // ET! Vetting - Addtional Information
     @JsonProperty("et1VettingAdditionalInformationTextArea")
     private String et1VettingAdditionalInformationTextArea;
+    // ET! Vetting - completed by and date
+    @JsonProperty("vettingCompletedBy")
+    private String vettingCompletedBy;
+    @JsonProperty("dateCompleted")
+    private String dateCompleted;
 }

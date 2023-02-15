@@ -262,7 +262,7 @@ public class TornadoService {
         try {
             dmStoreDocumentName = documentName;
             connection = createConnection();
-            buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
+            buildDocumentInstruction(connection, caseData, documentName, caseTypeId, userToken);
             return checkResponseStatus(userToken, connection, dmStoreDocumentName, caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
@@ -273,9 +273,9 @@ public class TornadoService {
     }
 
     private void buildDocumentInstruction(HttpURLConnection connection, CaseData caseData, String documentName,
-                                          String caseTypeId)
+                                          String caseTypeId, String userToken)
             throws IOException {
-        String documentContent = getDocumentContent(caseData, documentName, caseTypeId);
+        String documentContent = getDocumentContent(caseData, documentName, caseTypeId, userToken);
 
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(connection.getOutputStream(),
                 StandardCharsets.UTF_8)) {
@@ -284,14 +284,16 @@ public class TornadoService {
         }
     }
 
-    private String getDocumentContent(CaseData caseData, String documentName, String caseTypeId)
+    private String getDocumentContent(CaseData caseData, String documentName, String caseTypeId, String userToken)
             throws JsonProcessingException {
         if (isNullOrEmpty(documentName)) {
             throw new NullPointerException("Document name cannot be null or empty");
         }
         switch (documentName) {
             case "ET1 Vetting.pdf":
-                return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
+                UserDetails userDetails = userService.getUserDetails(userToken);
+                return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
+                        userDetails.getName());
             case "ET3 Processing.pdf":
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             case "ET3 Response.pdf":

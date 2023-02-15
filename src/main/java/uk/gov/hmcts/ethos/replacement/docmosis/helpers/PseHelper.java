@@ -94,16 +94,17 @@ public final class PseHelper {
         return String.format(
             ORDER_APP_MARKUP,
             sendNotificationType.getSendNotificationTitle(),
-            sendNotificationType.getSendNotificationSelectHearing() != null
-                ? sendNotificationType.getSendNotificationSelectHearing().getSelectedLabel()
-                : "",
+            sendNotificationType.getSendNotificationSelectHearing() == null
+                ? ""
+                : sendNotificationType.getSendNotificationSelectHearing().getSelectedLabel(),
             sendNotificationType.getDate(),
             defaultString(sendNotificationType.getSendNotificationCaseManagement()),
             defaultString(sendNotificationType.getSendNotificationResponseTribunal()),
             defaultString(sendNotificationType.getSendNotificationSelectParties()),
             defaultString(sendNotificationType.getSendNotificationAdditionalInfo()),
-            sendNotificationType.getSendNotificationUploadDocument() != null
-                ? sendNotificationType.getSendNotificationUploadDocument().stream()
+            sendNotificationType.getSendNotificationUploadDocument() == null
+                ? ""
+                : sendNotificationType.getSendNotificationUploadDocument().stream()
                     .map(d -> String.format(
                         ORDER_APP_DOC_MARKUP,
                         d.getValue().getShortDescription(),
@@ -111,8 +112,7 @@ public final class PseHelper {
                             .replaceFirst(""),
                         d.getValue().getUploadedDocument().getDocumentFilename()
                     ))
-                    .collect(Collectors.joining())
-                : "",
+                    .collect(Collectors.joining()),
             defaultString(sendNotificationType.getSendNotificationCaseManagement()),
             CASE_MANAGEMENT_ORDER.equals(sendNotificationType.getSendNotificationCaseManagement())
                 ? defaultString(sendNotificationType.getSendNotificationWhoCaseOrder())

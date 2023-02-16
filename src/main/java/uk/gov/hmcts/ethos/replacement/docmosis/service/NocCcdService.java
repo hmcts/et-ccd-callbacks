@@ -7,6 +7,7 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.AuditEventsResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 
 import java.io.IOException;
@@ -45,5 +46,34 @@ public class NocCcdService {
             jurisdiction,
             ccdRequest,
             caseId);
+    }
+
+    /**
+     * Gets all case assignments for a given case id.
+     * @param userToken - bearer token
+     * @param caseId - ccd case id
+     * @return list of case assignments for given case id
+     */
+    public CaseUserAssignmentData getCaseAssignments(String userToken, String caseId) {
+        try {
+            return ccdClient.retrieveCaseAssignments(userToken, caseId);
+        } catch (IOException exception) {
+            log.info("Error form ccd - {}", exception.getMessage());
+            throw new RuntimeException(exception);
+        }
+    }
+
+    /**
+     * Revokes access to case for given users.
+     * @param userToken - bearer token
+     * @param caseUserAssignmentData - containing list of user id, case id and role id mappings for removal
+     */
+    public void revokeCaseAssignments(String userToken, CaseUserAssignmentData caseUserAssignmentData) {
+        try {
+            ccdClient.revokeCaseAssignments(userToken, caseUserAssignmentData);
+        } catch (IOException exception) {
+            log.info("Error form ccd - {}", exception.getMessage());
+            throw new RuntimeException(exception);
+        }
     }
 }

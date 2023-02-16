@@ -2,12 +2,15 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -26,12 +29,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@SuppressWarnings("PMD.ExcessiveImports")
 public class NocRespondentRepresentativeService {
     public static final String NOC_REQUEST = "nocRequest";
     private final NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
@@ -121,7 +126,7 @@ public class NocRespondentRepresentativeService {
         CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore().getCaseData();
         CaseData caseData = caseDetails.getCaseData();
 
-        List<ChangeOrganisationRequest> changeRequests = getRepresentationChanges(caseData,
+        List<ChangeOrganisationRequest> changeRequests = identifyRepresentationChanges(caseData,
             caseDataBefore);
 
         String accessToken = adminUserService.getAdminUserToken();
@@ -137,8 +142,14 @@ public class NocRespondentRepresentativeService {
 
     }
 
-    public List<ChangeOrganisationRequest> getRepresentationChanges(CaseData  after,
-                                                                    CaseData before) {
+    /**
+     * Identifies differences in representation.
+     * @param after - case data after event
+     * @param before - case data before event was triggered
+     * @return list of change organisation requests for any changes detected
+     */
+    public List<ChangeOrganisationRequest> identifyRepresentationChanges(CaseData  after,
+                                                                         CaseData before) {
         final List<RespondentSumTypeItem> newRespondents =
             defaultIfNull(after.getRespondentCollection(), new ArrayList<>());
         final Map<String, Organisation> newRespondentsOrganisations =
@@ -161,5 +172,35 @@ public class NocRespondentRepresentativeService {
         }
 
         return changeRequests;
+    }
+
+    /**
+     * Revokes access from all users of an organisation being replaced or removed.
+     * @param caseId - case id of case to apply update to
+     * @param changeOrganisationRequest - containing case role and id of organisation to remove
+     * @throws IOException - thrown if no ccd service is inaccessible
+     */
+    public void removeOrganisationRepresentativeAccess(String caseId,
+                                                       ChangeOrganisationRequest changeOrganisationRequest)
+        throws IOException {
+        String roleOfRemovedOrg = changeOrganisationRequest.getCaseRoleId().getSelectedCode();
+        String orgId = changeOrganisationRequest.getOrganisationToRemove().getOrganisationID();
+        CaseUserAssignmentData caseAssignments =
+            nocCcdService.getCaseAssignments(adminUserService.getAdminUserToken(), caseId);
+
+        List<CaseUserAssignment> usersToRevoke = caseAssignments.getCaseUserAssignments().stream()
+            .filter(caseUserAssignment -> caseUserAssignment.getCaseRole().equals(roleOfRemovedOrg))
+            .map(caseUserAssignment ->
+                CaseUserAssignment.builder().userId(caseUserAssignment.getUserId())
+                    .organisationId(orgId)
+                    .caseRole(roleOfRemovedOrg)
+                    .caseId(caseId)
+                    .build()
+            ).collect(toList());
+
+        if (!CollectionUtils.isEmpty(usersToRevoke)) {
+            nocCcdService.revokeCaseAssignments(adminUserService.getAdminUserToken(),
+                CaseUserAssignmentData.builder().caseUserAssignments(usersToRevoke).build());
+        }
     }
 }

@@ -94,32 +94,44 @@ public final class PseHelper {
         return String.format(
             ORDER_APP_MARKUP,
             sendNotificationType.getSendNotificationTitle(),
-            sendNotificationType.getSendNotificationSelectHearing() == null
-                ? ""
-                : sendNotificationType.getSendNotificationSelectHearing().getSelectedLabel(),
+            getSendNotificationSelectHearing(sendNotificationType),
             sendNotificationType.getDate(),
             defaultString(sendNotificationType.getSendNotificationCaseManagement()),
             defaultString(sendNotificationType.getSendNotificationResponseTribunal()),
             defaultString(sendNotificationType.getSendNotificationSelectParties()),
             defaultString(sendNotificationType.getSendNotificationAdditionalInfo()),
-            sendNotificationType.getSendNotificationUploadDocument() == null
-                ? ""
-                : sendNotificationType.getSendNotificationUploadDocument().stream()
-                    .map(d -> String.format(
-                        ORDER_APP_DOC_MARKUP,
-                        d.getValue().getShortDescription(),
-                        Helper.getDocumentMatcher(d.getValue().getUploadedDocument().getDocumentBinaryUrl())
-                            .replaceFirst(""),
-                        d.getValue().getUploadedDocument().getDocumentFilename()
-                    ))
-                    .collect(Collectors.joining()),
+            getSendNotificationUploadDocument(sendNotificationType),
             defaultString(sendNotificationType.getSendNotificationCaseManagement()),
-            CASE_MANAGEMENT_ORDER.equals(sendNotificationType.getSendNotificationCaseManagement())
-                ? defaultString(sendNotificationType.getSendNotificationWhoCaseOrder())
-                : defaultString(sendNotificationType.getSendNotificationRequestMadeBy()),
+            getSendNotificationWhoMadeBy(sendNotificationType),
             defaultString(sendNotificationType.getSendNotificationFullName()),
             sendNotificationType.getSendNotificationNotify()
         );
+    }
+
+    private static String getSendNotificationSelectHearing(SendNotificationType sendNotificationType) {
+        return sendNotificationType.getSendNotificationSelectHearing() == null
+            ? ""
+            : sendNotificationType.getSendNotificationSelectHearing().getSelectedLabel();
+    }
+
+    private static String getSendNotificationUploadDocument(SendNotificationType sendNotificationType) {
+        return sendNotificationType.getSendNotificationUploadDocument() == null
+            ? ""
+            : sendNotificationType.getSendNotificationUploadDocument().stream()
+            .map(d -> String.format(
+                ORDER_APP_DOC_MARKUP,
+                d.getValue().getShortDescription(),
+                Helper.getDocumentMatcher(d.getValue().getUploadedDocument().getDocumentBinaryUrl())
+                    .replaceFirst(""),
+                d.getValue().getUploadedDocument().getDocumentFilename()
+            ))
+            .collect(Collectors.joining());
+    }
+
+    private static String getSendNotificationWhoMadeBy(SendNotificationType sendNotificationType) {
+        return CASE_MANAGEMENT_ORDER.equals(sendNotificationType.getSendNotificationCaseManagement())
+            ? defaultString(sendNotificationType.getSendNotificationWhoCaseOrder())
+            : defaultString(sendNotificationType.getSendNotificationRequestMadeBy());
     }
 
     /**

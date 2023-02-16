@@ -160,10 +160,10 @@ class PseRespondToTribunalControllerTest {
             .andExpect(status().isForbidden());
     }
 
-    // TODO: submitted_Success
-    /*
     @Test
     void submitted_Success() throws Exception {
+        when(pseRespondToTribunalService.getSubmittedBody(ccdRequest.getCaseDetails().getCaseData()))
+            .thenReturn("SubmittedBody");
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_URL)
                 .contentType(APPLICATION_JSON)
@@ -175,7 +175,6 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
     }
-     */
 
     @Test
     void submitted_invalidToken() throws Exception {

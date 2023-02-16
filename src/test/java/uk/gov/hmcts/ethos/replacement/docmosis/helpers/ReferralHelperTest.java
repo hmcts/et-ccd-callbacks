@@ -328,7 +328,7 @@ class ReferralHelperTest {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
         DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData);
         selectReferralList.setValue(new DynamicValueType());
-        selectReferralList.getValue().setCode("1");
+        selectReferralList.getValue().setLabel("1");
         caseData.setSelectReferral(selectReferralList);
         setReferralReplyData();
 
@@ -359,7 +359,7 @@ class ReferralHelperTest {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
         DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData);
         selectReferralList.setValue(new DynamicValueType());
-        selectReferralList.getValue().setCode("1");
+        selectReferralList.getValue().setLabel("1");
         caseData.setSelectReferral(selectReferralList);
 
         ReferralHelper.setReferralStatusToClosed(caseData);
@@ -429,7 +429,7 @@ class ReferralHelperTest {
 
         DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData);
         selectReferralList.setValue(new DynamicValueType());
-        selectReferralList.getValue().setCode("1");
+        selectReferralList.getValue().setLabel("1");
         caseData.setSelectReferral(selectReferralList);
 
         String expectedDocumentSummaryExisting = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-EGW-ENG-00067."

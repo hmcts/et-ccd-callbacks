@@ -8,7 +8,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
-
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DIGITAL_FILE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DO_NOT_POSTPONE;
@@ -28,10 +27,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ZERO;
 
 @Slf4j
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
-        "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
-        "PMD.GodClass", "PMD.ConfusingTernary", "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal",
-        "PMD.ImplicitSwitchFallThrough", "PMD.ConsecutiveAppendsShouldReuse", "PMD.LawOfDemeter",
-        "PMD.CyclomaticComplexity", "PMD.UnusedPrivateMethod"})
+    "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
+    "PMD.GodClass", "PMD.ConfusingTernary", "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal",
+    "PMD.ImplicitSwitchFallThrough", "PMD.ConsecutiveAppendsShouldReuse", "PMD.LawOfDemeter",
+    "PMD.CyclomaticComplexity"})
 public class FlagsImageHelper {
 
     private static final String COLOR_ORANGE = "Orange";
@@ -46,6 +45,7 @@ public class FlagsImageHelper {
     private static final String COLOR_SLATE_GRAY = "SlateGray";
     private static final String COLOR_DARK_SLATE_BLUE = "DarkSlateBlue";
     private static final String FLAG_REASONABLE_ADJUSTMENT = "REASONABLE ADJUSTMENT";
+    private static final String FLAG_WELSH_LANGUAGE = "Cymraeg";
 
     private FlagsImageHelper() {
     }
@@ -69,6 +69,7 @@ public class FlagsImageHelper {
         setFlagImageFor(FLAG_ECC, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
         setFlagImageFor(FLAG_DIGITAL_FILE, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
         setFlagImageFor(FLAG_REASONABLE_ADJUSTMENT, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
+        setFlagImageFor(FLAG_WELSH_LANGUAGE, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
         flagsImageFileName.append(IMAGE_FILE_EXTENSION);
 
         caseData.setFlagsImageAltText(flagsImageAltText.toString());
@@ -120,6 +121,10 @@ public class FlagsImageHelper {
             case FLAG_REASONABLE_ADJUSTMENT:
                 flagRequired = reasonableAdjustment(caseData);
                 flagColor = COLOR_DARK_SLATE_BLUE;
+                break;
+            case FLAG_WELSH_LANGUAGE:
+                flagRequired = welshColor(caseData);
+                flagColor = COLOR_RED;
                 break;
             default:
                 flagRequired = false;
@@ -229,6 +234,12 @@ public class FlagsImageHelper {
         }
     }
 
+    private static boolean welshColor(CaseData caseData) {
+        return caseData.getClaimantHearingPreference() != null
+                && (YES.equals(caseData.getClaimantHearingPreference().getContactLanguage())
+                || YES.equals(caseData.getClaimantHearingPreference().getHearingLanguage()));
+    }
+
     private static boolean digitalFile(CaseData caseData) {
         if (caseData.getAdditionalCaseInfoType() != null) {
             return YES.equals(caseData.getAdditionalCaseInfoType().getDigitalFile());
@@ -241,5 +252,4 @@ public class FlagsImageHelper {
         return SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)
                 && !TribunalOffice.GLASGOW.getOfficeName().equals(caseData.getManagingOffice());
     }
-
 }

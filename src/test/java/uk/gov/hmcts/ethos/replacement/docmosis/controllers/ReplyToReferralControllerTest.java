@@ -92,7 +92,7 @@ class ReplyToReferralControllerTest {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
         DynamicFixedListType selectReferralList = ReferralHelper.populateSelectReferralDropdown(caseData);
         selectReferralList.setValue(new DynamicValueType());
-        selectReferralList.getValue().setCode("1");
+        selectReferralList.getValue().setLabel("1");
         caseData.setSelectReferral(selectReferralList);
 
         List<HearingTypeItem> hearings = new ArrayList<>();

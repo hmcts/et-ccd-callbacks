@@ -33,7 +33,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyForDecision;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantForDecision;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
@@ -121,7 +121,7 @@ public class TseAdminService {
                         respondCount.incrementAndReturnValue(),
                         documentManagementService.displayDocNameTypeSizeLink(
                             replyItem.getValue().getAddDocument(), authToken))
-                    : formatLegalRepReplyForDecision(
+                    : formatLegalRepReplyOrClaimantForDecision(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),
                         populateListDocWithInfoAndLink(replyItem.getValue().getSupportingMaterial(), authToken)))
@@ -264,9 +264,6 @@ public class TseAdminService {
         caseData.setTseAdminSelectPartyNotify(null);
     }
 
-    // TODO -
-    //  display decision's document link (currently not sure if it is a list or just a single decision to display)
-    //  display responses from admin and/or claimant/respondent
     public String generateCloseApplicationDetailsMarkdown(CaseData caseData, String authToken) {
         if (getSelectedApplicationTypeItem(caseData) == null) {
             return null;

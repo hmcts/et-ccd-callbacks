@@ -204,7 +204,7 @@ public class ReplyToReferralController {
             caseData.getReplyToEmailAddress(),
             ReferralHelper.buildPersonalisation(
                 ccdRequest.getCaseDetails(),
-                caseData.getSelectReferral().getValue().getCode(),
+                caseData.getSelectReferral().getValue().getLabel(),
                 false,
                 userDetails.getName()
             )
@@ -219,7 +219,7 @@ public class ReplyToReferralController {
             userToken, ccdRequest.getCaseDetails().getCaseTypeId());
 
         ReferralType referral = caseData.getReferralCollection()
-            .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
+            .get(Integer.parseInt(caseData.getSelectReferral().getValue().getLabel()) - 1).getValue();
 
         referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));
 

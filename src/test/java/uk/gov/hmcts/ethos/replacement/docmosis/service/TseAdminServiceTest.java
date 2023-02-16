@@ -156,6 +156,40 @@ class TseAdminServiceTest {
     }
 
     private GenericTseApplicationType getGenericTseApplicationTypeItemBuild() {
+        TseRespondTypeItem claimantReply = TseRespondTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(
+                TseRespondType.builder()
+                    .from(CLAIMANT_TITLE)
+                    .date("23 December 2022")
+                    .response("Response Details")
+                    .hasSupportingMaterial(YES)
+                    .supportingMaterial(List.of(
+                        createDocumentTypeItem("image.png"),
+                        createDocumentTypeItem("Form.pdf")))
+                    .copyToOtherParty(YES)
+                    .build()
+            ).build();
+
+        TseRespondTypeItem adminReply = TseRespondTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(
+                TseRespondType.builder()
+                    .from(ADMIN)
+                    .date("24 December 2022")
+                    .enterResponseTitle("Title of Response")
+                    .isCmoOrRequest("Request")
+                    .isResponseRequired("Yes - view document for details")
+                    .selectPartyRespond("Both parties")
+                    .additionalInformation("Optional Text entered by admin")
+                    .addDocument(createUploadedDocumentType("admin.txt"))
+                    .requestMadeBy("Caseworker")
+                    .madeByFullName("Mr Jimmy")
+                    .selectPartyNotify("Both parties")
+                    .build()
+            )
+            .build();
+
         return TseApplicationBuilder.builder()
             .withNumber("1")
             .withType(TSE_APP_AMEND_RESPONSE)
@@ -165,38 +199,8 @@ class TseAdminServiceTest {
             .withDetails("Details Text")
             .withStatus(OPEN_STATE)
             .withRespondCollection(List.of(
-                TseRespondTypeItem.builder()
-                    .id(UUID.randomUUID().toString())
-                    .value(
-                        TseRespondType.builder()
-                            .from(CLAIMANT_TITLE)
-                            .date("23 December 2022")
-                            .response("Response Details")
-                            .hasSupportingMaterial(YES)
-                            .supportingMaterial(List.of(
-                                createDocumentTypeItem("image.png"),
-                                createDocumentTypeItem("Form.pdf")))
-                            .copyToOtherParty(YES)
-                            .build()
-                    ).build(),
-                TseRespondTypeItem.builder()
-                    .id(UUID.randomUUID().toString())
-                    .value(
-                        TseRespondType.builder()
-                            .from(ADMIN)
-                            .date("24 December 2022")
-                            .enterResponseTitle("Title of Response")
-                            .isCmoOrRequest("Request")
-                            .isResponseRequired("Yes - view document for details")
-                            .selectPartyRespond("Both parties")
-                            .additionalInformation("Optional Text entered by admin")
-                            .addDocument(createUploadedDocumentType("admin.txt"))
-                            .requestMadeBy("Caseworker")
-                            .madeByFullName("Mr Jimmy")
-                            .selectPartyNotify("Both parties")
-                            .build()
-                    )
-                    .build()
+                claimantReply,
+                adminReply
             ))
             .build();
     }

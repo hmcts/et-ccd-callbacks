@@ -235,7 +235,7 @@ public final class ReferralHelper {
 
     private static ReferralType getSelectedReferral(CaseData caseData) {
         return caseData.getReferralCollection()
-            .get(Integer.parseInt(caseData.getSelectReferral().getValue().getLabel()) - 1).getValue();
+            .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
     }
 
     /**

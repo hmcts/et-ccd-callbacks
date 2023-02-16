@@ -26,6 +26,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -88,38 +90,12 @@ class TseAdminServiceTest {
 
     @Test
     void initialTseAdminTableMarkUp_ReturnString() {
-        TseRespondTypeItem tseRespondTypeItem = TseRespondTypeItem.builder()
-            .id(UUID.randomUUID().toString())
-            .value(
-                TseRespondType.builder()
-                    .from(CLAIMANT_TITLE)
-                    .date("23 December 2022")
-                    .response("Response Details")
-                    .hasSupportingMaterial(YES)
-                    .supportingMaterial(List.of(createDocumentTypeItem("image.png"),
-                        createDocumentTypeItem("Form.pdf")))
-                    .copyToOtherParty(YES)
-                    .build()
-            ).build();
-
-        GenericTseApplicationType genericTseApplicationType = TseApplicationBuilder.builder()
-            .withNumber("1")
-            .withType(TSE_APP_AMEND_RESPONSE)
-            .withApplicant(RESPONDENT_TITLE)
-            .withDate("13 December 2022")
-            .withDocumentUpload(createUploadedDocumentType("document.txt"))
-            .withDetails("Details Text")
-            .withStatus(OPEN_STATE)
-            .withRespondCollection(List.of(tseRespondTypeItem))
-            .build();
-
-        GenericTseApplicationTypeItem genericTseApplicationTypeItem = GenericTseApplicationTypeItem.builder()
-            .id(UUID.randomUUID().toString())
-            .value(genericTseApplicationType)
-            .build();
 
         caseData.setGenericTseApplicationCollection(
-            List.of(genericTseApplicationTypeItem)
+            List.of(GenericTseApplicationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(getGenericTseApplicationTypeItemBuild())
+                .build())
         );
 
         caseData.setTseAdminSelectApplication(
@@ -140,6 +116,11 @@ class TseAdminServiceTest {
             createUploadedDocumentType("Form.pdf"), AUTH_TOKEN))
             .thenReturn(fileDisplay3);
 
+        String fileDisplay4 = "<a href=\"/documents/%s\" target=\"_blank\">Admin (TXT, 1MB)</a>";
+        when(documentManagementService.displayDocNameTypeSizeLink(
+            createUploadedDocumentType("admin.txt"), AUTH_TOKEN))
+            .thenReturn(fileDisplay4);
+
         String expected = "| | |\r\n"
             + "|--|--|\r\n"
             + "|Respondent application | Amend response|\r\n"
@@ -153,6 +134,20 @@ class TseAdminServiceTest {
             + "|Response date | 23 December 2022|\r\n"
             + "|Details | Response Details|\r\n"
             + "|Supporting material | " + fileDisplay2 + "<br>" + fileDisplay3 + "<br>" + "|\r\n"
+            + "\r\n"
+            + "|Response 2 | |\r\n"
+            + "|--|--|\r\n"
+            + "|Response | Title of Response|\r\n"
+            + "|Date | 24 December 2022|\r\n"
+            + "|Sent by | Tribunal|\r\n"
+            + "|Case management order or request? | Request|\r\n"
+            + "|Response due | Yes - view document for details|\r\n"
+            + "|Party or parties to respond | Both parties|\r\n"
+            + "|Additional information | Optional Text entered by admin|\r\n"
+            + "|Supporting material | " + fileDisplay4 + "|\r\n"
+            + "|Request made by | Caseworker|\r\n"
+            + "|Full name | Mr Jimmy|\r\n"
+            + "|Sent to | Both parties|\r\n"
             + "\r\n";
 
         tseAdminService.initialTseAdminTableMarkUp(caseData, AUTH_TOKEN);
@@ -160,12 +155,57 @@ class TseAdminServiceTest {
             .isEqualTo(expected);
     }
 
+    private GenericTseApplicationType getGenericTseApplicationTypeItemBuild() {
+        return TseApplicationBuilder.builder()
+            .withNumber("1")
+            .withType(TSE_APP_AMEND_RESPONSE)
+            .withApplicant(RESPONDENT_TITLE)
+            .withDate("13 December 2022")
+            .withDocumentUpload(createUploadedDocumentType("document.txt"))
+            .withDetails("Details Text")
+            .withStatus(OPEN_STATE)
+            .withRespondCollection(List.of(
+                TseRespondTypeItem.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(
+                        TseRespondType.builder()
+                            .from(CLAIMANT_TITLE)
+                            .date("23 December 2022")
+                            .response("Response Details")
+                            .hasSupportingMaterial(YES)
+                            .supportingMaterial(List.of(
+                                createDocumentTypeItem("image.png"),
+                                createDocumentTypeItem("Form.pdf")))
+                            .copyToOtherParty(YES)
+                            .build()
+                    ).build(),
+                TseRespondTypeItem.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(
+                        TseRespondType.builder()
+                            .from(ADMIN)
+                            .date("24 December 2022")
+                            .enterResponseTitle("Title of Response")
+                            .isCmoOrRequest("Request")
+                            .isResponseRequired("Yes - view document for details")
+                            .selectPartyRespond("Both parties")
+                            .additionalInformation("Optional Text entered by admin")
+                            .addDocument(createUploadedDocumentType("admin.txt"))
+                            .requestMadeBy("Caseworker")
+                            .madeByFullName("Mr Jimmy")
+                            .selectPartyNotify("Both parties")
+                            .build()
+                    )
+                    .build()
+            ))
+            .build();
+    }
+
     private UploadedDocumentType createUploadedDocumentType(String fileName) {
-        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
-        uploadedDocumentType.setDocumentBinaryUrl("http://dm-store:8080/documents/1234/binary");
-        uploadedDocumentType.setDocumentFilename(fileName);
-        uploadedDocumentType.setDocumentUrl("http://dm-store:8080/documents/1234");
-        return uploadedDocumentType;
+        return UploadedDocumentBuilder.builder()
+            .withFilename(fileName)
+            .withUuid("1234")
+            .build();
     }
 
     private DocumentTypeItem createDocumentTypeItem(String fileName) {

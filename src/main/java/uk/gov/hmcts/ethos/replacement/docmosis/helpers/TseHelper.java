@@ -80,9 +80,9 @@ public final class TseHelper {
         + "|Response due | %s|\r\n"
         + "|Party or parties to respond | %s|\r\n"
         + "|Additional information | %s|\r\n"
-        + "|Document | %s|\r\n"
+        + "|Supporting material | %s|\r\n"
         + "%s"
-        + "|Name | %s|\r\n"
+        + "|Full name | %s|\r\n"
         + "|Sent to | %s|\r\n"
         + "\r\n";
     private static final String ADMIN_REPLY_MARKUP_MADE_BY = "|%s made by | %s|\r\n";

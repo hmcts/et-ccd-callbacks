@@ -334,6 +334,7 @@ public class ReportDataServiceTest {
         assertEquals("2021-07-13", listingDataResult.getListingDate());
         assertEquals("2021-07-12", listingDataResult.getListingDateFrom());
         assertEquals("2021-07-14", listingDataResult.getListingDateTo());
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), listingDataResult.getManagingOffice());
     }
 
     @Test
@@ -411,6 +412,7 @@ public class ReportDataServiceTest {
         assertEquals("2021-07-13", listingDataResult.getListingDate());
         assertEquals("2021-07-12", listingDataResult.getListingDateFrom());
         assertEquals("2021-07-14", listingDataResult.getListingDateTo());
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), listingDataResult.getManagingOffice());
     }
 
     @Test
@@ -435,6 +437,7 @@ public class ReportDataServiceTest {
         assertEquals("2021-07-13", listingDataResult.getListingDate());
         assertEquals("2021-07-12", listingDataResult.getListingDateFrom());
         assertEquals("2021-07-14", listingDataResult.getListingDateTo());
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), listingDataResult.getManagingOffice());
     }
 
     @Test

@@ -146,15 +146,10 @@ public class DocumentManagementServiceTest {
     @Test
     public void downloadFileSecureDocStoreTrue() {
         ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", true);
-        when(caseDocumentClient.getDocumentBinary(anyString(), anyString(), anyString()))
-                .thenReturn(responseEntity);
+        when(documentDownloadClientApi.downloadBinary(anyString(), anyString(), anyString(), anyString(), anyString()))
+            .thenReturn(responseEntity);
         UploadedDocument uploadedDocument = documentManagementService.downloadFile("authString",
-                "http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
-        assertEquals("fileName", uploadedDocument.getName());
-        assertEquals("xslx", uploadedDocument.getContentType());
-
-        uploadedDocument = documentManagementService.downloadFile("authString",
-                "documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
+            "http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
         assertEquals("fileName", uploadedDocument.getName());
         assertEquals("xslx", uploadedDocument.getContentType());
     }

@@ -39,6 +39,7 @@ public class BfActionReport {
 
         String managingOffice = caseData.getManagingOffice();
         bfActionReportData.setOffice(ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), managingOffice));
+        bfActionReportData.setManagingOffice(bfActionReportData.getOffice());
         bfActionReportData.setListingDate(caseData.getListingDate());
         bfActionReportData.setListingDateFrom(caseData.getListingDateFrom());
         bfActionReportData.setListingDateTo(caseData.getListingDateTo());

@@ -197,12 +197,12 @@ public class Et1VettingData {
     @JsonProperty("et1OtherReferralGeneralNotes")
     private String et1OtherReferralGeneralNotes;
 
-    // ET! Vetting - Addtional Information
+    // ET1 Vetting - Addtional Information
     @JsonProperty("et1VettingAdditionalInformationTextArea")
     private String et1VettingAdditionalInformationTextArea;
-    // ET! Vetting - completed by and date
-    @JsonProperty("vettingCompletedBy")
-    private String vettingCompletedBy;
-    @JsonProperty("dateCompleted")
-    private String dateCompleted;
+    // ET1 Vetting - completed by and date
+    @JsonProperty("et1VettingCompletedBy")
+    private String et1VettingCompletedBy;
+    @JsonProperty("et1DateCompleted")
+    private String et1DateCompleted;
 }

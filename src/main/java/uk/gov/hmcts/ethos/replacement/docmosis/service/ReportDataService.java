@@ -146,7 +146,7 @@ public class ReportDataService {
         return claimsByHearingVenueReport.generateReport(claimsByHearingVenueReportParams);
     }
 
-    private String getUserFullName(String userToken) {
+    public String getUserFullName(String userToken) {
         UserDetails userDetails = userService.getUserDetails(userToken);
         String firstName = userDetails.getFirstName() != null ? userDetails.getFirstName() : "";
         String lastName = userDetails.getLastName() != null ? userDetails.getLastName() : "";

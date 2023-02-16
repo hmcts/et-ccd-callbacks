@@ -57,6 +57,7 @@ public class TornadoService {
     private final UserService userService;
     private final DefaultValuesReaderService defaultValuesReaderService;
     private final VenueAddressReaderService venueAddressReaderService;
+    private final ReportDataService reportDataService;
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
@@ -291,9 +292,8 @@ public class TornadoService {
         }
         switch (documentName) {
             case "ET1 Vetting.pdf":
-                UserDetails userDetails = userService.getUserDetails(userToken);
                 return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
-                        userDetails.getName());
+                        reportDataService.getUserFullName(userToken));
             case "ET3 Processing.pdf":
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             case "ET3 Response.pdf":

@@ -140,9 +140,9 @@ public final class Et1VettingHelper {
                 .et1OtherReferralGeneralNotes(defaultIfEmpty(caseData.getEt1OtherReferralGeneralNotes(), null))
                 .et1VettingAdditionalInformationTextArea(
                         defaultIfEmpty(caseData.getEt1VettingAdditionalInformationTextArea(), null))
-                .dateCompleted(
+                .et1DateCompleted(
                         defaultIfEmpty(LocalDate.now().toString(), null))
-                .vettingCompletedBy(defaultIfEmpty(name, null))
+                .et1VettingCompletedBy(defaultIfEmpty(name, null))
                 .build();
 
         Et1VettingDocument et1VettingDocument = Et1VettingDocument.builder()

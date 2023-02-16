@@ -36,6 +36,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
+@SuppressWarnings({"PMD.ExcessiveImports"})
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class PseRespondToTribunalServiceTest {
     private PseRespondToTribunalService pseRespondToTribService;
@@ -267,7 +268,7 @@ class PseRespondToTribunalServiceTest {
     }
 
     @Test
-    void getSubmittedBody_NoCopy() {
+    void submittedBody_NoCopy() {
         DynamicFixedListType newType = new DynamicFixedListType("1");
         caseData.setPseRespondentSelectOrderOrRequest(newType);
 
@@ -285,7 +286,7 @@ class PseRespondToTribunalServiceTest {
     }
 
     @Test
-    void getSubmittedBody_YesCopy() {
+    void submittedBody_YesCopy() {
         DynamicFixedListType newType = new DynamicFixedListType("1");
         caseData.setPseRespondentSelectOrderOrRequest(newType);
 

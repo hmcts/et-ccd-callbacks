@@ -54,6 +54,7 @@ public class MemberDaysReport {
             caseData.getManagingOffice());
 
         reportData.setOffice(reportOffice);
+        reportData.setManagingOffice(reportOffice);
         reportData.setHearingDateType(caseData.getHearingDateType());
         reportData.setReportType(MEMBER_DAYS_REPORT);
         reportData.setDocumentName(MEMBER_DAYS_REPORT);

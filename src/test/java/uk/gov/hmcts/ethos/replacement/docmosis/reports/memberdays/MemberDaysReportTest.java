@@ -54,6 +54,7 @@ class MemberDaysReportTest {
         listingData.setListingVenue(new DynamicFixedListType("Leeds"));
         listingData.setReportType(MEMBER_DAYS_REPORT);
         listingData.setHearingDateType(RANGE_HEARING_DATE_TYPE);
+        listingData.setManagingOffice("Leeds");
 
         listingDetails.setCaseData(listingData);
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
@@ -247,6 +248,12 @@ class MemberDaysReportTest {
     void shouldReturnMembersDayReportType() {
         MemberDaysReportData resultListingData = memberDaysReport.runReport(listingDetails, submitEvents);
         assertEquals(MEMBER_DAYS_REPORT, resultListingData.getReportType());
+    }
+
+    @Test
+    void shouldReturnMembersDayManagingOffice() {
+        MemberDaysReportData resultListingData = memberDaysReport.runReport(listingDetails, submitEvents);
+        assertEquals("Leeds", resultListingData.getManagingOffice());
     }
 
     @Test

@@ -3,16 +3,16 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
-import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
-import static uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType.getSelectedLabel;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et1VettingData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et1VettingDocument;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType.getSelectedLabel;
 
 /**
  * ET1 Vetting Helper provides methods to assist with the ET1 vetting event.

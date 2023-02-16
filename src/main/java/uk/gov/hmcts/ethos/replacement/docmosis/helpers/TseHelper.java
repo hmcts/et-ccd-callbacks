@@ -106,6 +106,20 @@ public final class TseHelper {
             .collect(Collectors.toList()));
     }
 
+    public static DynamicFixedListType populateOpenOrClosedApplications(CaseData caseData) {
+
+        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+            return null;
+        }
+
+        String selectedOpenOrClosed = caseData.getTseViewApplicationOpenOrClosed();
+
+        return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
+                .filter(o -> o.getValue().getStatus().equals(selectedOpenOrClosed))
+                .map(TseHelper::formatDropdownOption)
+                .collect(Collectors.toList()));
+    }
+
     private static DynamicValueType formatDropdownOption(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
         GenericTseApplicationType value = genericTseApplicationTypeItem.getValue();
         return DynamicValueType.create(value.getNumber(), String.format("%s %s", value.getNumber(), value.getType()));

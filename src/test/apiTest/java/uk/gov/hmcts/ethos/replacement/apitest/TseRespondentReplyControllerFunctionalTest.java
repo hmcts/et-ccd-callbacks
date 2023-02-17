@@ -54,7 +54,7 @@ class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTest {
         genericTseApplicationTypeItem.setValue(build);
         caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
 
-        caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
+        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
 
         caseData.getGenericTseApplicationCollection().get(0).getValue()

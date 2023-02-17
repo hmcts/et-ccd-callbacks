@@ -95,13 +95,17 @@ public final class TseHelper {
      * Create fields for application dropdown selector.
      * @param caseData contains all the case data
      */
-    public static DynamicFixedListType populateSelectApplicationDropdown(CaseData caseData) {
+    public static DynamicFixedListType populateRespondentSelectApplication(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
             return null;
         }
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
-            .filter(o -> !CLOSED_STATE.equals(o.getValue().getStatus()))
+            .filter(o -> !CLOSED_STATE.equals(o.getValue().getStatus())
+                && (o.getValue().getRespondCollection() == null
+                    || (int) o.getValue().getRespondCollection().stream()
+                    .filter(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()))
+                    .count() == 0))
             .map(TseHelper::formatDropdownOption)
             .collect(Collectors.toList()));
     }

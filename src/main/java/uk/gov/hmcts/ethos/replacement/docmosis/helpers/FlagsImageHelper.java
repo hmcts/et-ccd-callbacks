@@ -8,7 +8,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
-
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DIGITAL_FILE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DO_NOT_POSTPONE;
@@ -236,8 +235,9 @@ public class FlagsImageHelper {
     }
 
     private static boolean welshColor(CaseData caseData) {
-        return YES.equals(caseData.getClaimantHearingPreference().getContactLanguage())
-                || YES.equals(caseData.getClaimantHearingPreference().getHearingLanguage());
+        return caseData.getClaimantHearingPreference() != null
+                && (YES.equals(caseData.getClaimantHearingPreference().getContactLanguage())
+                || YES.equals(caseData.getClaimantHearingPreference().getHearingLanguage()));
     }
 
     private static boolean digitalFile(CaseData caseData) {
@@ -252,5 +252,4 @@ public class FlagsImageHelper {
         return SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)
                 && !TribunalOffice.GLASGOW.getOfficeName().equals(caseData.getManagingOffice());
     }
-
 }

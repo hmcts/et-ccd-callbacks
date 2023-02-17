@@ -143,7 +143,10 @@ public final class NotificationHelper {
             .collect(Collectors.joining(", "));
     }
 
-    private static String getEmailAddressForRespondent(CaseData caseData, RespondentSumType respondent) {
+    /**
+     * Gets the email address for the respondent's legal rep (if available) or their own email address.
+     */
+    public static String getEmailAddressForRespondent(CaseData caseData, RespondentSumType respondent) {
         RepresentedTypeR representative = getRespondentRepresentative(caseData, respondent);
         if (representative != null) {
             String email = representative.getRepresentativeEmailAddress();

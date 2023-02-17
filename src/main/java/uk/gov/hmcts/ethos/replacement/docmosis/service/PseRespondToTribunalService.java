@@ -6,10 +6,13 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.time.LocalDate;
@@ -18,7 +21,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatLegalRepReply;
@@ -39,6 +44,39 @@ public class PseRespondToTribunalService {
 
     private static final String RULE92_ANSWERED_YES =
         "You have responded to the tribunal and copied your response to the other party.\r\n\r\n";
+
+    /**
+     * Create fields for application dropdown selector.
+     * @param caseData contains all the case data
+     */
+    public DynamicFixedListType populateSelectDropdown(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getSendNotificationCollection())) {
+            return null;
+        }
+
+        return DynamicFixedListType.from(caseData.getSendNotificationCollection().stream()
+            .filter(r -> populateSelectDropdownFilterNotify(r)
+                && populateSelectDropdownFilterRespond(r))
+            .map(r ->
+                DynamicValueType.create(
+                    r.getValue().getNumber(),
+                    r.getValue().getNumber() + " " + r.getValue().getSendNotificationTitle()
+                )
+            )
+            .collect(Collectors.toList()));
+    }
+
+    private boolean populateSelectDropdownFilterNotify(SendNotificationTypeItem sendNotificationTypeItem) {
+        return RESPONDENT_ONLY.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify())
+            || BOTH_PARTIES.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify());
+    }
+
+    private boolean populateSelectDropdownFilterRespond(SendNotificationTypeItem sendNotificationTypeItem) {
+        return sendNotificationTypeItem.getValue().getRespondCollection() == null
+            || (int) sendNotificationTypeItem.getValue().getRespondCollection().stream()
+            .filter(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()))
+            .count() == 0;
+    }
 
     /**
      * Initial Application and Respond details table.

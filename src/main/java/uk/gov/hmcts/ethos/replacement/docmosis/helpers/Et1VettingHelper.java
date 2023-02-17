@@ -39,7 +39,8 @@ public final class Et1VettingHelper {
      * @throws JsonProcessingException if the JSON cannot be generated correctly, an error would be thrown. This could
      be due to an illegal character potentially existing in the data
      */
-    public static String getDocumentRequest(CaseData caseData, String userToken, String name) throws JsonProcessingException {
+    public static String getDocumentRequest(CaseData caseData,
+                                            String userToken) throws JsonProcessingException {
         Et1VettingData et1VettingData = Et1VettingData.builder()
                 .ethosCaseReference(caseData.getEthosCaseReference())
                 .et1VettingCanServeClaimYesOrNo(defaultIfEmpty(caseData.getEt1VettingCanServeClaimYesOrNo(), null))
@@ -141,8 +142,8 @@ public final class Et1VettingHelper {
                 .et1VettingAdditionalInformationTextArea(
                         defaultIfEmpty(caseData.getEt1VettingAdditionalInformationTextArea(), null))
                 .et1DateCompleted(
-                        defaultIfEmpty(LocalDate.now().toString(), null))
-                .et1VettingCompletedBy(defaultIfEmpty(name, null))
+                        defaultIfEmpty(caseData.getEt1DateCompleted(), LocalDate.now().toString()))
+                .et1VettingCompletedBy(defaultIfEmpty(caseData.getEt1VettingCompletedBy(), null))
                 .build();
 
         Et1VettingDocument et1VettingDocument = Et1VettingDocument.builder()

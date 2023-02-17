@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
@@ -57,6 +58,9 @@ class InitialConsiderationControllerTest {
 
     @MockBean
     private DocumentManagementService documentManagementService;
+
+    @MockBean
+    private ReportDataService reportDataService;
 
     @MockBean
     private TornadoService tornadoService;

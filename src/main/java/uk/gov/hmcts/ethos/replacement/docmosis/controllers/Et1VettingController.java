@@ -22,10 +22,10 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-
+import java.time.LocalDate;
 import java.util.List;
-
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -42,6 +42,7 @@ public class Et1VettingController {
     private final VerifyTokenService verifyTokenService;
     private final Et1VettingService et1VettingService;
     private final DocumentManagementService documentManagementService;
+    private final ReportDataService reportDataService;
 
     /**
      * Initialise ET1 case vetting.
@@ -167,6 +168,8 @@ public class Et1VettingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setEt1VettingCompletedBy(reportDataService.getUserFullName(userToken));
+        caseData.setEt1DateCompleted(LocalDate.now().toString());
         DocumentInfo documentInfo = et1VettingService.generateEt1VettingDocument(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setEt1VettingDocument(documentManagementService.addDocumentToDocumentField(documentInfo));

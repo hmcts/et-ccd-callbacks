@@ -84,9 +84,9 @@ public final class TseHelper {
         + "|Response due | %s|\r\n"
         + "|Party or parties to respond | %s|\r\n"
         + "|Additional information | %s|\r\n"
-        + "|Document | %s|\r\n"
+        + "|Supporting material | %s|\r\n"
         + "%s"
-        + "|Name | %s|\r\n"
+        + "|Full name | %s|\r\n"
         + "|Sent to | %s|\r\n"
         + "\r\n";
     private static final String ADMIN_REPLY_MARKUP_MADE_BY = "|%s made by | %s|\r\n";
@@ -502,8 +502,8 @@ public final class TseHelper {
      * @param docInfo Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
      * @return Markup String
      */
-    public static String formatLegalRepReplyForReply(TseRespondType reply, int respondCount, String applicant,
-                                                     String docInfo) {
+    public static String formatLegalRepReplyOrClaimantForReply(TseRespondType reply, int respondCount, String applicant,
+                                                               String docInfo) {
         return String.format(
             RESPONDENT_REPLY_MARKUP_FOR_REPLY,
             respondCount,
@@ -523,7 +523,8 @@ public final class TseHelper {
      * @param docInfo Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
      * @return Markup String
      */
-    public static String formatLegalRepReplyForDecision(TseRespondType reply, int respondCount, String docInfo) {
+    public static String formatLegalRepReplyOrClaimantForDecision(TseRespondType reply, int respondCount,
+                                                                  String docInfo) {
         return String.format(
             RESPONDENT_REPLY_MARKUP_FOR_DECISION,
             respondCount,

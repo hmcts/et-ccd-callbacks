@@ -461,10 +461,10 @@ public class ListingService {
     public DocumentInfo processHearingDocument(ListingData listingData, String caseTypeId, String authToken) {
         try {
             if (CLAIMS_BY_HEARING_VENUE_REPORT.equals(listingData.getReportType())) {
-              return claimsByHearingVenueExcelReportDocumentInfoService.generateExcelReportDocumentInfo(
-                      (ClaimsByHearingVenueReportData)listingData, caseTypeId, authToken);
+                return claimsByHearingVenueExcelReportDocumentInfoService.generateExcelReportDocumentInfo(
+                        (ClaimsByHearingVenueReportData)listingData, caseTypeId, authToken);
             }
-                return tornadoService.listingGeneration(authToken, listingData, caseTypeId);
+            return tornadoService.listingGeneration(authToken, listingData, caseTypeId);
         } catch (Exception ex) {
             throw new DocumentManagementException(MESSAGE + caseTypeId, ex);
         }

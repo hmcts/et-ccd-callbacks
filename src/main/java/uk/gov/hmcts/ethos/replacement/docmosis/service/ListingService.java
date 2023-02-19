@@ -33,11 +33,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesourcelocalreport.CaseSourceLocalReport;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays.MemberDaysReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.servingclaims.ServingClaimsReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.timetofirsthearing.TimeToFirstHearingReport;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ClaimsByHearingVenueExcelReportDocumentInfoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.VenueService;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -45,7 +46,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
@@ -53,6 +53,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REP
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASES_COMPLETED_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_SOURCE_LOCAL_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_ACCEPTED_REPORT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_BY_HEARING_VENUE_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
@@ -95,6 +96,7 @@ public class ListingService {
     private final TimeToFirstHearingReport timeToFirstHearingReport;
     private final ServingClaimsReport servingClaimsReport;
     private final CaseSourceLocalReport caseSourceLocalReport;
+    private final ClaimsByHearingVenueExcelReportDocumentInfoService claimsByHearingVenueExcelReportDocumentInfoService;
     private final VenueService venueService;
     private static final String MISSING_DOCUMENT_NAME = "Missing document name";
     private static final String MESSAGE = "Failed to generate document for case id : ";
@@ -458,7 +460,11 @@ public class ListingService {
 
     public DocumentInfo processHearingDocument(ListingData listingData, String caseTypeId, String authToken) {
         try {
-            return tornadoService.listingGeneration(authToken, listingData, caseTypeId);
+            if (CLAIMS_BY_HEARING_VENUE_REPORT.equals(listingData.getReportType())) {
+              return claimsByHearingVenueExcelReportDocumentInfoService.generateExcelReportDocumentInfo(
+                      (ClaimsByHearingVenueReportData)listingData, caseTypeId, authToken);
+            }
+                return tornadoService.listingGeneration(authToken, listingData, caseTypeId);
         } catch (Exception ex) {
             throw new DocumentManagementException(MESSAGE + caseTypeId, ex);
         }

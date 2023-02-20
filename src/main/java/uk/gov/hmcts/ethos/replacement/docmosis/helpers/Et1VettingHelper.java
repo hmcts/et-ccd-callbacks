@@ -8,6 +8,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et1VettingData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et1VettingDocument;
+import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -142,7 +143,8 @@ public final class Et1VettingHelper {
                 .et1VettingAdditionalInformationTextArea(
                         defaultIfEmpty(caseData.getEt1VettingAdditionalInformationTextArea(), null))
                 .et1DateCompleted(
-                        defaultIfEmpty(caseData.getEt1DateCompleted(), LocalDate.now().toString()))
+                        defaultIfEmpty(caseData.getEt1DateCompleted(),
+                                LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MMM/yyyy"))))
                 .et1VettingCompletedBy(defaultIfEmpty(caseData.getEt1VettingCompletedBy(), null))
                 .build();
 

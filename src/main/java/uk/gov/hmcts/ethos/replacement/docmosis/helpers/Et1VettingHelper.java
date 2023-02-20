@@ -145,6 +145,7 @@ public final class Et1VettingHelper {
                 .et1DateCompleted(
                         defaultIfEmpty(caseData.getEt1DateCompleted(),
                                 LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"))))
+
                 .et1VettingCompletedBy(defaultIfEmpty(caseData.getEt1VettingCompletedBy(), null))
                 .build();
 

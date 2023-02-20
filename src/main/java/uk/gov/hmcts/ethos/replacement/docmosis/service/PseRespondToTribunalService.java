@@ -55,8 +55,8 @@ public class PseRespondToTribunalService {
         }
 
         return DynamicFixedListType.from(caseData.getSendNotificationCollection().stream()
-            .filter(r -> populateSelectDropdownFilterNotify(r)
-                && populateSelectDropdownFilterRespond(r))
+            .filter(r -> isNotifyRespondent(r)
+                && isNoRespondentReply(r.getValue().getRespondCollection()))
             .map(r ->
                 DynamicValueType.create(
                     r.getValue().getNumber(),
@@ -66,16 +66,14 @@ public class PseRespondToTribunalService {
             .collect(Collectors.toList()));
     }
 
-    private boolean populateSelectDropdownFilterNotify(SendNotificationTypeItem sendNotificationTypeItem) {
+    private boolean isNotifyRespondent(SendNotificationTypeItem sendNotificationTypeItem) {
         return RESPONDENT_ONLY.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify())
             || BOTH_PARTIES.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify());
     }
 
-    private boolean populateSelectDropdownFilterRespond(SendNotificationTypeItem sendNotificationTypeItem) {
-        return sendNotificationTypeItem.getValue().getRespondCollection() == null
-            || (int) sendNotificationTypeItem.getValue().getRespondCollection().stream()
-            .filter(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()))
-            .count() == 0;
+    private boolean isNoRespondentReply(List<PseResponseTypeItem> pseResponseTypeItems) {
+        return CollectionUtils.isEmpty(pseResponseTypeItems)
+            || pseResponseTypeItems.stream().noneMatch(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()));
     }
 
     /**

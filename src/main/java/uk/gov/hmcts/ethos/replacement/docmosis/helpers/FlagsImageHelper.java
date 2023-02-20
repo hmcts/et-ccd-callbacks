@@ -46,6 +46,7 @@ public class FlagsImageHelper {
     private static final String COLOR_DARK_SLATE_BLUE = "DarkSlateBlue";
     private static final String FLAG_REASONABLE_ADJUSTMENT = "REASONABLE ADJUSTMENT";
     private static final String FLAG_WELSH_LANGUAGE = "Cymraeg";
+    private static final String WELSH = "Welsh";
 
     private FlagsImageHelper() {
     }
@@ -236,8 +237,8 @@ public class FlagsImageHelper {
 
     private static boolean welshColor(CaseData caseData) {
         return caseData.getClaimantHearingPreference() != null
-                && (YES.equals(caseData.getClaimantHearingPreference().getContactLanguage())
-                || YES.equals(caseData.getClaimantHearingPreference().getHearingLanguage()));
+                && (WELSH.equals(caseData.getClaimantHearingPreference().getContactLanguage())
+                || WELSH.equals(caseData.getClaimantHearingPreference().getHearingLanguage()));
     }
 
     private static boolean digitalFile(CaseData caseData) {

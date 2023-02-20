@@ -4,24 +4,42 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-@Service
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+
+@Service("sendNotificationService")
 @RequiredArgsConstructor
 @Slf4j
 public class SendNotificationService {
 
     private final HearingSelectionService hearingSelectionService;
+    private final EmailService emailService;
+    @Value("${url.exui.case-details}")
+    private String exuiUrl;
+    @Value("${url.citizen.case-details}")
+    private String citizenUrl;
+    @Value("${sendNotification.template.id}")
+    private String templateId;
 
     public void populateHearingSelection(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
@@ -83,5 +101,40 @@ public class SendNotificationService {
         caseData.setSendNotificationFullName2(null);
         caseData.setSendNotificationDetails(null);
         caseData.setSendNotificationRequestMadeBy(null);
+    }
+
+    /**
+     * Sends notification emails for the claimant and/or respondent(s) based on the radio list from the
+     * sendNotification event.
+     * @param caseDetails Details of the case
+     */
+    public void sendNotifyEmails(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+
+        if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {
+            emailService.sendEmail(templateId, caseData.getClaimantType().getClaimantEmailAddress(),
+                buildPersonalisation(caseDetails, citizenUrl));
+        }
+
+        if (!CLAIMANT_ONLY.equals(caseData.getSendNotificationNotify())) {
+            Map<String, String> personalisation = buildPersonalisation(caseDetails, exuiUrl);
+            List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+            respondents.forEach(obj -> sendRespondentEmail(caseData, personalisation, obj.getValue()));
+        }
+    }
+
+    private void sendRespondentEmail(CaseData caseData, Map<String, String> emailData, RespondentSumType respondent) {
+        String respondentEmail = NotificationHelper.getEmailAddressForRespondent(caseData, respondent);
+        if (isNullOrEmpty(respondentEmail)) {
+            return;
+        }
+        emailService.sendEmail(templateId, respondentEmail, emailData);
+    }
+
+    private Map<String, String> buildPersonalisation(CaseDetails caseDetails, String envUrl) {
+        return Map.of(
+            "caseNumber", caseDetails.getCaseData().getEthosCaseReference(),
+            "environmentUrl", envUrl + caseDetails.getCaseId()
+        );
     }
 }

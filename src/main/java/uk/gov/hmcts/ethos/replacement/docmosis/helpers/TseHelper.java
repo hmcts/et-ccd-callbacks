@@ -108,10 +108,8 @@ public final class TseHelper {
     }
 
     private static boolean isNoRespondentReply(List<TseRespondTypeItem> tseRespondTypeItems) {
-        return tseRespondTypeItems == null
-            || (int) tseRespondTypeItems.stream()
-            .filter(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()))
-            .count() == 0;
+        return CollectionUtils.isEmpty(tseRespondTypeItems)
+            || tseRespondTypeItems.stream().noneMatch(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()));
     }
 
     public static DynamicFixedListType populateOpenOrClosedApplications(CaseData caseData) {

@@ -25,6 +25,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
@@ -33,7 +34,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.LawOfDemeter", "PDM.FieldNamingConventions"})
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.LawOfDemeter",
+    "PMD.FieldNamingConventions", "PMD.ExcessiveImports"})
+
 public class Et1VettingController {
     public static final String PROCESSING_COMPLETE_TEXT = "<hr><h2>Do this next</h2>"
         + "<p>You must <a href=\"/cases/case-details/%s/trigger/preAcceptanceCase/preAcceptanceCase1\">"
@@ -169,7 +172,7 @@ public class Et1VettingController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setEt1VettingCompletedBy(reportDataService.getUserFullName(userToken));
-        caseData.setEt1DateCompleted(LocalDate.now().toString());
+        caseData.setEt1DateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MMM/yyyy")));
         DocumentInfo documentInfo = et1VettingService.generateEt1VettingDocument(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setEt1VettingDocument(documentManagementService.addDocumentToDocumentField(documentInfo));

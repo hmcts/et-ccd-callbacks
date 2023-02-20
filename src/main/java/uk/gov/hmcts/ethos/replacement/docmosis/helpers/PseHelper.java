@@ -1,9 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
@@ -50,26 +47,6 @@ public final class PseHelper {
 
     private PseHelper() {
         // Access through static methods
-    }
-
-    /**
-     * Create fields for application dropdown selector.
-     * @param caseData contains all the case data
-     */
-    public static DynamicFixedListType populateSelectDropdownNoReply(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getSendNotificationCollection())) {
-            return null;
-        }
-
-        return DynamicFixedListType.from(caseData.getSendNotificationCollection().stream()
-            .filter(r -> r.getValue().getRespondCollection() == null)
-            .map(r ->
-                DynamicValueType.create(
-                    r.getValue().getNumber(),
-                    r.getValue().getNumber() + " " + r.getValue().getSendNotificationTitle()
-                )
-            )
-            .collect(Collectors.toList()));
     }
 
     /**

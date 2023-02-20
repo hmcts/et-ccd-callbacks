@@ -31,12 +31,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class PseRespondToTribunalServiceTest {
     private PseRespondToTribunalService pseRespondToTribService;
@@ -58,6 +62,94 @@ class PseRespondToTribunalServiceTest {
     }
 
     @Test
+    void populateSelectDropdown_checkSendNotificationNotify_returnList() {
+        caseData.setSendNotificationCollection(List.of(
+            SendNotificationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(SendNotificationType.builder()
+                    .number("1")
+                    .sendNotificationTitle("View notice of hearing")
+                    .sendNotificationNotify(BOTH_PARTIES)
+                    .build())
+                .build(),
+            SendNotificationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(SendNotificationType.builder()
+                    .number("2")
+                    .sendNotificationTitle("Submit hearing agenda")
+                    .sendNotificationNotify(CLAIMANT_ONLY)
+                    .build())
+                .build(),
+            SendNotificationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(SendNotificationType.builder()
+                    .number("3")
+                    .sendNotificationTitle("Send Notification Title")
+                    .sendNotificationNotify(RESPONDENT_ONLY)
+                    .build())
+                .build()
+        ));
+
+        DynamicFixedListType expected = DynamicFixedListType.from(List.of(
+                DynamicValueType.create("1", "1 View notice of hearing"),
+                DynamicValueType.create("3", "3 Send Notification Title")
+            ));
+
+        assertThat(pseRespondToTribService.populateSelectDropdown(caseData),
+            is(expected));
+    }
+
+    @Test
+    void populateSelectDropdown_checkRespondCollection_returnList() {
+        caseData.setSendNotificationCollection(List.of(
+            SendNotificationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(SendNotificationType.builder()
+                    .number("1")
+                    .sendNotificationTitle("View notice of hearing")
+                    .sendNotificationNotify(BOTH_PARTIES)
+                    .build())
+                .build(),
+            SendNotificationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(SendNotificationType.builder()
+                    .number("2")
+                    .sendNotificationTitle("Submit hearing agenda")
+                    .sendNotificationNotify(BOTH_PARTIES)
+                    .respondCollection(List.of(PseResponseTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(PseResponseType.builder()
+                            .from(CLAIMANT_TITLE)
+                            .build())
+                        .build()))
+                    .build())
+                .build(),
+            SendNotificationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(SendNotificationType.builder()
+                    .number("3")
+                    .sendNotificationTitle("Send Notification Title")
+                    .sendNotificationNotify(BOTH_PARTIES)
+                    .respondCollection(List.of(PseResponseTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(PseResponseType.builder()
+                            .from(RESPONDENT_TITLE)
+                            .build())
+                        .build()))
+                    .build())
+                .build()
+        ));
+
+        DynamicFixedListType expected = DynamicFixedListType.from(List.of(
+            DynamicValueType.create("1", "1 View notice of hearing"),
+            DynamicValueType.create("2", "2 Submit hearing agenda")
+        ));
+
+        assertThat(pseRespondToTribService.populateSelectDropdown(caseData),
+            is(expected));
+    }
+
+    @Test
     void initialOrdReqDetailsTableMarkUp_hasOrderRequests() {
 
         caseData.setSendNotificationCollection(List.of(
@@ -71,7 +163,7 @@ class PseRespondToTribunalServiceTest {
                         DynamicValueType.create("3", "3: Hearing - Leeds - 14 Aug 2022")))
                     .sendNotificationCaseManagement("Case management order")
                     .sendNotificationResponseTribunal("Yes - view document for details")
-                    .sendNotificationSelectParties("Both parties")
+                    .sendNotificationSelectParties(BOTH_PARTIES)
                     .sendNotificationAdditionalInfo("Additional Info")
                     .sendNotificationUploadDocument(List.of(
                         createDocumentTypeItem("Letter 4.8 - Hearing notice - hearing agenda.pdf",
@@ -79,11 +171,11 @@ class PseRespondToTribunalServiceTest {
                             "Notice of Hearing and Submit Hearing Agenda document")))
                     .sendNotificationWhoCaseOrder("Legal Officer")
                     .sendNotificationFullName("Mr Lee Gal Officer")
-                    .sendNotificationNotify("Both parties")
+                    .sendNotificationNotify(BOTH_PARTIES)
                     .respondCollection(List.of(PseResponseTypeItem.builder()
                         .id(UUID.randomUUID().toString())
                         .value(PseResponseType.builder()
-                            .from("Claimant")
+                            .from(CLAIMANT_TITLE)
                             .date("10 Aug 2022")
                             .response("Response text entered")
                             .hasSupportingMaterial(YES)

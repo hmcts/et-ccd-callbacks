@@ -102,12 +102,16 @@ public final class TseHelper {
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
             .filter(o -> !CLOSED_STATE.equals(o.getValue().getStatus())
-                && (o.getValue().getRespondCollection() == null
-                    || (int) o.getValue().getRespondCollection().stream()
-                    .filter(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()))
-                    .count() == 0))
+                && isNoRespondentReply(o.getValue().getRespondCollection()))
             .map(TseHelper::formatDropdownOption)
             .collect(Collectors.toList()));
+    }
+
+    private static boolean isNoRespondentReply(List<TseRespondTypeItem> tseRespondTypeItems) {
+        return tseRespondTypeItems == null
+            || (int) tseRespondTypeItems.stream()
+            .filter(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()))
+            .count() == 0;
     }
 
     public static DynamicFixedListType populateOpenOrClosedApplications(CaseData caseData) {

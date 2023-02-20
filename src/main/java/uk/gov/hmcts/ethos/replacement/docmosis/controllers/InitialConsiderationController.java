@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -90,7 +91,7 @@ public class InitialConsiderationController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         initialConsiderationService.clearHiddenValue(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));
-        caseData.setIcDateCompleted(LocalDate.now().toString());
+        caseData.setIcDateCompleted( LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MMM/yyyy")));
         DocumentInfo documentInfo = initialConsiderationService.generateDocument(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setEtInitialConsiderationDocument(documentManagementService.addDocumentToDocumentField(documentInfo));

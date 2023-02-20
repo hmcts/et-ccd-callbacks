@@ -172,7 +172,7 @@ public class Et1VettingController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setEt1VettingCompletedBy(reportDataService.getUserFullName(userToken));
-        caseData.setEt1DateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MMM/yyyy")));
+        caseData.setEt1DateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy")));
         DocumentInfo documentInfo = et1VettingService.generateEt1VettingDocument(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setEt1VettingDocument(documentManagementService.addDocumentToDocumentField(documentInfo));

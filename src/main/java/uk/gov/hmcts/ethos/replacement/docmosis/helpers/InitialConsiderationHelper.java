@@ -146,7 +146,7 @@ public final class InitialConsiderationHelper {
                         defaultIfEmpty(caseData.getEtICFurtherInformationHearingAnyOtherDirections(), null))
                 .icDateCompleted(
                         defaultIfEmpty(caseData.getIcDateCompleted(),
-                                LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MMM/yyyy"))))
+                                LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"))))
                 .icCompletedBy(
                         defaultIfEmpty(caseData.getIcCompletedBy(), null))
                 .build();
@@ -173,7 +173,8 @@ public final class InitialConsiderationHelper {
                 .icOrderForFurtherInformation(defaultIfEmpty(caseData.getIcOrderForFurtherInformation(), null))
                 .icOtherIssuesOrFinalOrders(defaultIfEmpty(caseData.getIcOtherIssuesOrFinalOrders(), null))
                 .icDateCompleted(
-                        defaultIfEmpty(caseData.getIcDateCompleted(), LocalDate.now().toString()))
+                        defaultIfEmpty(caseData.getIcDateCompleted(),
+                                LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"))))
                 .icCompletedBy(
                         defaultIfEmpty(caseData.getIcCompletedBy(), null))
                 .build();

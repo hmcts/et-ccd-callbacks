@@ -170,6 +170,10 @@ public final class InitialConsiderationHelper {
                 .icDdaDisabilityIssues(defaultIfEmpty(caseData.getIcDdaDisabilityIssues(), null))
                 .icOrderForFurtherInformation(defaultIfEmpty(caseData.getIcOrderForFurtherInformation(), null))
                 .icOtherIssuesOrFinalOrders(defaultIfEmpty(caseData.getIcOtherIssuesOrFinalOrders(), null))
+                .icDateCompleted(
+                        defaultIfEmpty(caseData.getIcDateCompleted(), LocalDate.now().toString()))
+                .icCompletedBy(
+                        defaultIfEmpty(caseData.getIcCompletedBy(), null))
                 .build();
 
         InitialConsiderationDocument document = InitialConsiderationDocument.builder()

@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondToTribunalService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -72,7 +71,7 @@ public class PseRespondToTribunalController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setPseRespondentSelectOrderOrRequest(PseHelper.populateSelectDropdownNoReply(caseData));
+        caseData.setPseRespondentSelectOrderOrRequest(pseRespondToTribunalService.populateSelectDropdown(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 

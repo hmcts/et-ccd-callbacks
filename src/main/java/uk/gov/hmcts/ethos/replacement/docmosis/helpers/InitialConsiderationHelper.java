@@ -14,6 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule28;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsiderationData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsiderationDocument;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -144,7 +145,8 @@ public final class InitialConsiderationHelper {
                 .furtherInfoAnyOtherDirections(
                         defaultIfEmpty(caseData.getEtICFurtherInformationHearingAnyOtherDirections(), null))
                 .icDateCompleted(
-                        defaultIfEmpty(caseData.getIcDateCompleted(), LocalDate.now().toString()))
+                        defaultIfEmpty(caseData.getIcDateCompleted(),
+                                LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MMM/yyyy"))))
                 .icCompletedBy(
                         defaultIfEmpty(caseData.getIcCompletedBy(), null))
                 .build();

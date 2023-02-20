@@ -116,7 +116,7 @@ public class ReportDataService {
         reportData.setDocumentName(listingDetails.getCaseData().getDocumentName());
         reportData.setReportType(listingDetails.getCaseData().getReportType());
         reportData.setManagingOffice(
-                ReportHelper.getReportOffice(listingDetails.getCaseTypeId(),
+                ReportHelper.getReportOfficeForDisplay(listingDetails.getCaseTypeId(),
                         listingDetails.getCaseData().getManagingOffice()));
         reportData.setHearingDateType(listingDetails.getCaseData().getHearingDateType());
         reportData.setListingDateFrom(listingDetails.getCaseData().getListingDateFrom());
@@ -128,9 +128,9 @@ public class ReportDataService {
     private NoPositionChangeReportData getNoPositionChangeReport(ListingDetails listingDetails, String authToken) {
         log.info("No Change In Current Position for {}", listingDetails.getCaseTypeId());
         NoPositionChangeCcdDataSource reportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
-        NoPositionChangeReport hearingsToJudgmentsReport = new NoPositionChangeReport(reportDataSource,
+        NoPositionChangeReport noPositionChangeReport = new NoPositionChangeReport(reportDataSource,
                 listingDetails.getCaseData().getReportDate());
-        NoPositionChangeReportData reportData = hearingsToJudgmentsReport.runReport(listingDetails);
+        NoPositionChangeReportData reportData = noPositionChangeReport.runReport(listingDetails);
         setSharedReportDocumentFields(reportData, listingDetails, false);
         return reportData;
     }
@@ -166,7 +166,7 @@ public class ReportDataService {
         EccReportData reportData = eccReport.generateReport(params);
         setReportData(reportData, listingData);
         reportData.setManagingOffice(
-                ReportHelper.getReportOffice(listingDetails.getCaseTypeId(),
+                ReportHelper.getReportOfficeForDisplay(listingDetails.getCaseTypeId(),
                         listingData.getManagingOffice()));
         return reportData;
     }
@@ -204,7 +204,7 @@ public class ReportDataService {
         reportData.setReportType(listingData.getReportType());
         reportData.setHearingDateType(listingData.getHearingDateType());
         reportData.setManagingOffice(
-                ReportHelper.getReportOffice(listingDetails.getCaseTypeId(),
+                ReportHelper.getReportOfficeForDisplay(listingDetails.getCaseTypeId(),
                         listingData.getManagingOffice()));
         reportData.setListingDateFrom(listingData.getListingDateFrom());
         reportData.setListingDateTo(listingData.getListingDateTo());
@@ -225,7 +225,7 @@ public class ReportDataService {
                 .generateReport(params);
         setReportData(reportData, listingData);
         reportData.setManagingOffice(
-                ReportHelper.getReportOffice(listingDetails.getCaseTypeId(),
+                ReportHelper.getReportOfficeForDisplay(listingDetails.getCaseTypeId(),
                         listingData.getManagingOffice()));
         return reportData;
     }
@@ -254,7 +254,8 @@ public class ReportDataService {
                                                boolean isDateRangeReport) {
         reportData.setDocumentName(listingDetails.getCaseData().getDocumentName());
         reportData.setReportType(listingDetails.getCaseData().getReportType());
-        reportData.setManagingOffice(listingDetails.getCaseData().getManagingOffice());
+        reportData.setManagingOffice(ReportHelper.getReportOfficeForDisplay(listingDetails.getCaseTypeId(),
+                listingDetails.getCaseData().getManagingOffice()));
 
         if (isDateRangeReport) {
             reportData.setHearingDateType(listingDetails.getCaseData().getHearingDateType());

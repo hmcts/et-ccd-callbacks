@@ -111,11 +111,12 @@ public final class TseHelper {
         if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
             return null;
         }
-        
+
         boolean selectedClosed = CLOSED_STATE.equals(caseData.getTseViewApplicationOpenOrClosed());
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
-                .filter(o -> selectedClosed ? o.getValue().getStatus().equals(CLOSED_STATE) :!o.getValue().getStatus().equals(CLOSED_STATE))
+                .filter(o -> selectedClosed ? o.getValue().getStatus().equals(CLOSED_STATE)
+                        : !o.getValue().getStatus().equals(CLOSED_STATE))
                 .map(TseHelper::formatDropdownOption)
                 .collect(Collectors.toList()));
     }

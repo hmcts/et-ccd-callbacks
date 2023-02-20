@@ -91,7 +91,7 @@ public class InitialConsiderationController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         initialConsiderationService.clearHiddenValue(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));
-        caseData.setIcDateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MMM/yyyy")));
+        caseData.setIcDateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy")));
         DocumentInfo documentInfo = initialConsiderationService.generateDocument(caseData, userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId());
         caseData.setEtInitialConsiderationDocument(documentManagementService.addDocumentToDocumentField(documentInfo));

@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelection
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -116,16 +118,17 @@ public class SendNotificationService {
 
         if (!CLAIMANT_ONLY.equals(caseData.getSendNotificationNotify())) {
             Map<String, String> personalisation = buildPersonalisation(caseDetails, exuiUrl);
-            caseData.getRespondentCollection().forEach(obj -> respondent(caseData, personalisation, obj));
+            List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+            respondents.forEach(obj -> sendRespondentEmail(caseData, personalisation, obj.getValue()));
         }
     }
 
-    private void respondent(CaseData caseData, Map<String, String> personalisation, RespondentSumTypeItem obj) {
-        String respondentEmail = NotificationHelper.getEmailAddressForRespondent(caseData, obj.getValue());
+    private void sendRespondentEmail(CaseData caseData, Map<String, String> emailData, RespondentSumType respondent) {
+        String respondentEmail = NotificationHelper.getEmailAddressForRespondent(caseData, respondent);
         if (isNullOrEmpty(respondentEmail)) {
             return;
         }
-        emailService.sendEmail(templateId, respondentEmail, personalisation);
+        emailService.sendEmail(templateId, respondentEmail, emailData);
     }
 
     private Map<String, String> buildPersonalisation(CaseDetails caseDetails, String envUrl) {

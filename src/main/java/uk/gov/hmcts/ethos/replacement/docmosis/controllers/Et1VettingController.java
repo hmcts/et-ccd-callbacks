@@ -34,7 +34,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.LawOfDemeter", "PDM.FieldNamingConventions"})
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.LawOfDemeter",
+    "PMD.FieldNamingConventions", "PMD.ExcessiveImports"})
+
 public class Et1VettingController {
     public static final String PROCESSING_COMPLETE_TEXT = "<hr><h2>Do this next</h2>"
         + "<p>You must <a href=\"/cases/case-details/%s/trigger/preAcceptanceCase/preAcceptanceCase1\">"

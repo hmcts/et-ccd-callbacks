@@ -39,7 +39,7 @@ public class FlagsImageHelperTest {
             CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
-            hearingPreference.setContactLanguage("Yes");
+            hearingPreference.setContactLanguage("Welsh");
             caseData.setClaimantHearingPreference(hearingPreference);
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
             FlagsImageHelper.buildFlagsImageFileName(caseDetails);
@@ -54,7 +54,7 @@ public class FlagsImageHelperTest {
             CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
-            hearingPreference.setHearingLanguage("Yes");
+            hearingPreference.setHearingLanguage("Welsh");
             caseData.setClaimantHearingPreference(hearingPreference);
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
             FlagsImageHelper.buildFlagsImageFileName(caseDetails);
@@ -69,8 +69,8 @@ public class FlagsImageHelperTest {
             CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
-            hearingPreference.setHearingLanguage("Yes");
-            hearingPreference.setContactLanguage("Yes");
+            hearingPreference.setHearingLanguage("Welsh");
+            hearingPreference.setContactLanguage("Welsh");
             caseData.setClaimantHearingPreference(hearingPreference);
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
             FlagsImageHelper.buildFlagsImageFileName(caseDetails);

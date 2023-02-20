@@ -72,7 +72,7 @@ public class TseRespondentReplyController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
+        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 

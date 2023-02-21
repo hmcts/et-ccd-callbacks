@@ -35,7 +35,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyForReply;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantForReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
@@ -109,7 +109,7 @@ public class TseAdmReplyService {
                     respondCount.incrementAndReturnValue(),
                     documentManagementService.displayDocNameTypeSizeLink(
                         replyItem.getValue().getAddDocument(), authToken))
-                : formatLegalRepReplyForReply(
+                : formatLegalRepReplyOrClaimantForReply(
                     replyItem.getValue(),
                     respondCount.incrementAndReturnValue(),
                     application.getApplicant(),

@@ -62,14 +62,49 @@ public class TseHelperTest {
     @Test
     public void populateSelectApplicationDropdown_withEmptyList_doesNothing() {
         caseData.setGenericTseApplicationCollection(null);
-        DynamicFixedListType actual = TseHelper.populateSelectApplicationDropdown(caseData);
+        DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData);
         assertNull(actual);
     }
 
     @Test
     public void populateSelectApplicationDropdown_withAnApplication_returnsDynamicList() {
-        DynamicFixedListType actual = TseHelper.populateSelectApplicationDropdown(caseData);
+        DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData);
         assertThat(actual.getListItems().size(), is(1));
+    }
+
+    @Test
+    public void populateSelectApplicationDropdown_withRespondentReply_returnsNothing() {
+        caseData.getGenericTseApplicationCollection().get(0).getValue()
+            .setRespondCollection(List.of(TseRespondTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(TseRespondType.builder()
+                    .from(RESPONDENT_TITLE)
+                    .build())
+                .build()));
+        DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData);
+        assertThat(actual.getListItems().size(), is(0));
+    }
+
+    @Test
+    public void populateOpenOrClosedApplications_withEmptyList_doesNothing() {
+        caseData.setGenericTseApplicationCollection(null);
+        caseData.setTseViewApplicationOpenOrClosed("Open");
+        DynamicFixedListType actual = TseHelper.populateOpenOrClosedApplications(caseData);
+        assertNull(actual);
+    }
+
+    @Test
+    public void populateOpenApplications_withAnOpenApplication_returnsDynamicList() {
+        caseData.setTseViewApplicationOpenOrClosed("Open");
+        DynamicFixedListType actual = TseHelper.populateOpenOrClosedApplications(caseData);
+        assertThat(actual.getListItems().size(), is(1));
+    }
+
+    @Test
+    public void populateClosedApplications_withNoClosedApplications_returnEmptyList() {
+        caseData.setTseViewApplicationOpenOrClosed("Closed");
+        DynamicFixedListType actual = TseHelper.populateOpenOrClosedApplications(caseData);
+        assertThat(actual.getListItems().size(), is(0));
     }
 
     @Test
@@ -81,7 +116,7 @@ public class TseHelperTest {
 
     @Test
     public void setDataForRespondingToApplication_withAGroupBApplication_restoresData() {
-        caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
+        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
         TseHelper.setDataForRespondingToApplication(caseData);
         String expected = "The respondent has applied to <b>Withdraw my claim</b>.</br>You do not need to respond to "
@@ -96,7 +131,7 @@ public class TseHelperTest {
     @Test
     public void setDataForRespondingToApplication_withAGroupAApplication_restoresData() {
         caseData.getGenericTseApplicationCollection().get(0).getValue().setType(TSE_APP_POSTPONE_A_HEARING);
-        caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
+        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
         TseHelper.setDataForRespondingToApplication(caseData);
         String expected = "The respondent has applied to <b>Postpone a hearing</b>.</br></br> If you have any "
@@ -113,7 +148,7 @@ public class TseHelperTest {
         UploadedDocumentType documentType =
             UploadedDocumentBuilder.builder().withFilename("image.png").withUuid("1234").build();
         caseData.getGenericTseApplicationCollection().get(0).getValue().setDocumentUpload(documentType);
-        caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
+        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
         TseHelper.setDataForRespondingToApplication(caseData);
         String expected = "| | |\r\n" + "|--|--|\r\n" + "|Application date | 13 December 2022\r\n" + "|Details of "
@@ -132,7 +167,7 @@ public class TseHelperTest {
 
     @Test
     public void saveReplyToApplication_withApplication_savesReply() {
-        caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
+        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
 
         caseData.setTseResponseText("ResponseText");
@@ -181,7 +216,7 @@ public class TseHelperTest {
 
     @Test
     public void getReplyDocumentRequest_generatesData() throws JsonProcessingException {
-        caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
+        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
 
         caseData.getGenericTseApplicationCollection().get(0).getValue()
@@ -223,7 +258,7 @@ public class TseHelperTest {
 
     @Test
     public void getPersonalisationForResponse_withResponse() throws NotificationClientException {
-        caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
+        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
         caseData.setTseResponseText("TseResponseText");
 
@@ -248,7 +283,7 @@ public class TseHelperTest {
 
     @Test
     public void getPersonalisationForResponse_withoutResponse() throws NotificationClientException {
-        caseData.setTseRespondSelectApplication(TseHelper.populateSelectApplicationDropdown(caseData));
+        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
 
         CaseDetails caseDetails = new CaseDetails();

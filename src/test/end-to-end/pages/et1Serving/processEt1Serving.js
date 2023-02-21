@@ -62,16 +62,4 @@ module.exports =  async function () {
     I.click("//div[text()='History']");
     I.waitForText('Event', testConfig.TestTimeToWaitForText);
     I.see('ET1 serving');
-
-    //TODO A documents Tab is not visible though a document was uploaded in this ET1 Serving Process....
-    /*I.click("//div[text()='Documents']");
-    I.waitForText('Case documentation', testConfig.TestTimeToWaitForText);
-    I.see('Case documentation 1');
-    I.see('Type of Document');
-    I.see('ET1');
-    I.see('Document');
-    I.see('RET-1950_3.png');
-    I.see('Short Description');
-    I.see('Description for the Notice of Claim');*/
-
 }

@@ -80,9 +80,9 @@ public final class TseHelper {
         + "|Response due | %s|\r\n"
         + "|Party or parties to respond | %s|\r\n"
         + "|Additional information | %s|\r\n"
-        + "|Document | %s|\r\n"
+        + "|Supporting material | %s|\r\n"
         + "%s"
-        + "|Name | %s|\r\n"
+        + "|Full name | %s|\r\n"
         + "|Sent to | %s|\r\n"
         + "\r\n";
     private static final String ADMIN_REPLY_MARKUP_MADE_BY = "|%s made by | %s|\r\n";
@@ -95,15 +95,36 @@ public final class TseHelper {
      * Create fields for application dropdown selector.
      * @param caseData contains all the case data
      */
-    public static DynamicFixedListType populateSelectApplicationDropdown(CaseData caseData) {
+    public static DynamicFixedListType populateRespondentSelectApplication(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
             return null;
         }
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
-            .filter(o -> !CLOSED_STATE.equals(o.getValue().getStatus()))
+            .filter(o -> !CLOSED_STATE.equals(o.getValue().getStatus())
+                && isNoRespondentReply(o.getValue().getRespondCollection()))
             .map(TseHelper::formatDropdownOption)
             .collect(Collectors.toList()));
+    }
+
+    private static boolean isNoRespondentReply(List<TseRespondTypeItem> tseRespondTypeItems) {
+        return CollectionUtils.isEmpty(tseRespondTypeItems)
+            || tseRespondTypeItems.stream().noneMatch(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()));
+    }
+
+    public static DynamicFixedListType populateOpenOrClosedApplications(CaseData caseData) {
+
+        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+            return null;
+        }
+
+        boolean selectedClosed = CLOSED_STATE.equals(caseData.getTseViewApplicationOpenOrClosed());
+
+        return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
+                .filter(o -> selectedClosed ? o.getValue().getStatus().equals(CLOSED_STATE)
+                        : !o.getValue().getStatus().equals(CLOSED_STATE))
+                .map(TseHelper::formatDropdownOption)
+                .collect(Collectors.toList()));
     }
 
     private static DynamicValueType formatDropdownOption(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
@@ -340,8 +361,8 @@ public final class TseHelper {
      * @param docInfo Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
      * @return Markup String
      */
-    public static String formatLegalRepReplyForReply(TseRespondType reply, int respondCount, String applicant,
-                                                     String docInfo) {
+    public static String formatLegalRepReplyOrClaimantForReply(TseRespondType reply, int respondCount, String applicant,
+                                                               String docInfo) {
         return String.format(
             RESPONDENT_REPLY_MARKUP_FOR_REPLY,
             respondCount,
@@ -361,7 +382,8 @@ public final class TseHelper {
      * @param docInfo Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
      * @return Markup String
      */
-    public static String formatLegalRepReplyForDecision(TseRespondType reply, int respondCount, String docInfo) {
+    public static String formatLegalRepReplyOrClaimantForDecision(TseRespondType reply, int respondCount,
+                                                                  String docInfo) {
         return String.format(
             RESPONDENT_REPLY_MARKUP_FOR_DECISION,
             respondCount,

@@ -76,8 +76,12 @@ public class SendNotificationService {
         caseData.setSendNotificationRequestMadeBy(null);
     }
 
+    @FunctionalInterface
+    interface SendNotificationFormat {
+        String format(SendNotificationTypeItem sendNotificationTypeItem);
+    }
 
-    public List<DynamicValueType> getSendNotificationSelection(CaseData caseData) {
+    public List<DynamicValueType> getSendNotificationSelection(CaseData caseData, SendNotificationFormat sendNotificationFormat) {
         List<DynamicValueType> values = new ArrayList<>();
         List<SendNotificationTypeItem> sendNotificationTypeItemList = caseData.getSendNotificationCollection();
         if (CollectionUtils.isEmpty(sendNotificationTypeItemList)) {
@@ -85,9 +89,7 @@ public class SendNotificationService {
         }
         for (SendNotificationTypeItem sendNotificationType : sendNotificationTypeItemList) {
             String notificationId = sendNotificationType.getId();
-            String notificationTitle = sendNotificationType.getValue().getSendNotificationTitle();
-            String notificationSubject = sendNotificationType.getValue().getSendNotificationSubject().toString();
-            String label = String.format("%s - %s", notificationTitle, notificationSubject);
+            String label = sendNotificationFormat.format(sendNotificationType);
             values.add(DynamicValueType.create(notificationId, label));
         }
         return values;

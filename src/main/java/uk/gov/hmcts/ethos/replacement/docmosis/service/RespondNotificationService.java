@@ -25,7 +25,11 @@ public class RespondNotificationService {
     }
 
     public List<DynamicValueType> getSendNotificationSelection(CaseData caseData) {
-        return sendNotificationService.getSendNotificationSelection(caseData);
+        return sendNotificationService.getSendNotificationSelection(caseData,(sendNotificationType) -> {
+            String notificationTitle = sendNotificationType.getValue().getSendNotificationTitle();
+            String notificationSubject = sendNotificationType.getValue().getSendNotificationSubject().toString();
+            return String.format("%s - %s", notificationTitle, notificationSubject);
+        });
 
     }
 }

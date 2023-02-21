@@ -3,14 +3,17 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -71,5 +74,23 @@ public class SendNotificationService {
         caseData.setSendNotificationFullName2(null);
         caseData.setSendNotificationDetails(null);
         caseData.setSendNotificationRequestMadeBy(null);
+    }
+
+
+    public List<DynamicValueType> getSendNotificationSelection(CaseData caseData) {
+        List<DynamicValueType> values = new ArrayList<>();
+        List<SendNotificationTypeItem> sendNotificationTypeItemList = caseData.getSendNotificationCollection();
+        if (CollectionUtils.isEmpty(sendNotificationTypeItemList)) {
+            return values;
+        }
+        for (SendNotificationTypeItem sendNotificationType : sendNotificationTypeItemList) {
+            String notificationId = sendNotificationType.getId();
+            String notificationTitle = sendNotificationType.getValue().getSendNotificationTitle();
+            String notificationSubject = sendNotificationType.getValue().getSendNotificationSubject().toString();
+            String label = String.format("%s - %s", notificationTitle, notificationSubject);
+            values.add(DynamicValueType.create(notificationId, label));
+        }
+        return values;
+
     }
 }

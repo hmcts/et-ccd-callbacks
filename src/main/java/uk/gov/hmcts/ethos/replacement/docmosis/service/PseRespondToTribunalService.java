@@ -46,7 +46,10 @@ public class PseRespondToTribunalService {
         "You have responded to the tribunal and copied your response to the other party.\r\n\r\n";
 
     /**
-     * Create fields for application dropdown selector.
+     * Create a list for application dropdown selector.
+     * Only populate when
+     * - SendNotificationNotify = RESPONDENT_ONLY or BOTH_PARTIES
+     * - Respondent has not replied yet
      * @param caseData contains all the case data
      */
     public DynamicFixedListType populateSelectDropdown(CaseData caseData) {
@@ -74,6 +77,28 @@ public class PseRespondToTribunalService {
     private boolean isNoRespondentReply(List<PseResponseTypeItem> pseResponseTypeItems) {
         return CollectionUtils.isEmpty(pseResponseTypeItems)
             || pseResponseTypeItems.stream().noneMatch(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()));
+    }
+
+    /**
+     * Create fields for application dropdown selector.
+     * Only populate when
+     * - SendNotificationNotify = RESPONDENT_ONLY or BOTH_PARTIES
+     * @param caseData contains all the case data
+     */
+    public DynamicFixedListType populateSelectDropdownView(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getSendNotificationCollection())) {
+            return null;
+        }
+
+        return DynamicFixedListType.from(caseData.getSendNotificationCollection().stream()
+            .filter(this::isNotifyRespondent)
+            .map(r ->
+                DynamicValueType.create(
+                    r.getValue().getNumber(),
+                    r.getValue().getNumber() + " " + r.getValue().getSendNotificationTitle()
+                )
+            )
+            .collect(Collectors.toList()));
     }
 
     /**

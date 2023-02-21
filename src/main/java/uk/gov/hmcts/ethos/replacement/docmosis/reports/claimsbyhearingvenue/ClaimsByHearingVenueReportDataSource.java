@@ -4,5 +4,8 @@ import uk.gov.hmcts.ecm.common.model.reports.claimsbyhearingvenue.ClaimsByHearin
 import java.util.List;
 
 public interface ClaimsByHearingVenueReportDataSource {
-    List<ClaimsByHearingVenueSubmitEvent> getData(String caseTypeId, String listingDateFrom, String listingDateTo);
+    List<ClaimsByHearingVenueSubmitEvent> getData(String managingOffice,
+                                                  String caseTypeId,
+                                                  String listingDateFrom,
+                                                  String listingDateTo);
 }

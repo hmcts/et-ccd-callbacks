@@ -27,7 +27,7 @@ public final class ClaimsByHearingVenueReport {
 
     public ClaimsByHearingVenueReportData generateReport(ClaimsByHearingVenueReportParams reportParams) {
         List<ClaimsByHearingVenueSubmitEvent> submitEvents = dataSource.getData(
-            UtilHelper.getListingCaseTypeId(reportParams.getCaseTypeId()),
+            reportParams.getManagingOffice(), UtilHelper.getListingCaseTypeId(reportParams.getCaseTypeId()),
                 reportParams.getDateFrom(), reportParams.getDateTo());
         String reportOffice = ReportHelper.getReportOffice(reportParams.getCaseTypeId(),
             reportParams.getManagingOffice());

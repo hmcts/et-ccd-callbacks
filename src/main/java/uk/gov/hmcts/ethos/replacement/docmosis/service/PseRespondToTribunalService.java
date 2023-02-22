@@ -80,28 +80,6 @@ public class PseRespondToTribunalService {
     }
 
     /**
-     * Create fields for application dropdown selector.
-     * Only populate when
-     * - SendNotificationNotify = RESPONDENT_ONLY or BOTH_PARTIES
-     * @param caseData contains all the case data
-     */
-    public DynamicFixedListType populateSelectDropdownView(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getSendNotificationCollection())) {
-            return null;
-        }
-
-        return DynamicFixedListType.from(caseData.getSendNotificationCollection().stream()
-            .filter(this::isNotifyRespondent)
-            .map(r ->
-                DynamicValueType.create(
-                    r.getValue().getNumber(),
-                    r.getValue().getNumber() + " " + r.getValue().getSendNotificationTitle()
-                )
-            )
-            .collect(Collectors.toList()));
-    }
-
-    /**
      * Initial Application and Respond details table.
      * @param caseData contains all the case data
      */

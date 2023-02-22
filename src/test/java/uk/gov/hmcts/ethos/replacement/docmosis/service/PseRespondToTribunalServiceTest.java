@@ -150,44 +150,6 @@ class PseRespondToTribunalServiceTest {
     }
 
     @Test
-    void populateSelectDropdownView_checkSendNotificationNotify_returnList() {
-        caseData.setSendNotificationCollection(List.of(
-            SendNotificationTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
-                    .number("1")
-                    .sendNotificationTitle("View notice of hearing")
-                    .sendNotificationNotify(BOTH_PARTIES)
-                    .build())
-                .build(),
-            SendNotificationTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
-                    .number("2")
-                    .sendNotificationTitle("Submit hearing agenda")
-                    .sendNotificationNotify(CLAIMANT_ONLY)
-                    .build())
-                .build(),
-            SendNotificationTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
-                    .number("3")
-                    .sendNotificationTitle("Send Notification Title")
-                    .sendNotificationNotify(RESPONDENT_ONLY)
-                    .build())
-                .build()
-        ));
-
-        DynamicFixedListType expected = DynamicFixedListType.from(List.of(
-            DynamicValueType.create("1", "1 View notice of hearing"),
-            DynamicValueType.create("3", "3 Send Notification Title")
-        ));
-
-        assertThat(pseRespondToTribService.populateSelectDropdownView(caseData),
-            is(expected));
-    }
-
-    @Test
     void initialOrdReqDetailsTableMarkUp_hasOrderRequests() {
 
         caseData.setSendNotificationCollection(List.of(

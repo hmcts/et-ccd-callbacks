@@ -39,7 +39,7 @@ public class RespondNotificationController {
 
 
     /**
-    * about to start.
+    * Respond to a notification about to start.
     *
     * @param ccdRequest holds the request and case data
     * @param userToken  used for authorization
@@ -72,7 +72,7 @@ public class RespondNotificationController {
     }
 
     /**
-    * About to Submit.
+    * Respond to a notification about to Submit.
     *
     * @param ccdRequest holds the request and case data
     * @param userToken  used for authorization
@@ -99,7 +99,6 @@ public class RespondNotificationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        // Code here
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

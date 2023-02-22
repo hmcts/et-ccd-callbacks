@@ -46,7 +46,10 @@ public class PseRespondToTribunalService {
         "You have responded to the tribunal and copied your response to the other party.\r\n\r\n";
 
     /**
-     * Create fields for application dropdown selector.
+     * Create a list for application dropdown selector.
+     * Only populate when
+     * - SendNotificationNotify = RESPONDENT_ONLY or BOTH_PARTIES
+     * - Respondent has not replied yet
      * @param caseData contains all the case data
      */
     public DynamicFixedListType populateSelectDropdown(CaseData caseData) {

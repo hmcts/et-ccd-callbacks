@@ -106,7 +106,6 @@ class TseViewApplicationsControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-
     @Test
     void midPopulateChooseApplication_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -138,5 +137,4 @@ class TseViewApplicationsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
-
 }

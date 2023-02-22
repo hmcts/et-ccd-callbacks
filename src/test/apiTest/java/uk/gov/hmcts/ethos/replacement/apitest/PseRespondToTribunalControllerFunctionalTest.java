@@ -27,7 +27,6 @@ class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
 
     private static final String ABOUT_TO_START_URL = "/pseRespondToTribunal/aboutToStart";
-    private static final String ABOUT_TO_START_VIEW_URL = "/pseRespondToTribunal/aboutToStartView";
     private static final String MID_TABLE_DETAILS = "/pseRespondToTribunal/midDetailsTable";
     private static final String MID_VALIDATE_INPUT = "/pseRespondToTribunal/midValidateInput";
     private static final String ABOUT_TO_SUBMIT_URL = "/pseRespondToTribunal/aboutToSubmit";
@@ -70,20 +69,6 @@ class PseRespondToTribunalControllerFunctionalTest extends BaseFunctionalTest {
             .header(new Header(AUTHORIZATION, userToken))
             .body(ccdRequest)
             .post(ABOUT_TO_START_URL)
-            .then()
-            .statusCode(HttpStatus.SC_OK)
-            .log()
-            .all(true);
-    }
-
-    @Test
-    void shouldReceiveSuccessResponseWhenAboutToStartViewInvoked() {
-        RestAssured.given()
-            .spec(spec)
-            .contentType(ContentType.JSON)
-            .header(new Header(AUTHORIZATION, userToken))
-            .body(ccdRequest)
-            .post(ABOUT_TO_START_VIEW_URL)
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log()

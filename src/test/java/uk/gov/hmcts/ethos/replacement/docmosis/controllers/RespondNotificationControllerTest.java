@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import org.apache.regexp.RE;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
@@ -29,7 +27,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondNotificationController.class, JsonMapper.class})
-public class RespondNotificationControllerTest {
+@SuppressWarnings({"PMD.UnusedPrivateField"})
+class RespondNotificationControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_START_URL = "/respondNotification/aboutToStart";
@@ -89,7 +88,6 @@ public class RespondNotificationControllerTest {
             .andExpect(status().isBadRequest());
     }
 
-
     @Test
     void aboutToSubmit_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -121,7 +119,4 @@ public class RespondNotificationControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
     }
-    
-
-    
 }

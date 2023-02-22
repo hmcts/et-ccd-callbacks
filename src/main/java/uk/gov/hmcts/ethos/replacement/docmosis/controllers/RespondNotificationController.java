@@ -38,13 +38,13 @@ public class RespondNotificationController {
     private final VerifyTokenService verifyTokenService;
 
 
-     /**
-     * about to start.
-     *
-     * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
-     * @return Callback response entity with case data attached.
-     */
+    /**
+    * about to start.
+    *
+    * @param ccdRequest holds the request and case data
+    * @param userToken  used for authorization
+    * @return Callback response entity with case data attached.
+    */
     @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "About To Start")
     @ApiResponses(value = {
@@ -58,7 +58,7 @@ public class RespondNotificationController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToStart(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -71,13 +71,13 @@ public class RespondNotificationController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
-     /**
-     * About to Submit.
-     *
-     * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
-     * @return Callback response entity with case data attached.
-     */
+    /**
+    * About to Submit.
+    *
+    * @param ccdRequest holds the request and case data
+    * @param userToken  used for authorization
+    * @return Callback response entity with case data attached.
+    */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "about to submit")
     @ApiResponses(value = {
@@ -91,7 +91,7 @@ public class RespondNotificationController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);

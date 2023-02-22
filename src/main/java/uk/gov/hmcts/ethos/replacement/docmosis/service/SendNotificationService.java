@@ -4,9 +4,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-
 import org.springframework.beans.factory.annotation.Value;
-
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -22,10 +20,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelection
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-imort java.util.List;
+import java.util.List;
 import java.util.Map;
-
 import java.util.UUID;
+import java.util.function.Function;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -107,13 +105,8 @@ public class SendNotificationService {
         caseData.setSendNotificationRequestMadeBy(null);
     }
 
-
-    @FunctionalInterface
-    interface SendNotificationFormat {
-        String format(SendNotificationTypeItem sendNotificationTypeItem);
-    }
-
-    public List<DynamicValueType> getSendNotificationSelection(CaseData caseData, SendNotificationFormat sendNotificationFormat) {
+    public List<DynamicValueType> getSendNotificationSelection(CaseData caseData,
+                                                               Function<SendNotificationTypeItem, String> format) {
         List<DynamicValueType> values = new ArrayList<>();
         List<SendNotificationTypeItem> sendNotificationTypeItemList = caseData.getSendNotificationCollection();
         if (CollectionUtils.isEmpty(sendNotificationTypeItemList)) {
@@ -121,17 +114,20 @@ public class SendNotificationService {
         }
         for (SendNotificationTypeItem sendNotificationType : sendNotificationTypeItemList) {
             String notificationId = sendNotificationType.getId();
-            String label = sendNotificationFormat.format(sendNotificationType);
+            String label = format.apply(sendNotificationType);
             values.add(DynamicValueType.create(notificationId, label));
         }
         return values;
+    }
 
     /**
      * Sends notification emails for the claimant and/or respondent(s) based on the radio list from the
      * sendNotification event.
+     *
      * @param caseDetails Details of the case
      */
     public void sendNotifyEmails(CaseDetails caseDetails) {
+
         CaseData caseData = caseDetails.getCaseData();
 
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {

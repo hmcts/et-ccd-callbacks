@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,15 +16,14 @@ public class RespondNotificationService {
 
     private final SendNotificationService sendNotificationService;
 
-    public void populateSendNotificationSelection(CaseData caseData){
+    public void populateSendNotificationSelection(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(getSendNotificationSelection(caseData));
         caseData.setSelectNotificationDropdown(dynamicFixedListType);
-
     }
 
     public List<DynamicValueType> getSendNotificationSelection(CaseData caseData) {
-        return sendNotificationService.getSendNotificationSelection(caseData,(sendNotificationType) -> {
+        return sendNotificationService.getSendNotificationSelection(caseData, (sendNotificationType) -> {
             String notificationTitle = sendNotificationType.getValue().getSendNotificationTitle();
             String notificationSubject = sendNotificationType.getValue().getSendNotificationSubject().toString();
             return String.format("%s - %s", notificationTitle, notificationSubject);

@@ -152,9 +152,8 @@ async function judgment(I, eventName) {
     await I.executeJudgment();
 }
 
-async function generateReport(I, jurisdiction, caseType, eventName) {
-    await I.authenticateWithIdam(username, password);
-    await I.wait(2);
+async function generateReport(I, jurisdiction, caseType, eventName, userName, password) {
+    I.wait(2);
     await I.executeCreateReport(jurisdiction, caseType, eventName);
 }
 

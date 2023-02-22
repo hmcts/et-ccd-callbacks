@@ -125,6 +125,13 @@ public final class TseHelper {
                         : !o.getValue().getStatus().equals(CLOSED_STATE))
                 .map(TseHelper::formatDropdownOption)
                 .collect(Collectors.toList()));
+
+//        return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
+//                .filter(o -> selectedClosed ? CLOSED_STATE.equals(o.getValue().getStatus()) && o.getValue().getStatus() != null
+//                        : !CLOSED_STATE.equals(o.getValue().getStatus()) && o.getValue().getStatus() != null )
+//                .map(r -> DynamicValueType.create(r.getValue().getNumber(),
+//                        r.getValue().getNumber() + " " + r.getValue().getType()))
+//                .collect(Collectors.toList()));
     }
 
     private static DynamicValueType formatDropdownOption(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {

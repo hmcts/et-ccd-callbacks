@@ -38,6 +38,9 @@ class TseViewApplicationsControllerTest {
     private static final String MID_POPULATE_CHOOSE_APPLICATION_URL =
             "/viewRespondentTSEApplications/midPopulateChooseApplication";
 
+    private static final String ABOUT_TO_START_URL =
+            "/viewRespondentTSEApplications/aboutToStart";
+
     @Autowired
     private MockMvc mockMvc;
     @MockBean
@@ -70,6 +73,39 @@ class TseViewApplicationsControllerTest {
         UserDetails userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails("")).thenReturn(userDetails);
     }
+
+    @Test
+    void aboutToStart_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(ABOUT_TO_START_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void aboutToStart_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(ABOUT_TO_START_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void aboutToStart_badRequest() throws Exception {
+        mockMvc.perform(post(ABOUT_TO_START_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 
     @Test
     void midPopulateChooseApplication_tokenOk() throws Exception {

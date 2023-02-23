@@ -37,6 +37,9 @@ public final class ClaimsByHearingVenueReport {
                 reportParams.getDateTo(), reportParams.getHearingDateType());
         claimsByHearingVenueReportData.setReportPrintedOnDescription(
                 getReportedOnDetail(reportParams.getUserFullName()));
+        claimsByHearingVenueReportData.setManagingOffice(
+                ReportHelper.getReportOfficeForDisplay(UtilHelper.getListingCaseTypeId(reportParams.getCaseTypeId()),
+                        reportParams.getManagingOffice()));
 
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             setReportData(submitEvents, claimsByHearingVenueReportData);

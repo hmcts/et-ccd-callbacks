@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -103,12 +105,29 @@ public class SendNotificationService {
         caseData.setSendNotificationRequestMadeBy(null);
     }
 
+    public List<DynamicValueType> getSendNotificationSelection(CaseData caseData,
+                                                               Function<SendNotificationTypeItem, String> format) {
+        List<DynamicValueType> values = new ArrayList<>();
+        List<SendNotificationTypeItem> sendNotificationTypeItemList = caseData.getSendNotificationCollection();
+        if (CollectionUtils.isEmpty(sendNotificationTypeItemList)) {
+            return values;
+        }
+        for (SendNotificationTypeItem sendNotificationType : sendNotificationTypeItemList) {
+            String notificationId = sendNotificationType.getId();
+            String label = format.apply(sendNotificationType);
+            values.add(DynamicValueType.create(notificationId, label));
+        }
+        return values;
+    }
+
     /**
      * Sends notification emails for the claimant and/or respondent(s) based on the radio list from the
      * sendNotification event.
+     *
      * @param caseDetails Details of the case
      */
     public void sendNotifyEmails(CaseDetails caseDetails) {
+
         CaseData caseData = caseDetails.getCaseData();
 
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {

@@ -35,7 +35,7 @@ public final class ClaimsByHearingVenueReport {
         claimsByHearingVenueReportData.setReportPrintedOnDescription(
                 getReportedOnDetail(reportParams.getUserFullName()));
         claimsByHearingVenueReportData.setManagingOffice(
-                ReportHelper.getReportOfficeForDisplay(UtilHelper.getListingCaseTypeId(reportParams.getCaseTypeId()),
+                ReportHelper.getReportOfficeForDisplay(reportParams.getCaseTypeId(),
                         reportParams.getManagingOffice()));
         List<ClaimsByHearingVenueSubmitEvent> submitEvents = dataSource.getData(
                 reportParams.getManagingOffice(), UtilHelper.getListingCaseTypeId(reportParams.getCaseTypeId()),

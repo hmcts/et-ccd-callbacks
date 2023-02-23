@@ -26,9 +26,6 @@ public final class ClaimsByHearingVenueReport {
     }
 
     public ClaimsByHearingVenueReportData generateReport(ClaimsByHearingVenueReportParams reportParams) {
-        List<ClaimsByHearingVenueSubmitEvent> submitEvents = dataSource.getData(
-            reportParams.getManagingOffice(), UtilHelper.getListingCaseTypeId(reportParams.getCaseTypeId()),
-                reportParams.getDateFrom(), reportParams.getDateTo());
         String reportOffice = ReportHelper.getReportOffice(reportParams.getCaseTypeId(),
             reportParams.getManagingOffice());
         ClaimsByHearingVenueReportData claimsByHearingVenueReportData = initReport(reportOffice);
@@ -37,7 +34,12 @@ public final class ClaimsByHearingVenueReport {
                 reportParams.getDateTo(), reportParams.getHearingDateType());
         claimsByHearingVenueReportData.setReportPrintedOnDescription(
                 getReportedOnDetail(reportParams.getUserFullName()));
-
+        claimsByHearingVenueReportData.setManagingOffice(
+                ReportHelper.getReportOfficeForDisplay(reportParams.getCaseTypeId(),
+                        reportParams.getManagingOffice()));
+        List<ClaimsByHearingVenueSubmitEvent> submitEvents = dataSource.getData(
+                reportParams.getManagingOffice(), UtilHelper.getListingCaseTypeId(reportParams.getCaseTypeId()),
+                reportParams.getDateFrom(), reportParams.getDateTo());
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             setReportData(submitEvents, claimsByHearingVenueReportData);
         }

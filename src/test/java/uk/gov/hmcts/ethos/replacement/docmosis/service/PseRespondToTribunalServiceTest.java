@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 
@@ -55,9 +57,16 @@ class PseRespondToTribunalServiceTest {
     private static final String RULE92_ANSWERED_YES =
             "You have responded to the tribunal and copied your response to the other party.\r\n\r\n";
 
+    @MockBean
+    private EmailService emailService;
+    @MockBean
+    private UserService userService;
+    @MockBean
+    private HearingSelectionService hearingSelectionService;
+
     @BeforeEach
     void setUp() {
-        pseRespondToTribService = new PseRespondToTribunalService();
+        pseRespondToTribService = new PseRespondToTribunalService(emailService, userService, hearingSelectionService);
         caseData = CaseDataBuilder.builder().build();
     }
 

@@ -379,6 +379,7 @@ public class CaseActionsForCaseWorkerController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
         caseManagementForCaseWorkerService.claimantDefaults(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);

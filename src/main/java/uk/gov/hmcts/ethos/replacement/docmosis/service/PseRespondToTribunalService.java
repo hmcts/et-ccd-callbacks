@@ -4,20 +4,26 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -33,7 +39,17 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelec
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.ExcessiveImports"})
 public class PseRespondToTribunalService {
+
+    @Value("${pse.respondent.acknowledgement.yes.template.id}")
+    private String acknowledgeEmailYesTemplateId;
+    @Value("${pse.respondent.acknowledgement.no.template.id}")
+    private String acknowledgeEmailNoTemplateId;
+
+    private final EmailService emailService;
+    private final UserService userService;
+    private final HearingSelectionService hearingSelectionService;
 
     private static final String GIVE_MISSING_DETAIL =
         "Use the text box or supporting materials to give details.";
@@ -139,6 +155,44 @@ public class PseRespondToTribunalService {
                         .copyNoGiveDetails(caseData.getPseRespondentOrdReqCopyNoGiveDetails())
                         .build()
                 ).build());
+    }
+
+    /**
+     * Send Acknowledge Email.
+     * @param caseDetails in which the case details are extracted from
+     * @param userToken jwt used for authorization
+     */
+    public void sendAcknowledgeEmail(CaseDetails caseDetails, String userToken) {
+        CaseData caseData = caseDetails.getCaseData();
+        String email = userService.getUserDetails(userToken).getEmail();
+        if (YES.equals(caseData.getPseRespondentOrdReqCopyToOtherParty())) {
+            emailService.sendEmail(acknowledgeEmailYesTemplateId, email, buildPersonalisationYes(caseDetails));
+        } else {
+            emailService.sendEmail(acknowledgeEmailNoTemplateId, email, buildPersonalisationNo(caseDetails));
+        }
+    }
+
+    private Map<String, String> buildPersonalisationYes(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        return Map.of(
+            "caseNumber", caseData.getEthosCaseReference(),
+            "caseId", caseDetails.getCaseId()
+        );
+    }
+
+    private Map<String, String> buildPersonalisationNo(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
+        DateListedType dateListedType = hearingSelectionService.getSelectedListing(
+            caseData, sendNotificationType.getSendNotificationSelectHearing());
+        String hearingDate = UtilHelper.formatLocalDateTime(dateListedType.getListedDate());
+        return Map.of(
+            "caseNumber", caseData.getEthosCaseReference(),
+            "claimant", caseData.getClaimant(),
+            "respondents", Helper.getRespondentNames(caseData),
+            "hearingDate", hearingDate,
+            "caseId", caseDetails.getCaseId()
+        );
     }
 
     /**

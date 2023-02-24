@@ -7,17 +7,28 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PseRespondentViewService {
+
+    private static final String TABLE_COLUMNS_MARKDOWN =
+            "| No | Subject | To party | Date sent | Notification | Response due | Number of responses |\r\n"
+                    + "|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n"
+                    + "%s\r\n";
+
+    private static final String TABLE_ROW_MARKDOWN = "|%s|%s|%s|%s|%s|%s|%s|\r\n";
 
     /**
      * Create fields for application dropdown selector.
@@ -46,4 +57,31 @@ public class PseRespondentViewService {
             || BOTH_PARTIES.equals(sendNotificationTypeItem.getValue().getSendNotificationNotify());
     }
 
+    public String generateViewNotificationsMarkdown(CaseData caseData) {
+        List<SendNotificationTypeItem> notifications = caseData.getSendNotificationCollection();
+        if (CollectionUtils.isEmpty(notifications)) {
+            return String.format(TABLE_COLUMNS_MARKDOWN, "");
+        }
+
+        String tableRows = notifications.stream()
+                .filter(o -> !CLAIMANT_ONLY.equals(o.getValue().getSendNotificationNotify()))
+                .map(this::viewNotificationsFormatRow)
+                .collect(Collectors.joining());
+
+        return String.format(TABLE_COLUMNS_MARKDOWN, tableRows);
+    }
+
+    private String viewNotificationsFormatRow(SendNotificationTypeItem sendNotificationTypeItem) {
+        SendNotificationType notification = sendNotificationTypeItem.getValue();
+
+        return String.format(TABLE_ROW_MARKDOWN,
+                notification.getNumber(),
+                String.join(", ", notification.getSendNotificationSubject()),
+                notification.getSendNotificationNotify(),
+                notification.getDate(),
+                notification.getSendNotificationTitle(),
+                defaultString(notification.getSendNotificationResponseTribunal(), "No"),
+                "0"
+        );
+    }
 }

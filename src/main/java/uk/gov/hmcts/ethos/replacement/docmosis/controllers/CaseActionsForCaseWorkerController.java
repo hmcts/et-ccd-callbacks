@@ -347,8 +347,9 @@ public class CaseActionsForCaseWorkerController {
             log.info("Post Default values loaded: " + defaultValues);
             defaultValuesReaderService.getCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
-            FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
+            caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
 
+            FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
             addSingleCaseToMultipleService.addSingleCaseToMultipleLogic(
                     userToken, caseData, caseDetails.getCaseTypeId(),
                     caseDetails.getJurisdiction(),

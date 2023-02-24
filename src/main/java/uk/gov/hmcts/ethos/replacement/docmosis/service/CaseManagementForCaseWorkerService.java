@@ -68,6 +68,7 @@ public class CaseManagementForCaseWorkerService {
     private static final String CASE_NOT_FOUND_MESSAGE = "Case Reference Number not found.";
     public static final String LISTED_DATE_ON_WEEKEND_MESSAGE = "A hearing date you have entered "
             + "falls on a weekend. You cannot list this case on a weekend. Please amend the date of Hearing ";
+    public static final int ET3_DUE_DATE_FROM_SERVING_DATE = 28;
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
@@ -184,6 +185,13 @@ public class CaseManagementForCaseWorkerService {
         if (!isNullOrEmpty(caseData.getPositionType()) && positionChanged(caseData)) {
             caseData.setDateToPosition(LocalDate.now().toString());
             caseData.setCurrentPosition(caseData.getPositionType());
+        }
+    }
+
+    public void setEt3ResponseDueDate(CaseData caseData) {
+        if (!isNullOrEmpty(caseData.getClaimServedDate())) {
+            caseData.setEt3DueDate(LocalDate.parse(
+                caseData.getClaimServedDate()).plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString());
         }
     }
 

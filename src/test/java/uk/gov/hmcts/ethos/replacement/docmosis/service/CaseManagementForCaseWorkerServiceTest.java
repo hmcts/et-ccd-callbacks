@@ -57,6 +57,7 @@ import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
@@ -700,6 +701,16 @@ public class CaseManagementForCaseWorkerServiceTest {
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
             assertThat(respondentSumTypeItem.getValue().getExtensionRequested(), is(NO));
         }
+    }
+
+    @Test
+    public void setEt3ResponseDueDate_Serving_Date_Plus_28() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        LocalDate localDate = LocalDate.now();
+        String expectedEt3DueDate = localDate.plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString();
+        caseData.setClaimServedDate(localDate.toString());
+        caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
+        assertEquals(expectedEt3DueDate, caseData.getEt3DueDate());
     }
 
     @Test

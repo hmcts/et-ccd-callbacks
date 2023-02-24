@@ -20,6 +20,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -148,7 +149,7 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(pseRespondToTribunalService).sendAcknowledgeEmail(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(pseRespondToTribunalService, times(1)).sendAcknowledgeEmail(ccdRequest.getCaseDetails(), AUTH_TOKEN);
     }
 
     @Test

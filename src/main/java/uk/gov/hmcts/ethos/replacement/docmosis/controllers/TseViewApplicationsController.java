@@ -42,6 +42,36 @@ public class TseViewApplicationsController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
+    /**
+     * Resets the dynamic list for select an application to view either an open or closed application.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Resets the dynamic list for select an application to to view")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToStart(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setTseViewApplicationSelect(null);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
 
     /**
      * Populates the dynamic list of the applications open or closed on a case.

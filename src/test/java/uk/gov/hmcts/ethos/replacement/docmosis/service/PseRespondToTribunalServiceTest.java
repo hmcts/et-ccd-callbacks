@@ -388,8 +388,6 @@ class PseRespondToTribunalServiceTest {
             .withClaimant("Claimant Name")
             .withRespondent("Respondent One", YES, "01-Jan-2023", false)
             .withRespondent("Respondent Two", YES, "02-Jan-2023", false)
-            .withHearing("1", "test", "Judy", List.of(MSL_HEARING_FORMAT_VIDEO), "2", "Days", "Sit Alone")
-            .withHearingSession(0, "1", "2023-12-25T12:00:00.000", HEARING_STATUS_LISTED, false)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseId("1677174791076683");
 

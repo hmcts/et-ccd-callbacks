@@ -176,8 +176,7 @@ public class PseRespondToTribunalController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         pseRespondToTribunalService.addRespondentResponseToJON(caseDetails.getCaseData());
 
-        // TODO: RET-2962
-        //pseRespondToTribunalService.sendAcknowledgeEmail(caseDetails, userToken)
+        pseRespondToTribunalService.sendAcknowledgeEmail(caseDetails, userToken);
         // TODO: RET-2969
         //pseRespondToTribunalService.sendClaimantEmail(caseDetails)
         // TODO: RET-2964

@@ -7,23 +7,30 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.PseResponseTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -31,9 +38,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.I_DO_NOT_WANT_TO_COPY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
@@ -46,6 +58,8 @@ class PseRespondToTribunalServiceTest {
     private PseRespondToTribunalService pseRespondToTribService;
     private CaseData caseData;
 
+    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+    private static final String TEMPLATE_ID = "someTemplateId";
     private static final String RESPONSE = "Some Response";
 
     private static final String RULE92_NO_DETAILS = "Rule 92 Reasons";
@@ -55,9 +69,16 @@ class PseRespondToTribunalServiceTest {
     private static final String RULE92_ANSWERED_YES =
             "You have responded to the tribunal and copied your response to the other party.\r\n\r\n";
 
+    @MockBean
+    private EmailService emailService;
+    @MockBean
+    private UserService userService;
+    @MockBean
+    private HearingSelectionService hearingSelectionService;
+
     @BeforeEach
     void setUp() {
-        pseRespondToTribService = new PseRespondToTribunalService();
+        pseRespondToTribService = new PseRespondToTribunalService(emailService, userService, hearingSelectionService);
         caseData = CaseDataBuilder.builder().build();
     }
 
@@ -335,6 +356,76 @@ class PseRespondToTribunalServiceTest {
         document.setValue(documentType);
 
         return document;
+    }
+
+    @Test
+    void sendAcknowledgeEmail_rule92Yes() {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+            .withEthosCaseReference("6000001/2023")
+            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId("1677174791076683");
+        caseDetails.getCaseData().setPseRespondentOrdReqCopyToOtherParty(YES);
+
+        when(userService.getUserDetails(any())).thenReturn(HelperTest.getUserDetails());
+
+        ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailYesTemplateId", TEMPLATE_ID);
+
+        Map<String, String> expectedMap = Map.of(
+            "caseNumber", "6000001/2023",
+            "caseId", "1677174791076683"
+        );
+
+        pseRespondToTribService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
+        verify(emailService).sendEmail(TEMPLATE_ID, "mail@mail.com", expectedMap);
+    }
+
+    @Test
+    void sendAcknowledgeEmail_rule92No() {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+            .withEthosCaseReference("6000001/2023")
+            .withClaimant("Claimant Name")
+            .withRespondent("Respondent One", YES, "01-Jan-2023", false)
+            .withRespondent("Respondent Two", YES, "02-Jan-2023", false)
+            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId("1677174791076683");
+
+        caseDetails.getCaseData().setSendNotificationCollection(List.of(
+            SendNotificationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(SendNotificationType.builder()
+                    .number("1")
+                    .sendNotificationTitle("View notice of hearing")
+                    .sendNotificationSelectHearing(DynamicFixedListType.of(
+                        DynamicValueType.create("1", "1: Hearing - Leeds - 25 Dec 2023")))
+                    .build())
+                .build()
+        ));
+
+        caseDetails.getCaseData().setPseRespondentOrdReqCopyToOtherParty(NO);
+
+        caseDetails.getCaseData().setPseRespondentSelectOrderOrRequest(
+            DynamicFixedListType.of(DynamicValueType.create("1",
+                "1 View notice of hearing")));
+
+        when(userService.getUserDetails(any())).thenReturn(HelperTest.getUserDetails());
+
+        DateListedType selectedListing = new DateListedType();
+        selectedListing.setListedDate("2023-12-25T12:00:00.000");
+        when(hearingSelectionService.getSelectedListing(isA(CaseData.class),
+            isA(DynamicFixedListType.class))).thenReturn(selectedListing);
+
+        ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailNoTemplateId", TEMPLATE_ID);
+
+        Map<String, String> expectedMap = Map.of(
+            "caseNumber", "6000001/2023",
+            "claimant", "Claimant Name",
+            "respondents", "Respondent One, Respondent Two",
+            "hearingDate", "25 December 2023 12:00",
+            "caseId", "1677174791076683"
+        );
+
+        pseRespondToTribService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
+        verify(emailService).sendEmail(TEMPLATE_ID, "mail@mail.com", expectedMap);
     }
 
     @Test

@@ -40,6 +40,7 @@ import static java.time.DayOfWeek.SUNDAY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
@@ -68,7 +69,6 @@ public class CaseManagementForCaseWorkerService {
     private static final String CASE_NOT_FOUND_MESSAGE = "Case Reference Number not found.";
     public static final String LISTED_DATE_ON_WEEKEND_MESSAGE = "A hearing date you have entered "
             + "falls on a weekend. You cannot list this case on a weekend. Please amend the date of Hearing ";
-    public static final int ET3_DUE_DATE_FROM_SERVING_DATE = 28;
 
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,

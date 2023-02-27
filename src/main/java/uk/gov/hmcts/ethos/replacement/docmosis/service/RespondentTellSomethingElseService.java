@@ -8,10 +8,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
 import uk.gov.service.notify.NotificationClient;
@@ -45,12 +47,17 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getResponde
 public class RespondentTellSomethingElseService {
     private final EmailService emailService;
     private final UserService userService;
+    private final TribunalOfficesService tribunalOfficesService;
     private final TornadoService tornadoService;
 
     @Value("${tse.respondent.application.acknowledgement.template.id}")
     private String emailTemplateId;
     @Value("${tse.respondent.application.notify.claimant.template.id}")
     private String claimantTemplateId;
+    @Value("${url.exui.case-details}")
+    private String exuiUrl;
+    @Value("${tse.respondent.application.tribunal.template.id}")
+    private String adminTemplateId;
 
     private static final String GIVE_DETAIL_MISSING = "Use the text box or file upload to give details.";
     private static final List<String> GROUP_B_TYPES = List.of(TSE_APP_CHANGE_PERSONAL_DETAILS,
@@ -227,5 +234,35 @@ public class RespondentTellSomethingElseService {
 
         return String.format(TABLE_ROW_MARKDOWN, count.getAndIncrement(), value.getType(), value.getApplicant(),
             value.getDate(), value.getDueDate(), responses, status);
+    }
+
+    public void sendAdminEmail(CaseDetails caseDetails) {
+        String managingOffice = caseDetails.getCaseData().getManagingOffice();
+        TribunalOffice tribunalOffice = tribunalOfficesService.getTribunalOffice(managingOffice);
+
+        if (tribunalOffice == null) {
+            return;
+        }
+
+        String email = tribunalOffice.getOfficeEmail();
+
+        if (isNullOrEmpty(email)) {
+            return;
+        }
+
+        Map<String, String> personalisation = buildPersonalisationForAdminEmail(caseDetails);
+        emailService.sendEmail(adminTemplateId, email, personalisation);
+    }
+
+    private Map<String, String> buildPersonalisationForAdminEmail(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
+        personalisation.put("caseNumber", caseData.getEthosCaseReference());
+        personalisation.put("emailFlag", "");
+        personalisation.put("claimant", caseData.getClaimant());
+        personalisation.put("respondents", getRespondentNames(caseData));
+        personalisation.put("date", ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
+        personalisation.put("url", exuiUrl + caseDetails.getCaseId());
+        return personalisation;
     }
 }

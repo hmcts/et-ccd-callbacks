@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -211,73 +212,129 @@ public final class TseHelper {
     public static String createResponseTable(List<TseRespondTypeItem> respondList){
         AtomicInteger i = new AtomicInteger(1);
 
-        String RESPONSES_TABLE_START = "| | |\r\n"
-                + "|--|--|\r\n"+
-                "|Responses |\r\n";
-
         String RESPONSE_TABLE_BODY = respondList.stream().map((TseRespondTypeItem response)-> {
 
-            String RESPONSES_TABLE = "|Response " + String.valueOf(i.get()) + "\r\n";
+            // check if value is admin or not
+            if( ADMIN.equals(response.getValue().getFrom()) ){
+                String RESPONSES_TABLE = "|Response " + i.get() + " | |\r\n" +  "|--|--|\r\n";
 
-            if(response.getValue().getResponse() != null ){
-                RESPONSES_TABLE +=("|Response |" + String.valueOf(response.getValue().getResponse())) + "\r\n";
-            }
-            if(response.getValue().getEnterResponseTitle() != null ){
-                RESPONSES_TABLE +=("|Response title |" + String.valueOf(response.getValue().getEnterResponseTitle()))+ "\r\n";
+                // AN ADDITIONAL TITLE FIELD
+                if(response.getValue().getEnterResponseTitle() != null ){
+                    RESPONSES_TABLE +=("|Response |" + String.valueOf(response.getValue().getEnterResponseTitle()))+ "\r\n";
+                }
+                //  WHAT ABOUT THE ACTUAL RESPONSE
+                if(response.getValue().getResponse() != null ){
+                    RESPONSES_TABLE +=("|DO I EXIST |" + String.valueOf(response.getValue().getResponse())) + "\r\n";
+                }
+                if (response.getValue().getDate() != null) {
+                    RESPONSES_TABLE += ("|Date |" + String.valueOf(response.getValue().getDate())) + "\r\n";
+                }
+                if(response.getValue().getFrom() != null ){
+                    RESPONSES_TABLE +="|Sent by | Tribunal\r\n";
+                }
+                if (response.getValue().getIsCmoOrRequest() != null) {
+                    RESPONSES_TABLE += ("|Case management or order request? |" + String.valueOf(response.getValue().getIsCmoOrRequest())) + "\r\n";
+                }
+
+                // response due
+                if (response.getValue().getIsResponseRequired() != null) {
+                    RESPONSES_TABLE += ("|Response due |" + String.valueOf(response.getValue().getIsResponseRequired())) + "\r\n";
+                }
+
+                if (response.getValue().getSelectPartyRespond() != null) {
+                    RESPONSES_TABLE += ("|Parties or parties to respond |" + String.valueOf(response.getValue().getSelectPartyRespond())) + "\r\n";
+                }
+                if (response.getValue().getAdditionalInformation() != null) {
+                    RESPONSES_TABLE += ("|Additional information |" + String.valueOf(response.getValue().getAdditionalInformation())) + "\r\n";
+                }
+                // CONFIRM access to document and DESCRIPTION
+
+                // REQUEST MADE BY
+                if (StringUtils.isNotEmpty(formatAdminReplyMadeBy(response.getValue() ))) {
+                    RESPONSES_TABLE += formatAdminReplyMadeBy(response.getValue());
+                }
+                // check the ending of the above
+                if (StringUtils.isNotEmpty(defaultString(response.getValue().getMadeByFullName()))) {
+                    RESPONSES_TABLE += ("|Name |" + String.valueOf(response.getValue().getMadeByFullName())) + "\r\n";
+                }
+
+                // SENT TO
+                if (response.getValue().getSelectPartyNotify() != null) {
+                    RESPONSES_TABLE += ("|Sent to |" + response.getValue().getSelectPartyNotify() + "\r\n");
+                }
+
+                RESPONSES_TABLE += "\r\n";
+                i.getAndIncrement();
+                return RESPONSES_TABLE;
+            } else {
+
+                String RESPONSES_TABLE = "|Response " + i.get() + " | |\r\n" +  "|--|--|\r\n";
+
+                if (response.getValue().getResponse() != null) {
+                    RESPONSES_TABLE += ("|Response |" + String.valueOf(response.getValue().getResponse())) + "\r\n";
+                }
+                if (response.getValue().getEnterResponseTitle() != null) {
+                    RESPONSES_TABLE += ("|Response title |" + String.valueOf(response.getValue().getEnterResponseTitle())) + "\r\n";
+                }
+
+                if (response.getValue().getFrom() != null) {
+                    RESPONSES_TABLE += ("|From |" + String.valueOf(response.getValue().getFrom())) + "\r\n";
+                }
+
+                ArrayList<String> links = getDocumentUrls(response);
+                AtomicInteger j = new AtomicInteger(1);
+
+                if (links != null) {
+                    String linky = links.stream().map(link -> {
+                        if (j.get() == 1) {
+                            j.getAndIncrement();
+                            return "|Supporting Material |" + link + "\r\n";
+                        }
+                        return "| |" + link + "\r\n";
+                    }).collect(Collectors.joining(""));
+                    RESPONSES_TABLE += linky;
+
+                }
+
+                if (response.getValue().getDate() != null) {
+                    RESPONSES_TABLE += ("|Date |" + String.valueOf(response.getValue().getDate())) + "\r\n";
+                }
+
+                if (response.getValue().getCopyToOtherParty() != null) {
+                    RESPONSES_TABLE += ("|Copy to other party |" + String.valueOf(response.getValue().getCopyToOtherParty())) + "\r\n";
+                }
+                if (response.getValue().getCopyNoGiveDetails() != null) {
+                    RESPONSES_TABLE += ("|Copy no give details |" + String.valueOf(response.getValue().getCopyNoGiveDetails())) + "\r\n";
+                }
+                if (response.getValue().getIsCmoOrRequest() != null) {
+                    RESPONSES_TABLE += ("|Case management or order request? |" + String.valueOf(response.getValue().getIsCmoOrRequest())) + "\r\n";
+                }
+                if (response.getValue().getRequestMadeBy() != null) {
+                    RESPONSES_TABLE += ("|Request made by |" + String.valueOf(response.getValue().getRequestMadeBy())) + "\r\n";
+                }
+                if (response.getValue().getSelectPartyRespond() != null) {
+                    RESPONSES_TABLE += ("|Parties or parties to respond |" + String.valueOf(response.getValue().getSelectPartyRespond())) + "\r\n";
+                }
+                if (response.getValue().getSelectPartyNotify() != null) {
+                    RESPONSES_TABLE += ("|Sent to |" + String.valueOf(response.getValue().getSelectPartyNotify())) + "\r\n";
+                }
+                if (response.getValue().getAdditionalInformation() != null) {
+                    RESPONSES_TABLE += ("|Additional information |" + String.valueOf(response.getValue().getAdditionalInformation())) + "\r\n";
+                }
+
+                RESPONSES_TABLE += "\r\n";
+
+                i.getAndIncrement();
+                return RESPONSES_TABLE;
             }
 
-            if(response.getValue().getFrom() != null ){
-                RESPONSES_TABLE +=("|From |" + String.valueOf(response.getValue().getFrom()))+ "\r\n";
-            }
-
-            ArrayList<String> links = getDocumentUrls(response);
-            AtomicInteger j = new AtomicInteger(1);
-
-            if (links != null){
-                String linky = links.stream().map(link->{
-                    if(j.get() ==1) {
-                        j.getAndIncrement();
-                        return "|Supporting Material |" + link + "\r\n";
-                    }
-                    return "| |"+link+ "\r\n";
-                }).collect(Collectors.joining(""));
-                RESPONSES_TABLE += linky;
-
-            }
-
-            if(response.getValue().getDate() != null ){
-                RESPONSES_TABLE +=("|Date |" +String.valueOf(response.getValue().getDate()))+ "\r\n";
-            }
-
-            if(response.getValue().getCopyToOtherParty() != null ){
-                RESPONSES_TABLE +=("|Copy to other party |" +String.valueOf(response.getValue().getCopyToOtherParty()))+ "\r\n";
-            }
-            if(response.getValue().getCopyNoGiveDetails() != null ){
-                RESPONSES_TABLE +=("|Copy no give details |" +String.valueOf(response.getValue().getCopyNoGiveDetails()))+ "\r\n";
-            }
-            if(response.getValue().getIsCmoOrRequest() != null ){
-                RESPONSES_TABLE +=("|Case management or order request? |" +String.valueOf(response.getValue().getIsCmoOrRequest())) + "\r\n";
-            }
-            if(response.getValue().getRequestMadeBy() != null ){
-                RESPONSES_TABLE +=("|Request made by |" +String.valueOf(response.getValue().getRequestMadeBy())) + "\r\n";
-            }
-            if(response.getValue().getSelectPartyRespond() != null ){
-                RESPONSES_TABLE +=("|Parties or parties to respond |" +String.valueOf(response.getValue().getSelectPartyRespond())) + "\r\n";
-            }
-            if(response.getValue().getSelectPartyNotify() != null ){
-                RESPONSES_TABLE +=("|Sent to |" +String.valueOf(response.getValue().getSelectPartyNotify())) + "\r\n";
-            }
-            if(response.getValue().getAdditionalInformation() != null ){
-                RESPONSES_TABLE +=("|Additional information |" +String.valueOf(response.getValue().getAdditionalInformation())) + "\r\n";
-            }
-
-            RESPONSES_TABLE +="|  &nbsp;  |   | \r\n";
-            i.getAndIncrement();
-            return RESPONSES_TABLE;
 
         }).collect(Collectors.joining(""));
 
-        return RESPONSES_TABLE_START + RESPONSE_TABLE_BODY;
+        return RESPONSE_TABLE_BODY; //+ "<br><br><br><br>";
+       // return RESPONSES_TABLE_START + "<br><br><br><br>";
+
+    //    return  String.format(TABLE, "documentLink", "documentName","THREE");
     }
 
     private static final String APPLICATION_DETAILS = "<hr><h3>Application</h3>"
@@ -286,8 +343,8 @@ public final class TseHelper {
             + "<br><br>Application date     &#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 %s"
             + "<br><br>What do you want to tell or ask the tribunal? &#09&nbsp;&nbsp;&nbsp; %s"
             + "<br><br>Supporting material                          &#09&#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? &#09&#09 %s</pre> "
-            + "<br><br>";
+            + "<br><br>Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? &#09&#09 %s</pre> ";
+          //  + "<br><br>";
 
 
     public static void getDataSetViewForSelectedApplication(CaseData caseData) {
@@ -301,12 +358,9 @@ public final class TseHelper {
         // get the selected application picked from dropdown
         GenericTseApplicationType genericTseApplicationType = getChosenApplication(caseData);
 
+        // change
          // if the chosen application has a response collection create a table and set
-        if (!CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
-            List<TseRespondTypeItem> respondList = genericTseApplicationType.getRespondCollection();
-            String respondTablesCollection = createResponseTable(respondList);
-            caseData.setTseApplicationResponsesTable(respondTablesCollection);
-        }
+
 
         String document = "N/A";
 
@@ -317,15 +371,25 @@ public final class TseHelper {
             String documentName = genericTseApplicationType.getDocumentUpload().getDocumentFilename();
             document = String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
         }
-        caseData.setTseApplicationSummary(String.format(
-                APPLICATION_DETAILS,
-                "Applicant",
-                genericTseApplicationType.getType(),
-                genericTseApplicationType.getDate(),
-                isNullOrEmpty(genericTseApplicationType.getDetails()) ? "N/A" : genericTseApplicationType.getDetails(),
-                document,
-                genericTseApplicationType.getCopyToOtherPartyYesOrNo()
-        ));
+
+        // change
+        String respondTablesCollection = "";
+        if (!CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
+            List<TseRespondTypeItem> respondList = genericTseApplicationType.getRespondCollection();
+            respondTablesCollection = createResponseTable(respondList);
+          //  caseData.setTseApplicationResponsesTable(respondTablesCollection);
+        }
+        caseData.setTseApplicationResponsesTable(
+//                String.format(
+//                APPLICATION_DETAILS,
+//                "Applicant",
+//                genericTseApplicationType.getType(),
+//                genericTseApplicationType.getDate(),
+//                isNullOrEmpty(genericTseApplicationType.getDetails()) ? "N/A" : genericTseApplicationType.getDetails(),
+//                document,
+//                genericTseApplicationType.getCopyToOtherPartyYesOrNo()
+//        ) +
+                 respondTablesCollection );
 
     }
 

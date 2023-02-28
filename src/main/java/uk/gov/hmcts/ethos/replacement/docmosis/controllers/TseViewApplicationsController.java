@@ -25,6 +25,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getDataSetViewForSelectedApplication;
 
 /**
  * REST controller for the "View open or closed applications" event.
@@ -130,7 +131,7 @@ public class TseViewApplicationsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-       // getDataSetViewForSelectedApplication(caseData);
+        getDataSetViewForSelectedApplication(caseData);
        // setApplicationTableMarkup(caseData, userToken);
         TseViewAppService.setApplicationResponsesTable(caseData,userToken);
         return getCallbackRespEntityNoErrors(caseData);

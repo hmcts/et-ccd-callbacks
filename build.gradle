@@ -335,6 +335,11 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.86.Final'
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.86.Final'
 
+    //CVE-2022-45688
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.2'
+    //CVE-2022-45688
+    implementation group: 'org.json', name: 'json', version: '20220924'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 

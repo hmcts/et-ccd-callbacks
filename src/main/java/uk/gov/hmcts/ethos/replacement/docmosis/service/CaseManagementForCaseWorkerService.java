@@ -50,6 +50,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
 
 @Slf4j
 @Service("caseManagementForCaseWorkerService")
@@ -280,6 +281,17 @@ public class CaseManagementForCaseWorkerService {
                 }
             }
         }
+    }
+
+    public void setScotlandAllocatedOffice(String caseTypeId, CaseData caseData) {
+        if (!SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            return;
+        }
+
+        if (caseData.getManagingOffice() == null || UNASSIGNED_OFFICE.equals(caseData.getManagingOffice())) {
+            caseData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
+        }
+        caseData.setAllocatedOffice(TribunalOffice.GLASGOW.getOfficeName());
     }
 
     private void addHearingsOnWeekendError(DateListedTypeItem dateListedTypeItem, List<String> errors,

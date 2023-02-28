@@ -69,11 +69,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForC
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.NcssCount", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.UseProperClassLoader", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
+    "PMD.UseProperClassLoader", "PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.ExcessivePublicCount"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class CaseManagementForCaseWorkerServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+    public static final String UNASSIGNED_OFFICE = "Unassigned";
     @InjectMocks
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private CCDRequest scotlandCcdRequest1;
@@ -719,6 +720,28 @@ public class CaseManagementForCaseWorkerServiceTest {
         caseData.getRespondentCollection().get(0).getValue().setExtensionRequested(YES);
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
         assertThat(caseData.getRespondentCollection().get(0).getValue().getExtensionRequested(), is(YES));
+    }
+
+    @Test
+    public void testSetScotlandAllocatedOfficeManagingOfficeUnassigned() {
+        CaseData caseData = new CaseData();
+        caseData.setManagingOffice(UNASSIGNED_OFFICE);
+        String expectedAllocatedOffice = TribunalOffice.GLASGOW.getOfficeName();
+        String expectedManagingOffice = TribunalOffice.GLASGOW.getOfficeName();
+        caseManagementForCaseWorkerService.setScotlandAllocatedOffice(SCOTLAND_CASE_TYPE_ID, caseData);
+        assertEquals(expectedAllocatedOffice, caseData.getAllocatedOffice());
+        assertEquals(expectedManagingOffice, caseData.getManagingOffice());
+    }
+
+    @Test
+    public void testSetScotlandAllocatedOfficeManagingOfficeGlasgow() {
+        CaseData caseData = new CaseData();
+        caseData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
+        String expectedAllocatedOffice = TribunalOffice.GLASGOW.getOfficeName();
+        String expectedManagingOffice = TribunalOffice.GLASGOW.getOfficeName();
+        caseManagementForCaseWorkerService.setScotlandAllocatedOffice(SCOTLAND_CASE_TYPE_ID, caseData);
+        assertEquals(expectedAllocatedOffice, caseData.getAllocatedOffice());
+        assertEquals(expectedManagingOffice, caseData.getManagingOffice());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

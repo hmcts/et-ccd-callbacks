@@ -288,10 +288,9 @@ public class CaseManagementForCaseWorkerService {
             return;
         }
 
-        if (caseData.getManagingOffice() == null || UNASSIGNED_OFFICE.equals(caseData.getManagingOffice())) {
-            caseData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
+        if (caseData.getManagingOffice() == null || !UNASSIGNED_OFFICE.equals(caseData.getManagingOffice())) {
+            caseData.setAllocatedOffice(TribunalOffice.GLASGOW.getOfficeName());
         }
-        caseData.setAllocatedOffice(TribunalOffice.GLASGOW.getOfficeName());
     }
 
     private void addHearingsOnWeekendError(DateListedTypeItem dateListedTypeItem, List<String> errors,

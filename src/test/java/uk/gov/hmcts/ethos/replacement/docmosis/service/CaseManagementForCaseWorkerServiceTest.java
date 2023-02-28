@@ -726,11 +726,10 @@ public class CaseManagementForCaseWorkerServiceTest {
     public void testSetScotlandAllocatedOfficeManagingOfficeUnassigned() {
         CaseData caseData = new CaseData();
         caseData.setManagingOffice(UNASSIGNED_OFFICE);
-        String expectedAllocatedOffice = TribunalOffice.GLASGOW.getOfficeName();
+
         String expectedManagingOffice = TribunalOffice.GLASGOW.getOfficeName();
         caseManagementForCaseWorkerService.setScotlandAllocatedOffice(SCOTLAND_CASE_TYPE_ID, caseData);
-        assertEquals(expectedAllocatedOffice, caseData.getAllocatedOffice());
-        assertEquals(expectedManagingOffice, caseData.getManagingOffice());
+        assertNull(caseData.getAllocatedOffice());
     }
 
     @Test

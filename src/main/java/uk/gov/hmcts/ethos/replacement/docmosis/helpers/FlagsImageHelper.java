@@ -224,15 +224,14 @@ public class FlagsImageHelper {
     }
 
     private static boolean reasonableAdjustment(CaseData caseData) {
+        boolean flag = false;
         if (caseData.getAdditionalCaseInfoType() != null) {
-            if (!isNullOrEmpty(caseData.getAdditionalCaseInfoType().getReasonableAdjustment())) {
-                return caseData.getAdditionalCaseInfoType().getReasonableAdjustment().equals(YES);
-            } else {
-                return false;
-            }
-        } else {
-            return false;
+            flag = YES.equals(caseData.getAdditionalCaseInfoType().getReasonableAdjustment());
         }
+        if (!flag && caseData.getClaimantHearingPreference() != null) {
+            flag = YES.equals(caseData.getClaimantHearingPreference().getReasonableAdjustments());
+        }
+        return flag;
     }
 
     private static boolean welshColor(CaseData caseData) {

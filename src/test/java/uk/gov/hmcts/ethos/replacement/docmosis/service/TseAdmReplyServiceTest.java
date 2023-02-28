@@ -154,7 +154,7 @@ class TseAdmReplyServiceTest {
             + "|Applicant | Respondent|\r\n"
             + "|Type of application | Amend response|\r\n"
             + "|Application date | 13 December 2022|\r\n"
-            + "|Give details | Details Text|\r\n"
+            + "|Details of the application | Details Text|\r\n"
             + "|Supporting material | " + fileDisplay1 + "|\r\n"
             + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? "
             + "| Yes|\r\n"

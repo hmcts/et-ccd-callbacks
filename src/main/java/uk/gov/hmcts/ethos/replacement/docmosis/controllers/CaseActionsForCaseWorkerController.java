@@ -270,6 +270,8 @@ public class CaseActionsForCaseWorkerController {
 
             if (ET1_ONLINE_CASE_SOURCE.equals(caseData.getCaseSource())) {
                 caseData.setPositionType(ET1_ONLINE_SUBMISSION_POSITION_TYPE);
+                caseManagementForCaseWorkerService.setScotlandAllocatedOffice(
+                    ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
             }
         }
 

@@ -58,7 +58,7 @@ public class TseAdmReplyService {
             + "|Applicant | %s|\r\n"
             + "|Type of application | %s|\r\n"
             + "|Application date | %s|\r\n"
-            + "|Give details | %s|\r\n"
+            + "|Details of the application | %s|\r\n"
             + "|Supporting material | %s|\r\n"
             + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
             + "\r\n";

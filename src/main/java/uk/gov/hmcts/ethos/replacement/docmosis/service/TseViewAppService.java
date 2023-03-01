@@ -45,8 +45,9 @@ public class TseViewAppService {
     public void setApplicationResponsesTable(CaseData caseData, String authToken) {
         GenericTseApplicationType applicationTypeItem = getChosenApplication(caseData);
         if (applicationTypeItem != null) {
-            caseData.setTseApplicationSummary(initialTseAdminAppDetails(applicationTypeItem, authToken)
-                + initialTseAdminRespondDetails(applicationTypeItem, authToken));
+//            caseData.setTseApplicationSummary(initialTseAdminAppDetails(applicationTypeItem, authToken)
+//                + initialTseAdminRespondDetails(applicationTypeItem, authToken));
+            caseData.setTseApplicationSummary("");
         }
     }
 

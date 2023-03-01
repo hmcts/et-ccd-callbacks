@@ -237,7 +237,7 @@ public class RespondentTellSomethingElseService {
     }
 
     /**
-     * Sends an email notifying the admin that an application has been created.
+     * Sends an email notifying the admin that an application has been created/replied to.
      */
     public void sendAdminEmail(CaseDetails caseDetails) {
         String managingOffice = caseDetails.getCaseData().getManagingOffice();
@@ -258,7 +258,7 @@ public class RespondentTellSomethingElseService {
     }
 
     /**
-     * Builds peronalisation data for sending an email to the admin about an application.
+     * Builds personalisation data for sending an email to the admin about an application.
      */
     public Map<String, String> buildPersonalisationForAdminEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();

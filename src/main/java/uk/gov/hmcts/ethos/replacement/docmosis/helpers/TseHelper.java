@@ -187,7 +187,6 @@ public final class TseHelper {
         );
     }
 
-
     public static GenericTseApplicationType getChosenApplication(CaseData caseData) {
         return caseData.getGenericTseApplicationCollection()
                 .get(Integer.parseInt(caseData.getTseViewApplicationSelect().getValue().getCode()) - 1).getValue();
@@ -217,7 +216,7 @@ public final class TseHelper {
             + "|Response due | %s|\r\n"
             + "|Party or parties to respond | %s|\r\n"
             + "|Additional information | %s|\r\n"
-     //       + "|Supporting material | %s|\r\n"
+            + "|Supporting material | %s|\r\n"
             + "%s"
             + "|Name | %s|\r\n"
             + "|Sent to | %s|\r\n"
@@ -236,14 +235,14 @@ public final class TseHelper {
             + "|--|--|\r\n"
             + "\r\n";
 
-
-
-
-    public static String createResponseTable(List<TseRespondTypeItem> respondList, String application){
+    private static String createResponseTable(List<TseRespondTypeItem> respondList, String application){
         AtomicInteger i = new AtomicInteger(0);
-     //   return "|Responses | |\r\n |--|--|\r\n" + respondList.stream().map((TseRespondTypeItem response)-> {
         return  RESPONSE_LIST_TITLE + respondList.stream().map((TseRespondTypeItem response)-> {
             i.getAndIncrement();
+            String documentStr = "please update";
+                    //documentManagementService.displayDocNameTypeSizeLink(
+                    // response.getValue().getAddDocument(), authToken));
+
             if( ADMIN.equals(response.getValue().getFrom()) ){
                 return String.format(
                         VIEW_APPLICATION_ADMIN_REPLY_MARKUP,
@@ -254,6 +253,8 @@ public final class TseHelper {
                         defaultString(response.getValue().getIsResponseRequired()),
                         defaultString(response.getValue().getSelectPartyRespond()),
                         defaultString(response.getValue().getAdditionalInformation()),
+                        // get admin docs
+                        documentStr,
                         formatAdminReplyMadeBy(response.getValue()),
                         defaultString(response.getValue().getMadeByFullName()),
                         defaultString(response.getValue().getSelectPartyNotify())
@@ -278,30 +279,23 @@ public final class TseHelper {
         }).collect(Collectors.joining(""));
     }
 
-    private static final String APPLICATION_DETAILS = "<hr><h3>Application</h3>"
-            + "<pre>Applicant               &#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Type of application  &#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&nbsp;&nbsp;&nbsp; %s"
-            + "<br><br>Application date     &#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09&#09 %s"
-            + "<br><br>What do you want to tell or ask the tribunal? &#09&nbsp;&nbsp;&nbsp; %s"
-            + "<br><br>Supporting material                          &#09&#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? &#09&#09 %s</pre> "
-            + "<br><br>";
-
+    private static final String APPLICATION_DETAILS = "|Application | |\r\n"
+            + "|--|--|\r\n"
+            + "|Applicant | %s|\r\n"
+            + "|Type of application | %s|\r\n"
+            + "|Application date | %s|\r\n"
+            + "|What do you want to tell or ask the tribunal? | %s|\r\n"
+            + "|Supporting material | %s|\r\n"
+            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s |\r\n"
+            + "\r\n";
 
     public static void getDataSetViewForSelectedApplication(CaseData caseData) {
 
-        // get every application on the case
         List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
-        // return null if no applications
         if (CollectionUtils.isEmpty(applications) || getChosenApplication(caseData) == null) {
             return;
         }
-        // get the selected application picked from dropdown
         GenericTseApplicationType genericTseApplicationType = getChosenApplication(caseData);
-
-        // change
-         // if the chosen application has a response collection create a table and set
-
 
         String document = "N/A";
 
@@ -312,26 +306,20 @@ public final class TseHelper {
             String documentName = genericTseApplicationType.getDocumentUpload().getDocumentFilename();
             document = String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
         }
-
-        // change
         String respondTablesCollection = "";
         if (!CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
             List<TseRespondTypeItem> respondList = genericTseApplicationType.getRespondCollection();
             respondTablesCollection = createResponseTable(respondList, genericTseApplicationType.getApplicant());
-          //  caseData.setTseApplicationResponsesTable(respondTablesCollection);
         }
         caseData.setTseApplicationResponsesTable(
                 String.format(
-                APPLICATION_DETAILS,
-                "Applicant",
+                APPLICATION_DETAILS, genericTseApplicationType.getApplicant(),
                 genericTseApplicationType.getType(),
                 genericTseApplicationType.getDate(),
                 isNullOrEmpty(genericTseApplicationType.getDetails()) ? "N/A" : genericTseApplicationType.getDetails(),
                 document,
                 genericTseApplicationType.getCopyToOtherPartyYesOrNo()
-        ) +
-                 respondTablesCollection );
-
+        ) + respondTablesCollection );
     }
 
     /**

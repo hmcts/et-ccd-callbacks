@@ -18,7 +18,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TseViewAppService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -40,8 +39,6 @@ public class TseViewApplicationsController {
     private final VerifyTokenService verifyTokenService;
     private final TornadoService tornadoService;
     private final UserService userService;
-    private final TseViewAppService TseViewAppService;
-
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
     /**
@@ -132,8 +129,6 @@ public class TseViewApplicationsController {
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         getDataSetViewForSelectedApplication(caseData);
-       // setApplicationTableMarkup(caseData, userToken);
-        TseViewAppService.setApplicationResponsesTable(caseData,userToken);
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

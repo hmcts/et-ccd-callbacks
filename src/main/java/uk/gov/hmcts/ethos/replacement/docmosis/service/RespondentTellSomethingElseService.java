@@ -236,6 +236,9 @@ public class RespondentTellSomethingElseService {
             value.getDate(), value.getDueDate(), responses, status);
     }
 
+    /**
+     * Sends an email notifying the admin that an application has been created.
+     */
     public void sendAdminEmail(CaseDetails caseDetails) {
         String managingOffice = caseDetails.getCaseData().getManagingOffice();
         TribunalOffice tribunalOffice = tribunalOfficesService.getTribunalOffice(managingOffice);
@@ -254,7 +257,10 @@ public class RespondentTellSomethingElseService {
         emailService.sendEmail(adminTemplateId, email, personalisation);
     }
 
-    private Map<String, String> buildPersonalisationForAdminEmail(CaseDetails caseDetails) {
+    /**
+     * Builds peronalisation data for sending an email to the admin about an application.
+     */
+    public Map<String, String> buildPersonalisationForAdminEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());

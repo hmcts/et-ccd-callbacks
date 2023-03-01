@@ -230,7 +230,6 @@ class PseRespondToTribunalServiceTest {
             + "|Name | Mr Lee Gal Officer|\r\n"
             + "|Sent to | Both parties|\r\n"
             + "\r\n"
-            + "\r\n"
             + "|Response 1 | |\r\n"
             + "|--|--|\r\n"
             + "|Response from | Claimant|\r\n"

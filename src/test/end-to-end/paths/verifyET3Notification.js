@@ -9,4 +9,4 @@ Scenario('progress application through et3 notification -  happy path England an
     await processCaseToAcceptedState();
     await et3Notification(I,eventNames.ET3_NOTIFICATION);
 
-}).tag('@wip').tag('@biggerrefactoring');
+}).tag('@toberefactored').retry(testConfig.TestRetryScenarios)

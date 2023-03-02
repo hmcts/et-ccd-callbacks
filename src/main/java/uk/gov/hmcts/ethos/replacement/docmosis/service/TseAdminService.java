@@ -26,6 +26,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -104,8 +105,9 @@ public class TseAdminService {
             applicationType.getApplicant(),
             applicationType.getType(),
             applicationType.getDate(),
-            applicationType.getDetails(),
-            documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken)
+            defaultString(applicationType.getDetails()),
+            defaultString(documentManagementService.displayDocNameTypeSizeLink(
+                applicationType.getDocumentUpload(), authToken))
         );
     }
 
@@ -120,8 +122,8 @@ public class TseAdminService {
                     ? formatAdminReply(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),
-                        documentManagementService.displayDocNameTypeSizeLink(
-                            replyItem.getValue().getAddDocument(), authToken))
+                        defaultString(documentManagementService.displayDocNameTypeSizeLink(
+                            replyItem.getValue().getAddDocument(), authToken)))
                     : formatLegalRepReplyOrClaimantForDecision(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),
@@ -299,7 +301,7 @@ public class TseAdminService {
             applicationTypeItem.getValue().getApplicant(),
             applicationTypeItem.getValue().getType(),
             applicationTypeItem.getValue().getDate(),
-            applicationTypeItem.getValue().getDetails(),
+            defaultString(applicationTypeItem.getValue().getDetails()),
             getApplicationDocumentLink(applicationTypeItem, authToken),
             formatRule92(applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo(),
                 applicationTypeItem.getValue().getCopyToOtherPartyText())

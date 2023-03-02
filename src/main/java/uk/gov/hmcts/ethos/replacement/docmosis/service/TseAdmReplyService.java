@@ -25,6 +25,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
@@ -91,8 +92,9 @@ public class TseAdmReplyService {
             applicationType.getApplicant(),
             applicationType.getType(),
             applicationType.getDate(),
-            applicationType.getDetails(),
-            documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken),
+            defaultString(applicationType.getDetails()),
+            defaultString(documentManagementService.displayDocNameTypeSizeLink(
+                applicationType.getDocumentUpload(), authToken)),
             formatRule92(applicationType.getCopyToOtherPartyYesOrNo(),
                 applicationType.getCopyToOtherPartyText())
         );
@@ -109,8 +111,8 @@ public class TseAdmReplyService {
                 ? formatAdminReply(
                     replyItem.getValue(),
                     respondCount.incrementAndReturnValue(),
-                    documentManagementService.displayDocNameTypeSizeLink(
-                        replyItem.getValue().getAddDocument(), authToken))
+                    defaultString(documentManagementService.displayDocNameTypeSizeLink(
+                        replyItem.getValue().getAddDocument(), authToken)))
                 : formatLegalRepReplyOrClaimantForReply(
                     replyItem.getValue(),
                     respondCount.incrementAndReturnValue(),

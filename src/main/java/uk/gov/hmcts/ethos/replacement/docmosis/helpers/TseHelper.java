@@ -239,11 +239,15 @@ public final class TseHelper {
         AtomicInteger i = new AtomicInteger(0);
         return  RESPONSE_LIST_TITLE + respondList.stream().map((TseRespondTypeItem response)-> {
             i.getAndIncrement();
-            String documentStr = "please update";
-                    //documentManagementService.displayDocNameTypeSizeLink(
-                    // response.getValue().getAddDocument(), authToken));
-
+            String doc = "N/A";
             if( ADMIN.equals(response.getValue().getFrom()) ){
+
+                Pattern pattern = Pattern.compile("^.+?/documents/");
+                Matcher matcher = pattern.matcher(response.getValue().getAddDocument().getDocumentBinaryUrl());
+                String documentLink = matcher.replaceFirst("");
+                String documentName = response.getValue().getAddDocument().getDocumentFilename();
+                doc = String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
+
                 return String.format(
                         VIEW_APPLICATION_ADMIN_REPLY_MARKUP,
                         i.get(),
@@ -253,8 +257,7 @@ public final class TseHelper {
                         defaultString(response.getValue().getIsResponseRequired()),
                         defaultString(response.getValue().getSelectPartyRespond()),
                         defaultString(response.getValue().getAdditionalInformation()),
-                        // get admin docs
-                        documentStr,
+                        doc,
                         formatAdminReplyMadeBy(response.getValue()),
                         defaultString(response.getValue().getMadeByFullName()),
                         defaultString(response.getValue().getSelectPartyNotify())

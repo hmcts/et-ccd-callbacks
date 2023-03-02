@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
 @Configuration
 @Lazy
 public class ServiceTokenGeneratorConfiguration {
+
     @Bean
     @Primary
     @Qualifier("ccd")

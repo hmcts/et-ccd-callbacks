@@ -184,6 +184,10 @@ public class TseAdmReplyService {
                             .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
                             .build()
                     ).build());
+
+            genericTseApplicationType.setResponsesCount(
+                    String.valueOf(genericTseApplicationType.getRespondCollection().size())
+            );
         }
     }
 

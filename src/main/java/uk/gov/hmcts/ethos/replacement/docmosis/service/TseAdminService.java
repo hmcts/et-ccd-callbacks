@@ -341,8 +341,8 @@ public class TseAdminService {
                     ? formatAdminReply(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),
-                        documentManagementService.displayDocNameTypeSizeLink(
-                            replyItem.getValue().getAddDocument(), authToken))
+                        defaultString(documentManagementService.displayDocNameTypeSizeLink(
+                            replyItem.getValue().getAddDocument(), authToken)))
                     : formatLegalRepReplyOrClaimantWithRule92(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),

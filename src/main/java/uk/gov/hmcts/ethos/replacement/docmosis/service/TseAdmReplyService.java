@@ -36,6 +36,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantForReply;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
@@ -54,14 +55,14 @@ public class TseAdmReplyService {
     private final DocumentManagementService documentManagementService;
 
     private static final String APP_DETAILS = "| | |\r\n"
-            + "|--|--|\r\n"
-            + "|Applicant | %s|\r\n"
-            + "|Type of application | %s|\r\n"
-            + "|Application date | %s|\r\n"
-            + "|Give details | %s|\r\n"
-            + "|Supporting material | %s|\r\n"
-            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
-            + "\r\n";
+        + "|--|--|\r\n"
+        + "|Applicant | %s|\r\n"
+        + "|Type of application | %s|\r\n"
+        + "|Application date | %s|\r\n"
+        + "|Give details | %s|\r\n"
+        + "|Supporting material | %s|\r\n"
+        + "%s" // Rule92
+        + "\r\n";
     private static final String STRING_BR = "<br>";
 
     private static final String RESPONSE_REQUIRED =
@@ -92,7 +93,8 @@ public class TseAdmReplyService {
             applicationType.getDate(),
             applicationType.getDetails(),
             documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken),
-            applicationType.getCopyToOtherPartyYesOrNo()
+            formatRule92(applicationType.getCopyToOtherPartyYesOrNo(),
+                applicationType.getCopyToOtherPartyText())
         );
     }
 

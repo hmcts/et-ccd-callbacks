@@ -34,6 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantForDecision;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
@@ -65,7 +66,7 @@ public class TseAdminService {
         + "|Application date | %s|\r\n"
         + "|What do you want to tell or ask the tribunal? | %s|\r\n"
         + "|Supporting material | %s|\r\n"
-        + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
+        + "%s" // Rule92
         + "\r\n";
 
     private static final String CLOSE_APP_DECISION_DETAILS = "|Decision | |\r\n"
@@ -300,7 +301,8 @@ public class TseAdminService {
             applicationTypeItem.getValue().getDate(),
             applicationTypeItem.getValue().getDetails(),
             getApplicationDocumentLink(applicationTypeItem, authToken),
-            applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo()
+            formatRule92(applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo(),
+                applicationTypeItem.getValue().getCopyToOtherPartyText())
         )
             + initialTseAdminRespondDetails(applicationTypeItem.getValue(), authToken)
             + decisionsMarkdown;

@@ -34,7 +34,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantForDecision;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithRule92;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithoutRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
@@ -95,7 +96,7 @@ public class TseAdminService {
         GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem != null) {
             caseData.setTseAdminTableMarkUp(initialTseAdminAppDetails(applicationTypeItem.getValue(), authToken)
-                + initialTseAdminRespondDetails(applicationTypeItem.getValue(), authToken));
+                + initialRespondDetailsWithoutRule92(applicationTypeItem.getValue(), authToken));
         }
     }
 
@@ -111,7 +112,7 @@ public class TseAdminService {
         );
     }
 
-    private String initialTseAdminRespondDetails(GenericTseApplicationType applicationType, String authToken) {
+    private String initialRespondDetailsWithoutRule92(GenericTseApplicationType applicationType, String authToken) {
         if (CollectionUtils.isEmpty(applicationType.getRespondCollection())) {
             return "";
         }
@@ -124,7 +125,7 @@ public class TseAdminService {
                         respondCount.incrementAndReturnValue(),
                         defaultString(documentManagementService.displayDocNameTypeSizeLink(
                             replyItem.getValue().getAddDocument(), authToken)))
-                    : formatLegalRepReplyOrClaimantForDecision(
+                    : formatLegalRepReplyOrClaimantWithoutRule92(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),
                         populateListDocWithInfoAndLink(replyItem.getValue().getSupportingMaterial(), authToken)))
@@ -306,7 +307,7 @@ public class TseAdminService {
             formatRule92(applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo(),
                 applicationTypeItem.getValue().getCopyToOtherPartyText())
         )
-            + initialTseAdminRespondDetails(applicationTypeItem.getValue(), authToken)
+            + initialRespondDetailsWithRule92(applicationTypeItem.getValue(), authToken)
             + decisionsMarkdown;
 
     }
@@ -327,6 +328,27 @@ public class TseAdminService {
 
         return documentManagementService
             .displayDocNameTypeSizeLink(applicationTypeItem.getValue().getDocumentUpload(), authToken);
+    }
+
+    private String initialRespondDetailsWithRule92(GenericTseApplicationType application, String authToken) {
+        if (CollectionUtils.isEmpty(application.getRespondCollection())) {
+            return "";
+        }
+        IntWrapper respondCount = new IntWrapper(0);
+        return application.getRespondCollection().stream()
+            .map(replyItem ->
+                ADMIN.equals(replyItem.getValue().getFrom())
+                    ? formatAdminReply(
+                        replyItem.getValue(),
+                        respondCount.incrementAndReturnValue(),
+                        documentManagementService.displayDocNameTypeSizeLink(
+                            replyItem.getValue().getAddDocument(), authToken))
+                    : formatLegalRepReplyOrClaimantWithRule92(
+                        replyItem.getValue(),
+                        respondCount.incrementAndReturnValue(),
+                        application.getApplicant(),
+                        populateListDocWithInfoAndLink(replyItem.getValue().getSupportingMaterial(), authToken)))
+            .collect(Collectors.joining(""));
     }
 
     /**

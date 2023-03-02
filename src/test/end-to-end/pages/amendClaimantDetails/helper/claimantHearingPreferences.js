@@ -6,7 +6,7 @@ function verifyClaimantHearingPreferences() {
     I.waitForText('Claimant Details', testConfig.TestTimeToWaitForText);
     I.see('Case Number:');
     //I.see('Additional Claimant Information'); This is not coming up in automation - Possibly as such in Demo not deplyed into AAT yet.
-    I.see('Claimant Hearing Preferences');
+    I.see('Additional Claimant Information');
     I.see('What are the claimant\'s hearing preferences');
     I.see('Video');
     I.see('Phone');

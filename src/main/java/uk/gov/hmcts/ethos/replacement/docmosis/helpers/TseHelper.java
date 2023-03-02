@@ -76,6 +76,7 @@ public final class TseHelper {
         + "|Supporting material | %s|\r\n"
         + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
         + "\r\n";
+
     private static final String RESPONDENT_REPLY_MARKUP_FOR_DECISION = "|Response %s | |\r\n"
         + "|--|--|\r\n"
         + "|Response from | %s|\r\n"
@@ -97,6 +98,35 @@ public final class TseHelper {
         + "|Full name | %s|\r\n"
         + "|Sent to | %s|\r\n"
         + "\r\n";
+
+    private static final String VIEW_APPLICATION_ADMIN_REPLY_MARKUP = "|Response %s | |\r\n"
+            + "|--|--|\r\n"
+            + "|Response | %s|\r\n"
+            + "|Date | %s|\r\n"
+            + "|Sent by | Tribunal|\r\n"
+            + "|Case management order or request? | %s|\r\n"
+            + "|Response due | %s|\r\n"
+            + "|Party or parties to respond | %s|\r\n"
+            + "|Additional information | %s|\r\n"
+            + "|Supporting material | %s|\r\n"
+            + "%s"
+            + "|Name | %s|\r\n"
+            + "|Sent to | %s|\r\n"
+            + "\r\n";
+
+    private static final String RESPONSE_LIST_TITLE =  "|Responses | |\r\n"
+            + "|--|--|\r\n"
+            + "\r\n";
+
+    private static final String APPLICATION_DETAILS = "|Application | |\r\n"
+            + "|--|--|\r\n"
+            + "|Applicant | %s|\r\n"
+            + "|Type of application | %s|\r\n"
+            + "|Application date | %s|\r\n"
+            + "|What do you want to tell or ask the tribunal? | %s|\r\n"
+            + "|Supporting material | %s|\r\n"
+            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s |\r\n"
+            + "\r\n";
     private static final String ADMIN_REPLY_MARKUP_MADE_BY = "|%s made by | %s|\r\n";
 
     private TseHelper() {
@@ -192,56 +222,26 @@ public final class TseHelper {
                 .get(Integer.parseInt(caseData.getTseViewApplicationSelect().getValue().getCode()) - 1).getValue();
     }
 
-    public static ArrayList<String> getDocumentUrls(TseRespondTypeItem tseRespondType){
+    public static String getDocumentUrls(TseRespondTypeItem tseRespondType){
         if (tseRespondType.getValue().getSupportingMaterial() != null) {
             Pattern pattern = Pattern.compile("^.+?/documents/");
-            ArrayList<String> links = tseRespondType.getValue().getSupportingMaterial().stream()
+            return tseRespondType.getValue().getSupportingMaterial().stream()
                     .map(doc -> {
                         Matcher matcher = pattern.matcher(doc.getValue().getUploadedDocument().getDocumentBinaryUrl());
                         String documentLink = matcher.replaceFirst("");
                         String documentName = doc.getValue().getUploadedDocument().getDocumentFilename();
-                        return String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
-                    }).collect(Collectors.toCollection(ArrayList::new));
-            return links;
+                        return String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName) + STRING_BR;
+                    }).collect(Collectors.joining(""));
         }
         return null;
     }
 
-    private static final String VIEW_APPLICATION_ADMIN_REPLY_MARKUP = "|Response %s | |\r\n"
-            + "|--|--|\r\n"
-            + "|Response | %s|\r\n"
-            + "|Date | %s|\r\n"
-            + "|Sent by | Tribunal|\r\n"
-            + "|Case management order or request? | %s|\r\n"
-            + "|Response due | %s|\r\n"
-            + "|Party or parties to respond | %s|\r\n"
-            + "|Additional information | %s|\r\n"
-            + "|Supporting material | %s|\r\n"
-            + "%s"
-            + "|Name | %s|\r\n"
-            + "|Sent to | %s|\r\n"
-            + "\r\n";
-
-    private static final String VIEW_APPLICATION_RESPONDENT_CLAIMANT_REPLY_MARKUP = "|Response %s | |\r\n"
-            + "|--|--|\r\n"
-            + "|Response from | %s|\r\n"
-            + "|Response date | %s|\r\n"
-            + "|What’s your response to the %s’s application? | %s|\r\n"
-            + "|Supporting material | %s|\r\n"
-            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
-            + "\r\n";
-
-    private static final String RESPONSE_LIST_TITLE =  "\r\n\r\n\r\n\r\n|Responses | |\r\n"
-            + "|--|--|\r\n"
-            + "\r\n";
-
-    private static String createResponseTable(List<TseRespondTypeItem> respondList, String application){
+    private static String createResponseTable(List<TseRespondTypeItem> respondList, String applicant){
         AtomicInteger i = new AtomicInteger(0);
         return  RESPONSE_LIST_TITLE + respondList.stream().map((TseRespondTypeItem response)-> {
             i.getAndIncrement();
             String doc = "N/A";
             if( ADMIN.equals(response.getValue().getFrom()) ){
-
                 Pattern pattern = Pattern.compile("^.+?/documents/");
                 Matcher matcher = pattern.matcher(response.getValue().getAddDocument().getDocumentBinaryUrl());
                 String documentLink = matcher.replaceFirst("");
@@ -263,34 +263,23 @@ public final class TseHelper {
                         defaultString(response.getValue().getSelectPartyNotify())
                 );
             } else {
-                String documents = "N/A";
-                ArrayList<String> links = getDocumentUrls(response);
+                String links = getDocumentUrls(response);
                 if (links != null) {
-                    documents = links.stream().map(link -> link + STRING_BR).collect(Collectors.joining(""));
+                    doc = links;
                 }
                 return String.format(
-                        VIEW_APPLICATION_RESPONDENT_CLAIMANT_REPLY_MARKUP,
+                        RESPONDENT_REPLY_MARKUP_FOR_REPLY,
                         i.get(),
                         response.getValue().getFrom(),
                         response.getValue().getDate(),
-                        application.toLowerCase(Locale.ENGLISH),
+                        applicant.toLowerCase(Locale.ENGLISH),
                         defaultString(response.getValue().getResponse()),
-                        documents,
+                        doc,
                         response.getValue().getCopyToOtherParty()
                 );
             }
         }).collect(Collectors.joining(""));
     }
-
-    private static final String APPLICATION_DETAILS = "|Application | |\r\n"
-            + "|--|--|\r\n"
-            + "|Applicant | %s|\r\n"
-            + "|Type of application | %s|\r\n"
-            + "|Application date | %s|\r\n"
-            + "|What do you want to tell or ask the tribunal? | %s|\r\n"
-            + "|Supporting material | %s|\r\n"
-            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s |\r\n"
-            + "\r\n";
 
     public static void getDataSetViewForSelectedApplication(CaseData caseData) {
 
@@ -298,10 +287,9 @@ public final class TseHelper {
         if (CollectionUtils.isEmpty(applications) || getChosenApplication(caseData) == null) {
             return;
         }
+        // get values for the application summary
         GenericTseApplicationType genericTseApplicationType = getChosenApplication(caseData);
-
         String document = "N/A";
-
         if (genericTseApplicationType.getDocumentUpload() != null) {
             Pattern pattern = Pattern.compile("^.+?/documents/");
             Matcher matcher = pattern.matcher(genericTseApplicationType.getDocumentUpload().getDocumentBinaryUrl());
@@ -309,11 +297,13 @@ public final class TseHelper {
             String documentName = genericTseApplicationType.getDocumentUpload().getDocumentFilename();
             document = String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
         }
+        // get values for the response list
         String respondTablesCollection = "";
         if (!CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
             List<TseRespondTypeItem> respondList = genericTseApplicationType.getRespondCollection();
             respondTablesCollection = createResponseTable(respondList, genericTseApplicationType.getApplicant());
         }
+        // set the application summary and response list to setTse......
         caseData.setTseApplicationResponsesTable(
                 String.format(
                 APPLICATION_DETAILS, genericTseApplicationType.getApplicant(),

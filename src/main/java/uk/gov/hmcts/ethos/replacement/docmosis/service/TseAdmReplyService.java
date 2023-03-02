@@ -35,7 +35,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantForReply;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
@@ -79,7 +79,7 @@ public class TseAdmReplyService {
         GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem != null) {
             return initialAppDetails(applicationTypeItem.getValue(), authToken)
-                    + initialRespondDetails(applicationTypeItem.getValue(), authToken);
+                    + initialRespondDetailsWithRule92(applicationTypeItem.getValue(), authToken);
         }
         throw new NotFoundException("No selected application type item found.");
     }
@@ -96,7 +96,7 @@ public class TseAdmReplyService {
         );
     }
 
-    private String initialRespondDetails(GenericTseApplicationType application, String authToken) {
+    private String initialRespondDetailsWithRule92(GenericTseApplicationType application, String authToken) {
         if (CollectionUtils.isEmpty(application.getRespondCollection())) {
             return "";
         }
@@ -109,7 +109,7 @@ public class TseAdmReplyService {
                     respondCount.incrementAndReturnValue(),
                     documentManagementService.displayDocNameTypeSizeLink(
                         replyItem.getValue().getAddDocument(), authToken))
-                : formatLegalRepReplyOrClaimantForReply(
+                : formatLegalRepReplyOrClaimantWithRule92(
                     replyItem.getValue(),
                     respondCount.incrementAndReturnValue(),
                     application.getApplicant(),

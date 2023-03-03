@@ -53,6 +53,11 @@ public class TseApplicationBuilder {
         return this;
     }
 
+    public TseApplicationBuilder withCopyToOtherPartyText(String copyToOtherPartyText) {
+        genericTseApplicationType.setCopyToOtherPartyText(copyToOtherPartyText);
+        return this;
+    }
+
     public TseApplicationBuilder withDetails(String details) {
         genericTseApplicationType.setDetails(details);
         return this;

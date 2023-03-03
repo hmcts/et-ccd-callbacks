@@ -8,8 +8,10 @@ import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @Slf4j
 public final class PseHelper {
@@ -25,13 +27,15 @@ public final class PseHelper {
         + "|Party or parties to respond | %s|\r\n"
         + "|Additional information | %s|\r\n"
         + "%s" // APP_DETAILS_DOC
-        + "|%s made by | %s|\r\n" // Case management order / Request
-        + "|Name | %s|\r\n"
+        + "%s" // Case management order / Request
         + "|Sent to | %s|\r\n"
         + "\r\n";
 
     private static final String ORDER_APP_DOC_MARKUP = "|Description | %s|\r\n"
         + "|Document | <a href=\"/documents/%s\" target=\"_blank\">%s</a>|\r\n";
+
+    private static final String ORDER_APP_CMO_MARKUP = "|%s made by | %s|\r\n"
+        + "|Name | %s|\r\n";
 
     private static final String LEGAL_REP_REPLY_MARKUP = "|Response %s | |\r\n"
         + "|--|--|\r\n"
@@ -40,7 +44,11 @@ public final class PseHelper {
         + "|What's your response to the tribunal? | %s|\r\n"
         + "|Supporting material | %s|\r\n"
         + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
+        + "%s" // Rule92 No Details
         + "\r\n";
+
+    private static final String RULE92_DETAILS_MARKUP =
+        "|Details of why you do not want to inform the other party | %s|\r\n";
 
     private static final String DOC_MARKUP = "<a href=\"/documents/%s\" target=\"_blank\">%s</a>\r\n";
 
@@ -77,9 +85,7 @@ public final class PseHelper {
             defaultString(sendNotificationType.getSendNotificationSelectParties()),
             defaultString(sendNotificationType.getSendNotificationAdditionalInfo()),
             getSendNotificationUploadDocument(sendNotificationType),
-            defaultString(sendNotificationType.getSendNotificationCaseManagement()),
-            getSendNotificationWhoMadeBy(sendNotificationType),
-            defaultString(sendNotificationType.getSendNotificationFullName()),
+            getSendNotificationCmoRequestWhoMadeBy(sendNotificationType),
             sendNotificationType.getSendNotificationNotify()
         );
     }
@@ -104,10 +110,18 @@ public final class PseHelper {
             .collect(Collectors.joining());
     }
 
-    private static String getSendNotificationWhoMadeBy(SendNotificationType sendNotificationType) {
-        return CASE_MANAGEMENT_ORDER.equals(sendNotificationType.getSendNotificationCaseManagement())
-            ? defaultString(sendNotificationType.getSendNotificationWhoCaseOrder())
-            : defaultString(sendNotificationType.getSendNotificationRequestMadeBy());
+    private static String getSendNotificationCmoRequestWhoMadeBy(SendNotificationType sendNotificationType) {
+        if (isNullOrEmpty(sendNotificationType.getSendNotificationCaseManagement())) {
+            return "";
+        }
+        return String.format(
+            ORDER_APP_CMO_MARKUP,
+            defaultString(sendNotificationType.getSendNotificationCaseManagement()),
+            CASE_MANAGEMENT_ORDER.equals(sendNotificationType.getSendNotificationCaseManagement())
+                ? defaultString(sendNotificationType.getSendNotificationWhoCaseOrder())
+                : defaultString(sendNotificationType.getSendNotificationRequestMadeBy()),
+            defaultString(sendNotificationType.getSendNotificationFullName())
+        );
     }
 
     /**
@@ -130,7 +144,12 @@ public final class PseHelper {
                     d.getValue().getUploadedDocument().getDocumentFilename()
                 ))
                 .collect(Collectors.joining()),
-            pseResponseType.getCopyToOtherParty()
+            pseResponseType.getCopyToOtherParty(),
+            NO.equals(pseResponseType.getCopyToOtherParty())
+                ? String.format(
+                    RULE92_DETAILS_MARKUP,
+                    pseResponseType.getCopyNoGiveDetails())
+                : ""
         );
     }
 

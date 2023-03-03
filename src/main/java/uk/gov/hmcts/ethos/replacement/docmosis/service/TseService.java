@@ -35,6 +35,9 @@ public class TseService {
      * @param caseData contains all the case data.
      * @param isClaimant create a claimant application or a respondent application
      */
+
+    public static final String NOT_STARTED_YET = "notStartedYet";
+
     public void createApplication(CaseData caseData, boolean isClaimant) {
         if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
             caseData.setGenericTseApplicationCollection(new ArrayList<>());
@@ -75,6 +78,7 @@ public class TseService {
         application.setDocumentUpload(claimantTse.getContactApplicationFile());
         application.setCopyToOtherPartyYesOrNo(claimantTse.getCopyToOtherPartyYesOrNo());
         application.setCopyToOtherPartyText(claimantTse.getCopyToOtherPartyText());
+        application.setStatus(IN_PROGRESS);
 
         caseData.setClaimantTse(null);
     }
@@ -85,6 +89,7 @@ public class TseService {
         application.setType(caseData.getResTseSelectApplication());
         application.setCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
         application.setCopyToOtherPartyText(caseData.getResTseCopyToOtherPartyTextArea());
+        application.setStatus(NOT_STARTED_YET);
 
         clearRespondentTseDataFromCaseData(caseData);
     }

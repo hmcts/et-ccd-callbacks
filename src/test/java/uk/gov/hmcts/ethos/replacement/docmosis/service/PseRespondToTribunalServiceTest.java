@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
@@ -228,7 +229,6 @@ class PseRespondToTribunalServiceTest {
             + "|Case management order made by | Legal Officer|\r\n"
             + "|Name | Mr Lee Gal Officer|\r\n"
             + "|Sent to | Both parties|\r\n"
-            + "\r\n"
             + "\r\n"
             + "|Response 1 | |\r\n"
             + "|--|--|\r\n"
@@ -426,6 +426,41 @@ class PseRespondToTribunalServiceTest {
 
         pseRespondToTribService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
         verify(emailService).sendEmail(TEMPLATE_ID, "mail@mail.com", expectedMap);
+    }
+
+    @Test
+    void sendClaimantEmail_rule92Yes_SendEmail() {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+            .withEthosCaseReference("6000001/2023")
+            .withClaimant("Claimant Name")
+            .withClaimantType("claimant@email.com")
+            .withRespondent("Respondent One", YES, "01-Jan-2023", false)
+            .withRespondent("Respondent Two", YES, "02-Jan-2023", false)
+            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId("1677174791076683");
+        caseDetails.getCaseData().setPseRespondentOrdReqCopyToOtherParty(YES);
+
+        ReflectionTestUtils.setField(pseRespondToTribService, "notificationToClaimantTemplateId", TEMPLATE_ID);
+
+        Map<String, String> expectedMap = Map.of(
+            "caseNumber", "6000001/2023",
+            "claimant", "Claimant Name",
+            "respondents", "Respondent One, Respondent Two",
+            "caseId", "1677174791076683"
+        );
+
+        pseRespondToTribService.sendClaimantEmail(caseDetails);
+        verify(emailService).sendEmail(TEMPLATE_ID, "claimant@email.com", expectedMap);
+    }
+
+    @Test
+    void sendClaimantEmail_rule92No_NotSend() {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.getCaseData().setPseRespondentOrdReqCopyToOtherParty(NO);
+
+        pseRespondToTribService.sendClaimantEmail(caseDetails);
+        verify(emailService, never()).sendEmail(any(), any(), any());
     }
 
     @Test

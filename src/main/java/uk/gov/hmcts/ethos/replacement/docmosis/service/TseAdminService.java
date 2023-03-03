@@ -26,6 +26,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -35,6 +36,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithoutRule92;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
@@ -66,7 +68,7 @@ public class TseAdminService {
         + "|Application date | %s|\r\n"
         + "|What do you want to tell or ask the tribunal? | %s|\r\n"
         + "|Supporting material | %s|\r\n"
-        + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
+        + "%s" // Rule92
         + "\r\n";
 
     private static final String CLOSE_APP_DECISION_DETAILS = "|Decision | |\r\n"
@@ -104,8 +106,9 @@ public class TseAdminService {
             applicationType.getApplicant(),
             applicationType.getType(),
             applicationType.getDate(),
-            applicationType.getDetails(),
-            documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken)
+            defaultString(applicationType.getDetails()),
+            defaultString(documentManagementService.displayDocNameTypeSizeLink(
+                applicationType.getDocumentUpload(), authToken))
         );
     }
 
@@ -120,8 +123,8 @@ public class TseAdminService {
                     ? formatAdminReply(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),
-                        documentManagementService.displayDocNameTypeSizeLink(
-                            replyItem.getValue().getAddDocument(), authToken))
+                        defaultString(documentManagementService.displayDocNameTypeSizeLink(
+                            replyItem.getValue().getAddDocument(), authToken)))
                     : formatLegalRepReplyOrClaimantWithoutRule92(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),
@@ -299,9 +302,10 @@ public class TseAdminService {
             applicationTypeItem.getValue().getApplicant(),
             applicationTypeItem.getValue().getType(),
             applicationTypeItem.getValue().getDate(),
-            applicationTypeItem.getValue().getDetails(),
+            defaultString(applicationTypeItem.getValue().getDetails()),
             getApplicationDocumentLink(applicationTypeItem, authToken),
-            applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo()
+            formatRule92(applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo(),
+                applicationTypeItem.getValue().getCopyToOtherPartyText())
         )
             + initialRespondDetailsWithRule92(applicationTypeItem.getValue(), authToken)
             + decisionsMarkdown;
@@ -337,8 +341,8 @@ public class TseAdminService {
                     ? formatAdminReply(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),
-                        documentManagementService.displayDocNameTypeSizeLink(
-                            replyItem.getValue().getAddDocument(), authToken))
+                        defaultString(documentManagementService.displayDocNameTypeSizeLink(
+                            replyItem.getValue().getAddDocument(), authToken)))
                     : formatLegalRepReplyOrClaimantWithRule92(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),

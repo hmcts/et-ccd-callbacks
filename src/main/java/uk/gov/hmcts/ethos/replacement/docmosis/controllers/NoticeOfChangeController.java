@@ -85,14 +85,14 @@ public class NoticeOfChangeController {
         ChangeOrganisationRequest changeOrganisationRequestField =
             callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField();
 
-        if (changeOrganisationRequestField != null) {
-            try {
-                nocRespondentRepresentativeService.removeOrganisationRepresentativeAccess(
-                    callbackRequest.getCaseDetails().getCaseId(), changeOrganisationRequestField);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+//        if (changeOrganisationRequestField != null) {
+//            try {
+//                nocRespondentRepresentativeService.removeOrganisationRepresentativeAccess(
+//                    callbackRequest.getCaseDetails().getCaseId(), changeOrganisationRequestField);
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
 
         return ResponseEntity.ok(ccdCaseAssignment.applyNocAsAdmin(callbackRequest));
     }

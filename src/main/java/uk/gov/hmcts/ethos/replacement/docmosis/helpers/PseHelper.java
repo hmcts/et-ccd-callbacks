@@ -28,7 +28,6 @@ public final class PseHelper {
         + "|%s made by | %s|\r\n" // Case management order / Request
         + "|Name | %s|\r\n"
         + "|Sent to | %s|\r\n"
-        + "\r\n"
         + "\r\n";
 
     private static final String ORDER_APP_DOC_MARKUP = "|Description | %s|\r\n"

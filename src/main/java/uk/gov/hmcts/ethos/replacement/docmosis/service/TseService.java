@@ -50,7 +50,6 @@ public class TseService {
         application.setResponsesCount("0");
         application.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
         application.setStatus(OPEN_STATE);
-        application.setApplicationState(IN_PROGRESS);
 
         if (isClaimant) {
             addClaimantData(caseData, application);
@@ -78,7 +77,7 @@ public class TseService {
         application.setDocumentUpload(claimantTse.getContactApplicationFile());
         application.setCopyToOtherPartyYesOrNo(claimantTse.getCopyToOtherPartyYesOrNo());
         application.setCopyToOtherPartyText(claimantTse.getCopyToOtherPartyText());
-        application.setStatus(IN_PROGRESS);
+        application.setApplicationState(IN_PROGRESS);
 
         caseData.setClaimantTse(null);
     }
@@ -89,7 +88,7 @@ public class TseService {
         application.setType(caseData.getResTseSelectApplication());
         application.setCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
         application.setCopyToOtherPartyText(caseData.getResTseCopyToOtherPartyTextArea());
-        application.setStatus(NOT_STARTED_YET);
+        application.setApplicationState(NOT_STARTED_YET);
 
         clearRespondentTseDataFromCaseData(caseData);
     }

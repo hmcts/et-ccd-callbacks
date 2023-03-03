@@ -27,7 +27,7 @@ public final class TseAdminHelper {
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
             .filter(r -> r.getValue().getStatus() != null && !CLOSED_STATE.equals(r.getValue().getStatus()))
             .map(r -> DynamicValueType.create(r.getValue().getNumber(),
-                r.getValue().getNumber() + " " + r.getValue().getType())
+                r.getValue().getNumber() + " - " + r.getValue().getType())
             )
             .collect(Collectors.toList()));
     }

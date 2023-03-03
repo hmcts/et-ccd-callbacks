@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
@@ -81,9 +80,6 @@ public class NoticeOfChangeController {
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
         }
-
-        ChangeOrganisationRequest changeOrganisationRequestField =
-            callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField();
 
         return ResponseEntity.ok(ccdCaseAssignment.applyNocAsAdmin(callbackRequest));
     }

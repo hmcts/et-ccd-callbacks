@@ -132,7 +132,10 @@ public class Et1VettingService {
             caseData.setEt1TribunalRegion(caseData.getManagingOffice());
         }
         caseData.setEt1HearingVenues(getHearingVenuesList(caseData.getEt1TribunalRegion()));
-        if (caseData.getSuggestedHearingVenues() != null && caseData.getSuggestedHearingVenues().getValue() != null) {
+        if (caseData.getSuggestedHearingVenues() != null
+                && caseData.getSuggestedHearingVenues().getValue() != null
+                && caseData.getEt1HearingVenues().getListItems()
+                .equals(caseData.getSuggestedHearingVenues().getListItems())) {
             caseData.getEt1HearingVenues().setValue(caseData.getSuggestedHearingVenues().getValue());
         }
     }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.common.Strings;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -27,7 +28,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_CASE_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_CASE_PAPERS;
@@ -46,6 +46,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_STRIKING_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_CLOSED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
@@ -130,8 +131,15 @@ public final class Helper {
                     .filter(respondentSumTypeItem -> respondentSumTypeItem.getValue().getResponseStruckOut() == null
                             || respondentSumTypeItem.getValue().getResponseStruckOut().equals(NO))
                     .collect(Collectors.toList());
-        }
 
+            if (caseData.getRespondentCollection().size() == 1
+                    && YES.equals(caseData.getRespondentCollection().get(0).getValue().getResponseStruckOut())
+                    && YES.equals(caseData.getRespondentCollection().get(0).getValue().getResponseReceived())
+                    && !Strings.isNullOrEmpty(caseData.getRespondentCollection().get(0)
+                    .getValue().getResponseReceivedDate())) {
+                return caseData.getRespondentCollection();
+            }
+        }
         return activeRespondents;
     }
 

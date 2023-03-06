@@ -120,18 +120,18 @@ class SolicitorRoleTest {
     void shouldReturnTheCorrectRespondentRepresentativeItem() {
         assertThat(SolicitorRole.from("[SOLICITORA]")
             .flatMap(solicitorRole -> solicitorRole.getRepresentationItem(caseData))
-            .map(representedTypeRItem -> representedTypeRItem.getValue().getRespRepName()))
+            .map(representedTypeRItem -> representedTypeRItem.getValue().getRespondentName()))
             .isPresent().hasValue(RESPONDENT_NAME);
 
         assertThat(SolicitorRole.from("[SOLICITORB]")
             .flatMap(solicitorRole -> solicitorRole.getRepresentationItem(caseData))
-            .map(representedTypeRItem -> representedTypeRItem.getValue().getRespRepName()))
+            .map(representedTypeRItem -> representedTypeRItem.getValue().getRespondentName()))
             .isPresent().hasValue(
                 RESPONDENT_NAME_TWO);
 
         assertThat(SolicitorRole.from("[SOLICITORC]")
             .flatMap(solicitorRole -> solicitorRole.getRepresentationItem(caseData))
-            .map(representedTypeRItem -> representedTypeRItem.getValue().getRespRepName()))
+            .map(representedTypeRItem -> representedTypeRItem.getValue().getRespondentName()))
             .isPresent().hasValue(
                 RESPONDENT_NAME_THREE);
     }

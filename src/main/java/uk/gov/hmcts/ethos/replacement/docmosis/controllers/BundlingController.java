@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.netty.handler.codec.http.HttpHeaders.Values.APPLICATION_JSON;
+import static org.hibernate.boot.archive.internal.ArchiveHelper.getBytesFromInputStream;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -85,9 +85,10 @@ public class BundlingController {
         log.info(String.valueOf(ccdRequest));
         UploadedDocument doc = documentManagementService.downloadFile(userToken,
                 caseData.getCaseBundles().get(0).getValue().getStitchedDocument().getDocumentBinaryUrl());
-        byte[] fileContents = FileUtils.readFileToByteArray(doc.getContent().getFile());
+        System.out.println(doc);
+        var bytes = getBytesFromInputStream(doc.getContent().getInputStream());
         Map<String, Object> personalisation = new HashMap<>();
-        personalisation.put("document", NotificationClient.prepareUpload(fileContents));
+        personalisation.put("document", NotificationClient.prepareUpload(bytes));
         personalisation.put("caseId", caseData.getEthosCaseReference());
         emailService.sendEmailWithFile("7ca32165-dfc8-450f-b9ae-c97d14ef8c94", "test@test.com", personalisation);
         return getCallbackRespEntityNoErrors(caseData);

@@ -13,4 +13,5 @@ Scenario('Verify Upload Document', async ({I}) => {
 
     await uploadDocumentEvent(I, eventNames.UPLOAD_DOCUMENT);
 
-}).tag('@RET-BAT').tag('@nightly').tag('SC2').retry(testConfig.TestRetryScenarios);
+
+}).tag('@RET_BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);

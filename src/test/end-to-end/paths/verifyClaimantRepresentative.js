@@ -4,7 +4,7 @@ const {claimantRepresentative} = require("../helpers/caseHelper");
 const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 
 
-Feature('Leeds Singles Case & Execute Claimant Representative...');
+Feature('Validate Claimant Representative');
 
 Scenario('Verify Claimant Representative', async ({I}) => {
 
@@ -12,5 +12,4 @@ Scenario('Verify Claimant Representative', async ({I}) => {
     console.log("... case id =>" +caseId);
     await claimantRepresentative(I, eventNames.CLAIMANT_REPRESENTATIVE);
 
-}).tag('@e2e')
-    .tag('@nightly').tag('@RET-BAT').retry(testConfig.TestRetryScenarios);
+}).tag('@nightly').tag('@RET-BAT').retry(testConfig.TestRetryScenarios);

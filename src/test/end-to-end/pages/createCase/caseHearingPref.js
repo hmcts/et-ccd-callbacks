@@ -6,7 +6,7 @@ const caseRepConfig = require('./caseRepConfig.json');
 module.exports =  async function () {
     const I = this;
     I.see('Create Case');
-    I.see('Claimant Hearing Preferences');
+    I.see('Additional Claimant Information');
     I.see('What are the claimant\'s hearing preferences\n');
     I.see('Video');I.see('Phone');I.see('Neither');
 

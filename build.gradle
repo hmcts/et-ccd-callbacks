@@ -5,7 +5,7 @@ plugins {
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.0.14.RELEASE'
     id 'org.springframework.boot' version '2.7.4'
-    id 'org.owasp.dependencycheck' version '7.2.1'
+    id 'org.owasp.dependencycheck' version '8.0.1'
     id 'com.github.ben-manes.versions' version '0.42.0'
     id 'au.com.dius.pact' version '4.3.15'
     id 'io.freefair.lombok' version '6.5.1'
@@ -129,7 +129,7 @@ task yarnInstall(type: Exec) {
 
 task yarnAudit(type: Exec,  dependsOn: ':yarnInstall') {
     workingDir '.'
-    commandLine 'yarn', 'audit', '--groups', 'dependencies', '--json', '|', 'grep', 'auditAdvisory', '>', 'yarn-audit-known-issues'
+    commandLine 'yarn', 'npm', 'audit', '--groups', 'dependencies', '--json', '|', 'grep', 'auditAdvisory', '>', 'yarn-audit-known-issues'
 }
 
 task codeceptSmoke(type: Exec, dependsOn: ':yarnInstall') {
@@ -247,6 +247,7 @@ dependencyCheck {
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
     suppressionFile = 'config/owasp/suppressions.xml'
     analyzers.assemblyEnabled = false
+    analyzers.nodeAudit.yarnEnabled = false
 }
 
 repositories {
@@ -334,6 +335,8 @@ dependencies {
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.3'
     implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.86.Final'
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.86.Final'
+
+    implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.5.0'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

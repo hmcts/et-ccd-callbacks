@@ -78,7 +78,8 @@ public class BundlingController {
     })
     public ResponseEntity<CCDCallbackResponse> stitchBundle(@RequestBody CCDRequest ccdRequest,
                                                             @RequestHeader(value = HttpHeaders.AUTHORIZATION)
-                                                            String userToken) throws IOException, NotificationClientException {
+                                                            String userToken) throws IOException,
+            NotificationClientException {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setCaseBundles(bundlingService.stitchBundle(ccdRequest.getCaseDetails(), userToken));
         log.info(String.valueOf(ccdRequest));

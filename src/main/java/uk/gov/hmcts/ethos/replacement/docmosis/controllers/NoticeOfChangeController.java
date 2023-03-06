@@ -14,20 +14,19 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.io.IOException;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @RestController
 @RequestMapping("/noc-decision")
@@ -36,26 +35,27 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class NoticeOfChangeController {
     private final VerifyTokenService verifyTokenService;
     private final NocNotificationService nocNotificationService;
-    private final RespondentRepresentativeService respondentRepresentativeService;
+    private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final CcdCaseAssignment ccdCaseAssignment;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String APPLY_NOC_DECISION = "applyNocDecision";
 
     @PostMapping("/about-to-submit")
-    public CCDCallbackResponse handleAboutToSubmit(@RequestBody CallbackRequest callbackRequest,
+    public ResponseEntity<CCDCallbackResponse> handleAboutToSubmit(@RequestBody CallbackRequest callbackRequest,
                                                       @RequestHeader("Authorization")
                                                       String userToken) throws IOException {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
         CaseData caseData =
-            respondentRepresentativeService
+            nocRespondentRepresentativeService
                 .updateRepresentation(callbackRequest.getCaseDetails());
 
         callbackRequest.getCaseDetails().setCaseData(caseData);
 
-        return ccdCaseAssignment.applyNoc(callbackRequest, userToken);
+        return ResponseEntity.ok(ccdCaseAssignment.applyNoc(callbackRequest, userToken));
 
     }
 
@@ -65,7 +65,7 @@ public class NoticeOfChangeController {
         @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> updateNocRespondents(@RequestBody CCDRequest callbackRequest,
+    public ResponseEntity<CCDCallbackResponse> updateNocRespondents(@RequestBody CallbackRequest callbackRequest,
                                                                     @RequestHeader("Authorization")
                                                                     String userToken) {
         log.info("Noc update respondents ---> {}", callbackRequest.getCaseDetails().getCaseId());
@@ -75,9 +75,26 @@ public class NoticeOfChangeController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
+        try {
+            nocNotificationService.sendNotificationOfChangeEmails(callbackRequest,
+                    callbackRequest.getCaseDetails().getCaseData());
+        } catch (Exception exception) {
+            log.error(exception.getMessage(), exception);
+        }
 
-        return getCallbackRespEntityNoErrors(caseData);
+        ChangeOrganisationRequest changeOrganisationRequestField =
+            callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField();
+
+        if (changeOrganisationRequestField != null) {
+            try {
+                nocRespondentRepresentativeService.removeOrganisationRepresentativeAccess(
+                    callbackRequest.getCaseDetails().getCaseId(), changeOrganisationRequestField);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return ResponseEntity.ok(ccdCaseAssignment.applyNocAsAdmin(callbackRequest));
     }
 
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)

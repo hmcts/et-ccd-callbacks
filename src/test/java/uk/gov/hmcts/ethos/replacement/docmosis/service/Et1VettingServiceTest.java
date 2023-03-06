@@ -87,6 +87,12 @@ class Et1VettingServiceTest {
         + "<h3>Respondent</h3><pre>Contact address &#09&#09 11 Small Street"
         + "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 22 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
         + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M12 42R</pre><hr>";
+    private static final String EXPECTED_ADDRESSES_HTML_NO_WORK_ADDRESS = "<hr><h2>Listing details<hr><h3>Claimant</h3>"
+            + "<pre>Contact address &#09&#09 232 Petticoat Square<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 3 House<br>"
+            + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 London<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 W10 4AG</pre>"
+            + "<hr><h3>Respondent</h3><pre>Contact address &#09&#09 11 Small Street"
+            + "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 22 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
+            + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 M12 42R</pre><hr>";
     private static final String EXPECTED_RESPONDENT1_ACAS_DETAILS = "<hr><h3>Respondent 1</h3><pre>Name "
         + "&#09&#09&#09&#09&#09&#09&nbsp; Antonio Vazquez<br><br>Contact address &#09&#09 11 Small Street<br>"
         + "&#09&#09&#09&#09&#09&#09&#09&#09&#09 22 House<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 Manchester<br>"
@@ -408,9 +414,24 @@ class Et1VettingServiceTest {
     @Test
     void testGettingHearingVenueAddressesHtml() {
         caseDetails.getCaseData().setManagingOffice("Manchester");
-
+        caseDetails.getCaseData().setClaimantWorkAddressQuestion("No");
         assertThat(et1VettingService.getAddressesHtml(caseDetails.getCaseData()))
             .isEqualTo(EXPECTED_ADDRESSES_HTML);
+    }
+
+    @Test
+    void testGettingHearingVenueAddressesHtmlQuestionYes() {
+        caseDetails.getCaseData().setManagingOffice("Manchester");
+        caseDetails.getCaseData().setClaimantWorkAddressQuestion("Yes");
+        assertThat(et1VettingService.getAddressesHtml(caseDetails.getCaseData()))
+                .isEqualTo(EXPECTED_ADDRESSES_HTML_NO_WORK_ADDRESS);
+    }
+
+    @Test
+    void testGettingHearingVenueAddressesHtmlQuestionNull() {
+        caseDetails.getCaseData().setManagingOffice("Manchester");
+        assertThat(et1VettingService.getAddressesHtml(caseDetails.getCaseData()))
+                .isEqualTo(EXPECTED_ADDRESSES_HTML_NO_WORK_ADDRESS);
     }
 
     @Test

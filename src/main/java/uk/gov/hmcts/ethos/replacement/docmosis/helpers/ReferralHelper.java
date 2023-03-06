@@ -543,7 +543,22 @@ public final class ReferralHelper {
         personalisation.put("subject", getReferralSubject(caseData, isNew));
         personalisation.put("username", username);
         personalisation.put("replyReferral", isNew ? REPLY_REFERRAL_REF : REPLY_REFERRAL_REP);
+        personalisation.put("ccdId", detail.getCaseId());
         return personalisation;
+    }
+
+    /**
+     * Gets errors in document upload.
+     * @param documentTypeItems - a list from which referral document items are extracted
+     * @param errors list
+     */
+    public static void addDocumentUploadErrors(List<DocumentTypeItem> documentTypeItems, List<String> errors) {
+        for (DocumentTypeItem documentTypeItem : documentTypeItems) {
+            if (!Strings.isNullOrEmpty(documentTypeItem.getValue().getShortDescription())
+                && documentTypeItem.getValue().getUploadedDocument() == null) {
+                errors.add("Short description is added but document is not uploaded.");
+            }
+        }
     }
 
     private static String getRespondentNames(CaseData caseData) {

@@ -217,12 +217,12 @@ public final class TseHelper {
         );
     }
 
-    public static GenericTseApplicationType getChosenApplication(CaseData caseData) {
+    private static GenericTseApplicationType getChosenApplication(CaseData caseData) {
         return caseData.getGenericTseApplicationCollection()
                 .get(Integer.parseInt(caseData.getTseViewApplicationSelect().getValue().getCode()) - 1).getValue();
     }
 
-    public static String getDocumentUrls(TseRespondTypeItem tseRespondType){
+    private static String getDocumentUrls(TseRespondTypeItem tseRespondType){
         if (tseRespondType.getValue().getSupportingMaterial() != null) {
             Pattern pattern = Pattern.compile("^.+?/documents/");
             return tseRespondType.getValue().getSupportingMaterial().stream()
@@ -236,7 +236,8 @@ public final class TseHelper {
         return null;
     }
 
-    private static String createResponseTable(List<TseRespondTypeItem> respondList, String applicant){
+    // should be private
+    public static String createResponseTable(List<TseRespondTypeItem> respondList, String applicant){
         AtomicInteger i = new AtomicInteger(0);
         return  RESPONSE_LIST_TITLE + respondList.stream().map((TseRespondTypeItem response)-> {
             i.getAndIncrement();
@@ -281,7 +282,7 @@ public final class TseHelper {
         }).collect(Collectors.joining(""));
     }
 
-    public static void getDataSetViewForSelectedApplication(CaseData caseData) {
+    public static void setDataForTseApplicationSummaryAndResponses(CaseData caseData) {
 
         List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
         if (CollectionUtils.isEmpty(applications) || getChosenApplication(caseData) == null) {
@@ -304,7 +305,7 @@ public final class TseHelper {
             respondTablesCollection = createResponseTable(respondList, genericTseApplicationType.getApplicant());
         }
         // set the application summary and response list to setTse......
-        caseData.setTseApplicationResponsesTable(
+        caseData.setTseApplicationSummaryAndResponsesMarkup(
                 String.format(
                 APPLICATION_DETAILS, genericTseApplicationType.getApplicant(),
                 genericTseApplicationType.getType(),

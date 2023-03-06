@@ -29,12 +29,7 @@ import java.util.UUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
 
 @SuppressWarnings({"PMD.LinguisticNaming", "PMD.ExcessiveImports"})
 public class TseHelperTest {
@@ -305,4 +300,112 @@ public class TseHelperTest {
         assertThat(actual.toString(), is(expected.toString()));
     }
 
+    private DocumentTypeItem createDocumentTypeItem(String fileName) {
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        documentTypeItem.setId("1234");
+        documentTypeItem.setValue(DocumentTypeBuilder.builder().withUploadedDocument(fileName, "1234").build());
+        return documentTypeItem;
+    }
+
+    @Test
+    public void createResponseTable_ReturnString() {
+
+        TseRespondType tseRespondType = TseRespondType.builder()
+                .from(CLAIMANT_TITLE)
+                .date("23 December 2022")
+                .response("Response Details")
+                .hasSupportingMaterial(YES)
+                .supportingMaterial(List.of(
+                        createDocumentTypeItem("image.png"),
+                        createDocumentTypeItem("Form.pdf")))
+                .copyToOtherParty(NO)
+                .build();
+
+        TseRespondTypeItem tseRespondTypeItem = TseRespondTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(tseRespondType)
+                .build();
+
+        List<TseRespondTypeItem> respondList = List.of(tseRespondTypeItem);
+        String applicant = "Respondent";
+
+        String fileDisplay1 = "<a href=\"/documents/1234/binary\" target=\"_blank\">image.png</a>";
+
+        String fileDisplay2 = "<a href=\"/documents/1234/binary\" target=\"_blank\">Form.pdf</a>";
+
+        String expected = "|Responses | |\r\n"
+                + "|--|--|\r\n\r\n"
+                + "|Response 1 | |\r\n"
+                + "|--|--|\r\n"
+                + "|Response from | Claimant|\r\n"
+                + "|Response date | 23 December 2022|\r\n"
+                + "|What’s your response to the respondent’s application? | Response Details|\r\n"
+                + "|Supporting material | " + fileDisplay1 + "<br>" + fileDisplay2 + "<br>" + "|\r\n"
+                + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? "
+                + "| No|\r\n"
+                + "\r\n";
+
+        String actual =  TseHelper.createResponseTable(respondList, applicant);
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void setDataForTseApplicationSummaryAndResponses_withEmptyList_doesNothing() {
+        caseData.setGenericTseApplicationCollection(null);
+        TseHelper.setDataForTseApplicationSummaryAndResponses(caseData);
+        assertNull(caseData.getTseApplicationSummaryAndResponsesMarkup());
+    }
+
+    @Test
+    public void setDataForTseApplicationSummaryAndResponses_withAnApplication_setsApplicationSummary() {
+
+        caseData.setTseViewApplicationOpenOrClosed(OPEN_STATE);
+        caseData.setTseViewApplicationSelect(TseHelper.populateOpenOrClosedApplications(caseData));
+        caseData.getTseViewApplicationSelect().setValue(DynamicValueType.create("1", ""));
+        TseHelper.setDataForTseApplicationSummaryAndResponses(caseData);
+        String expected = "|Application | |\r\n" +
+                "|--|--|\r\n" +
+                "|Applicant | Claimant|\r\n" +
+                "|Type of application | Withdraw my claim|\r\n" +
+                "|Application date | 13 December 2022|\r\n" +
+                "|What do you want to tell or ask the tribunal? | Text|\r\n" +
+                "|Supporting material | N/A|\r\n" +
+                "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | null |\r\n\r\n";
+        assertThat(caseData.getTseApplicationSummaryAndResponsesMarkup(), is(expected));
+    }
+
+    @Test
+    public void setDataForTseApplicationSummaryAndResponses_withAnApplicationToPostpone_setsApplicationSummary() {
+        caseData.getGenericTseApplicationCollection().get(0).getValue().setType(TSE_APP_POSTPONE_A_HEARING);
+        caseData.setTseViewApplicationOpenOrClosed(OPEN_STATE);
+        caseData.setTseViewApplicationSelect(TseHelper.populateOpenOrClosedApplications(caseData));
+        caseData.getTseViewApplicationSelect().setValue(DynamicValueType.create("1", ""));
+        TseHelper.setDataForTseApplicationSummaryAndResponses(caseData);
+        String expected = "|Application | |\r\n" +
+                "|--|--|\r\n" +
+                "|Applicant | Claimant|\r\n" +
+                "|Type of application | Postpone a hearing|\r\n" +
+                "|Application date | 13 December 2022|\r\n" +
+                "|What do you want to tell or ask the tribunal? | Text|\r\n" +
+                "|Supporting material | N/A|\r\n" +
+                "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | null |\r\n" +
+                "\r\n";
+
+        assertThat(caseData.getTseApplicationSummaryAndResponsesMarkup(), is(expected));
+    }
+//
+//    @Test
+//    public void setDataForRespondingToApplication_withApplicationWithDocument_restoresData() {
+//        UploadedDocumentType documentType =
+//                UploadedDocumentBuilder.builder().withFilename("image.png").withUuid("1234").build();
+//        caseData.getGenericTseApplicationCollection().get(0).getValue().setDocumentUpload(documentType);
+//        caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
+//        caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
+//        TseHelper.setDataForRespondingToApplication(caseData);
+//        String expected = "| | |\r\n" + "|--|--|\r\n" + "|Application date | 13 December 2022\r\n" + "|Details of "
+//                + "the application | Text\r\n" + "Application file upload | <a href=\"/documents/1234/binary\" "
+//                + "target=\"_blank\">image.png</a>";
+//
+//        assertThat(caseData.getTseResponseTable(), is(expected));
+//    }
 }

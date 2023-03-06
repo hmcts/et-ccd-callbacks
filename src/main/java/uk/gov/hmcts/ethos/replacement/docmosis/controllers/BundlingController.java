@@ -86,7 +86,7 @@ public class BundlingController {
         log.info(String.valueOf(ccdRequest));
         UploadedDocument doc = documentManagementService.downloadFile(userToken,
                 caseData.getCaseBundles().get(0).getValue().getStitchedDocument().getDocumentBinaryUrl());
-        System.out.println(doc);
+        log.info(String.valueOf(doc));
         var bytes = getBytesFromInputStream(doc.getContent().getInputStream());
         Map<String, Object> personalisation = new HashMap<>();
         personalisation.put("document", NotificationClient.prepareUpload(bytes));

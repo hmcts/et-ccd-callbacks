@@ -45,4 +45,23 @@ public class EmailService {
             throw new EmailServiceException("Failed to send email", e);
         }
     }
+
+    public void sendEmailWithFile(String templateId, String emailAddress, Map<String, Object> personalisation) {
+
+        String referenceId = UUID.randomUUID().toString();
+
+        try {
+            emailClient.sendEmail(
+                    templateId,
+                    emailAddress,
+                    personalisation,
+                    referenceId
+            );
+            log.info("Sending email success. Reference ID: {}", referenceId);
+
+        } catch (NotificationClientException e) {
+            log.warn("Failed to send email. Reference ID: {}. Reason:", referenceId, e);
+            throw new EmailServiceException("Failed to send email", e);
+        }
+    }
 }

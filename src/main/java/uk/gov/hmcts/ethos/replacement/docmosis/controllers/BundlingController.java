@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlingService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
+import uk.gov.service.notify.NotificationClient;
+import uk.gov.service.notify.NotificationClientException;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.netty.handler.codec.http.HttpHeaders.Values.APPLICATION_JSON;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -31,6 +42,10 @@ public class BundlingController {
 
     @Autowired
     private BundlingService bundlingService;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private DocumentManagementService documentManagementService;
 
     @PostMapping(path = "/createBundle", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
     @Operation(description = "Create bundle")
@@ -63,11 +78,18 @@ public class BundlingController {
     })
     public ResponseEntity<CCDCallbackResponse> stitchBundle(@RequestBody CCDRequest ccdRequest,
                                                             @RequestHeader(value = HttpHeaders.AUTHORIZATION)
-                                                            String userToken) {
-        ccdRequest.getCaseDetails().getCaseData().setCaseBundles(
-                bundlingService.stitchBundle(ccdRequest.getCaseDetails(), userToken));
+                                                            String userToken) throws IOException, NotificationClientException {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setCaseBundles(bundlingService.stitchBundle(ccdRequest.getCaseDetails(), userToken));
         log.info(String.valueOf(ccdRequest));
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+        UploadedDocument doc = documentManagementService.downloadFile(userToken,
+                caseData.getCaseBundles().get(0).getValue().getStitchedDocument().getDocumentBinaryUrl());
+        byte[] fileContents = FileUtils.readFileToByteArray(doc.getContent().getFile());
+        Map<String, Object> personalisation = new HashMap<>();
+        personalisation.put("document", NotificationClient.prepareUpload(fileContents));
+        personalisation.put("caseId", caseData.getEthosCaseReference());
+        emailService.sendEmailWithFile("7ca32165-dfc8-450f-b9ae-c97d14ef8c94", "test@test.com", personalisation);
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
 }

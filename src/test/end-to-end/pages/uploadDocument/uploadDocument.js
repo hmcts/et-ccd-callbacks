@@ -12,6 +12,7 @@ module.exports = async function () {
     I.see('Add new');
     I.see('Upload documentation for the case');
 
+    I.wait(3);
     I.click('Add new');
     I.waitForText('Case documentation', testConfig.TestTimeToWaitForText);
     I.see('Type of Document (Optional)'); 
@@ -21,9 +22,12 @@ module.exports = async function () {
     I.attachFile('#documentCollection_0_uploadedDocument', 'data/fileUpload.txt');
     I.fillField('#documentCollection_0_shortDescription', commonConfig.shortDescription);
 
+    I.wait(3);
     I.click(commonConfig.continue);
     I.see('Upload Document');
     I.see('Case Number:');
+    
+    I.wait(3);
     I.click(commonConfig.submit);
     
     //Wait for Case Details to correctly load

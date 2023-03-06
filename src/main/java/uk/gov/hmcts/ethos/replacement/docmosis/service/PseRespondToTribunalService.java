@@ -46,6 +46,8 @@ public class PseRespondToTribunalService {
     private String acknowledgeEmailYesTemplateId;
     @Value("${pse.respondent.acknowledgement.no.template.id}")
     private String acknowledgeEmailNoTemplateId;
+    @Value("${pse.respondent.notification.claimant.template.id}")
+    private String notificationToClaimantTemplateId;
 
     private final EmailService emailService;
     private final UserService userService;
@@ -191,6 +193,29 @@ public class PseRespondToTribunalService {
             "claimant", caseData.getClaimant(),
             "respondents", Helper.getRespondentNames(caseData),
             "hearingDate", hearingDate,
+            "caseId", caseDetails.getCaseId()
+        );
+    }
+
+    /**
+     * Generate email notification to claimant when LR responds to order/request.
+     * @param caseDetails in which the case details are extracted from
+     */
+    public void sendClaimantEmail(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        if (YES.equals(caseData.getPseRespondentOrdReqCopyToOtherParty())) {
+            emailService.sendEmail(notificationToClaimantTemplateId,
+                caseData.getClaimantType().getClaimantEmailAddress(),
+                buildPersonalisationNotify(caseDetails));
+        }
+    }
+
+    private Map<String, String> buildPersonalisationNotify(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        return Map.of(
+            "caseNumber", caseData.getEthosCaseReference(),
+            "claimant", caseData.getClaimant(),
+            "respondents", Helper.getRespondentNames(caseData),
             "caseId", caseDetails.getCaseId()
         );
     }

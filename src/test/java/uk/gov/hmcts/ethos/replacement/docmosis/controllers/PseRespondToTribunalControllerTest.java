@@ -150,6 +150,7 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
         verify(pseRespondToTribunalService, times(1)).sendAcknowledgeEmail(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(pseRespondToTribunalService, times(1)).sendClaimantEmail(ccdRequest.getCaseDetails());
     }
 
     @Test

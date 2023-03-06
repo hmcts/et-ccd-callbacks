@@ -41,6 +41,7 @@ import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
@@ -68,13 +69,18 @@ public final class TseHelper {
 
     private static final String STRING_BR = "<br>";
 
+    private static final String RULE92_YES_OR_NO_MARKUP =
+        "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
+        + "%s";
+    private static final String RULE92_DETAILS_MARKUP =
+        "|Details of why you do not want to inform the other party | %s|\r\n";
     private static final String RESPONDENT_REPLY_MARKUP_FOR_REPLY = "|Response %s | |\r\n"
         + "|--|--|\r\n"
         + "|Response from | %s|\r\n"
         + "|Response date | %s|\r\n"
         + "|What’s your response to the %s’s application? | %s|\r\n"
         + "|Supporting material | %s|\r\n"
-        + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
+        + "%s" // Rule92
         + "\r\n";
 
     private static final String RESPONDENT_REPLY_MARKUP_FOR_DECISION = "|Response %s | |\r\n"
@@ -456,6 +462,25 @@ public final class TseHelper {
     }
 
     /**
+     * Format Rule92 No Given details markup.
+     * @param copyToOtherPartyYesOrNo Rule 92 Yes or No
+     * @param copyToOtherPartyText Give details
+     * @return Markup String
+     */
+    public static String formatRule92(String copyToOtherPartyYesOrNo, String copyToOtherPartyText) {
+        return String.format(
+            RULE92_YES_OR_NO_MARKUP,
+            copyToOtherPartyYesOrNo,
+            NO.equals(copyToOtherPartyYesOrNo)
+                ? String.format(
+                    RULE92_DETAILS_MARKUP,
+                    copyToOtherPartyText
+                )
+                : ""
+            );
+    }
+
+    /**
      * Format Admin response markup.
      * @param reply Respond as TseRespondType
      * @param respondCount Respond count as incrementAndReturnValue()
@@ -502,8 +527,8 @@ public final class TseHelper {
      * @param docInfo Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
      * @return Markup String
      */
-    public static String formatLegalRepReplyOrClaimantForReply(TseRespondType reply, int respondCount, String applicant,
-                                                               String docInfo) {
+    public static String formatLegalRepReplyOrClaimantWithRule92(TseRespondType reply, int respondCount,
+                                                                 String applicant, String docInfo) {
         return String.format(
             RESPONDENT_REPLY_MARKUP_FOR_REPLY,
             respondCount,
@@ -512,7 +537,8 @@ public final class TseHelper {
             applicant.toLowerCase(Locale.ENGLISH),
             defaultString(reply.getResponse()),
             docInfo,
-            reply.getCopyToOtherParty()
+            formatRule92(reply.getCopyToOtherParty(),
+                reply.getCopyNoGiveDetails())
         );
     }
 
@@ -523,8 +549,8 @@ public final class TseHelper {
      * @param docInfo Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
      * @return Markup String
      */
-    public static String formatLegalRepReplyOrClaimantForDecision(TseRespondType reply, int respondCount,
-                                                                  String docInfo) {
+    public static String formatLegalRepReplyOrClaimantWithoutRule92(TseRespondType reply, int respondCount,
+                                                                    String docInfo) {
         return String.format(
             RESPONDENT_REPLY_MARKUP_FOR_DECISION,
             respondCount,

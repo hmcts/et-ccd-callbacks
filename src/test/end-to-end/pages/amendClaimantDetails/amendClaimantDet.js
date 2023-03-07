@@ -10,6 +10,9 @@ module.exports = async function () {
     await I.click(commonConfig.continue);
     await I.click(commonConfig.continue);
     await I.checkOption(claimDetailConfig.phoneHearingPreference);
+    await I.click(claimDetailConfig.physicalConditionYes);
+    await I.click(claimDetailConfig.contactLanguageEnglish);
+    await I.click(claimDetailConfig.hearingLanguageEnglish);
     await I.click(commonConfig.continue);
     await I.click(commonConfig.submit)
     await I.wait(2);

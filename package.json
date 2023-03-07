@@ -33,7 +33,7 @@
         "totp-generator": "0.0.13"
     },
     "scripts": {
-        "test:functional": "codeceptjs run --config ./src/test/end-to-end/codecept.conf.js --steps —-reporter mocha-multi",
+        "test:functional": "codeceptjs run --config ./src/test/end-to-end/codecept.conf.js --steps —-reporter mocha-multi --grep @RET-BAT",
         "codeceptjs": "codeceptjs run --steps",
         "codeceptjs:headless": "HEADLESS=true codeceptjs run --steps"
     },

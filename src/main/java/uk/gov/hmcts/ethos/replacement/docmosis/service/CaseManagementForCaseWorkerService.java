@@ -40,6 +40,7 @@ import static java.time.DayOfWeek.SUNDAY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
@@ -184,6 +185,13 @@ public class CaseManagementForCaseWorkerService {
         if (!isNullOrEmpty(caseData.getPositionType()) && positionChanged(caseData)) {
             caseData.setDateToPosition(LocalDate.now().toString());
             caseData.setCurrentPosition(caseData.getPositionType());
+        }
+    }
+
+    public void setEt3ResponseDueDate(CaseData caseData) {
+        if (!isNullOrEmpty(caseData.getClaimServedDate())) {
+            caseData.setEt3DueDate(LocalDate.parse(
+                caseData.getClaimServedDate()).plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString());
         }
     }
 

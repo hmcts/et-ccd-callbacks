@@ -8,10 +8,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et1VettingData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et1VettingDocument;
-
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType.getSelectedLabel;
 
@@ -40,7 +40,8 @@ public final class Et1VettingHelper {
      * @throws JsonProcessingException if the JSON cannot be generated correctly, an error would be thrown. This could
      be due to an illegal character potentially existing in the data
      */
-    public static String getDocumentRequest(CaseData caseData, String userToken) throws JsonProcessingException {
+    public static String getDocumentRequest(CaseData caseData,
+                                            String userToken) throws JsonProcessingException {
         Et1VettingData et1VettingData = Et1VettingData.builder()
                 .ethosCaseReference(caseData.getEthosCaseReference())
                 .et1VettingCanServeClaimYesOrNo(defaultIfEmpty(caseData.getEt1VettingCanServeClaimYesOrNo(), null))
@@ -141,6 +142,11 @@ public final class Et1VettingHelper {
                 .et1OtherReferralGeneralNotes(defaultIfEmpty(caseData.getEt1OtherReferralGeneralNotes(), null))
                 .et1VettingAdditionalInformationTextArea(
                         defaultIfEmpty(caseData.getEt1VettingAdditionalInformationTextArea(), null))
+                .et1DateCompleted(
+                        defaultIfEmpty(caseData.getEt1DateCompleted(),
+                                LocalDate.now().format(DateTimeFormatter.ofPattern("dd MMM yyyy"))))
+
+                .et1VettingCompletedBy(defaultIfEmpty(caseData.getEt1VettingCompletedBy(), null))
                 .build();
 
         Et1VettingDocument et1VettingDocument = Et1VettingDocument.builder()

@@ -8,6 +8,7 @@ import uk.gov.hmcts.ecm.common.exceptions.CaseRetrievalException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReportData;
@@ -114,6 +115,9 @@ public class ReportDataService {
                 listingDetails.getCaseData().getManagingOffice());
         reportData.setDocumentName(listingDetails.getCaseData().getDocumentName());
         reportData.setReportType(listingDetails.getCaseData().getReportType());
+        reportData.setManagingOffice(
+                ReportHelper.getReportOfficeForDisplay(listingDetails.getCaseTypeId(),
+                        listingDetails.getCaseData().getManagingOffice()));
         reportData.setHearingDateType(listingDetails.getCaseData().getHearingDateType());
         reportData.setListingDateFrom(listingDetails.getCaseData().getListingDateFrom());
         reportData.setListingDateTo(listingDetails.getCaseData().getListingDateTo());
@@ -124,9 +128,9 @@ public class ReportDataService {
     private NoPositionChangeReportData getNoPositionChangeReport(ListingDetails listingDetails, String authToken) {
         log.info("No Change In Current Position for {}", listingDetails.getCaseTypeId());
         NoPositionChangeCcdDataSource reportDataSource = new NoPositionChangeCcdDataSource(authToken, ccdClient);
-        NoPositionChangeReport hearingsToJudgmentsReport = new NoPositionChangeReport(reportDataSource,
+        NoPositionChangeReport noPositionChangeReport = new NoPositionChangeReport(reportDataSource,
                 listingDetails.getCaseData().getReportDate());
-        NoPositionChangeReportData reportData = hearingsToJudgmentsReport.runReport(listingDetails);
+        NoPositionChangeReportData reportData = noPositionChangeReport.runReport(listingDetails);
         setSharedReportDocumentFields(reportData, listingDetails, false);
         return reportData;
     }
@@ -146,7 +150,7 @@ public class ReportDataService {
         return claimsByHearingVenueReport.generateReport(claimsByHearingVenueReportParams);
     }
 
-    private String getUserFullName(String userToken) {
+    public String getUserFullName(String userToken) {
         UserDetails userDetails = userService.getUserDetails(userToken);
         String firstName = userDetails.getFirstName() != null ? userDetails.getFirstName() : "";
         String lastName = userDetails.getLastName() != null ? userDetails.getLastName() : "";
@@ -161,6 +165,9 @@ public class ReportDataService {
         EccReport eccReport = new EccReport(reportDataSource);
         EccReportData reportData = eccReport.generateReport(params);
         setReportData(reportData, listingData);
+        reportData.setManagingOffice(
+                ReportHelper.getReportOfficeForDisplay(listingDetails.getCaseTypeId(),
+                        listingData.getManagingOffice()));
         return reportData;
     }
 
@@ -196,6 +203,9 @@ public class ReportDataService {
         reportData.setDocumentName(listingData.getDocumentName());
         reportData.setReportType(listingData.getReportType());
         reportData.setHearingDateType(listingData.getHearingDateType());
+        reportData.setManagingOffice(
+                ReportHelper.getReportOfficeForDisplay(listingDetails.getCaseTypeId(),
+                        listingData.getManagingOffice()));
         reportData.setListingDateFrom(listingData.getListingDateFrom());
         reportData.setListingDateTo(listingData.getListingDateTo());
         reportData.setListingDate(listingData.getListingDate());
@@ -214,6 +224,9 @@ public class ReportDataService {
         HearingsByHearingTypeReportData reportData = hearingsByHearingTypeReport
                 .generateReport(params);
         setReportData(reportData, listingData);
+        reportData.setManagingOffice(
+                ReportHelper.getReportOfficeForDisplay(listingDetails.getCaseTypeId(),
+                        listingData.getManagingOffice()));
         return reportData;
     }
 
@@ -241,7 +254,8 @@ public class ReportDataService {
                                                boolean isDateRangeReport) {
         reportData.setDocumentName(listingDetails.getCaseData().getDocumentName());
         reportData.setReportType(listingDetails.getCaseData().getReportType());
-        reportData.setManagingOffice(listingDetails.getCaseData().getManagingOffice());
+        reportData.setManagingOffice(ReportHelper.getReportOfficeForDisplay(listingDetails.getCaseTypeId(),
+                listingDetails.getCaseData().getManagingOffice()));
 
         if (isDateRangeReport) {
             reportData.setHearingDateType(listingDetails.getCaseData().getHearingDateType());

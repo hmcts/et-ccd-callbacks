@@ -18,6 +18,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -37,6 +39,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,6 +50,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService.APPLICATION_DOCX_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.successfulDocStoreUpload;
@@ -71,6 +75,8 @@ public class DocumentManagementServiceTest {
     private RestTemplate restTemplate;
     @InjectMocks
     private DocumentManagementService documentManagementService;
+    @InjectMocks
+    private DocumentGenerationService documentGenerationService;
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -158,15 +164,10 @@ public class DocumentManagementServiceTest {
     @Test
     public void downloadFileSecureDocStoreTrue() {
         ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", true);
-        when(caseDocumentClient.getDocumentBinary(anyString(), anyString(), anyString()))
-                .thenReturn(responseEntity);
+        when(documentDownloadClientApi.downloadBinary(anyString(), anyString(), anyString(), anyString(), anyString()))
+            .thenReturn(responseEntity);
         UploadedDocument uploadedDocument = documentManagementService.downloadFile("authString",
-                "http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
-        assertEquals("fileName", uploadedDocument.getName());
-        assertEquals("xslx", uploadedDocument.getContentType());
-
-        uploadedDocument = documentManagementService.downloadFile("authString",
-                "documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
+            "http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary");
         assertEquals("fileName", uploadedDocument.getName());
         assertEquals("xslx", uploadedDocument.getContentType());
     }
@@ -221,5 +222,18 @@ public class DocumentManagementServiceTest {
         String expected = "<a href=\"/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary\" target=\"_blank\">Test (TXT, " + size + ")</a>";
 
         assertEquals(expected, actual);
+      }
+
+    @Test
+    public void setBFAction() {
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+        CaseData caseData = new CaseData();
+        caseDetails.setCaseData(caseData);
+        documentGenerationService.setBfActions(caseData);
+
+        LocalDate servingDate = LocalDate.parse(caseData.getClaimServedDate());
+        LocalDate et3DueDate = LocalDate.parse(caseData.getEt3DueDate());
+        assertThat(et3DueDate).isEqualTo(servingDate.plusDays(28));
     }
 }

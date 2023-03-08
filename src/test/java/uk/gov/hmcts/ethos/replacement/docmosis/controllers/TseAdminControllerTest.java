@@ -45,6 +45,7 @@ class TseAdminControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmin/aboutToSubmit";
     private static final String SUBMITTED_URL = "/tseAdmin/submitted";
     private static final String ABOUT_TO_SUBMIT_CLOSE_APP_URL = "/tseAdmin/aboutToSubmitCloseApplication";
+    private static final String SUBMITTED_CLOSE_APP_URL = "/tseAdmin/submittedCloseApplication";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -214,6 +215,7 @@ class TseAdminControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
+            .andExpect(jsonPath("$.confirmation_body", notNullValue()))
             .andExpect(jsonPath("$.data", nullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
@@ -276,4 +278,36 @@ class TseAdminControllerTest {
             ccdRequest.getCaseDetails().getCaseData());
     }
 
+    @Test
+    void submittedCloseApplication_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(SUBMITTED_CLOSE_APP_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_body", notNullValue()))
+                .andExpect(jsonPath("$.data", nullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void submittedCloseApplication_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(SUBMITTED_CLOSE_APP_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void submittedCloseApplication_badRequest() throws Exception {
+        mockMvc.perform(post(SUBMITTED_CLOSE_APP_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }

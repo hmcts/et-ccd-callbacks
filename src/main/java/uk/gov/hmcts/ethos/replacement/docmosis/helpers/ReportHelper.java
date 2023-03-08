@@ -11,14 +11,12 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.AdhocReportTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.AdhocReportType;
-
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
@@ -268,6 +266,17 @@ public class ReportHelper {
             return managingOffice;
         } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
             return TribunalOffice.SCOTLAND.getOfficeName();
+        } else {
+            throw new IllegalArgumentException("Unexpected case type id " + listingCaseTypeId);
+        }
+    }
+
+    public static String getReportOfficeForDisplay(String listingCaseTypeId, String managingOffice) {
+        String caseTypeId = UtilHelper.getListingCaseTypeId(listingCaseTypeId);
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            return managingOffice;
+        } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            return TribunalOffice.GLASGOW.getOfficeName();
         } else {
             throw new IllegalArgumentException("Unexpected case type id " + listingCaseTypeId);
         }

@@ -148,5 +148,9 @@ public class InitialConsiderationData {
     private String icOrderForFurtherInformation;
     @JsonProperty("icOtherIssuesOrFinalOrders")
     private String icOtherIssuesOrFinalOrders;
+    @JsonProperty("icCompletedBy")
+    private String icCompletedBy;
+    @JsonProperty("icDateCompleted")
+    private String icDateCompleted;
 
 }

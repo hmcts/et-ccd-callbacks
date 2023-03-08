@@ -29,7 +29,11 @@ public class ClaimsByHearingVenueCcdReportDataSourceTest {
         when(ccdClient.claimsByHearingVenueSearch(anyString(), anyString(), anyString())).thenReturn(submitEvents);
         ClaimsByHearingVenueCcdReportDataSource ccdReportDataSource = new ClaimsByHearingVenueCcdReportDataSource(
             authToken, ccdClient);
-        List<ClaimsByHearingVenueSubmitEvent> results = ccdReportDataSource.getData(caseTypeId, fromDate, toDate);
+        List<ClaimsByHearingVenueSubmitEvent> results = ccdReportDataSource.getData(
+                "Leeds",
+                caseTypeId,
+                fromDate,
+                toDate);
         assertEquals(2, results.size());
         assertEquals(submitEventOne, results.get(0));
         assertEquals(submitEventTwo, results.get(1));
@@ -47,7 +51,7 @@ public class ClaimsByHearingVenueCcdReportDataSourceTest {
         ClaimsByHearingVenueCcdReportDataSource ccdReportDataSource = new ClaimsByHearingVenueCcdReportDataSource(
             authToken, ccdClient);
         ReportException exception = assertThrows(ReportException.class, () -> {
-            ccdReportDataSource.getData(caseTypeId, fromDate, toDate);
+            ccdReportDataSource.getData("Leeds", caseTypeId, fromDate, toDate);
         });
 
         String expectedMessage = "Failed to get claims by hearing venue search results "

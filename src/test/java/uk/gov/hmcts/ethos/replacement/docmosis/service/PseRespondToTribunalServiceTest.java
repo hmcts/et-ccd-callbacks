@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -76,10 +77,13 @@ class PseRespondToTribunalServiceTest {
     private UserService userService;
     @MockBean
     private HearingSelectionService hearingSelectionService;
+    @MockBean
+    private TribunalOfficesService tribunalOfficesService;
 
     @BeforeEach
     void setUp() {
-        pseRespondToTribService = new PseRespondToTribunalService(emailService, userService, hearingSelectionService);
+        pseRespondToTribService = new PseRespondToTribunalService(emailService, userService, hearingSelectionService,
+            tribunalOfficesService);
         caseData = CaseDataBuilder.builder().build();
     }
 
@@ -508,6 +512,98 @@ class PseRespondToTribunalServiceTest {
 
         pseRespondToTribService.sendClaimantEmail(caseDetails);
         verify(emailService, never()).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void sendTribunalEmail_withHearing() {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+            .withEthosCaseReference("6000001/2023")
+            .withClaimant("Claimant Name")
+            .withRespondent("Respondent One", YES, "01-Jan-2023", false)
+            .withRespondent("Respondent Two", YES, "02-Jan-2023", false)
+            .withManagingOffice("Manchester")
+            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId("1677174791076683");
+
+        caseDetails.getCaseData().setSendNotificationCollection(List.of(
+            SendNotificationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(SendNotificationType.builder()
+                    .number("1")
+                    .sendNotificationTitle("View notice of hearing")
+                    .sendNotificationSelectHearing(DynamicFixedListType.of(
+                        DynamicValueType.create("1", "1: Hearing - Leeds - 25 Dec 2023")))
+                    .build())
+                .build()
+        ));
+
+        caseDetails.getCaseData().setPseRespondentSelectOrderOrRequest(
+            DynamicFixedListType.of(DynamicValueType.create("1",
+                "1 View notice of hearing")));
+
+        when(tribunalOfficesService.getTribunalOffice(any()))
+            .thenReturn(TribunalOffice.valueOfOfficeName("Manchester"));
+
+        DateListedType selectedListing = new DateListedType();
+        selectedListing.setListedDate("2023-12-25T12:00:00.000");
+        when(hearingSelectionService.getSelectedListing(isA(CaseData.class),
+            isA(DynamicFixedListType.class))).thenReturn(selectedListing);
+
+        ReflectionTestUtils.setField(pseRespondToTribService, "notificationToAdminTemplateId", TEMPLATE_ID);
+
+        Map<String, String> expectedMap = Map.of(
+            "caseNumber", "6000001/2023",
+            "application", "View notice of hearing",
+            "claimant", "Claimant Name",
+            "respondents", "Respondent One, Respondent Two",
+            "hearingDate", "25 December 2023 12:00",
+            "caseId", "1677174791076683"
+        );
+
+        pseRespondToTribService.sendTribunalEmail(caseDetails);
+        verify(emailService).sendEmail(TEMPLATE_ID, "manchesteret@justice.gov.uk", expectedMap);
+    }
+
+    @Test
+    void sendTribunalEmail_withoutHearing() {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+            .withEthosCaseReference("6000001/2023")
+            .withClaimant("Claimant Name")
+            .withRespondent("Respondent One", YES, "01-Jan-2023", false)
+            .withManagingOffice("Manchester")
+            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId("1677174791076683");
+
+        caseDetails.getCaseData().setSendNotificationCollection(List.of(
+            SendNotificationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(SendNotificationType.builder()
+                    .number("1")
+                    .sendNotificationTitle("View notice of hearing")
+                    .build())
+                .build()
+        ));
+
+        caseDetails.getCaseData().setPseRespondentSelectOrderOrRequest(
+            DynamicFixedListType.of(DynamicValueType.create("1",
+                "1 View notice of hearing")));
+
+        when(tribunalOfficesService.getTribunalOffice(any()))
+            .thenReturn(TribunalOffice.valueOfOfficeName("Manchester"));
+
+        ReflectionTestUtils.setField(pseRespondToTribService, "notificationToAdminTemplateId", TEMPLATE_ID);
+
+        Map<String, String> expectedMap = Map.of(
+            "caseNumber", "6000001/2023",
+            "application", "View notice of hearing",
+            "claimant", "Claimant Name",
+            "respondents", "Respondent One",
+            "hearingDate", "",
+            "caseId", "1677174791076683"
+        );
+
+        pseRespondToTribService.sendTribunalEmail(caseDetails);
+        verify(emailService).sendEmail(TEMPLATE_ID, "manchesteret@justice.gov.uk", expectedMap);
     }
 
     @Test

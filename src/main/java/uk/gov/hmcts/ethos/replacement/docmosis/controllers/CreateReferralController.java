@@ -163,6 +163,9 @@ public class CreateReferralController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        if ("Party not responded/compiled".equals(caseData.getReferralSubject())) {
+            caseData.setReferralSubject("Party not responded/complied");
+        }
         UserDetails userDetails = userService.getUserDetails(userToken);
 
         emailService.sendEmail(
@@ -177,7 +180,6 @@ public class CreateReferralController {
         );
 
         caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
-
         DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,
             userToken, ccdRequest.getCaseDetails().getCaseTypeId());
 

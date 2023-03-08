@@ -44,6 +44,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_REP_ADDRES
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_REP_AND_RESPONDENTS_ADDRESSES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_REP_AND_RESPONDENTS_REPS_ADDRESSES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CUSTOMISE_SELECTED_ADDRESSES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENTS_ADDRESSES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENTS_AND_RESPONDENTS_REPS_ADDRESSES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENTS_REPS_ADDRESSES;
@@ -229,6 +230,9 @@ public class DocumentGenerationService {
             LocalDate date = LocalDate.parse(dateEntered);
             caseData.setClaimServedDate(String.valueOf(date));
         }
+        caseData.setEt3DueDate(LocalDate.parse(caseData.getClaimServedDate())
+            .plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString());
+
         return caseData;
     }
 

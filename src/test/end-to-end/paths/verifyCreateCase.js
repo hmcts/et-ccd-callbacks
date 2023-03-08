@@ -15,4 +15,8 @@ Scenario('Case Creation Test', async ({ I }) => {
    I.wait(commonConfig.time_interval_1_second);
    await verifyApplicationTabs(I);
 
-}).tag('@RET-BAT').tag('@nightly').tag('@crossbrowser').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT')
+  .tag('@nightly')
+  .tag('@crossbrowser')
+  .tag('@RET-ACAS')
+  .retry(testConfig.TestRetryScenarios);

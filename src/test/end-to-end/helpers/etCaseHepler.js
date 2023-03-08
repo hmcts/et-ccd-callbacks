@@ -157,7 +157,6 @@ async function performCaseVettingEvent(authToken, serviceToken, case_id) {
     console.log("vetiing body => " + executeEt1payload);
     const eventExecutionResponse = await I.sendPostRequest(execuEt1teUrl, executeEt1payload, completeVettingHeader);
     expect(eventExecutionResponse.status).to.eql(201);
-
 }
 
 async function acceptTheCaseEvent(authToken, serviceToken, case_id) {
@@ -184,7 +183,60 @@ async function acceptTheCaseEvent(authToken, serviceToken, case_id) {
         "data": {
             "preAcceptCase": {
                 "caseAccepted": "Yes",
-                "dateAccepted": "2022-07-24"
+                "dateAccepted": "2022-08-18"
+            }
+        },
+        "event": {
+            "id": "preAcceptanceCase",
+            "summary": "",
+            "description": ""
+        },
+        "event_token": acceptEventToken
+    };
+
+    console.log("... This is the payload for triggering next event" + acceptBody);
+    let acceptUrl = `http://ccd-data-store-api-${env}.service.core-compute-${env}.internal/cases/${case_id}/events`
+    let acceptHeaders = {
+        'Authorization': `Bearer ${authToken}`,
+        'ServiceAuthorization': `Bearer ${serviceToken}`,
+        'experimental': true,
+        'Content-Type': 'application/json'
+    };
+    let acceptPayload = JSON.stringify(acceptBody)
+
+    const nextEventExecutionResponse = await I.sendPostRequest(acceptUrl, acceptPayload, acceptHeaders);
+    expect(nextEventExecutionResponse.status).to.eql(201);
+}
+
+async function rejectTheCaseEvent(authToken, serviceToken, case_id) {
+
+    console.log("... application vetted, starting accept event...");
+    const initiateNextEvent = `/cases/${case_id}/event-triggers/preAcceptanceCase?ignore-warning=false`;
+
+
+    let initiateAcceptUrl = ccdApiUrl + initiateNextEvent;
+    let startAcceptanceHeaders = {
+        'Authorization': `Bearer ${authToken}`,
+        'ServiceAuthorization': `Bearer ${serviceToken}`,
+        'experimental': true,
+        'Content-Type': 'application/json'
+    };
+
+    let startAcceptanceResponse = await I.sendGetRequest(initiateAcceptUrl, startAcceptanceHeaders);
+    expect(startAcceptanceResponse.status).to.eql(200);
+    let acceptEventToken = startAcceptanceResponse.data.token;
+
+
+    // execute case
+    let acceptBody = {
+        "data": {
+            "preAcceptCase": {
+                "caseAccepted": "No",
+                "dateAccepted": null,
+                "dateRejected": "2022-01-23",
+                "rejectReason": [
+                    "Not on Prescribed Form"
+                ]
             }
         },
         "event": {
@@ -214,6 +266,34 @@ async function navigateToCaseDetailsScreen(case_id) {
     await I.amOnPage('/case-details/' + case_id);
 }
 
+async function processCaseToSubmittedState() {
+    // Login to IDAM to get the authentication token
+    const authToken = await getAuthToken();
+    const serviceToken = await getS2SServiceToken();
+
+    //Getting the User Id based on the Authentication Token that is passed for this User.
+    const userId = await getUserDetails(authToken);
+    const case_id = await createACase(authToken, serviceToken, userId);
+    //Navigate to the Case Detail Page
+    await navigateToCaseDetailsScreen(case_id);
+    return case_id;
+}
+
+async function processCaseToET1VettedState() {
+    // Login to IDAM to get the authentication token
+    const authToken = await getAuthToken();
+    const serviceToken = await getS2SServiceToken();
+
+    //Getting the User Id based on the Authentication Token that is passed for this User.
+    const userId = await getUserDetails(authToken);
+    const case_id = await createACase(authToken, serviceToken, userId);
+    await performCaseVettingEvent(authToken, serviceToken, case_id);
+
+    //Navigate to the Case Detail Pages
+    await navigateToCaseDetailsScreen(case_id);
+    return case_id;
+}
+
 async function processCaseToAcceptedState() {
 
     // Login to IDAM to get the authentication token
@@ -233,6 +313,28 @@ async function processCaseToAcceptedState() {
     return case_id;
 }
 
+async function processCaseToRejectedState() {
+
+    // Login to IDAM to get the authentication token
+    const authToken = await getAuthToken();
+    const serviceToken = await getS2SServiceToken();
+
+    //Getting the User Id based on the Authentication Token that is passed for this User.
+    const userId = await getUserDetails(authToken);
+    const case_id = await createACase(authToken, serviceToken, userId);
+    await performCaseVettingEvent(authToken, serviceToken, case_id);
+
+    //Initiate reject case
+    await rejectTheCaseEvent(authToken, serviceToken, case_id);
+
+    //Navigate to the Case Detail Page
+    await navigateToCaseDetailsScreen(case_id);
+    return case_id;
+}
+
 module.exports = {
-    processCaseToAcceptedState
+    processCaseToSubmittedState,
+    processCaseToET1VettedState,
+    processCaseToAcceptedState,
+    processCaseToRejectedState,
 };

@@ -10,5 +10,7 @@ Scenario('Verify Initial Consideration Journey', async ({I}) => {
     await processCaseToAcceptedState();
     await et3Response(I,eventNames.ET3_RESPONSE);
 
-}).tag('@wip').tag('@biggerrefactoring');
+}).tag('@wip')
+  .tag('@RET-ACAS')
+  .tag('@biggerrefactoring');
     //.retry(testConfig.TestRetryScenarios)

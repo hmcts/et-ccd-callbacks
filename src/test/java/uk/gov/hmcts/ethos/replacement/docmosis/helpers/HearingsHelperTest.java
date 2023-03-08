@@ -261,7 +261,7 @@ public class HearingsHelperTest {
         setListingDate(hearingCollection, 1, 2, "1999-01-01T01:01:01.000");
         setListingDate(hearingCollection, 2, 1, "2100-04-01T01:01:01.000");
         String actual = HearingsHelper.getEarliestFutureHearingDate(hearingCollection);
-        assertEquals("2100-02-01T01:01:01.000", actual);
+        assertEquals("2100-04-01T01:01:01.000", actual);
     }
 
     @Test

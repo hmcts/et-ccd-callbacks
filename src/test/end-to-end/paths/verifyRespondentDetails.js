@@ -12,5 +12,8 @@ Scenario('Verify Respondent Details', async ({I}) => {
 
     await claimantRespondentDetails(I, eventNames.CLAIMANT_RESPONDENT_DETAILS);
 
-}).tag('@biggerrefactoring');
-    //.retry(testConfig.TestRetryScenarios);
+}).tag('@RET-ACAS')
+  .tag('@RET-BAT')
+  .tag('@nightly')
+  .retry(testConfig.TestRetryScenarios);
+

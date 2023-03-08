@@ -11,5 +11,4 @@ Scenario('Validate hearing error message if user schedules the hearing date duri
     console.log("... case id =>" +caseId);
     await scheduleHearingDuringTheWeekend(I, eventNames.LIST_HEARING, 'Leeds');
 
-}).tag('@biggerrefactoring');
-    //.retry(testConfig.TestRetryScenarios);
+}).tag('@nightly').retry(testConfig.TestRetryScenarios);

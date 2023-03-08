@@ -13,6 +13,9 @@ function verifyClaimantHearingPreferences() {
     I.see('Neither');
     I.checkOption('#claimantHearingPreference_hearing_preferences-Video');
     I.checkOption('#claimantHearingPreference_hearing_preferences-Phone');
+    I.click('#claimantHearingPreference_reasonable_adjustments_Yes');
+    I.click('#claimantHearingPreference_contact_language-English');
+    I.click('#claimantHearingPreference_hearing_language-English');
     I.click('Continue');
 }
 module.exports = { verifyClaimantHearingPreferences };

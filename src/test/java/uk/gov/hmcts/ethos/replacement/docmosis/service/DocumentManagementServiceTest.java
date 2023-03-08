@@ -222,7 +222,7 @@ public class DocumentManagementServiceTest {
         String expected = "<a href=\"/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary\" target=\"_blank\">Test (TXT, " + size + ")</a>";
 
         assertEquals(expected, actual);
-      }
+    }
 
     @Test
     public void setBFAction() {

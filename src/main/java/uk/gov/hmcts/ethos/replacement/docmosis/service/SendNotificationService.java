@@ -1,6 +1,8 @@
 
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.google.common.base.Strings;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -15,19 +17,18 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.SendNotificationTypeData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSendNotificationUploadDocument;
 
 @Service("sendNotificationService")
 @RequiredArgsConstructor
@@ -140,6 +141,41 @@ public class SendNotificationService {
             List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
             respondents.forEach(obj -> sendRespondentEmail(caseData, personalisation, obj.getValue()));
         }
+    }
+
+    public SendNotificationType getSendNotification(CaseData caseData) {
+        Optional<SendNotificationTypeItem> sendNotificationTypeItemOptional = caseData.getSendNotificationCollection().stream()
+                .filter(s -> s.getId().equals(caseData.getSelectNotificationDropdown().getSelectedCode()))
+                .findFirst();
+
+        if (sendNotificationTypeItemOptional.isEmpty()){
+            //TODO error handling
+            return null;
+        }
+
+        SendNotificationType sendNotificationType = sendNotificationTypeItemOptional.get().getValue();
+        return sendNotificationType;
+    }
+
+    public String getSendNotificationMarkDown(SendNotificationType sendNotification) {
+        StringBuilder markdownBuilder = new StringBuilder();
+        markdownBuilder.append("| | |\r\n");
+        markdownBuilder.append("| --- | --- |\r\n");
+        markdownBuilder.append("| Subject |" + Strings.nullToEmpty(sendNotification.getSendNotificationTitle()) + "|\r\n");
+        markdownBuilder.append("| Notification |" + sendNotification.getSendNotificationSubject() + "|\r\n");
+        markdownBuilder.append("| Hearing |" + sendNotification.getSendNotificationSelectHearing().getSelectedLabel() + "|\r\n");
+        markdownBuilder.append("| Date Sent |" + "01 Jan 1970" + "|\r\n");
+        markdownBuilder.append("| Sent By |" + "TEST PERSON" + "|\r\n");
+        markdownBuilder.append("| Case management order request |" + Strings.nullToEmpty(sendNotification.getSendNotificationCaseManagement()) + "|\r\n");
+        markdownBuilder.append("| Response due |" + "01 Jan 1970" + "|\r\n");
+        markdownBuilder.append("| Party or parties to respond |" + Strings.nullToEmpty(sendNotification.getSendNotificationSelectParties()) + "|\r\n");
+        markdownBuilder.append("| Additional Infomation |" + Strings.nullToEmpty(sendNotification.getSendNotificationAdditionalInfo()) + "|\r\n");
+        markdownBuilder.append("| Desciption |" + Strings.nullToEmpty(sendNotification.getSendNotificationTitle()) + "|\r\n");
+        markdownBuilder.append("| Document |" + getSendNotificationUploadDocument(sendNotification) + "|\r\n");
+        markdownBuilder.append("| Case management order made by |" + Strings.nullToEmpty(sendNotification.getSendNotificationRequestMadeBy()) + "|\r\n");
+        markdownBuilder.append("| Name |" + Strings.nullToEmpty(sendNotification.getSendNotificationFullName()) + "|\r\n");
+        markdownBuilder.append("| Sent to |" + Strings.nullToEmpty(sendNotification.getSendNotificationSelectParties()) + "|\r\n");
+        return markdownBuilder.toString();
     }
 
     private void sendRespondentEmail(CaseData caseData, Map<String, String> emailData, RespondentSumType respondent) {

@@ -101,7 +101,7 @@ public final class PseHelper {
                 sendNotificationType.getSendNotificationSelectHearing().getSelectedLabel());
     }
 
-    private static String getSendNotificationUploadDocument(SendNotificationType sendNotificationType) {
+    public static String getSendNotificationUploadDocument(SendNotificationType sendNotificationType) {
         return sendNotificationType.getSendNotificationUploadDocument() == null
             ? ""
             : sendNotificationType.getSendNotificationUploadDocument().stream()

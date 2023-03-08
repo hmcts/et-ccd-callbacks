@@ -19,7 +19,7 @@ public final class PseHelper {
     private static final String ORDER_APP_MARKUP = "|Hearing, case management order or request | |\r\n"
         + "|--|--|\r\n"
         + "|Notification | %s|\r\n"
-        + "|Hearing | %s|\r\n"
+        + "%s" // Hearing
         + "|Date sent | %s|\r\n"
         + "|Sent by | Tribunal|\r\n"
         + "|Case management order or request? | %s|\r\n"
@@ -31,13 +31,15 @@ public final class PseHelper {
         + "|Sent to | %s|\r\n"
         + "\r\n";
 
+    private static final String ORDER_APP_HEARING_MARKUP = "|Hearing | %s|\r\n";
+
     private static final String ORDER_APP_DOC_MARKUP = "|Description | %s|\r\n"
         + "|Document | <a href=\"/documents/%s\" target=\"_blank\">%s</a>|\r\n";
 
     private static final String ORDER_APP_CMO_MARKUP = "|%s made by | %s|\r\n"
         + "|Name | %s|\r\n";
 
-    private static final String LEGAL_REP_REPLY_MARKUP = "|Response %s | |\r\n"
+    private static final String CLAIMANT_REPLY_MARKUP = "|Response %s | |\r\n"
         + "|--|--|\r\n"
         + "|Response from | %s|\r\n"
         + "|Response date | %s|\r\n"
@@ -93,7 +95,9 @@ public final class PseHelper {
     private static String getSendNotificationSelectHearing(SendNotificationType sendNotificationType) {
         return sendNotificationType.getSendNotificationSelectHearing() == null
             ? ""
-            : sendNotificationType.getSendNotificationSelectHearing().getSelectedLabel();
+            : String.format(
+                ORDER_APP_HEARING_MARKUP,
+                sendNotificationType.getSendNotificationSelectHearing().getSelectedLabel());
     }
 
     private static String getSendNotificationUploadDocument(SendNotificationType sendNotificationType) {
@@ -124,14 +128,15 @@ public final class PseHelper {
         );
     }
 
+    // TODO: RET-2879: Update Claimant response after RET-2928
     /**
      * Markup for displaying Response(s).
      * @param pseResponseType Legal Rep Respond
      * @return Response(s) Markup
      */
-    public static String formatLegalRepReply(PseResponseType pseResponseType, int respondCount) {
+    public static String formatClaimantReply(PseResponseType pseResponseType, int respondCount) {
         return String.format(
-            LEGAL_REP_REPLY_MARKUP,
+            CLAIMANT_REPLY_MARKUP,
             respondCount,
             pseResponseType.getFrom(),
             pseResponseType.getDate(),

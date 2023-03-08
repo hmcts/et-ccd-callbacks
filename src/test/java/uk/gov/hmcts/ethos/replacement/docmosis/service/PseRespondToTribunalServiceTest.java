@@ -172,7 +172,20 @@ class PseRespondToTribunalServiceTest {
     }
 
     @Test
-    void initialOrdReqDetailsTableMarkUp_hasOrderRequests() {
+    void initialOrdReqDetailsTableMarkUp_withHearing() {
+
+        PseResponseTypeItem pseResponseTypeItem = PseResponseTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(PseResponseType.builder()
+                .from(CLAIMANT_TITLE)
+                .date("10 Aug 2022")
+                .response("Response text entered")
+                .hasSupportingMaterial(YES)
+                .supportingMaterial(List.of(createDocumentTypeItem("My claimant hearing agenda.pdf",
+                    "ca35bccd-f507-4243-9133-f6081fb0fe5e")))
+                .copyToOtherParty(YES)
+                .build())
+            .build();
 
         caseData.setSendNotificationCollection(List.of(
             SendNotificationTypeItem.builder()
@@ -180,43 +193,34 @@ class PseRespondToTribunalServiceTest {
                 .value(SendNotificationType.builder()
                     .number("1")
                     .date("5 Aug 2022")
-                    .sendNotificationTitle("View notice of hearing, submit hearing agenda")
+                    .sendNotificationTitle("View notice of hearing")
+                    .sendNotificationLetter(YES)
+                    .sendNotificationUploadDocument(List.of(
+                        createDocumentTypeItem("Letter 4.8 - Hearing notice - hearing agenda.pdf",
+                            "5fac5af5-b8ac-458c-a329-31cce78da5c2",
+                            "Notice of Hearing and Submit Hearing Agenda document")))
+                    .sendNotificationSubject(List.of("Hearing", "Case management orders / requests"))
                     .sendNotificationSelectHearing(DynamicFixedListType.of(
                         DynamicValueType.create("3", "3: Hearing - Leeds - 14 Aug 2022")))
                     .sendNotificationCaseManagement("Case management order")
                     .sendNotificationResponseTribunal("Yes - view document for details")
                     .sendNotificationSelectParties(BOTH_PARTIES)
-                    .sendNotificationAdditionalInfo("Additional Info")
-                    .sendNotificationUploadDocument(List.of(
-                        createDocumentTypeItem("Letter 4.8 - Hearing notice - hearing agenda.pdf",
-                            "5fac5af5-b8ac-458c-a329-31cce78da5c2",
-                            "Notice of Hearing and Submit Hearing Agenda document")))
                     .sendNotificationWhoCaseOrder("Legal Officer")
                     .sendNotificationFullName("Mr Lee Gal Officer")
+                    .sendNotificationAdditionalInfo("Additional Info")
                     .sendNotificationNotify(BOTH_PARTIES)
-                    .respondCollection(List.of(PseResponseTypeItem.builder()
-                        .id(UUID.randomUUID().toString())
-                        .value(PseResponseType.builder()
-                            .from(CLAIMANT_TITLE)
-                            .date("10 Aug 2022")
-                            .response("Response text entered")
-                            .hasSupportingMaterial(YES)
-                            .supportingMaterial(List.of(createDocumentTypeItem("My claimant hearing agenda.pdf",
-                                "ca35bccd-f507-4243-9133-f6081fb0fe5e")))
-                            .copyToOtherParty(YES)
-                            .build())
-                        .build()))
+                    .respondCollection(List.of(pseResponseTypeItem))
                     .build())
                 .build()
         ));
 
         caseData.setPseRespondentSelectOrderOrRequest(
             DynamicFixedListType.of(DynamicValueType.create("1",
-                "1 View notice of hearing, submit hearing agenda")));
+                "1 View notice of hearing")));
 
         String expected = "|Hearing, case management order or request | |\r\n"
             + "|--|--|\r\n"
-            + "|Notification | View notice of hearing, submit hearing agenda|\r\n"
+            + "|Notification | View notice of hearing|\r\n"
             + "|Hearing | 3: Hearing - Leeds - 14 Aug 2022|\r\n"
             + "|Date sent | 5 Aug 2022|\r\n"
             + "|Sent by | Tribunal|\r\n"
@@ -261,6 +265,49 @@ class PseRespondToTribunalServiceTest {
                 .withShortDescription(shortDescription)
             .build());
         return documentTypeItem;
+    }
+
+    @Test
+    void initialOrdReqDetailsTableMarkUp_NoHearing() {
+
+        caseData.setSendNotificationCollection(List.of(
+            SendNotificationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(SendNotificationType.builder()
+                    .number("1")
+                    .date("5 Aug 2022")
+                    .sendNotificationTitle("View notice of hearing")
+                    .sendNotificationLetter(NO)
+                    .sendNotificationSubject(List.of("Case management orders / requests"))
+                    .sendNotificationCaseManagement("Request")
+                    .sendNotificationResponseTribunal("No")
+                    .sendNotificationRequestMadeBy("Judge")
+                    .sendNotificationFullName("Mr Lee Gal Officer")
+                    .sendNotificationNotify(BOTH_PARTIES)
+                    .build())
+                .build()
+        ));
+
+        caseData.setPseRespondentSelectOrderOrRequest(
+            DynamicFixedListType.of(DynamicValueType.create("1",
+                "1 View notice of hearing")));
+
+        String expected = "|Hearing, case management order or request | |\r\n"
+            + "|--|--|\r\n"
+            + "|Notification | View notice of hearing|\r\n"
+            + "|Date sent | 5 Aug 2022|\r\n"
+            + "|Sent by | Tribunal|\r\n"
+            + "|Case management order or request? | Request|\r\n"
+            + "|Response due | No|\r\n"
+            + "|Party or parties to respond | |\r\n"
+            + "|Additional information | |\r\n"
+            + "|Request made by | Judge|\r\n"
+            + "|Name | Mr Lee Gal Officer|\r\n"
+            + "|Sent to | Both parties|\r\n"
+            + "\r\n";
+
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData),
+            is(expected));
     }
 
     @ParameterizedTest

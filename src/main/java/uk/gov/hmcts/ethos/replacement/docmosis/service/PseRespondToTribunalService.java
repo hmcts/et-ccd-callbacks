@@ -32,7 +32,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatLegalRepReply;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatClaimantReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatOrdReqDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelectedSendNotificationTypeItem;
 
@@ -114,7 +114,7 @@ public class PseRespondToTribunalService {
         }
         IntWrapper respondCount = new IntWrapper(0);
         return sendNotificationType.getRespondCollection().stream()
-            .map(r -> formatLegalRepReply(r.getValue(), respondCount.incrementAndReturnValue()))
+            .map(r -> formatClaimantReply(r.getValue(), respondCount.incrementAndReturnValue()))
             .collect(Collectors.joining(""));
     }
 

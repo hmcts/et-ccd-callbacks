@@ -76,6 +76,7 @@ public final class PseHelper {
      * @param sendNotificationType Target SendNotification Subject
      * @return Hearing, case management order or request Markup
      */
+    // TODO: RET-2879: Add Judgment and ECC
     public static String formatOrdReqDetails(SendNotificationType sendNotificationType) {
         return String.format(
             ORDER_APP_MARKUP,
@@ -128,12 +129,12 @@ public final class PseHelper {
         );
     }
 
-    // TODO: RET-2879: Update Claimant response after RET-2928
     /**
      * Markup for displaying Response(s).
      * @param pseResponseType Legal Rep Respond
      * @return Response(s) Markup
      */
+    // TODO: RET-2879: Update Claimant response after RET-2928 ready
     public static String formatClaimantReply(PseResponseType pseResponseType, int respondCount) {
         return String.format(
             CLAIMANT_REPLY_MARKUP,

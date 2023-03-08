@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -32,14 +33,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatLegalRepReply;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatClaimantReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatOrdReqDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelectedSendNotificationTypeItem;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 public class PseRespondToTribunalService {
 
     @Value("${pse.respondent.acknowledgement.yes.template.id}")
@@ -48,10 +49,13 @@ public class PseRespondToTribunalService {
     private String acknowledgeEmailNoTemplateId;
     @Value("${pse.respondent.notification.claimant.template.id}")
     private String notificationToClaimantTemplateId;
+    @Value("${pse.respondent.notification.admin.template.id}")
+    private String notificationToAdminTemplateId;
 
     private final EmailService emailService;
     private final UserService userService;
     private final HearingSelectionService hearingSelectionService;
+    private final TribunalOfficesService tribunalOfficesService;
 
     private static final String GIVE_MISSING_DETAIL =
         "Use the text box or supporting materials to give details.";
@@ -114,7 +118,7 @@ public class PseRespondToTribunalService {
         }
         IntWrapper respondCount = new IntWrapper(0);
         return sendNotificationType.getRespondCollection().stream()
-            .map(r -> formatLegalRepReply(r.getValue(), respondCount.incrementAndReturnValue()))
+            .map(r -> formatClaimantReply(r.getValue(), respondCount.incrementAndReturnValue()))
             .collect(Collectors.joining(""));
     }
 
@@ -185,16 +189,22 @@ public class PseRespondToTribunalService {
     private Map<String, String> buildPersonalisationNo(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
-        DateListedType dateListedType = hearingSelectionService.getSelectedListing(
-            caseData, sendNotificationType.getSendNotificationSelectHearing());
-        String hearingDate = UtilHelper.formatLocalDateTime(dateListedType.getListedDate());
         return Map.of(
             "caseNumber", caseData.getEthosCaseReference(),
             "claimant", caseData.getClaimant(),
             "respondents", Helper.getRespondentNames(caseData),
-            "hearingDate", hearingDate,
+            "hearingDate", getHearingDate(caseData, sendNotificationType),
             "caseId", caseDetails.getCaseId()
         );
+    }
+
+    private String getHearingDate(CaseData caseData, SendNotificationType sendNotificationType) {
+        if (sendNotificationType.getSendNotificationSelectHearing() == null) {
+            return "";
+        }
+        DateListedType dateListedType = hearingSelectionService.getSelectedListing(
+            caseData, sendNotificationType.getSendNotificationSelectHearing());
+        return UtilHelper.formatLocalDateTime(dateListedType.getListedDate());
     }
 
     /**
@@ -216,6 +226,35 @@ public class PseRespondToTribunalService {
             "caseNumber", caseData.getEthosCaseReference(),
             "claimant", caseData.getClaimant(),
             "respondents", Helper.getRespondentNames(caseData),
+            "caseId", caseDetails.getCaseId()
+        );
+    }
+
+    /**
+     * Generate email notification to admin when LR responds to order/request.
+     * @param caseDetails in which the case details are extracted from
+     */
+    public void sendTribunalEmail(CaseDetails caseDetails) {
+        emailService.sendEmail(notificationToAdminTemplateId,
+            getAdminEmail(caseDetails),
+            buildPersonalisationAdmin(caseDetails));
+    }
+
+    private String getAdminEmail(CaseDetails caseDetails) {
+        String managingOffice = caseDetails.getCaseData().getManagingOffice();
+        TribunalOffice tribunalOffice = tribunalOfficesService.getTribunalOffice(managingOffice);
+        return tribunalOffice.getOfficeEmail();
+    }
+
+    private Map<String, String> buildPersonalisationAdmin(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
+        return Map.of(
+            "caseNumber", caseData.getEthosCaseReference(),
+            "application", sendNotificationType.getSendNotificationTitle(),
+            "claimant", caseData.getClaimant(),
+            "respondents", Helper.getRespondentNames(caseData),
+            "hearingDate", getHearingDate(caseData, sendNotificationType),
             "caseId", caseDetails.getCaseId()
         );
     }

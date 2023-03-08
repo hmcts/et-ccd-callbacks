@@ -49,4 +49,5 @@ public class UserService implements uk.gov.hmcts.ecm.common.service.UserService 
     public String getAccessToken(String username, String password) {
         return getAccessTokenResponse(username, password).accessToken;
     }
+
 }

@@ -33,6 +33,7 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
     private static final String MID_DETAILS_TABLE = "/tseAdmin/midDetailsTable";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmin/aboutToSubmit";
     private static final String ABOUT_TO_SUBMIT_CLOSE_APP_URL = "/tseAdmin/aboutToSubmitCloseApplication";
+    private static final String SUBMITTED_CLOSE_APP_URL = "/tseAdmin/submittedCloseApplication";
 
     private static final String APPLICATION_CODE = "1";
     private static final String APPLICATION_LABEL = "1 - Amend response";
@@ -119,15 +120,29 @@ class TseAdminControllerFunctionalTest extends BaseFunctionalTest {
     @Test
     void aboutToSubmitCloseApplicationSuccessResponse() {
         RestAssured.given()
-            .spec(spec)
-            .contentType(ContentType.JSON)
-            .header(new Header(AUTHORIZATION, userToken))
-            .body(ccdRequest)
-            .post(ABOUT_TO_SUBMIT_CLOSE_APP_URL)
-            .then()
-            .statusCode(HttpStatus.SC_OK)
-            .log()
-            .all(true);
+                .spec(spec)
+                .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, userToken))
+                .body(ccdRequest)
+                .post(ABOUT_TO_SUBMIT_CLOSE_APP_URL)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .log()
+                .all(true);
+    }
+
+    @Test
+    void submittedCloseApplicationSuccessResponse() {
+        RestAssured.given()
+                .spec(spec)
+                .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, userToken))
+                .body(ccdRequest)
+                .post(SUBMITTED_CLOSE_APP_URL)
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .log()
+                .all(true);
     }
 
     private RespondentSumTypeItem createRespondentType() {

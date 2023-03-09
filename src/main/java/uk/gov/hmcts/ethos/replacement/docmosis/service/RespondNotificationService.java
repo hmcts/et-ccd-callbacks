@@ -36,7 +36,12 @@ public class RespondNotificationService {
     }
 
     public String getNotificationMarkDown(CaseData caseData) {
-        SendNotificationType sendNotificationType = sendNotificationService.getSendNotification(caseData);
-        return sendNotificationService.getSendNotificationMarkDown(sendNotificationType);
+        Optional<SendNotificationTypeItem> sendNotification = sendNotificationService.getSendNotification(caseData);
+        if (sendNotification.isEmpty()) {
+            return "";
+        }
+        return sendNotificationService.getSendNotificationMarkDown(sendNotification.get().getValue());
+
+
     }
 }

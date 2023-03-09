@@ -13,17 +13,21 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.SendNotificationTypeData;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -43,6 +47,26 @@ public class SendNotificationService {
     private String citizenUrl;
     @Value("${sendNotification.template.id}")
     private String templateId;
+
+
+    private final String RESPONSE_DETAILS = "|  | |\r\n"
+             + "| --- | --- |\r\n"
+             + "| Subject | %1$s |\r\n"
+             + "| Notification | %2$s |\r\n"
+             + "| Hearing | %3$s |\r\n"
+             + "| Date Sent | %4$s |\r\n"
+             + "| Sent By | %5$s  |\r\n"
+             + "| Case management order request | %6$s |\r\n"
+             + "| Response due | %7$s |\r\n"
+             + "| Party or parties to respond | %8$s |\r\n"
+             + "| Additional Information | %9$s |\r\n"
+             + "| Description | %1$s |\r\n"
+             + " %10$s\r\n"
+             + "| Case management order made by | %11$s |\r\n"
+             + "| Name | %12$s |\r\n"
+             + "| Sent to | %8$s |\r\n";
+    private final String TRIBUNAL = "TRIBUNAL";
+
 
     public void populateHearingSelection(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
@@ -143,39 +167,52 @@ public class SendNotificationService {
         }
     }
 
-    public SendNotificationType getSendNotification(CaseData caseData) {
-        Optional<SendNotificationTypeItem> sendNotificationTypeItemOptional = caseData.getSendNotificationCollection().stream()
+    public Optional<SendNotificationTypeItem> getSendNotification(CaseData caseData) {
+        return caseData.getSendNotificationCollection()
+                .stream()
                 .filter(s -> s.getId().equals(caseData.getSelectNotificationDropdown().getSelectedCode()))
                 .findFirst();
+    }
 
-        if (sendNotificationTypeItemOptional.isEmpty()){
-            //TODO error handling
-            return null;
+    private String getSendNotificationSingleDocumentMarkdown(DocumentTypeItem documentTypeItem){
+        String document = "| Document | N/A |";
+        if (documentTypeItem != null) {
+            Matcher matcher = Helper.getDocumentMatcher(
+                    documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl());
+            String documentLink = matcher.replaceFirst("");
+            String documentName = documentTypeItem.getValue().getUploadedDocument().getDocumentFilename();
+            document = String.format("| Document | <a href=\"/documents/%s\" target=\"_blank\">%s</a>| ", documentLink,
+                    documentName);
         }
+        return document;
+    }
 
-        SendNotificationType sendNotificationType = sendNotificationTypeItemOptional.get().getValue();
-        return sendNotificationType;
+    private String getSendNotificationDocumentsMarkdown(SendNotificationType sendNotification) {
+        List<String> documents = sendNotification.getSendNotificationUploadDocument().stream()
+                .map(documentTypeItem -> getSendNotificationSingleDocumentMarkdown(documentTypeItem))
+                .collect(Collectors.toList());
+        return String.join("\r\n", documents);
+
     }
 
     public String getSendNotificationMarkDown(SendNotificationType sendNotification) {
-        StringBuilder markdownBuilder = new StringBuilder();
-        markdownBuilder.append("| | |\r\n");
-        markdownBuilder.append("| --- | --- |\r\n");
-        markdownBuilder.append("| Subject |" + Strings.nullToEmpty(sendNotification.getSendNotificationTitle()) + "|\r\n");
-        markdownBuilder.append("| Notification |" + sendNotification.getSendNotificationSubject() + "|\r\n");
-        markdownBuilder.append("| Hearing |" + sendNotification.getSendNotificationSelectHearing().getSelectedLabel() + "|\r\n");
-        markdownBuilder.append("| Date Sent |" + "01 Jan 1970" + "|\r\n");
-        markdownBuilder.append("| Sent By |" + "TEST PERSON" + "|\r\n");
-        markdownBuilder.append("| Case management order request |" + Strings.nullToEmpty(sendNotification.getSendNotificationCaseManagement()) + "|\r\n");
-        markdownBuilder.append("| Response due |" + "01 Jan 1970" + "|\r\n");
-        markdownBuilder.append("| Party or parties to respond |" + Strings.nullToEmpty(sendNotification.getSendNotificationSelectParties()) + "|\r\n");
-        markdownBuilder.append("| Additional Infomation |" + Strings.nullToEmpty(sendNotification.getSendNotificationAdditionalInfo()) + "|\r\n");
-        markdownBuilder.append("| Desciption |" + Strings.nullToEmpty(sendNotification.getSendNotificationTitle()) + "|\r\n");
-        markdownBuilder.append("| Document |" + getSendNotificationUploadDocument(sendNotification) + "|\r\n");
-        markdownBuilder.append("| Case management order made by |" + Strings.nullToEmpty(sendNotification.getSendNotificationRequestMadeBy()) + "|\r\n");
-        markdownBuilder.append("| Name |" + Strings.nullToEmpty(sendNotification.getSendNotificationFullName()) + "|\r\n");
-        markdownBuilder.append("| Sent to |" + Strings.nullToEmpty(sendNotification.getSendNotificationSelectParties()) + "|\r\n");
-        return markdownBuilder.toString();
+
+        Optional<DynamicFixedListType> sendNotificationSelectHearing
+                = Optional.ofNullable(sendNotification.getSendNotificationSelectHearing());
+
+        return String.format(RESPONSE_DETAILS, Strings.nullToEmpty(sendNotification.getSendNotificationTitle()),
+                sendNotification.getSendNotificationSubject(),
+                sendNotificationSelectHearing.isPresent() ? sendNotificationSelectHearing.get().getSelectedLabel() : "",
+                sendNotification.getDate(),
+                TRIBUNAL,
+                Strings.nullToEmpty(sendNotification.getSendNotificationCaseManagement()),
+                Strings.nullToEmpty(sendNotification.getSendNotificationResponseTribunal()),
+                Strings.nullToEmpty(sendNotification.getSendNotificationNotify()),
+                Strings.nullToEmpty(sendNotification.getSendNotificationAdditionalInfo()),
+                getSendNotificationDocumentsMarkdown(sendNotification),
+                Strings.nullToEmpty(sendNotification.getSendNotificationWhoCaseOrder()),
+                Strings.nullToEmpty(sendNotification.getSendNotificationFullName()));
+
     }
 
     private void sendRespondentEmail(CaseData caseData, Map<String, String> emailData, RespondentSumType respondent) {

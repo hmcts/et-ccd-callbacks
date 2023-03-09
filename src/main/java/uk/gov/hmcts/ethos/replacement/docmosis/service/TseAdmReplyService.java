@@ -62,7 +62,7 @@ public class TseAdmReplyService {
             + "|Application date | %s|\r\n"
             + "|Details of the application | %s|\r\n"
             + "|Supporting material | %s|\r\n"
-            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
+            + "%s" // Rule92
             + "\r\n";
     private static final String STRING_BR = "<br>";
 

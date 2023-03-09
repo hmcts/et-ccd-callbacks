@@ -10,16 +10,19 @@ module.exports = async function () {
     const I = this;
     //page 1
     I.see('ET3 - Response to Employment tribunal claim (ET1)');
+    I.waitForElement('//button[@class="button"]');
     await I.click(commonConfig.continue);
 
     //Page 2
     await I.waitForText("Is this the correct claimant for the claim you're responding to?", testConfig.TestTimeToWaitForText);
     await I.click("#et3ResponseIsClaimantNameCorrect_Yes");
+    I.waitForElement('//button[@class="button"]');
     await I.click(commonConfig.continue);
 
     //Page 3
     await I.waitForText("What is the respondent's name?", testConfig.TestTimeToWaitForText);
     await I.fillField("#et3ResponseRespondentLegalName", "Annie Thomas");
+    I.waitForElement('//button[@class="button"]');
     await I.click(commonConfig.continue);
 
     //Page 4
@@ -28,6 +31,7 @@ module.exports = async function () {
     await I.click("#et3RespondentAddress_et3RespondentAddress_postcodeLookup > button")
     await I.waitForText("18 addresses found");
     await I.selectOption("#et3RespondentAddress_et3RespondentAddress_addressList","Five Oaks, Druidstone Road, Old St. Mellons, Caerdydd");
+    I.waitForElement('//button[@class="button"]');
     await I.click(commonConfig.continue);
 
     //Page 5
@@ -104,6 +108,7 @@ module.exports = async function () {
     //Page 19
     await I.waitForText("In the respondent party - are you aware of any physical, mental or learning disability or health conditions which requires support?", testConfig.TestTimeToWaitForText);
     await I.checkOption("#et3ResponseRespondentSupportNeeded-No");
+    I.waitForElement('//button[@class="button"]');
     await I.click(commonConfig.continue);
 
     //Page 20

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -24,7 +24,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.setDataForTseApplicationSummaryAndResponses;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper.setDataForTseApplicationSummaryAndResponses;
 
 /**
  * REST controller for the "View open or closed applications" event.
@@ -103,20 +103,19 @@ public class TseViewApplicationsController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setTseViewApplicationSelect(TseHelper.populateOpenOrClosedApplications(caseData));
+        caseData.setTseViewApplicationSelect(TseViewApplicationHelper.populateOpenOrClosedApplications(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/midPopulateSelectedApplicationData", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates data for the selected application")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                }), @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> populateSelectedApplicationData(
 

@@ -25,14 +25,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultString;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
@@ -59,8 +56,6 @@ public final class TseHelper {
 
     private static final String REPLY_OUTPUT_NAME = "%s Reply.pdf";
     private static final String REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-01212.docx";
-    private static final String STRING_BR = "<br>";
-
     private static final String RULE92_YES_OR_NO_MARKUP =
         "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
         + "%s";
@@ -95,86 +90,7 @@ public final class TseHelper {
         + "|Full name | %s|\r\n"
         + "|Sent to | %s|\r\n"
         + "\r\n";
-    private static final String VIEW_APPLICATION_ADMIN_REPLY_MARKUP = "|Response %s | |\r\n"
-            + "|--|--|\r\n"
-            + "%s" // response title
-            + "|Date | %s|\r\n"
-            + "|Sent by | Tribunal|\r\n"
-            + "|Case management order or request? | %s|\r\n"
-            + "%s" // response due
-            + "%s" // party or parties to respond
-            + "%s" // Additional information
-            + "|Supporting material | %s|\r\n"
-            + "%s" // made by
-            + "%s" // name / author
-            + "|Sent to | %s|\r\n"
-            + "\r\n";
 
-    private static final String PARTY_OR_PARTIES_TO_RESPOND = "|Party or parties to respond | %s|\r\n";
-    private static final String RESPONSE_DUE = "|Response due | %s|\r\n";
-    private static final String NAME_OF_ADMIN_RESPONSE_AUTHOR = "|Name | %s|\r\n";
-    private static final String ADMIN_RESPONSE_TITLE = "|Response | %s|\r\n";
-    private static final String ADMIN_RESPONSE_ADDITIONAL_INFORMATION = "|Additional information | %s|\r\n";
-
-    private static String formatAminResponseTitle(TseRespondType reply) {
-        if (!isNullOrEmpty(reply.getEnterResponseTitle())) {
-            return String.format(
-                    ADMIN_RESPONSE_TITLE,
-                    reply.getEnterResponseTitle());
-        }
-        return "";
-    }
-
-    private static String formatAdminResponseAdditionalInfo(TseRespondType reply) {
-        if (!isNullOrEmpty(reply.getAdditionalInformation())) { //
-            return String.format(
-                    ADMIN_RESPONSE_ADDITIONAL_INFORMATION,
-                    reply.getAdditionalInformation());
-        }
-        return "";
-    }
-
-    private static String formatMadeByFullName(TseRespondType reply) {
-        if (!isNullOrEmpty(reply.getMadeByFullName())) { //
-            return String.format(
-                    NAME_OF_ADMIN_RESPONSE_AUTHOR,
-                    reply.getMadeByFullName());
-        }
-        return "";
-    }
-
-    private static String formatResponseDue(TseRespondType reply) {
-        if (!isNullOrEmpty(reply.getIsResponseRequired())) { //
-            return String.format(
-                    RESPONSE_DUE,
-                    reply.getIsResponseRequired());
-        }
-        return "";
-    }
-
-    private static String formatPartyOrPartiesToRespond(TseRespondType reply) {
-        if (!isNullOrEmpty(reply.getSelectPartyRespond())) { //
-            return String.format(
-                    PARTY_OR_PARTIES_TO_RESPOND,
-                    reply.getSelectPartyRespond());
-        }
-        return "";
-    }
-
-    private static final String RESPONSE_LIST_TITLE = "|Responses | |\r\n"
-            + "|--|--|\r\n"
-            + "\r\n";
-
-    private static final String APPLICATION_DETAILS = "|Application | |\r\n"
-            + "|--|--|\r\n"
-            + "|Applicant | %s|\r\n"
-            + "|Type of application | %s|\r\n"
-            + "|Application date | %s|\r\n"
-            + "|What do you want to tell or ask the tribunal? | %s|\r\n"
-            + "|Supporting material | %s|\r\n"
-            + "|Do you want to copy this correspondence to the other party "
-            + "to satisfy the Rules of Procedure? | %s |\r\n"
-            + "\r\n";
     private static final String ADMIN_REPLY_MARKUP_MADE_BY = "|%s made by | %s|\r\n";
 
     private TseHelper() {
@@ -200,21 +116,6 @@ public final class TseHelper {
     private static boolean isNoRespondentReply(List<TseRespondTypeItem> tseRespondTypeItems) {
         return CollectionUtils.isEmpty(tseRespondTypeItems)
             || tseRespondTypeItems.stream().noneMatch(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()));
-    }
-
-    public static DynamicFixedListType populateOpenOrClosedApplications(CaseData caseData) {
-
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
-            return null;
-        }
-
-        boolean selectedClosed = CLOSED_STATE.equals(caseData.getTseViewApplicationOpenOrClosed());
-
-        return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
-                .filter(o -> selectedClosed ? o.getValue().getStatus().equals(CLOSED_STATE)
-                        : !o.getValue().getStatus().equals(CLOSED_STATE))
-                .map(TseHelper::formatDropdownOption)
-                .collect(Collectors.toList()));
     }
 
     private static DynamicValueType formatDropdownOption(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
@@ -263,106 +164,6 @@ public final class TseHelper {
                 document
             )
         );
-    }
-
-    private static GenericTseApplicationType getChosenApplication(CaseData caseData) {
-        return caseData.getGenericTseApplicationCollection()
-                .get(Integer.parseInt(caseData.getTseViewApplicationSelect().getValue().getCode()) - 1).getValue();
-    }
-
-    private static String getDocumentUrls(TseRespondTypeItem tseRespondType) {
-        if (tseRespondType.getValue().getSupportingMaterial() != null) {
-            Pattern pattern = Pattern.compile("^.+?/documents/");
-            return tseRespondType.getValue().getSupportingMaterial().stream()
-                    .map(doc -> {
-                        Matcher matcher = pattern.matcher(doc.getValue().getUploadedDocument().getDocumentBinaryUrl());
-                        String documentLink = matcher.replaceFirst("");
-                        String documentName = doc.getValue().getUploadedDocument().getDocumentFilename();
-                        return String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink,
-                                documentName) + STRING_BR;
-                    }).collect(Collectors.joining(""));
-        }
-        return null;
-    }
-
-    // should be private
-    public static String createResponseTable(List<TseRespondTypeItem> respondList, String applicant) {
-        AtomicInteger i = new AtomicInteger(0);
-        return RESPONSE_LIST_TITLE + respondList.stream().map((TseRespondTypeItem response) -> {
-            i.getAndIncrement();
-            String doc = "N/A";
-            if (ADMIN.equals(response.getValue().getFrom())) {
-                if (response.getValue().getAddDocument() != null) {
-                    Pattern pattern = Pattern.compile("^.+?/documents/");
-                    Matcher matcher = pattern.matcher(response.getValue().getAddDocument().getDocumentBinaryUrl());
-                    String documentLink = matcher.replaceFirst("");
-                    String documentName = response.getValue().getAddDocument().getDocumentFilename();
-                    doc = String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink,
-                            documentName);
-                }
-                return String.format(
-                        VIEW_APPLICATION_ADMIN_REPLY_MARKUP,
-                        i.get(),
-                        formatAminResponseTitle(response.getValue()),
-                        response.getValue().getDate(),
-                        defaultString(response.getValue().getIsCmoOrRequest()),
-                        formatResponseDue(response.getValue()),
-                        formatPartyOrPartiesToRespond(response.getValue()),
-                        formatAdminResponseAdditionalInfo(response.getValue()),
-                        doc,
-                        formatAdminReplyMadeBy(response.getValue()),
-                        formatMadeByFullName(response.getValue()),
-                        defaultString(response.getValue().getSelectPartyNotify()));
-            } else {
-                String links = getDocumentUrls(response);
-                if (links != null) {
-                    doc = links;
-                }
-                return String.format(
-                        RESPONDENT_REPLY_MARKUP_FOR_REPLY,
-                        i.get(),
-                        response.getValue().getFrom(),
-                        response.getValue().getDate(),
-                        applicant.toLowerCase(Locale.ENGLISH),
-                        isNullOrEmpty(response.getValue().getResponse()) ? "N/A"
-                                : defaultString(response.getValue().getResponse()),
-                        doc,
-                        formatRule92(response.getValue().getCopyToOtherParty(),
-                        isNullOrEmpty(response.getValue().getCopyNoGiveDetails())?"N/A":response.getValue().getCopyNoGiveDetails()));
-            }
-        }).collect(Collectors.joining(""));
-    }
-
-    public static void setDataForTseApplicationSummaryAndResponses(CaseData caseData) {
-        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
-        if (CollectionUtils.isEmpty(applications) || getChosenApplication(caseData) == null) {
-            return;
-        }
-        GenericTseApplicationType genericTseApplicationType = getChosenApplication(caseData);
-        String document = "N/A";
-        if (genericTseApplicationType.getDocumentUpload() != null) {
-            Pattern pattern = Pattern.compile("^.+?/documents/");
-            Matcher matcher = pattern.matcher(genericTseApplicationType.getDocumentUpload().getDocumentBinaryUrl());
-            String documentLink = matcher.replaceFirst("");
-            String documentName = genericTseApplicationType.getDocumentUpload().getDocumentFilename();
-            document = String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
-        }
-        String respondTablesCollection = "";
-        if (!CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
-            List<TseRespondTypeItem> respondList = genericTseApplicationType.getRespondCollection();
-            respondTablesCollection = createResponseTable(respondList, genericTseApplicationType.getApplicant());
-        }
-        caseData.setTseApplicationSummaryAndResponsesMarkup(
-                String.format(
-                        APPLICATION_DETAILS, genericTseApplicationType.getApplicant(),
-                        genericTseApplicationType.getType(),
-                        genericTseApplicationType.getDate(),
-                        isNullOrEmpty(genericTseApplicationType.getDetails()) ? "N/A"
-                                : genericTseApplicationType.getDetails(),
-                        document,
-                        isNullOrEmpty(genericTseApplicationType.getCopyToOtherPartyYesOrNo()) ? "N/A"
-                                : genericTseApplicationType.getCopyToOtherPartyYesOrNo()
-                ) + respondTablesCollection);
     }
 
     /**
@@ -568,7 +369,6 @@ public final class TseHelper {
      * @param respondCount Respond count as incrementAndReturnValue()
      * @param applicant GenericTseApplicationType getApplicant()
      * @param docInfo Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
-     *                     documentManagementService.displayDocNameTypeSizeLink()
      * @return Markup String
      */
     public static String formatLegalRepReplyOrClaimantWithRule92(TseRespondType reply, int respondCount,

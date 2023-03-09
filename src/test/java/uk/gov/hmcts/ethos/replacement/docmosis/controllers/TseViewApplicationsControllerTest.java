@@ -41,7 +41,8 @@ class TseViewApplicationsControllerTest {
     private static final String ABOUT_TO_START_URL =
             "/viewRespondentTSEApplications/aboutToStart";
 
-    private static final String MID_POPULATE_SELECTED_APPLICATION = "/viewRespondentTSEApplications/midPopulateSelectedApplicationData";
+    private static final String MID_POPULATE_SELECTED_APPLICATION =
+            "/viewRespondentTSEApplications/midPopulateSelectedApplicationData";
 
     @Autowired
     private MockMvc mockMvc;

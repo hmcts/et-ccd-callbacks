@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondentTellSomethingElseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseRespondentReplyService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -38,6 +39,7 @@ public class TseRespondentReplyController {
 
     private final VerifyTokenService verifyTokenService;
     private final TseRespondentReplyService tseRespondentReplyService;
+    private final RespondentTellSomethingElseService respondentTellSomethingElseService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String SUBMITTED_BODY = "### What happens next \r\n\r\nYou have sent your response to the"
@@ -139,6 +141,7 @@ public class TseRespondentReplyController {
         CaseData caseData = caseDetails.getCaseData();
         TseHelper.saveReplyToApplication(caseData);
 
+        respondentTellSomethingElseService.sendAdminEmail(caseDetails);
         tseRespondentReplyService.sendAcknowledgementAndClaimantEmail(caseDetails, userToken);
 
         TseHelper.resetReplyToApplicationPage(caseData);

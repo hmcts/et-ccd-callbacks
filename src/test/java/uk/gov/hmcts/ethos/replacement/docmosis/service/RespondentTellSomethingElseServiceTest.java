@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
@@ -39,7 +40,9 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -56,6 +59,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PUBLICITY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_VARY_OR_REVOKE_AN_ORDER;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
@@ -70,6 +74,9 @@ class RespondentTellSomethingElseServiceTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private TribunalOfficesService tribunalOfficesService;
 
     @MockBean
     private TornadoService tornadoService;
@@ -103,10 +110,12 @@ class RespondentTellSomethingElseServiceTest {
     @BeforeEach
     void setUp() {
         respondentTellSomethingElseService =
-                new RespondentTellSomethingElseService(emailService, userService, tornadoService);
+                new RespondentTellSomethingElseService(emailService, userService, tribunalOfficesService,
+                        tornadoService);
         tseService = new TseService();
 
         ReflectionTestUtils.setField(respondentTellSomethingElseService, "emailTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(respondentTellSomethingElseService, "exuiUrl", "exui/cases/case-details/");
 
         UserDetails userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);
@@ -449,6 +458,51 @@ class RespondentTellSomethingElseServiceTest {
         CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
 
         assertThat(respondentTellSomethingElseService.generateTableMarkdown(caseData), is(""));
+    }
+
+    @Test
+    void sendAdminEmail_DoesNothingWhenNoManagingOfficeIsSet() {
+        CaseData caseData = createCaseData("", YES);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        respondentTellSomethingElseService.sendAdminEmail(caseDetails);
+        verify(emailService, never()).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void sendAdminEmail_DoesNothingWhenNoManagingOfficeHasNoEmail() {
+        CaseData caseData = createCaseData("", YES);
+        CaseDetails caseDetails = new CaseDetails();
+        caseData.setManagingOffice("Aberdeen");
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        respondentTellSomethingElseService.sendAdminEmail(caseDetails);
+        verify(emailService, never()).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void sendAdminEmail_SendsEmail() {
+        CaseData caseData = createCaseData("", YES);
+        CaseDetails caseDetails = new CaseDetails();
+        caseData.setManagingOffice("Bristol");
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        when(tribunalOfficesService.getTribunalOffice(any())).thenReturn(TribunalOffice.BRISTOL);
+        respondentTellSomethingElseService.sendAdminEmail(caseDetails);
+
+        Map<String, String> caseNumber = Map.of("caseNumber", "test",
+                "emailFlag", "",
+                "claimant", "claimant",
+                "respondents", "Father Ted",
+                "date", "Not set",
+                "url", "exui/cases/case-details/669718251103419");
+
+        verify(emailService, times(1)).sendEmail(any(), any(), eq(caseNumber));
+
     }
 
     private List<GenericTseApplicationTypeItem> generateGenericTseApplicationList() {

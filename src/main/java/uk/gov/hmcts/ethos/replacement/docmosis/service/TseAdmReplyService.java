@@ -56,14 +56,14 @@ public class TseAdmReplyService {
     private final DocumentManagementService documentManagementService;
 
     private static final String APP_DETAILS = "| | |\r\n"
-        + "|--|--|\r\n"
-        + "|Applicant | %s|\r\n"
-        + "|Type of application | %s|\r\n"
-        + "|Application date | %s|\r\n"
-        + "|Give details | %s|\r\n"
-        + "|Supporting material | %s|\r\n"
-        + "%s" // Rule92
-        + "\r\n";
+            + "|--|--|\r\n"
+            + "|Applicant | %s|\r\n"
+            + "|Type of application | %s|\r\n"
+            + "|Application date | %s|\r\n"
+            + "|Details of the application | %s|\r\n"
+            + "|Supporting material | %s|\r\n"
+            + "%s" // Rule92
+            + "\r\n";
     private static final String STRING_BR = "<br>";
 
     private static final String RESPONSE_REQUIRED =

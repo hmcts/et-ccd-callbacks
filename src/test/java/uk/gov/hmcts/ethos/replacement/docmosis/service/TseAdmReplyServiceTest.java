@@ -93,7 +93,7 @@ class TseAdmReplyServiceTest {
     }
 
     @Test
-    void initialTseAdminTableMarkUp_ReturnString() {
+    void initialTseAdminTableMarkUp_Rule92Yes_ReturnString() {
         TseRespondType tseRespondType = TseRespondType.builder()
             .from(CLAIMANT_TITLE)
             .date("23 December 2022")
@@ -102,7 +102,7 @@ class TseAdmReplyServiceTest {
             .supportingMaterial(List.of(
                 createDocumentTypeItem("image.png"),
                 createDocumentTypeItem("Form.pdf")))
-            .copyToOtherParty(NO)
+            .copyToOtherParty(YES)
             .build();
 
         TseRespondTypeItem tseRespondTypeItem = TseRespondTypeItem.builder()
@@ -166,7 +166,68 @@ class TseAdmReplyServiceTest {
             + "|What’s your response to the respondent’s application? | Response Details|\r\n"
             + "|Supporting material | " + fileDisplay2 + "<br>" + fileDisplay3 + "<br>" + "|\r\n"
             + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? "
-            + "| No|\r\n"
+            + "| Yes|\r\n"
+            + "\r\n";
+
+        String actual = tseAdmReplyService.initialTseAdmReplyTableMarkUp(caseData, AUTH_TOKEN);
+
+        assertThat(actual)
+            .isEqualTo(expected);
+    }
+
+    @Test
+    void initialTseAdminTableMarkUp_Rule92No_ReturnString() {
+        TseRespondTypeItem tseRespondTypeItem = TseRespondTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(TseRespondType.builder()
+                .from(CLAIMANT_TITLE)
+                .date("23 December 2022")
+                .response("Response Details")
+                .copyToOtherParty(NO)
+                .copyNoGiveDetails("No Details")
+                .build())
+            .build();
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = GenericTseApplicationTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(TseApplicationBuilder.builder()
+                .withNumber("1")
+                .withType(TSE_APP_AMEND_RESPONSE)
+                .withApplicant(RESPONDENT_TITLE)
+                .withDate("13 December 2022")
+                .withDetails("Details Text")
+                .withCopyToOtherPartyYesOrNo(NO)
+                .withCopyToOtherPartyText("Rule92 Text")
+                .withStatus(OPEN_STATE)
+                .withRespondCollection(List.of(tseRespondTypeItem))
+                .build())
+            .build();
+
+        caseData.setGenericTseApplicationCollection(
+            List.of(genericTseApplicationTypeItem)
+        );
+
+        caseData.setTseAdminSelectApplication(
+            DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
+
+        String expected = "| | |\r\n"
+            + "|--|--|\r\n"
+            + "|Applicant | Respondent|\r\n"
+            + "|Type of application | Amend response|\r\n"
+            + "|Application date | 13 December 2022|\r\n"
+            + "|Give details | Details Text|\r\n"
+            + "|Supporting material | |\r\n"
+            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | No|\r\n"
+            + "|Details of why you do not want to inform the other party | Rule92 Text|\r\n"
+            + "\r\n"
+            + "|Response 1 | |\r\n"
+            + "|--|--|\r\n"
+            + "|Response from | Claimant|\r\n"
+            + "|Response date | 23 December 2022|\r\n"
+            + "|What’s your response to the respondent’s application? | Response Details|\r\n"
+            + "|Supporting material | |\r\n"
+            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | No|\r\n"
+            + "|Details of why you do not want to inform the other party | No Details|\r\n"
             + "\r\n";
 
         String actual = tseAdmReplyService.initialTseAdmReplyTableMarkUp(caseData, AUTH_TOKEN);

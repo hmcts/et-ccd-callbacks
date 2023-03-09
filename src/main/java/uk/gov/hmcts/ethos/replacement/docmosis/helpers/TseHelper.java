@@ -382,22 +382,23 @@ public final class TseHelper {
         }
 
         genericTseApplicationType.getRespondCollection().add(TseRespondTypeItem.builder()
-             .id(UUID.randomUUID().toString())
-             .value(
-                 TseRespondType.builder()
-                     .response(caseData.getTseResponseText())
-                     .supportingMaterial(caseData.getTseResponseSupportingMaterial())
-                     .hasSupportingMaterial(caseData.getTseResponseHasSupportingMaterial())
-                     .from(RESPONDENT_TITLE)
-                     .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                     .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
-                     .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
-                     .build()
-             ).build());
+            .id(UUID.randomUUID().toString())
+            .value(
+                TseRespondType.builder()
+                    .response(caseData.getTseResponseText())
+                    .supportingMaterial(caseData.getTseResponseSupportingMaterial())
+                    .hasSupportingMaterial(caseData.getTseResponseHasSupportingMaterial())
+                    .from(RESPONDENT_TITLE)
+                    .date(UtilHelper.formatCurrentDate(LocalDate.now()))
+                    .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
+                    .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
+                    .build()
+            ).build());
 
         genericTseApplicationType.setResponsesCount(
-            String.valueOf(genericTseApplicationType.getRespondCollection().size()));
-        }
+            String.valueOf(genericTseApplicationType.getRespondCollection().size())
+        );
+    }
 
     /**
      * Clears fields that are used when responding to an application.
@@ -447,23 +448,22 @@ public final class TseHelper {
         GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
         TseReplyData data = createDataForTseReply(caseData.getEthosCaseReference(), selectedApplication);
         TseReplyDocument document = TseReplyDocument.builder()
-                .accessKey(accessKey)
-                .outputName(String.format(REPLY_OUTPUT_NAME, selectedApplication.getType()))
-                .templateName(REPLY_TEMPLATE_NAME)
-                .data(data).build();
+            .accessKey(accessKey)
+            .outputName(String.format(REPLY_OUTPUT_NAME, selectedApplication.getType()))
+            .templateName(REPLY_TEMPLATE_NAME)
+            .data(data).build();
         return new ObjectMapper().writeValueAsString(document);
     }
 
     /**
      * Personalisation for sending Acknowledgement for Response.
-     * 
      * @param caseDetails contains all the case data
-     * @param document    TSE Reply.pdf
+     * @param document TSE Reply.pdf
      * @return Personalisation For Response
      * @throws NotificationClientException Throw Exception
      */
     public static Map<String, Object> getPersonalisationForResponse(CaseDetails caseDetails, byte[] document)
-            throws NotificationClientException {
+        throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
@@ -477,6 +477,7 @@ public final class TseHelper {
             "respondents", Helper.getRespondentNames(caseData),
             "linkToDocument", documentJson
         );
+    }
 
     public static Map<String, Object> getPersonalisationForAcknowledgement(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
@@ -489,6 +490,7 @@ public final class TseHelper {
             "shortText", selectedApplication.getType(),
             "caseId", caseDetails.getCaseId()
         );
+    }
 
     private static TseReplyData createDataForTseReply(String caseId, GenericTseApplicationType application) {
         TseRespondType replyType = application.getRespondCollection().get(0).getValue();
@@ -523,7 +525,7 @@ public final class TseHelper {
 
     /**
      * Format Admin response markup.
-     * @param reply        Respond as TseRespondType
+     * @param reply Respond as TseRespondType
      * @param respondCount Respond count as incrementAndReturnValue()
      * @param docInfo Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
      * @return Markup String

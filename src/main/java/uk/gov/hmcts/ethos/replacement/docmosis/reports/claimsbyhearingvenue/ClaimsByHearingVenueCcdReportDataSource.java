@@ -15,10 +15,10 @@ public class ClaimsByHearingVenueCcdReportDataSource implements ClaimsByHearingV
     private final CcdClient ccdClient;
 
     @Override
-    public List<ClaimsByHearingVenueSubmitEvent> getData(String caseTypeId,
+    public List<ClaimsByHearingVenueSubmitEvent> getData(String managingOffice, String caseTypeId,
                                                          String listingDateFrom, String listingDateTo) {
         try {
-            String query = ClaimsByHearingVenueESQuery.create(listingDateFrom, listingDateTo);
+            String query = ClaimsByHearingVenueESQuery.create(listingDateFrom, listingDateTo, managingOffice);
             return ccdClient.claimsByHearingVenueSearch(authToken, caseTypeId, query);
         } catch (Exception e) {
             throw new ReportException(String.format(

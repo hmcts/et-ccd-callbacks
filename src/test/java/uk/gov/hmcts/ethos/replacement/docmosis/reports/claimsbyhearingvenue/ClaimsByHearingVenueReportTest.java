@@ -76,7 +76,7 @@ class ClaimsByHearingVenueReportTest {
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvents.add(submitEventTwo);
 
-        when(claimsByHearingVenueReportDataSource.getData(
+        when(claimsByHearingVenueReportDataSource.getData(OFFICE_NAME,
                 UtilHelper.getListingCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID), RANGE_START_DATE, RANGE_END_DATE))
                 .thenReturn(submitEvents);
 
@@ -110,7 +110,7 @@ class ClaimsByHearingVenueReportTest {
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvents.add(submitEventOne);
 
-        when(claimsByHearingVenueReportDataSource.getData(
+        when(claimsByHearingVenueReportDataSource.getData(OFFICE_NAME,
                 UtilHelper.getListingCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID), SINGLE_START_DATE, SINGLE_END_DATE))
                 .thenReturn(submitEvents);
 
@@ -145,7 +145,7 @@ class ClaimsByHearingVenueReportTest {
                 .withRespondentCollection(null)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvents.add(submitEventOne);
-        when(claimsByHearingVenueReportDataSource.getData(
+        when(claimsByHearingVenueReportDataSource.getData(OFFICE_NAME,
                 UtilHelper.getListingCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID), RANGE_START_DATE, RANGE_END_DATE))
                 .thenReturn(submitEvents);
 
@@ -185,7 +185,7 @@ class ClaimsByHearingVenueReportTest {
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvents.add(submitEventOne);
 
-        when(claimsByHearingVenueReportDataSource.getData(
+        when(claimsByHearingVenueReportDataSource.getData(OFFICE_NAME,
                 UtilHelper.getListingCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID), RANGE_START_DATE, RANGE_END_DATE))
                 .thenReturn(submitEvents);
         ClaimsByHearingVenueReportData reportData = claimsByHearingVenueReport
@@ -242,7 +242,7 @@ class ClaimsByHearingVenueReportTest {
                 .withRespondentCollection(respondentCollection)
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvents.add(submitEventOne);
-        when(claimsByHearingVenueReportDataSource.getData(
+        when(claimsByHearingVenueReportDataSource.getData(OFFICE_NAME,
                 UtilHelper.getListingCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID), RANGE_START_DATE, RANGE_END_DATE))
                 .thenReturn(submitEvents);
 
@@ -292,7 +292,7 @@ class ClaimsByHearingVenueReportTest {
                 .buildAsSubmitEvent(ACCEPTED_STATE);
         submitEvents.add(submitEventThree);
 
-        when(claimsByHearingVenueReportDataSource.getData(
+        when(claimsByHearingVenueReportDataSource.getData(OFFICE_NAME,
                 UtilHelper.getListingCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID), RANGE_START_DATE, RANGE_END_DATE))
                 .thenReturn(submitEvents);
 
@@ -330,7 +330,7 @@ class ClaimsByHearingVenueReportTest {
         ClaimsByHearingVenueReportParams singleHearingDateTypeReportParams = new ClaimsByHearingVenueReportParams(
                 ENGLANDWALES_LISTING_CASE_TYPE_ID,
                 OFFICE_NAME, SINGLE_START_DATE, SINGLE_END_DATE, SINGLE_HEARING_DATE_TYPE, TEST_USERNAME);
-        when(claimsByHearingVenueReportDataSource.getData(
+        when(claimsByHearingVenueReportDataSource.getData(OFFICE_NAME,
                 UtilHelper.getListingCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID), SINGLE_START_DATE, SINGLE_END_DATE))
                 .thenReturn(submitEvents);
         ClaimsByHearingVenueReportData reportData = claimsByHearingVenueReport

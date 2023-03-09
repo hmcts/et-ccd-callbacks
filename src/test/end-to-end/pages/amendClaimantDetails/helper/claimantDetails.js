@@ -84,7 +84,7 @@ function verifyClaimantDetails() {
     I.see('United Kingdom');
     I.see('Work phone number');
     I.see('01234567870');
-    I.see('Claimant Hearing Preferences');
+    I.see('Additional Claimant Information');
     I.see('What are the claimant\'s hearing preferences');
     I.see('Video');
     I.see('Phone');

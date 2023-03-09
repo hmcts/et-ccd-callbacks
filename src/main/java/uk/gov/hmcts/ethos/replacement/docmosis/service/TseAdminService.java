@@ -26,6 +26,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -33,7 +34,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantForDecision;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithRule92;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithoutRule92;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
@@ -65,7 +68,7 @@ public class TseAdminService {
         + "|Application date | %s|\r\n"
         + "|What do you want to tell or ask the tribunal? | %s|\r\n"
         + "|Supporting material | %s|\r\n"
-        + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
+        + "%s" // Rule92
         + "\r\n";
 
     private static final String CLOSE_APP_DECISION_DETAILS = "|Decision | |\r\n"
@@ -93,7 +96,7 @@ public class TseAdminService {
         GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem != null) {
             caseData.setTseAdminTableMarkUp(initialTseAdminAppDetails(applicationTypeItem.getValue(), authToken)
-                + initialTseAdminRespondDetails(applicationTypeItem.getValue(), authToken));
+                + initialRespondDetailsWithoutRule92(applicationTypeItem.getValue(), authToken));
         }
     }
 
@@ -103,12 +106,13 @@ public class TseAdminService {
             applicationType.getApplicant(),
             applicationType.getType(),
             applicationType.getDate(),
-            applicationType.getDetails(),
-            documentManagementService.displayDocNameTypeSizeLink(applicationType.getDocumentUpload(), authToken)
+            defaultString(applicationType.getDetails()),
+            defaultString(documentManagementService.displayDocNameTypeSizeLink(
+                applicationType.getDocumentUpload(), authToken))
         );
     }
 
-    private String initialTseAdminRespondDetails(GenericTseApplicationType applicationType, String authToken) {
+    private String initialRespondDetailsWithoutRule92(GenericTseApplicationType applicationType, String authToken) {
         if (CollectionUtils.isEmpty(applicationType.getRespondCollection())) {
             return "";
         }
@@ -119,9 +123,9 @@ public class TseAdminService {
                     ? formatAdminReply(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),
-                        documentManagementService.displayDocNameTypeSizeLink(
-                            replyItem.getValue().getAddDocument(), authToken))
-                    : formatLegalRepReplyOrClaimantForDecision(
+                        defaultString(documentManagementService.displayDocNameTypeSizeLink(
+                            replyItem.getValue().getAddDocument(), authToken)))
+                    : formatLegalRepReplyOrClaimantWithoutRule92(
                         replyItem.getValue(),
                         respondCount.incrementAndReturnValue(),
                         populateListDocWithInfoAndLink(replyItem.getValue().getSupportingMaterial(), authToken)))
@@ -298,11 +302,12 @@ public class TseAdminService {
             applicationTypeItem.getValue().getApplicant(),
             applicationTypeItem.getValue().getType(),
             applicationTypeItem.getValue().getDate(),
-            applicationTypeItem.getValue().getDetails(),
+            defaultString(applicationTypeItem.getValue().getDetails()),
             getApplicationDocumentLink(applicationTypeItem, authToken),
-            applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo()
+            formatRule92(applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo(),
+                applicationTypeItem.getValue().getCopyToOtherPartyText())
         )
-            + initialTseAdminRespondDetails(applicationTypeItem.getValue(), authToken)
+            + initialRespondDetailsWithRule92(applicationTypeItem.getValue(), authToken)
             + decisionsMarkdown;
 
     }
@@ -323,6 +328,27 @@ public class TseAdminService {
 
         return documentManagementService
             .displayDocNameTypeSizeLink(applicationTypeItem.getValue().getDocumentUpload(), authToken);
+    }
+
+    private String initialRespondDetailsWithRule92(GenericTseApplicationType application, String authToken) {
+        if (CollectionUtils.isEmpty(application.getRespondCollection())) {
+            return "";
+        }
+        IntWrapper respondCount = new IntWrapper(0);
+        return application.getRespondCollection().stream()
+            .map(replyItem ->
+                ADMIN.equals(replyItem.getValue().getFrom())
+                    ? formatAdminReply(
+                        replyItem.getValue(),
+                        respondCount.incrementAndReturnValue(),
+                        defaultString(documentManagementService.displayDocNameTypeSizeLink(
+                            replyItem.getValue().getAddDocument(), authToken)))
+                    : formatLegalRepReplyOrClaimantWithRule92(
+                        replyItem.getValue(),
+                        respondCount.incrementAndReturnValue(),
+                        application.getApplicant(),
+                        populateListDocWithInfoAndLink(replyItem.getValue().getSupportingMaterial(), authToken)))
+            .collect(Collectors.joining(""));
     }
 
     /**

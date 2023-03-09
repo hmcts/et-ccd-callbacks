@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.common.Strings;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -286,6 +287,9 @@ public final class Helper {
     }
 
     public static String getRespondentNames(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            return "";
+        }
         return caseData.getRespondentCollection().stream()
             .map(o -> o.getValue().getRespondentName())
             .collect(Collectors.joining(", "));

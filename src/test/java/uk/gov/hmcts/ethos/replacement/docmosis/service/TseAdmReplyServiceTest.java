@@ -215,7 +215,7 @@ class TseAdmReplyServiceTest {
             + "|Applicant | Respondent|\r\n"
             + "|Type of application | Amend response|\r\n"
             + "|Application date | 13 December 2022|\r\n"
-            + "|Give details | Details Text|\r\n"
+            + "|Details of the application | Details Text|\r\n"
             + "|Supporting material | |\r\n"
             + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | No|\r\n"
             + "|Details of why you do not want to inform the other party | Rule92 Text|\r\n"

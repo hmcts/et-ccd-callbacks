@@ -188,6 +188,9 @@ public class SendNotificationService {
     }
 
     private String getSendNotificationDocumentsMarkdown(SendNotificationType sendNotification) {
+        if(sendNotification.getSendNotificationUploadDocument() == null) {
+            return "";
+        }
         List<String> documents = sendNotification.getSendNotificationUploadDocument().stream()
                 .map(documentTypeItem -> getSendNotificationSingleDocumentMarkdown(documentTypeItem))
                 .collect(Collectors.toList());
@@ -201,7 +204,7 @@ public class SendNotificationService {
                 = Optional.ofNullable(sendNotification.getSendNotificationSelectHearing());
 
         return String.format(RESPONSE_DETAILS, Strings.nullToEmpty(sendNotification.getSendNotificationTitle()),
-                sendNotification.getSendNotificationSubject(),
+                Strings.nullToEmpty(sendNotification.getSendNotificationSubject().toString()),
                 sendNotificationSelectHearing.isPresent() ? sendNotificationSelectHearing.get().getSelectedLabel() : "",
                 sendNotification.getDate(),
                 TRIBUNAL,

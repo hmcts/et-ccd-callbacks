@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.util.List;
 import java.util.Locale;
@@ -114,11 +115,7 @@ public final class TseViewApplicationHelper {
         GenericTseApplicationType genericTseApplicationType = getChosenApplication(caseData);
         String document = "N/A";
         if (genericTseApplicationType.getDocumentUpload() != null) {
-            Pattern pattern = Pattern.compile("^.+?/documents/");
-            Matcher matcher = pattern.matcher(genericTseApplicationType.getDocumentUpload().getDocumentBinaryUrl());
-            String documentLink = matcher.replaceFirst("");
-            String documentName = genericTseApplicationType.getDocumentUpload().getDocumentFilename();
-            document = String.format(DOCUMENT_LINK, documentLink, documentName);
+            document = createLinkForUploadedDocument(genericTseApplicationType.getDocumentUpload());
         }
         String respondTablesCollection = "";
         if (!CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
@@ -207,33 +204,26 @@ public final class TseViewApplicationHelper {
 
     private static String getDocumentUrls(TseRespondType tseRespondType) {
         if (tseRespondType.getSupportingMaterial() != null) {
-            Pattern pattern = Pattern.compile("^.+?/documents/");
             return tseRespondType.getSupportingMaterial().stream()
-                    .map(doc -> {
-                        Matcher matcher = pattern.matcher(doc.getValue().getUploadedDocument().getDocumentBinaryUrl());
-                        String documentLink = matcher.replaceFirst("");
-                        String documentName = doc.getValue().getUploadedDocument().getDocumentFilename();
-                        return String.format(DOCUMENT_LINK, documentLink, documentName) + STRING_BR;
-                    }).collect(Collectors.joining(""));
+                    .map(doc -> createLinkForUploadedDocument(doc.getValue().getUploadedDocument())
+                            + STRING_BR)
+                    .collect(Collectors.joining(""));
         }
         return null;
     }
 
-    private static String createLinkForAdminResponseUploadedDoc(TseRespondType tseRespondType) {
-        if (tseRespondType.getAddDocument() != null) {
-            Pattern pattern = Pattern.compile("^.+?/documents/");
-            Matcher matcher = pattern.matcher(tseRespondType.getAddDocument().getDocumentBinaryUrl());
-            String documentLink = matcher.replaceFirst("");
-            String documentName = tseRespondType.getAddDocument().getDocumentFilename();
-            return String.format(DOCUMENT_LINK, documentLink, documentName);
-        }
-        return null;
+    private static String createLinkForUploadedDocument(UploadedDocumentType document) {
+        Pattern pattern = Pattern.compile("^.+?/documents/");
+        Matcher matcher = pattern.matcher(document.getDocumentBinaryUrl());
+        String documentLink = matcher.replaceFirst("");
+        String documentName = document.getDocumentFilename();
+        return String.format(DOCUMENT_LINK, documentLink, documentName);
     }
 
     private static String createAdminResponse(TseRespondType response, AtomicInteger count) {
         String doc = "N/A";
-        if (createLinkForAdminResponseUploadedDoc(response) != null) {
-            doc = createLinkForAdminResponseUploadedDoc(response);
+        if (response.getAddDocument() != null) {
+            doc = createLinkForUploadedDocument(response.getAddDocument());
         }
         return String.format(
                 VIEW_APPLICATION_ADMIN_REPLY_MARKUP,

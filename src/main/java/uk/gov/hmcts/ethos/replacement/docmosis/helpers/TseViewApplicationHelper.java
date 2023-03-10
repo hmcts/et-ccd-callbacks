@@ -124,6 +124,12 @@ public final class TseViewApplicationHelper {
         // Access through static methods
     }
 
+    /**
+     * Populates a dynamic list with either open or closed applications
+     * for the tell something else 'view an application' dropdown selector.
+     * @param caseData
+     * @return DynamicFixedListType
+     */
     public static DynamicFixedListType populateOpenOrClosedApplications(CaseData caseData) {
 
         if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
@@ -223,6 +229,11 @@ public final class TseViewApplicationHelper {
         }).collect(Collectors.joining(""));
     }
 
+    /**
+     * Set the markup for an application summary and a table of responses
+     * for the 'view an application' event.
+     * @param caseData
+     */
     public static void setDataForTseApplicationSummaryAndResponses(CaseData caseData) {
         List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
         if (CollectionUtils.isEmpty(applications) || getChosenApplication(caseData) == null) {

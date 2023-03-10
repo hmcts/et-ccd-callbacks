@@ -74,7 +74,8 @@ public final class TseViewApplicationHelper {
             + "to satisfy the Rules of Procedure? | %s |\r\n"
             + "\r\n";
     private static final String ADMIN_REPLY_MARKUP_MADE_BY = "|%s made by | %s|\r\n";
-
+    private static final String DOCUMENT_LINK = "<a href=\"/documents/%s\" target=\"_blank\">%s</a>";
+    
     private TseViewApplicationHelper() {
         // Access through static methods
     }
@@ -117,7 +118,7 @@ public final class TseViewApplicationHelper {
             Matcher matcher = pattern.matcher(genericTseApplicationType.getDocumentUpload().getDocumentBinaryUrl());
             String documentLink = matcher.replaceFirst("");
             String documentName = genericTseApplicationType.getDocumentUpload().getDocumentFilename();
-            document = String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
+            document = String.format(DOCUMENT_LINK, documentLink, documentName);
         }
         String respondTablesCollection = "";
         if (!CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
@@ -212,8 +213,7 @@ public final class TseViewApplicationHelper {
                         Matcher matcher = pattern.matcher(doc.getValue().getUploadedDocument().getDocumentBinaryUrl());
                         String documentLink = matcher.replaceFirst("");
                         String documentName = doc.getValue().getUploadedDocument().getDocumentFilename();
-                        return String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink,
-                                documentName) + STRING_BR;
+                        return String.format(DOCUMENT_LINK, documentLink, documentName) + STRING_BR;
                     }).collect(Collectors.joining(""));
         }
         return null;
@@ -225,8 +225,7 @@ public final class TseViewApplicationHelper {
             Matcher matcher = pattern.matcher(tseRespondType.getAddDocument().getDocumentBinaryUrl());
             String documentLink = matcher.replaceFirst("");
             String documentName = tseRespondType.getAddDocument().getDocumentFilename();
-            return String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink,
-                    documentName);
+            return String.format(DOCUMENT_LINK, documentLink, documentName);
         }
         return null;
     }

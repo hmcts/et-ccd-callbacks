@@ -24,6 +24,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -344,7 +345,8 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
-    public CaseData createECC(CaseDetails caseDetails, String authToken, List<String> errors, String callback) {
+    public CaseData createECC(CaseDetails caseDetails, String authToken, List<String> errors, String callback)
+            throws IOException {
         CaseData currentCaseData = caseDetails.getCaseData();
         List<SubmitEvent> submitEvents = getCasesES(caseDetails, authToken);
         if (submitEvents != null && !submitEvents.isEmpty()) {
@@ -362,8 +364,7 @@ public class CaseManagementForCaseWorkerService {
                         currentCaseData.setCaseSource(FLAG_ECC);
                         break;
                     default:
-                        sendUpdateSingleCaseECC(authToken, caseDetails, submitEvent.getCaseData(),
-                                String.valueOf(submitEvent.getCaseId()));
+                        sendUpdateSingleCaseECC(authToken, caseDetails, String.valueOf(submitEvent.getCaseId()));
                 }
             }
         } else {
@@ -382,23 +383,25 @@ public class CaseManagementForCaseWorkerService {
     }
 
     private void sendUpdateSingleCaseECC(String authToken, CaseDetails currentCaseDetails,
-                                         CaseData originalCaseData, String caseIdToLink) {
+                                         String caseIdToLink) throws IOException {
+        CCDRequest returnedRequest = ccdClient.startEventForCase(authToken, currentCaseDetails.getCaseTypeId(),
+                currentCaseDetails.getJurisdiction(), caseIdToLink);
+        CaseData returnedRequestCaseData = returnedRequest.getCaseDetails().getCaseData();
         try {
             EccCounterClaimTypeItem eccCounterClaimTypeItem = new EccCounterClaimTypeItem();
             EccCounterClaimType eccCounterClaimType = new EccCounterClaimType();
             eccCounterClaimType.setCounterClaim(currentCaseDetails.getCaseData().getEthosCaseReference());
             eccCounterClaimTypeItem.setId(UUID.randomUUID().toString());
             eccCounterClaimTypeItem.setValue(eccCounterClaimType);
-            if (originalCaseData.getEccCases() != null) {
-                originalCaseData.getEccCases().add(eccCounterClaimTypeItem);
+            if (returnedRequestCaseData.getEccCases() != null) {
+                returnedRequestCaseData.getEccCases().add(eccCounterClaimTypeItem);
             } else {
-                originalCaseData.setEccCases(
+                returnedRequestCaseData.setEccCases(
                         new ArrayList<>(Collections.singletonList(eccCounterClaimTypeItem)));
             }
-            FlagsImageHelper.buildFlagsImageFileName(currentCaseDetails.getCaseTypeId(), originalCaseData);
-            CCDRequest returnedRequest = ccdClient.startEventForCase(authToken, currentCaseDetails.getCaseTypeId(),
-                    currentCaseDetails.getJurisdiction(), caseIdToLink);
-            ccdClient.submitEventForCase(authToken, originalCaseData, currentCaseDetails.getCaseTypeId(),
+            FlagsImageHelper.buildFlagsImageFileName(currentCaseDetails.getCaseTypeId(), returnedRequestCaseData);
+
+            ccdClient.submitEventForCase(authToken, returnedRequestCaseData, currentCaseDetails.getCaseTypeId(),
                     currentCaseDetails.getJurisdiction(), returnedRequest, caseIdToLink);
         } catch (Exception e) {
             throw new CaseCreationException(MESSAGE + caseIdToLink + e.getMessage());

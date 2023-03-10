@@ -568,7 +568,7 @@ public class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    public void midRespondentECC() {
+    public void midRespondentECC() throws IOException {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
                 .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
@@ -578,7 +578,7 @@ public class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    public void midRespondentECCWithStruckOut() {
+    public void midRespondentECCWithStruckOut() throws IOException {
         CaseData caseData = new CaseData();
         caseData.setRespondentCollection(createRespondentCollection(false));
         submitEvent.setCaseData(caseData);
@@ -591,7 +591,7 @@ public class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    public void midRespondentECCEmpty() {
+    public void midRespondentECCEmpty() throws IOException {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
                 .thenReturn(null);
@@ -602,7 +602,7 @@ public class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    public void midRespondentECCWithNoRespondentECC() {
+    public void midRespondentECCWithNoRespondentECC() throws IOException {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
                 .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
@@ -613,7 +613,7 @@ public class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    public void createECC() {
+    public void createECC() throws IOException {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
                 .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
@@ -627,20 +627,22 @@ public class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    public void linkOriginalCaseECC() {
+    public void linkOriginalCaseECC() throws IOException {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
                 .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+        when(ccdClient.startEventForCase(anyString(), anyString(), anyString(),anyString())).thenReturn(ccdRequest10);
         assertEquals("11111", caseManagementForCaseWorkerService.createECC(
                 manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                 new ArrayList<>(), SUBMITTED_CALLBACK).getCaseRefECC());
     }
 
     @Test
-    public void linkOriginalCaseECCCounterClaims() {
+    public void linkOriginalCaseECCCounterClaims() throws IOException {
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(
                 isA(String.class), eq(AUTH_TOKEN), isA(String.class), isA(List.class)))
                 .thenReturn(new ArrayList(Collections.singleton(submitEvent)));
+        when(ccdClient.startEventForCase(anyString(), anyString(), anyString(),anyString())).thenReturn(ccdRequest10);
         assertEquals("72632632", caseManagementForCaseWorkerService.createECC(
                 manchesterCcdRequest.getCaseDetails(), AUTH_TOKEN,
                 new ArrayList<>(), SUBMITTED_CALLBACK).getEccCases().get(0).getValue().getCounterClaim());
@@ -679,7 +681,7 @@ public class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    public void createECCFromClosedCaseWithoutET3() {
+    public void createECCFromClosedCaseWithoutET3() throws IOException {
         submitEvent.setState("Closed");
         submitEvent.getCaseData().getRespondentCollection().get(0).getValue().setResponseReceived(NO);
         when(caseRetrievalForCaseWorkerService.casesRetrievalESRequest(

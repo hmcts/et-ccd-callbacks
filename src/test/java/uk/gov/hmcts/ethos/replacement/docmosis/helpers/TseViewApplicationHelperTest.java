@@ -119,13 +119,6 @@ public class TseViewApplicationHelperTest {
         assertThat(caseData.getTseApplicationSummaryAndResponsesMarkup(), is(expected));
     }
 
-    private DocumentTypeItem createDocumentTypeItem(String fileName) {
-        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
-        documentTypeItem.setId("1234");
-        documentTypeItem.setValue(DocumentTypeBuilder.builder().withUploadedDocument(fileName, "1234").build());
-        return documentTypeItem;
-    }
-
     @Test
     public void setDataForTseApplicationSummaryAndResponses_withApplicationWithDocument_setsApplicationSummary() {
         UploadedDocumentType documentType =
@@ -143,13 +136,6 @@ public class TseViewApplicationHelperTest {
                 + "to satisfy the Rules of Procedure? | N/A |\r\n\r\n";
 
         assertThat(caseData.getTseApplicationSummaryAndResponsesMarkup(), is(expected));
-    }
-
-    private UploadedDocumentType createUploadedDocumentType(String fileName) {
-        return UploadedDocumentBuilder.builder()
-            .withFilename(fileName)
-            .withUuid("1234")
-            .build();
     }
 
     @Test
@@ -222,5 +208,19 @@ public class TseViewApplicationHelperTest {
         
         assertThat(caseData.getTseApplicationSummaryAndResponsesMarkup(), is(expected));
 
+    }
+
+    private UploadedDocumentType createUploadedDocumentType(String fileName) {
+        return UploadedDocumentBuilder.builder()
+                .withFilename(fileName)
+                .withUuid("1234")
+                .build();
+    }
+
+    private DocumentTypeItem createDocumentTypeItem(String fileName) {
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        documentTypeItem.setId("1234");
+        documentTypeItem.setValue(DocumentTypeBuilder.builder().withUploadedDocument(fileName, "1234").build());
+        return documentTypeItem;
     }
 }

@@ -26,7 +26,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRule92;
 
 @Slf4j
-@SuppressWarnings({"PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 public final class TseViewApplicationHelper {
 
     private static final String STRING_BR = "<br>";
@@ -75,6 +75,70 @@ public final class TseViewApplicationHelper {
             + "\r\n";
     private static final String ADMIN_REPLY_MARKUP_MADE_BY = "|%s made by | %s|\r\n";
 
+    private TseViewApplicationHelper() {
+        // Access through static methods
+    }
+
+    /**
+     * Populates a dynamic list with either open or closed applications
+     * for the tell something else 'view an application' dropdown selector.
+     * @param caseData - the caseData contains the values for the case
+     * @return DynamicFixedListType
+     */
+    public static DynamicFixedListType populateOpenOrClosedApplications(CaseData caseData) {
+
+        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+            return null;
+        }
+
+        boolean selectedClosed = CLOSED_STATE.equals(caseData.getTseViewApplicationOpenOrClosed());
+
+        return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
+                .filter(o -> selectedClosed ? o.getValue().getStatus().equals(CLOSED_STATE)
+                        : !o.getValue().getStatus().equals(CLOSED_STATE))
+                .map(TseViewApplicationHelper::formatDropdownOption)
+                .collect(Collectors.toList()));
+    }
+
+    /**
+     * Set the markup for an application summary and a table of responses
+     * for the 'view an application' event.
+     * @param caseData - all case data for the case
+     */
+    public static void setDataForTseApplicationSummaryAndResponses(CaseData caseData) {
+        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
+        if (CollectionUtils.isEmpty(applications) || getChosenApplication(caseData) == null) {
+            return;
+        }
+        GenericTseApplicationType genericTseApplicationType = getChosenApplication(caseData);
+        String document = "N/A";
+        if (genericTseApplicationType.getDocumentUpload() != null) {
+            Pattern pattern = Pattern.compile("^.+?/documents/");
+            Matcher matcher = pattern.matcher(genericTseApplicationType.getDocumentUpload().getDocumentBinaryUrl());
+            String documentLink = matcher.replaceFirst("");
+            String documentName = genericTseApplicationType.getDocumentUpload().getDocumentFilename();
+            document = String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
+        }
+        String respondTablesCollection = "";
+        if (!CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
+            List<TseRespondTypeItem> respondList = genericTseApplicationType.getRespondCollection();
+            respondTablesCollection = createResponseTable(respondList, genericTseApplicationType.getApplicant());
+        }
+
+        String applicationSummary = String.format(
+                APPLICATION_DETAILS, genericTseApplicationType.getApplicant(),
+                genericTseApplicationType.getType(),
+                genericTseApplicationType.getDate(),
+                isNullOrEmpty(genericTseApplicationType.getDetails()) ? "N/A"
+                        : genericTseApplicationType.getDetails(),
+                document,
+                isNullOrEmpty(genericTseApplicationType.getCopyToOtherPartyYesOrNo()) ? "N/A"
+                        : genericTseApplicationType.getCopyToOtherPartyYesOrNo()
+        );
+        
+        caseData.setTseApplicationSummaryAndResponsesMarkup(applicationSummary + respondTablesCollection);
+    }
+
     private static String formatAminResponseTitle(TseRespondType reply) {
         if (!isNullOrEmpty(reply.getEnterResponseTitle())) {
             return String.format(
@@ -120,29 +184,14 @@ public final class TseViewApplicationHelper {
         return "";
     }
 
-    private TseViewApplicationHelper() {
-        // Access through static methods
+    private static String formatRespondentResponse(TseRespondType reply) {
+        return isNullOrEmpty(reply.getResponse()) ? "N/A"
+                : defaultString(reply.getResponse());
     }
 
-    /**
-     * Populates a dynamic list with either open or closed applications
-     * for the tell something else 'view an application' dropdown selector.
-     * @param caseData
-     * @return DynamicFixedListType
-     */
-    public static DynamicFixedListType populateOpenOrClosedApplications(CaseData caseData) {
-
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
-            return null;
-        }
-
-        boolean selectedClosed = CLOSED_STATE.equals(caseData.getTseViewApplicationOpenOrClosed());
-
-        return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
-                .filter(o -> selectedClosed ? o.getValue().getStatus().equals(CLOSED_STATE)
-                        : !o.getValue().getStatus().equals(CLOSED_STATE))
-                .map(TseViewApplicationHelper::formatDropdownOption)
-                .collect(Collectors.toList()));
+    private static String formatReasonForNotSharing(TseRespondType reply) {
+        return isNullOrEmpty(reply.getCopyNoGiveDetails()) ? "N/A"
+                : defaultString(reply.getCopyNoGiveDetails());
     }
 
     private static DynamicValueType formatDropdownOption(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
@@ -155,10 +204,10 @@ public final class TseViewApplicationHelper {
                 .get(Integer.parseInt(caseData.getTseViewApplicationSelect().getValue().getCode()) - 1).getValue();
     }
 
-    private static String getDocumentUrls(TseRespondTypeItem tseRespondType) {
-        if (tseRespondType.getValue().getSupportingMaterial() != null) {
+    private static String getDocumentUrls(TseRespondType tseRespondType) {
+        if (tseRespondType.getSupportingMaterial() != null) {
             Pattern pattern = Pattern.compile("^.+?/documents/");
-            return tseRespondType.getValue().getSupportingMaterial().stream()
+            return tseRespondType.getSupportingMaterial().stream()
                     .map(doc -> {
                         Matcher matcher = pattern.matcher(doc.getValue().getUploadedDocument().getDocumentBinaryUrl());
                         String documentLink = matcher.replaceFirst("");
@@ -170,15 +219,22 @@ public final class TseViewApplicationHelper {
         return null;
     }
 
+    private static String createLinkForAdminResponseUploadedDoc(TseRespondType tseRespondType) {
+        if (tseRespondType.getAddDocument() != null) {
+            Pattern pattern = Pattern.compile("^.+?/documents/");
+            Matcher matcher = pattern.matcher(tseRespondType.getAddDocument().getDocumentBinaryUrl());
+            String documentLink = matcher.replaceFirst("");
+            String documentName = tseRespondType.getAddDocument().getDocumentFilename();
+            return String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink,
+                    documentName);
+        }
+        return null;
+    }
+
     private static String createAdminResponse(TseRespondTypeItem response, AtomicInteger count) {
         String doc = "N/A";
-        if (response.getValue().getAddDocument() != null) {
-            Pattern pattern = Pattern.compile("^.+?/documents/");
-            Matcher matcher = pattern.matcher(response.getValue().getAddDocument().getDocumentBinaryUrl());
-            String documentLink = matcher.replaceFirst("");
-            String documentName = response.getValue().getAddDocument().getDocumentFilename();
-            doc = String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink,
-                    documentName);
+        if (createLinkForAdminResponseUploadedDoc(response.getValue()) != null) {
+            doc = createLinkForAdminResponseUploadedDoc(response.getValue());
         }
         return String.format(
                 VIEW_APPLICATION_ADMIN_REPLY_MARKUP,
@@ -195,7 +251,7 @@ public final class TseViewApplicationHelper {
                 defaultString(response.getValue().getSelectPartyNotify()));
     }
 
-    private static String createRespondentOrClaimantResponse(TseRespondTypeItem response,
+    private static String createRespondentOrClaimantResponse(TseRespondType response,
                                                              AtomicInteger count, String applicant) {
         String doc = "N/A";
 
@@ -206,15 +262,12 @@ public final class TseViewApplicationHelper {
         return String.format(
                 RESPONDENT_REPLY_MARKUP_FOR_REPLY,
                 count.get(),
-                response.getValue().getFrom(),
-                response.getValue().getDate(),
+                response.getFrom(),
+                response.getDate(),
                 applicant.toLowerCase(Locale.ENGLISH),
-                isNullOrEmpty(response.getValue().getResponse()) ? "N/A"
-                        : defaultString(response.getValue().getResponse()),
+                formatRespondentResponse(response),
                 doc,
-                formatRule92(response.getValue().getCopyToOtherParty(),
-                        isNullOrEmpty(response.getValue().getCopyNoGiveDetails())
-                                ? "N/A" : response.getValue().getCopyNoGiveDetails()));
+                formatRule92(response.getCopyToOtherParty(), formatReasonForNotSharing(response)));
     }
 
     private static String createResponseTable(List<TseRespondTypeItem> respondList, String applicant) {
@@ -223,47 +276,9 @@ public final class TseViewApplicationHelper {
             count.getAndIncrement();
             if (ADMIN.equals(response.getValue().getFrom())) {
                 return createAdminResponse(response, count);
-            } else {
-                return createRespondentOrClaimantResponse(response, count, applicant);
             }
+            return createRespondentOrClaimantResponse(response.getValue(), count, applicant);
         }).collect(Collectors.joining(""));
-    }
-
-    /**
-     * Set the markup for an application summary and a table of responses
-     * for the 'view an application' event.
-     * @param caseData
-     */
-    public static void setDataForTseApplicationSummaryAndResponses(CaseData caseData) {
-        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
-        if (CollectionUtils.isEmpty(applications) || getChosenApplication(caseData) == null) {
-            return;
-        }
-        GenericTseApplicationType genericTseApplicationType = getChosenApplication(caseData);
-        String document = "N/A";
-        if (genericTseApplicationType.getDocumentUpload() != null) {
-            Pattern pattern = Pattern.compile("^.+?/documents/");
-            Matcher matcher = pattern.matcher(genericTseApplicationType.getDocumentUpload().getDocumentBinaryUrl());
-            String documentLink = matcher.replaceFirst("");
-            String documentName = genericTseApplicationType.getDocumentUpload().getDocumentFilename();
-            document = String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
-        }
-        String respondTablesCollection = "";
-        if (!CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
-            List<TseRespondTypeItem> respondList = genericTseApplicationType.getRespondCollection();
-            respondTablesCollection = createResponseTable(respondList, genericTseApplicationType.getApplicant());
-        }
-        caseData.setTseApplicationSummaryAndResponsesMarkup(
-                String.format(
-                        APPLICATION_DETAILS, genericTseApplicationType.getApplicant(),
-                        genericTseApplicationType.getType(),
-                        genericTseApplicationType.getDate(),
-                        isNullOrEmpty(genericTseApplicationType.getDetails()) ? "N/A"
-                                : genericTseApplicationType.getDetails(),
-                        document,
-                        isNullOrEmpty(genericTseApplicationType.getCopyToOtherPartyYesOrNo()) ? "N/A"
-                                : genericTseApplicationType.getCopyToOtherPartyYesOrNo()
-                ) + respondTablesCollection);
     }
 
     private static String formatAdminReplyMadeBy(TseRespondType reply) {
@@ -280,4 +295,5 @@ public final class TseViewApplicationHelper {
         }
         return "";
     }
+
 }

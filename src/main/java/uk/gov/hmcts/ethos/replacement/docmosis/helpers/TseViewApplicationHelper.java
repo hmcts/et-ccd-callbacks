@@ -75,7 +75,7 @@ public final class TseViewApplicationHelper {
             + "\r\n";
     private static final String ADMIN_REPLY_MARKUP_MADE_BY = "|%s made by | %s|\r\n";
     private static final String DOCUMENT_LINK = "<a href=\"/documents/%s\" target=\"_blank\">%s</a>";
-    
+
     private TseViewApplicationHelper() {
         // Access through static methods
     }
@@ -230,24 +230,24 @@ public final class TseViewApplicationHelper {
         return null;
     }
 
-    private static String createAdminResponse(TseRespondTypeItem response, AtomicInteger count) {
+    private static String createAdminResponse(TseRespondType response, AtomicInteger count) {
         String doc = "N/A";
-        if (createLinkForAdminResponseUploadedDoc(response.getValue()) != null) {
-            doc = createLinkForAdminResponseUploadedDoc(response.getValue());
+        if (createLinkForAdminResponseUploadedDoc(response) != null) {
+            doc = createLinkForAdminResponseUploadedDoc(response);
         }
         return String.format(
                 VIEW_APPLICATION_ADMIN_REPLY_MARKUP,
                 count.get(),
-                formatAminResponseTitle(response.getValue()),
-                response.getValue().getDate(),
-                defaultString(response.getValue().getIsCmoOrRequest()),
-                formatResponseDue(response.getValue()),
-                formatPartyOrPartiesToRespond(response.getValue()),
-                formatAdminResponseAdditionalInfo(response.getValue()),
+                formatAminResponseTitle(response),
+                response.getDate(),
+                defaultString(response.getIsCmoOrRequest()),
+                formatResponseDue(response),
+                formatPartyOrPartiesToRespond(response),
+                formatAdminResponseAdditionalInfo(response),
                 doc,
-                formatAdminReplyMadeBy(response.getValue()),
-                formatMadeByFullName(response.getValue()),
-                defaultString(response.getValue().getSelectPartyNotify()));
+                formatAdminReplyMadeBy(response),
+                formatMadeByFullName(response),
+                defaultString(response.getSelectPartyNotify()));
     }
 
     private static String createRespondentOrClaimantResponse(TseRespondType response,
@@ -274,7 +274,7 @@ public final class TseViewApplicationHelper {
         return RESPONSE_LIST_TITLE + respondList.stream().map((TseRespondTypeItem response) -> {
             count.getAndIncrement();
             if (ADMIN.equals(response.getValue().getFrom())) {
-                return createAdminResponse(response, count);
+                return createAdminResponse(response.getValue(), count);
             }
             return createRespondentOrClaimantResponse(response.getValue(), count, applicant);
         }).collect(Collectors.joining(""));

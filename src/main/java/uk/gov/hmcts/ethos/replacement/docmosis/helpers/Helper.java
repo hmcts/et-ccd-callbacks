@@ -307,6 +307,9 @@ public final class Helper {
      * @return a string anchor tag linking to the document
      */
     public static String createLinkForUploadedDocument(UploadedDocumentType document) {
+        if (document == null) {
+            return "";
+        }
         Matcher matcher = Helper.getDocumentMatcher(document.getDocumentBinaryUrl());
         String documentLink = matcher.replaceFirst("");
         String documentName = document.getDocumentFilename();

@@ -93,8 +93,7 @@ public final class TseViewApplicationHelper {
         boolean selectedClosed = CLOSED_STATE.equals(caseData.getTseViewApplicationOpenOrClosed());
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
-                .filter(o -> selectedClosed ? CLOSED_STATE.equals(o.getValue().getStatus())
-                        : !CLOSED_STATE.equals(o.getValue().getStatus()))
+                .filter(o -> selectedClosed == CLOSED_STATE.equals(o.getValue().getStatus()))
                 .map(TseViewApplicationHelper::formatDropdownOption)
                 .collect(Collectors.toList()));
     }

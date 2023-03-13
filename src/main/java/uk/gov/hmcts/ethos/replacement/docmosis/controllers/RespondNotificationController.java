@@ -17,8 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
-import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -33,6 +31,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/respondNotification")
 @RestController
 @RequiredArgsConstructor
+@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class RespondNotificationController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -104,13 +103,13 @@ public class RespondNotificationController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
-     /**
-     * midGetNotification.
-     *
-     * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
-     * @return Callback response entity with case data attached.
-     */
+    /**
+    * midGetNotification.
+    *
+    * @param ccdRequest holds the request and case data
+    * @param userToken  used for authorization
+    * @return Callback response entity with case data attached.
+    */
     @PostMapping(value = "/midGetNotification", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "midGetNotification")
     @ApiResponses(value = {

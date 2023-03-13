@@ -2,7 +2,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.base.Strings;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -13,32 +12,32 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.SendNotificationTypeData;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
-import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSendNotificationUploadDocument;
 
 @Service("sendNotificationService")
 @RequiredArgsConstructor
 @Slf4j
+@SuppressWarnings({"PMD.ExcessiveImports"})
 public class SendNotificationService {
 
     private final HearingSelectionService hearingSelectionService;
@@ -50,8 +49,7 @@ public class SendNotificationService {
     @Value("${sendNotification.template.id}")
     private String templateId;
 
-
-    private final String RESPONSE_DETAILS = "|  | |\r\n"
+    private static final String RESPONSE_DETAILS = "|  | |\r\n"
              + "| --- | --- |\r\n"
              + "| Subject | %1$s |\r\n"
              + "| Notification | %2$s |\r\n"
@@ -67,8 +65,7 @@ public class SendNotificationService {
              + "| Case management order made by | %11$s |\r\n"
              + "| Name | %12$s |\r\n"
              + "| Sent to | %8$s |\r\n";
-    private final String TRIBUNAL = "TRIBUNAL";
-
+    private static final String TRIBUNAL = "TRIBUNAL";
 
     public void populateHearingSelection(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
@@ -176,7 +173,7 @@ public class SendNotificationService {
                 .findFirst();
     }
 
-    private String getSendNotificationSingleDocumentMarkdown(UploadedDocumentType uploadedDocumentType){
+    private String getSendNotificationSingleDocumentMarkdown(UploadedDocumentType uploadedDocumentType) {
         String document = "| Document | N/A |";
         if (uploadedDocumentType != null) {
             document = String.format("| Document | %s", createLinkForUploadedDocument(uploadedDocumentType));
@@ -185,7 +182,7 @@ public class SendNotificationService {
     }
 
     private String getSendNotificationDocumentsMarkdown(SendNotificationType sendNotification) {
-        if(sendNotification.getSendNotificationUploadDocument() == null) {
+        if (sendNotification.getSendNotificationUploadDocument() == null) {
             return "";
         }
         List<String> documents = sendNotification.getSendNotificationUploadDocument().stream()

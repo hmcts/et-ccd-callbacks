@@ -41,6 +41,9 @@ class TseViewApplicationsControllerTest {
     private static final String ABOUT_TO_START_URL =
             "/viewRespondentTSEApplications/aboutToStart";
 
+    private static final String MID_POPULATE_SELECTED_APPLICATION =
+            "/viewRespondentTSEApplications/midPopulateSelectedApplicationData";
+
     @Autowired
     private MockMvc mockMvc;
     @MockBean
@@ -137,4 +140,37 @@ class TseViewApplicationsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void midPopulateReply_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(MID_POPULATE_SELECTED_APPLICATION)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void midPopulateReply_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(MID_POPULATE_SELECTED_APPLICATION)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void midPopulateReply_badRequest() throws Exception {
+        mockMvc.perform(post(MID_POPULATE_SELECTED_APPLICATION)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 }

@@ -56,7 +56,6 @@ public final class TseHelper {
 
     private static final String REPLY_OUTPUT_NAME = "%s Reply.pdf";
     private static final String REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-01212.docx";
-
     private static final String RULE92_YES_OR_NO_MARKUP =
         "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
         + "%s";
@@ -91,6 +90,7 @@ public final class TseHelper {
         + "|Full name | %s|\r\n"
         + "|Sent to | %s|\r\n"
         + "\r\n";
+
     private static final String ADMIN_REPLY_MARKUP_MADE_BY = "|%s made by | %s|\r\n";
 
     private TseHelper() {
@@ -116,21 +116,6 @@ public final class TseHelper {
     private static boolean isNoRespondentReply(List<TseRespondTypeItem> tseRespondTypeItems) {
         return CollectionUtils.isEmpty(tseRespondTypeItems)
             || tseRespondTypeItems.stream().noneMatch(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()));
-    }
-
-    public static DynamicFixedListType populateOpenOrClosedApplications(CaseData caseData) {
-
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
-            return null;
-        }
-
-        boolean selectedClosed = CLOSED_STATE.equals(caseData.getTseViewApplicationOpenOrClosed());
-
-        return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
-                .filter(o -> selectedClosed ? o.getValue().getStatus().equals(CLOSED_STATE)
-                        : !o.getValue().getStatus().equals(CLOSED_STATE))
-                .map(TseHelper::formatDropdownOption)
-                .collect(Collectors.toList()));
     }
 
     private static DynamicValueType formatDropdownOption(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {

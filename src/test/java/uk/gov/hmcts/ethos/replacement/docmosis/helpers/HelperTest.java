@@ -6,6 +6,7 @@ import org.junit.Test;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
 
 import java.nio.file.Files;
@@ -111,5 +112,16 @@ public class HelperTest {
     public void getDocumentMatcher() {
         Matcher matcher = Helper.getDocumentMatcher("testUrl");
         assertEquals("^.+?/documents/", matcher.pattern().toString());
+    }
+
+    @Test
+    public void createLinkForUploadedDocument() {
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentBinaryUrl("http://dm-store:8080/documents/1234/binary");
+        uploadedDocumentType.setDocumentFilename("testFileName");
+        uploadedDocumentType.setDocumentUrl("http://dm-store:8080/documents/1234");
+        String expected = "<a href=\"/documents/1234/binary\" target=\"_blank\">testFileName</a>";
+        String actual = Helper.createLinkForUploadedDocument(uploadedDocumentType);
+        assertEquals(expected, actual);
     }
 }

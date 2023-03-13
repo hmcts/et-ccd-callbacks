@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -298,5 +299,17 @@ public final class Helper {
     public static Matcher getDocumentMatcher(String url) {
         Pattern pattern = Pattern.compile("^.+?/documents/");
         return pattern.matcher(url);
+    }
+
+    /**
+     * Generates and returns a link for an UploadedDocumentType.
+     * Creates an HTML anchor element link to an uploaded document which will open in a new tab.
+     * @return a string anchor tag linking to the document
+     */
+    public static String createLinkForUploadedDocument(UploadedDocumentType document) {
+        Matcher matcher = Helper.getDocumentMatcher(document.getDocumentBinaryUrl());
+        String documentLink = matcher.replaceFirst("");
+        String documentName = document.getDocumentFilename();
+        return String.format("<a href=\"/documents/%s\" target=\"_blank\">%s</a>", documentLink, documentName);
     }
 }

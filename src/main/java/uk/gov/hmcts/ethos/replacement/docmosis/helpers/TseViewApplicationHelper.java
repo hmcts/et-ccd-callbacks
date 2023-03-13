@@ -9,16 +9,14 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
-import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
@@ -75,7 +73,6 @@ public final class TseViewApplicationHelper {
             + "to satisfy the Rules of Procedure? | %s |\r\n"
             + "\r\n";
     private static final String ADMIN_REPLY_MARKUP_MADE_BY = "|%s made by | %s|\r\n";
-    private static final String DOCUMENT_LINK = "<a href=\"/documents/%s\" target=\"_blank\">%s</a>";
 
     private TseViewApplicationHelper() {
         // Access through static methods
@@ -96,8 +93,8 @@ public final class TseViewApplicationHelper {
         boolean selectedClosed = CLOSED_STATE.equals(caseData.getTseViewApplicationOpenOrClosed());
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
-                .filter(o -> selectedClosed ? o.getValue().getStatus().equals(CLOSED_STATE)
-                        : !o.getValue().getStatus().equals(CLOSED_STATE))
+                .filter(o -> selectedClosed ? CLOSED_STATE.equals(o.getValue().getStatus())
+                        : !CLOSED_STATE.equals(o.getValue().getStatus()))
                 .map(TseViewApplicationHelper::formatDropdownOption)
                 .collect(Collectors.toList()));
     }
@@ -115,7 +112,7 @@ public final class TseViewApplicationHelper {
         GenericTseApplicationType genericTseApplicationType = getChosenApplication(caseData);
         String document = "N/A";
         if (genericTseApplicationType.getDocumentUpload() != null) {
-            document = createLinkForUploadedDocument(genericTseApplicationType.getDocumentUpload());
+            document = Helper.createLinkForUploadedDocument(genericTseApplicationType.getDocumentUpload());
         }
         String respondTablesCollection = "";
         if (!CollectionUtils.isEmpty(genericTseApplicationType.getRespondCollection())) {
@@ -127,11 +124,9 @@ public final class TseViewApplicationHelper {
                 APPLICATION_DETAILS, genericTseApplicationType.getApplicant(),
                 genericTseApplicationType.getType(),
                 genericTseApplicationType.getDate(),
-                isNullOrEmpty(genericTseApplicationType.getDetails()) ? "N/A"
-                        : genericTseApplicationType.getDetails(),
+                defaultIfEmpty(genericTseApplicationType.getDetails(), "N/A"),
                 document,
-                isNullOrEmpty(genericTseApplicationType.getCopyToOtherPartyYesOrNo()) ? "N/A"
-                        : genericTseApplicationType.getCopyToOtherPartyYesOrNo()
+                defaultIfEmpty(genericTseApplicationType.getCopyToOtherPartyYesOrNo(), "N/A")
         );
         
         caseData.setTseApplicationSummaryAndResponsesMarkup(applicationSummary + respondTablesCollection);
@@ -205,25 +200,17 @@ public final class TseViewApplicationHelper {
     private static String getDocumentUrls(TseRespondType tseRespondType) {
         if (tseRespondType.getSupportingMaterial() != null) {
             return tseRespondType.getSupportingMaterial().stream()
-                    .map(doc -> createLinkForUploadedDocument(doc.getValue().getUploadedDocument())
+                    .map(doc -> Helper.createLinkForUploadedDocument(doc.getValue().getUploadedDocument())
                             + STRING_BR)
                     .collect(Collectors.joining(""));
         }
         return null;
     }
-
-    private static String createLinkForUploadedDocument(UploadedDocumentType document) {
-        Pattern pattern = Pattern.compile("^.+?/documents/");
-        Matcher matcher = pattern.matcher(document.getDocumentBinaryUrl());
-        String documentLink = matcher.replaceFirst("");
-        String documentName = document.getDocumentFilename();
-        return String.format(DOCUMENT_LINK, documentLink, documentName);
-    }
-
+    
     private static String createAdminResponse(TseRespondType response, AtomicInteger count) {
         String doc = "N/A";
         if (response.getAddDocument() != null) {
-            doc = createLinkForUploadedDocument(response.getAddDocument());
+            doc = Helper.createLinkForUploadedDocument(response.getAddDocument());
         }
         return String.format(
                 VIEW_APPLICATION_ADMIN_REPLY_MARKUP,

@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.SendNotificationTypeData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSendNotificationUploadDocument;
 
 @Service("sendNotificationService")
@@ -174,15 +176,10 @@ public class SendNotificationService {
                 .findFirst();
     }
 
-    private String getSendNotificationSingleDocumentMarkdown(DocumentTypeItem documentTypeItem){
+    private String getSendNotificationSingleDocumentMarkdown(UploadedDocumentType uploadedDocumentType){
         String document = "| Document | N/A |";
-        if (documentTypeItem != null) {
-            Matcher matcher = Helper.getDocumentMatcher(
-                    documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl());
-            String documentLink = matcher.replaceFirst("");
-            String documentName = documentTypeItem.getValue().getUploadedDocument().getDocumentFilename();
-            document = String.format("| Document | <a href=\"/documents/%s\" target=\"_blank\">%s</a>| ", documentLink,
-                    documentName);
+        if (uploadedDocumentType != null) {
+            document = String.format("| Document | %s", createLinkForUploadedDocument(uploadedDocumentType));
         }
         return document;
     }
@@ -192,7 +189,8 @@ public class SendNotificationService {
             return "";
         }
         List<String> documents = sendNotification.getSendNotificationUploadDocument().stream()
-                .map(documentTypeItem -> getSendNotificationSingleDocumentMarkdown(documentTypeItem))
+                .map(documentTypeItem ->
+                        getSendNotificationSingleDocumentMarkdown(documentTypeItem.getValue().getUploadedDocument()))
                 .collect(Collectors.toList());
         return String.join("\r\n", documents);
 

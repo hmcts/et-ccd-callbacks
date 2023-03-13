@@ -386,6 +386,42 @@ public class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
+    public void struckOutRespondentRespAddressLinesEmpty() {
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .setResponseRespondentAddress(new Address());
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .getResponseRespondentAddress().setAddressLine1("");
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .getResponseRespondentAddress().setAddressLine2("");
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .getResponseRespondentAddress().setAddressLine3("");
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .getResponseRespondentAddress().setCountry("");
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .getResponseRespondentAddress().setCounty("");
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .getResponseRespondentAddress().setPostCode("");
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .getResponseRespondentAddress().setPostTown("");
+        CaseData caseData = caseManagementForCaseWorkerService.struckOutRespondents(scotlandCcdRequest1);
+        assertEquals(3, caseData.getRespondentCollection().size());
+        assertEquals("", caseData
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getAddressLine1());
+        assertEquals("", caseData
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getAddressLine2());
+        assertEquals("", caseData
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getAddressLine3());
+        assertEquals("", caseData
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getCountry());
+        assertEquals("", caseData
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getCounty());
+        assertEquals("", caseData
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getPostCode());
+        assertEquals("", caseData
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getPostTown());
+    }
+
+    @Test
     public void struckOutRespondentUnchanged() {
         CaseData caseData = caseManagementForCaseWorkerService.struckOutRespondents(scotlandCcdRequest3);
 

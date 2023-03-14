@@ -236,19 +236,20 @@ public class PseRespondToTribunalService {
      * @param caseDetails in which the case details are extracted from
      */
     public void sendTribunalEmail(CaseDetails caseDetails) {
-        String adminEmail = getAdminEmail(caseDetails);
+        String managingOffice = caseDetails.getCaseData().getManagingOffice();
+        TribunalOffice tribunalOffice = tribunalOfficesService.getTribunalOffice(managingOffice);
+        if (tribunalOffice == null) {
+            return;
+        }
+
+        String adminEmail = tribunalOffice.getOfficeEmail();
         if (isNullOrEmpty(adminEmail)) {
             return;
         }
+
         emailService.sendEmail(notificationToAdminTemplateId,
             adminEmail,
             buildPersonalisationAdmin(caseDetails));
-    }
-
-    private String getAdminEmail(CaseDetails caseDetails) {
-        String managingOffice = caseDetails.getCaseData().getManagingOffice();
-        TribunalOffice tribunalOffice = tribunalOfficesService.getTribunalOffice(managingOffice);
-        return tribunalOffice.getOfficeEmail();
     }
 
     private Map<String, String> buildPersonalisationAdmin(CaseDetails caseDetails) {

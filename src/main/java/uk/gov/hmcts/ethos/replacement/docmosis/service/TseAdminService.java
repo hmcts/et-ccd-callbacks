@@ -79,7 +79,6 @@ public class TseAdminService {
         + "|Sent by | %s|\r\n"
         + "|Type of decision | %s|\r\n"
         + "|Additional information | %s|\r\n"
-        + "|Description | %s|\r\n"
         + "|Document | %s|\r\n"
         + "|Decision made by | %s|\r\n"
         + "|Name | %s|\r\n"
@@ -286,7 +285,6 @@ public class TseAdminService {
                     "Tribunal",
                     d.getValue().getTypeOfDecision(),
                     Optional.ofNullable(d.getValue().getAdditionalInformation()).orElse(""),
-                    Optional.ofNullable(d.getValue().getDecisionDetails()).orElse(""),
                     getDecisionDocumentLink(d.getValue(), authToken),
                     d.getValue().getDecisionMadeBy(),
                     d.getValue().getDecisionMadeByFullName(),

@@ -79,7 +79,7 @@ class RespondNotificationServiceTest {
                 + "| Party or parties to respond | Both parties |\r\n"
                 + "| Additional Information |  |\r\n"
                 + "| Description | title |\r\n"
-                + " \r\n"
+                + " | Document | |\r\n"
                 + "| Case management order made by |  |\r\n"
                 + "| Name |  |\r\n"
                 + "| Sent to | Both parties |\r\n";

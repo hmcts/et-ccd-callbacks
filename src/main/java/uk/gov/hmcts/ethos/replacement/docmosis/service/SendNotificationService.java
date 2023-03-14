@@ -174,7 +174,7 @@ public class SendNotificationService {
     }
 
     private String getSendNotificationSingleDocumentMarkdown(UploadedDocumentType uploadedDocumentType) {
-        String document = "| Document | N/A |";
+        String document = "| Document | |";
         if (uploadedDocumentType != null) {
             document = String.format("| Document | %s", createLinkForUploadedDocument(uploadedDocumentType));
         }
@@ -183,7 +183,7 @@ public class SendNotificationService {
 
     private String getSendNotificationDocumentsMarkdown(SendNotificationType sendNotification) {
         if (sendNotification.getSendNotificationUploadDocument() == null) {
-            return "";
+            return "| Document | |";
         }
         List<String> documents = sendNotification.getSendNotificationUploadDocument().stream()
                 .map(documentTypeItem ->

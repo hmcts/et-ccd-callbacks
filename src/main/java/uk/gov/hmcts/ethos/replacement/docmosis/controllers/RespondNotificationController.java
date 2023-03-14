@@ -104,7 +104,7 @@ public class RespondNotificationController {
     }
 
     /**
-    * midGetNotification.
+    * Populates the Notification details for respond to a notification page.
     *
     * @param ccdRequest holds the request and case data
     * @param userToken  used for authorization

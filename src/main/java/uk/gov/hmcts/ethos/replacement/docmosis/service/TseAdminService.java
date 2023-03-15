@@ -57,7 +57,7 @@ public class TseAdminService {
             + "|--|--|\r\n"
             + "|%s application | %s|\r\n"
             + "|Application date | %s|\r\n"
-            + "|Give details | %s|\r\n"
+            + "|Details of the application | %s|\r\n"
             + "|Supporting material | %s|\r\n"
             + "\r\n";
 

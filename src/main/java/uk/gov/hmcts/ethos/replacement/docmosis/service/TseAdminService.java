@@ -26,8 +26,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -74,7 +74,7 @@ public class TseAdminService {
 
     private static final String CLOSE_APP_DECISION_DETAILS = "|Decision | |\r\n"
         + "|--|--|\r\n"
-        +  "%s" // Notification - "|Notification | %s|\r\n"
+        +  "%s" // Notification title
         + "|Decision | %s|\r\n"
         + "|Date | %s|\r\n"
         + "|Sent by | %s|\r\n"
@@ -88,6 +88,8 @@ public class TseAdminService {
         + "\r\n";
 
     private static final String STRING_BR = "<br>";
+
+    private static final String DECISION_NOTIFICATION_TITLE = "|Notification | %s|\r\n";
 
     /**
      * Initial Application and Respond details table.
@@ -281,7 +283,6 @@ public class TseAdminService {
                 .stream()
                 .reduce((first, second) -> second)
                 .map(d -> String.format(CLOSE_APP_DECISION_DETAILS,
-                   // Optional.ofNullable(d.getValue().getEnterNotificationTitle()).orElse(""),
                         formatNotificationTitle(d.getValue()),
                     d.getValue().getDecision(),
                     d.getValue().getDate(),
@@ -315,10 +316,8 @@ public class TseAdminService {
     }
 
     private String formatNotificationTitle(TseAdminRecordDecisionType decision) {
-        if (isNullOrEmpty(decision.getEnterNotificationTitle()) ) {
-            return "";
-        }
-        return String.format("|Notification | %s|\r\n",Optional.ofNullable(decision.getEnterNotificationTitle()));
+        return isBlank(decision.getEnterNotificationTitle()) ? "" :
+                String.format(DECISION_NOTIFICATION_TITLE, decision.getEnterNotificationTitle());
     }
 
     private String getDecisionDocumentLink(TseAdminRecordDecisionType decisionType, String authToken) {

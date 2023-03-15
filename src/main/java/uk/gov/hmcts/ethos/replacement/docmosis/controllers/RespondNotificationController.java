@@ -100,6 +100,8 @@ public class RespondNotificationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        respondNotificationService.createResponseNotification(caseData);
+        respondNotificationService.clearResponseNotificationFields(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

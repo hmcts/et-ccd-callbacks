@@ -254,7 +254,7 @@ class TseAdmReplyServiceTest {
     @Test
     void validateInput_Yes_NoDoc_ReturnErrorMsg() {
         caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
-        caseData.setTseAdmReplyIsResponseRequired(YES);
+        caseData.setTseAdmReplyCmoIsResponseRequired(YES);
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).hasSize(1);
         assertThat(errors.get(0)).isEqualTo(ERROR_MSG_ADD_DOC_MISSING);
@@ -263,7 +263,7 @@ class TseAdmReplyServiceTest {
     @Test
     void validateInput_CmoYes_HaveDoc_NoErrorMsg() {
         caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
-        caseData.setTseAdmReplyIsResponseRequired(YES);
+        caseData.setTseAdmReplyCmoIsResponseRequired(YES);
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
@@ -272,7 +272,7 @@ class TseAdmReplyServiceTest {
     @Test
     void validateInput_RequestYes_HaveDoc_NoErrorMsg() {
         caseData.setTseAdmReplyIsCmoOrRequest(REQUEST);
-        caseData.setTseAdmReplyIsResponseRequired(YES);
+        caseData.setTseAdmReplyRequestIsResponseRequired(YES);
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
@@ -281,7 +281,7 @@ class TseAdmReplyServiceTest {
     @Test
     void validateInput_No_HaveDoc_NoErrorMsg() {
         caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
-        caseData.setTseAdmReplyIsResponseRequired(NO);
+        caseData.setTseAdmReplyCmoIsResponseRequired(NO);
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
@@ -290,7 +290,7 @@ class TseAdmReplyServiceTest {
     @Test
     void validateInput_No_NoDoc_NoErrorMsg() {
         caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
-        caseData.setTseAdmReplyIsResponseRequired(NO);
+        caseData.setTseAdmReplyCmoIsResponseRequired(NO);
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
     }
@@ -329,9 +329,9 @@ class TseAdmReplyServiceTest {
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyCmoMadeBy("Legal Officer");
-        caseData.setTseAdmReplyEnterFullName("Full Name");
-        caseData.setTseAdmReplyIsResponseRequired(YES);
-        caseData.setTseAdmReplySelectPartyRespond(BOTH_PARTIES);
+        caseData.setTseAdmReplyCmoEnterFullName("Full Name");
+        caseData.setTseAdmReplyCmoIsResponseRequired(YES);
+        caseData.setTseAdmReplyCmoSelectPartyRespond(BOTH_PARTIES);
         caseData.setTseAdmReplySelectPartyNotify(CLAIMANT_ONLY);
 
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
@@ -381,8 +381,8 @@ class TseAdmReplyServiceTest {
         caseData.setTseAdmReplyAddDocument(createUploadedDocumentType("document.txt"));
         caseData.setTseAdmReplyIsCmoOrRequest(REQUEST);
         caseData.setTseAdmReplyRequestMadeBy("Judge");
-        caseData.setTseAdmReplyEnterFullName("Full Name");
-        caseData.setTseAdmReplyIsResponseRequired(NO);
+        caseData.setTseAdmReplyRequestEnterFullName("Full Name");
+        caseData.setTseAdmReplyRequestIsResponseRequired(NO);
         caseData.setTseAdmReplySelectPartyNotify(RESPONDENT_ONLY);
 
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
@@ -476,8 +476,8 @@ class TseAdmReplyServiceTest {
         createRespondent(caseData);
 
         caseData.setTseAdmReplySelectPartyNotify(admReplySelectPartyNotify);
-        caseData.setTseAdmReplyIsResponseRequired(admReplyIsResponseRequired);
-        caseData.setTseAdmReplySelectPartyRespond(admReplySelectPartyRespond);
+        caseData.setTseAdmReplyRequestIsResponseRequired(admReplyIsResponseRequired);
+        caseData.setTseAdmReplyRequestSelectPartyRespond(admReplySelectPartyRespond);
 
         Map<String, String> expectedPersonalisationClaimant =
             createPersonalisation(caseData, expectedClaimantCustomText);
@@ -567,9 +567,12 @@ class TseAdmReplyServiceTest {
         caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdmReplyCmoMadeBy("Legal Officer");
         caseData.setTseAdmReplyRequestMadeBy("Legal Officer");
-        caseData.setTseAdmReplyEnterFullName("Enter Full Name");
-        caseData.setTseAdmReplyIsResponseRequired(YES);
-        caseData.setTseAdmReplySelectPartyRespond(BOTH_PARTIES);
+        caseData.setTseAdmReplyCmoEnterFullName("Enter Full Name");
+        caseData.setTseAdmReplyCmoIsResponseRequired(YES);
+        caseData.setTseAdmReplyRequestEnterFullName("Enter Full Name");
+        caseData.setTseAdmReplyRequestIsResponseRequired(YES);
+        caseData.setTseAdmReplyRequestSelectPartyRespond(BOTH_PARTIES);
+        caseData.setTseAdmReplyCmoSelectPartyRespond(BOTH_PARTIES);
         caseData.setTseAdmReplySelectPartyNotify(CLAIMANT_ONLY);
 
         tseAdmReplyService.clearTseAdmReplyDataFromCaseData(caseData);
@@ -582,9 +585,12 @@ class TseAdmReplyServiceTest {
         assertThat(caseData.getTseAdmReplyIsCmoOrRequest()).isNull();
         assertThat(caseData.getTseAdmReplyCmoMadeBy()).isNull();
         assertThat(caseData.getTseAdmReplyRequestMadeBy()).isNull();
-        assertThat(caseData.getTseAdmReplyEnterFullName()).isNull();
-        assertThat(caseData.getTseAdmReplyIsResponseRequired()).isNull();
-        assertThat(caseData.getTseAdmReplySelectPartyRespond()).isNull();
+        assertThat(caseData.getTseAdmReplyCmoEnterFullName()).isNull();
+        assertThat(caseData.getTseAdmReplyCmoIsResponseRequired()).isNull();
+        assertThat(caseData.getTseAdmReplyRequestEnterFullName()).isNull();
+        assertThat(caseData.getTseAdmReplyRequestIsResponseRequired()).isNull();
+        assertThat(caseData.getTseAdmReplyRequestSelectPartyRespond()).isNull();
+        assertThat(caseData.getTseAdmReplyCmoSelectPartyRespond()).isNull();
         assertThat(caseData.getTseAdmReplySelectPartyNotify()).isNull();
     }
 

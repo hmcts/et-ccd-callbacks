@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.rse.ccd.lib.ControlPlane;
 import uk.gov.hmcts.rse.ccd.lib.api.CFTLib;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ADMIN_CONFIG_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ADMIN_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CASEWORKER_CCA;
@@ -24,12 +26,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CCD_IMPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CITIZEN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CITIZEN_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ENGLANDWALES_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ET_ACAS_API;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ENGLANGWALES_CONFIG_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.IDAM_SYSTEM_USER_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_CAA;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_CASE_MANAGER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_ORGANISATION_MANAGER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.PUI_USER_MANAGER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SCOTLAND_CONFIG_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SCOTLAND_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SOLICITOR_1_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SUPERUSER_EMAIL;
@@ -123,13 +126,26 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SUPERUSER_E
 @SuppressWarnings({"PMD.ExcessiveImports"})
 public class CftlibConfig implements CFTLibConfigurer {
 
+    @Value("${cftlib.import-ccd-defs-on-boot}")
+    private boolean importCcdDefsOnBoot;
+
+    @Value("${cftlib.englandwales-ccd-config-path}")
+    private String englandWalesCcdConfigPath;
+
+    @Value("${cftlib.scotland-ccd-config-path}")
+    private String scotlandCcdConfigPath;
+
+    @Value("${cftlib.admin-ccd-config-path}")
+    private String adminCcdConfigPath;
+
     @Override
     public void configure(CFTLib lib) {
         createRoles(lib);
         createUsers(lib);
-//        importCcdDefinitions(lib);
+        importCcdDefinitions(lib);
         startDockerCompose();
     }
+
     private void createRoles(CFTLib lib) {
         lib.createRoles(CASEWORKER_ROLES);
     }
@@ -144,8 +160,6 @@ public class CftlibConfig implements CFTLibConfigurer {
             CASEWORKER,
             CASEWORKER_EMPLOYMENT,
             CASEWORKER_EMPLOYMENT_ENGLANDWALES);
-
-        lib.createIdamUser("et@acas.com", ET_ACAS_API, CASEWORKER);
 
         lib.createIdamUser(SCOTLAND_EMAIL,
             CASEWORKER,
@@ -173,28 +187,28 @@ public class CftlibConfig implements CFTLibConfigurer {
         lib.createIdamUser(IDAM_SYSTEM_USER_EMAIL, CASEWORKER);
     }
 
-//    private void importCcdDefinitions(CFTLib lib) {
-//        if (importCcdDefsOnBoot) {
-//            importEnglandWales(lib);
-//            importScotland(lib);
-//            importAdmin(lib);
-//        }
-//    }
-//
-//    private void importEnglandWales(CFTLib lib) {
-//        String file = englandWalesCcdConfigPath + ENGLANGWALES_CONFIG_FILE;
-//        importCcdDefinition(lib, file);
-//    }
-//
-//    private void importScotland(CFTLib lib) {
-//        String file = scotlandCcdConfigPath + SCOTLAND_CONFIG_FILE;
-//        importCcdDefinition(lib, file);
-//    }
-//
-//    private void importAdmin(CFTLib lib) {
-//        String file = adminCcdConfigPath + ADMIN_CONFIG_FILE;
-//        importCcdDefinition(lib, file);
-//    }
+    private void importCcdDefinitions(CFTLib lib) {
+        if (importCcdDefsOnBoot) {
+            importEnglandWales(lib);
+            importScotland(lib);
+            importAdmin(lib);
+        }
+    }
+
+    private void importEnglandWales(CFTLib lib) {
+        String file = englandWalesCcdConfigPath + ENGLANGWALES_CONFIG_FILE;
+        importCcdDefinition(lib, file);
+    }
+
+    private void importScotland(CFTLib lib) {
+        String file = scotlandCcdConfigPath + SCOTLAND_CONFIG_FILE;
+        importCcdDefinition(lib, file);
+    }
+
+    private void importAdmin(CFTLib lib) {
+        String file = adminCcdConfigPath + ADMIN_CONFIG_FILE;
+        importCcdDefinition(lib, file);
+    }
 
     private void importCcdDefinition(CFTLib lib, String file) {
         try {

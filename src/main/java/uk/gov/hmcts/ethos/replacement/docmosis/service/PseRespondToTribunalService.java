@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
@@ -235,15 +236,20 @@ public class PseRespondToTribunalService {
      * @param caseDetails in which the case details are extracted from
      */
     public void sendTribunalEmail(CaseDetails caseDetails) {
-        emailService.sendEmail(notificationToAdminTemplateId,
-            getAdminEmail(caseDetails),
-            buildPersonalisationAdmin(caseDetails));
-    }
-
-    private String getAdminEmail(CaseDetails caseDetails) {
         String managingOffice = caseDetails.getCaseData().getManagingOffice();
         TribunalOffice tribunalOffice = tribunalOfficesService.getTribunalOffice(managingOffice);
-        return tribunalOffice.getOfficeEmail();
+        if (tribunalOffice == null) {
+            return;
+        }
+
+        String adminEmail = tribunalOffice.getOfficeEmail();
+        if (isNullOrEmpty(adminEmail)) {
+            return;
+        }
+
+        emailService.sendEmail(notificationToAdminTemplateId,
+            adminEmail,
+            buildPersonalisationAdmin(caseDetails));
     }
 
     private Map<String, String> buildPersonalisationAdmin(CaseDetails caseDetails) {

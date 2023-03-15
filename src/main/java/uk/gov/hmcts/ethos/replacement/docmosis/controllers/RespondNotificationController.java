@@ -98,11 +98,10 @@ public class RespondNotificationController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        respondNotificationService.handleAboutToSumbit(caseDetails);
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        respondNotificationService.createResponseNotification(caseData);
-        respondNotificationService.clearResponseNotificationFields(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 
     /**

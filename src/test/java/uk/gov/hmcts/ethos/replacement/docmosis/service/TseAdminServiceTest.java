@@ -125,7 +125,7 @@ class TseAdminServiceTest {
             + "|--|--|\r\n"
             + "|Respondent application | Amend response|\r\n"
             + "|Application date | 13 December 2022|\r\n"
-            + "|Give details | Details Text|\r\n"
+            + "|Details of the application | Details Text|\r\n"
             + "|Supporting material | " + fileDisplay1 + "|\r\n"
             + "\r\n"
             + "|Response 1 | |\r\n"

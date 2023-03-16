@@ -19,6 +19,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -33,6 +36,7 @@ class RespondNotificationControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_START_URL = "/respondNotification/aboutToStart";
     private static final String ABOUT_TO_SUBMIT_URL = "/respondNotification/aboutToSubmit";
+    private static final String MID_GET_NOTIFICATION_URL = "/respondNotification/midGetNotification";
 
     @MockBean
     private RespondNotificationService respondNotificationService;
@@ -47,76 +51,109 @@ class RespondNotificationControllerTest {
     @BeforeEach
     void setUp() throws Exception {
         CaseDetails caseDetails = CaseDataBuilder.builder()
-            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseDetails.getCaseData().setEthosCaseReference("1234");
 
         ccdRequest = CCDRequestBuilder.builder()
-            .withCaseData(caseDetails.getCaseData())
-            .build();
+                .withCaseData(caseDetails.getCaseData())
+                .build();
     }
 
     @Test
     void aboutToStart_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_START_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
     }
 
     @Test
     void aboutToStart_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_START_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     void aboutToStart_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_START_URL)
-                .content("garbage content")
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest());
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     void aboutToSubmit_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
-            .andExpect(jsonPath("$.warnings", nullValue()));
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
     }
 
     @Test
     void aboutToSubmit_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .content(jsonMapper.toJson(ccdRequest))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden());
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test
     void aboutToSubmit_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                .content("garbage content")
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest());
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void midGetNotification_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(MID_GET_NOTIFICATION_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(respondNotificationService, times(1)).getNotificationMarkDown(any());
+    }
+
+    @Test
+    void midGetNotification_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(MID_GET_NOTIFICATION_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void midGetNotification_badRequest() throws Exception {
+        mockMvc.perform(post(MID_GET_NOTIFICATION_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

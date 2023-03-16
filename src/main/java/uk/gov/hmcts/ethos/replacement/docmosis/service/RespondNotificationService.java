@@ -6,8 +6,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,13 @@ public class RespondNotificationService {
             String notificationSubject = sendNotificationType.getValue().getSendNotificationSubject().toString();
             return String.format("%s - %s", notificationTitle, notificationSubject);
         });
+    }
 
+    public String getNotificationMarkDown(CaseData caseData) {
+        Optional<SendNotificationTypeItem> sendNotification = sendNotificationService.getSendNotification(caseData);
+        if (sendNotification.isEmpty()) {
+            return "";
+        }
+        return sendNotificationService.getSendNotificationMarkDown(sendNotification.get().getValue());
     }
 }

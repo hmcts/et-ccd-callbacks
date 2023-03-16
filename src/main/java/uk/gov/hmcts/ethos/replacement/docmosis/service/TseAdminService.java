@@ -90,7 +90,6 @@ public class TseAdminService {
     private static final String STRING_BR = "<br>";
 
     private static final String CLOSE_APP_DECISION_DETAILS_OTHER = "|Decision details | %s|\r\n";
-
     private static final String DECISION_NOTIFICATION_TITLE = "|Notification | %s|\r\n";
 
     /**

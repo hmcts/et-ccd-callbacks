@@ -39,7 +39,7 @@ class RespondNotificationServiceTest {
     void setUp() {
         SendNotificationService sendNotificationService =
                 new SendNotificationService(hearingSelectionService, emailService);
-        respondNotificationService = new RespondNotificationService(sendNotificationService);
+        respondNotificationService = new RespondNotificationService(emailService, sendNotificationService);
         caseData = new CaseData();
     }
 

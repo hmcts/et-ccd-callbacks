@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.UUID.randomUUID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -36,8 +38,10 @@ public class RespondNotificationService {
     private String exuiUrl;
     @Value("${url.citizen.case-details}")
     private String citizenUrl;
+    @Value("${sendNotification.template.id}")
     private String responseTemplateId;
-    private String noResponseTempalteId;
+    @Value("${respondNotification.noResponseTemplate.id}")
+    private String noResponseTemplateId;
 
     public void populateSendNotificationSelection(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
@@ -63,7 +67,10 @@ public class RespondNotificationService {
         respondNotificationType.setRespondNotificationFullName(caseData.getRespondNotificationFullName());
         respondNotificationType.setRespondNotificationPartyToNotify(caseData.getRespondNotificationPartyToNotify());
 
-        sendNotificationType.getRespondNotificationTypeCollection().add(respondNotificationType);
+        GenericTypeItem<RespondNotificationType> respondNotificationTypeGenericTypeItem = new GenericTypeItem<>();
+        respondNotificationTypeGenericTypeItem.setId(String.valueOf(randomUUID()));
+        respondNotificationTypeGenericTypeItem.setValue(respondNotificationType);
+        sendNotificationType.getRespondNotificationTypeCollection().add(respondNotificationTypeGenericTypeItem);
     }
 
     public void clearResponseNotificationFields(CaseData caseData) {
@@ -114,11 +121,11 @@ public class RespondNotificationService {
         emailService.sendEmail(templateId, respondentEmail, emailData);
     }
 
-    public void sendNotifyEmails(CaseDetails caseDetails, CaseData caseData,
-                                 SendNotificationType sendNotificationType) {
+    public void sendNotifyEmails(CaseDetails caseDetails, SendNotificationType sendNotificationType) {
+        CaseData caseData = caseDetails.getCaseData();
         String templateId;
-        if(NO.equals(caseData.getRespondNotificationResponseRequired())) {
-            templateId = noResponseTempalteId;
+        if (NO.equals(caseData.getRespondNotificationResponseRequired())) {
+            templateId = noResponseTemplateId;
         } else {
             templateId = responseTemplateId;
         }
@@ -126,17 +133,17 @@ public class RespondNotificationService {
         String sendNotificationTitle = sendNotificationType.getSendNotificationTitle();
         if (!RESPONDENT_ONLY.equals(caseData.getRespondNotificationPartyToNotify())) {
             emailService.sendEmail(templateId, caseData.getClaimantType().getClaimantEmailAddress(),
-                buildPersonalisation(caseDetails, cit, sendNotificationTitle));
+                buildPersonalisation(caseDetails, citizenUrl, sendNotificationTitle));
         }
 
-        if (!CLAIMANT_ONLY.equals(caseData.getRespondNotificationPartyToNotify())){
+        if (!CLAIMANT_ONLY.equals(caseData.getRespondNotificationPartyToNotify())) {
             Map<String, String> personalisation = buildPersonalisation(caseDetails, exuiUrl, sendNotificationTitle);
             List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
             respondents.forEach(obj -> sendRespondentEmail(caseData, personalisation, obj.getValue(), templateId));
         }
     }
 
-    public void handleAboutToSumbit(CaseDetails caseDetails) {
+    public void handleAboutToSubmit(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         Optional<SendNotificationTypeItem> sendNotificationTypeItemOptional = sendNotificationService.getSendNotification(caseData);
         if (sendNotificationTypeItemOptional.isEmpty()) {
@@ -146,8 +153,7 @@ public class RespondNotificationService {
         }
         SendNotificationType sendNotificationType = sendNotificationTypeItemOptional.get().getValue();
         createResponseNotification(caseData, sendNotificationType);
+        sendNotifyEmails(caseDetails,sendNotificationType);
         clearResponseNotificationFields(caseData);
-        sendNotifyEmails(caseDetails, caseData sendNotificationType);
-
     }
 }

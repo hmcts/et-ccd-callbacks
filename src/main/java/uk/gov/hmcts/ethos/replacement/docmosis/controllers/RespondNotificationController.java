@@ -99,7 +99,7 @@ public class RespondNotificationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        respondNotificationService.handleAboutToSumbit(caseDetails);
+        respondNotificationService.handleAboutToSubmit(caseDetails);
 
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }

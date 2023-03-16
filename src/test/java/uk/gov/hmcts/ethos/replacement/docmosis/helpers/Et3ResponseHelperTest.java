@@ -26,7 +26,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming"})
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming", "PMD.TooManyMethods"})
 class Et3ResponseHelperTest {
 
     public static final String START_DATE_MUST_BE_IN_THE_PAST = "Start date must be in the past";

@@ -52,6 +52,8 @@ public class RespondentTellSomethingElseService {
 
     @Value("${tse.respondent.application.acknowledgement.template.id}")
     private String emailTemplateId;
+    @Value("${tse.respondent.application.acknowledgement.type.c.template.id}")
+    private String emailTypeCTemplateId;
     @Value("${tse.respondent.application.notify.claimant.template.id}")
     private String claimantTemplateId;
     @Value("${url.exui.case-details}")
@@ -109,12 +111,12 @@ public class RespondentTellSomethingElseService {
     public void sendAcknowledgeEmailAndGeneratePdf(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
 
+        String email = userService.getUserDetails(userToken).getEmail();
+
         if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
-            // No need to send email for Group C
+            emailService.sendEmail(emailTypeCTemplateId, email, buildPersonalisationTypeC(caseDetails));
             return;
         }
-
-        String email = userService.getUserDetails(userToken).getEmail();
 
         if (NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())) {
             emailService.sendEmail(emailTemplateId, email, buildPersonalisation(caseDetails, RULE92_ANSWERED_NO));
@@ -163,6 +165,16 @@ public class RespondentTellSomethingElseService {
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
+    }
+
+    private Map<String, String> buildPersonalisationTypeC(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        return Map.of(
+            "caseNumber", caseData.getEthosCaseReference(),
+            "claimant", caseData.getClaimant(),
+            "respondents", getRespondentNames(caseData),
+            "caseId", caseDetails.getCaseId()
+        );
     }
 
     private Map<String, String> buildPersonalisation(CaseDetails detail, String customisedText) {

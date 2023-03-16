@@ -9,13 +9,6 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: spring-security-crypto-5.7.2.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org.springframework.security/spring-security-crypto@.*$</packageUrl>
-        <cve>CVE-2020-5408</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
    file name: spring-web-5.3.21.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org.springframework/spring-web@.*$</packageUrl>
@@ -27,13 +20,6 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/xalan/xalan@.*$</packageUrl>
         <cve>CVE-2022-34169</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: snakeyaml-1.32.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-        <vulnerabilityName>CVE-2022-38752</vulnerabilityName>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -363,28 +349,7 @@
     file name: snakeyaml-1.33.jar
     ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-        <cpe>cpe:/a:snakeyaml_project:snakeyaml</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-    file name: snakeyaml-1.33.jar
-    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
         <cpe>cpe:/a:yaml_project:yaml</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-    file name: snakeyaml-1.33.jar
-    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-        <cve>CVE-2022-3064</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-        file name: snakeyaml-1.33.jar
-        ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-        <cve>CVE-2021-4235</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[

@@ -43,7 +43,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelec
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings({"squid:S1192", "PMD.AvoidInstantiatingObjectsInLoops", "PMD.ExcessiveImports"})
+@SuppressWarnings({"squid:S1192", "PMD.AvoidInstantiatingObjectsInLoops", "PMD.ExcessiveImports", "PMD.TooManyMethods"})
 public class TseAdminService {
 
     @Value("${tse.admin.record-a-decision.notify.claimant.template.id}")
@@ -76,6 +76,7 @@ public class TseAdminService {
         + "|--|--|\r\n"
         +  "%s" // Notification title
         + "|Decision | %s|\r\n"
+        + "%s" // Decision details
         + "|Date | %s|\r\n"
         + "|Sent by | %s|\r\n"
         + "|Type of decision | %s|\r\n"
@@ -87,6 +88,8 @@ public class TseAdminService {
         + "\r\n";
 
     private static final String STRING_BR = "<br>";
+
+    private static final String CLOSE_APP_DECISION_DETAILS_OTHER = "|Decision details | %s|\r\n";
 
     private static final String DECISION_NOTIFICATION_TITLE = "|Notification | %s|\r\n";
 
@@ -284,6 +287,7 @@ public class TseAdminService {
                 .map(d -> String.format(CLOSE_APP_DECISION_DETAILS,
                         formatNotificationTitle(d.getValue()),
                     d.getValue().getDecision(),
+                    formatDecisionDetails(d.getValue()),
                     d.getValue().getDate(),
                     "Tribunal",
                     d.getValue().getTypeOfDecision(),
@@ -316,6 +320,12 @@ public class TseAdminService {
     private String formatNotificationTitle(TseAdminRecordDecisionType decision) {
         return isBlank(decision.getEnterNotificationTitle()) ? "" :
                 String.format(DECISION_NOTIFICATION_TITLE, decision.getEnterNotificationTitle());
+    }
+
+    private String formatDecisionDetails(TseAdminRecordDecisionType decision) {
+        return isBlank(decision.getDecisionDetails())
+            ? ""
+            : String.format(CLOSE_APP_DECISION_DETAILS_OTHER, decision.getDecisionDetails());
     }
 
     private String getDecisionDocumentLink(TseAdminRecordDecisionType decisionType, String authToken) {

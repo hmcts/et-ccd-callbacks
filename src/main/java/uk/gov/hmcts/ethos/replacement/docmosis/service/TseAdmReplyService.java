@@ -25,6 +25,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
@@ -149,7 +150,8 @@ public class TseAdmReplyService {
         return caseData.getTseAdmReplyAddDocument() == null
             && (CASE_MANAGEMENT_ORDER.equals(caseData.getTseAdmReplyIsCmoOrRequest())
                 || REQUEST.equals(caseData.getTseAdmReplyIsCmoOrRequest()))
-            && YES.equals(caseData.getTseAdmReplyIsResponseRequired());
+            && (YES.equals(caseData.getTseAdmReplyCmoIsResponseRequired())
+                || YES.equals(caseData.getTseAdmReplyRequestIsResponseRequired()));
     }
 
     /**
@@ -182,9 +184,12 @@ public class TseAdmReplyService {
                             .isCmoOrRequest(caseData.getTseAdmReplyIsCmoOrRequest())
                             .cmoMadeBy(caseData.getTseAdmReplyCmoMadeBy())
                             .requestMadeBy(caseData.getTseAdmReplyRequestMadeBy())
-                            .madeByFullName(caseData.getTseAdmReplyEnterFullName())
-                            .isResponseRequired(caseData.getTseAdmReplyIsResponseRequired())
-                            .selectPartyRespond(caseData.getTseAdmReplySelectPartyRespond())
+                            .madeByFullName(defaultIfEmpty(caseData.getTseAdmReplyCmoEnterFullName(),
+                                    caseData.getTseAdmReplyRequestEnterFullName()))
+                            .isResponseRequired(defaultIfEmpty(caseData.getTseAdmReplyCmoIsResponseRequired(),
+                                    caseData.getTseAdmReplyRequestIsResponseRequired()))
+                            .selectPartyRespond(defaultIfEmpty(caseData.getTseAdmReplyCmoSelectPartyRespond(),
+                                    caseData.getTseAdmReplyRequestSelectPartyRespond()))
                             .selectPartyNotify(caseData.getTseAdmReplySelectPartyNotify())
                             .build()
                     ).build());
@@ -227,9 +232,7 @@ public class TseAdmReplyService {
                             emailToRespondentTemplateId,
                             respondentSumTypeItem.getValue().getRespondentEmail());
 
-                    if (YES.equals(caseData.getTseAdmReplyIsResponseRequired())
-                        && (BOTH_PARTIES.equals(caseData.getTseAdmReplySelectPartyRespond())
-                        || RESPONDENT_TITLE.equals(caseData.getTseAdmReplySelectPartyRespond()))) {
+                    if (isResponseRequired(caseData, RESPONDENT_TITLE)) {
                         respondentDetails.setCustomisedText(RESPONSE_REQUIRED);
                     } else {
                         respondentDetails.setCustomisedText(RESPONSE_NOT_REQUIRED);
@@ -251,9 +254,7 @@ public class TseAdmReplyService {
                 TSEAdminEmailRecipientsData claimantDetails =
                     new TSEAdminEmailRecipientsData(emailToClaimantTemplateId, claimantEmail);
 
-                if (YES.equals(caseData.getTseAdmReplyIsResponseRequired())
-                    && (BOTH_PARTIES.equals(caseData.getTseAdmReplySelectPartyRespond())
-                    || CLAIMANT_TITLE.equals(caseData.getTseAdmReplySelectPartyRespond()))) {
+                if (isResponseRequired(caseData, CLAIMANT_TITLE)) {
                     claimantDetails.setCustomisedText(RESPONSE_REQUIRED);
                 } else {
                     claimantDetails.setCustomisedText(RESPONSE_NOT_REQUIRED);
@@ -262,6 +263,16 @@ public class TseAdmReplyService {
                 emailsToSend.add(claimantDetails);
             }
         }
+    }
+
+    private boolean isResponseRequired(CaseData caseData, String title) {
+        return CASE_MANAGEMENT_ORDER.equals(caseData.getTseAdmReplyIsCmoOrRequest())
+                ? YES.equals(caseData.getTseAdmReplyCmoIsResponseRequired())
+                    && (BOTH_PARTIES.equals(caseData.getTseAdmReplyCmoSelectPartyRespond())
+                        || title.equals(caseData.getTseAdmReplyCmoSelectPartyRespond()))
+                : YES.equals(caseData.getTseAdmReplyRequestIsResponseRequired())
+                    && (BOTH_PARTIES.equals(caseData.getTseAdmReplyRequestSelectPartyRespond())
+                        || title.equals(caseData.getTseAdmReplyRequestSelectPartyRespond()));
     }
 
     private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String customText) {
@@ -285,9 +296,12 @@ public class TseAdmReplyService {
         caseData.setTseAdmReplyIsCmoOrRequest(null);
         caseData.setTseAdmReplyCmoMadeBy(null);
         caseData.setTseAdmReplyRequestMadeBy(null);
-        caseData.setTseAdmReplyEnterFullName(null);
-        caseData.setTseAdmReplyIsResponseRequired(null);
-        caseData.setTseAdmReplySelectPartyRespond(null);
+        caseData.setTseAdmReplyCmoEnterFullName(null);
+        caseData.setTseAdmReplyCmoIsResponseRequired(null);
+        caseData.setTseAdmReplyRequestEnterFullName(null);
+        caseData.setTseAdmReplyRequestIsResponseRequired(null);
+        caseData.setTseAdmReplyCmoSelectPartyRespond(null);
+        caseData.setTseAdmReplyRequestSelectPartyRespond(null);
         caseData.setTseAdmReplySelectPartyNotify(null);
     }
 

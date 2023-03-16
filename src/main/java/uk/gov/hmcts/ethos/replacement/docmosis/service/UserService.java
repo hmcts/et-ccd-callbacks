@@ -27,8 +27,27 @@ public class UserService implements uk.gov.hmcts.ecm.common.service.UserService 
     }
 
     @Override
-    public UserDetails getUserDetailsById(String authorisation, String id) {
-        return idamApi.retrieveUserDetails(authorisation);
+    public UserDetails getUserDetailsById(String authToken, String userId) {
+        return idamApi.getUserByUserId(authToken, userId);
+    }
+
+    public TokenResponse getAccessTokenResponse(String username, String password) {
+        return idamApi.generateOpenIdToken(
+            new TokenRequest(
+                oauth2Configuration.getClientId(),
+                oauth2Configuration.getClientSecret(),
+                OPENID_GRANT_TYPE,
+                oauth2Configuration.getRedirectUri(),
+                username,
+                password,
+                oauth2Configuration.getClientScope(),
+                null,
+                null
+            ));
+    }
+
+    public String getAccessToken(String username, String password) {
+        return getAccessTokenResponse(username, password).accessToken;
     }
 
 }

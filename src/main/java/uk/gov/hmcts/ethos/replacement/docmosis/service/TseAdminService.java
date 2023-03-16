@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -57,7 +58,7 @@ public class TseAdminService {
             + "|--|--|\r\n"
             + "|%s application | %s|\r\n"
             + "|Application date | %s|\r\n"
-            + "|Give details | %s|\r\n"
+            + "|Details of the application | %s|\r\n"
             + "|Supporting material | %s|\r\n"
             + "\r\n";
 
@@ -73,13 +74,12 @@ public class TseAdminService {
 
     private static final String CLOSE_APP_DECISION_DETAILS = "|Decision | |\r\n"
         + "|--|--|\r\n"
-        + "|Notification | %s|\r\n"
+        +  "%s" // Notification title
         + "|Decision | %s|\r\n"
         + "|Date | %s|\r\n"
         + "|Sent by | %s|\r\n"
         + "|Type of decision | %s|\r\n"
         + "|Additional information | %s|\r\n"
-        + "|Description | %s|\r\n"
         + "|Document | %s|\r\n"
         + "|Decision made by | %s|\r\n"
         + "|Name | %s|\r\n"
@@ -87,6 +87,8 @@ public class TseAdminService {
         + "\r\n";
 
     private static final String STRING_BR = "<br>";
+
+    private static final String DECISION_NOTIFICATION_TITLE = "|Notification | %s|\r\n";
 
     /**
      * Initial Application and Respond details table.
@@ -280,13 +282,12 @@ public class TseAdminService {
                 .stream()
                 .reduce((first, second) -> second)
                 .map(d -> String.format(CLOSE_APP_DECISION_DETAILS,
-                    Optional.ofNullable(d.getValue().getEnterNotificationTitle()).orElse(""),
+                        formatNotificationTitle(d.getValue()),
                     d.getValue().getDecision(),
                     d.getValue().getDate(),
                     "Tribunal",
                     d.getValue().getTypeOfDecision(),
                     Optional.ofNullable(d.getValue().getAdditionalInformation()).orElse(""),
-                    Optional.ofNullable(d.getValue().getDecisionDetails()).orElse(""),
                     getDecisionDocumentLink(d.getValue(), authToken),
                     d.getValue().getDecisionMadeBy(),
                     d.getValue().getDecisionMadeByFullName(),
@@ -310,6 +311,11 @@ public class TseAdminService {
             + initialRespondDetailsWithRule92(applicationTypeItem.getValue(), authToken)
             + decisionsMarkdown;
 
+    }
+
+    private String formatNotificationTitle(TseAdminRecordDecisionType decision) {
+        return isBlank(decision.getEnterNotificationTitle()) ? "" :
+                String.format(DECISION_NOTIFICATION_TITLE, decision.getEnterNotificationTitle());
     }
 
     private String getDecisionDocumentLink(TseAdminRecordDecisionType decisionType, String authToken) {

@@ -1,14 +1,22 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
+import java.util.List;
+import java.util.UUID;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.*;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.AllocateHearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.AllocateHearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
@@ -17,16 +25,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.SelectionService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.CourtWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.CourtWorkerSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.JudgeSelectionService;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class AllocateHearingServiceTest {
@@ -156,7 +154,9 @@ public class AllocateHearingServiceTest {
 
         allocateHearingService.populateRooms(caseData);
 
-        verify(roomSelectionService, times(1)).createRoomSelection(caseData, selectedListing,
+        verify(roomSelectionService, times(1)).createRoomSelection(
+                caseData.getAllocateHearingCollection().get(0).getValue().getAllocateHearingVenue(),
+                selectedListing,
             true);
     }
 
@@ -171,7 +171,9 @@ public class AllocateHearingServiceTest {
 
         allocateHearingService.populateRooms(caseData);
 
-        verify(roomSelectionService, times(1)).createRoomSelection(caseData, selectedListing,
+        verify(roomSelectionService, times(1)).createRoomSelection(
+                caseData.getAllocateHearingCollection().get(0).getValue().getAllocateHearingVenue(),
+                selectedListing,
             false);
     }
 
@@ -224,7 +226,11 @@ public class AllocateHearingServiceTest {
     private CaseData createCaseData() {
         CaseData caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         caseData.setAllocateHearingHearing(new DynamicFixedListType());
-
+        AllocateHearingTypeItem allocateHearingTypeItem = new AllocateHearingTypeItem();
+        allocateHearingTypeItem.setId(UUID.randomUUID().toString());
+        AllocateHearingType allocateHearingType = new AllocateHearingType();
+        allocateHearingTypeItem.setValue(allocateHearingType);
+        caseData.setAllocateHearingCollection(List.of(allocateHearingTypeItem));
         selectedHearing = new HearingType();
         selectedListing = new DateListedType();
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
@@ -236,17 +242,19 @@ public class AllocateHearingServiceTest {
 
         return caseData;
     }
-
     private HearingSelectionService mockHearingSelectionService() {
         HearingSelectionService hearingSelectionService = mock(HearingSelectionService.class);
         List<DynamicValueType> hearings = SelectionServiceTestUtils.createListItems("hearing",
             "Hearing ");
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setId(UUID.randomUUID().toString());
+        dateListedTypeItem.setValue(selectedListing);
         when(hearingSelectionService.getHearingSelection(isA(CaseData.class))).thenReturn(hearings);
 
         when(hearingSelectionService.getSelectedHearing(isA(CaseData.class),
                 isA(DynamicFixedListType.class))).thenReturn(selectedHearing);
-        when(hearingSelectionService.getSelectedListing(isA(CaseData.class),
-                isA(DynamicFixedListType.class))).thenReturn(selectedListing);
+        when(hearingSelectionService.getListings(isA(CaseData.class),
+                isA(DynamicFixedListType.class))).thenReturn(List.of(dateListedTypeItem));
 
         return hearingSelectionService;
     }
@@ -278,7 +286,7 @@ public class AllocateHearingServiceTest {
         List<DynamicValueType> rooms = SelectionServiceTestUtils.createListItems("room", "Room ");
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(rooms);
-        when(roomSelectionService.createRoomSelection(isA(CaseData.class),
+        when(roomSelectionService.createRoomSelection(isA(DynamicFixedListType.class),
                 isA(DateListedType.class), isA(Boolean.class))).thenReturn(dynamicFixedListType);
 
         return roomSelectionService;

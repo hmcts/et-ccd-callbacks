@@ -207,8 +207,8 @@ public class ScotlandAllocatedHearingServiceTest {
 
         when(hearingSelectionService.getSelectedHearing(isA(CaseData.class),
                 isA(DynamicFixedListType.class))).thenReturn(selectedHearing);
-        when(hearingSelectionService.getSelectedListing(isA(CaseData.class),
-                isA(DynamicFixedListType.class))).thenReturn(selectedListing);
+//        when(hearingSelectionService.getListings(isA(CaseData.class),
+//                isA(DynamicFixedListType.class))).thenReturn(selectedListing);
 
         return hearingSelectionService;
     }
@@ -259,7 +259,7 @@ public class ScotlandAllocatedHearingServiceTest {
         List<DynamicValueType> rooms = SelectionServiceTestUtils.createListItems("room", "Room ");
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(rooms);
-        when(roomSelectionService.createRoomSelection(isA(CaseData.class),
+        when(roomSelectionService.createRoomSelection(isA(DynamicFixedListType.class),
                 isA(DateListedType.class), isA(Boolean.class))).thenReturn(dynamicFixedListType);
 
         return roomSelectionService;

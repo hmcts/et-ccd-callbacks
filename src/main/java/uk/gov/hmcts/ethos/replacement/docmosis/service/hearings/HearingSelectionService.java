@@ -9,7 +9,6 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
 @Service
@@ -47,18 +46,14 @@ public class HearingSelectionService {
                 dynamicFixedListType.getValue().getLabel(), caseData.getEthosCaseReference()));
     }
 
-    public DateListedType getSelectedListing(CaseData caseData, DynamicFixedListType dynamicFixedListType) {
+    public List<DateListedTypeItem> getListings(CaseData caseData, DynamicFixedListType dynamicFixedListType) {
         String id = dynamicFixedListType.getValue().getCode();
         for (HearingTypeItem hearing : caseData.getHearingCollection()) {
-            for (DateListedTypeItem listing : hearing.getValue().getHearingDateCollection()) {
-                if (listing.getId().equals(id)) {
-                    return listing.getValue();
-                }
+            if (hearing.getId().equals(id)) {
+                return hearing.getValue().getHearingDateCollection();
             }
         }
-
-        throw new IllegalStateException(String.format("Selected listing %s not found in case %s",
+        throw new IllegalStateException(String.format("Listings %s not found for selected hearing in case %s",
                 dynamicFixedListType.getValue().getLabel(), caseData.getEthosCaseReference()));
     }
-
 }

@@ -1,15 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static java.util.UUID.randomUUID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +15,18 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.UUID.randomUUID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
 @Service
 @RequiredArgsConstructor
@@ -145,15 +147,16 @@ public class RespondNotificationService {
 
     public void handleAboutToSubmit(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        Optional<SendNotificationTypeItem> sendNotificationTypeItemOptional = sendNotificationService.getSendNotification(caseData);
+        Optional<SendNotificationTypeItem> sendNotificationTypeItemOptional =
+            sendNotificationService.getSendNotification(caseData);
         if (sendNotificationTypeItemOptional.isEmpty()) {
-            log.warn(caseDetails.getCaseId() + " failed to create and send notification due to missing notification " +
-                "details");
+            log.warn(caseDetails.getCaseId() + " failed to create and send notification due to missing notification "
+                + "details");
             return;
         }
         SendNotificationType sendNotificationType = sendNotificationTypeItemOptional.get().getValue();
         createResponseNotification(caseData, sendNotificationType);
-        sendNotifyEmails(caseDetails,sendNotificationType);
+        sendNotifyEmails(caseDetails, sendNotificationType);
         clearResponseNotificationFields(caseData);
     }
 }

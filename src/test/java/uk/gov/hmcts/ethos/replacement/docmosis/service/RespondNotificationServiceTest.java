@@ -5,27 +5,42 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
-
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
 @ExtendWith(SpringExtension.class)
 class RespondNotificationServiceTest {
+    private static final String CLAIMANT_EMAIL = "claimant@test.com";
+    private static final String RESPONDENT_EMAIL = "repondent@test.com";
 
+    private CaseDetails caseDetails;
     private CaseData caseData;
 
     @Mock
@@ -38,8 +53,9 @@ class RespondNotificationServiceTest {
     @BeforeEach
     void setUp() {
         SendNotificationService sendNotificationService =
-                new SendNotificationService(hearingSelectionService, emailService);
+            new SendNotificationService(hearingSelectionService, emailService);
         respondNotificationService = new RespondNotificationService(emailService, sendNotificationService);
+        caseDetails = new CaseDetails();
         caseData = new CaseData();
     }
 
@@ -68,28 +84,29 @@ class RespondNotificationServiceTest {
         String result = respondNotificationService.getNotificationMarkDown(caseData);
 
         String expected = "|  | |\r\n"
-                + "| --- | --- |\r\n"
-                + "| Subject | title |\r\n"
-                + "| Notification | [Judgment] |\r\n"
-                + "| Hearing |  |\r\n"
-                + "| Date Sent | 01-JAN-1970 |\r\n"
-                + "| Sent By | TRIBUNAL  |\r\n"
-                + "| Case management order request |  |\r\n"
-                + "| Response due | no |\r\n"
-                + "| Party or parties to respond | Both parties |\r\n"
-                + "| Additional Information |  |\r\n"
-                + "| Description | title |\r\n"
-                + " | Document | |\r\n"
-                + "| Case management order made by |  |\r\n"
-                + "| Name |  |\r\n"
-                + "| Sent to | Both parties |\r\n";
+            + "| --- | --- |\r\n"
+            + "| Subject | title |\r\n"
+            + "| Notification | [Judgment] |\r\n"
+            + "| Hearing |  |\r\n"
+            + "| Date Sent | 01-JAN-1970 |\r\n"
+            + "| Sent By | TRIBUNAL  |\r\n"
+            + "| Case management order request |  |\r\n"
+            + "| Response due | no |\r\n"
+            + "| Party or parties to respond | Both parties |\r\n"
+            + "| Additional Information |  |\r\n"
+            + "| Description | title |\r\n"
+            + " | Document | |\r\n"
+            + "| Case management order made by |  |\r\n"
+            + "| Name |  |\r\n"
+            + "| Sent to | Both parties |\r\n";
         assertEquals(expected, result);
     }
 
     @Test
     void testGetRespondNotificationMarkdownAllFields() {
         UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
-        uploadedDocumentType.setDocumentBinaryUrl("http://dm-store:8080/documents/6fbf9470-f735-484a-9790-5b246b646fe2/binary");
+        uploadedDocumentType.setDocumentBinaryUrl(
+            "http://dm-store:8080/documents/6fbf9470-f735-484a-9790-5b246b646fe2/binary");
         uploadedDocumentType.setDocumentFilename("TEST.PDF");
         uploadedDocumentType.setDocumentUrl("http://dm-store:8080/documents/6fbf9470-f735-484a-9790-5b246b646fe2");
 
@@ -108,7 +125,7 @@ class RespondNotificationServiceTest {
         notificationType.setSendNotificationLetter("no");
         notificationType.setSendNotificationUploadDocument(documents);
         notificationType.setSendNotificationSubject(List.of("Hearing",
-                "Case management orders / requests", "Judgment"));
+            "Case management orders / requests", "Judgment"));
         notificationType.setSendNotificationAdditionalInfo("info");
         notificationType.setSendNotificationNotify("Both parties");
         notificationType.setSendNotificationCaseManagement("Request");
@@ -140,22 +157,89 @@ class RespondNotificationServiceTest {
         String result = respondNotificationService.getNotificationMarkDown(caseData);
 
         String expected = "|  | |\r\n"
-                + "| --- | --- |\r\n"
-                + "| Subject | title |\r\n"
-                + "| Notification | [Hearing, Case management orders / requests, Judgment] |\r\n"
-                + "| Hearing | 1: Hearing - Barnstaple - 16 May 2022 01:00 |\r\n"
-                + "| Date Sent | 01-JAN-1970 |\r\n"
-                + "| Sent By | TRIBUNAL  |\r\n"
-                + "| Case management order request | Request |\r\n"
-                + "| Response due | no |\r\n"
-                + "| Party or parties to respond | Both parties |\r\n"
-                + "| Additional Information | info |\r\n"
-                + "| Description | title |\r\n"
-                + " | Document | <a href=\"/documents/6fbf9470-f735-484a-9790-5b246b646fe2/binary\""
-                + " target=\"_blank\">TEST.PDF</a>\r\n"
-                + "| Case management order made by | Judge |\r\n"
-                + "| Name | John Doe |\r\n"
-                + "| Sent to | Both parties |\r\n";
+            + "| --- | --- |\r\n"
+            + "| Subject | title |\r\n"
+            + "| Notification | [Hearing, Case management orders / requests, Judgment] |\r\n"
+            + "| Hearing | 1: Hearing - Barnstaple - 16 May 2022 01:00 |\r\n"
+            + "| Date Sent | 01-JAN-1970 |\r\n"
+            + "| Sent By | TRIBUNAL  |\r\n"
+            + "| Case management order request | Request |\r\n"
+            + "| Response due | no |\r\n"
+            + "| Party or parties to respond | Both parties |\r\n"
+            + "| Additional Information | info |\r\n"
+            + "| Description | title |\r\n"
+            + " | Document | <a href=\"/documents/6fbf9470-f735-484a-9790-5b246b646fe2/binary\""
+            + " target=\"_blank\">TEST.PDF</a>\r\n"
+            + "| Case management order made by | Judge |\r\n"
+            + "| Name | John Doe |\r\n"
+            + "| Sent to | Both parties |\r\n";
         assertEquals(expected, result);
+    }
+
+    private void setUpNotifyEmail() {
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentEmail(RESPONDENT_EMAIL);
+
+        caseDetails.setCaseId("1234");
+        caseData =
+            CaseDataBuilder.builder()
+                .withEthosCaseReference("1234")
+                .withClaimant("Claimant")
+                .withClaimantType(CLAIMANT_EMAIL)
+                .withRespondent(respondentSumType).build();
+        caseData.setSendNotificationTitle("TEST");
+        ReflectionTestUtils.setField(respondNotificationService,
+            "noResponseTemplateId", "noResponseTemplateId");
+        ReflectionTestUtils.setField(respondNotificationService,
+            "responseTemplateId", "responseTemplateId");
+
+    }
+
+    @Test
+    void sendNotifyEmailsNoResponseBothParties() {
+        setUpNotifyEmail();
+
+        caseData.setRespondNotificationWhoRespond(BOTH_PARTIES);
+        caseData.setRespondNotificationResponseRequired(NO);
+        caseDetails.setCaseData(caseData);
+        SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();
+        respondNotificationService.sendNotifyEmails(caseDetails, sendNotification);
+        verify(emailService, times(1)).sendEmail(eq("noResponseTemplateId"),
+            eq(CLAIMANT_EMAIL), any());
+        verify(emailService, times(1)).sendEmail(eq("noResponseTemplateId"),
+            eq(RESPONDENT_EMAIL), any());
+
+    }
+
+    @Test
+    void sendNotifyEmailsNoResponseClaimantOnly() {
+        setUpNotifyEmail();
+
+        caseData.setRespondNotificationWhoRespond(CLAIMANT_EMAIL);
+        caseData.setRespondNotificationResponseRequired(NO);
+        caseDetails.setCaseData(caseData);
+        SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();
+        respondNotificationService.sendNotifyEmails(caseDetails, sendNotification);
+        verify(emailService, times(1)).sendEmail(eq("noResponseTemplateId"),
+            eq(CLAIMANT_EMAIL), any());
+        verify(emailService, times(0)).sendEmail(eq("noResponseTemplateId"),
+            eq(RESPONDENT_EMAIL), any());
+
+    }
+
+    @Test
+    void sendNotifyEmailsResponseRequiredRespondentOnly() {
+        setUpNotifyEmail();
+
+        caseData.setRespondNotificationWhoRespond(RESPONDENT_ONLY);
+        caseData.setRespondNotificationResponseRequired(YES);
+        caseDetails.setCaseData(caseData);
+        SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();
+        respondNotificationService.sendNotifyEmails(caseDetails, sendNotification);
+        verify(emailService, times(0)).sendEmail(eq("responseTemplateId"),
+            eq(CLAIMANT_EMAIL), any());
+        verify(emailService, times(1)).sendEmail(eq("responseTemplateId"),
+            eq(RESPONDENT_EMAIL), any());
+
     }
 }

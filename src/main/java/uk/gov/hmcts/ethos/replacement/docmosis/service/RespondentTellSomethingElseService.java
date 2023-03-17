@@ -108,7 +108,7 @@ public class RespondentTellSomethingElseService {
      * @param caseDetails in which the case details are extracted from
      * @param userToken jwt used for authorization
      */
-    public void sendAcknowledgeEmailAndGeneratePdf(CaseDetails caseDetails, String userToken) {
+    public void sendAcknowledgeEmail(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
 
         String email = userService.getUserDetails(userToken).getEmail();
@@ -132,6 +132,16 @@ public class RespondentTellSomethingElseService {
         }
 
         emailService.sendEmail(emailTemplateId, email, buildPersonalisation(caseDetails, customisedText));
+    }
+
+    private Map<String, String> buildPersonalisationTypeC(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        return Map.of(
+            "caseNumber", caseData.getEthosCaseReference(),
+            "claimant", caseData.getClaimant(),
+            "respondents", getRespondentNames(caseData),
+            "caseId", caseDetails.getCaseId()
+        );
     }
 
     /**
@@ -165,16 +175,6 @@ public class RespondentTellSomethingElseService {
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
-    }
-
-    private Map<String, String> buildPersonalisationTypeC(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
-        return Map.of(
-            "caseNumber", caseData.getEthosCaseReference(),
-            "claimant", caseData.getClaimant(),
-            "respondents", getRespondentNames(caseData),
-            "caseId", caseDetails.getCaseId()
-        );
     }
 
     private Map<String, String> buildPersonalisation(CaseDetails detail, String customisedText) {

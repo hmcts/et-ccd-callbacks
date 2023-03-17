@@ -114,7 +114,7 @@ public class RespondentTellSomethingElseController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
 
         // send Respondent confirmation Email
-        resTseService.sendAcknowledgeEmailAndGeneratePdf(caseDetails, userToken);
+        resTseService.sendAcknowledgeEmail(caseDetails, userToken);
         resTseService.sendClaimantEmail(caseDetails);
         resTseService.sendAdminEmail(caseDetails);
 

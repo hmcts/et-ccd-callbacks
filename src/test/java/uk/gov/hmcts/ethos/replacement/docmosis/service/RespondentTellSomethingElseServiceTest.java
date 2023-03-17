@@ -115,6 +115,7 @@ class RespondentTellSomethingElseServiceTest {
         tseService = new TseService();
 
         ReflectionTestUtils.setField(respondentTellSomethingElseService, "emailTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(respondentTellSomethingElseService, "emailTypeCTemplateId", "TypeCTemplateId");
         ReflectionTestUtils.setField(respondentTellSomethingElseService, "exuiUrl", "exui/cases/case-details/");
 
         UserDetails userDetails = HelperTest.getUserDetails();
@@ -273,7 +274,7 @@ class RespondentTellSomethingElseServiceTest {
         Map<String, String> expectedPersonalisation = createPersonalisation(caseData, expectedAnswer,
             selectedApplication);
 
-        respondentTellSomethingElseService.sendAcknowledgeEmailAndGeneratePdf(caseDetails, AUTH_TOKEN);
+        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
 
         if (emailSent) {
             verify(emailService).sendEmail(TEMPLATE_ID, LEGAL_REP_EMAIL, expectedPersonalisation);
@@ -306,10 +307,27 @@ class RespondentTellSomethingElseServiceTest {
             Arguments.of(TSE_APP_RESTRICT_PUBLICITY, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
             Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupB, true),
             Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupB, true),
-            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupB, true),
-
-            Arguments.of(TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE, null, null, false)
+            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupB, true)
         );
+    }
+
+    @Test
+    void sendAcknowledgeEmailTypeC() {
+        CaseData caseData = createCaseData(TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE, NO);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        Map<String, String> expectedPersonalisation = Map.of(
+            "caseNumber", caseData.getEthosCaseReference(),
+            "claimant", caseData.getClaimant(),
+            "respondents", getRespondentNames(caseData),
+            "caseId", CASE_ID
+        );
+
+        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
+
+        verify(emailService).sendEmail("TypeCTemplateId", LEGAL_REP_EMAIL, expectedPersonalisation);
     }
 
     @Test

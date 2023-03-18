@@ -16,6 +16,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelection
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.CourtWorkerSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.JudgeSelectionService;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @SuppressWarnings({"PMD.ConfusingTernary"})
@@ -42,13 +43,11 @@ public class ScotlandAllocateHearingService {
         List<DateListedTypeItem> listings = getListings(caseData);
         for (DateListedTypeItem dateListedTypeItem : listings) {
             DateListedType dateListedType = dateListedTypeItem.getValue();
-            for (AllocateHearingTypeItem allocateHearingTypeItem : caseData.getAllocateHearingCollection()) {
-                AllocateHearingType allocateHearingType = allocateHearingTypeItem.getValue();
-                if (allocateHearingType.getAllocateHearingDate()
-                        .equals(dateListedType.getListedDate())) {
-                    allocateHearingType.setAllocateHearingManagingOffice(dateListedType.getHearingVenueDayScotland());
-                }
-            }
+            Optional<AllocateHearingTypeItem> item = caseData.getAllocateHearingCollection().stream().filter(a ->
+                    a.getValue().getAllocateHearingDate().equals(dateListedType.getListedDate())).findFirst();
+            item.ifPresent(allocateHearingTypeItem
+                    -> allocateHearingTypeItem.getValue()
+                    .setAllocateHearingManagingOffice(dateListedType.getHearingVenueDayScotland()));
         }
     }
 

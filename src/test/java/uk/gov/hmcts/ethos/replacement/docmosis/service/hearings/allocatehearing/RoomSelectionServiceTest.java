@@ -20,8 +20,6 @@ public class RoomSelectionServiceTest {
         dynamicFixedListType.setValue(dynamicValueType);
         dynamicFixedListType.setListItems(List.of(dynamicValueType));
         RoomService roomService = mockRoomService();
-        List<DynamicValueType> dynamicValues = SelectionServiceTestUtils.createListItems("room", "Room ");
-        when(roomService.getRooms("venue1")).thenReturn(dynamicValues);
         RoomSelectionService roomSelectionService = new RoomSelectionService(roomService);
         DateListedType selectedListing = mockSelectedListing(null);
         DynamicFixedListType actualResult = roomSelectionService.createRoomSelection(

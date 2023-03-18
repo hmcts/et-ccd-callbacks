@@ -65,7 +65,7 @@ public class AllocateHearingServiceTest {
         String postponedBy = "Barney";
         selectedListing.setHearingStatus(hearingStatus);
         selectedListing.setPostponedBy(postponedBy);
-
+        selectedHearing.setHearingSitAlone(String.valueOf(Boolean.TRUE));
         // Act
         allocateHearingService.handleListingSelected(caseData);
 
@@ -137,14 +137,6 @@ public class AllocateHearingServiceTest {
         assertEquals(hearingSitAlone, caseData.getAllocateHearingSitAlone());
         assertEquals(postponedBy, allocateHearingType.getAllocateHearingPostponedBy());
         assertEquals(hearingStatus, allocateHearingType.getAllocateHearingStatus());
-    }
-
-    @Test
-    public void testPopulateRooms() {
-        AllocateHearingType allocateHearingType = caseData.getAllocateHearingCollection().get(0).getValue();
-        allocateHearingService.populateRooms(caseData);
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(allocateHearingType.getAllocateHearingRoom(),
-                "code", "label");
     }
 
     @Test

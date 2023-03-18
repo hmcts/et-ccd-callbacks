@@ -1,13 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
-import java.util.List;
-import java.util.UUID;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.*;
+import org.mockito.Mockito;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -25,6 +20,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.SelectionService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.CourtWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.CourtWorkerSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.JudgeSelectionService;
+import java.util.List;
+import java.util.UUID;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.isA;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class AllocateHearingServiceTest {
@@ -61,9 +61,6 @@ public class AllocateHearingServiceTest {
     @Test
     public void testHandleListingSelectedNoExistingSelections() {
         // Arrange
-        String hearingSitAlone = String.valueOf(Boolean.TRUE);
-        selectedHearing.setHearingSitAlone(hearingSitAlone);
-
         String hearingStatus = Constants.HEARING_STATUS_HEARD;
         String postponedBy = "Barney";
         selectedListing.setHearingStatus(hearingStatus);
@@ -75,20 +72,26 @@ public class AllocateHearingServiceTest {
         // Assert
         DynamicFixedListType judges = caseData.getAllocateHearingJudge();
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(judges, "judge", "Judge ");
-        DynamicFixedListType venues = caseData.getAllocateHearingVenue();
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(venues, "venue", "Venue ");
-        DynamicFixedListType clerks = caseData.getAllocateHearingClerk();
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(clerks, "clerk", "Clerk ");
+        DynamicFixedListType venues = caseData.getAllocateHearingCollection()
+                .get(0).getValue().getAllocateHearingVenue();
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
+                venues, "venue", "Venue ");
+        DynamicFixedListType clerks = caseData.getAllocateHearingCollection()
+                .get(0).getValue().getAllocateHearingClerk();
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
+                clerks, "clerk", "Clerk ");
         DynamicFixedListType employerMembers = caseData.getAllocateHearingEmployerMember();
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
                 employerMembers, "employerMember", "Employer Member ");
         DynamicFixedListType employeeMembers = caseData.getAllocateHearingEmployeeMember();
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
                 employeeMembers, "employeeMember", "Employee Member ");
-
+        String hearingSitAlone = String.valueOf(Boolean.TRUE);
         assertEquals(hearingSitAlone, caseData.getAllocateHearingSitAlone());
-        assertEquals(postponedBy, caseData.getAllocateHearingPostponedBy());
-        assertEquals(hearingStatus, caseData.getAllocateHearingStatus());
+        assertEquals(postponedBy,  caseData.getAllocateHearingCollection()
+                .get(0).getValue().getAllocateHearingPostponedBy());
+        assertEquals(hearingStatus,  caseData.getAllocateHearingCollection()
+                .get(0).getValue().getAllocateHearingStatus());
     }
 
     @Test
@@ -114,11 +117,12 @@ public class AllocateHearingServiceTest {
         allocateHearingService.handleListingSelected(caseData);
 
         // Assert
+        AllocateHearingType allocateHearingType = caseData.getAllocateHearingCollection().get(0).getValue();
         DynamicFixedListType judges = caseData.getAllocateHearingJudge();
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(judges, "judge", "Judge ");
-        DynamicFixedListType venues = caseData.getAllocateHearingVenue();
+        DynamicFixedListType venues = allocateHearingType.getAllocateHearingVenue();
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(venues, "venue", "Venue ");
-        DynamicFixedListType clerks = caseData.getAllocateHearingClerk();
+        DynamicFixedListType clerks = allocateHearingType.getAllocateHearingClerk();
         SelectionServiceTestUtils.verifyDynamicFixedListSelected(clerks, "clerk", "Clerk ",
             selectedClerk);
         DynamicFixedListType employerMembers = caseData.getAllocateHearingEmployerMember();
@@ -131,47 +135,57 @@ public class AllocateHearingServiceTest {
                 selectedEmployeeMember);
 
         assertEquals(hearingSitAlone, caseData.getAllocateHearingSitAlone());
-        assertEquals(postponedBy, caseData.getAllocateHearingPostponedBy());
-        assertEquals(hearingStatus, caseData.getAllocateHearingStatus());
+        assertEquals(postponedBy, allocateHearingType.getAllocateHearingPostponedBy());
+        assertEquals(hearingStatus, allocateHearingType.getAllocateHearingStatus());
     }
 
     @Test
     public void testPopulateRooms() {
+        AllocateHearingType allocateHearingType = caseData.getAllocateHearingCollection().get(0).getValue();
         allocateHearingService.populateRooms(caseData);
-
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(caseData.getAllocateHearingRoom(),
-                "room", "Room ");
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(allocateHearingType.getAllocateHearingRoom(),
+                "code", "label");
     }
 
     @Test
     public void testPopulateRoomsNewVenueSelected() {
-        selectedListing.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("venue1",
-            "venue1")));
-        selectedListing.setHearingRoom(DynamicFixedListType.of(DynamicValueType.create("room1",
-            "room1")));
-        caseData.setAllocateHearingVenue(DynamicFixedListType.of(DynamicValueType.create("venue2",
-            "venue2")));
-
+        selectedListing.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("code1",
+            "label1")));
+        selectedListing.setHearingRoom(DynamicFixedListType.of(DynamicValueType.create("code1",
+            "label1")));
+        caseData.setAllocateHearingVenue(DynamicFixedListType.of(DynamicValueType.create("code1",
+            "label1")));
+        selectedListing.setListedDate("2022-02-11 11:00:00");
         allocateHearingService.populateRooms(caseData);
 
-        verify(roomSelectionService, times(1)).createRoomSelection(
+        Mockito.verify(roomSelectionService, Mockito.times(1)).createRoomSelection(
                 caseData.getAllocateHearingCollection().get(0).getValue().getAllocateHearingVenue(),
                 selectedListing,
-            true);
+            false);
     }
 
     @Test
     public void testPopulateRoomsExistingVenueSelected() {
-        selectedListing.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("venue1",
-            "venue1")));
+        DynamicValueType dynamicValueType1 = new DynamicValueType();
+        dynamicValueType1.setCode("code1");
+        dynamicValueType1.setLabel("label1");
+        DynamicValueType dynamicValueType2 = new DynamicValueType();
+        dynamicValueType2.setCode("code2");
+        dynamicValueType2.setLabel("label2");
+        DynamicValueType dynamicValueType3 = new DynamicValueType();
+        dynamicValueType3.setCode("code3");
+        dynamicValueType3.setLabel("label3");
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        dynamicFixedListType.setListItems(List.of(dynamicValueType1, dynamicValueType2, dynamicValueType3));
+        dynamicFixedListType.setValue(dynamicValueType1);
+        selectedListing.setHearingVenueDay(dynamicFixedListType);
         DynamicValueType selectedRoom = DynamicValueType.create("room1", "Room 1");
         selectedListing.setHearingRoom(DynamicFixedListType.of(selectedRoom));
-        caseData.setAllocateHearingVenue(DynamicFixedListType.of(DynamicValueType.create("venue1",
-            "venue1")));
-
+        caseData.setAllocateHearingVenue(DynamicFixedListType.of(DynamicValueType.create("venue1", "venue1")));
+        selectedListing.setListedDate("2022-02-11 11:00:00");
         allocateHearingService.populateRooms(caseData);
 
-        verify(roomSelectionService, times(1)).createRoomSelection(
+        Mockito.verify(roomSelectionService, Mockito.times(1)).createRoomSelection(
                 caseData.getAllocateHearingCollection().get(0).getValue().getAllocateHearingVenue(),
                 selectedListing,
             false);
@@ -181,26 +195,32 @@ public class AllocateHearingServiceTest {
     public void testUpdateCase() {
         // Arrange
         String sitAlone = String.valueOf(Boolean.TRUE);
-        DynamicFixedListType judge = DynamicFixedListType.of(DynamicValueType.create("judge2", "Judge 2"));
         DynamicFixedListType employerMember = DynamicFixedListType.of(DynamicValueType.create("employerMember2",
-            "Employer Member 2"));
+                "Employer Member 2"));
         DynamicFixedListType employeeMember = DynamicFixedListType.of(DynamicValueType.create("employeeMember2",
-            "Employee Member 2"));
-        String hearingStatus = Constants.HEARING_STATUS_POSTPONED;
-        String postponedBy = "Doris";
-        DynamicFixedListType venue = DynamicFixedListType.of(DynamicValueType.create("venue2", "Venue 2"));
-        DynamicFixedListType room = DynamicFixedListType.of(DynamicValueType.create("room2", "Room 2"));
-        DynamicFixedListType clerk = DynamicFixedListType.of(DynamicValueType.create("clerk2", "Clerk 2"));
+                "Employee Member 2"));
         caseData.setAllocateHearingSitAlone(sitAlone);
+        DynamicFixedListType judge = DynamicFixedListType.of(DynamicValueType.create("judge2", "Judge 2"));
         caseData.setAllocateHearingJudge(judge);
         caseData.setAllocateHearingEmployerMember(employerMember);
         caseData.setAllocateHearingEmployeeMember(employeeMember);
-        caseData.setAllocateHearingStatus(hearingStatus);
-        caseData.setAllocateHearingPostponedBy(postponedBy);
-        caseData.setAllocateHearingVenue(venue);
-        caseData.setAllocateHearingRoom(room);
-        caseData.setAllocateHearingClerk(clerk);
-
+        AllocateHearingTypeItem allocateHearingTypeItem = new AllocateHearingTypeItem();
+        allocateHearingTypeItem.setId(UUID.randomUUID().toString());
+        AllocateHearingType allocateHearingType = new AllocateHearingType();
+        String hearingStatus = Constants.HEARING_STATUS_POSTPONED;
+        String postponedBy = "Doris";
+        allocateHearingType.setAllocateHearingStatus(hearingStatus);
+        allocateHearingType.setAllocateHearingPostponedBy(postponedBy);
+        DynamicFixedListType venue = DynamicFixedListType.of(DynamicValueType.create("venue2", "Venue 2"));
+        DynamicFixedListType room = DynamicFixedListType.of(DynamicValueType.create("room2", "Room 2"));
+        DynamicFixedListType clerk = DynamicFixedListType.of(DynamicValueType.create("clerk2", "Clerk 2"));
+        allocateHearingType.setAllocateHearingVenue(venue);
+        allocateHearingType.setAllocateHearingRoom(room);
+        allocateHearingType.setAllocateHearingClerk(clerk);
+        allocateHearingType.setAllocateHearingDate("2022-02-11 11:00:00");
+        allocateHearingTypeItem.setValue(allocateHearingType);
+        caseData.setAllocateHearingCollection(List.of(allocateHearingTypeItem));
+        selectedListing.setListedDate("2022-02-11 11:00:00");
         // Act
         allocateHearingService.updateCase(caseData);
 
@@ -228,7 +248,25 @@ public class AllocateHearingServiceTest {
         caseData.setAllocateHearingHearing(new DynamicFixedListType());
         AllocateHearingTypeItem allocateHearingTypeItem = new AllocateHearingTypeItem();
         allocateHearingTypeItem.setId(UUID.randomUUID().toString());
+        DynamicValueType dynamicValueType1 = new DynamicValueType();
+        DynamicValueType dynamicValueType2 = new DynamicValueType();
+        dynamicValueType1.setCode("code1");
+        dynamicValueType1.setLabel("label1");
+        dynamicValueType2.setCode("code2");
+        dynamicValueType2.setLabel("label2");
+        DynamicValueType dynamicValueType3 = new DynamicValueType();
+        dynamicValueType3.setCode("code3");
+        dynamicValueType3.setLabel("label3");
         AllocateHearingType allocateHearingType = new AllocateHearingType();
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        dynamicFixedListType.setListItems(List.of(dynamicValueType1, dynamicValueType2, dynamicValueType3));
+        dynamicFixedListType.setValue(dynamicValueType1);
+        allocateHearingType.setAllocateHearingRoom(dynamicFixedListType);
+        allocateHearingType.setAllocateHearingVenue(dynamicFixedListType);
+        allocateHearingType.setAllocateHearingClerk(dynamicFixedListType);
+        allocateHearingType.setAllocateHearingPostponedBy("clerk");
+        allocateHearingType.setAllocateHearingStatus("Heard");
+        allocateHearingType.setAllocateHearingDate("2022-02-11 11:00:00");
         allocateHearingTypeItem.setValue(allocateHearingType);
         caseData.setAllocateHearingCollection(List.of(allocateHearingTypeItem));
         selectedHearing = new HearingType();
@@ -242,70 +280,71 @@ public class AllocateHearingServiceTest {
 
         return caseData;
     }
+
     private HearingSelectionService mockHearingSelectionService() {
-        HearingSelectionService hearingSelectionService = mock(HearingSelectionService.class);
+        HearingSelectionService hearingSelectionService = Mockito.mock(HearingSelectionService.class);
         List<DynamicValueType> hearings = SelectionServiceTestUtils.createListItems("hearing",
             "Hearing ");
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setId(UUID.randomUUID().toString());
         dateListedTypeItem.setValue(selectedListing);
-        when(hearingSelectionService.getHearingSelection(isA(CaseData.class))).thenReturn(hearings);
+        Mockito.when(hearingSelectionService.getHearingSelection(isA(CaseData.class))).thenReturn(hearings);
 
-        when(hearingSelectionService.getSelectedHearing(isA(CaseData.class),
+        Mockito.when(hearingSelectionService.getSelectedHearing(isA(CaseData.class),
                 isA(DynamicFixedListType.class))).thenReturn(selectedHearing);
-        when(hearingSelectionService.getListings(isA(CaseData.class),
+        Mockito.when(hearingSelectionService.getListings(isA(CaseData.class),
                 isA(DynamicFixedListType.class))).thenReturn(List.of(dateListedTypeItem));
 
         return hearingSelectionService;
     }
 
     private JudgeSelectionService mockJudgeSelectionService() {
-        JudgeSelectionService judgeSelectionService = mock(JudgeSelectionService.class);
+        JudgeSelectionService judgeSelectionService = Mockito.mock(JudgeSelectionService.class);
         List<DynamicValueType> judges = SelectionServiceTestUtils.createListItems("judge", "Judge ");
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(judges);
-        when(judgeSelectionService.createJudgeSelection(isA(TribunalOffice.class),
+        Mockito.when(judgeSelectionService.createJudgeSelection(isA(TribunalOffice.class),
                 isA(HearingType.class))).thenReturn(dynamicFixedListType);
 
         return judgeSelectionService;
     }
 
     private VenueSelectionService mockVenueSelectionService() {
-        VenueSelectionService venueSelectionService = mock(VenueSelectionService.class);
+        VenueSelectionService venueSelectionService = Mockito.mock(VenueSelectionService.class);
         List<DynamicValueType> venues = SelectionServiceTestUtils.createListItems("venue", "Venue ");
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(venues);
-        when(venueSelectionService.createVenueSelection(isA(TribunalOffice.class),
+        Mockito.when(venueSelectionService.createVenueSelection(isA(TribunalOffice.class),
                 isA(DateListedType.class))).thenReturn(dynamicFixedListType);
 
         return venueSelectionService;
     }
 
     private RoomSelectionService mockRoomSelectionService() {
-        RoomSelectionService roomSelectionService = mock(RoomSelectionService.class);
+        RoomSelectionService roomSelectionService = Mockito.mock(RoomSelectionService.class);
         List<DynamicValueType> rooms = SelectionServiceTestUtils.createListItems("room", "Room ");
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(rooms);
-        when(roomSelectionService.createRoomSelection(isA(DynamicFixedListType.class),
+        Mockito.when(roomSelectionService.createRoomSelection(isA(DynamicFixedListType.class),
                 isA(DateListedType.class), isA(Boolean.class))).thenReturn(dynamicFixedListType);
 
         return roomSelectionService;
     }
 
     private CourtWorkerSelectionService mockCourtWorkerSelectionService() {
-        CourtWorkerService courtWorkerService = mock(CourtWorkerService.class);
+        CourtWorkerService courtWorkerService = Mockito.mock(CourtWorkerService.class);
         List<DynamicValueType> clerks = SelectionServiceTestUtils.createListItems("clerk", "Clerk ");
-        when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
+        Mockito.when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
                 CourtWorkerType.CLERK)).thenReturn(clerks);
 
         List<DynamicValueType> employerMembers = SelectionServiceTestUtils.createListItems("employerMember",
             "Employer Member ");
-        when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
+        Mockito.when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
                 CourtWorkerType.EMPLOYER_MEMBER)).thenReturn(employerMembers);
 
         List<DynamicValueType> employeeMembers = SelectionServiceTestUtils.createListItems("employeeMember",
             "Employee Member ");
-        when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
+        Mockito.when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
                 CourtWorkerType.EMPLOYEE_MEMBER)).thenReturn(employeeMembers);
 
         return new CourtWorkerSelectionService(courtWorkerService);

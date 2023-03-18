@@ -3,74 +3,90 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing
 import org.junit.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.SelectionServiceTestUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.RoomService;
-
 import java.util.List;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class RoomSelectionServiceTest {
     @Test
     public void testCreateRoomSelectionNoSelectedRoom() {
-        CaseData caseData = mockCaseData();
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setCode("room");
+        dynamicValueType.setLabel("room");
+        dynamicFixedListType.setValue(dynamicValueType);
+        dynamicFixedListType.setListItems(List.of(dynamicValueType));
         RoomService roomService = mockRoomService();
-        DateListedType selectedListing = mockSelectedListing(null);
-
+        List<DynamicValueType> dynamicValues = SelectionServiceTestUtils.createListItems("room", "Room ");
+        when(roomService.getRooms("venue1")).thenReturn(dynamicValues);
         RoomSelectionService roomSelectionService = new RoomSelectionService(roomService);
-        DynamicFixedListType actualResult = roomSelectionService.createRoomSelection(caseData, selectedListing, false);
+        DateListedType selectedListing = mockSelectedListing(null);
+        DynamicFixedListType actualResult = roomSelectionService.createRoomSelection(
+                dynamicFixedListType,
+                selectedListing,
+                false);
 
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(actualResult, "room", "Room ");
     }
 
     @Test
     public void testCreateRoomSelectionWithSelectedRoom() {
-        CaseData caseData = mockCaseData();
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setCode("room");
+        dynamicValueType.setLabel("room");
+        dynamicFixedListType.setValue(dynamicValueType);
+        dynamicFixedListType.setListItems(List.of(dynamicValueType));
         RoomService roomService = mockRoomService();
+        RoomSelectionService roomSelectionService = new RoomSelectionService(roomService);
         DynamicValueType selectedRoom = DynamicValueType.create("room2", "Room 2");
         DateListedType selectedListing = mockSelectedListing(selectedRoom);
+        DynamicFixedListType actualResult = roomSelectionService.createRoomSelection(
+                dynamicFixedListType, selectedListing, false);
 
-        RoomSelectionService roomSelectionService = new RoomSelectionService(roomService);
-        DynamicFixedListType actualResult = roomSelectionService.createRoomSelection(caseData, selectedListing, false);
-
-        SelectionServiceTestUtils.verifyDynamicFixedListSelected(actualResult, "room", "Room ", selectedRoom);
+        SelectionServiceTestUtils.verifyDynamicFixedListSelected(
+                actualResult, "room", "Room ", selectedRoom);
     }
 
     @Test
     public void testCreateRoomSelectionVenueChangedNoSelectedRoom() {
-        CaseData caseData = mockCaseData();
-        RoomService roomService = mockRoomService();
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setCode("room");
+        dynamicValueType.setLabel("room");
+        dynamicFixedListType.setValue(dynamicValueType);
+        dynamicFixedListType.setListItems(List.of(dynamicValueType));
         DateListedType selectedListing = mockSelectedListing(null);
-
+        RoomService roomService = mockRoomService();
         RoomSelectionService roomSelectionService = new RoomSelectionService(roomService);
-        DynamicFixedListType actualResult = roomSelectionService.createRoomSelection(caseData, selectedListing, true);
+        DynamicFixedListType actualResult = roomSelectionService.createRoomSelection(
+                dynamicFixedListType, selectedListing, true);
 
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(actualResult, "room", "Room ");
+        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
+                actualResult, "room", "Room ");
     }
 
     @Test
     public void testCreateRoomSelectionVenueChangedWithSelectedRoom() {
-        CaseData caseData = mockCaseData();
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setCode("room");
+        dynamicValueType.setLabel("room");
+        dynamicFixedListType.setValue(dynamicValueType);
+        dynamicFixedListType.setListItems(List.of(dynamicValueType));
         RoomService roomService = mockRoomService();
+        RoomSelectionService roomSelectionService = new RoomSelectionService(roomService);
         DynamicValueType selectedRoom = DynamicValueType.create("room2", "Room 2");
         DateListedType selectedListing = mockSelectedListing(selectedRoom);
-
-        RoomSelectionService roomSelectionService = new RoomSelectionService(roomService);
-        DynamicFixedListType actualResult = roomSelectionService.createRoomSelection(caseData, selectedListing, true);
+        DynamicFixedListType actualResult = roomSelectionService.createRoomSelection(
+                dynamicFixedListType,
+                selectedListing,
+                true);
 
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(actualResult, "room", "Room ");
-    }
-
-    private CaseData mockCaseData() {
-        CaseData caseData = mock(CaseData.class);
-        DynamicFixedListType venue = new DynamicFixedListType();
-        venue.setValue(DynamicValueType.create("venue1", "Venue 1"));
-        when(caseData.getAllocateHearingVenue()).thenReturn(venue);
-
-        return caseData;
     }
 
     private RoomService mockRoomService() {

@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -19,9 +16,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.CourtWorkerSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.JudgeSelectionService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
-@SuppressWarnings({"PMD.ConfusingTernary","PMD.AvoidInstantiatingObjectsInLoops"})
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.AvoidInstantiatingObjectsInLoops"})
 public class AllocateHearingService {
 
     private final HearingSelectionService hearingSelectionService;
@@ -52,10 +52,11 @@ public class AllocateHearingService {
         HearingType selectedHearing = getSelectedHearing(caseData);
         TribunalOffice managingOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
         if (selectedHearing != null && !CollectionUtils.isEmpty(selectedHearing.getHearingDateCollection())) {
-            caseData.setAllocateHearingJudge(judgeSelectionService.createJudgeSelection(managingOffice, selectedHearing));
+            caseData.setAllocateHearingJudge(judgeSelectionService.createJudgeSelection(
+                    managingOffice, selectedHearing));
             caseData.setAllocateHearingSitAlone(selectedHearing.getHearingSitAlone());
-            addEmployerMembers(caseData,selectedHearing, caseData.getManagingOffice());
-            addEmployeeMembers(caseData,selectedHearing, caseData.getManagingOffice());
+            addEmployerMembers(caseData, selectedHearing, caseData.getManagingOffice());
+            addEmployeeMembers(caseData, selectedHearing, caseData.getManagingOffice());
             addAllocateHearingTypeItems(selectedHearing, caseData);
         }
     }
@@ -65,14 +66,15 @@ public class AllocateHearingService {
         List<AllocateHearingTypeItem> allocateHearingTypeItemList = new ArrayList<>();
         for (DateListedTypeItem dateListedTypeItem : selectedHearing.getHearingDateCollection()) {
             DateListedType dateListedType = dateListedTypeItem.getValue();
-            AllocateHearingTypeItem allocateHearingItem = new AllocateHearingTypeItem();
             AllocateHearingType allocateHearingType = new AllocateHearingType();
             allocateHearingType.setAllocateHearingDate(dateListedType.getListedDate());
             allocateHearingType.setAllocateHearingRoom(dateListedType.getHearingRoom());
-            allocateHearingType.setAllocateHearingVenue(venueSelectionService.createVenueSelection(managingOffice, dateListedType));
+            allocateHearingType.setAllocateHearingVenue(venueSelectionService.createVenueSelection(
+                    managingOffice, dateListedType));
             allocateHearingType.setAllocateHearingPostponedBy(dateListedType.getPostponedBy());
             allocateHearingType.setAllocateHearingStatus(dateListedType.getHearingStatus());
             addClerk(allocateHearingType, dateListedType, caseData.getManagingOffice());
+            AllocateHearingTypeItem allocateHearingItem = new AllocateHearingTypeItem();
             allocateHearingItem.setId(UUID.randomUUID().toString());
             allocateHearingItem.setValue(allocateHearingType);
             allocateHearingTypeItemList.add(allocateHearingItem);
@@ -97,7 +99,8 @@ public class AllocateHearingService {
     private void setAllocateHearingRoom(AllocateHearingTypeItem allocateHearingTypeItem, DateListedType listing) {
         AllocateHearingType allocateHearingType = allocateHearingTypeItem.getValue();
         if (allocateHearingType.getAllocateHearingDate().equals(listing.getListedDate())) {
-            boolean venueChanged = isVenueChanged(listing.getHearingVenueDay(), allocateHearingType.getAllocateHearingVenue());
+            boolean venueChanged = isVenueChanged(listing.getHearingVenueDay(),
+                    allocateHearingType.getAllocateHearingVenue());
             allocateHearingType.setAllocateHearingRoom(roomSelectionService.createRoomSelection(
                     allocateHearingType.getAllocateHearingVenue(),
                     listing,
@@ -166,7 +169,9 @@ public class AllocateHearingService {
         caseData.setAllocateHearingEmployeeMember(dynamicFixedListType);
     }
 
-    private void addClerk(AllocateHearingType allocateHearingType, DateListedType selectedListing, String managingOffice) {
+    private void addClerk(AllocateHearingType allocateHearingType,
+                          DateListedType selectedListing,
+                          String managingOffice) {
         TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(managingOffice);
         DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
             tribunalOffice, CourtWorkerType.CLERK);

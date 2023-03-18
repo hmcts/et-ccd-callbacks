@@ -1,13 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails;
 
-import java.util.List;
-import java.util.UUID;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -21,6 +15,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingDetailType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.SelectionServiceTestUtils;
+import java.util.List;
+import java.util.UUID;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class HearingDetailServiceTest {
 
@@ -136,7 +136,6 @@ public class HearingDetailServiceTest {
 
     @Test
     public void testUpdateCase() {
-        CaseData caseData = createCaseData();
         HearingDetailType hearingDetailType = new HearingDetailType();
         selectedListing.setListedDate("2022-11-11 11:00:00");
         hearingDetailType.setHearingDetailsDate(selectedListing.getListedDate());
@@ -174,6 +173,7 @@ public class HearingDetailServiceTest {
         hearingDetailType.setHearingDetailsHearingNotes2(notes);
         HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
         hearingDetailTypeItem.setValue(hearingDetailType);
+        CaseData caseData = createCaseData();
         caseData.setHearingDetailsCollection(List.of(hearingDetailTypeItem));
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
@@ -209,14 +209,13 @@ public class HearingDetailServiceTest {
         hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
         when(hearingSelectionService.getListings(isA(CaseData.class),
                 isA(DynamicFixedListType.class))).thenReturn(List.of(dateListedTypeItem));
-        when(hearingSelectionService.getSelectedHearing(isA(CaseData.class),isA(DynamicFixedListType.class)))
+        when(hearingSelectionService.getSelectedHearing(isA(CaseData.class), isA(DynamicFixedListType.class)))
                 .thenReturn(hearingType);
 
         return hearingSelectionService;
     }
 
     private CaseData createCaseData() {
-        CaseData caseData = new CaseData();
         HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setId("id1");
         HearingType hearingType = new HearingType();
@@ -228,6 +227,7 @@ public class HearingDetailServiceTest {
         DynamicValueType dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode("id1");
         dynamicFixedListType.setValue(dynamicValueType);
+        CaseData caseData = new CaseData();
         caseData.setHearingDetailsHearing(dynamicFixedListType);
         caseData.setHearingCollection(List.of(hearingTypeItem));
         return caseData;

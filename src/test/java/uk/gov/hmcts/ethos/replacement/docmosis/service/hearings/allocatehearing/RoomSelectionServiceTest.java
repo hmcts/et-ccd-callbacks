@@ -15,8 +15,8 @@ public class RoomSelectionServiceTest {
     public void testCreateRoomSelectionNoSelectedRoom() {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode("room");
-        dynamicValueType.setLabel("room");
+        dynamicValueType.setCode("venue1");
+        dynamicValueType.setLabel("venue1");
         dynamicFixedListType.setValue(dynamicValueType);
         dynamicFixedListType.setListItems(List.of(dynamicValueType));
         RoomService roomService = mockRoomService();
@@ -34,8 +34,8 @@ public class RoomSelectionServiceTest {
     public void testCreateRoomSelectionWithSelectedRoom() {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode("room");
-        dynamicValueType.setLabel("room");
+        dynamicValueType.setCode("room1");
+        dynamicValueType.setLabel("room1");
         dynamicFixedListType.setValue(dynamicValueType);
         dynamicFixedListType.setListItems(List.of(dynamicValueType));
         RoomService roomService = mockRoomService();
@@ -53,8 +53,8 @@ public class RoomSelectionServiceTest {
     public void testCreateRoomSelectionVenueChangedNoSelectedRoom() {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode("room");
-        dynamicValueType.setLabel("room");
+        dynamicValueType.setCode("venue1");
+        dynamicValueType.setLabel("venue1");
         dynamicFixedListType.setValue(dynamicValueType);
         dynamicFixedListType.setListItems(List.of(dynamicValueType));
         DateListedType selectedListing = mockSelectedListing(null);
@@ -71,8 +71,8 @@ public class RoomSelectionServiceTest {
     public void testCreateRoomSelectionVenueChangedWithSelectedRoom() {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode("room");
-        dynamicValueType.setLabel("room");
+        dynamicValueType.setCode("venue1");
+        dynamicValueType.setLabel("venue1");
         dynamicFixedListType.setValue(dynamicValueType);
         dynamicFixedListType.setListItems(List.of(dynamicValueType));
         RoomService roomService = mockRoomService();

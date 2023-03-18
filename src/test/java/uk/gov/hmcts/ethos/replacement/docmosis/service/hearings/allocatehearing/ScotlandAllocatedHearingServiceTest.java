@@ -75,22 +75,16 @@ public class ScotlandAllocatedHearingServiceTest {
 
     @Test
     public void testPopulateRooms() {
-        DynamicValueType dynamicValueType1 = new DynamicValueType();
-        DynamicValueType dynamicValueType2 = new DynamicValueType();
-        dynamicValueType1.setCode("code1");
-        dynamicValueType1.setLabel("label1");
-        dynamicValueType2.setCode("code2");
-        dynamicValueType2.setLabel("label2");
-        DynamicValueType dynamicValueType3 = new DynamicValueType();
-        dynamicValueType3.setCode("code3");
-        dynamicValueType3.setLabel("label3");
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setCode("code1");
+        dynamicValueType.setLabel("label1");
         caseData.getAllocateHearingCollection().get(0).getValue().getAllocateHearingRoom().setValue(null);
         caseData.getAllocateHearingCollection().get(0).getValue().getAllocateHearingRoom()
-                .setListItems(List.of(dynamicValueType1, dynamicValueType2, dynamicValueType3));
+                .setListItems(List.of(dynamicValueType));
         scotlandAllocateHearingService.populateRooms(caseData);
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
                 caseData.getAllocateHearingCollection().get(0).getValue().getAllocateHearingRoom(),
-                "code", "label");
+                "room", "Room ");
     }
 
     @Test

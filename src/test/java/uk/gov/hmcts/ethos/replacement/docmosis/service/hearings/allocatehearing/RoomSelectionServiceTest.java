@@ -34,8 +34,8 @@ public class RoomSelectionServiceTest {
     public void testCreateRoomSelectionWithSelectedRoom() {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode("room1");
-        dynamicValueType.setLabel("room1");
+        dynamicValueType.setCode("venue1");
+        dynamicValueType.setLabel("venue1");
         dynamicFixedListType.setValue(dynamicValueType);
         dynamicFixedListType.setListItems(List.of(dynamicValueType));
         RoomService roomService = mockRoomService();

@@ -92,6 +92,9 @@ public class EventValidationService {
             SUBMITTED_STATE, ACCEPTED_STATE, REJECTED_STATE);
     public static final String DISPOSAL_DATE_IN_FUTURE = "Disposal Date cannot be a date in the future for "
             + "jurisdiction code %s.";
+
+    public static final String DISPOSAL_DATE_BEFORE_RECEIPT_DATE = "Disposal Date cannot be before receipt date for "
+            + "jurisdiction code %s.";
     public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "The date entered does not match any of the "
         + "disposed hearing days on this case. Please check the hearing details"
         + " for jurisdiction code %s.";
@@ -276,17 +279,25 @@ public class EventValidationService {
                                 caseData.getHearingCollection(),
                                 item.getValue().getDisposalDate(),
                                 errors, item.getValue().getJuridictionCodesList(),
-                                item.getValue().getJudgmentOutcome()));
+                                item.getValue().getJudgmentOutcome(), caseData.getReceiptDate()));
     }
 
     private void addInvalidDisposalDateError(List<HearingTypeItem> hearingTypeItems,
-                                             String disposalDate, List<String> errors, String jurCode, String outcome) {
+                                             String disposalDate,
+                                             List<String> errors,
+                                             String jurCode,
+                                             String outcome,
+                                             String receiptDate) {
 
         if (isNullOrEmpty(outcome) || NO_DISPOSAL.contains(outcome)) {
             return;
         }
 
         if (Strings.isNullOrEmpty(disposalDate) || isDisposalDateInFuture(disposalDate, errors, jurCode)) {
+            return;
+        }
+
+        if (isDisposalDateBeforeReceiptDate(disposalDate, errors, jurCode, receiptDate)) {
             return;
         }
 
@@ -300,6 +311,18 @@ public class EventValidationService {
             errors.add(String.format(DISPOSAL_DATE_HEARING_DATE_MATCH, jurCode));
         }
     }
+
+    private boolean isDisposalDateBeforeReceiptDate(String disposalDate,
+                                                    List<String> errors,
+                                                    String jurCode,
+                                                    String receiptDate) {
+      if (LocalDate.parse(disposalDate).isBefore(LocalDate.parse(receiptDate))) {
+          errors.add(String.format(DISPOSAL_DATE_BEFORE_RECEIPT_DATE, jurCode));
+          return true;
+      }
+      return false;
+    }
+
 
     private Optional<DateListedTypeItem> findHearingTypeItem(List<HearingTypeItem> hearingItems, String disposalDate) {
         if (CollectionUtils.isEmpty(hearingItems)) {

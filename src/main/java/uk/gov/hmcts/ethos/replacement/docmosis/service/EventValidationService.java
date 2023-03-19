@@ -316,13 +316,12 @@ public class EventValidationService {
                                                     List<String> errors,
                                                     String jurCode,
                                                     String receiptDate) {
-      if (LocalDate.parse(disposalDate).isBefore(LocalDate.parse(receiptDate))) {
-          errors.add(String.format(DISPOSAL_DATE_BEFORE_RECEIPT_DATE, jurCode));
-          return true;
-      }
-      return false;
+        if (LocalDate.parse(disposalDate).isBefore(LocalDate.parse(receiptDate))) {
+            errors.add(String.format(DISPOSAL_DATE_BEFORE_RECEIPT_DATE, jurCode));
+            return true;
+        }
+        return false;
     }
-
 
     private Optional<DateListedTypeItem> findHearingTypeItem(List<HearingTypeItem> hearingItems, String disposalDate) {
         if (CollectionUtils.isEmpty(hearingItems)) {

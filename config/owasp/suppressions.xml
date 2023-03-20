@@ -9,20 +9,6 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-    file name: flat:4.1.1
-    ]]></notes>
-        <packageUrl regex="true">^pkg:npm/flat@.*$</packageUrl>
-        <vulnerabilityName>1085318</vulnerabilityName>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-    file name: json5:1.0.1
-    ]]></notes>
-        <packageUrl regex="true">^pkg:npm/json5@.*$</packageUrl>
-        <vulnerabilityName>1085311</vulnerabilityName>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
     file name: json5:1.0.1
     ]]></notes>
         <packageUrl regex="true">^pkg:npm/json5@.*$</packageUrl>
@@ -93,13 +79,6 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: json5:1.0.1
-   ]]></notes>
-        <packageUrl regex="true">^pkg:npm/json5@.*$</packageUrl>
-        <vulnerabilityName>1088341</vulnerabilityName>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
    file name: ua-parser-js:1.0.32
    ]]></notes>
         <packageUrl regex="true">^pkg:npm/ua\-parser\-js@.*$</packageUrl>
@@ -131,28 +110,7 @@
    file name: woodstox-core-6.2.8.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.woodstox/woodstox\-core@.*$</packageUrl>
-        <cpe>cpe:/a:fasterxml:woodstox</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: woodstox-core-6.2.8.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.woodstox/woodstox\-core@.*$</packageUrl>
         <cve>CVE-2022-40152</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: jackson-core-2.13.4.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-core@.*$</packageUrl>
-        <cve>CVE-2022-45688</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: json-20210307.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.json/json@.*$</packageUrl>
-        <cve>CVE-2022-45688</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -160,14 +118,6 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/net.minidev/json-smart@2.4.8.*$</packageUrl>
         <cve>CVE-2022-45688</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-     file name: woodstox-core-6.2.8.jar
-     ]]></notes>
-    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.woodstox\/woodstox-core@.*$</packageUrl>
-    <cpe>cpe:2.3:a:fasterxml:woodstox</cpe>
-    <cve>CVE-2022-40152</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[

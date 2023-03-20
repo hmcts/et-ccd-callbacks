@@ -439,6 +439,7 @@ class EventValidationServiceTest {
         CaseData caseData = new CaseData();
         HearingTypeItem hearingTypeItem1 = setHearing(HEARING_DATE2, disposed);
         HearingTypeItem hearingTypeItem2 = setHearing(HEARING_DATE, disposed);
+        caseData.setReceiptDate("2019-01-01");
         caseData.setHearingCollection(Arrays.asList(hearingTypeItem1, hearingTypeItem2));
         JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
         jurCodesTypeItem.setId(UUID.randomUUID().toString());

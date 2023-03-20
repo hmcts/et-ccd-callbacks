@@ -97,6 +97,7 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationDetails(caseData.getSendNotificationDetails());
         sendNotificationType.setSendNotificationRequestMadeBy(caseData.getSendNotificationRequestMadeBy());
         sendNotificationType.setSendNotificationEccQuestion(caseData.getSendNotificationEccQuestion());
+        sendNotificationType.setSendNotificationWhoCaseOrder(caseData.getSendNotificationWhoCaseOrder());
 
         SendNotificationTypeItem sendNotificationTypeItem = new SendNotificationTypeItem();
         sendNotificationTypeItem.setId(UUID.randomUUID().toString());
@@ -129,12 +130,13 @@ public class SendNotificationService {
         caseData.setSendNotificationDetails(null);
         caseData.setSendNotificationRequestMadeBy(null);
         caseData.setSendNotificationEccQuestion(null);
+        caseData.setSendNotificationWhoCaseOrder(null);
     }
 
     /**
      * Gets a list of notifications in the selected format.
      * @param caseData data to get notifications from
-     * @param format lamda contains details for the formatting
+     * @param format lambda contains details for the formatting
      * @return A list of notifications
      */
     public List<DynamicValueType> getSendNotificationSelection(CaseData caseData,

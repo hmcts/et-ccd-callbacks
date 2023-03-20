@@ -70,7 +70,7 @@ public class RespondNotificationService {
     }
 
     /**
-     * Creates the responseNotification and persists it.
+     * Creates the responseNotification and adds it to a list of responses stored on the notification.
      * @param caseData caseData contains the notification details
      * @param sendNotificationType the notificationType where the data will be stored
      */
@@ -153,7 +153,7 @@ public class RespondNotificationService {
         if (respondNotificationTypeCollection == null) {
             return "";
         }
-        List<String> resondNotificationMarkdownList =
+        List<String> respondNotificationMarkdownList =
             respondNotificationTypeCollection.stream().map(respondNotificationType -> {
                 Integer index =
                     respondNotificationTypeCollection.indexOf(respondNotificationType) + 1;
@@ -171,7 +171,7 @@ public class RespondNotificationService {
                     );
                 }
             ).collect(Collectors.toList());
-        return String.join("\r\n", resondNotificationMarkdownList);
+        return String.join("\r\n", respondNotificationMarkdownList);
     }
 
     public String getNotificationMarkDown(CaseData caseData) {

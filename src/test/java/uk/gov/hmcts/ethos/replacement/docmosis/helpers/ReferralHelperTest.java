@@ -187,7 +187,7 @@ class ReferralHelperTest {
             + "null), ownerDocument=null, creationDate=null, shortDescription=null))], referralInstruction=Custom inst"
             + "ructions for judge, referredBy=Judge Judy, referralDate="
             + Helper.getCurrentDate()
-            + ", referralStatus=Awaiting instructions, referralRep"
+            + ", referralStatus=Awaiting instructions, closeReferralGeneralNotes=null, referralRep"
             + "lyCollection=null, referralSummaryPdf=null)";
 
         String actual = caseData.getReferralCollection().get(0).getValue().toString();

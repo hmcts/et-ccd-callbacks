@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
@@ -511,6 +513,18 @@ public class CaseDataBuilder {
                 .collect(Collectors.toList());
         caseData.setAssignOffice(DynamicFixedListType.from(tribunalOffices));
         caseData.getAssignOffice().setValue(DynamicValueType.create(selectedOffice, selectedOffice));
+        return this;
+    }
+
+    public CaseDataBuilder withEt3RepresentingRespondent(String respondentName) {
+        DynamicValueType respondent = DynamicValueType.create(respondentName, respondentName);
+        DynamicFixedListType dynamicFixedListType = DynamicFixedListType.from(List.of(respondent));
+        dynamicFixedListType.setValue(respondent);
+        DynamicListType dynamicListType = new DynamicListType();
+        dynamicListType.setDynamicList(dynamicFixedListType);
+        DynamicListTypeItem dynamicListTypeItem = new DynamicListTypeItem();
+        dynamicListTypeItem.setValue(dynamicListType);
+        caseData.setEt3RepresentingRespondent(List.of(dynamicListTypeItem));
         return this;
     }
 }

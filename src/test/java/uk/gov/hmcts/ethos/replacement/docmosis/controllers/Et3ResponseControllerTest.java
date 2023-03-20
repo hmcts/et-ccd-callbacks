@@ -42,6 +42,7 @@ class Et3ResponseControllerTest {
     private static final String PROCESSING_COMPLETE_URL = "/et3Response/processingComplete";
     private static final String MID_EMPLOYMENT_DATES_URL = "/et3Response/midEmploymentDates";
     private static final String ABOUT_TO_SUBMIT_URL = "/et3Response/aboutToSubmit";
+    private static final String VALIDATE_RESPONDENT_URL = "/et3Response/validateRespondent";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -62,6 +63,7 @@ class Et3ResponseControllerTest {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
 
         CaseDetails caseDetails = CaseDataBuilder.builder()
+                .withEt3RepresentingRespondent("test")
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         ccdRequest = CCDRequestBuilder.builder()
@@ -197,5 +199,37 @@ class Et3ResponseControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void validateRespondent_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(VALIDATE_RESPONDENT_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()))
+                .andExpect(jsonPath("$.errors", notNullValue()));
+    }
+
+    @Test
+    void validateRespondent_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(VALIDATE_RESPONDENT_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void validateRespondent_badRequest() throws Exception {
+        mvc.perform(post(VALIDATE_RESPONDENT_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

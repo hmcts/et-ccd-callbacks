@@ -20,7 +20,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelection
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,12 +29,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
 @ExtendWith(SpringExtension.class)
+@SuppressWarnings({"PMD.ExcessiveImports"})
 class RespondNotificationServiceTest {
     private static final String CLAIMANT_EMAIL = "claimant@test.com";
     private static final String RESPONDENT_EMAIL = "repondent@test.com";
@@ -98,7 +98,8 @@ class RespondNotificationServiceTest {
             + " | Document | |\r\n"
             + "| Case management order made by |  |\r\n"
             + "| Name |  |\r\n"
-            + "| Sent to | Both parties |\r\n";
+            + "| Sent to | Both parties |\r\n"
+            + "\r\n";
         assertEquals(expected, result);
     }
 
@@ -172,7 +173,8 @@ class RespondNotificationServiceTest {
             + " target=\"_blank\">TEST.PDF</a>\r\n"
             + "| Case management order made by | Judge |\r\n"
             + "| Name | John Doe |\r\n"
-            + "| Sent to | Both parties |\r\n";
+            + "| Sent to | Both parties |\r\n"
+            + "\r\n";
         assertEquals(expected, result);
     }
 
@@ -199,7 +201,7 @@ class RespondNotificationServiceTest {
     void sendNotifyEmailsNoResponseBothParties() {
         setUpNotifyEmail();
 
-        caseData.setRespondNotificationWhoRespond(BOTH_PARTIES);
+        caseData.setRespondNotificationPartyToNotify(BOTH_PARTIES);
         caseData.setRespondNotificationResponseRequired(NO);
         caseDetails.setCaseData(caseData);
         SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();
@@ -215,7 +217,7 @@ class RespondNotificationServiceTest {
     void sendNotifyEmailsNoResponseClaimantOnly() {
         setUpNotifyEmail();
 
-        caseData.setRespondNotificationWhoRespond(CLAIMANT_EMAIL);
+        caseData.setRespondNotificationPartyToNotify(CLAIMANT_ONLY);
         caseData.setRespondNotificationResponseRequired(NO);
         caseDetails.setCaseData(caseData);
         SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();
@@ -231,7 +233,7 @@ class RespondNotificationServiceTest {
     void sendNotifyEmailsResponseRequiredRespondentOnly() {
         setUpNotifyEmail();
 
-        caseData.setRespondNotificationWhoRespond(RESPONDENT_ONLY);
+        caseData.setRespondNotificationPartyToNotify(RESPONDENT_ONLY);
         caseData.setRespondNotificationResponseRequired(YES);
         caseDetails.setCaseData(caseData);
         SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();

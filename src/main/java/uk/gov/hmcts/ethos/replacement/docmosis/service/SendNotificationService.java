@@ -49,7 +49,7 @@ public class SendNotificationService {
     @Value("${sendNotification.template.id}")
     private String templateId;
 
-    private static final String RESPONSE_DETAILS = "|  | |\r\n"
+    private static final String NOTIFICATION_DETAILS = "|  | |\r\n"
              + "| --- | --- |\r\n"
              + "| Subject | %1$s |\r\n"
              + "| Notification | %2$s |\r\n"
@@ -96,6 +96,7 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationFullName2(caseData.getSendNotificationFullName2());
         sendNotificationType.setSendNotificationDetails(caseData.getSendNotificationDetails());
         sendNotificationType.setSendNotificationRequestMadeBy(caseData.getSendNotificationRequestMadeBy());
+        sendNotificationType.setSendNotificationEccQuestion(caseData.getSendNotificationEccQuestion());
 
         SendNotificationTypeItem sendNotificationTypeItem = new SendNotificationTypeItem();
         sendNotificationTypeItem.setId(UUID.randomUUID().toString());
@@ -127,21 +128,25 @@ public class SendNotificationService {
         caseData.setSendNotificationFullName2(null);
         caseData.setSendNotificationDetails(null);
         caseData.setSendNotificationRequestMadeBy(null);
+        caseData.setSendNotificationEccQuestion(null);
     }
 
+    /**
+     * Gets a list of notifications in the selected format.
+     * @param caseData data to get notifications from
+     * @param format lamda contains details for the formatting
+     * @return A list of notifications
+     */
     public List<DynamicValueType> getSendNotificationSelection(CaseData caseData,
                                                                Function<SendNotificationTypeItem, String> format) {
-        List<DynamicValueType> values = new ArrayList<>();
         List<SendNotificationTypeItem> sendNotificationTypeItemList = caseData.getSendNotificationCollection();
         if (CollectionUtils.isEmpty(sendNotificationTypeItemList)) {
-            return values;
+            return new ArrayList<>();
         }
-        for (SendNotificationTypeItem sendNotificationType : sendNotificationTypeItemList) {
-            String notificationId = sendNotificationType.getId();
-            String label = format.apply(sendNotificationType);
-            values.add(DynamicValueType.create(notificationId, label));
-        }
-        return values;
+        return sendNotificationTypeItemList.stream()
+            .map(sendNotificationType -> DynamicValueType.create(sendNotificationType.getId(),
+                format.apply(sendNotificationType)))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -190,7 +195,6 @@ public class SendNotificationService {
                         getSendNotificationSingleDocumentMarkdown(documentTypeItem.getValue().getUploadedDocument()))
                 .collect(Collectors.toList());
         return String.join("\r\n", documents);
-
     }
 
     public String getSendNotificationMarkDown(SendNotificationType sendNotification) {
@@ -198,7 +202,7 @@ public class SendNotificationService {
         Optional<DynamicFixedListType> sendNotificationSelectHearing
                 = Optional.ofNullable(sendNotification.getSendNotificationSelectHearing());
 
-        return String.format(RESPONSE_DETAILS, Strings.nullToEmpty(sendNotification.getSendNotificationTitle()),
+        return String.format(NOTIFICATION_DETAILS, Strings.nullToEmpty(sendNotification.getSendNotificationTitle()),
                 Strings.nullToEmpty(sendNotification.getSendNotificationSubject().toString()),
                 sendNotificationSelectHearing.isPresent() ? sendNotificationSelectHearing.get().getSelectedLabel() : "",
                 sendNotification.getDate(),

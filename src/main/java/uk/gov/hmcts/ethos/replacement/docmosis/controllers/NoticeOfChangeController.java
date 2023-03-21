@@ -85,7 +85,8 @@ public class NoticeOfChangeController {
         ChangeOrganisationRequest changeOrganisationRequestField =
             callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField();
 
-        if (changeOrganisationRequestField != null) {
+        if (changeOrganisationRequestField != null
+            && changeOrganisationRequestField.getOrganisationToRemove() != null) {
             try {
                 nocRespondentRepresentativeService.removeOrganisationRepresentativeAccess(
                     callbackRequest.getCaseDetails().getCaseId(), changeOrganisationRequestField);

@@ -8,8 +8,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
-
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DIGITAL_FILE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DO_NOT_POSTPONE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
@@ -46,6 +46,8 @@ public class FlagsImageHelper {
     private static final String COLOR_SLATE_GRAY = "SlateGray";
     private static final String COLOR_DARK_SLATE_BLUE = "DarkSlateBlue";
     private static final String FLAG_REASONABLE_ADJUSTMENT = "REASONABLE ADJUSTMENT";
+    private static final String FLAG_WELSH_LANGUAGE = "Cymraeg";
+    private static final String WELSH = "Welsh";
 
     private FlagsImageHelper() {
     }
@@ -69,6 +71,7 @@ public class FlagsImageHelper {
         setFlagImageFor(FLAG_ECC, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
         setFlagImageFor(FLAG_DIGITAL_FILE, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
         setFlagImageFor(FLAG_REASONABLE_ADJUSTMENT, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
+        setFlagImageFor(FLAG_WELSH_LANGUAGE, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
         flagsImageFileName.append(IMAGE_FILE_EXTENSION);
 
         caseData.setFlagsImageAltText(flagsImageAltText.toString());
@@ -120,6 +123,10 @@ public class FlagsImageHelper {
             case FLAG_REASONABLE_ADJUSTMENT:
                 flagRequired = reasonableAdjustment(caseData);
                 flagColor = COLOR_DARK_SLATE_BLUE;
+                break;
+            case FLAG_WELSH_LANGUAGE:
+                flagRequired = welshColor(caseData);
+                flagColor = COLOR_RED;
                 break;
             default:
                 flagRequired = false;
@@ -218,15 +225,26 @@ public class FlagsImageHelper {
     }
 
     private static boolean reasonableAdjustment(CaseData caseData) {
+        boolean flag = false;
         if (caseData.getAdditionalCaseInfoType() != null) {
-            if (!isNullOrEmpty(caseData.getAdditionalCaseInfoType().getReasonableAdjustment())) {
-                return caseData.getAdditionalCaseInfoType().getReasonableAdjustment().equals(YES);
-            } else {
-                return false;
-            }
-        } else {
-            return false;
+            flag = YES.equals(caseData.getAdditionalCaseInfoType().getReasonableAdjustment());
         }
+        if (!flag && caseData.getClaimantHearingPreference() != null) {
+            flag = YES.equals(caseData.getClaimantHearingPreference().getReasonableAdjustments());
+        }
+        if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
+            flag = caseData.getRespondentCollection()
+                    .stream()
+                    .anyMatch(r -> YES.equals(
+                            defaultIfEmpty(r.getValue().getEt3ResponseRespondentSupportNeeded(), "")));
+        }
+        return flag;
+    }
+
+    private static boolean welshColor(CaseData caseData) {
+        return caseData.getClaimantHearingPreference() != null
+                && (WELSH.equals(caseData.getClaimantHearingPreference().getContactLanguage())
+                || WELSH.equals(caseData.getClaimantHearingPreference().getHearingLanguage()));
     }
 
     private static boolean digitalFile(CaseData caseData) {
@@ -241,5 +259,4 @@ public class FlagsImageHelper {
         return SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)
                 && !TribunalOffice.GLASGOW.getOfficeName().equals(caseData.getManagingOffice());
     }
-
 }

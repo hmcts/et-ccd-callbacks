@@ -10,4 +10,4 @@ Scenario('Generate a Report', async ({I}) => {
     I.wait(commonConfig.time_interval_1_second);
     await generateReport(I, commonConfig.jurisdictionType, commonConfig.caseType, eventNames.CREATE_REPORT);
     
-}).tag('@RET-BAT').tag('@nightly').tag('@pats').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);

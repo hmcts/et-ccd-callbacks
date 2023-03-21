@@ -274,6 +274,15 @@ public class BfActionReportTest {
     }
 
     @Test
+    public void shouldShowManagingOffice() {
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        listingData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents);
+        BfActionReportData bfActionReportData = (BfActionReportData) resultListingData;
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), bfActionReportData.getManagingOffice());
+    }
+
+    @Test
     public void shouldShowReportOfficeName_Scotland() {
         listingDetails.getCaseData().setManagingOffice(null);
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);

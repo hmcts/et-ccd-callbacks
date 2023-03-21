@@ -54,13 +54,15 @@ public class TseAdminService {
     private final EmailService emailService;
     private final DocumentManagementService documentManagementService;
 
-    private static final String RESPONSE_APP_DETAILS = "| | |\r\n"
-            + "|--|--|\r\n"
-            + "|%s application | %s|\r\n"
-            + "|Application date | %s|\r\n"
-            + "|Details of the application | %s|\r\n"
-            + "|Supporting material | %s|\r\n"
-            + "\r\n";
+    private static final String RECORD_DECISION_DETAILS = "| | |\r\n"
+        + "|--|--|\r\n"
+        + "|%s application | %s|\r\n"
+        + "|Application date | %s|\r\n"
+        + "|Details of the application | %s|\r\n"
+        + "%s" // Supporting material
+        + "\r\n";
+
+    private static final String RECORD_DECISION_DETAILS_DOC = "|Supporting material | %s|\r\n";
 
     private static final String CLOSE_APP_DETAILS = "| | |\r\n"
         + "|--|--|\r\n"
@@ -110,13 +112,17 @@ public class TseAdminService {
 
     private String initialTseAdminAppDetails(GenericTseApplicationType applicationType, String authToken) {
         return String.format(
-            RESPONSE_APP_DETAILS,
+            RECORD_DECISION_DETAILS,
             applicationType.getApplicant(),
             applicationType.getType(),
             applicationType.getDate(),
             defaultString(applicationType.getDetails()),
-            defaultString(documentManagementService.displayDocNameTypeSizeLink(
-                applicationType.getDocumentUpload(), authToken))
+            applicationType.getDocumentUpload() == null
+                ? ""
+                : String.format(
+                    RECORD_DECISION_DETAILS_DOC,
+                    documentManagementService.displayDocNameTypeSizeLink(
+                        applicationType.getDocumentUpload(), authToken))
         );
     }
 

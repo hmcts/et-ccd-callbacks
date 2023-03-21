@@ -94,7 +94,7 @@ class TseAdminServiceTest {
     }
 
     @Test
-    void initialTseAdminTableMarkUp_ReturnString() {
+    void initialTseAdminTableMarkUp_withDoc_ReturnString() {
 
         caseData.setGenericTseApplicationCollection(
             List.of(GenericTseApplicationTypeItem.builder()
@@ -222,6 +222,88 @@ class TseAdminServiceTest {
         documentTypeItem.setId("1234");
         documentTypeItem.setValue(DocumentTypeBuilder.builder().withUploadedDocument(fileName, "1234").build());
         return documentTypeItem;
+    }
+
+    @Test
+    void initialTseAdminTableMarkUp_NoDoc_ReturnString() {
+
+        TseRespondTypeItem claimantReply = TseRespondTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(
+                TseRespondType.builder()
+                    .from(CLAIMANT_TITLE)
+                    .date("23 December 2022")
+                    .response("Response Details")
+                    .hasSupportingMaterial(NO)
+                    .copyToOtherParty(YES)
+                    .build()
+            ).build();
+
+        TseRespondTypeItem adminReply = TseRespondTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(
+                TseRespondType.builder()
+                    .from(ADMIN)
+                    .date("24 December 2022")
+                    .isCmoOrRequest("Neither")
+                    .selectPartyNotify("Both parties")
+                    .build()
+            )
+            .build();
+
+        GenericTseApplicationType genericTseApplication = TseApplicationBuilder.builder()
+            .withNumber("1")
+            .withType(TSE_APP_AMEND_RESPONSE)
+            .withApplicant(RESPONDENT_TITLE)
+            .withDate("13 December 2022")
+            .withDetails("Details Text")
+            .withStatus(OPEN_STATE)
+            .withRespondCollection(List.of(
+                claimantReply,
+                adminReply
+            ))
+            .build();
+
+        caseData.setGenericTseApplicationCollection(
+            List.of(GenericTseApplicationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(genericTseApplication)
+                .build())
+        );
+
+        caseData.setTseAdminSelectApplication(
+            DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
+
+        String expected = "| | |\r\n"
+            + "|--|--|\r\n"
+            + "|Respondent application | Amend response|\r\n"
+            + "|Application date | 13 December 2022|\r\n"
+            + "|Details of the application | Details Text|\r\n"
+            + "\r\n"
+            + "|Response 1 | |\r\n"
+            + "|--|--|\r\n"
+            + "|Response from | Claimant|\r\n"
+            + "|Response date | 23 December 2022|\r\n"
+            + "|Details | Response Details|\r\n"
+            + "|Supporting material | |\r\n" // TODO: Remove Empty Row
+            + "\r\n"
+            + "|Response 2 | |\r\n"
+            + "|--|--|\r\n"
+            + "|Response | |\r\n" // TODO: Remove Empty Row
+            + "|Date | 24 December 2022|\r\n"
+            + "|Sent by | Tribunal|\r\n"
+            + "|Case management order or request? | Neither|\r\n"
+            + "|Response due | |\r\n" // TODO: Remove Empty Row
+            + "|Party or parties to respond | |\r\n" // TODO: Remove Empty Row
+            + "|Additional information | |\r\n" // TODO: Remove Empty Row
+            + "|Supporting material | |\r\n" // TODO: Remove Empty Row
+            + "|Full name | |\r\n" // TODO: Remove Empty Row
+            + "|Sent to | Both parties|\r\n"
+            + "\r\n";
+
+        tseAdminService.initialTseAdminTableMarkUp(caseData, AUTH_TOKEN);
+        assertThat(caseData.getTseAdminTableMarkUp())
+            .isEqualTo(expected);
     }
 
     @Test

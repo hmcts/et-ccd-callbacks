@@ -85,7 +85,7 @@ public class TseAdminService {
         + "|Sent to | %s|\r\n"
         + "\r\n";
 
-    private static final String ADDITIONAL_INFO = "|Additional information | %s|\n";
+    private static final String ADDITIONAL_INFO = "|Additional information | %s|\r\n";
 
     private static final String DOCUMENT = "|Document | %s|\r\n";
 

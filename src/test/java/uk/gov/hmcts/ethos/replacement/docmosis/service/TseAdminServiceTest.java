@@ -14,7 +14,12 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.*;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -532,7 +537,8 @@ class TseAdminServiceTest {
                 + "|Application date | 13 December 2022|\r\n"
                 + "|What do you want to tell or ask the tribunal? | Details Text|\r\n"
                 + "|Supporting material | <a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>|\r\n"
-                + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | " + null + "|\r\n"
+                + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | "
+                + null + "|\r\n"
                 + "\r\n"
                 + "|Decision | |\r\n"
                 + "|--|--|\r\n"
@@ -587,7 +593,6 @@ class TseAdminServiceTest {
                                 .responseRequiredDoc(hasDoc ? createUploadedDocumentType("admin.txt") : null)
                                 .build()
                 ).build();
-
 
         return TseApplicationBuilder.builder()
                 .withNumber("1")

@@ -26,7 +26,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -328,7 +329,6 @@ public class TseAdminService {
         return isBlank(decision.getEnterNotificationTitle()) ? "" :
                 String.format(DECISION_NOTIFICATION_TITLE, decision.getEnterNotificationTitle());
     }
-
 
     private String formatDecisionDetails(TseAdminRecordDecisionType decision) {
         return isBlank(decision.getDecisionDetails())

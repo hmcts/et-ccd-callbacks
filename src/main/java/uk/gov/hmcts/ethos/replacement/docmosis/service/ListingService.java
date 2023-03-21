@@ -218,7 +218,7 @@ public class ListingService {
             dateTo = listingData.getListingDate();
         }
         if (ALL_VENUES.equals(venueToSearch)) {
-            venueToSearch = listingData.getManagingOffice();
+            venueToSearch = getManagingOfficeForESQuery(listingData.getManagingOffice());
             venueToSearchMapping = getFieldNameForVenueToSearch(listingDetails.getCaseTypeId());
         }
         return ccdClient.buildAndGetElasticSearchRequest(authToken,
@@ -232,6 +232,13 @@ public class ListingService {
         } else {
             return ELASTICSEARCH_FIELD_MANAGING_OFFICE;
         }
+    }
+
+    private String getManagingOfficeForESQuery(String managingOffice) {
+        if (ALL_VENUES.equals(managingOffice)) {
+            return " ";
+        }
+        return managingOffice;
     }
 
     private String getESQuery(String dateFrom, String dateTo, String key, String venue) {
@@ -482,8 +489,10 @@ public class ListingService {
     private void dynamicVenueList(ListingData listingData) {
         List<DynamicValueType> listItems = new ArrayList<>();
         listItems.add(DynamicValueType.create(ALL_VENUES, ALL_VENUES));
-        listItems.addAll(venueService.getVenues(TribunalOffice.valueOfOfficeName(listingData.getManagingOffice())));
-
+        if (!ALL_VENUES.equals(listingData.getManagingOffice())) {
+            listItems.addAll(venueService.getVenues(TribunalOffice.valueOfOfficeName(
+                    listingData.getManagingOffice())));
+        }
         DynamicFixedListType dynamicListingVenues = new DynamicFixedListType();
         dynamicListingVenues.setListItems(listItems);
         listingData.setListingVenue(dynamicListingVenues);

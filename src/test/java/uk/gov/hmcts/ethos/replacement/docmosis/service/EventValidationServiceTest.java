@@ -69,6 +69,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TARGET_HEARING_DATE_INCREMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator.CLOSING_CASE_WITH_BF_OPEN_ERROR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.DISPOSAL_DATE_BEFORE_RECEIPT_DATE;
 
 @SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming", "PMD.TooManyMethods", "PMD.TooManyFields",
     "PMD.ExcessiveImports"})
@@ -478,6 +479,26 @@ class EventValidationServiceTest {
                 JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING),
             errors);
         assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void disposalDateAfterReceiptDate() {
+        List<String> errors = new ArrayList<>();
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest(DISPOSAL_DATE, YES,
+                        JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING),
+                errors);
+        assertThat(errors).isEmpty();
+
+    }
+
+    @Test
+    void disposalDateBeforeReceiptDate() {
+        List<String> errors = new ArrayList<>();
+        eventValidationService.validateJurisdiction(setCaseDataForDisposalDateTest("2018-02-02", YES,
+                        JURISDICTION_OUTCOME_SUCCESSFUL_AT_HEARING),
+                errors);
+        assertThat(errors.get(0))
+                .isEqualTo(String.format(DISPOSAL_DATE_BEFORE_RECEIPT_DATE, "blah blah"));
     }
 
     @Test

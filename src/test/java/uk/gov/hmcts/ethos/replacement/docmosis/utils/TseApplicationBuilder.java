@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
@@ -80,6 +81,11 @@ public class TseApplicationBuilder {
 
     public TseApplicationBuilder withRespondCollection(List<TseRespondTypeItem> respondCollection) {
         genericTseApplicationType.setRespondCollection(respondCollection);
+        return this;
+    }
+
+    public TseApplicationBuilder withDecisionCollection(List<TseAdminRecordDecisionTypeItem> decisionCollection) {
+        genericTseApplicationType.setAdminDecision(decisionCollection);
         return this;
     }
 

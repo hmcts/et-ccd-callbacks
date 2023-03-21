@@ -26,8 +26,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.StringUtils.defaultString;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -80,12 +79,15 @@ public class TseAdminService {
         + "|Date | %s|\r\n"
         + "|Sent by | %s|\r\n"
         + "|Type of decision | %s|\r\n"
-        + "|Additional information | %s|\r\n"
-        + "|Document | %s|\r\n"
+        + "%s%s"
         + "|Decision made by | %s|\r\n"
         + "|Name | %s|\r\n"
         + "|Sent to | %s|\r\n"
         + "\r\n";
+
+    private static final String ADDITIONAL_INFO = "|Additional information | %s|\n";
+
+    private static final String DOCUMENT = "|Document | %s|\r\n";
 
     private static final String STRING_BR = "<br>";
 
@@ -291,7 +293,7 @@ public class TseAdminService {
                     d.getValue().getDate(),
                     "Tribunal",
                     d.getValue().getTypeOfDecision(),
-                    Optional.ofNullable(d.getValue().getAdditionalInformation()).orElse(""),
+                    getAdditionInfoMarkdown(d),
                     getDecisionDocumentLink(d.getValue(), authToken),
                     d.getValue().getDecisionMadeBy(),
                     d.getValue().getDecisionMadeByFullName(),
@@ -317,10 +319,16 @@ public class TseAdminService {
 
     }
 
+    private String getAdditionInfoMarkdown(TseAdminRecordDecisionTypeItem decision) {
+        return decision.getValue().getAdditionalInformation() == null ? ""
+                : String.format(ADDITIONAL_INFO, decision.getValue().getAdditionalInformation());
+    }
+
     private String formatNotificationTitle(TseAdminRecordDecisionType decision) {
         return isBlank(decision.getEnterNotificationTitle()) ? "" :
                 String.format(DECISION_NOTIFICATION_TITLE, decision.getEnterNotificationTitle());
     }
+
 
     private String formatDecisionDetails(TseAdminRecordDecisionType decision) {
         return isBlank(decision.getDecisionDetails())
@@ -333,8 +341,8 @@ public class TseAdminService {
             return "";
         }
 
-        return documentManagementService
-            .displayDocNameTypeSizeLink(decisionType.getResponseRequiredDoc(), authToken);
+        return String.format(DOCUMENT, documentManagementService
+                .displayDocNameTypeSizeLink(decisionType.getResponseRequiredDoc(), authToken));
     }
 
     private String getApplicationDocumentLink(GenericTseApplicationTypeItem applicationTypeItem, String authToken) {

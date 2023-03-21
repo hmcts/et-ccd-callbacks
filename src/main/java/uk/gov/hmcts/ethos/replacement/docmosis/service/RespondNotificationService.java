@@ -30,6 +30,7 @@ import static java.util.UUID.randomUUID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
@@ -61,7 +62,6 @@ public class RespondNotificationService {
         + "| What's your response to the tribunal? | %5$s\r\n"
         + "| Do you want to copy correspondence to the other party to satisfy the Rules of Procedure? | %6$s |\r\n";
 
-    private static final String TRIBUNAL = "TRIBUNAL";
 
     public void populateSendNotificationSelection(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();

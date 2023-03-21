@@ -4,7 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -16,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
@@ -35,8 +38,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -205,7 +210,7 @@ class TseAdminServiceTest {
             .build();
     }
 
-    private UploadedDocumentType createUploadedDocumentType(String fileName) {
+    private static UploadedDocumentType createUploadedDocumentType(String fileName) {
         return UploadedDocumentBuilder.builder()
             .withFilename(fileName)
             .withUuid("1234")
@@ -594,5 +599,97 @@ class TseAdminServiceTest {
             .isNull();
         assertThat(caseData.getTseAdminCloseApplicationText())
             .isNull();
+    }
+
+    @ParameterizedTest
+    @MethodSource("generateCloseApplicationMarkdown")
+    void generateCloseApplicationMarkdown(boolean hasDoc, boolean hasAdditionalInfo) {
+        GenericTseApplicationType tseApplicationType = getTseAppType(hasDoc, hasAdditionalInfo);
+        caseData.setGenericTseApplicationCollection(
+                List.of(GenericTseApplicationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(tseApplicationType)
+                        .build())
+        );
+
+        String expected = "| | |\r\n"
+                + "|--|--|\r\n"
+                + "|Applicant | Respondent|\r\n"
+                + "|Type of application | Amend response|\r\n"
+                + "|Application date | 13 December 2022|\r\n"
+                + "|What do you want to tell or ask the tribunal? | Details Text|\r\n"
+                + "|Supporting material | <a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>|\r\n"
+                + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | "
+                + null + "|\r\n"
+                + "\r\n"
+                + "|Decision | |\r\n"
+                + "|--|--|\r\n"
+                + "|Notification | Response Details|\r\n"
+                + "|Decision | decision|\r\n"
+                + "|Decision details | decision details|\r\n"
+                + "|Date | 23 December 2022|\r\n"
+                + "|Sent by | Tribunal|\r\n"
+                + "|Type of decision | type of decision|\r\n"
+                + (hasAdditionalInfo ? "|Additional information | additional info|\r\n" : "")
+                + (hasDoc ? "|Document | <a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>|\r\n" : "")
+                + "|Decision made by | decision made by|\r\n"
+                + "|Name | made by full name|\r\n"
+                + "|Sent to | party notify|\r\n"
+                + "\r\n";
+
+        String fileDisplay1 = "<a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>";
+        when(documentManagementService.displayDocNameTypeSizeLink(
+                any(), any()))
+                .thenReturn(fileDisplay1);
+
+        caseData.setTseAdminSelectApplication(
+                DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
+
+        assertThat(tseAdminService.generateCloseApplicationDetailsMarkdown(caseData, AUTH_TOKEN))
+                .isEqualTo(expected);
+
+    }
+
+    private static Stream<Arguments> generateCloseApplicationMarkdown() {
+        return Stream.of(
+                Arguments.of(true, true),
+                Arguments.of(true, false),
+                Arguments.of(false, false)
+        );
+    }
+
+    private static GenericTseApplicationType getTseAppType(boolean hasDoc, boolean hasAdditionalInfo) {
+        TseAdminRecordDecisionTypeItem recordDecisionTypeItem = TseAdminRecordDecisionTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(
+                        TseAdminRecordDecisionType.builder()
+                                .date("23 December 2022")
+                                .enterNotificationTitle("Response Details")
+                                .decision("decision")
+                                .decisionDetails("decision details")
+                                .typeOfDecision("type of decision")
+                                .additionalInformation(hasAdditionalInfo ? "additional info" : null)
+                                .decisionMadeBy("decision made by")
+                                .decisionMadeByFullName("made by full name")
+                                .selectPartyNotify("party notify")
+                                .responseRequiredDoc(hasDoc ? createUploadedDocumentType("admin.txt") : null)
+                                .build()
+                ).build();
+
+        return TseApplicationBuilder.builder()
+                .withNumber("1")
+                .withType(TSE_APP_AMEND_RESPONSE)
+                .withApplicant(RESPONDENT_TITLE)
+                .withDate("13 December 2022")
+                .withDocumentUpload(UploadedDocumentBuilder.builder()
+                        .withFilename("test")
+                        .withUuid("1234")
+                        .build())
+                .withDetails("Details Text")
+                .withStatus(OPEN_STATE)
+                .withDecisionCollection(List.of(
+                        recordDecisionTypeItem
+                ))
+                .build();
     }
 }

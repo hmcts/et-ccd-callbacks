@@ -20,7 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
-import java.lang.reflect.Field;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -64,7 +64,7 @@ class RespondNotificationServiceTest {
         caseData = new CaseData();
     }
 
-    private List<DocumentTypeItem> setUpDocument() {
+    private List<DocumentTypeItem> createDocumentList() {
         UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
         uploadedDocumentType.setDocumentBinaryUrl(
             "http://dm-store:8080/documents/6fbf9470-f735-484a-9790-5b246b646fe2/binary");
@@ -170,7 +170,7 @@ class RespondNotificationServiceTest {
         respondNotificationType.setRespondNotificationDate("02-JAN-1970");
         respondNotificationType.setRespondNotificationTitle("TEST");
         respondNotificationType.setRespondNotificationAdditionalInfo("INFO");
-        respondNotificationType.setRespondNotificationUploadDocument(setUpDocument());
+        respondNotificationType.setRespondNotificationUploadDocument(createDocumentList());
         respondNotificationType.setRespondNotificationCmoOrRequest(CASE_MANAGEMENT_ORDER);
         respondNotificationType.setRespondNotificationResponseRequired(YES);
         respondNotificationType.setRespondNotificationWhoRespond(BOTH_PARTIES);
@@ -228,8 +228,8 @@ class RespondNotificationServiceTest {
             + "| RESPONSE 1 | |\r\n"
             + "| Response from | TRIBUNAL |\r\n"
             + "| Response date | 02-JAN-1970 |\r\n"
-            +" | Supporting material | <a href=\"/documents/6fbf9470-f735-484a-9790-5b246b646fe2/binary\" "
-            +        "target=\"_blank\">TEST.PDF</a>\r\n"
+            + " | Supporting material | <a href=\"/documents/6fbf9470-f735-484a-9790-5b246b646fe2/binary\" "
+            +  "target=\"_blank\">TEST.PDF</a>\r\n"
             + "| What's your response to the tribunal? | TEST - INFO\r\n"
             + "| Do you want to copy correspondence to the other party to satisfy the Rules of Procedure? | Yes |\r\n";
         assertEquals(expected, result);
@@ -242,7 +242,7 @@ class RespondNotificationServiceTest {
         notificationType.setDate("01-JAN-1970");
         notificationType.setSendNotificationTitle("title");
         notificationType.setSendNotificationLetter("no");
-        notificationType.setSendNotificationUploadDocument(setUpDocument());
+        notificationType.setSendNotificationUploadDocument(createDocumentList());
         notificationType.setSendNotificationSubject(List.of("Hearing",
             "Case management orders / requests", "Judgment"));
         notificationType.setSendNotificationAdditionalInfo("info");

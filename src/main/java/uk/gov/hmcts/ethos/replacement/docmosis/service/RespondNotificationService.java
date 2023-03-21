@@ -62,7 +62,6 @@ public class RespondNotificationService {
         + "| What's your response to the tribunal? | %5$s\r\n"
         + "| Do you want to copy correspondence to the other party to satisfy the Rules of Procedure? | %6$s |\r\n";
 
-
     public void populateSendNotificationSelection(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(getSendNotificationSelection(caseData));

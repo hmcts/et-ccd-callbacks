@@ -99,6 +99,7 @@ class SendNotificationServiceTest {
         assertEquals("John Doe", sendNotificationType.getSendNotificationFullName2());
         assertEquals("details", sendNotificationType.getSendNotificationDetails());
         assertEquals("Judge", sendNotificationType.getSendNotificationRequestMadeBy());
+        assertEquals("notStartedYet", sendNotificationType.getNotificationState());
 
     }
 

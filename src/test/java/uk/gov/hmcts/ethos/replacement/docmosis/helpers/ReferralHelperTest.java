@@ -187,8 +187,8 @@ class ReferralHelperTest {
             + "null), ownerDocument=null, creationDate=null, shortDescription=null))], referralInstruction=Custom inst"
             + "ructions for judge, referredBy=Judge Judy, referralDate="
             + Helper.getCurrentDate()
-            + ", referralStatus=Awaiting instructions, referralRep"
-            + "lyCollection=null, referralSummaryPdf=null)";
+            + ", referralStatus=Awaiting instructions, closeReferralGeneralNotes=null, "
+            + "referralReplyCollection=null, referralSummaryPdf=null)";
 
         String actual = caseData.getReferralCollection().get(0).getValue().toString();
         assertEquals(expected, actual);
@@ -347,7 +347,7 @@ class ReferralHelperTest {
         caseData.setCloseReferralGeneralNotes("generalNotes");
 
         ReferralHelper.clearCloseReferralDataFromCaseData(caseData);
-        
+
         assertNull(caseData.getSelectReferral());
         assertNull(caseData.getCloseReferralHearingDetails());
         assertNull(caseData.getConfirmCloseReferral());
@@ -489,7 +489,7 @@ class ReferralHelperTest {
 
         return respondentSumTypeItem;
     }
-    
+
     private void setReferralReplyData() {
         caseData.setHearingAndReferralDetails("hearingDetails");
         caseData.setDirectionTo("directionTo");

@@ -11,17 +11,21 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -29,6 +33,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
@@ -59,6 +64,62 @@ class RespondNotificationServiceTest {
         caseData = new CaseData();
     }
 
+    private List<DocumentTypeItem> setUpDocument() {
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentBinaryUrl(
+            "http://dm-store:8080/documents/6fbf9470-f735-484a-9790-5b246b646fe2/binary");
+        uploadedDocumentType.setDocumentFilename("TEST.PDF");
+        uploadedDocumentType.setDocumentUrl("http://dm-store:8080/documents/6fbf9470-f735-484a-9790-5b246b646fe2");
+
+        DocumentType documentType = new DocumentType();
+        documentType.setUploadedDocument(uploadedDocumentType);
+        documentType.setShortDescription("TEST");
+
+        List<DocumentTypeItem> documents = new ArrayList<>();
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        documentTypeItem.setValue(documentType);
+        documents.add(documentTypeItem);
+        return documents;
+    }
+
+    @Test
+    void testCreateAndClearRespondNotification() throws IllegalAccessException {
+        caseData.setRespondNotificationTitle("title");
+        caseData.setRespondNotificationAdditionalInfo("info");
+        caseData.setRespondNotificationPartyToNotify(BOTH_PARTIES);
+        caseData.setRespondNotificationCmoOrRequest(CASE_MANAGEMENT_ORDER);
+        caseData.setRespondNotificationResponseRequired(NO);
+        caseData.setRespondNotificationWhoRespond(BOTH_PARTIES);
+        caseData.setRespondNotificationFullName("John Doe");
+
+        var respondNotificationTypeItemList = new ArrayList<GenericTypeItem<RespondNotificationType>>();
+        SendNotificationType notificationType = new SendNotificationType();
+        notificationType.setRespondNotificationTypeCollection(respondNotificationTypeItemList);
+        respondNotificationService.createResponseNotification(caseData, notificationType);
+
+        RespondNotificationType respondNotificationType =
+            notificationType.getRespondNotificationTypeCollection().get(0).getValue();
+        assertEquals("title", respondNotificationType.getRespondNotificationTitle());
+        assertEquals("info", respondNotificationType.getRespondNotificationAdditionalInfo());
+        assertEquals(BOTH_PARTIES, respondNotificationType.getRespondNotificationPartyToNotify());
+        assertEquals(CASE_MANAGEMENT_ORDER, respondNotificationType.getRespondNotificationCmoOrRequest());
+        assertEquals(NO, respondNotificationType.getRespondNotificationResponseRequired());
+        assertEquals(BOTH_PARTIES, respondNotificationType.getRespondNotificationWhoRespond());
+        assertEquals("John Doe", respondNotificationType.getRespondNotificationFullName());
+
+        respondNotificationService.clearResponseNotificationFields(caseData);
+        assertNull(caseData.getRespondNotificationTitle());
+        assertNull(caseData.getRespondNotificationAdditionalInfo());
+        assertNull(caseData.getRespondNotificationUploadDocument());
+        assertNull(caseData.getRespondNotificationCmoOrRequest());
+        assertNull(caseData.getRespondNotificationResponseRequired());
+        assertNull(caseData.getRespondNotificationWhoRespond());
+        assertNull(caseData.getRespondNotificationCaseManagementMadeBy());
+        assertNull(caseData.getRespondNotificationFullName());
+        assertNull(caseData.getRespondNotificationPartyToNotify());
+
+    }
+
     @Test
     void testGetRespondNotificationMarkdownRequiredFields() {
         SendNotificationType notificationType = new SendNotificationType();
@@ -66,10 +127,10 @@ class RespondNotificationServiceTest {
         notificationType.setSendNotificationTitle("title");
         notificationType.setSendNotificationLetter("no");
         notificationType.setSendNotificationSubject(List.of("Judgment"));
-        notificationType.setSendNotificationNotify("Both parties");
+        notificationType.setSendNotificationNotify(BOTH_PARTIES);
         notificationType.setSendNotificationCaseManagement("");
         notificationType.setSendNotificationResponseTribunal("no");
-        notificationType.setSendNotificationSelectParties("Both parties");
+        notificationType.setSendNotificationSelectParties(BOTH_PARTIES);
 
         SendNotificationTypeItem notificationTypeItem = new SendNotificationTypeItem();
         String uuid = UUID.randomUUID().toString();
@@ -104,35 +165,92 @@ class RespondNotificationServiceTest {
     }
 
     @Test
+    void testGetRespondNotificationMarkdownRequiredFieldsWithResponse() {
+        RespondNotificationType respondNotificationType = new RespondNotificationType();
+        respondNotificationType.setRespondNotificationDate("02-JAN-1970");
+        respondNotificationType.setRespondNotificationTitle("TEST");
+        respondNotificationType.setRespondNotificationAdditionalInfo("INFO");
+        respondNotificationType.setRespondNotificationUploadDocument(setUpDocument());
+        respondNotificationType.setRespondNotificationCmoOrRequest(CASE_MANAGEMENT_ORDER);
+        respondNotificationType.setRespondNotificationResponseRequired(YES);
+        respondNotificationType.setRespondNotificationWhoRespond(BOTH_PARTIES);
+        respondNotificationType.setRespondNotificationCaseManagementMadeBy("Judge");
+        respondNotificationType.setRespondNotificationFullName("John Doe");
+        respondNotificationType.setRespondNotificationPartyToNotify(BOTH_PARTIES);
+
+        var respondNotificationTypeItem = new GenericTypeItem<RespondNotificationType>();
+        respondNotificationTypeItem.setValue(respondNotificationType);
+        var respondNotificationTypeItemList = new ArrayList<GenericTypeItem<RespondNotificationType>>();
+        respondNotificationTypeItemList.add(respondNotificationTypeItem);
+
+        SendNotificationType notificationType = new SendNotificationType();
+        notificationType.setRespondNotificationTypeCollection(respondNotificationTypeItemList);
+        notificationType.setDate("01-JAN-1970");
+        notificationType.setSendNotificationTitle("title");
+        notificationType.setSendNotificationLetter("no");
+        notificationType.setSendNotificationSubject(List.of("Judgment"));
+        notificationType.setSendNotificationNotify(BOTH_PARTIES);
+        notificationType.setSendNotificationCaseManagement("");
+        notificationType.setSendNotificationResponseTribunal("no");
+        notificationType.setSendNotificationSelectParties(BOTH_PARTIES);
+
+        SendNotificationTypeItem notificationTypeItem = new SendNotificationTypeItem();
+        String uuid = UUID.randomUUID().toString();
+        notificationTypeItem.setId(uuid);
+        notificationTypeItem.setValue(notificationType);
+
+        List<SendNotificationTypeItem> notificationTypeItems = new ArrayList<>();
+        notificationTypeItems.add(notificationTypeItem);
+        caseData.setSelectNotificationDropdown(DynamicFixedListType.of(DynamicValueType.create(uuid, "")));
+        caseData.setSendNotificationCollection(notificationTypeItems);
+
+        String result = respondNotificationService.getNotificationMarkDown(caseData);
+
+        String expected = "|  | |\r\n"
+            + "| --- | --- |\r\n"
+            + "| Subject | title |\r\n"
+            + "| Notification | [Judgment] |\r\n"
+            + "| Hearing |  |\r\n"
+            + "| Date Sent | 01-JAN-1970 |\r\n"
+            + "| Sent By | TRIBUNAL  |\r\n"
+            + "| Case management order request |  |\r\n"
+            + "| Response due | no |\r\n"
+            + "| Party or parties to respond | Both parties |\r\n"
+            + "| Additional Information |  |\r\n"
+            + "| Description | title |\r\n"
+            + " | Document | |\r\n"
+            + "| Case management order made by |  |\r\n"
+            + "| Name |  |\r\n"
+            + "| Sent to | Both parties |\r\n"
+            + "\r\n"
+            + "|  | |\r\n"
+            + "| --- | --- |\r\n"
+            + "| RESPONSE 1 | |\r\n"
+            + "| Response from | TRIBUNAL |\r\n"
+            + "| Response date | 02-JAN-1970 |\r\n"
+            +" | Supporting material | <a href=\"/documents/6fbf9470-f735-484a-9790-5b246b646fe2/binary\" "
+            +        "target=\"_blank\">TEST.PDF</a>\r\n"
+            + "| What's your response to the tribunal? | TEST - INFO\r\n"
+            + "| Do you want to copy correspondence to the other party to satisfy the Rules of Procedure? | Yes |\r\n";
+        assertEquals(expected, result);
+    }
+
+    @Test
     void testGetRespondNotificationMarkdownAllFields() {
-        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
-        uploadedDocumentType.setDocumentBinaryUrl(
-            "http://dm-store:8080/documents/6fbf9470-f735-484a-9790-5b246b646fe2/binary");
-        uploadedDocumentType.setDocumentFilename("TEST.PDF");
-        uploadedDocumentType.setDocumentUrl("http://dm-store:8080/documents/6fbf9470-f735-484a-9790-5b246b646fe2");
-
-        DocumentType documentType = new DocumentType();
-        documentType.setUploadedDocument(uploadedDocumentType);
-        documentType.setShortDescription("TEST");
-
-        List<DocumentTypeItem> documents = new ArrayList<>();
-        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
-        documentTypeItem.setValue(documentType);
-        documents.add(documentTypeItem);
 
         SendNotificationType notificationType = new SendNotificationType();
         notificationType.setDate("01-JAN-1970");
         notificationType.setSendNotificationTitle("title");
         notificationType.setSendNotificationLetter("no");
-        notificationType.setSendNotificationUploadDocument(documents);
+        notificationType.setSendNotificationUploadDocument(setUpDocument());
         notificationType.setSendNotificationSubject(List.of("Hearing",
             "Case management orders / requests", "Judgment"));
         notificationType.setSendNotificationAdditionalInfo("info");
-        notificationType.setSendNotificationNotify("Both parties");
+        notificationType.setSendNotificationNotify(BOTH_PARTIES);
         notificationType.setSendNotificationCaseManagement("Request");
         notificationType.setSendNotificationResponseTribunal("no");
         notificationType.setSendNotificationWhoCaseOrder("Judge");
-        notificationType.setSendNotificationSelectParties("Both parties");
+        notificationType.setSendNotificationSelectParties(BOTH_PARTIES);
         notificationType.setSendNotificationFullName("John Doe");
         notificationType.setSendNotificationFullName2("John Doe");
         notificationType.setSendNotificationDetails("details");

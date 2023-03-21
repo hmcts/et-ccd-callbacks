@@ -97,7 +97,7 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationDetails(caseData.getSendNotificationDetails());
         sendNotificationType.setSendNotificationRequestMadeBy(caseData.getSendNotificationRequestMadeBy());
         sendNotificationType.setSendNotificationEccQuestion(caseData.getSendNotificationEccQuestion());
-        sendNotificationType.setSendNotificationWhoCaseOrder(caseData.getSendNotificationWhoCaseOrder());
+        sendNotificationType.setSendNotificationWhoMadeJudgement(caseData.getSendNotificationWhoMadeJudgement());
 
         SendNotificationTypeItem sendNotificationTypeItem = new SendNotificationTypeItem();
         sendNotificationTypeItem.setId(UUID.randomUUID().toString());

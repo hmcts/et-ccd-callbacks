@@ -602,7 +602,7 @@ class TseAdminServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("generateCloseApplicationMarkdown")
     void generateCloseApplicationMarkdown(boolean hasDoc, boolean hasAdditionalInfo) {
         GenericTseApplicationType tseApplicationType = getTseAppType(hasDoc, hasAdditionalInfo);
         caseData.setGenericTseApplicationCollection(

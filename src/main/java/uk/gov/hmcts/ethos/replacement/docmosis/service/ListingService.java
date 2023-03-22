@@ -27,6 +27,7 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.ListingTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.ListingType;
+import static uk.gov.hmcts.ethos.replacement.docmosis.controllers.ListingGenerationController.ALL_OFFICES;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingVenueHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
@@ -123,12 +124,13 @@ public class ListingService {
     public CaseData processListingSingleCasesRequest(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         List<ListingTypeItem> listingTypeItems = new ArrayList<>();
+        String caseTypeId = getCaseTypeId(caseData);
         if (caseData.getHearingCollection() != null && !caseData.getHearingCollection().isEmpty()) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                 if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
                     log.info("Processing listing single cases");
                     listingTypeItems.addAll(getListingTypeItems(hearingTypeItem,
-                            caseData.getPrintHearingDetails(), caseData, true));
+                            caseData.getPrintHearingDetails(), caseData, caseTypeId));
                 }
             }
         }
@@ -169,7 +171,6 @@ public class ListingService {
                         CAUSE_LIST_DATE_TIME_PATTERN)));
                 listingDetails.getCaseData().setListingCollection(listingTypeItems);
             }
-
             listingDetails.getCaseData().clearReportFields();
             return listingDetails.getCaseData();
         } catch (Exception ex) {
@@ -195,7 +196,9 @@ public class ListingService {
         for (HearingTypeItem hearingTypeItem : submitEvent.getCaseData().getHearingCollection()) {
             if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
                 listingTypeItems.addAll(getListingTypeItems(hearingTypeItem,
-                        listingDetails.getCaseData(), submitEvent.getCaseData(), false));
+                        listingDetails.getCaseData(),
+                        submitEvent.getCaseData(),
+                        UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId())));
             }
         }
     }
@@ -218,7 +221,7 @@ public class ListingService {
             dateTo = listingData.getListingDate();
         }
         if (ALL_VENUES.equals(venueToSearch)) {
-            venueToSearch = getManagingOfficeForESQuery(listingData.getManagingOffice());
+            venueToSearch = listingData.getManagingOffice();
             venueToSearchMapping = getFieldNameForVenueToSearch(listingDetails.getCaseTypeId());
         }
         return ccdClient.buildAndGetElasticSearchRequest(authToken,
@@ -234,20 +237,15 @@ public class ListingService {
         }
     }
 
-    private String getManagingOfficeForESQuery(String managingOffice) {
-        if (ALL_VENUES.equals(managingOffice)) {
-            return " ";
-        }
-        return managingOffice;
-    }
-
     private String getESQuery(String dateFrom, String dateTo, String key, String venue) {
         BoolQueryBuilder boolQueryBuilder = boolQuery()
                 .filter(new RangeQueryBuilder(
                         ELASTICSEARCH_FIELD_HEARING_LISTED_DATE)
                         .gte(dateFrom).lte(dateTo));
 
-        boolQueryBuilder.must(new MatchQueryBuilder(key, venue));
+        if (!ALL_VENUES.equals(venue)) {
+            boolQueryBuilder.must(new MatchQueryBuilder(key, venue));
+        }
         return new SearchSourceBuilder()
                 .size(MAX_ES_SIZE)
                 .query(boolQueryBuilder).toString();
@@ -265,7 +263,9 @@ public class ListingService {
     }
 
     private List<ListingTypeItem> getListingTypeItems(HearingTypeItem hearingTypeItem,
-                                                      ListingData listingData, CaseData caseData, boolean singleCase) {
+                                                      ListingData listingData,
+                                                      CaseData caseData,
+                                                      String caseTypeId) {
         List<ListingTypeItem> listingTypeItems = new ArrayList<>();
         if (isHearingTypeValid(listingData, hearingTypeItem)) {
             int hearingDateCollectionSize = hearingTypeItem.getValue().getHearingDateCollection().size();
@@ -275,7 +275,7 @@ public class ListingService {
                 log.info("Hearing number: " + hearingTypeItem.getValue().getHearingNumber());
                 DateListedTypeItem dateListedTypeItem = hearingTypeItem.getValue().getHearingDateCollection().get(i);
                 boolean isListingVenueValid = isListingVenueValid(listingData, dateListedTypeItem,
-                    getCaseTypeId(listingData, caseData, singleCase), caseData.getEthosCaseReference());
+                    caseTypeId, caseData.getEthosCaseReference());
                 boolean isListingDateValid = isListingDateValid(listingData, dateListedTypeItem);
                 log.info("isListingVenueValid: " + isListingVenueValid);
                 log.info("isListingDateValid: " + isListingDateValid);
@@ -299,12 +299,8 @@ public class ListingService {
         return listingTypeItems;
     }
 
-    private String getCaseTypeId(ListingData listingData, CaseData caseData, boolean singleCase) {
-        if (singleCase) {
+    private String getCaseTypeId(CaseData caseData) {
             return TribunalOffice.getCaseTypeId(getSelectedOfficeForPrintLists(caseData));
-        } else {
-            return TribunalOffice.getCaseTypeId(listingData.getManagingOffice());
-        }
     }
 
     public ListingData getDateRangeReport(ListingDetails listingDetails, String authToken) throws IOException {
@@ -369,9 +365,10 @@ public class ListingService {
         if (listingData.hasListingVenue()
                 && ALL_VENUES.equals(listingData.getListingVenue().getSelectedCode())) {
             return caseTypeId.equals(ENGLANDWALES_CASE_TYPE_ID)
-                    || caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)
-                    && listingData.getManagingOffice()
-                    .equals(dateListedTypeItem.getValue().getHearingVenueDayScotland());
+                    || (caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)
+                    && (listingData.getManagingOffice()
+                    .equals(dateListedTypeItem.getValue().getHearingVenueDayScotland())
+                    || ALL_OFFICES.equals(listingData.getManagingOffice())));
         }
         return false;
     }

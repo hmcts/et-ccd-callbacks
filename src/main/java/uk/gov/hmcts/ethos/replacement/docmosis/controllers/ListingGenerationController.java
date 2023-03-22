@@ -50,7 +50,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
     "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
-    "PMD.ExcessiveImports", "PMD.ConfusingTernary", "PDM.UselessParentheses"})
+    "PMD.ExcessiveImports", "PMD.ConfusingTernary", "PMD.UselessParentheses", "PMD.LawOfDemeter"})
 public class ListingGenerationController {
 
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
@@ -151,11 +151,11 @@ public class ListingGenerationController {
         if (ListingHelper.isListingRangeValid(listingData, errors)) {
             listingData = listingService.processListingHearingsRequest(
                     listingRequest.getCaseDetails(), userToken);
-        String managingOffice = listingRequest.getCaseDetails().getCaseData().getManagingOffice();
-        if (listingRequest.getCaseDetails().getCaseTypeId().equals(SCOTLAND_LISTING_CASE_TYPE_ID)
-        &&  ALL_OFFICES.equals(managingOffice)) {
-            managingOffice = TribunalOffice.GLASGOW.getOfficeName();
-        }
+            String managingOffice = listingRequest.getCaseDetails().getCaseData().getManagingOffice();
+            if (listingRequest.getCaseDetails().getCaseTypeId().equals(SCOTLAND_LISTING_CASE_TYPE_ID)
+                    &&  ALL_OFFICES.equals(managingOffice)) {
+                managingOffice = TribunalOffice.GLASGOW.getOfficeName();
+            }
             DefaultValues defaultValues = defaultValuesReaderService.getDefaultValues(managingOffice);
             log.info("Post Default values loaded: " + defaultValues);
             listingData = defaultValuesReaderService.getListingData(listingData, defaultValues);

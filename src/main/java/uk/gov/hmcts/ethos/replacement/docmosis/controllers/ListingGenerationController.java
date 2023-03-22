@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -34,12 +35,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ListingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PrintHearingListService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SERVING_CLAIMS_REPORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -56,6 +56,7 @@ public class ListingGenerationController {
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
     private static final String GENERATED_DOCUMENT_URL = "Please download the document from : ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
+    public static final String ALL_OFFICES = "All";
 
     private final ListingService listingService;
     private final ReportDataService reportDataService;
@@ -150,9 +151,12 @@ public class ListingGenerationController {
         if (ListingHelper.isListingRangeValid(listingData, errors)) {
             listingData = listingService.processListingHearingsRequest(
                     listingRequest.getCaseDetails(), userToken);
-
-            DefaultValues defaultValues = defaultValuesReaderService.getDefaultValues(
-                    listingRequest.getCaseDetails().getCaseData().getManagingOffice());
+        String managingOffice = listingRequest.getCaseDetails().getCaseData().getManagingOffice();
+        if (listingRequest.getCaseDetails().getCaseTypeId().equals(SCOTLAND_LISTING_CASE_TYPE_ID)
+        &&  ALL_OFFICES.equals(managingOffice)) {
+            managingOffice = TribunalOffice.GLASGOW.getOfficeName();
+        }
+            DefaultValues defaultValues = defaultValuesReaderService.getDefaultValues(managingOffice);
             log.info("Post Default values loaded: " + defaultValues);
             listingData = defaultValuesReaderService.getListingData(listingData, defaultValues);
         }

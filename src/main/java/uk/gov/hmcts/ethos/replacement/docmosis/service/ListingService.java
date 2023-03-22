@@ -365,10 +365,10 @@ public class ListingService {
         if (listingData.hasListingVenue()
                 && ALL_VENUES.equals(listingData.getListingVenue().getSelectedCode())) {
             return caseTypeId.equals(ENGLANDWALES_CASE_TYPE_ID)
-                    || (caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)
+                    || caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)
                     && (listingData.getManagingOffice()
                     .equals(dateListedTypeItem.getValue().getHearingVenueDayScotland())
-                    || ALL_OFFICES.equals(listingData.getManagingOffice())));
+                    || ALL_OFFICES.equals(listingData.getManagingOffice()));
         }
         return false;
     }

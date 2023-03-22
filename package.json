@@ -118,8 +118,7 @@
         "electron": "21.3.1",
         "got": "11.8.5",
         "qs": ">=6.10.3",
-        "ua-parser-js": "^1.0.33",
-        "snakeyaml": "^2.0"
+        "ua-parser-js": "^1.0.33"
     },
     "packageManager": "yarn@3.4.1"
 }

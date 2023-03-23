@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 
@@ -39,7 +41,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkF
 @Slf4j
 @SuppressWarnings({"PMD.ExcessiveImports"})
 public class SendNotificationService {
-
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
     @Value("${url.exui.case-details}")
@@ -96,6 +97,11 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationFullName2(caseData.getSendNotificationFullName2());
         sendNotificationType.setSendNotificationDetails(caseData.getSendNotificationDetails());
         sendNotificationType.setSendNotificationRequestMadeBy(caseData.getSendNotificationRequestMadeBy());
+        if (RESPONDENT_ONLY.equals(sendNotificationType.getSendNotificationSelectParties())) {
+            sendNotificationType.setNotificationState(NOT_VIEWED_YET);
+        } else {
+            sendNotificationType.setNotificationState(NOT_STARTED_YET);
+        }
 
         SendNotificationTypeItem sendNotificationTypeItem = new SendNotificationTypeItem();
         sendNotificationTypeItem.setId(UUID.randomUUID().toString());

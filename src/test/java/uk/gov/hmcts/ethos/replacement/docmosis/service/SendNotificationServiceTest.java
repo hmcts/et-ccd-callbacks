@@ -27,6 +27,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -99,7 +100,15 @@ class SendNotificationServiceTest {
         assertEquals("John Doe", sendNotificationType.getSendNotificationFullName2());
         assertEquals("details", sendNotificationType.getSendNotificationDetails());
         assertEquals("Judge", sendNotificationType.getSendNotificationRequestMadeBy());
+        assertEquals("notStartedYet", sendNotificationType.getNotificationState());
+    }
 
+    @Test
+    void testCreateSendNotificationWhenRespondentShouldBeNotified() {
+        caseData.setSendNotificationSelectParties(RESPONDENT_ONLY);
+        sendNotificationService.createSendNotification(caseData);
+        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().get(0).getValue();
+        assertEquals(NOT_VIEWED_YET, sendNotificationType.getNotificationState());
     }
 
     @Test

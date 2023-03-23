@@ -99,7 +99,7 @@ public class AllocateHearingService {
     private void addEmployerMembers(CaseData caseData, HearingType selectedHearing) {
         TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
         DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
-                tribunalOffice, CourtWorkerType.EMPLOYER_MEMBER);
+            tribunalOffice, CourtWorkerType.EMPLOYER_MEMBER);
 
         if (selectedHearing.hasHearingEmployerMember()) {
             dynamicFixedListType.setValue(selectedHearing.getHearingERMember().getValue());
@@ -110,7 +110,7 @@ public class AllocateHearingService {
     private void addEmployeeMembers(CaseData caseData, HearingType selectedHearing) {
         TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
         DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
-                tribunalOffice, CourtWorkerType.EMPLOYEE_MEMBER);
+            tribunalOffice, CourtWorkerType.EMPLOYEE_MEMBER);
 
         if (selectedHearing.hasHearingEmployeeMember()) {
             dynamicFixedListType.setValue(selectedHearing.getHearingEEMember().getValue());
@@ -121,7 +121,7 @@ public class AllocateHearingService {
     private void addClerk(CaseData caseData, DateListedType selectedListing) {
         TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
         DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
-                tribunalOffice, CourtWorkerType.CLERK);
+            tribunalOffice, CourtWorkerType.CLERK);
 
         if (selectedListing.hasHearingClerk()) {
             dynamicFixedListType.setValue(selectedListing.getHearingClerk().getValue());

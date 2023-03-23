@@ -31,16 +31,16 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.TseService.NOT_STARTED_YET;
 
 @Service("sendNotificationService")
 @RequiredArgsConstructor
 @Slf4j
 @SuppressWarnings({"PMD.ExcessiveImports"})
 public class SendNotificationService {
-    public static final String NOT_VIEWED_YET = "notViewedYet";
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
     @Value("${url.exui.case-details}")

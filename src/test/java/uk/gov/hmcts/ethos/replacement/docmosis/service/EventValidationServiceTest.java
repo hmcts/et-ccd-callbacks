@@ -166,10 +166,10 @@ class EventValidationServiceTest {
         casePreAcceptType.setDateRejected(rejectedDate);
         caseData.setPreAcceptCase(casePreAcceptType);
         List<String> errors = eventValidationService.validateReceiptDate(caseData);
-        if (rejectedDate.equals("2023-01-01")) {
+        if ("2023-01-01".equals(rejectedDate)) {
             assertEquals(0, errors.size());
         }
-        if (rejectedDate.equals("2019-01-01")) {
+        if ("2019-01-01".equals(rejectedDate)) {
             assertEquals(RECEIPT_DATE_LATER_THAN_REJECTED_ERROR_MESSAGE, errors.get(0));
         }
     }

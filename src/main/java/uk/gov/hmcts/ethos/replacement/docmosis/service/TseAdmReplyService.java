@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
@@ -61,10 +62,12 @@ public class TseAdmReplyService {
             + "|Applicant | %s|\r\n"
             + "|Type of application | %s|\r\n"
             + "|Application date | %s|\r\n"
-            + "|Details of the application | %s|\r\n"
-            + "|Supporting material | %s|\r\n"
+            + "%s" // Details of the application
+            + "%s" // Supporting material
             + "%s" // Rule92
             + "\r\n";
+    private static final String APP_DETAILS_DETAILS = "|Details of the application | %s|\r\n";
+    private static final String APP_DETAILS_UPLOAD = "|Supporting material | %s|\r\n";
     private static final String STRING_BR = "<br>";
 
     private static final String RESPONSE_REQUIRED =
@@ -93,9 +96,13 @@ public class TseAdmReplyService {
             applicationType.getApplicant(),
             applicationType.getType(),
             applicationType.getDate(),
-            defaultString(applicationType.getDetails()),
-            defaultString(documentManagementService.displayDocNameTypeSizeLink(
-                applicationType.getDocumentUpload(), authToken)),
+            isBlank(applicationType.getDetails())
+                ? ""
+                : String.format(APP_DETAILS_DETAILS, applicationType.getDetails()),
+            applicationType.getDocumentUpload() == null
+                ? ""
+                : String.format(APP_DETAILS_UPLOAD, documentManagementService.displayDocNameTypeSizeLink(
+                    applicationType.getDocumentUpload(), authToken)),
             formatRule92(applicationType.getCopyToOtherPartyYesOrNo(),
                 applicationType.getCopyToOtherPartyText())
         );

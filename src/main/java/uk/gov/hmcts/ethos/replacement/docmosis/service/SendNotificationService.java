@@ -13,10 +13,10 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
@@ -50,6 +50,10 @@ public class SendNotificationService {
     @Value("${sendNotification.template.id}")
     private String templateId;
 
+    private static final String BLANK_DOCUMENT_MARKDOWN = "| Document | | \r\n| Description | |";
+
+    private static final String POPULATED_DOCUMENT_MARKDOWN = "| Document |%s|\r\n| Description |%s|";
+
     private static final String NOTIFICATION_DETAILS = "|  | |\r\n"
              + "| --- | --- |\r\n"
              + "| Subject | %1$s |\r\n"
@@ -57,11 +61,10 @@ public class SendNotificationService {
              + "| Hearing | %3$s |\r\n"
              + "| Date Sent | %4$s |\r\n"
              + "| Sent By | %5$s  |\r\n"
-             + "| Case management order request | %6$s |\r\n"
+             + "| Case management order or request | %6$s |\r\n"
              + "| Response due | %7$s |\r\n"
              + "| Party or parties to respond | %8$s |\r\n"
              + "| Additional Information | %9$s |\r\n"
-             + "| Description | %1$s |\r\n"
              + " %10$s\r\n"
              + "| Case management order made by | %11$s |\r\n"
              + "| Name | %12$s |\r\n"
@@ -180,21 +183,23 @@ public class SendNotificationService {
                 .findFirst();
     }
 
-    private String getSendNotificationSingleDocumentMarkdown(UploadedDocumentType uploadedDocumentType) {
-        String document = "| Document | |";
+    private String getSendNotificationSingleDocumentMarkdown(DocumentType uploadedDocumentType) {
+        String document = BLANK_DOCUMENT_MARKDOWN;
         if (uploadedDocumentType != null) {
-            document = String.format("| Document | %s", createLinkForUploadedDocument(uploadedDocumentType));
+            document = String.format(POPULATED_DOCUMENT_MARKDOWN,
+                createLinkForUploadedDocument(uploadedDocumentType.getUploadedDocument()),
+                uploadedDocumentType.getShortDescription());
         }
         return document;
     }
 
     private String getSendNotificationDocumentsMarkdown(SendNotificationType sendNotification) {
         if (sendNotification.getSendNotificationUploadDocument() == null) {
-            return "| Document | |";
+            return BLANK_DOCUMENT_MARKDOWN;
         }
         List<String> documents = sendNotification.getSendNotificationUploadDocument().stream()
                 .map(documentTypeItem ->
-                        getSendNotificationSingleDocumentMarkdown(documentTypeItem.getValue().getUploadedDocument()))
+                        getSendNotificationSingleDocumentMarkdown(documentTypeItem.getValue()))
                 .collect(Collectors.toList());
         return String.join("\r\n", documents);
     }

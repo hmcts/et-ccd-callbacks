@@ -64,22 +64,18 @@ class RespondNotificationServiceTest {
         caseData = new CaseData();
     }
 
-    private List<DocumentTypeItem> createDocumentList() {
+    private DocumentType createDocument(String name, String description) {
         UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
         uploadedDocumentType.setDocumentBinaryUrl(
             "http://dm-store:8080/documents/6fbf9470-f735-484a-9790-5b246b646fe2/binary");
-        uploadedDocumentType.setDocumentFilename("TEST.PDF");
+        uploadedDocumentType.setDocumentFilename(name);
         uploadedDocumentType.setDocumentUrl("http://dm-store:8080/documents/6fbf9470-f735-484a-9790-5b246b646fe2");
 
         DocumentType documentType = new DocumentType();
         documentType.setUploadedDocument(uploadedDocumentType);
-        documentType.setShortDescription("TEST");
+        documentType.setShortDescription(description);
 
-        List<DocumentTypeItem> documents = new ArrayList<>();
-        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
-        documentTypeItem.setValue(documentType);
-        documents.add(documentTypeItem);
-        return documents;
+        return documentType;
     }
 
     @Test
@@ -151,12 +147,12 @@ class RespondNotificationServiceTest {
             + "| Hearing |  |\r\n"
             + "| Date Sent | 01-JAN-1970 |\r\n"
             + "| Sent By | Tribunal  |\r\n"
-            + "| Case management order request |  |\r\n"
+            + "| Case management order or request |  |\r\n"
             + "| Response due | no |\r\n"
             + "| Party or parties to respond | Both parties |\r\n"
             + "| Additional Information |  |\r\n"
-            + "| Description | title |\r\n"
-            + " | Document | |\r\n"
+            + " | Document | | \r\n"
+            + "| Description | |\r\n"
             + "| Case management order made by |  |\r\n"
             + "| Name |  |\r\n"
             + "| Sent to | Both parties |\r\n"
@@ -166,11 +162,16 @@ class RespondNotificationServiceTest {
 
     @Test
     void testGetRespondNotificationMarkdownRequiredFieldsWithResponse() {
+        List<DocumentTypeItem> documentTypeItems = new ArrayList<>();
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        documentTypeItem.setValue(createDocument("TEST.PDF", "TEST"));
+        documentTypeItems.add(documentTypeItem);
+
         RespondNotificationType respondNotificationType = new RespondNotificationType();
         respondNotificationType.setRespondNotificationDate("02-JAN-1970");
         respondNotificationType.setRespondNotificationTitle("TEST");
         respondNotificationType.setRespondNotificationAdditionalInfo("INFO");
-        respondNotificationType.setRespondNotificationUploadDocument(createDocumentList());
+        respondNotificationType.setRespondNotificationUploadDocument(documentTypeItems);
         respondNotificationType.setRespondNotificationCmoOrRequest(CASE_MANAGEMENT_ORDER);
         respondNotificationType.setRespondNotificationResponseRequired(YES);
         respondNotificationType.setRespondNotificationWhoRespond(BOTH_PARTIES);
@@ -213,12 +214,12 @@ class RespondNotificationServiceTest {
             + "| Hearing |  |\r\n"
             + "| Date Sent | 01-JAN-1970 |\r\n"
             + "| Sent By | Tribunal  |\r\n"
-            + "| Case management order request |  |\r\n"
+            + "| Case management order or request |  |\r\n"
             + "| Response due | no |\r\n"
             + "| Party or parties to respond | Both parties |\r\n"
             + "| Additional Information |  |\r\n"
-            + "| Description | title |\r\n"
-            + " | Document | |\r\n"
+            + " | Document | | \r\n"
+            + "| Description | |\r\n"
             + "| Case management order made by |  |\r\n"
             + "| Name |  |\r\n"
             + "| Sent to | Both parties |\r\n"
@@ -237,12 +238,19 @@ class RespondNotificationServiceTest {
 
     @Test
     void testGetRespondNotificationMarkdownAllFields() {
+        List<DocumentTypeItem> documentTypeItems = new ArrayList<>();
+        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
+        documentTypeItem.setValue(createDocument("TEST.PDF", "TEST"));
+        documentTypeItems.add(documentTypeItem);
+        documentTypeItem = new DocumentTypeItem();
+        documentTypeItem.setValue(createDocument("TEST2.DOC", "TEST DOC"));
+        documentTypeItems.add(documentTypeItem);
 
         SendNotificationType notificationType = new SendNotificationType();
         notificationType.setDate("01-JAN-1970");
         notificationType.setSendNotificationTitle("title");
         notificationType.setSendNotificationLetter("no");
-        notificationType.setSendNotificationUploadDocument(createDocumentList());
+        notificationType.setSendNotificationUploadDocument(documentTypeItems);
         notificationType.setSendNotificationSubject(List.of("Hearing",
             "Case management orders / requests", "Judgment"));
         notificationType.setSendNotificationAdditionalInfo("info");
@@ -282,13 +290,16 @@ class RespondNotificationServiceTest {
             + "| Hearing | 1: Hearing - Barnstaple - 16 May 2022 01:00 |\r\n"
             + "| Date Sent | 01-JAN-1970 |\r\n"
             + "| Sent By | Tribunal  |\r\n"
-            + "| Case management order request | Request |\r\n"
+            + "| Case management order or request | Request |\r\n"
             + "| Response due | no |\r\n"
             + "| Party or parties to respond | Both parties |\r\n"
             + "| Additional Information | info |\r\n"
-            + "| Description | title |\r\n"
-            + " | Document | <a href=\"/documents/6fbf9470-f735-484a-9790-5b246b646fe2/binary\""
-            + " target=\"_blank\">TEST.PDF</a>\r\n"
+            + " | Document |<a href=\"/documents/6fbf9470-f735-484a-9790-5b246b646fe2/binary\""
+            + " target=\"_blank\">TEST.PDF</a>|\r\n"
+            + "| Description |TEST|\r\n"
+            + "| Document |<a href=\"/documents/6fbf9470-f735-484a-9790-5b246b646fe2/binary\""
+            + " target=\"_blank\">TEST2.DOC</a>|\r\n"
+            + "| Description |TEST DOC|\r\n"
             + "| Case management order made by | Judge |\r\n"
             + "| Name | John Doe |\r\n"
             + "| Sent to | Both parties |\r\n"

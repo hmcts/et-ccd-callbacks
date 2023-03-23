@@ -25,9 +25,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
@@ -96,7 +96,7 @@ public class TseAdmReplyService {
             applicationType.getApplicant(),
             applicationType.getType(),
             applicationType.getDate(),
-            isNullOrEmpty(applicationType.getDetails())
+            isBlank(applicationType.getDetails())
                 ? ""
                 : String.format(APP_DETAILS_DETAILS, applicationType.getDetails()),
             applicationType.getDocumentUpload() == null

@@ -9,13 +9,6 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-    file name: snakeyaml-1.33.jar
-    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-        <cpe>cpe:/a:yaml_project:yaml</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
    file name: jackson-core-2.14.2.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-core@.*$</packageUrl>
@@ -37,8 +30,8 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-    file name: snakeyaml-1.33.jar
-    ]]></notes>
+   file name: snakeyaml-1.33.jar
+   ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
         <cve>CVE-2022-1471</cve>
     </suppress>

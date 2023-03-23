@@ -5,9 +5,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.AllocateHearingTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.AllocateHearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
@@ -15,8 +12,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.CourtWorkerSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.JudgeSelectionService;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @SuppressWarnings({"PMD.ConfusingTernary"})
@@ -40,90 +35,47 @@ public class ScotlandAllocateHearingService {
     }
 
     public void handleListingSelected(CaseData caseData) {
-        List<DateListedTypeItem> listings = getListings(caseData);
-        for (DateListedTypeItem dateListedTypeItem : listings) {
-            DateListedType dateListedType = dateListedTypeItem.getValue();
-            Optional<AllocateHearingTypeItem> item = caseData.getAllocateHearingCollection().stream().filter(a ->
-                    a.getValue().getAllocateHearingDate().equals(dateListedType.getListedDate())).findFirst();
-            item.ifPresent(allocateHearingTypeItem
-                    -> allocateHearingTypeItem.getValue()
-                    .setAllocateHearingManagingOffice(dateListedType.getHearingVenueDayScotland()));
-        }
+        DateListedType selectedListing = getSelectedListing(caseData);
+        caseData.setAllocateHearingManagingOffice(selectedListing.getHearingVenueDayScotland());
     }
 
     public void handleManagingOfficeSelected(CaseData caseData) {
         HearingType selectedHearing = getSelectedHearing(caseData);
-        List<DateListedTypeItem> listings = getListings(caseData);
-        TribunalOffice managingOffice;
+        DateListedType selectedListing = getSelectedListing(caseData);
+        TribunalOffice managingOffice = TribunalOffice.valueOfOfficeName(caseData.getAllocateHearingManagingOffice());
 
+        caseData.setAllocateHearingJudge(judgeSelectionService.createJudgeSelection(managingOffice, selectedHearing));
+        caseData.setAllocateHearingVenue(scotlandVenueSelectionService.createVenueSelection(managingOffice,
+                selectedListing));
         caseData.setAllocateHearingSitAlone(selectedHearing.getHearingSitAlone());
+        caseData.setAllocateHearingReadingDeliberation(selectedListing.getHearingTypeReadingDeliberation());
+        caseData.setAllocateHearingStatus(selectedListing.getHearingStatus());
+        caseData.setAllocateHearingPostponedBy(selectedListing.getPostponedBy());
+        caseData.setAllocateHearingEmployerMember(getEmployerMembers(managingOffice, selectedHearing));
+        caseData.setAllocateHearingEmployeeMember(getEmployeeMembers(managingOffice, selectedHearing));
+        caseData.setAllocateHearingClerk(getClerks(managingOffice, selectedListing));
 
-        for (DateListedTypeItem dateListedTypeItem : listings) {
-            DateListedType dateListedType = dateListedTypeItem.getValue();
-            for (AllocateHearingTypeItem allocateHearingTypeItem : caseData.getAllocateHearingCollection()) {
-                AllocateHearingType allocateHearingType = allocateHearingTypeItem.getValue();
-                if (allocateHearingType.getAllocateHearingDate().equals(dateListedType.getListedDate())) {
-                    managingOffice = TribunalOffice.valueOfOfficeName(
-                            allocateHearingType.getAllocateHearingManagingOffice());
-                    setAllocateHearing(allocateHearingType,
-                            dateListedType, selectedHearing, managingOffice, caseData);
-                    managingOfficeChanged(allocateHearingType, dateListedType, managingOffice, caseData);
-                }
-            }
-        }
-    }
-
-    private void managingOfficeChanged(AllocateHearingType allocateHearingType,
-                                      DateListedType dateListedType,
-                                      TribunalOffice managingOffice,
-                                      CaseData caseData) {
         // If the managing office has changed then we need to remove any selected
         // values that are controlled by it so that no invalid options are selected
-        String existingManagingOffice = dateListedType.getHearingVenueDayScotland();
+        String existingManagingOffice = selectedListing.getHearingVenueDayScotland();
         if (!managingOffice.getOfficeName().equals(existingManagingOffice)) {
             caseData.getAllocateHearingJudge().setValue(null);
-            allocateHearingType.getAllocateHearingVenue().setValue(null);
-            if (allocateHearingType.getAllocateHearingRoom() != null) {
-                allocateHearingType.getAllocateHearingRoom().setValue(null);
+            caseData.getAllocateHearingVenue().setValue(null);
+            if (caseData.getAllocateHearingRoom() != null) {
+                caseData.getAllocateHearingRoom().setValue(null);
             }
-            allocateHearingType.getAllocateHearingClerk().setValue(null);
+            caseData.getAllocateHearingClerk().setValue(null);
             caseData.getAllocateHearingEmployeeMember().setValue(null);
             caseData.getAllocateHearingEmployerMember().setValue(null);
         }
     }
 
-    private void setAllocateHearing(AllocateHearingType allocateHearingType,
-                                    DateListedType dateListedType,
-                                    HearingType selectedHearing,
-                                    TribunalOffice managingOffice,
-                                    CaseData caseData) {
-        allocateHearingType.setAllocateHearingVenue(scotlandVenueSelectionService.createVenueSelection(managingOffice,
-                dateListedType));
-        allocateHearingType.setAllocateHearingReadingDeliberation(dateListedType.getHearingTypeReadingDeliberation());
-        allocateHearingType.setAllocateHearingStatus(dateListedType.getHearingStatus());
-        allocateHearingType.setAllocateHearingPostponedBy(dateListedType.getPostponedBy());
-        allocateHearingType.setAllocateHearingClerk(getClerks(managingOffice, dateListedType));
-        caseData.setAllocateHearingJudge(judgeSelectionService.createJudgeSelection(managingOffice, selectedHearing));
-        caseData.setAllocateHearingEmployerMember(getEmployerMembers(managingOffice, selectedHearing));
-        caseData.setAllocateHearingEmployeeMember(getEmployeeMembers(managingOffice, selectedHearing));
-    }
-
     public void populateRooms(CaseData caseData) {
-        List<DateListedTypeItem> listings = getListings(caseData);
-        boolean venueChanged;
-        for (DateListedTypeItem dateListedTypeItem : listings) {
-            DateListedType dateListedType = dateListedTypeItem.getValue();
-            for (AllocateHearingTypeItem allocateHearingTypeItem : caseData.getAllocateHearingCollection()) {
-                AllocateHearingType allocateHearingType = allocateHearingTypeItem.getValue();
-                if (allocateHearingType.getAllocateHearingDate().equals(dateListedType.getListedDate())) {
-                    venueChanged = isVenueChanged(dateListedType, allocateHearingType.getAllocateHearingVenue());
-                    allocateHearingType.setAllocateHearingRoom(roomSelectionService.createRoomSelection(
-                            allocateHearingType.getAllocateHearingVenue(),
-                            dateListedType,
-                            venueChanged));
-                }
-            }
-        }
+        DateListedType selectedListing = getSelectedListing(caseData);
+        boolean venueChanged = isVenueChanged(selectedListing, caseData.getAllocateHearingVenue());
+
+        caseData.setAllocateHearingRoom(roomSelectionService.createRoomSelection(caseData, selectedListing,
+                venueChanged));
     }
 
     public void updateCase(CaseData caseData) {
@@ -133,65 +85,52 @@ public class ScotlandAllocateHearingService {
         selectedHearing.setHearingERMember(caseData.getAllocateHearingEmployerMember());
         selectedHearing.setHearingEEMember(caseData.getAllocateHearingEmployeeMember());
 
-        List<DateListedTypeItem> listings = getListings(caseData);
-        for (DateListedTypeItem dateListedTypeItem : listings) {
-            DateListedType dateListedType = dateListedTypeItem.getValue();
-            for (AllocateHearingTypeItem allocateHearingTypeItem : caseData.getAllocateHearingCollection()) {
-                AllocateHearingType allocateHearingType = allocateHearingTypeItem.getValue();
-                if (allocateHearingType.getAllocateHearingDate().equals(dateListedType.getListedDate())) {
-                    setHearings(dateListedType, allocateHearingType, selectedHearing);
-                }
-            }
-        }
-        Helper.updatePostponedDate(caseData);
-    }
+        DateListedType selectedListing = getSelectedListing(caseData);
+        selectedListing.setHearingTypeReadingDeliberation(caseData.getAllocateHearingReadingDeliberation());
+        selectedListing.setHearingStatus(caseData.getAllocateHearingStatus());
+        selectedListing.setPostponedBy(caseData.getAllocateHearingPostponedBy());
 
-    private void setHearings(DateListedType dateListedType,
-                              AllocateHearingType allocateHearingType,
-                              HearingType selectedHearing) {
-        dateListedType.setHearingTypeReadingDeliberation(allocateHearingType.getAllocateHearingReadingDeliberation());
-        dateListedType.setHearingStatus(allocateHearingType.getAllocateHearingStatus());
-        dateListedType.setPostponedBy(allocateHearingType.getAllocateHearingPostponedBy());
-
-        String managingOffice = allocateHearingType.getAllocateHearingManagingOffice();
-        dateListedType.setHearingVenueDayScotland(managingOffice);
-        dateListedType.setHearingGlasgow(null);
-        dateListedType.setHearingAberdeen(null);
-        dateListedType.setHearingDundee(null);
-        dateListedType.setHearingEdinburgh(null);
+        String managingOffice = caseData.getAllocateHearingManagingOffice();
+        selectedListing.setHearingVenueDayScotland(managingOffice);
+        selectedListing.setHearingGlasgow(null);
+        selectedListing.setHearingAberdeen(null);
+        selectedListing.setHearingDundee(null);
+        selectedListing.setHearingEdinburgh(null);
 
         final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(managingOffice);
         switch (tribunalOffice) {
             case GLASGOW:
-                selectedHearing.setHearingGlasgow(allocateHearingType.getAllocateHearingVenue());
-                dateListedType.setHearingGlasgow(allocateHearingType.getAllocateHearingVenue());
+                selectedHearing.setHearingGlasgow(caseData.getAllocateHearingVenue());
+                selectedListing.setHearingGlasgow(caseData.getAllocateHearingVenue());
                 break;
             case ABERDEEN:
-                selectedHearing.setHearingAberdeen(allocateHearingType.getAllocateHearingVenue());
-                dateListedType.setHearingAberdeen(allocateHearingType.getAllocateHearingVenue());
+                selectedHearing.setHearingAberdeen(caseData.getAllocateHearingVenue());
+                selectedListing.setHearingAberdeen(caseData.getAllocateHearingVenue());
                 break;
             case DUNDEE:
-                selectedHearing.setHearingDundee(allocateHearingType.getAllocateHearingVenue());
-                dateListedType.setHearingDundee(allocateHearingType.getAllocateHearingVenue());
+                selectedHearing.setHearingDundee(caseData.getAllocateHearingVenue());
+                selectedListing.setHearingDundee(caseData.getAllocateHearingVenue());
                 break;
             case EDINBURGH:
-                selectedHearing.setHearingEdinburgh(allocateHearingType.getAllocateHearingVenue());
-                dateListedType.setHearingEdinburgh(allocateHearingType.getAllocateHearingVenue());
+                selectedHearing.setHearingEdinburgh(caseData.getAllocateHearingVenue());
+                selectedListing.setHearingEdinburgh(caseData.getAllocateHearingVenue());
                 break;
             default:
                 break;
         }
 
-        dateListedType.setHearingRoom(allocateHearingType.getAllocateHearingRoom());
-        dateListedType.setHearingClerk(allocateHearingType.getAllocateHearingClerk());
+        selectedListing.setHearingRoom(caseData.getAllocateHearingRoom());
+        selectedListing.setHearingClerk(caseData.getAllocateHearingClerk());
+
+        Helper.updatePostponedDate(caseData);
     }
 
     private HearingType getSelectedHearing(CaseData caseData) {
         return hearingSelectionService.getSelectedHearing(caseData, caseData.getAllocateHearingHearing());
     }
 
-    private List<DateListedTypeItem> getListings(CaseData caseData) {
-        return hearingSelectionService.getListings(caseData, caseData.getAllocateHearingHearing());
+    private DateListedType getSelectedListing(CaseData caseData) {
+        return hearingSelectionService.getSelectedListing(caseData, caseData.getAllocateHearingHearing());
     }
 
     private boolean isVenueChanged(DateListedType listing, DynamicFixedListType newVenue) {
@@ -226,7 +165,7 @@ public class ScotlandAllocateHearingService {
 
     private DynamicFixedListType getEmployerMembers(TribunalOffice tribunalOffice, HearingType selectedHearing) {
         DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
-            tribunalOffice, CourtWorkerType.EMPLOYER_MEMBER);
+                tribunalOffice, CourtWorkerType.EMPLOYER_MEMBER);
 
         if (selectedHearing.hasHearingEmployerMember()) {
             dynamicFixedListType.setValue(selectedHearing.getHearingERMember().getValue());
@@ -236,7 +175,7 @@ public class ScotlandAllocateHearingService {
 
     private DynamicFixedListType getEmployeeMembers(TribunalOffice tribunalOffice, HearingType selectedHearing) {
         DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
-            tribunalOffice, CourtWorkerType.EMPLOYEE_MEMBER);
+                tribunalOffice, CourtWorkerType.EMPLOYEE_MEMBER);
 
         if (selectedHearing.hasHearingEmployeeMember()) {
             dynamicFixedListType.setValue(selectedHearing.getHearingEEMember().getValue());
@@ -246,7 +185,7 @@ public class ScotlandAllocateHearingService {
 
     private DynamicFixedListType getClerks(TribunalOffice tribunalOffice, DateListedType selectedListing) {
         DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
-            tribunalOffice, CourtWorkerType.CLERK);
+                tribunalOffice, CourtWorkerType.CLERK);
 
         if (selectedListing.hasHearingClerk()) {
             dynamicFixedListType.setValue(selectedListing.getHearingClerk().getValue());

@@ -59,6 +59,7 @@ project.tasks['sonarqube'].dependsOn jacocoTestReport
 sourceSets {
     test {
         java.srcDir 'src/test/java'
+        java.srcDir 'src/test/utils/java'
     }
     functional {
         java {

@@ -50,13 +50,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
     "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
-    "PMD.ExcessiveImports", "PMD.ConfusingTernary", "PDM.UselessParentheses"})
+    "PMD.ExcessiveImports", "PMD.ConfusingTernary", "PMD.UselessParentheses", "PMD.LawOfDemeter"})
 public class ListingGenerationController {
 
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
     private static final String GENERATED_DOCUMENT_URL = "Please download the document from : ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
-
     private final ListingService listingService;
     private final ReportDataService reportDataService;
     private final DefaultValuesReaderService defaultValuesReaderService;
@@ -150,9 +149,8 @@ public class ListingGenerationController {
         if (ListingHelper.isListingRangeValid(listingData, errors)) {
             listingData = listingService.processListingHearingsRequest(
                     listingRequest.getCaseDetails(), userToken);
-
-            DefaultValues defaultValues = defaultValuesReaderService.getDefaultValues(
-                    listingRequest.getCaseDetails().getCaseData().getManagingOffice());
+            DefaultValues defaultValues = defaultValuesReaderService.getListingDefaultValues(
+                    listingRequest.getCaseDetails());
             log.info("Post Default values loaded: " + defaultValues);
             listingData = defaultValuesReaderService.getListingData(listingData, defaultValues);
         }

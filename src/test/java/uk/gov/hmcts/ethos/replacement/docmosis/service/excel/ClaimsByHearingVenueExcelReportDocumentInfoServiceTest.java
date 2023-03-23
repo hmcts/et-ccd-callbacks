@@ -19,7 +19,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTIN
 @RunWith(MockitoJUnitRunner.class)
 public class ClaimsByHearingVenueExcelReportDocumentInfoServiceTest {
     @Mock
-    ClaimsByHearingVenueExcelReportDocumentInfoService excelReportDocInfService;
+    ExcelReportDocumentInfoService excelReportDocInfService;
     @Mock
     ExcelDocManagementService excelDocManagementService;
     @Mock
@@ -34,7 +34,7 @@ public class ClaimsByHearingVenueExcelReportDocumentInfoServiceTest {
         detailEntry.setCaseReference("245000/2021");
         detailEntry.setRespondentET3Postcode("TE5 TE1");
         reportData.getReportDetails().add(detailEntry);
-        excelReportDocInfService = new ClaimsByHearingVenueExcelReportDocumentInfoService(
+        excelReportDocInfService = new ExcelReportDocumentInfoService(
                 reportCreationService, excelDocManagementService);
         docInfo = new DocumentInfo();
     }
@@ -49,7 +49,7 @@ public class ClaimsByHearingVenueExcelReportDocumentInfoServiceTest {
                         new byte[0]))
                 .thenReturn(docInfo);
 
-        DocumentInfo resultDocInfo = excelReportDocInfService.generateExcelReportDocumentInfo(
+        DocumentInfo resultDocInfo = excelReportDocInfService.generateClaimsByHearingVenueExcelReportDocumentInfo(
                 reportData, ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
         assertNotNull(resultDocInfo);
     }
@@ -64,7 +64,7 @@ public class ClaimsByHearingVenueExcelReportDocumentInfoServiceTest {
                         new byte[0]))
                 .thenReturn(docInfo);
 
-        excelReportDocInfService.generateExcelReportDocumentInfo(reportData,
+        excelReportDocInfService.generateClaimsByHearingVenueExcelReportDocumentInfo(reportData,
                 ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
 
         verify(reportCreationService, times(1)).getReportExcelFile(reportData);

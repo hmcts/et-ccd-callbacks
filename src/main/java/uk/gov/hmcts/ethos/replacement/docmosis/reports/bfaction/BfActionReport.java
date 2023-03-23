@@ -20,9 +20,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REP
 
 public class BfActionReport {
     public ListingData runReport(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
-        BfActionReportData bfActionReportData = new BfActionReportData();
+        ListingData bfActionReportData = new ListingData();
         ListingData caseData = listingDetails.getCaseData();
-        bfActionReportData.setHearingDateType(caseData.getHearingDateType());
+        //bfActionReportData.setHearingDateType(caseData.getHearingDateType());
 
         if (!CollectionUtils.isEmpty(submitEvents)) {
             List<BFDateTypeItem> bfDateTypeItems = new ArrayList<>();

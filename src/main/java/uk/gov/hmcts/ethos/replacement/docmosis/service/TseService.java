@@ -72,7 +72,7 @@ public class TseService {
         application.setApplicant(CLAIMANT_TITLE);
 
         ClaimantTse claimantTse = caseData.getClaimantTse();
-        application.setType(claimantTse.getContactApplicationType());
+        application.setType(ClaimantTse.APP_TYPE_MAP.get(claimantTse.getContactApplicationType()));
         application.setDetails(claimantTse.getContactApplicationText());
         application.setDocumentUpload(claimantTse.getContactApplicationFile());
         application.setCopyToOtherPartyYesOrNo(claimantTse.getCopyToOtherPartyYesOrNo());

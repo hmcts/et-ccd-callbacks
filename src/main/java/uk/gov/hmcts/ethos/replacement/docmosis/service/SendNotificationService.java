@@ -205,7 +205,7 @@ public class SendNotificationService {
                 = Optional.ofNullable(sendNotification.getSendNotificationSelectHearing());
 
         return String.format(NOTIFICATION_DETAILS, Strings.nullToEmpty(sendNotification.getSendNotificationTitle()),
-                Strings.nullToEmpty(sendNotification.getSendNotificationSubject().toString()),
+                Strings.nullToEmpty(String.join(", ", sendNotification.getSendNotificationSubject())),
                 sendNotificationSelectHearing.isPresent() ? sendNotificationSelectHearing.get().getSelectedLabel() : "",
                 sendNotification.getDate(),
                 TRIBUNAL,

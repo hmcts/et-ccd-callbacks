@@ -10,8 +10,10 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.AuditEventsResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -75,6 +78,27 @@ class NocCcdServiceTest {
         when(ccdClient.retrieveCaseEvents(AUTH_TOKEN, CASE_ID)).thenReturn(auditEventsResponse);
         Optional<AuditEvent> event = nocCcdService.getLatestAuditEventByName(AUTH_TOKEN, CASE_ID, "nocRequest");
         assertThat(event).isPresent().hasValue(getAuditEventsResponse().getAuditEvents().get(1));
+    }
+
+    @Test
+    void shouldThrowExceptionRetrievingCaseAssignments() throws IOException {
+        when(ccdClient.retrieveCaseAssignments(AUTH_TOKEN, CASE_ID)).thenThrow(new IOException());
+        CcdInputOutputException exception = assertThrows(
+                CcdInputOutputException.class, () ->
+                nocCcdService.getCaseAssignments(AUTH_TOKEN, CASE_ID));
+
+        assertThat(exception.getMessage()).isEqualTo("Failed to retrieve case assignments");
+    }
+
+    @Test
+    void shouldThrowExceptionRevokingCaseAssignments() throws IOException {
+        CaseUserAssignmentData data = new CaseUserAssignmentData();
+        when(ccdClient.revokeCaseAssignments(AUTH_TOKEN, data)).thenThrow(new IOException());
+        CcdInputOutputException exception = assertThrows(
+                CcdInputOutputException.class, () ->
+                        nocCcdService.revokeCaseAssignments(AUTH_TOKEN, data));
+
+        assertThat(exception.getMessage()).isEqualTo("Failed to revoke case assignments");
     }
 
     @Test

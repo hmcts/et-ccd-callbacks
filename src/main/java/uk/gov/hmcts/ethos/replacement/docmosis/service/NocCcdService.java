@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.AuditEventsResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -59,7 +60,7 @@ public class NocCcdService {
             return ccdClient.retrieveCaseAssignments(userToken, caseId);
         } catch (IOException exception) {
             log.info("Error form ccd - {}", exception.getMessage());
-            throw new RuntimeException(exception);
+            throw new CcdInputOutputException("Failed to retrieve case assignments", exception);
         }
     }
 
@@ -73,7 +74,7 @@ public class NocCcdService {
             ccdClient.revokeCaseAssignments(userToken, caseUserAssignmentData);
         } catch (IOException exception) {
             log.info("Error form ccd - {}", exception.getMessage());
-            throw new RuntimeException(exception);
+            throw new CcdInputOutputException("Failed to revoke case assignments", exception);
         }
     }
 }

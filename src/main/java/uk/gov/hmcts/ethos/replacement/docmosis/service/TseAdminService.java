@@ -58,9 +58,11 @@ public class TseAdminService {
         + "|--|--|\r\n"
         + "|%s application | %s|\r\n"
         + "|Application date | %s|\r\n"
-        + "|Details of the application | %s|\r\n"
+        + "%s" // Details of the application
         + "%s" // Supporting material
         + "\r\n";
+
+    private static final String RECORD_DECISION_DETAILS_DETAILS = "|Details of the application | %s|\r\n";
 
     private static final String RECORD_DECISION_DETAILS_DOC = "|Supporting material | %s|\r\n";
 
@@ -116,7 +118,9 @@ public class TseAdminService {
             applicationType.getApplicant(),
             applicationType.getType(),
             applicationType.getDate(),
-            defaultString(applicationType.getDetails()),
+            isBlank(applicationType.getDetails())
+                ? ""
+                : String.format(RECORD_DECISION_DETAILS_DETAILS, applicationType.getDetails()),
             applicationType.getDocumentUpload() == null
                 ? ""
                 : String.format(

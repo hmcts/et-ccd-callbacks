@@ -94,7 +94,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.UnusedPrivateMethod", "PMD.ExcessiveImports", "PMD.UnusedPrivateField",
     "PMD.LinguisticNaming", "PMD.TooManyMethods", "PMD.ExcessiveClassLength", "PMD.ExcessiveMethodLength",
-    "PMD.NcssCount"})
+    "PMD.NcssCount", "PMD.ExcessivePublicCount"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ListingServiceTest {
 

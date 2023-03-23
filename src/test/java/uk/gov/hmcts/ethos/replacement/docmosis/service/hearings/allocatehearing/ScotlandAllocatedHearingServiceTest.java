@@ -110,9 +110,9 @@ public class ScotlandAllocatedHearingServiceTest {
         String sitAlone = String.valueOf(Boolean.TRUE);
         DynamicFixedListType judge = DynamicFixedListType.of(DynamicValueType.create("judge2", "Judge 2"));
         DynamicFixedListType employerMember = DynamicFixedListType.of(DynamicValueType.create("employerMember2",
-                "Employer Member 2"));
+            "Employer Member 2"));
         DynamicFixedListType employeeMember = DynamicFixedListType.of(DynamicValueType.create("employeeMember2",
-                "Employee Member 2"));
+            "Employee Member 2"));
         String readingDeliberation = "Reading Day";
         String hearingStatus = Constants.HEARING_STATUS_POSTPONED;
         String postponedBy = "Doris";
@@ -185,7 +185,7 @@ public class ScotlandAllocatedHearingServiceTest {
         CaseData caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         caseData.setAllocateHearingHearing(
                 SelectionServiceTestUtils.createSelectedDynamicList("hearing ", "Hearing ",
-                        1));
+                    1));
 
         selectedHearing = new HearingType();
         selectedListing = new DateListedType();
@@ -202,7 +202,7 @@ public class ScotlandAllocatedHearingServiceTest {
     private HearingSelectionService mockHearingSelectionService() {
         HearingSelectionService hearingSelectionService = mock(HearingSelectionService.class);
         List<DynamicValueType> hearings = SelectionServiceTestUtils.createListItems("hearing",
-                "Hearing ");
+            "Hearing ");
         when(hearingSelectionService.getHearingSelection(isA(CaseData.class))).thenReturn(hearings);
 
         when(hearingSelectionService.getSelectedHearing(isA(CaseData.class),
@@ -242,12 +242,12 @@ public class ScotlandAllocatedHearingServiceTest {
                 CourtWorkerType.CLERK)).thenReturn(clerks);
 
         List<DynamicValueType> employerMembers = SelectionServiceTestUtils.createListItems("employerMember",
-                "Employer Member ");
+            "Employer Member ");
         when(courtWorkerService.getCourtWorkerByTribunalOffice(TribunalOffice.SCOTLAND,
                 CourtWorkerType.EMPLOYER_MEMBER)).thenReturn(employerMembers);
 
         List<DynamicValueType> employeeMembers = SelectionServiceTestUtils.createListItems("employeeMember",
-                "Employee Member ");
+            "Employee Member ");
         when(courtWorkerService.getCourtWorkerByTribunalOffice(TribunalOffice.SCOTLAND,
                 CourtWorkerType.EMPLOYEE_MEMBER)).thenReturn(employeeMembers);
 

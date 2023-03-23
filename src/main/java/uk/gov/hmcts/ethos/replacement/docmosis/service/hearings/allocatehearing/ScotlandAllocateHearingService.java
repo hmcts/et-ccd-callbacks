@@ -165,7 +165,7 @@ public class ScotlandAllocateHearingService {
 
     private DynamicFixedListType getEmployerMembers(TribunalOffice tribunalOffice, HearingType selectedHearing) {
         DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
-                tribunalOffice, CourtWorkerType.EMPLOYER_MEMBER);
+            tribunalOffice, CourtWorkerType.EMPLOYER_MEMBER);
 
         if (selectedHearing.hasHearingEmployerMember()) {
             dynamicFixedListType.setValue(selectedHearing.getHearingERMember().getValue());
@@ -175,7 +175,7 @@ public class ScotlandAllocateHearingService {
 
     private DynamicFixedListType getEmployeeMembers(TribunalOffice tribunalOffice, HearingType selectedHearing) {
         DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
-                tribunalOffice, CourtWorkerType.EMPLOYEE_MEMBER);
+            tribunalOffice, CourtWorkerType.EMPLOYEE_MEMBER);
 
         if (selectedHearing.hasHearingEmployeeMember()) {
             dynamicFixedListType.setValue(selectedHearing.getHearingEEMember().getValue());
@@ -185,7 +185,7 @@ public class ScotlandAllocateHearingService {
 
     private DynamicFixedListType getClerks(TribunalOffice tribunalOffice, DateListedType selectedListing) {
         DynamicFixedListType dynamicFixedListType = courtWorkerSelectionService.createCourtWorkerSelection(
-                tribunalOffice, CourtWorkerType.CLERK);
+            tribunalOffice, CourtWorkerType.CLERK);
 
         if (selectedListing.hasHearingClerk()) {
             dynamicFixedListType.setValue(selectedListing.getHearingClerk().getValue());

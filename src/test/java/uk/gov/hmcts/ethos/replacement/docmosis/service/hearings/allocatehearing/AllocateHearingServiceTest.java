@@ -99,10 +99,10 @@ public class AllocateHearingServiceTest {
         String hearingSitAlone = String.valueOf(Boolean.TRUE);
         selectedHearing.setHearingSitAlone(hearingSitAlone);
         DynamicValueType selectedEmployerMember = DynamicValueType.create("employerMember2",
-                "Employer Member 2");
+            "Employer Member 2");
         selectedHearing.setHearingERMember(DynamicFixedListType.of(selectedEmployerMember));
         DynamicValueType selectedEmployeeMember = DynamicValueType.create("employeeMember2",
-                "Employee Member 2");
+            "Employee Member 2");
         selectedHearing.setHearingEEMember(DynamicFixedListType.of(selectedEmployeeMember));
 
         String hearingStatus = Constants.HEARING_STATUS_HEARD;
@@ -122,14 +122,14 @@ public class AllocateHearingServiceTest {
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(venues, "venue", "Venue ");
         DynamicFixedListType clerks = caseData.getAllocateHearingClerk();
         SelectionServiceTestUtils.verifyDynamicFixedListSelected(clerks, "clerk", "Clerk ",
-                selectedClerk);
+            selectedClerk);
         DynamicFixedListType employerMembers = caseData.getAllocateHearingEmployerMember();
         SelectionServiceTestUtils.verifyDynamicFixedListSelected(employerMembers, "employerMember",
-                "Employer Member ",
+            "Employer Member ",
                 selectedEmployerMember);
         DynamicFixedListType employeeMembers = caseData.getAllocateHearingEmployeeMember();
         SelectionServiceTestUtils.verifyDynamicFixedListSelected(employeeMembers, "employeeMember",
-                "Employee Member ",
+            "Employee Member ",
                 selectedEmployeeMember);
 
         assertEquals(hearingSitAlone, caseData.getAllocateHearingSitAlone());
@@ -148,31 +148,31 @@ public class AllocateHearingServiceTest {
     @Test
     public void testPopulateRoomsNewVenueSelected() {
         selectedListing.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("venue1",
-                "venue1")));
+            "venue1")));
         selectedListing.setHearingRoom(DynamicFixedListType.of(DynamicValueType.create("room1",
-                "room1")));
+            "room1")));
         caseData.setAllocateHearingVenue(DynamicFixedListType.of(DynamicValueType.create("venue2",
-                "venue2")));
+            "venue2")));
 
         allocateHearingService.populateRooms(caseData);
 
         verify(roomSelectionService, times(1)).createRoomSelection(caseData, selectedListing,
-                true);
+            true);
     }
 
     @Test
     public void testPopulateRoomsExistingVenueSelected() {
         selectedListing.setHearingVenueDay(DynamicFixedListType.of(DynamicValueType.create("venue1",
-                "venue1")));
+            "venue1")));
         DynamicValueType selectedRoom = DynamicValueType.create("room1", "Room 1");
         selectedListing.setHearingRoom(DynamicFixedListType.of(selectedRoom));
         caseData.setAllocateHearingVenue(DynamicFixedListType.of(DynamicValueType.create("venue1",
-                "venue1")));
+            "venue1")));
 
         allocateHearingService.populateRooms(caseData);
 
         verify(roomSelectionService, times(1)).createRoomSelection(caseData, selectedListing,
-                false);
+            false);
     }
 
     @Test
@@ -181,9 +181,9 @@ public class AllocateHearingServiceTest {
         String sitAlone = String.valueOf(Boolean.TRUE);
         DynamicFixedListType judge = DynamicFixedListType.of(DynamicValueType.create("judge2", "Judge 2"));
         DynamicFixedListType employerMember = DynamicFixedListType.of(DynamicValueType.create("employerMember2",
-                "Employer Member 2"));
+            "Employer Member 2"));
         DynamicFixedListType employeeMember = DynamicFixedListType.of(DynamicValueType.create("employeeMember2",
-                "Employee Member 2"));
+            "Employee Member 2"));
         String hearingStatus = Constants.HEARING_STATUS_POSTPONED;
         String postponedBy = "Doris";
         DynamicFixedListType venue = DynamicFixedListType.of(DynamicValueType.create("venue2", "Venue 2"));
@@ -240,7 +240,7 @@ public class AllocateHearingServiceTest {
     private HearingSelectionService mockHearingSelectionService() {
         HearingSelectionService hearingSelectionService = mock(HearingSelectionService.class);
         List<DynamicValueType> hearings = SelectionServiceTestUtils.createListItems("hearing",
-                "Hearing ");
+            "Hearing ");
         when(hearingSelectionService.getHearingSelection(isA(CaseData.class))).thenReturn(hearings);
 
         when(hearingSelectionService.getSelectedHearing(isA(CaseData.class),
@@ -291,12 +291,12 @@ public class AllocateHearingServiceTest {
                 CourtWorkerType.CLERK)).thenReturn(clerks);
 
         List<DynamicValueType> employerMembers = SelectionServiceTestUtils.createListItems("employerMember",
-                "Employer Member ");
+            "Employer Member ");
         when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
                 CourtWorkerType.EMPLOYER_MEMBER)).thenReturn(employerMembers);
 
         List<DynamicValueType> employeeMembers = SelectionServiceTestUtils.createListItems("employeeMember",
-                "Employee Member ");
+            "Employee Member ");
         when(courtWorkerService.getCourtWorkerByTribunalOffice(tribunalOffice,
                 CourtWorkerType.EMPLOYEE_MEMBER)).thenReturn(employeeMembers);
 

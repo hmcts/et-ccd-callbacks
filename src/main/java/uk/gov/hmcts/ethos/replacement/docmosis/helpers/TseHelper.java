@@ -41,9 +41,16 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksCo
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CCD_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.RESPONDENTS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.RESPONSE_TABLE_HEADER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.TABLE_STRING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.ADDITIONAL_INFORMATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.PARTY_OR_PARTIES_TO_RESPOND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_DUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_FROM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_TABLE_HEADER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 
 @Slf4j
 @SuppressWarnings({"PMD.ExcessiveImports"})
@@ -72,8 +79,8 @@ public final class TseHelper {
     private static final String RESPONDENT_REPLY_MARKUP_FOR_REPLY =
             RESPONSE_TABLE_HEADER
                     + TABLE_STRING
-                    + "|Response from | %s|\r\n"
-                    + "|Response date | %s|\r\n"
+                    + RESPONSE_FROM
+                    + RESPONSE_DATE
                     + "|What’s your response to the %s’s application? | %s|\r\n"
                     + SUPPORTING_MATERIAL_TABLE_HEADER
                     + "%s" // Rule92
@@ -81,21 +88,21 @@ public final class TseHelper {
     private static final String RESPONDENT_REPLY_MARKUP_FOR_DECISION =
             RESPONSE_TABLE_HEADER
                     + TABLE_STRING
-                    + "|Response from | %s|\r\n"
-                    + "|Response date | %s|\r\n"
+                    + RESPONSE_FROM
+                    + RESPONSE_DATE
                     + "|Details | %s|\r\n"
                     + SUPPORTING_MATERIAL_TABLE_HEADER
                     + "\r\n";
     private static final String ADMIN_REPLY_MARKUP =
             RESPONSE_TABLE_HEADER
                     + TABLE_STRING
-                    + "|Response | %s|\r\n"
-                    + "|Date | %s|\r\n"
+                    + RESPONSE_TITLE
+                    + DATE_MARKUP
                     + "|Sent by | Tribunal|\r\n"
                     + "|Case management order or request? | %s|\r\n"
-                    + "|Response due | %s|\r\n"
-                    + "|Party or parties to respond | %s|\r\n"
-                    + "|Additional information | %s|\r\n"
+                    + RESPONSE_DUE
+                    + PARTY_OR_PARTIES_TO_RESPOND
+                    + ADDITIONAL_INFORMATION
                     + SUPPORTING_MATERIAL_TABLE_HEADER
                     + "%s"
                     + "|Full name | %s|\r\n"

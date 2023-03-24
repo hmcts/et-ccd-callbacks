@@ -12,40 +12,43 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.RESPONSE_TABLE_HEADER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.TABLE_STRING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.ADDITIONAL_INFORMATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DECISION_NOTIFICATION_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.NAME_MARKUP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.ORDER_APP_DOC_MARKUP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.ORDER_APP_HEARING_MARKUP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.PARTY_OR_PARTIES_TO_RESPOND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_DUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_FROM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_TABLE_HEADER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 
 @Slf4j
 public final class PseHelper {
 
     private static final String ORDER_APP_MARKUP = "|Hearing, case management order or request | |\r\n"
-            + "|--|--|\r\n"
-            + "|Notification | %s|\r\n"
+            + TABLE_STRING
+            + DECISION_NOTIFICATION_TITLE
             + "%s" // Hearing
             + "|Date sent | %s|\r\n"
             + "|Sent by | Tribunal|\r\n"
             + "|Case management order or request? | %s|\r\n"
-            + "|Response due | %s|\r\n"
-            + "|Party or parties to respond | %s|\r\n"
-            + "|Additional information | %s|\r\n"
+            + RESPONSE_DUE
+            + PARTY_OR_PARTIES_TO_RESPOND
+            + ADDITIONAL_INFORMATION
             + "%s" // APP_DETAILS_DOC
             + "%s" // Case management order / Request
             + "|Sent to | %s|\r\n"
             + "\r\n";
-
-    private static final String ORDER_APP_HEARING_MARKUP = "|Hearing | %s|\r\n";
-
-    private static final String ORDER_APP_DOC_MARKUP = "|Description | %s|\r\n"
-            + "|Document | <a href=\"/documents/%s\" target=\"_blank\">%s</a>|\r\n";
-
     private static final String ORDER_APP_CMO_MARKUP = "|%s made by | %s|\r\n"
-            + "|Name | %s|\r\n";
+            + NAME_MARKUP;
 
     private static final String CLAIMANT_REPLY_MARKUP = RESPONSE_TABLE_HEADER
             + TABLE_STRING
-            + "|Response from | %s|\r\n"
-            + "|Response date | %s|\r\n"
+            + RESPONSE_FROM
+            + RESPONSE_DATE
             + "|What's your response to the tribunal? | %s|\r\n"
             + SUPPORTING_MATERIAL_TABLE_HEADER
             + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"

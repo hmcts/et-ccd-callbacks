@@ -22,22 +22,30 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.RESPONSE_TABLE_HEADER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.TABLE_STRING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.ADDITIONAL_INFORMATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.NAME_MARKUP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.PARTY_OR_PARTIES_TO_RESPOND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_DUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_FROM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_LIST_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_TABLE_HEADER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.STRING_BR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRule92;
 
 @Slf4j
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 public final class TseViewApplicationHelper {
 
-    private static final String STRING_BR = "<br>";
-
     private static final String RESPONDENT_REPLY_MARKUP_FOR_REPLY =
             RESPONSE_TABLE_HEADER
                     + TABLE_STRING
-                    + "|Response from | %s|\r\n"
-                    + "|Response date | %s|\r\n"
+                    + RESPONSE_FROM
+                    + RESPONSE_DATE
                     + "|What’s your response to the %s’s application? | %s|\r\n"
                     + SUPPORTING_MATERIAL_TABLE_HEADER
                     + "%s" // Rule92
@@ -46,7 +54,7 @@ public final class TseViewApplicationHelper {
             RESPONSE_TABLE_HEADER
                     + TABLE_STRING
                     + "%s" // response title
-                    + "|Date | %s|\r\n"
+                    + DATE_MARKUP
                     + "|Sent by | Tribunal|\r\n"
                     + "|Case management order or request? | %s|\r\n"
                     + "%s" // response due
@@ -57,15 +65,6 @@ public final class TseViewApplicationHelper {
                     + "%s" // name / author
                     + "|Sent to | %s|\r\n"
                     + "\r\n";
-
-    private static final String PARTY_OR_PARTIES_TO_RESPOND = "|Party or parties to respond | %s|\r\n";
-    private static final String RESPONSE_DUE = "|Response due | %s|\r\n";
-    private static final String NAME_OF_ADMIN_RESPONSE_AUTHOR = "|Name | %s|\r\n";
-    private static final String ADMIN_RESPONSE_TITLE = "|Response | %s|\r\n";
-    private static final String ADMIN_RESPONSE_ADDITIONAL_INFORMATION = "|Additional information | %s|\r\n";
-    private static final String RESPONSE_LIST_TITLE = "|Responses | |\r\n"
-            + "|--|--|\r\n"
-            + "\r\n";
 
     private static final String APPLICATION_DETAILS = "|Application | |\r\n"
             + TABLE_STRING
@@ -141,7 +140,7 @@ public final class TseViewApplicationHelper {
     private static String formatAminResponseTitle(TseRespondType reply) {
         if (!isNullOrEmpty(reply.getEnterResponseTitle())) {
             return String.format(
-                    ADMIN_RESPONSE_TITLE,
+                    RESPONSE_TITLE,
                     reply.getEnterResponseTitle());
         }
         return "";
@@ -150,7 +149,7 @@ public final class TseViewApplicationHelper {
     private static String formatAdminResponseAdditionalInfo(TseRespondType reply) {
         if (!isNullOrEmpty(reply.getAdditionalInformation())) { //
             return String.format(
-                    ADMIN_RESPONSE_ADDITIONAL_INFORMATION,
+                    ADDITIONAL_INFORMATION,
                     reply.getAdditionalInformation());
         }
         return "";
@@ -159,7 +158,7 @@ public final class TseViewApplicationHelper {
     private static String formatMadeByFullName(TseRespondType reply) {
         if (!isNullOrEmpty(reply.getMadeByFullName())) { //
             return String.format(
-                    NAME_OF_ADMIN_RESPONSE_AUTHOR,
+                    NAME_MARKUP,
                     reply.getMadeByFullName());
         }
         return "";

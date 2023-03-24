@@ -39,7 +39,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_NUMBER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.APP_DETAILS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.STRING_BR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRule92;
@@ -61,7 +64,7 @@ public class TseAdmReplyService {
     private final DocumentManagementService documentManagementService;
 
     private static final String APP_DETAILS = "| | |\r\n"
-            + "|--|--|\r\n"
+            + TABLE_STRING
             + "|Applicant | %s|\r\n"
             + "|Type of application | %s|\r\n"
             + "|Application date | %s|\r\n"
@@ -69,8 +72,6 @@ public class TseAdmReplyService {
             + "%s" // Supporting material
             + "%s" // Rule92
             + "\r\n";
-    private static final String APP_DETAILS_DETAILS = "|Details of the application | %s|\r\n";
-    private static final String STRING_BR = "<br>";
 
     private static final String RESPONSE_REQUIRED =
         "The tribunal requires some information from you about an application.";

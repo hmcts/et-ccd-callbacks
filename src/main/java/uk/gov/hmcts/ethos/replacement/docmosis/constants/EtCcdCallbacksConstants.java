@@ -11,9 +11,6 @@ public final class EtCcdCallbacksConstants {
     public static final String CCD_ID = "ccdId";
     public static final String DATE = "date";
     public static final String EMAIL_FLAG = "emailFlag";
-    public static final String TABLE_STRING = "|--|--|\r\n";
-    public static final String RESPONSE_TABLE_HEADER = "|Response %s | |\r\n";
-    public static final String SUPPORTING_MATERIAL_TABLE_HEADER = "|Supporting material | %s|\r\n";
 
     private EtCcdCallbacksConstants() {
         // restrict instantiation

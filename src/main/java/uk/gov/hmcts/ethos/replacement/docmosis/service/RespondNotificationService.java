@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -55,12 +56,14 @@ public class RespondNotificationService {
 
     private static final String RESPONSE_DETAILS = "|  | |\r\n"
         + "| --- | --- |\r\n"
-        + "| RESPONSE %1$S | |\r\n"
+        + "| Response %1$S | |\r\n"
         + "| Response from | %2$s |\r\n"
         + "| Response date | %3$s |\r\n"
         + " %4$s\r\n"
         + "| What's your response to the tribunal? | %5$s\r\n"
         + "| Do you want to copy correspondence to the other party to satisfy the Rules of Procedure? | %6$s |\r\n";
+
+    private static final String UPLOAD_DOCUMENT_IS_REQUIRED = "Upload document is required";
 
     public void populateSendNotificationSelection(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
@@ -90,6 +93,7 @@ public class RespondNotificationService {
         respondNotificationType.setRespondNotificationWhoRespond(caseData.getRespondNotificationWhoRespond());
         respondNotificationType.setRespondNotificationCaseManagementMadeBy(
             caseData.getRespondNotificationCaseManagementMadeBy());
+        respondNotificationType.setRespondNotificationRequestMadeBy(caseData.getRespondNotificationRequestMadeBy());
         respondNotificationType.setRespondNotificationFullName(caseData.getRespondNotificationFullName());
         respondNotificationType.setRespondNotificationPartyToNotify(caseData.getRespondNotificationPartyToNotify());
 
@@ -111,6 +115,7 @@ public class RespondNotificationService {
         caseData.setRespondNotificationResponseRequired(null);
         caseData.setRespondNotificationWhoRespond(null);
         caseData.setRespondNotificationCaseManagementMadeBy(null);
+        caseData.setRespondNotificationRequestMadeBy(null);
         caseData.setRespondNotificationFullName(null);
         caseData.setRespondNotificationPartyToNotify(null);
     }
@@ -231,6 +236,17 @@ public class RespondNotificationService {
             List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
             respondents.forEach(obj -> sendRespondentEmail(caseData, personalisation, obj.getValue(), templateId));
         }
+    }
+
+
+    public List<String> validateInput(CaseData caseData) {
+        List<String> errors = new ArrayList<>();
+
+        if (YES.equals(caseData.getRespondNotificationResponseRequired())
+            && CollectionUtils.isEmpty(caseData.getRespondNotificationUploadDocument())) {
+            errors.add(UPLOAD_DOCUMENT_IS_REQUIRED);
+        }
+        return errors;
     }
 
     /**

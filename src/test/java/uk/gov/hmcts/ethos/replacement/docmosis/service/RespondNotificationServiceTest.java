@@ -226,7 +226,7 @@ class RespondNotificationServiceTest {
             + "\r\n"
             + "|  | |\r\n"
             + "| --- | --- |\r\n"
-            + "| RESPONSE 1 | |\r\n"
+            + "| Response 1 | |\r\n"
             + "| Response from | Tribunal |\r\n"
             + "| Response date | 02-JAN-1970 |\r\n"
             + " | Supporting material | <a href=\"/documents/6fbf9470-f735-484a-9790-5b246b646fe2/binary\" "

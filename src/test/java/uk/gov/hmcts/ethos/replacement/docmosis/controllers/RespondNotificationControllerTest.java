@@ -37,6 +37,7 @@ class RespondNotificationControllerTest {
     private static final String ABOUT_TO_START_URL = "/respondNotification/aboutToStart";
     private static final String ABOUT_TO_SUBMIT_URL = "/respondNotification/aboutToSubmit";
     private static final String MID_GET_NOTIFICATION_URL = "/respondNotification/midGetNotification";
+    private static final String MID_GET_INPUT_URL = "/respondNotification/midValidateInput";
 
     @MockBean
     private RespondNotificationService respondNotificationService;
@@ -155,5 +156,39 @@ class RespondNotificationControllerTest {
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    void midValidateInput_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(MID_GET_INPUT_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+        verify(respondNotificationService, times(1)).getNotificationMarkDown(any());
+    }
+
+    @Test
+    void midValidateInput_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(MID_GET_INPUT_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void midValidateInput_badRequest() throws Exception {
+        mockMvc.perform(post(MID_GET_INPUT_URL)
+                .content("garbage content")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
     }
 }

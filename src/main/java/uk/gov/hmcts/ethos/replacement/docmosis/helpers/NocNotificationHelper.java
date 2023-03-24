@@ -19,6 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.DATE;
 
 @Slf4j
 @SuppressWarnings({"PMD.AvoidCatchingNPE"})
@@ -123,14 +125,14 @@ public final class NocNotificationHelper {
         String nextHearingDate = HearingsHelper.getEarliestFutureHearingDate(caseData.getHearingCollection());
 
         if (nextHearingDate == null) {
-            personalisation.put("date", "Not set");
+            personalisation.put(DATE, "Not set");
         } else {
             try {
                 Date hearingStartDate =
                         new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.UK).parse(nextHearingDate);
-                personalisation.put("date", new SimpleDateFormat("dd MMM yyyy", Locale.UK).format(hearingStartDate));
+                personalisation.put(DATE, new SimpleDateFormat("dd MMM yyyy", Locale.UK).format(hearingStartDate));
             } catch (ParseException e) {
-                personalisation.put("date", "Not set");
+                personalisation.put(DATE, "Not set");
             }
         }
 
@@ -141,7 +143,7 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
-        personalisation.put("date",
+        personalisation.put(DATE,
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")));
         personalisation.put("tribunal", isNullOrEmpty(caseData.getTribunalAndOfficeLocation()) ? UNKNOWN :
                 caseData.getTribunalAndOfficeLocation());
@@ -150,7 +152,7 @@ public final class NocNotificationHelper {
     }
 
     private static void addCommonValues(CaseData caseData, Map<String, String> personalisation) {
-        personalisation.put("claimant", caseData.getClaimant());
+        personalisation.put(CLAIMANT, caseData.getClaimant());
         personalisation.put("list_of_respondents", getListOfRespondents(caseData));
         personalisation.put("case_number", caseData.getEthosCaseReference());
     }

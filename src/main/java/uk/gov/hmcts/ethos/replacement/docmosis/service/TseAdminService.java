@@ -34,6 +34,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithoutRule92;
@@ -259,8 +261,8 @@ public class TseAdminService {
 
     private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String recipientName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", caseNumber);
-        personalisation.put("caseId", caseId);
+        personalisation.put(CASE_NUMBER, caseNumber);
+        personalisation.put(CASE_ID, caseId);
         personalisation.put("name", recipientName);
         return personalisation;
     }

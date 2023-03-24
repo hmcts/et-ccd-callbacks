@@ -15,6 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CCD_ID;
 
 /**
  * Helper methods for the Upload Documents event.
@@ -54,10 +56,10 @@ public final class UploadDocumentHelper {
     public static Map<String, String> buildPersonalisationForCaseRejection(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", caseData.getEthosCaseReference());
+        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
         personalisation.put("initialTitle", getClaimantTitleOrInitial(caseData));
         personalisation.put("lastName", getLastName(caseData.getClaimant()));
-        personalisation.put("ccdId", caseDetails.getCaseId());
+        personalisation.put(CCD_ID, caseDetails.getCaseId());
         return personalisation;
     }
 

@@ -39,6 +39,12 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CCD_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.EMAIL_FLAG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.RESPONDENTS;
 
 @Slf4j
 @SuppressWarnings({"PMD.TooManyMethods",
@@ -533,17 +539,17 @@ public final class ReferralHelper {
                                                            String username) {
         CaseData caseData = detail.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", caseData.getEthosCaseReference());
-        personalisation.put("emailFlag", getEmailFlag(isNew ? caseData.getIsUrgent() : caseData.getIsUrgentReply()));
-        personalisation.put("claimant", caseData.getClaimant());
-        personalisation.put("respondents", getRespondentNames(caseData));
-        personalisation.put("date", getNearestHearingToReferral(caseData, "Not set"));
+        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
+        personalisation.put(EMAIL_FLAG, getEmailFlag(isNew ? caseData.getIsUrgent() : caseData.getIsUrgentReply()));
+        personalisation.put(CLAIMANT, caseData.getClaimant());
+        personalisation.put(RESPONDENTS, getRespondentNames(caseData));
+        personalisation.put(DATE, getNearestHearingToReferral(caseData, "Not set"));
         personalisation.put("body", isNew ? EMAIL_BODY_NEW : EMAIL_BODY_REPLY);
         personalisation.put("refNumber", referralNumber);
         personalisation.put("subject", getReferralSubject(caseData, isNew));
         personalisation.put("username", username);
         personalisation.put("replyReferral", isNew ? REPLY_REFERRAL_REF : REPLY_REFERRAL_REP);
-        personalisation.put("ccdId", detail.getCaseId());
+        personalisation.put(CCD_ID, detail.getCaseId());
         return personalisation;
     }
 

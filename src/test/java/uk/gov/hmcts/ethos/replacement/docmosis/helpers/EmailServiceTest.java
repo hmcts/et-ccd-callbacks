@@ -20,6 +20,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.RESPONDENTS;
 
 @ExtendWith(SpringExtension.class)
 class EmailServiceTest {
@@ -71,10 +74,10 @@ class EmailServiceTest {
 
     private Map<String, String> createPersonalisation() {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", "caseRef");
+        personalisation.put(CASE_NUMBER, "caseRef");
         personalisation.put("emailFlag", "URGENT");
-        personalisation.put("claimant", "claimant");
-        personalisation.put("respondents", "Andrew Smith");
+        personalisation.put(CLAIMANT, "claimant");
+        personalisation.put(RESPONDENTS, "Andrew Smith");
         personalisation.put("date", "11 Nov 2030");
         personalisation.put("body", "You have a new message about this employment tribunal case.");
         return personalisation;

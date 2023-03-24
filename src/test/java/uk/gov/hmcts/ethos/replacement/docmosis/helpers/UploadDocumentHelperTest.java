@@ -20,6 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_NUMBER;
 
 public class UploadDocumentHelperTest {
     CCDRequest ccdRequest;
@@ -105,7 +106,7 @@ public class UploadDocumentHelperTest {
 
     private Map<String, String> buildPersonalisation(String initialTitle) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", "1234");
+        personalisation.put(CASE_NUMBER, "1234");
         personalisation.put("initialTitle", initialTitle);
         personalisation.put("lastName", "Last");
         personalisation.put("ccdId", "1234");

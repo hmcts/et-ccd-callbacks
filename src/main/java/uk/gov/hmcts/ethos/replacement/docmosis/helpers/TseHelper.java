@@ -41,6 +41,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksCo
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CCD_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.RESPONSE_TABLE_HEADER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.TABLE_STRING;
 
 @Slf4j
 @SuppressWarnings({"PMD.ExcessiveImports"})
@@ -50,11 +53,11 @@ public final class TseHelper {
         + "%s at the latest.</br></br>If you need more time to respond, you may request more time from the tribunal. If"
         + " you do not respond or request more time to respond, the tribunal will consider the application without your"
         + " response.";
-    public static final String TABLE = "| | |\r\n"
-        + "|--|--|\r\n"
-        + "|Application date | %s\r\n"
-        + "|Details of the application | %s\r\n"
-        + "Application file upload | %s";
+    public static final String TSE_RESPONSE_TABLE = "| | |\r\n"
+            + TABLE_STRING
+            + "|Application date | %s\r\n"
+            + "|Details of the application | %s\r\n"
+            + "Application file upload | %s";
     public static final String GROUP_B = "You do not need to respond to this application.<br>";
     public static final List<String> GROUP_B_TYPES = List.of("Change my personal details", "Consider a decision "
             + "afresh", "Reconsider a judgment", "Withdraw my claim");
@@ -66,35 +69,38 @@ public final class TseHelper {
                     + "%s";
     private static final String RULE92_DETAILS_MARKUP =
             "|Details of why you do not want to inform the other party | %s|\r\n";
-    private static final String RESPONDENT_REPLY_MARKUP_FOR_REPLY = "|Response %s | |\r\n"
-            + "|--|--|\r\n"
-            + "|Response from | %s|\r\n"
-            + "|Response date | %s|\r\n"
-            + "|What’s your response to the %s’s application? | %s|\r\n"
-            + "|Supporting material | %s|\r\n"
-            + "%s" // Rule92
-            + "\r\n";
-    private static final String RESPONDENT_REPLY_MARKUP_FOR_DECISION = "|Response %s | |\r\n"
-            + "|--|--|\r\n"
-            + "|Response from | %s|\r\n"
-            + "|Response date | %s|\r\n"
-            + "|Details | %s|\r\n"
-            + "|Supporting material | %s|\r\n"
-            + "\r\n";
-    private static final String ADMIN_REPLY_MARKUP = "|Response %s | |\r\n"
-            + "|--|--|\r\n"
-            + "|Response | %s|\r\n"
-            + "|Date | %s|\r\n"
-            + "|Sent by | Tribunal|\r\n"
-            + "|Case management order or request? | %s|\r\n"
-            + "|Response due | %s|\r\n"
-            + "|Party or parties to respond | %s|\r\n"
-            + "|Additional information | %s|\r\n"
-            + "|Supporting material | %s|\r\n"
-            + "%s"
-            + "|Full name | %s|\r\n"
-            + "|Sent to | %s|\r\n"
-            + "\r\n";
+    private static final String RESPONDENT_REPLY_MARKUP_FOR_REPLY =
+            RESPONSE_TABLE_HEADER
+                    + TABLE_STRING
+                    + "|Response from | %s|\r\n"
+                    + "|Response date | %s|\r\n"
+                    + "|What’s your response to the %s’s application? | %s|\r\n"
+                    + SUPPORTING_MATERIAL_TABLE_HEADER
+                    + "%s" // Rule92
+                    + "\r\n";
+    private static final String RESPONDENT_REPLY_MARKUP_FOR_DECISION =
+            RESPONSE_TABLE_HEADER
+                    + TABLE_STRING
+                    + "|Response from | %s|\r\n"
+                    + "|Response date | %s|\r\n"
+                    + "|Details | %s|\r\n"
+                    + SUPPORTING_MATERIAL_TABLE_HEADER
+                    + "\r\n";
+    private static final String ADMIN_REPLY_MARKUP =
+            RESPONSE_TABLE_HEADER
+                    + TABLE_STRING
+                    + "|Response | %s|\r\n"
+                    + "|Date | %s|\r\n"
+                    + "|Sent by | Tribunal|\r\n"
+                    + "|Case management order or request? | %s|\r\n"
+                    + "|Response due | %s|\r\n"
+                    + "|Party or parties to respond | %s|\r\n"
+                    + "|Additional information | %s|\r\n"
+                    + SUPPORTING_MATERIAL_TABLE_HEADER
+                    + "%s"
+                    + "|Full name | %s|\r\n"
+                    + "|Sent to | %s|\r\n"
+                    + "\r\n";
 
     private static final String ADMIN_REPLY_MARKUP_MADE_BY = "|%s made by | %s|\r\n";
 
@@ -165,7 +171,7 @@ public final class TseHelper {
 
         caseData.setTseResponseTable(
             String.format(
-                TABLE,
+                TSE_RESPONSE_TABLE,
                 genericTseApplicationType.getDate(),
                 isNullOrEmpty(genericTseApplicationType.getDetails()) ? "N/A" : genericTseApplicationType.getDetails(),
                 document

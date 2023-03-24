@@ -39,6 +39,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRule92;
@@ -69,7 +70,6 @@ public class TseAdmReplyService {
             + "%s" // Rule92
             + "\r\n";
     private static final String APP_DETAILS_DETAILS = "|Details of the application | %s|\r\n";
-    private static final String APP_DETAILS_UPLOAD = "|Supporting material | %s|\r\n";
     private static final String STRING_BR = "<br>";
 
     private static final String RESPONSE_REQUIRED =
@@ -103,7 +103,7 @@ public class TseAdmReplyService {
                 : String.format(APP_DETAILS_DETAILS, applicationType.getDetails()),
             applicationType.getDocumentUpload() == null
                 ? ""
-                : String.format(APP_DETAILS_UPLOAD, documentManagementService.displayDocNameTypeSizeLink(
+                : String.format(SUPPORTING_MATERIAL_TABLE_HEADER, documentManagementService.displayDocNameTypeSizeLink(
                     applicationType.getDocumentUpload(), authToken)),
             formatRule92(applicationType.getCopyToOtherPartyYesOrNo(),
                 applicationType.getCopyToOtherPartyText())

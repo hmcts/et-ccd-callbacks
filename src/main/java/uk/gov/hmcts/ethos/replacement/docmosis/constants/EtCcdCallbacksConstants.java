@@ -2,10 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.constants;
 
 public final class EtCcdCallbacksConstants {
 
-    private EtCcdCallbacksConstants() {
-        // restrict instantiation
-    }
-
     public static final String CASE_NUMBER = "caseNumber";
     public static final String CASE_ID = "caseId";
     public static final String CLAIMANT = "claimant";
@@ -15,5 +11,11 @@ public final class EtCcdCallbacksConstants {
     public static final String CCD_ID = "ccdId";
     public static final String DATE = "date";
     public static final String EMAIL_FLAG = "emailFlag";
+    public static final String TABLE_STRING = "|--|--|\r\n";
+    public static final String RESPONSE_TABLE_HEADER = "|Response %s | |\r\n";
+    public static final String SUPPORTING_MATERIAL_TABLE_HEADER = "|Supporting material | %s|\r\n";
 
+    private EtCcdCallbacksConstants() {
+        // restrict instantiation
+    }
 }

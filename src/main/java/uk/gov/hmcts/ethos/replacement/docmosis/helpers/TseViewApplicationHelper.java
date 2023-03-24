@@ -22,6 +22,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.RESPONSE_TABLE_HEADER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.TABLE_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRule92;
 
 @Slf4j
@@ -30,28 +33,30 @@ public final class TseViewApplicationHelper {
 
     private static final String STRING_BR = "<br>";
 
-    private static final String RESPONDENT_REPLY_MARKUP_FOR_REPLY = "|Response %s | |\r\n"
-            + "|--|--|\r\n"
-            + "|Response from | %s|\r\n"
-            + "|Response date | %s|\r\n"
-            + "|What’s your response to the %s’s application? | %s|\r\n"
-            + "|Supporting material | %s|\r\n"
-            + "%s" // Rule92
-            + "\r\n";
-    private static final String VIEW_APPLICATION_ADMIN_REPLY_MARKUP = "|Response %s | |\r\n"
-            + "|--|--|\r\n"
-            + "%s" // response title
-            + "|Date | %s|\r\n"
-            + "|Sent by | Tribunal|\r\n"
-            + "|Case management order or request? | %s|\r\n"
-            + "%s" // response due
-            + "%s" // party or parties to respond
-            + "%s" // Additional information
-            + "|Supporting material | %s|\r\n"
-            + "%s" // made by
-            + "%s" // name / author
-            + "|Sent to | %s|\r\n"
-            + "\r\n";
+    private static final String RESPONDENT_REPLY_MARKUP_FOR_REPLY =
+            RESPONSE_TABLE_HEADER
+                    + TABLE_STRING
+                    + "|Response from | %s|\r\n"
+                    + "|Response date | %s|\r\n"
+                    + "|What’s your response to the %s’s application? | %s|\r\n"
+                    + SUPPORTING_MATERIAL_TABLE_HEADER
+                    + "%s" // Rule92
+                    + "\r\n";
+    private static final String VIEW_APPLICATION_ADMIN_REPLY_MARKUP =
+            RESPONSE_TABLE_HEADER
+                    + TABLE_STRING
+                    + "%s" // response title
+                    + "|Date | %s|\r\n"
+                    + "|Sent by | Tribunal|\r\n"
+                    + "|Case management order or request? | %s|\r\n"
+                    + "%s" // response due
+                    + "%s" // party or parties to respond
+                    + "%s" // Additional information
+                    + SUPPORTING_MATERIAL_TABLE_HEADER
+                    + "%s" // made by
+                    + "%s" // name / author
+                    + "|Sent to | %s|\r\n"
+                    + "\r\n";
 
     private static final String PARTY_OR_PARTIES_TO_RESPOND = "|Party or parties to respond | %s|\r\n";
     private static final String RESPONSE_DUE = "|Response due | %s|\r\n";
@@ -63,12 +68,12 @@ public final class TseViewApplicationHelper {
             + "\r\n";
 
     private static final String APPLICATION_DETAILS = "|Application | |\r\n"
-            + "|--|--|\r\n"
+            + TABLE_STRING
             + "|Applicant | %s|\r\n"
             + "|Type of application | %s|\r\n"
             + "|Application date | %s|\r\n"
             + "|What do you want to tell or ask the tribunal? | %s|\r\n"
-            + "|Supporting material | %s|\r\n"
+            + SUPPORTING_MATERIAL_TABLE_HEADER
             + "|Do you want to copy this correspondence to the other party "
             + "to satisfy the Rules of Procedure? | %s |\r\n"
             + "\r\n";
@@ -81,6 +86,7 @@ public final class TseViewApplicationHelper {
     /**
      * Populates a dynamic list with either open or closed applications
      * for the tell something else 'view an application' dropdown selector.
+     *
      * @param caseData - the caseData contains the values for the case
      * @return DynamicFixedListType
      */
@@ -101,6 +107,7 @@ public final class TseViewApplicationHelper {
     /**
      * Set the markup for an application summary and a table of responses
      * for the 'view an application' event.
+     *
      * @param caseData - all case data for the case
      */
     public static void setDataForTseApplicationSummaryAndResponses(CaseData caseData) {
@@ -127,7 +134,7 @@ public final class TseViewApplicationHelper {
                 document,
                 defaultIfEmpty(genericTseApplicationType.getCopyToOtherPartyYesOrNo(), "N/A")
         );
-        
+
         caseData.setTseApplicationSummaryAndResponsesMarkup(applicationSummary + respondTablesCollection);
     }
 
@@ -205,7 +212,7 @@ public final class TseViewApplicationHelper {
         }
         return null;
     }
-    
+
     private static String createAdminResponse(TseRespondType response, AtomicInteger count) {
         String doc = "N/A";
         if (response.getAddDocument() != null) {

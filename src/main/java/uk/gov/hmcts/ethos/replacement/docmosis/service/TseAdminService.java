@@ -36,6 +36,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithoutRule92;
@@ -66,15 +67,13 @@ public class TseAdminService {
 
     private static final String RECORD_DECISION_DETAILS_DETAILS = "|Details of the application | %s|\r\n";
 
-    private static final String RECORD_DECISION_DETAILS_DOC = "|Supporting material | %s|\r\n";
-
     private static final String CLOSE_APP_DETAILS = "| | |\r\n"
         + "|--|--|\r\n"
         + "|Applicant | %s|\r\n"
         + "|Type of application | %s|\r\n"
         + "|Application date | %s|\r\n"
         + "|What do you want to tell or ask the tribunal? | %s|\r\n"
-        + "|Supporting material | %s|\r\n"
+        + SUPPORTING_MATERIAL_TABLE_HEADER
         + "%s" // Rule92
         + "\r\n";
 
@@ -126,7 +125,7 @@ public class TseAdminService {
             applicationType.getDocumentUpload() == null
                 ? ""
                 : String.format(
-                    RECORD_DECISION_DETAILS_DOC,
+                    SUPPORTING_MATERIAL_TABLE_HEADER,
                     documentManagementService.displayDocNameTypeSizeLink(
                         applicationType.getDocumentUpload(), authToken))
         );

@@ -72,7 +72,7 @@ class NocNotificationHelperTest {
     @Test
     void testbuildClaimantPersonalisation() {
         Map<String, String> claimantPersonalisation =
-            NocNotificationHelper.buildClaimantPersonalisation(caseData, "test_party");
+            NocNotificationHelper.buildPersonalisationWithPartyName(caseData, "test_party");
         assertThat(claimantPersonalisation.size(), is(4));
         for (String value : claimantPersonalisation.values()) {
             assertThat(value, notNullValue());
@@ -92,7 +92,7 @@ class NocNotificationHelperTest {
     @Test
     void testBuildNewRespondentSolicitorPersonalisation() {
         Map<String, String> claimantPersonalisation =
-            NocNotificationHelper.buildNewRespondentSolicitorPersonalisation(caseData, "test_party");
+            NocNotificationHelper.buildPersonalisationWithPartyName(caseData, "test_party");
         assertThat(claimantPersonalisation.size(), is(4));
         for (String value : claimantPersonalisation.values()) {
             assertThat(value, notNullValue());

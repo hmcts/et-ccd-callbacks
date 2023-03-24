@@ -42,7 +42,7 @@ public class NocNotificationService {
             emailService.sendEmail(
                 claimantTemplateId,
                 claimantEmail,
-                NocNotificationHelper.buildClaimantPersonalisation(caseData, partyName)
+                NocNotificationHelper.buildPersonalisationWithPartyName(caseData, partyName)
             );
         }
 
@@ -64,7 +64,7 @@ public class NocNotificationService {
             emailService.sendEmail(
                 newRespondentSolicitorTemplateId,
                 newSolicitorEmail,
-                NocNotificationHelper.buildNewRespondentSolicitorPersonalisation(caseData, partyName)
+                NocNotificationHelper.buildPersonalisationWithPartyName(caseData, partyName)
             );
         }
 

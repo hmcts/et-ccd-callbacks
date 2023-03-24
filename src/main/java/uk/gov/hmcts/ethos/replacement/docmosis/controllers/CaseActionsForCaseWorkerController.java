@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
@@ -278,7 +279,7 @@ public class CaseActionsForCaseWorkerController {
 
             //create NOC answers section
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
-            
+
             if (ET1_ONLINE_CASE_SOURCE.equals(caseData.getCaseSource())) {
                 caseData.setPositionType(ET1_ONLINE_SUBMISSION_POSITION_TYPE);
             }
@@ -490,8 +491,7 @@ public class CaseActionsForCaseWorkerController {
         try {
             nocRespondentRepresentativeService.updateRepresentativesAccess(callbackRequest);
         } catch (IOException e) {
-            log.error("Failed to update respondent representatives accesses");
-            throw new RuntimeException(e);
+            throw new CcdInputOutputException("Failed to update respondent representatives accesses", e);
         }
     }
 

@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
@@ -91,7 +92,7 @@ public class NoticeOfChangeController {
                 nocRespondentRepresentativeService.removeOrganisationRepresentativeAccess(
                     callbackRequest.getCaseDetails().getCaseId(), changeOrganisationRequestField);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new CcdInputOutputException("Failed to remove organisation representitive access", e);
             }
         }
 

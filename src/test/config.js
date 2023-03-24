@@ -3,7 +3,7 @@ module.exports = {
     IdamBaseUrl: process.env.IDAM_URL || 'https://idam-api.aat.platform.hmcts.net',
     RedirectUri: process.env.REDIRECT_URI || `https://manage-case.aat.platform.hmcts.net/oauth2/callback`,
     TestEnv: process.env.RUNNING_ENV || 'aat',
-    TestShowBrowserWindow: process.env.SHOW_BROWSER_WINDOW || false,
+    TestShowBrowserWindow: process.env.SHOW_BROWSER_WINDOW || true,
     TestRetryFeatures: process.env.RETRY_FEATURES || 0,
     TestRetryScenarios: process.env.RETRY_SCENARIOS || 2,
     TestPathToRun: process.env.E2E_TEST_PATH || './paths/**/*.js',

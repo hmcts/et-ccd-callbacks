@@ -70,6 +70,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TARGET_HEARING_DATE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator.CLOSING_CASE_WITH_BF_OPEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.DISPOSAL_DATE_BEFORE_RECEIPT_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.RECEIPT_DATE_LATER_THAN_REJECTED_ERROR_MESSAGE;
 
 @SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming", "PMD.TooManyMethods", "PMD.TooManyFields",
     "PMD.ExcessiveImports"})
@@ -155,6 +156,22 @@ class EventValidationServiceTest {
 
         assertEquals(0, errors.size());
         assertEquals(caseData.getTargetHearingDate(), PAST_TARGET_HEARING_DATE.toString());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"2023-01-01", "2019-01-01"})
+    void shouldValidateRejectedDate(String rejectedDate) {
+        caseData.setReceiptDate("2022-01-01");
+        CasePreAcceptType casePreAcceptType = new CasePreAcceptType();
+        casePreAcceptType.setDateRejected(rejectedDate);
+        caseData.setPreAcceptCase(casePreAcceptType);
+        List<String> errors = eventValidationService.validateReceiptDate(caseData);
+        if ("2023-01-01".equals(rejectedDate)) {
+            assertEquals(0, errors.size());
+        }
+        if ("2019-01-01".equals(rejectedDate)) {
+            assertEquals(RECEIPT_DATE_LATER_THAN_REJECTED_ERROR_MESSAGE, errors.get(0));
+        }
     }
 
     @Test

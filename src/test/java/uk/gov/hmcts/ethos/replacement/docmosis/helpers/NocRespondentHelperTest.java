@@ -190,7 +190,7 @@ class NocRespondentHelperTest {
         assertThat(nocRespondentHelper.getIndexOfRep(respondentSumTypeItem2,
             caseData.getRepCollection())).isEqualTo(1);
         assertThat(nocRespondentHelper.getIndexOfRep(respondentSumTypeItem3,
-            caseData.getRepCollection())).isEqualTo(0);
+            caseData.getRepCollection())).isZero();
         assertThat(nocRespondentHelper.getIndexOfRep(unknownRespondentSumTypeItem,
             caseData.getRepCollection())).isEqualTo(-1);
     }

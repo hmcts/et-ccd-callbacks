@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Map;
 import static java.util.Objects.isNull;
 
@@ -25,7 +26,7 @@ public class CaseConverter {
 
     public <T> Map<String, Object> toMap(T object) {
         if (isNull(object)) {
-            return null;
+            return Collections.emptyMap();
         }
         return objectMapper.convertValue(object, typeReference);
     }

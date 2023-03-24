@@ -13,4 +13,4 @@ Scenario('Verify Leeds case Allocate Hearing', async ({I}) => {
     //await listHearing(I, eventNames.LIST_HEARING, 'Leeds');
     await allocateHearing(I, eventNames.ALLOCATE_HEARING, 'Leeds');
 
-}).tag('@pats');
+}).tag('@nightly').tag('@RET-BAT').retry(testConfig.TestRetryScenarios);

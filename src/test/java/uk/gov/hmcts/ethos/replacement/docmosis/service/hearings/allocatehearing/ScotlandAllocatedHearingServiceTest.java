@@ -203,10 +203,10 @@ public class ScotlandAllocatedHearingServiceTest {
         HearingSelectionService hearingSelectionService = mock(HearingSelectionService.class);
         List<DynamicValueType> hearings = SelectionServiceTestUtils.createListItems("hearing",
             "Hearing ");
-        when(hearingSelectionService.getHearingSelection(isA(CaseData.class))).thenReturn(hearings);
+        when(hearingSelectionService.getHearingSelectionAllocateHearing(isA(CaseData.class))).thenReturn(hearings);
 
-        when(hearingSelectionService.getSelectedHearing(isA(CaseData.class),
-                isA(DynamicFixedListType.class))).thenReturn(selectedHearing);
+        when(hearingSelectionService.getSelectedHearingAllocateHearing(isA(CaseData.class)))
+                .thenReturn(selectedHearing);
         when(hearingSelectionService.getSelectedListing(isA(CaseData.class))).thenReturn(selectedListing);
 
         return hearingSelectionService;

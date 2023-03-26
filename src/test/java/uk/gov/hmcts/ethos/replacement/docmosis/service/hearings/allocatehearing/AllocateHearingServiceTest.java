@@ -235,7 +235,8 @@ public class AllocateHearingServiceTest {
             "Hearing ");
         when(hearingSelectionService.getHearingSelection(isA(CaseData.class))).thenReturn(hearings);
 
-        when(hearingSelectionService.getSelectedHearingAllocateHearing(isA(CaseData.class))).thenReturn(selectedHearing);
+        when(hearingSelectionService.getSelectedHearingAllocateHearing(isA(CaseData.class)))
+                .thenReturn(selectedHearing);
         when(hearingSelectionService.getSelectedListing(isA(CaseData.class))).thenReturn(selectedListing);
 
         return hearingSelectionService;

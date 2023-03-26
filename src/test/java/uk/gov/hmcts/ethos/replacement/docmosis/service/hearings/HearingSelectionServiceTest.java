@@ -61,11 +61,11 @@ public class HearingSelectionServiceTest {
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
         caseData.setAllocateHearingHearing(new DynamicFixedListType("id1"));
         DateListedType selectedListing = hearingSelectionService.getSelectedListing(caseData);
-        assertEquals("1970-01-03T10:00:00.000", selectedListing.getListedDate());
-        caseData.setAllocateHearingHearing(new DynamicFixedListType("id5"));
-        selectedListing = hearingSelectionService.getSelectedListing(caseData);
         assertEquals("1970-01-01T10:00:00.000", selectedListing.getListedDate());
-        caseData.setAllocateHearingHearing(new DynamicFixedListType("id6"));
+        caseData.setAllocateHearingHearing(new DynamicFixedListType("id2"));
+        selectedListing = hearingSelectionService.getSelectedListing(caseData);
+        assertEquals("1970-01-03T10:00:00.000", selectedListing.getListedDate());
+        caseData.setAllocateHearingHearing(new DynamicFixedListType("id3"));
         selectedListing = hearingSelectionService.getSelectedListing(caseData);
         assertEquals("1970-01-03T10:00:00.000", selectedListing.getListedDate());
     }

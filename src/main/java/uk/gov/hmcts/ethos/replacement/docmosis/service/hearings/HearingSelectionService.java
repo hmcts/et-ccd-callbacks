@@ -44,8 +44,8 @@ public class HearingSelectionService {
         return values;
     }
 
-    public HearingType getSelectedHearingAllocateHearing(CaseData caseData,
-                                                         DynamicFixedListType dynamicFixedListType) {
+    public HearingType getSelectedHearingAllocateHearing(CaseData caseData) {
+        DynamicFixedListType dynamicFixedListType = caseData.getAllocateHearingHearing();
         String id = dynamicFixedListType.getValue().getCode();
         for (HearingTypeItem hearing : caseData.getHearingCollection()) {
             for (DateListedTypeItem listing : hearing.getValue().getHearingDateCollection()) {
@@ -69,18 +69,8 @@ public class HearingSelectionService {
                 dynamicFixedListType.getValue().getLabel(), caseData.getEthosCaseReference()));
     }
 
-    public List<DateListedTypeItem> getListings(CaseData caseData, DynamicFixedListType dynamicFixedListType) {
-        String id = dynamicFixedListType.getValue().getCode();
-        for (HearingTypeItem hearing : caseData.getHearingCollection()) {
-            if (hearing.getId().equals(id)) {
-                return hearing.getValue().getHearingDateCollection();
-            }
-        }
-        throw new IllegalStateException(String.format("Listings %s not found for selected hearing in case %s",
-                dynamicFixedListType.getValue().getLabel(), caseData.getEthosCaseReference()));
-    }
-
-    public DateListedType getSelectedListing(CaseData caseData, DynamicFixedListType dynamicFixedListType) {
+    public DateListedType getSelectedListing(CaseData caseData) {
+        DynamicFixedListType dynamicFixedListType = caseData.getAllocateHearingHearing();
         String id = dynamicFixedListType.getValue().getCode();
         for (HearingTypeItem hearing : caseData.getHearingCollection()) {
             for (DateListedTypeItem listing : hearing.getValue().getHearingDateCollection()) {

@@ -207,8 +207,6 @@ public class HearingDetailServiceTest {
         dateListedTypeItem.setValue(selectedListing);
         HearingType hearingType = new HearingType();
         hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
-        when(hearingSelectionService.getListings(isA(CaseData.class),
-                isA(DynamicFixedListType.class))).thenReturn(List.of(dateListedTypeItem));
         when(hearingSelectionService.getSelectedHearing(isA(CaseData.class), isA(DynamicFixedListType.class)))
                 .thenReturn(hearingType);
 

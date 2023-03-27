@@ -91,7 +91,7 @@ class RespondNotificationServiceTest {
         var respondNotificationTypeItemList = new ArrayList<GenericTypeItem<RespondNotificationType>>();
         SendNotificationType notificationType = new SendNotificationType();
         notificationType.setRespondNotificationTypeCollection(respondNotificationTypeItemList);
-        respondNotificationService.createResponseNotification(caseData, notificationType);
+        respondNotificationService.createRespondNotification(caseData, notificationType);
 
         RespondNotificationType respondNotificationType =
             notificationType.getRespondNotificationTypeCollection().get(0).getValue();
@@ -103,7 +103,7 @@ class RespondNotificationServiceTest {
         assertEquals(BOTH_PARTIES, respondNotificationType.getRespondNotificationWhoRespond());
         assertEquals("John Doe", respondNotificationType.getRespondNotificationFullName());
 
-        respondNotificationService.clearResponseNotificationFields(caseData);
+        respondNotificationService.clearRespondNotificationFields(caseData);
         assertNull(caseData.getRespondNotificationTitle());
         assertNull(caseData.getRespondNotificationAdditionalInfo());
         assertNull(caseData.getRespondNotificationUploadDocument());

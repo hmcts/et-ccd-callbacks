@@ -72,11 +72,11 @@ public class RespondNotificationService {
     }
 
     /**
-     * Creates the responseNotification and adds it to a list of responses stored on the notification.
+     * Creates the respondNotification and adds it to a list of responses stored on the notification.
      * @param caseData caseData contains the notification details
      * @param sendNotificationType the notificationType where the data will be stored
      */
-    public void createResponseNotification(CaseData caseData, SendNotificationType sendNotificationType) {
+    public void createRespondNotification(CaseData caseData, SendNotificationType sendNotificationType) {
 
         if (sendNotificationType.getRespondNotificationTypeCollection() == null) {
             sendNotificationType.setRespondNotificationTypeCollection(new ArrayList<>());
@@ -104,10 +104,10 @@ public class RespondNotificationService {
     }
 
     /**
-     * Clears the responseNotification fields, so the page can be reused.
+     * Clears the respondNotification fields, so the page can be reused.
      * @param caseData caseData to be cleared
      */
-    public void clearResponseNotificationFields(CaseData caseData) {
+    public void clearRespondNotificationFields(CaseData caseData) {
         caseData.setRespondNotificationTitle(null);
         caseData.setRespondNotificationAdditionalInfo(null);
         caseData.setRespondNotificationUploadDocument(null);
@@ -238,7 +238,6 @@ public class RespondNotificationService {
         }
     }
 
-
     public List<String> validateInput(CaseData caseData) {
         List<String> errors = new ArrayList<>();
 
@@ -251,7 +250,7 @@ public class RespondNotificationService {
 
     /**
      * Handles the 'about to submit' event including.
-     * * Creating the ResponseNotification and persisting in caseData
+     * * Creating the RespondNotification and persisting in caseData
      * * sending the notification emails
      * * clearing the response fields so page is ready for the next use
      * @param caseDetails - caseDetails
@@ -266,8 +265,8 @@ public class RespondNotificationService {
             return;
         }
         SendNotificationType sendNotificationType = sendNotificationTypeItemOptional.get().getValue();
-        createResponseNotification(caseData, sendNotificationType);
+        createRespondNotification(caseData, sendNotificationType);
         sendNotifyEmails(caseDetails, sendNotificationType);
-        clearResponseNotificationFields(caseData);
+        clearRespondNotificationFields(caseData);
     }
 }

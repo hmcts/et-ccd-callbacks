@@ -13,6 +13,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.Clai
 public class ExcelReportDocumentInfoService {
     private final ClaimsByHearingVenueExcelReportCreationService claimsByHearingVenueExcelReportCreationService;
     private final ExcelDocManagementService excelDocManagementService;
+    private final BfExcelReportService bfExcelReportService;
     private static final String CLAIMS_BY_HEARING_VENUE_FILE_NAME = "_Hearings_By_Venue_Report.xlsx";
     private static final String BROUGHT_FORWARD_REPORT_FILE_NAME = "_Brought_Forward_Report.xlsx";
 
@@ -25,7 +26,7 @@ public class ExcelReportDocumentInfoService {
 
     public DocumentInfo generateBfExcelReportDocumentInfo(BfActionReportData reportData, String caseTypeId,
                                                           String userToken) {
-        byte[] excelBytes = bfExcelReportCreationService.getReportExcelFile(reportData);
+        byte[] excelBytes = bfExcelReportService.getReportExcelFile(reportData);
         String outPutFileName = caseTypeId + BROUGHT_FORWARD_REPORT_FILE_NAME;
         return excelDocManagementService.uploadExcelReportDocument(userToken, outPutFileName, excelBytes);
     }

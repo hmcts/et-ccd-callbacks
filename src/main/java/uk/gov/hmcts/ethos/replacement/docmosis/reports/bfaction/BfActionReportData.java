@@ -10,4 +10,8 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 public class BfActionReportData extends ListingData {
     @JsonIgnore
     private String office;
+    @JsonIgnore
+    private String reportPeriodDescription;
+    @JsonIgnore
+    private String reportPrintedOnDescription;
 }

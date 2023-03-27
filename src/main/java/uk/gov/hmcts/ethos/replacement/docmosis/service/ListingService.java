@@ -99,6 +99,7 @@ public class ListingService {
     private final CaseSourceLocalReport caseSourceLocalReport;
     private final ExcelReportDocumentInfoService excelReportDocumentInfoService;
     private final VenueService venueService;
+    private final ReportDataService reportDataService;
     private static final String MISSING_DOCUMENT_NAME = "Missing document name";
     private static final String MESSAGE = "Failed to generate document for case id : ";
     public static final String ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND =
@@ -314,7 +315,9 @@ public class ListingService {
         log.info("Number of cases found: " + submitEvents.size());
         switch (listingDetails.getCaseData().getReportType()) {
             case BROUGHT_FORWARD_REPORT:
-                return new BfActionReport().runReport(listingDetails, submitEvents);
+                return new BfActionReport().runReport(listingDetails,
+                        submitEvents,
+                        reportDataService.getUserFullName(authToken));
             case CLAIMS_ACCEPTED_REPORT:
                 return ReportHelper.processClaimsAcceptedRequest(listingDetails, submitEvents);
             case LIVE_CASELOAD_REPORT:

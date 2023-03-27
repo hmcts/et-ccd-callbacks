@@ -1,58 +1,76 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
+import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReportData;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportData;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportDetail;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 public class BfExcelReportService {
-    public byte[] getReportExcelFile(BfActionReportData reportData,
-                                     String workbookName,
-                                     List<String> headers) {
+
+    private static final String EXCEL_REPORT_WORKBOOK_NAME = "BF Action Report";
+    private static final String CASE_NUMBER_HEADER = "Case No.";
+    private static final String ACTION = "Action";
+    private static final String DATE_TAKEN = "Date Taken";
+    private static final String BF_DATE = "B/F Date";
+    private static final String COMMENTS = "Comments";
+    private static final List<String> HEADERS = new ArrayList<>(List.of(
+            CASE_NUMBER_HEADER, ACTION, DATE_TAKEN,
+            BF_DATE, COMMENTS));
+    public byte[] getReportExcelFile(BfActionReportData reportData) {
         if (reportData == null) {
             return new byte[0];
         }
 
-        List<ClaimsByHearingVenueReportDetail> reportDetails = reportData.getReportDetails();
         XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet(workbookName);
+        XSSFSheet sheet = workbook.createSheet(EXCEL_REPORT_WORKBOOK_NAME);
         adjustColumnSize(sheet);
         initializeReportHeaders(reportData,
                 workbook,
                 sheet,
-                headers);
-        initializeReportData(workbook, sheet, reportDetails, reportData.getReportPrintedOnDescription());
+                HEADERS);
+        initializeReportData(workbook,
+                sheet,
+                reportData.getBfDateCollection(),
+                reportData.getReportPrintedOnDescription());
         return writeExcelFileToByteArray(workbook);
     }
 
     private void adjustColumnSize(XSSFSheet sheet) {
         //Adjust the column width to fit the content
-        for (int i = 0; i <= 5; i++) {
+        for (int i = 0; i < 5; i++) {
             sheet.setColumnWidth(i, 9000);
         }
     }
 
-    private void initializeReportHeaders(ClaimsByHearingVenueReportData reportData,
+    private void initializeReportHeaders(BfActionReportData reportData,
                                          XSSFWorkbook workbook,
                                          XSSFSheet sheet,
                                          List<String> headers) {
-        CellRangeAddress reportTitleCellRange = new CellRangeAddress(0, 0, 0, 6);
+        CellRangeAddress reportTitleCellRange = new CellRangeAddress(0, 0, 0, 5);
         sheet.addMergedRegion(reportTitleCellRange);
         XSSFRow rowReportTitle = sheet.createRow(0);
         rowReportTitle.setHeight((short)(rowReportTitle.getHeight() * 8));
         CellStyle styleForHeaderCell = getReportTitleCellStyle(workbook);
         createCell(rowReportTitle, 0, reportData.getDocumentName(), styleForHeaderCell);
 
-        CellRangeAddress reportPeriodCellRange = new CellRangeAddress(1, 1, 0, 6);
+        CellRangeAddress reportPeriodCellRange = new CellRangeAddress(1, 1, 0, 5);
         sheet.addMergedRegion(reportPeriodCellRange);
         XSSFRow rowReportPeriod = sheet.createRow(1);
         rowReportPeriod.setHeight((short)(rowReportPeriod.getHeight() * 6));
@@ -108,17 +126,18 @@ public class BfExcelReportService {
     }
 
     private void initializeReportData(XSSFWorkbook workbook, XSSFSheet sheet,
-                                      List<ClaimsByHearingVenueReportDetail> reportDetails,
+                                      List<BFDateTypeItem> bfDateTypeCollection,
                                       String reportPrintedOnDescription) {
-        if (reportDetails.isEmpty()) {
+        if (bfDateTypeCollection.isEmpty()) {
             return;
         }
 
         int rowIndex = 3;
-        addColumnFilterCellRange(sheet, reportDetails.size());
+        addColumnFilterCellRange(sheet, bfDateTypeCollection.size());
 
-        for (ClaimsByHearingVenueReportDetail claim : reportDetails) {
-            constructCaseExcelRow(workbook, sheet, rowIndex, claim);
+        for (BFDateTypeItem item : bfDateTypeCollection) {
+            BFDateType bfDateType = item.getValue();
+            constructCaseExcelRow(workbook, sheet, rowIndex, bfDateType);
             rowIndex++;
         }
 
@@ -150,17 +169,16 @@ public class BfExcelReportService {
     }
 
     private void constructCaseExcelRow(XSSFWorkbook workbook, XSSFSheet sheet, int rowIndex,
-                                       ClaimsByHearingVenueReportDetail item) {
+                                       BFDateType bfDateType) {
         XSSFRow row = sheet.createRow(rowIndex);
         row.setHeight((short)(row.getHeight() * 4));
         int columnIndex = 0;
         CellStyle cellStyle = getCellStyle(workbook);
-        createCell(row, columnIndex, item.getCaseReference(), cellStyle);
-        createCell(row, columnIndex + 1, item.getDateOfReceipt(), cellStyle);
-        createCell(row, columnIndex + 2, item.getClaimantPostcode(), cellStyle);
-        createCell(row, columnIndex + 3, item.getClaimantWorkPostcode(), cellStyle);
-        createCell(row, columnIndex + 4, item.getRespondentPostcode(), cellStyle);
-        createCell(row, columnIndex + 5, item.getRespondentET3Postcode(), cellStyle);
+        createCell(row, columnIndex, bfDateType.getCaseReference(), cellStyle);
+        createCell(row, columnIndex + 1, bfDateType.getBroughtForwardAction(), cellStyle);
+        createCell(row, columnIndex + 2, bfDateType.getBroughtForwardEnteredDate(), cellStyle);
+        createCell(row, columnIndex + 3, bfDateType.getBroughtForwardDate(), cellStyle);
+        createCell(row, columnIndex + 4, bfDateType.getBroughtForwardDateReason(), cellStyle);
     }
 
     private Font getFont(XSSFWorkbook workbook) {

@@ -17,31 +17,33 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTING_CASE_TYPE_ID;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ClaimsByHearingVenueExcelReportDocumentInfoServiceTest {
+public class ExcelReportDocumentInfoServiceTest {
     @Mock
     ExcelReportDocumentInfoService excelReportDocInfService;
     @Mock
     ExcelDocManagementService excelDocManagementService;
     @Mock
+    BfExcelReportService bfExcelReportService;
+    @Mock
     ClaimsByHearingVenueExcelReportCreationService reportCreationService;
-    ClaimsByHearingVenueReportData reportData;
+    ClaimsByHearingVenueReportData claimsByHearingVenueReportData;
     private DocumentInfo docInfo;
 
     @Before
     public void setUp() {
-        reportData = new ClaimsByHearingVenueReportData();
+        claimsByHearingVenueReportData = new ClaimsByHearingVenueReportData();
         ClaimsByHearingVenueReportDetail detailEntry = new ClaimsByHearingVenueReportDetail();
         detailEntry.setCaseReference("245000/2021");
         detailEntry.setRespondentET3Postcode("TE5 TE1");
-        reportData.getReportDetails().add(detailEntry);
+        claimsByHearingVenueReportData.getReportDetails().add(detailEntry);
         excelReportDocInfService = new ExcelReportDocumentInfoService(
-                reportCreationService, excelDocManagementService);
+                reportCreationService, excelDocManagementService, bfExcelReportService);
         docInfo = new DocumentInfo();
     }
 
     @Test
     public void shouldReturnNonNullExcelReportDocumentInfo() {
-        when(reportCreationService.getReportExcelFile(reportData))
+        when(reportCreationService.getReportExcelFile(claimsByHearingVenueReportData))
                 .thenReturn(new byte[0]);
         when(excelDocManagementService
                 .uploadExcelReportDocument("dummyToken",
@@ -50,13 +52,13 @@ public class ClaimsByHearingVenueExcelReportDocumentInfoServiceTest {
                 .thenReturn(docInfo);
 
         DocumentInfo resultDocInfo = excelReportDocInfService.generateClaimsByHearingVenueExcelReportDocumentInfo(
-                reportData, ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
+                claimsByHearingVenueReportData, ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
         assertNotNull(resultDocInfo);
     }
 
     @Test
     public void shouldReturnCorrectCountOfDependenciesInvocation() {
-        when(reportCreationService.getReportExcelFile(reportData))
+        when(reportCreationService.getReportExcelFile(claimsByHearingVenueReportData))
                 .thenReturn(new byte[0]);
         when(excelDocManagementService
                 .uploadExcelReportDocument("dummyToken",
@@ -64,10 +66,31 @@ public class ClaimsByHearingVenueExcelReportDocumentInfoServiceTest {
                         new byte[0]))
                 .thenReturn(docInfo);
 
-        excelReportDocInfService.generateClaimsByHearingVenueExcelReportDocumentInfo(reportData,
+        excelReportDocInfService.generateClaimsByHearingVenueExcelReportDocumentInfo(claimsByHearingVenueReportData,
                 ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
 
-        verify(reportCreationService, times(1)).getReportExcelFile(reportData);
+        verify(reportCreationService, times(1)).getReportExcelFile(claimsByHearingVenueReportData);
+        verifyNoMoreInteractions(reportCreationService);
+        verify(excelDocManagementService, times(1))
+                .uploadExcelReportDocument("dummyToken",
+                        "ET_EnglandWales_Listings_Hearings_By_Venue_Report.xlsx", new byte[0]);
+        verifyNoMoreInteractions(excelDocManagementService);
+    }
+
+    @Test
+    public void shouldReturnCorrectCountOfDependenciesInvocationBfReport() {
+        when(reportCreationService.getReportExcelFile(claimsByHearingVenueReportData))
+                .thenReturn(new byte[0]);
+        when(excelDocManagementService
+                .uploadExcelReportDocument("dummyToken",
+                        "ET_EnglandWales_Listings_Brought_Forward_Report.xlsx",
+                        new byte[0]))
+                .thenReturn(docInfo);
+
+        excelReportDocInfService.generateBfExcelReportDocumentInfo(claimsByHearingVenueReportData,
+                ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
+
+        verify(reportCreationService, times(1)).getReportExcelFile(claimsByHearingVenueReportData);
         verifyNoMoreInteractions(reportCreationService);
         verify(excelDocManagementService, times(1))
                 .uploadExcelReportDocument("dummyToken",

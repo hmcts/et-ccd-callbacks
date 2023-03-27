@@ -167,9 +167,9 @@ class RespondNotificationControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.errors", notNullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(respondNotificationService, times(1)).getNotificationMarkDown(any());
+        verify(respondNotificationService, times(1)).validateInput(any());
     }
 
     @Test

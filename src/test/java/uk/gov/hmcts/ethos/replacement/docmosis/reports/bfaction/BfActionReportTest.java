@@ -111,7 +111,7 @@ public class BfActionReportTest {
         submitEvent.setCaseData(caseData);
         submitEvents.add(submitEvent);
 
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents);
+        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
         int actualBfDateCount  = resultListingData.getBfDateCollection().size();
         int expectedBfDateCount = 3;
         assertEquals(expectedBfDateCount, actualBfDateCount);
@@ -148,7 +148,7 @@ public class BfActionReportTest {
         submitEvent.setCaseData(caseData);
         submitEvents.add(submitEvent);
 
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents);
+        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
         BFDateType firstBFDateTypeItem = resultListingData.getBfDateCollection().get(2).getValue();
         assertEquals(bfActionType.getBfDate().split("T")[0], firstBFDateTypeItem.getBroughtForwardDate());
         assertEquals(bfActionType.getCwActions(), firstBFDateTypeItem.getBroughtForwardAction());
@@ -171,7 +171,7 @@ public class BfActionReportTest {
         submitEvent.setCaseData(caseData);
         submitEvents.add(submitEvent);
 
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents);
+        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents,"userName");
         int expectedBfDateCount = 2;
         assertEquals(expectedBfDateCount, resultListingData.getBfDateCollection().size());
     }
@@ -195,7 +195,7 @@ public class BfActionReportTest {
         submitEvent.setCaseData(caseData);
         submitEvents.add(submitEvent);
 
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents);
+        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
         int expectedBfDateCount = 2;
         assertEquals(expectedBfDateCount, resultListingData.getBfDateCollection().size());
     }
@@ -221,7 +221,7 @@ public class BfActionReportTest {
         submitEvents.add(submitEvent);
 
         BfActionReport bfActionReport = new BfActionReport();
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents);
+        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
         // bfActionType3 is added last. But it has the earliest bfDate. As the returned listingData from
         // bfActionReport.runReport method call should be ordered by bfDate, bfActionType3
         // should be the first element
@@ -255,7 +255,7 @@ public class BfActionReportTest {
         submitEvents.add(submitEvent);
 
         BfActionReport bfActionReport = new BfActionReport();
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents);
+        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
         //Because the Bf entries are sorted by bf date, bfActionTypeItemFour is the first entry in the
         //result listing data
         BFDateType firstBFDateTypeItem = resultListingData.getBfDateCollection().get(0).getValue();
@@ -268,7 +268,7 @@ public class BfActionReportTest {
     public void shouldShowReportOfficeName_EngWales() {
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents);
+        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
         BfActionReportData bfActionReportData = (BfActionReportData) resultListingData;
         assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), bfActionReportData.getOffice());
     }
@@ -277,7 +277,7 @@ public class BfActionReportTest {
     public void shouldShowManagingOffice() {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents);
+        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
         BfActionReportData bfActionReportData = (BfActionReportData) resultListingData;
         assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), bfActionReportData.getManagingOffice());
     }
@@ -286,7 +286,7 @@ public class BfActionReportTest {
     public void shouldShowReportOfficeName_Scotland() {
         listingDetails.getCaseData().setManagingOffice(null);
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents);
+        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
         BfActionReportData bfActionReportData = (BfActionReportData) resultListingData;
         assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), bfActionReportData.getOffice());
     }

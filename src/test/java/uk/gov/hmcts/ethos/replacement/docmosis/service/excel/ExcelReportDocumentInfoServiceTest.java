@@ -1,11 +1,16 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
+import java.util.List;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
+import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportDetail;
 
@@ -25,25 +30,43 @@ public class ExcelReportDocumentInfoServiceTest {
     @Mock
     BfExcelReportService bfExcelReportService;
     @Mock
-    ClaimsByHearingVenueExcelReportCreationService reportCreationService;
+    ClaimsByHearingVenueExcelReportCreationService claimsByHearingVenueExcelReportCreationService;
     ClaimsByHearingVenueReportData claimsByHearingVenueReportData;
+    BfActionReportData bfActionReportData;
     private DocumentInfo docInfo;
 
-    @Before
-    public void setUp() {
+    public void setUpClaimsReport() {
         claimsByHearingVenueReportData = new ClaimsByHearingVenueReportData();
         ClaimsByHearingVenueReportDetail detailEntry = new ClaimsByHearingVenueReportDetail();
         detailEntry.setCaseReference("245000/2021");
         detailEntry.setRespondentET3Postcode("TE5 TE1");
         claimsByHearingVenueReportData.getReportDetails().add(detailEntry);
         excelReportDocInfService = new ExcelReportDocumentInfoService(
-                reportCreationService, excelDocManagementService, bfExcelReportService);
+                claimsByHearingVenueExcelReportCreationService, excelDocManagementService, bfExcelReportService);
+        docInfo = new DocumentInfo();
+    }
+
+    public void setUpBfReport() {
+        bfActionReportData = new BfActionReportData();
+        BFDateTypeItem bfDateTypeItem = new BFDateTypeItem();
+        bfDateTypeItem.setId(UUID.randomUUID().toString());
+        BFDateType bfDateType = new BFDateType();
+        bfDateType.setCaseReference("245000/2021");
+        bfDateType.setBroughtForwardDate("2023-01-01");
+        bfDateType.setBroughtForwardAction("action");
+        bfDateType.setBroughtForwardEnteredDate("2023-02-01");
+        bfDateType.setBroughtForwardDateReason("reason");
+        bfDateTypeItem.setValue(bfDateType);
+        bfActionReportData.setBfDateCollection(List.of(bfDateTypeItem));
+        excelReportDocInfService = new ExcelReportDocumentInfoService(
+                claimsByHearingVenueExcelReportCreationService, excelDocManagementService, bfExcelReportService);
         docInfo = new DocumentInfo();
     }
 
     @Test
     public void shouldReturnNonNullExcelReportDocumentInfo() {
-        when(reportCreationService.getReportExcelFile(claimsByHearingVenueReportData))
+        setUpClaimsReport();
+        when(claimsByHearingVenueExcelReportCreationService.getReportExcelFile(claimsByHearingVenueReportData))
                 .thenReturn(new byte[0]);
         when(excelDocManagementService
                 .uploadExcelReportDocument("dummyToken",
@@ -58,7 +81,8 @@ public class ExcelReportDocumentInfoServiceTest {
 
     @Test
     public void shouldReturnCorrectCountOfDependenciesInvocation() {
-        when(reportCreationService.getReportExcelFile(claimsByHearingVenueReportData))
+        setUpClaimsReport();
+        when(claimsByHearingVenueExcelReportCreationService.getReportExcelFile(claimsByHearingVenueReportData))
                 .thenReturn(new byte[0]);
         when(excelDocManagementService
                 .uploadExcelReportDocument("dummyToken",
@@ -69,8 +93,8 @@ public class ExcelReportDocumentInfoServiceTest {
         excelReportDocInfService.generateClaimsByHearingVenueExcelReportDocumentInfo(claimsByHearingVenueReportData,
                 ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
 
-        verify(reportCreationService, times(1)).getReportExcelFile(claimsByHearingVenueReportData);
-        verifyNoMoreInteractions(reportCreationService);
+        verify(claimsByHearingVenueExcelReportCreationService, times(1)).getReportExcelFile(claimsByHearingVenueReportData);
+        verifyNoMoreInteractions(claimsByHearingVenueExcelReportCreationService);
         verify(excelDocManagementService, times(1))
                 .uploadExcelReportDocument("dummyToken",
                         "ET_EnglandWales_Listings_Hearings_By_Venue_Report.xlsx", new byte[0]);
@@ -79,7 +103,8 @@ public class ExcelReportDocumentInfoServiceTest {
 
     @Test
     public void shouldReturnCorrectCountOfDependenciesInvocationBfReport() {
-        when(reportCreationService.getReportExcelFile(claimsByHearingVenueReportData))
+        setUpBfReport();
+        when(bfExcelReportService.getReportExcelFile(bfActionReportData))
                 .thenReturn(new byte[0]);
         when(excelDocManagementService
                 .uploadExcelReportDocument("dummyToken",
@@ -87,14 +112,30 @@ public class ExcelReportDocumentInfoServiceTest {
                         new byte[0]))
                 .thenReturn(docInfo);
 
-        excelReportDocInfService.generateBfExcelReportDocumentInfo(claimsByHearingVenueReportData,
+        excelReportDocInfService.generateBfExcelReportDocumentInfo(bfActionReportData,
                 ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
 
-        verify(reportCreationService, times(1)).getReportExcelFile(claimsByHearingVenueReportData);
-        verifyNoMoreInteractions(reportCreationService);
+        verify(bfExcelReportService, times(1)).getReportExcelFile(bfActionReportData);
+        verifyNoMoreInteractions(bfExcelReportService);
         verify(excelDocManagementService, times(1))
                 .uploadExcelReportDocument("dummyToken",
-                        "ET_EnglandWales_Listings_Hearings_By_Venue_Report.xlsx", new byte[0]);
+                        "ET_EnglandWales_Listings_Brought_Forward_Report.xlsx", new byte[0]);
         verifyNoMoreInteractions(excelDocManagementService);
+    }
+
+    @Test
+    public void shouldReturnNonNullExcelBfReportDocumentInfo() {
+        setUpBfReport();
+        when(bfExcelReportService.getReportExcelFile(bfActionReportData))
+                .thenReturn(new byte[0]);
+        when(excelDocManagementService
+                .uploadExcelReportDocument("dummyToken",
+                        "ET_EnglandWales_Listings_Brought_Forward_Report.xlsx",
+                        new byte[0]))
+                .thenReturn(docInfo);
+
+        DocumentInfo resultDocInfo = excelReportDocInfService.generateBfExcelReportDocumentInfo(
+                bfActionReportData, ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
+        assertNotNull(resultDocInfo);
     }
 }

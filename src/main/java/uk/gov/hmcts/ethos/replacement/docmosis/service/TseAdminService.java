@@ -39,6 +39,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.ADDITIONAL_INFORMATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.APP_DETAILS_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.CLOSE_APP_DECISION_DETAILS_OTHER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.CLOSE_APP_TELL_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DECISION_NOTIFICATION_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DOCUMENT;
@@ -74,10 +75,6 @@ public class TseAdminService {
         + "%s" // Supporting material
         + "\r\n";
 
-    private static final String RECORD_DECISION_DETAILS_DETAILS = "|Details of the application | %s|\r\n";
-
-    private static final String SUPPORTING_MATERIAL = "|Supporting material | %s|\r\n";
-
     private static final String CLOSE_APP_DETAILS = "| | |\r\n"
         + TABLE_STRING
         + "|Applicant | %s|\r\n"
@@ -87,8 +84,6 @@ public class TseAdminService {
         + "%s" // Supporting material
         + "%s" // Rule92
         + "\r\n";
-
-    private static final String CLOSE_APP_TELL_DETAILS = "|What do you want to tell or ask the tribunal? | %s|\r\n";
 
     private static final String CLOSE_APP_DECISION_DETAILS = "|Decision | |\r\n"
         + TABLE_STRING
@@ -127,9 +122,7 @@ public class TseAdminService {
                 : String.format(APP_DETAILS_DETAILS, applicationType.getDetails()),
             applicationType.getDocumentUpload() == null
                 ? ""
-                : String.format(
-                    SUPPORTING_MATERIAL_TABLE_HEADER,
-                : String.format(SUPPORTING_MATERIAL,
+                : String.format(SUPPORTING_MATERIAL_TABLE_HEADER,
                     documentManagementService.displayDocNameTypeSizeLink(
                         applicationType.getDocumentUpload(), authToken))
         );
@@ -367,7 +360,7 @@ public class TseAdminService {
             return "";
         }
 
-        return String.format(SUPPORTING_MATERIAL,
+        return String.format(SUPPORTING_MATERIAL_TABLE_HEADER,
             documentManagementService.displayDocNameTypeSizeLink(
                 applicationTypeItem.getValue().getDocumentUpload(), authToken));
     }

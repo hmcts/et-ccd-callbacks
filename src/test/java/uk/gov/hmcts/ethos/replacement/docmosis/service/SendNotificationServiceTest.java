@@ -30,9 +30,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
+@SuppressWarnings({"PMD.ExcessiveImports"})
 class SendNotificationServiceTest {
 
     @Mock
@@ -65,7 +67,7 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationTitle("title");
         caseData.setSendNotificationLetter("no");
         caseData.setSendNotificationUploadDocument(new ArrayList<>());
-        caseData.setSendNotificationSubject(List.of("Hearing"));
+        caseData.setSendNotificationSubject(List.of("Hearing", "Judgment"));
         caseData.setSendNotificationAdditionalInfo("info");
         caseData.setSendNotificationNotify("Both parties");
         caseData.setSendNotificationSelectHearing(null);
@@ -88,7 +90,7 @@ class SendNotificationServiceTest {
         assertEquals("title", sendNotificationType.getSendNotificationTitle());
         assertEquals("no", sendNotificationType.getSendNotificationLetter());
         assertEquals(0, sendNotificationType.getSendNotificationUploadDocument().size());
-        assertEquals("Hearing", sendNotificationType.getSendNotificationSubject().get(0));
+        assertEquals("[Hearing, Judgment]", sendNotificationType.getSendNotificationSubject().toString());
         assertEquals("info", sendNotificationType.getSendNotificationAdditionalInfo());
         assertEquals("Both parties", sendNotificationType.getSendNotificationNotify());
         assertNull(sendNotificationType.getSendNotificationSelectHearing());
@@ -101,6 +103,10 @@ class SendNotificationServiceTest {
         assertEquals("details", sendNotificationType.getSendNotificationDetails());
         assertEquals("Judge", sendNotificationType.getSendNotificationRequestMadeBy());
         assertEquals("notStartedYet", sendNotificationType.getNotificationState());
+        assertEquals(YES, sendNotificationType.getSendNotificationResponseTribunalTable());
+        assertEquals("Hearing, Judgment", sendNotificationType.getSendNotificationSubjectString());
+        assertEquals("0", sendNotificationType.getSendNotificationResponsesCount());
+        assertEquals(TRIBUNAL, sendNotificationType.getSendNotificationSentBy());
     }
 
     @Test

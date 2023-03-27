@@ -93,7 +93,7 @@ public class RespondNotificationService {
         respondNotificationType.setRespondNotificationWhoRespond(caseData.getRespondNotificationWhoRespond());
         respondNotificationType.setRespondNotificationCaseManagementMadeBy(
             caseData.getRespondNotificationCaseManagementMadeBy());
-        respondNotificationType.setRespondNotification(caseData.getRespondNotificationRequestMadeBy());
+        respondNotificationType.setRespondNotificationRequestMadeBy(caseData.getRespondNotificationRequestMadeBy());
         respondNotificationType.setRespondNotificationFullName(caseData.getRespondNotificationFullName());
         respondNotificationType.setRespondNotificationPartyToNotify(caseData.getRespondNotificationPartyToNotify());
 

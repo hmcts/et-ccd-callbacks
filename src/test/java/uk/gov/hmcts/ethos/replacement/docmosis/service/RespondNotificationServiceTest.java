@@ -157,6 +157,7 @@ class RespondNotificationServiceTest {
             + "| Name |  |\r\n"
             + "| Sent to | Both parties |\r\n"
             + "\r\n";
+
         assertEquals(expected, result);
     }
 

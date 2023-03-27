@@ -171,7 +171,7 @@ async function processCaseToAcceptedState() {
         "data": {
             "preAcceptCase": {
                 "caseAccepted": "Yes",
-                "dateAccepted": "2022-07-24"
+                "dateAccepted": "2022-09-24"
             }
         },
         "event": {

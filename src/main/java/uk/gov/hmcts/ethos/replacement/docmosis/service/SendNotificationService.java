@@ -34,7 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 
 @Service("sendNotificationService")

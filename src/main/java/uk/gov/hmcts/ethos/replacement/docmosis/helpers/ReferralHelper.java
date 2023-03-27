@@ -39,12 +39,12 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_NUMBER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CCD_ID;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CLAIMANT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.DATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.EMAIL_FLAG;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 
 @Slf4j
 @SuppressWarnings({"PMD.TooManyMethods",

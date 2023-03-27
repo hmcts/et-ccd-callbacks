@@ -20,9 +20,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_NUMBER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CLAIMANT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 
 @ExtendWith(SpringExtension.class)
 class EmailServiceTest {

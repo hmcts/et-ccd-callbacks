@@ -38,13 +38,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_JUDGEMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_ID;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CASE_NUMBER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CCD_ID;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CLAIMANT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.DATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.EMAIL_FLAG;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.RESPONDENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
 @Slf4j

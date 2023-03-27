@@ -19,8 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.CLAIMANT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.EtCcdCallbacksConstants.DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 
 @Slf4j
 @SuppressWarnings({"PMD.AvoidCatchingNPE"})

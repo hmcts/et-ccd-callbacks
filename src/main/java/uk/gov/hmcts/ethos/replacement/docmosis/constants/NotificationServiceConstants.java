@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.constants;
 
-public final class EtCcdCallbacksConstants {
+public final class NotificationServiceConstants {
 
     public static final String CASE_NUMBER = "caseNumber";
     public static final String CASE_ID = "caseId";
@@ -12,7 +12,7 @@ public final class EtCcdCallbacksConstants {
     public static final String DATE = "date";
     public static final String EMAIL_FLAG = "emailFlag";
 
-    private EtCcdCallbacksConstants() {
+    private NotificationServiceConstants() {
         // restrict instantiation
     }
 }

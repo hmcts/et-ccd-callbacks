@@ -60,6 +60,7 @@ module.exports = async function (jurisdiction) {
     I.see('Case Number:');
     I.click(commonConfig.submit);
 
+    //Verifying the Hearings Tab.
     I.waitForText('has been updated with event: List Hearing', testConfig.TestTimeToWaitForText);
     I.click("//div[text()='Hearings']");
     I.see('Hearing type');
@@ -93,4 +94,12 @@ module.exports = async function (jurisdiction) {
     I.see('Listed');
     I.see('Hearing Venue');
     I.see('Leeds');
+
+    //Making Sure that no Personnel resources are allocated
+    I.dontSee('Employment Judge');
+    I.dontSee('A Judge');
+    I.dontSee('Employee Member');
+    I.dontSee('EE Member');
+    I.dontSee('Clerk');
+    I.dontSee('A Clerk');
 };

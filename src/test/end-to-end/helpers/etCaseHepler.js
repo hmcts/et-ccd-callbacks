@@ -261,6 +261,160 @@ async function rejectTheCaseEvent(authToken, serviceToken, case_id) {
     expect(nextEventExecutionResponse.status).to.eql(201);
 }
 
+async function listTheCaseEvent(authToken, serviceToken, case_id, userId) {
+
+    console.log("... application vetted, starting accept event...");
+    const listingStartCasePath = `/caseworkers/${userId}/jurisdictions/EMPLOYMENT/case-types/${location}/cases/${case_id}/event-triggers/addAmendHearing/token`;
+    const listingSaveCasePath = `/caseworkers/${userId}/jurisdictions/EMPLOYMENT/case-types/${location}/cases/${case_id}/events`;
+
+    let initiateListUrl = ccdApiUrl + listingStartCasePath;
+    let startListEventHeaders = {
+        'Authorization': `Bearer ${authToken}`,
+        'ServiceAuthorization': `Bearer ${serviceToken}`,
+        'experimental': true,
+        'Content-Type': 'application/json'
+    };
+
+    let startListingResponse = await I.sendGetRequest(initiateListUrl, startListEventHeaders);
+    expect(startListingResponse.status).to.eql(200);
+    let listEventToken = startListingResponse.data.token;
+    const date = new Date(new Date().setHours(0, 0, 0, 0));
+    switch (date.getDay()) {
+        case 0: //Sunday
+            date.setDate(date.getDate() + 1);
+            break;
+        case 6: //Saturday
+            date.setDate(date.getDate() + 2);
+            break;
+        default:
+    }
+    const formattedDate = date.toJSON();
+    console.log('The value of the formatted Date : ' + formattedDate);
+    const listDate = formattedDate.substring(0, formattedDate.length - 1);
+    console.log('The value of the listed Date : ' + listDate);
+
+    let listEventBody = {
+        "data": {
+            "hearingCollection": [
+                {
+                    "value": {
+                        "hearingNumber": "1",
+                        "Hearing_type": "Preliminary Hearing",
+                        "hearingPublicPrivate": "Public",
+                        "judicialMediation": "Yes",
+                        "Hearing_venue": {
+                            "value": {
+                                "code": "Hull Combined Court Centre",
+                                "label": "Hull Combined Court Centre"
+                            },
+                            "selectedLabel": "Hull Combined Court Centre",
+                            "selectedCode": "Hull Combined Court Centre",
+                            "list_items": [
+                                {
+                                    "code": "Harrogate CJC",
+                                    "label": "Harrogate CJC"
+                                },
+                                {
+                                    "code": "Hull",
+                                    "label": "Hull"
+                                },
+                                {
+                                    "code": "Hull Combined Court Centre",
+                                    "label": "Hull Combined Court Centre"
+                                },
+                                {
+                                    "code": "IAC",
+                                    "label": "IAC"
+                                },
+                                {
+                                    "code": "Leeds",
+                                    "label": "Leeds"
+                                },
+                                {
+                                    "code": "Scarborough",
+                                    "label": "Scarborough"
+                                },
+                                {
+                                    "code": "Sheffield Combi",
+                                    "label": "Sheffield Combined Court"
+                                },
+                                {
+                                    "code": "Teesside ET",
+                                    "label": "Teesside ET"
+                                },
+                                {
+                                    "code": "Wakefield Count",
+                                    "label": "Wakefield Civil and Family Justice Centre"
+                                }
+                            ]
+                        },
+                        "hearingEstLengthNum": "1",
+                        "hearingEstLengthNumType": "Days",
+                        "hearingSitAlone": "Full Panel",
+                        "Hearing_stage": null,
+                        "Hearing_notes": null,
+                        "hearingShowDetails": null,
+                        "judge": null,
+                        "hearingERMember": null,
+                        "hearingEEMember": null,
+                        "hearingFormat": [
+                            "In person"
+                        ],
+                        "hearingDateCollection": [
+                            {
+                                "value": {
+                                    "listedDate": `${listDate}`,
+                                    "Hearing_status": null,
+                                    "Postponed_by": null,
+                                    "postponedDate": null,
+                                    "hearingVenueDay": null,
+                                    "hearingRoom": null,
+                                    "hearingClerk": null,
+                                    "hearingCaseDisposed": null,
+                                    "Hearing_part_heard": null,
+                                    "Hearing_reserved_judgement": null,
+                                    "attendee_claimant": null,
+                                    "attendee_non_attendees": null,
+                                    "attendee_resp_no_rep": null,
+                                    "attendee_resp_&_rep": null,
+                                    "attendee_rep_only": null,
+                                    "hearingTimingStart": null,
+                                    "hearingTimingBreak": null,
+                                    "hearingTimingResume": null,
+                                    "hearingTimingFinish": null,
+                                    "hearingTimingDuration": null,
+                                    "HearingNotes2": null
+                                },
+                                "id": "9f80414b-1679-49f5-b539-f169f1b7308b"
+                            }
+                        ]
+                    },
+                    "id": "62928f4f-5fbe-41c7-a2ae-ff73fd3b79ed"
+                }
+            ]
+        },
+        "event": {
+            "id": "addAmendHearing",
+            "summary": "",
+            "description": ""
+        },
+        "event_token": listEventToken,
+        "ignore_warning": false
+    };
+
+    let listSaveUrl = ccdApiUrl + listingSaveCasePath;
+    let listHeaders = {
+        'Authorization': `Bearer ${authToken}`,
+        'ServiceAuthorization': `${serviceToken}`,
+        'Content-Type': 'application/json'
+    };
+
+    let listPayload = JSON.stringify(listEventBody)
+
+    const listEventExecutionResponse = await I.sendPostRequest(listSaveUrl, listPayload, listHeaders);
+    expect(listEventExecutionResponse.status).to.eql(201);
+}
+
 async function navigateToCaseDetailsScreen(case_id) {
     await I.authenticateWithIdam(username, password);
     await I.amOnPage('/case-details/' + case_id);
@@ -332,9 +486,31 @@ async function processCaseToRejectedState() {
     return case_id;
 }
 
+async function processCaseToListedState() {
+
+    // Login to IDAM to get the authentication token
+    const authToken = await getAuthToken();
+    const serviceToken = await getS2SServiceToken();
+
+    //Getting the User Id based on the Authentication Token that is passed for this User.
+    const userId = await getUserDetails(authToken);
+    const case_id = await createACase(authToken, serviceToken, userId);
+    await performCaseVettingEvent(authToken, serviceToken, case_id);
+
+    //Initiate accept case
+    await acceptTheCaseEvent(authToken, serviceToken, case_id);
+    await listTheCaseEvent(authToken, serviceToken, case_id, userId);
+
+    //Navigate to the Case Detail Page
+    await navigateToCaseDetailsScreen(case_id);
+    return case_id;
+}
+
+
 module.exports = {
     processCaseToSubmittedState,
     processCaseToET1VettedState,
     processCaseToAcceptedState,
     processCaseToRejectedState,
+    processCaseToListedState
 };

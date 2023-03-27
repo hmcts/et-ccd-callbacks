@@ -2,7 +2,7 @@
   "videoHearingPreference": "#claimantHearingPreference_hearing_preferences-Video",
   "phoneHearingPreference": "#claimantHearingPreference_hearing_preferences-Phone",
   "selectNeitherPreference": "#claimantHearingPreference_hearing_preferences-Neither",
-  "physicalConditionYes": "#claimantHearingPreference_reasonable_adjustments_Yes",
+  "physicalConditionNo": "#claimantHearingPreference_reasonable_adjustments_No",
   "contactLanguageEnglish": "#claimantHearingPreference_contact_language-English",
   "hearingLanguageEnglish": "#claimantHearingPreference_hearing_language-English"
 

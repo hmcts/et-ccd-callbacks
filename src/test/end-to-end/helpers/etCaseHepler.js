@@ -264,12 +264,8 @@ async function rejectTheCaseEvent(authToken, serviceToken, case_id) {
 async function listTheCaseEvent(authToken, serviceToken, case_id, userId) {
 
     console.log("... application vetted, starting accept event...");
-    //let manage_case_url = `https://manage-case.${env}.platform.hmcts.net`
-    //const initiateListEvent = `/data/internal/cases/${case_id}/event-triggers/addAmendHearing?ignore-warning=false`;
     const listingStartCasePath = `/caseworkers/${userId}/jurisdictions/EMPLOYMENT/case-types/${location}/cases/${case_id}/event-triggers/addAmendHearing/token`;
     const listingSaveCasePath = `/caseworkers/${userId}/jurisdictions/EMPLOYMENT/case-types/${location}/cases/${case_id}/events`;
-
-    //let initiateListUrl = manage_case_url + initiateListEvent;
 
     let initiateListUrl = ccdApiUrl + listingStartCasePath;
     let startListEventHeaders = {
@@ -297,7 +293,6 @@ async function listTheCaseEvent(authToken, serviceToken, case_id, userId) {
     const listDate = formattedDate.substring(0, formattedDate.length - 1);
     console.log('The value of the listed Date : ' + listDate);
 
-    //var data = fs.readFileSync('../data/list-the-accepted-case.json');
     let listEventBody = {
         "data": {
             "hearingCollection": [
@@ -407,8 +402,6 @@ async function listTheCaseEvent(authToken, serviceToken, case_id, userId) {
         "ignore_warning": false
     };
 
-    // console.log("... This is the payload for triggering the list event" + listEventToken);
-    //let listSaveUrl = `https://manage-case.${env}.platform.hmcts.net/data/cases/${case_id}/events`;
     let listSaveUrl = ccdApiUrl + listingSaveCasePath;
     let listHeaders = {
         'Authorization': `Bearer ${authToken}`,
@@ -419,7 +412,6 @@ async function listTheCaseEvent(authToken, serviceToken, case_id, userId) {
     let listPayload = JSON.stringify(listEventBody)
 
     const listEventExecutionResponse = await I.sendPostRequest(listSaveUrl, listPayload, listHeaders);
-    //console.log("Response From the Post Call : " + JSON.stringify(listEventExecutionResponse));
     expect(listEventExecutionResponse.status).to.eql(201);
 }
 

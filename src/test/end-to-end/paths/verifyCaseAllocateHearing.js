@@ -10,7 +10,6 @@ Scenario('Verify Leeds case Allocate Hearing', async ({I}) => {
     let caseId = await processCaseToListedState();
     console.log("... case id =>" +caseId);
 
-    //await listHearing(I, eventNames.LIST_HEARING, 'Leeds');
     await allocateHearing(I, eventNames.ALLOCATE_HEARING, 'Leeds');
 
 }).tag('@nightly').tag('@RET-BAT').retry(testConfig.TestRetryScenarios);

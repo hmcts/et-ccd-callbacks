@@ -31,7 +31,12 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 
 @Service("sendNotificationService")
@@ -39,7 +44,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkF
 @Slf4j
 @SuppressWarnings({"PMD.ExcessiveImports"})
 public class SendNotificationService {
-
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
     @Value("${url.exui.case-details}")
@@ -65,7 +69,6 @@ public class SendNotificationService {
              + "| Case management order made by | %11$s |\r\n"
              + "| Name | %12$s |\r\n"
              + "| Sent to | %8$s |\r\n";
-    private static final String TRIBUNAL = "TRIBUNAL";
 
     public void populateHearingSelection(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
@@ -96,6 +99,20 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationFullName2(caseData.getSendNotificationFullName2());
         sendNotificationType.setSendNotificationDetails(caseData.getSendNotificationDetails());
         sendNotificationType.setSendNotificationRequestMadeBy(caseData.getSendNotificationRequestMadeBy());
+        if (RESPONDENT_ONLY.equals(sendNotificationType.getSendNotificationSelectParties())) {
+            sendNotificationType.setNotificationState(NOT_VIEWED_YET);
+        } else {
+            sendNotificationType.setNotificationState(NOT_STARTED_YET);
+        }
+
+        sendNotificationType.setSendNotificationSentBy(TRIBUNAL);
+        sendNotificationType.setSendNotificationSubjectString(
+                String.join(", ", caseData.getSendNotificationSubject())
+        );
+        sendNotificationType.setSendNotificationResponsesCount("0");
+        sendNotificationType.setSendNotificationResponseTribunalTable(
+                NO.equals(caseData.getSendNotificationResponseTribunal()) ? NO : YES
+        );
 
         SendNotificationTypeItem sendNotificationTypeItem = new SendNotificationTypeItem();
         sendNotificationTypeItem.setId(UUID.randomUUID().toString());

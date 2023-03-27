@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.IN_PROGRESS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 
@@ -35,8 +36,6 @@ public class TseService {
      * @param caseData contains all the case data.
      * @param isClaimant create a claimant application or a respondent application
      */
-
-    public static final String NOT_STARTED_YET = "notStartedYet";
 
     public void createApplication(CaseData caseData, boolean isClaimant) {
         if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
@@ -72,7 +71,7 @@ public class TseService {
         application.setApplicant(CLAIMANT_TITLE);
 
         ClaimantTse claimantTse = caseData.getClaimantTse();
-        application.setType(claimantTse.getContactApplicationType());
+        application.setType(ClaimantTse.APP_TYPE_MAP.get(claimantTse.getContactApplicationType()));
         application.setDetails(claimantTse.getContactApplicationText());
         application.setDocumentUpload(claimantTse.getContactApplicationFile());
         application.setCopyToOtherPartyYesOrNo(claimantTse.getCopyToOtherPartyYesOrNo());

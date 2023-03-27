@@ -98,7 +98,7 @@ public final class NocNotificationHelper {
 
     }
 
-    public static Map<String, String> buildClaimantPersonalisation(CaseData caseData, String partyName) {
+    public static Map<String, String> buildPersonalisationWithPartyName(CaseData caseData, String partyName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
@@ -111,15 +111,6 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
-        return personalisation;
-    }
-
-    public static Map<String, String> buildNewRespondentSolicitorPersonalisation(CaseData caseData, String partyName) {
-        Map<String, String> personalisation = new ConcurrentHashMap<>();
-
-        addCommonValues(caseData, personalisation);
-        personalisation.put("party_name", partyName);
-
         return personalisation;
     }
 

@@ -14,12 +14,13 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.IntStream;
-import static java.util.stream.Collectors.toList;
+
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus.APPROVED;
@@ -31,40 +32,40 @@ public class NocRespondentHelper {
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
 
         return respondentCollection.stream().collect(
-            HashMap::new,
-            (container, respondent) ->
-                container.put(respondent.getId(), getOrgFromRep(respondent.getId(), repCollection)),
-            HashMap::putAll
+                HashMap::new,
+                (container, respondent) ->
+                        container.put(respondent.getId(), getOrgFromRep(respondent.getId(), repCollection)),
+                HashMap::putAll
         );
     }
 
     public Organisation getOrgFromRep(String respId, List<RepresentedTypeRItem> repCollection) {
         return emptyIfNull(repCollection).stream()
-            .filter(rep -> rep.getValue().getRespondentId().equals(respId))
-            .filter(rep -> rep.getValue().getRespondentOrganisation() != null)
-            .filter(rep -> isNotEmpty(rep.getValue().getRespondentOrganisation().getOrganisationID()))
-            .map(rep -> rep.getValue().getRespondentOrganisation())
-            .findFirst()
-            .orElse(null);
+                .filter(rep -> rep.getValue().getRespondentId().equals(respId))
+                .filter(rep -> rep.getValue().getRespondentOrganisation() != null)
+                .filter(rep -> isNotEmpty(rep.getValue().getRespondentOrganisation().getOrganisationID()))
+                .map(rep -> rep.getValue().getRespondentOrganisation())
+                .findFirst()
+                .orElse(null);
     }
 
     public int getIndexOfRep(RespondentSumTypeItem respondent,
-                              List<RepresentedTypeRItem> repCollection) {
+                             List<RepresentedTypeRItem> repCollection) {
         return IntStream.range(0, repCollection.size())
-            .filter(index -> respondent.getId().equals(repCollection.get(index).getValue().getRespondentId()))
-            .findFirst().orElse(-1);
+                .filter(index -> respondent.getId().equals(repCollection.get(index).getValue().getRespondentId()))
+                .findFirst().orElse(-1);
     }
 
     public Optional<RepresentedTypeRItem> getRespondentRep(RespondentSumTypeItem respondent,
-                                                                   List<RepresentedTypeRItem> repCollection) {
+                                                           List<RepresentedTypeRItem> repCollection) {
         return repCollection.stream()
-            .filter(rep -> rep.getValue().getRespondentId().equals(respondent.getId())).findFirst();
+                .filter(rep -> rep.getValue().getRespondentId().equals(respondent.getId())).findFirst();
 
     }
 
     public ChangeOrganisationRequest createChangeRequest(Organisation newOrganisation,
-                                                                Organisation oldOrganisation,
-                                                                SolicitorRole solicitorRole) {
+                                                         Organisation oldOrganisation,
+                                                         SolicitorRole solicitorRole) {
         DynamicFixedListType roleItem = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode(solicitorRole.getCaseRoleLabel());
@@ -72,59 +73,62 @@ public class NocRespondentHelper {
         roleItem.setValue(dynamicValueType);
 
         return ChangeOrganisationRequest.builder()
-            .approvalStatus(APPROVED)
-            .requestTimestamp(LocalDateTime.now())
-            .caseRoleId(roleItem)
-            .organisationToRemove(oldOrganisation)
-            .organisationToAdd(newOrganisation)
-            .build();
+                .approvalStatus(APPROVED)
+                .requestTimestamp(LocalDateTime.now())
+                .caseRoleId(roleItem)
+                .organisationToRemove(oldOrganisation)
+                .organisationToAdd(newOrganisation)
+                .build();
     }
 
     public RespondentSumType getRespondent(String respName, CaseData caseData) {
         return caseData.getRespondentCollection().stream()
-            .filter(respondent -> respondent.getValue().getRespondentName().equals(respName))
-            .findFirst().map(RespondentSumTypeItem::getValue)
-            .orElse(new RespondentSumType());
+                .filter(respondent -> respondent.getValue().getRespondentName().equals(respName))
+                .findFirst().map(RespondentSumTypeItem::getValue)
+                .orElse(new RespondentSumType());
     }
 
     public Optional<RespondentSumTypeItem> getRespondentSumTypeItem(CaseData caseData,
                                                                     RepresentedTypeRItem respondentRep) {
         final List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
         return respondentCollection.stream()
-            .filter(resp ->
-                resp.getValue().getRespondentName()
-                    .equals(respondentRep.getValue().getRespRepName())).findFirst();
+                .filter(resp ->
+                        resp.getValue().getRespondentName()
+                                .equals(respondentRep.getValue().getRespRepName())).findFirst();
     }
 
     public List<RepresentedTypeRItem> updateWithRespondentIds(CaseData caseData) {
-        return caseData.getRepCollection().stream()
-            .peek(respondentRep ->
-                getRespondentSumTypeItem(caseData, respondentRep)
+        List<RepresentedTypeRItem> repList = new ArrayList<>();
+        for (RepresentedTypeRItem respondentRep : caseData.getRepCollection()) {
+            getRespondentSumTypeItem(caseData, respondentRep)
                     .ifPresent(respondent ->
-                        respondentRep.getValue().setRespondentId(respondent.getId())))
-            .collect(toList());
+                            respondentRep.getValue().setRespondentId(respondent.getId()));
+            repList.add(respondentRep);
+        }
+        return repList;
     }
 
     public void amendRespondentNameRepresentativeNames(CaseData caseData) {
-        List<RepresentedTypeRItem> repCollection = emptyIfNull(caseData.getRepCollection()).stream()
-            .peek(respondentRep -> {
-                final List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
-                Optional<RespondentSumTypeItem> matchedRespondent = respondentCollection.stream()
+        List<RepresentedTypeRItem> repCollection = new ArrayList<>();
+        for (RepresentedTypeRItem respondentRep : emptyIfNull(caseData.getRepCollection())) {
+            final List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+            Optional<RespondentSumTypeItem> matchedRespondent = respondentCollection.stream()
                     .filter(resp ->
-                        resp.getId().equals(respondentRep.getValue().getRespondentId())).findFirst();
+                            resp.getId().equals(respondentRep.getValue().getRespondentId())).findFirst();
 
-                matchedRespondent.ifPresent(respondent ->
+            matchedRespondent.ifPresent(respondent ->
                     updateRepWithRespondentDetails(respondent, respondentRep, respondentCollection));
 
-            }).collect(toList());
+            repCollection.add(respondentRep);
+        }
 
         caseData.setRepCollection(repCollection);
     }
 
     public void updateRepWithRespondentDetails(RespondentSumTypeItem respondent, RepresentedTypeRItem respondentRep,
-                          List<RespondentSumTypeItem> respondents) {
+                                               List<RespondentSumTypeItem> respondents) {
         List<DynamicValueType> respondentNameList = DynamicListHelper.createDynamicRespondentName(
-            respondents);
+                respondents);
 
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(respondentNameList);
@@ -139,17 +143,17 @@ public class NocRespondentHelper {
     }
 
     public RepresentedTypeR generateNewRepDetails(ChangeOrganisationRequest change,
-                                                     Optional<UserDetails> userDetails,
+                                                  Optional<UserDetails> userDetails,
                                                   RespondentSumTypeItem respondent) {
         return RepresentedTypeR.builder()
-            .nameOfRepresentative(userDetails
-                .map(user -> String.join(" ", user.getFirstName(), user.getLastName()))
-                .orElse(null))
-            .representativeEmailAddress(userDetails.map(UserDetails::getEmail).orElse(null))
-            .respondentOrganisation(change.getOrganisationToAdd())
-            .respRepName(respondent.getValue().getRespondentName())
-            .respondentId(respondent.getId())
-            .myHmctsYesNo("Yes")
-            .build();
+                .nameOfRepresentative(userDetails
+                        .map(user -> String.join(" ", user.getFirstName(), user.getLastName()))
+                        .orElse(null))
+                .representativeEmailAddress(userDetails.map(UserDetails::getEmail).orElse(null))
+                .respondentOrganisation(change.getOrganisationToAdd())
+                .respRepName(respondent.getValue().getRespondentName())
+                .respondentId(respondent.getId())
+                .myHmctsYesNo("Yes")
+                .build();
     }
 }

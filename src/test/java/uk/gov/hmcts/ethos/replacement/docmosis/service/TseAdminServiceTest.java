@@ -130,7 +130,6 @@ class TseAdminServiceTest {
             + "|--|--|\r\n"
             + "|Respondent application | Amend response|\r\n"
             + "|Application date | 13 December 2022|\r\n"
-            + "|Details of the application | Details Text|\r\n"
             + "|Supporting material | " + fileDisplay1 + "|\r\n"
             + "\r\n"
             + "|Response 1 | |\r\n"
@@ -201,7 +200,6 @@ class TseAdminServiceTest {
             .withApplicant(RESPONDENT_TITLE)
             .withDate("13 December 2022")
             .withDocumentUpload(createUploadedDocumentType("document.txt"))
-            .withDetails("Details Text")
             .withStatus(OPEN_STATE)
             .withRespondCollection(List.of(
                 claimantReply,

@@ -21,6 +21,7 @@ import java.util.Objects;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -156,7 +157,7 @@ class Et3ResponseHelperTest {
 
         // UTF-8 is required here for special characters to resolve on Windows correctly
         String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-            .getResource("et3ResponseDocument.json")).toURI())), UTF_8);
+                .getResource("et3ResponseDocument.json")).toURI())), UTF_8);
 
         String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any");
         assertThat(actual).isEqualTo(expected);
@@ -165,20 +166,20 @@ class Et3ResponseHelperTest {
     @Test
     void createDynamicListSelection() {
         Et3ResponseHelper.createDynamicListSelection(caseData);
-        assertThat(caseData.getEt3RepresentingRespondent().size()).isEqualTo(1);
+        assertThat(caseData.getEt3RepresentingRespondent(), hasSize(1));
     }
 
     @Test
     void validateRespondents_noErrors() {
         List<String> errors = Et3ResponseHelper.validateRespondents(caseData);
-        assertThat(errors.size()).isEqualTo(0);
+        assertThat(errors.isEmpty());
     }
 
     @Test
     void validateRespondents_noOption() {
         caseData.setEt3RepresentingRespondent(new ArrayList<>());
         List<String> errors = Et3ResponseHelper.validateRespondents(caseData);
-        assertThat(errors.size()).isEqualTo(1);
+        assertThat(errors, hasSize(1));
         assertThat(errors.get(0)).isEqualTo("No respondents found");
     }
 

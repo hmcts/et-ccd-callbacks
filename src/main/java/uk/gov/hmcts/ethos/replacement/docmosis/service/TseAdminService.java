@@ -64,17 +64,19 @@ public class TseAdminService {
 
     private static final String RECORD_DECISION_DETAILS_DETAILS = "|Details of the application | %s|\r\n";
 
-    private static final String RECORD_DECISION_DETAILS_DOC = "|Supporting material | %s|\r\n";
+    private static final String SUPPORTING_MATERIAL = "|Supporting material | %s|\r\n";
 
     private static final String CLOSE_APP_DETAILS = "| | |\r\n"
         + "|--|--|\r\n"
         + "|Applicant | %s|\r\n"
         + "|Type of application | %s|\r\n"
         + "|Application date | %s|\r\n"
-        + "|What do you want to tell or ask the tribunal? | %s|\r\n"
-        + "|Supporting material | %s|\r\n"
+        + "%s" // What do you want to tell or ask the tribunal?
+        + "%s" // Supporting material
         + "%s" // Rule92
         + "\r\n";
+
+    private static final String CLOSE_APP_TELL_DETAILS = "|What do you want to tell or ask the tribunal? | %s|\r\n";
 
     private static final String CLOSE_APP_DECISION_DETAILS = "|Decision | |\r\n"
         + "|--|--|\r\n"
@@ -123,8 +125,7 @@ public class TseAdminService {
                 : String.format(RECORD_DECISION_DETAILS_DETAILS, applicationType.getDetails()),
             applicationType.getDocumentUpload() == null
                 ? ""
-                : String.format(
-                    RECORD_DECISION_DETAILS_DOC,
+                : String.format(SUPPORTING_MATERIAL,
                     documentManagementService.displayDocNameTypeSizeLink(
                         applicationType.getDocumentUpload(), authToken))
         );
@@ -320,7 +321,9 @@ public class TseAdminService {
             applicationTypeItem.getValue().getApplicant(),
             applicationTypeItem.getValue().getType(),
             applicationTypeItem.getValue().getDate(),
-            defaultString(applicationTypeItem.getValue().getDetails()),
+            isBlank(applicationTypeItem.getValue().getDetails())
+                ? ""
+                : String.format(CLOSE_APP_TELL_DETAILS, applicationTypeItem.getValue().getDetails()),
             getApplicationDocumentLink(applicationTypeItem, authToken),
             formatRule92(applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo(),
                 applicationTypeItem.getValue().getCopyToOtherPartyText())
@@ -360,8 +363,9 @@ public class TseAdminService {
             return "";
         }
 
-        return documentManagementService
-            .displayDocNameTypeSizeLink(applicationTypeItem.getValue().getDocumentUpload(), authToken);
+        return String.format(SUPPORTING_MATERIAL,
+            documentManagementService.displayDocNameTypeSizeLink(
+                applicationTypeItem.getValue().getDocumentUpload(), authToken));
     }
 
     private String initialRespondDetailsWithRule92(GenericTseApplicationType application, String authToken) {

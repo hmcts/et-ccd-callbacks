@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 
 @Slf4j
 public final class NotificationHelper {
@@ -36,9 +38,9 @@ public final class NotificationHelper {
 
     public static Map<String, String> buildMapForClaimant(CaseData caseData, String caseId) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", caseData.getEthosCaseReference());
+        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
         personalisation.put("emailAddress", getEmailAddressForClaimant(caseData));
-        personalisation.put("ccdId", caseId);
+        personalisation.put(CCD_ID, caseId);
         RepresentedTypeC representativeClaimantType = caseData.getRepresentativeClaimantType();
 
         String initialTitle;
@@ -84,9 +86,9 @@ public final class NotificationHelper {
     public static Map<String, String> buildMapForRespondent(CaseDetails caseDetails, RespondentSumType respondent) {
         CaseData caseData = caseDetails.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", caseData.getEthosCaseReference());
+        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
         personalisation.put("emailAddress", getEmailAddressForRespondent(caseData, respondent));
-        personalisation.put("ccdId", caseDetails.getCaseId());
+        personalisation.put(CCD_ID, caseDetails.getCaseId());
         RepresentedTypeR respondentRepresentative = getRespondentRepresentative(caseData, respondent);
 
         if (respondentRepresentative == null) {

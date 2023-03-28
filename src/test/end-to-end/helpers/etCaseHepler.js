@@ -439,7 +439,7 @@ async function jurisdictionToTheCaseEvent(authToken, serviceToken, case_id, user
                 {
                     "value": {
                         "juridictionCodesList": "ADT",
-                        "judgmentOutcome": "Not allocated",
+                        "judgmentOutcome": "Input in error",
                         "dateNotified": null,
                         "disposalDate": null
                     },

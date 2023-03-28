@@ -601,8 +601,10 @@ class TseAdminServiceTest {
 
     @ParameterizedTest
     @MethodSource("generateCloseApplicationMarkdown")
-    void generateCloseApplicationMarkdown(boolean hasDoc, boolean hasAdditionalInfo) {
-        GenericTseApplicationType tseApplicationType = getTseAppType(hasDoc, hasAdditionalInfo);
+    void generateCloseApplicationMarkdown(boolean appHasDoc, boolean appHasDetails,
+                                          boolean hasDoc, boolean hasAdditionalInfo) {
+        GenericTseApplicationType tseApplicationType =
+            getTseAppType(appHasDoc, appHasDetails, hasDoc, hasAdditionalInfo);
         caseData.setGenericTseApplicationCollection(
                 List.of(GenericTseApplicationTypeItem.builder()
                         .id(UUID.randomUUID().toString())
@@ -615,8 +617,10 @@ class TseAdminServiceTest {
                 + "|Applicant | Respondent|\r\n"
                 + "|Type of application | Amend response|\r\n"
                 + "|Application date | 13 December 2022|\r\n"
-                + "|What do you want to tell or ask the tribunal? | Details Text|\r\n"
-                + "|Supporting material | <a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>|\r\n"
+                + (appHasDetails ? "|What do you want to tell or ask the tribunal? | Details Text|\r\n" : "")
+                + (appHasDoc
+                    ? "|Supporting material | <a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>|\r\n"
+                    : "")
                 + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | "
                 + null + "|\r\n"
                 + "\r\n"
@@ -650,13 +654,14 @@ class TseAdminServiceTest {
 
     private static Stream<Arguments> generateCloseApplicationMarkdown() {
         return Stream.of(
-                Arguments.of(true, true),
-                Arguments.of(true, false),
-                Arguments.of(false, false)
+            Arguments.of(true, true, true, true),
+            Arguments.of(true, false, true, false),
+            Arguments.of(false, true, false, true)
         );
     }
 
-    private static GenericTseApplicationType getTseAppType(boolean hasDoc, boolean hasAdditionalInfo) {
+    private static GenericTseApplicationType getTseAppType(boolean appHasDoc, boolean appHasDetails,
+                                                           boolean hasDoc, boolean hasAdditionalInfo) {
         TseAdminRecordDecisionTypeItem recordDecisionTypeItem = TseAdminRecordDecisionTypeItem.builder()
                 .id(UUID.randomUUID().toString())
                 .value(
@@ -674,20 +679,26 @@ class TseAdminServiceTest {
                                 .build()
                 ).build();
 
-        return TseApplicationBuilder.builder()
+        GenericTseApplicationType tseApplicationBuilder = TseApplicationBuilder.builder()
                 .withNumber("1")
                 .withType(TSE_APP_AMEND_RESPONSE)
                 .withApplicant(RESPONDENT_TITLE)
                 .withDate("13 December 2022")
-                .withDocumentUpload(UploadedDocumentBuilder.builder()
-                        .withFilename("test")
-                        .withUuid("1234")
-                        .build())
-                .withDetails("Details Text")
+                .withDetails(appHasDetails ? "Details Text" : null)
                 .withStatus(OPEN_STATE)
                 .withDecisionCollection(List.of(
                         recordDecisionTypeItem
                 ))
                 .build();
+
+        if (appHasDoc) {
+            tseApplicationBuilder.setDocumentUpload(
+                UploadedDocumentBuilder.builder()
+                    .withFilename("test")
+                    .withUuid("1234")
+                    .build());
+        }
+
+        return tseApplicationBuilder;
     }
 }

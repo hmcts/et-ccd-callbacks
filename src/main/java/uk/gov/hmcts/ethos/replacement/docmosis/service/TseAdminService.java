@@ -34,6 +34,19 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.ADDITIONAL_INFORMATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.APP_DETAILS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.CLOSE_APP_DECISION_DETAILS_OTHER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.CLOSE_APP_TELL_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DECISION_NOTIFICATION_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DOCUMENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.NAME_MARKUP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.STRING_BR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithoutRule92;
@@ -55,50 +68,36 @@ public class TseAdminService {
     private final DocumentManagementService documentManagementService;
 
     private static final String RECORD_DECISION_DETAILS = "| | |\r\n"
-        + "|--|--|\r\n"
+        + TABLE_STRING
         + "|%s application | %s|\r\n"
         + "|Application date | %s|\r\n"
         + "%s" // Details of the application
         + "%s" // Supporting material
         + "\r\n";
 
-    private static final String RECORD_DECISION_DETAILS_DETAILS = "|Details of the application | %s|\r\n";
-
-    private static final String RECORD_DECISION_DETAILS_DOC = "|Supporting material | %s|\r\n";
-
     private static final String CLOSE_APP_DETAILS = "| | |\r\n"
-        + "|--|--|\r\n"
+        + TABLE_STRING
         + "|Applicant | %s|\r\n"
         + "|Type of application | %s|\r\n"
         + "|Application date | %s|\r\n"
-        + "|What do you want to tell or ask the tribunal? | %s|\r\n"
-        + "|Supporting material | %s|\r\n"
+        + "%s" // What do you want to tell or ask the tribunal?
+        + "%s" // Supporting material
         + "%s" // Rule92
         + "\r\n";
 
     private static final String CLOSE_APP_DECISION_DETAILS = "|Decision | |\r\n"
-        + "|--|--|\r\n"
+        + TABLE_STRING
         +  "%s" // Notification title
         + "|Decision | %s|\r\n"
         + "%s" // Decision details
-        + "|Date | %s|\r\n"
+        + DATE_MARKUP
         + "|Sent by | %s|\r\n"
         + "|Type of decision | %s|\r\n"
         + "%s%s"
         + "|Decision made by | %s|\r\n"
-        + "|Name | %s|\r\n"
+        + NAME_MARKUP
         + "|Sent to | %s|\r\n"
         + "\r\n";
-
-    private static final String ADDITIONAL_INFO = "|Additional information | %s|\r\n";
-
-    private static final String DOCUMENT = "|Document | %s|\r\n";
-
-    private static final String STRING_BR = "<br>";
-
-    private static final String CLOSE_APP_DECISION_DETAILS_OTHER = "|Decision details | %s|\r\n";
-
-    private static final String DECISION_NOTIFICATION_TITLE = "|Notification | %s|\r\n";
 
     /**
      * Initial Application and Respond details table.
@@ -120,11 +119,10 @@ public class TseAdminService {
             applicationType.getDate(),
             isBlank(applicationType.getDetails())
                 ? ""
-                : String.format(RECORD_DECISION_DETAILS_DETAILS, applicationType.getDetails()),
+                : String.format(APP_DETAILS_DETAILS, applicationType.getDetails()),
             applicationType.getDocumentUpload() == null
                 ? ""
-                : String.format(
-                    RECORD_DECISION_DETAILS_DOC,
+                : String.format(SUPPORTING_MATERIAL_TABLE_HEADER,
                     documentManagementService.displayDocNameTypeSizeLink(
                         applicationType.getDocumentUpload(), authToken))
         );
@@ -259,8 +257,8 @@ public class TseAdminService {
 
     private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String recipientName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", caseNumber);
-        personalisation.put("caseId", caseId);
+        personalisation.put(CASE_NUMBER, caseNumber);
+        personalisation.put(CASE_ID, caseId);
         personalisation.put("name", recipientName);
         return personalisation;
     }
@@ -320,7 +318,9 @@ public class TseAdminService {
             applicationTypeItem.getValue().getApplicant(),
             applicationTypeItem.getValue().getType(),
             applicationTypeItem.getValue().getDate(),
-            defaultString(applicationTypeItem.getValue().getDetails()),
+            isBlank(applicationTypeItem.getValue().getDetails())
+                ? ""
+                : String.format(CLOSE_APP_TELL_DETAILS, applicationTypeItem.getValue().getDetails()),
             getApplicationDocumentLink(applicationTypeItem, authToken),
             formatRule92(applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo(),
                 applicationTypeItem.getValue().getCopyToOtherPartyText())
@@ -332,7 +332,7 @@ public class TseAdminService {
 
     private String getAdditionInfoMarkdown(TseAdminRecordDecisionTypeItem decision) {
         return decision.getValue().getAdditionalInformation() == null ? ""
-                : String.format(ADDITIONAL_INFO, decision.getValue().getAdditionalInformation());
+                : String.format(ADDITIONAL_INFORMATION, decision.getValue().getAdditionalInformation());
     }
 
     private String formatNotificationTitle(TseAdminRecordDecisionType decision) {
@@ -360,8 +360,9 @@ public class TseAdminService {
             return "";
         }
 
-        return documentManagementService
-            .displayDocNameTypeSizeLink(applicationTypeItem.getValue().getDocumentUpload(), authToken);
+        return String.format(SUPPORTING_MATERIAL_TABLE_HEADER,
+            documentManagementService.displayDocNameTypeSizeLink(
+                applicationTypeItem.getValue().getDocumentUpload(), authToken));
     }
 
     private String initialRespondDetailsWithRule92(GenericTseApplicationType application, String authToken) {

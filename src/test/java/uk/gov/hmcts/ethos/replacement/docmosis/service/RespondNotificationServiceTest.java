@@ -20,7 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.List;

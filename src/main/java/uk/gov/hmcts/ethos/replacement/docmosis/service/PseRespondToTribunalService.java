@@ -34,6 +34,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatClaimantReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatOrdReqDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelectedSendNotificationTypeItem;
@@ -182,8 +188,8 @@ public class PseRespondToTribunalService {
     private Map<String, String> buildPersonalisationYes(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         return Map.of(
-            "caseNumber", caseData.getEthosCaseReference(),
-            "caseId", caseDetails.getCaseId()
+            CASE_NUMBER, caseData.getEthosCaseReference(),
+                CASE_ID, caseDetails.getCaseId()
         );
     }
 
@@ -191,11 +197,11 @@ public class PseRespondToTribunalService {
         CaseData caseData = caseDetails.getCaseData();
         SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
         return Map.of(
-            "caseNumber", caseData.getEthosCaseReference(),
-            "claimant", caseData.getClaimant(),
-            "respondents", Helper.getRespondentNames(caseData),
-            "hearingDate", getHearingDate(caseData, sendNotificationType),
-            "caseId", caseDetails.getCaseId()
+                CASE_NUMBER, caseData.getEthosCaseReference(),
+                CLAIMANT, caseData.getClaimant(),
+                RESPONDENTS, Helper.getRespondentNames(caseData),
+                HEARING_DATE, getHearingDate(caseData, sendNotificationType),
+                CASE_ID, caseDetails.getCaseId()
         );
     }
 
@@ -224,10 +230,10 @@ public class PseRespondToTribunalService {
     private Map<String, String> buildPersonalisationNotify(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         return Map.of(
-            "caseNumber", caseData.getEthosCaseReference(),
-            "claimant", caseData.getClaimant(),
-            "respondents", Helper.getRespondentNames(caseData),
-            "caseId", caseDetails.getCaseId()
+                CASE_NUMBER, caseData.getEthosCaseReference(),
+                CLAIMANT, caseData.getClaimant(),
+                RESPONDENTS, Helper.getRespondentNames(caseData),
+                CASE_ID, caseDetails.getCaseId()
         );
     }
 
@@ -256,12 +262,12 @@ public class PseRespondToTribunalService {
         CaseData caseData = caseDetails.getCaseData();
         SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
         return Map.of(
-            "caseNumber", caseData.getEthosCaseReference(),
-            "application", sendNotificationType.getSendNotificationTitle(),
-            "claimant", caseData.getClaimant(),
-            "respondents", Helper.getRespondentNames(caseData),
-            "hearingDate", getHearingDate(caseData, sendNotificationType),
-            "caseId", caseDetails.getCaseId()
+                CASE_NUMBER, caseData.getEthosCaseReference(),
+                APPLICATION, sendNotificationType.getSendNotificationTitle(),
+                CLAIMANT, caseData.getClaimant(),
+                RESPONDENTS, Helper.getRespondentNames(caseData),
+                HEARING_DATE, getHearingDate(caseData, sendNotificationType),
+                CASE_ID, caseDetails.getCaseId()
         );
     }
 

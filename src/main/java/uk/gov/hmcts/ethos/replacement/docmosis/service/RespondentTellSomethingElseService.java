@@ -38,6 +38,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_JUDGEMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
 @Slf4j
@@ -63,31 +70,32 @@ public class RespondentTellSomethingElseService {
 
     private static final String GIVE_DETAIL_MISSING = "Use the text box or file upload to give details.";
     private static final List<String> GROUP_B_TYPES = List.of(TSE_APP_CHANGE_PERSONAL_DETAILS,
-        TSE_APP_CONSIDER_A_DECISION_AFRESH, TSE_APP_RECONSIDER_JUDGEMENT);
+            TSE_APP_CONSIDER_A_DECISION_AFRESH, TSE_APP_RECONSIDER_JUDGEMENT);
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
     private static final String RULE92_ANSWERED_NO = "You have said that you do not want to copy this correspondence "
-        + "to the other party. \n \n"
-        + "The tribunal will consider all correspondence and let you know what happens next.";
+            + "to the other party. \n \n"
+            + "The tribunal will consider all correspondence and let you know what happens next.";
     private static final String RULE92_ANSWERED_YES_GROUP_A = "The other party will be notified that any objections to "
-        + "your %s application should be sent to the tribunal as soon as possible, and in any event within 7 days.";
+            + "your %s application should be sent to the tribunal as soon as possible, and in any event within 7 days.";
     private static final String RULE92_ANSWERED_YES_GROUP_B = "The other party is not expected to respond to this "
-        + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
-        + "sent to the tribunal as soon as possible, and in any event within 7 days.";
+            + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
+            + "sent to the tribunal as soon as possible, and in any event within 7 days.";
     private static final String CLAIMANT_EMAIL_GROUP_B = "You are not expected to respond to this application"
-        + ".\r\n\r\nIf you do respond you should do so as soon as possible and in any event by %s.";
+            + ".\r\n\r\nIf you do respond you should do so as soon as possible and in any event by %s.";
     private static final String CLAIMANT_EMAIL_GROUP_A = "You should respond as soon as possible, and in any "
-        + "event by %s.";
+            + "event by %s.";
     private static final String RES_TSE_FILE_NAME = "resTse.pdf";
 
     private static final String TABLE_COLUMNS_MARKDOWN =
-        "| No | Application type | Applicant | Application date | Response due | Number of responses | Status |\r\n"
-            + "|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n"
-            + "%s\r\n";
+            "| No | Application type | Applicant | Application date | Response due | Number of responses | Status |\r\n"
+                    + "|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n"
+                    + "%s\r\n";
 
     private static final String TABLE_ROW_MARKDOWN = "|%s|%s|%s|%s|%s|%s|%s|\r\n";
 
     /**
      * Validate Give Details (free text box) or file upload is mandatory.
+     *
      * @param caseData in which the case details are extracted from
      * @return errors Error message
      */
@@ -105,8 +113,9 @@ public class RespondentTellSomethingElseService {
     /**
      * Uses {@link EmailService} to generate an email to Respondent.
      * Uses {@link UserService} to get Respondents email address.
+     *
      * @param caseDetails in which the case details are extracted from
-     * @param userToken jwt used for authorization
+     * @param userToken   jwt used for authorization
      */
     public void sendAcknowledgeEmail(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
@@ -137,23 +146,24 @@ public class RespondentTellSomethingElseService {
     private Map<String, String> buildPersonalisationTypeC(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         return Map.of(
-            "caseNumber", caseData.getEthosCaseReference(),
-            "claimant", caseData.getClaimant(),
-            "respondents", getRespondentNames(caseData),
-            "caseId", caseDetails.getCaseId()
+                CASE_NUMBER, caseData.getEthosCaseReference(),
+                CLAIMANT, caseData.getClaimant(),
+                RESPONDENTS, getRespondentNames(caseData),
+                CASE_ID, caseDetails.getCaseId()
         );
     }
 
     /**
      * Uses {@link EmailService} to generate an email to Claimant.
+     *
      * @param caseDetails in which the case details are extracted from
      */
     public void sendClaimantEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
 
         if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())
-            || NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())
-            || caseData.getClaimantType().getClaimantEmailAddress() == null) {
+                || NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())
+                || caseData.getClaimantType().getClaimantEmailAddress() == null) {
             return;
         }
 
@@ -180,37 +190,38 @@ public class RespondentTellSomethingElseService {
     private Map<String, String> buildPersonalisation(CaseDetails detail, String customisedText) {
         CaseData caseData = detail.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", caseData.getEthosCaseReference());
-        personalisation.put("claimant", caseData.getClaimant());
-        personalisation.put("respondents", getRespondentNames(caseData));
+        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
+        personalisation.put(CLAIMANT, caseData.getClaimant());
+        personalisation.put(RESPONDENTS, getRespondentNames(caseData));
         personalisation.put("customisedText", customisedText);
         personalisation.put("shortText", caseData.getResTseSelectApplication());
-        personalisation.put("caseId", detail.getCaseId());
+        personalisation.put(CASE_ID, detail.getCaseId());
         return personalisation;
     }
 
     /**
      * Builds personalisation for sending an email to the claimant.
-     * @param caseDetails Details about the case
+     *
+     * @param caseDetails  Details about the case
      * @param instructions Instructions to be included
-     * @param document document to link off to
+     * @param document     document to link off to
      * @return KeyValue mappings needed to populate the email
      * @throws NotificationClientException When the document cannot be uploaded
      */
     public Map<String, Object> claimantPersonalisation(CaseDetails caseDetails, String instructions, byte[] document)
-        throws NotificationClientException {
+            throws NotificationClientException {
 
         CaseData caseData = caseDetails.getCaseData();
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
         return Map.of(
-            "ccdId", caseDetails.getCaseId(),
-            "caseNumber", caseData.getEthosCaseReference(),
-            "applicationType", caseData.getResTseSelectApplication(),
-            "instructions", instructions,
-            "claimant", caseData.getClaimant(),
-            "respondents", getRespondentNames(caseData),
-            "linkToDocument", documentJson
+                CCD_ID, caseDetails.getCaseId(),
+                CASE_NUMBER, caseData.getEthosCaseReference(),
+                "applicationType", caseData.getResTseSelectApplication(),
+                "instructions", instructions,
+                CLAIMANT, caseData.getClaimant(),
+                RESPONDENTS, getRespondentNames(caseData),
+                "linkToDocument", documentJson
         );
     }
 
@@ -223,9 +234,9 @@ public class RespondentTellSomethingElseService {
         AtomicInteger applicationNumber = new AtomicInteger(1);
 
         String tableRows = genericApplicationList.stream()
-            .filter(this::applicationsSharedWithRespondent)
-            .map(o -> formatRow(o, applicationNumber))
-            .collect(Collectors.joining());
+                .filter(this::applicationsSharedWithRespondent)
+                .map(o -> formatRow(o, applicationNumber))
+                .collect(Collectors.joining());
 
         return String.format(TABLE_COLUMNS_MARKDOWN, tableRows);
     }
@@ -234,7 +245,7 @@ public class RespondentTellSomethingElseService {
         String applicant = genericTseApplicationTypeItem.getValue().getApplicant();
         String copyToRespondent = genericTseApplicationTypeItem.getValue().getCopyToOtherPartyYesOrNo();
         boolean isClaimantAndRule92Shared = CLAIMANT_TITLE.equals(applicant)
-            && YES.equals(copyToRespondent);
+                && YES.equals(copyToRespondent);
 
         return RESPONDENT_TITLE.equals(applicant) || isClaimantAndRule92Shared;
     }
@@ -245,7 +256,7 @@ public class RespondentTellSomethingElseService {
         String status = Optional.ofNullable(value.getStatus()).orElse(OPEN_STATE);
 
         return String.format(TABLE_ROW_MARKDOWN, count.getAndIncrement(), value.getType(), value.getApplicant(),
-            value.getDate(), value.getDueDate(), responses, status);
+                value.getDate(), value.getDueDate(), responses, status);
     }
 
     /**
@@ -275,11 +286,11 @@ public class RespondentTellSomethingElseService {
     public Map<String, String> buildPersonalisationForAdminEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-        personalisation.put("caseNumber", caseData.getEthosCaseReference());
-        personalisation.put("emailFlag", "");
-        personalisation.put("claimant", caseData.getClaimant());
-        personalisation.put("respondents", getRespondentNames(caseData));
-        personalisation.put("date", ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
+        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
+        personalisation.put(EMAIL_FLAG, "");
+        personalisation.put(CLAIMANT, caseData.getClaimant());
+        personalisation.put(RESPONDENTS, getRespondentNames(caseData));
+        personalisation.put(DATE, ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
         personalisation.put("url", exuiUrl + caseDetails.getCaseId());
         return personalisation;
     }

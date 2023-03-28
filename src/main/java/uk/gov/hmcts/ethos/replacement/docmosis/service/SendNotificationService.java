@@ -37,6 +37,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 
 @Service("sendNotificationService")
@@ -240,7 +241,7 @@ public class SendNotificationService {
 
     private Map<String, String> buildPersonalisation(CaseDetails caseDetails, String envUrl) {
         return Map.of(
-            "caseNumber", caseDetails.getCaseData().getEthosCaseReference(),
+                CASE_NUMBER, caseDetails.getCaseData().getEthosCaseReference(),
             "environmentUrl", envUrl + caseDetails.getCaseId()
         );
     }

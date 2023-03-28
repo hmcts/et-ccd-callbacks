@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.CloseResource"})
 public class BfExcelReportService {
 
     private static final String EXCEL_REPORT_WORKBOOK_NAME = "BF Action Report";

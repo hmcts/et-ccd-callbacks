@@ -19,6 +19,7 @@ import java.util.List;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 
+@SuppressWarnings({"PMD.LawOfDemeter"})
 public class BfActionReport {
     public ListingData runReport(ListingDetails listingDetails,
                                  List<SubmitEvent> submitEvents,

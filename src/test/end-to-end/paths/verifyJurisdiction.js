@@ -12,5 +12,4 @@ Scenario('Verify Jurisdiction', async ({I}) => {
     await jurisdiction(I, eventNames.JURISDICTION, "Not allocated");
     await jurisdiction(I, eventNames.JURISDICTION, "Withdrawn or private settlement");
 
-}).tag('@pats');
-    //.retry(testConfig.TestRetryScenarios);
+}).tag('@nightly').tag('@RET-BAT').retry(testConfig.TestRetryScenarios);

@@ -292,6 +292,7 @@ public final class Helper {
             return "";
         }
         return caseData.getRespondentCollection().stream()
+            .filter(o -> o.getValue() != null && o.getValue().getRespondentName() != null)
             .map(o -> o.getValue().getRespondentName())
             .collect(Collectors.joining(", "));
     }

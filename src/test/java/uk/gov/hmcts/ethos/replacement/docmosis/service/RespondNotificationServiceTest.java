@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -27,7 +28,10 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -57,11 +61,20 @@ class RespondNotificationServiceTest {
 
     @BeforeEach
     void setUp() {
+        doNothing().when(emailService).sendEmail(anyString(), anyString(), anyMap());
+
         SendNotificationService sendNotificationService =
             new SendNotificationService(hearingSelectionService, emailService);
+
         respondNotificationService = new RespondNotificationService(emailService, sendNotificationService);
+        ReflectionTestUtils.setField(respondNotificationService, "exuiUrl", "exuiUrl");
+        ReflectionTestUtils.setField(respondNotificationService, "citizenUrl", "citizenUrl");
+        ReflectionTestUtils.setField(respondNotificationService, "responseTemplateId", "responseTemplateId");
+        ReflectionTestUtils.setField(respondNotificationService, "noResponseTemplateId", "noResponseTemplateId");
+
         caseDetails = new CaseDetails();
         caseData = new CaseData();
+        caseDetails.setCaseId(String.valueOf(UUID.randomUUID()));
     }
 
     private DocumentType createDocument(String name, String description) {
@@ -80,30 +93,43 @@ class RespondNotificationServiceTest {
 
     @Test
     void testCreateAndClearRespondNotification() throws IllegalAccessException {
+
         caseData.setRespondNotificationTitle("title");
         caseData.setRespondNotificationAdditionalInfo("info");
-        caseData.setRespondNotificationPartyToNotify(BOTH_PARTIES);
+        caseData.setRespondNotificationPartyToNotify(CLAIMANT_ONLY);
         caseData.setRespondNotificationCmoOrRequest(CASE_MANAGEMENT_ORDER);
         caseData.setRespondNotificationResponseRequired(NO);
-        caseData.setRespondNotificationWhoRespond(BOTH_PARTIES);
+        caseData.setRespondNotificationWhoRespond(CLAIMANT_ONLY);
+
         caseData.setRespondNotificationFullName("John Doe");
+        caseData.setClaimantType(new ClaimantType());
+        caseData.setClaimant("Claimant");
+        caseData.setEthosCaseReference("1234");
 
-        var respondNotificationTypeItemList = new ArrayList<GenericTypeItem<RespondNotificationType>>();
+        String uuid = String.valueOf(UUID.randomUUID());
+        DynamicValueType dynamicValueType = DynamicValueType.create(uuid, "sendNotification");
+        caseData.setSelectNotificationDropdown(DynamicFixedListType.of(dynamicValueType));
+
         SendNotificationType notificationType = new SendNotificationType();
-        notificationType.setRespondNotificationTypeCollection(respondNotificationTypeItemList);
-        respondNotificationService.createRespondNotification(caseData, notificationType);
+        notificationType.setSendNotificationTitle("test");
+        SendNotificationTypeItem sendNotificationTypeItem = new SendNotificationTypeItem();
+        sendNotificationTypeItem.setId(uuid);
+        sendNotificationTypeItem.setValue(notificationType);
+        caseData.setSendNotificationCollection(List.of(sendNotificationTypeItem));
+        caseDetails.setCaseData(caseData);
 
-        RespondNotificationType respondNotificationType =
-            notificationType.getRespondNotificationTypeCollection().get(0).getValue();
+        respondNotificationService.handleAboutToSubmit(caseDetails);
+        var sendNotificationType = caseDetails.getCaseData().getSendNotificationCollection().get(0).getValue();
+        var respondNotificationType = sendNotificationType.getRespondNotificationTypeCollection().get(0).getValue();
+
         assertEquals("title", respondNotificationType.getRespondNotificationTitle());
         assertEquals("info", respondNotificationType.getRespondNotificationAdditionalInfo());
-        assertEquals(BOTH_PARTIES, respondNotificationType.getRespondNotificationPartyToNotify());
+        assertEquals(CLAIMANT_ONLY, respondNotificationType.getRespondNotificationPartyToNotify());
         assertEquals(CASE_MANAGEMENT_ORDER, respondNotificationType.getRespondNotificationCmoOrRequest());
         assertEquals(NO, respondNotificationType.getRespondNotificationResponseRequired());
-        assertEquals(BOTH_PARTIES, respondNotificationType.getRespondNotificationWhoRespond());
+        assertEquals(CLAIMANT_ONLY, respondNotificationType.getRespondNotificationWhoRespond());
         assertEquals("John Doe", respondNotificationType.getRespondNotificationFullName());
 
-        respondNotificationService.clearRespondNotificationFields(caseData);
         assertNull(caseData.getRespondNotificationTitle());
         assertNull(caseData.getRespondNotificationAdditionalInfo());
         assertNull(caseData.getRespondNotificationUploadDocument());

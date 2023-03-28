@@ -65,6 +65,8 @@ public class RespondNotificationService {
 
     private static final String UPLOAD_DOCUMENT_IS_REQUIRED = "Upload document is required";
 
+    private static final String SUPPORTING_MATERIAL = "| Supporting material | |";
+
     public void populateSendNotificationSelection(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(getSendNotificationSelection(caseData));
@@ -76,7 +78,7 @@ public class RespondNotificationService {
      * @param caseData caseData contains the notification details
      * @param sendNotificationType the notificationType where the data will be stored
      */
-    public void createRespondNotification(CaseData caseData, SendNotificationType sendNotificationType) {
+    private void createRespondNotification(CaseData caseData, SendNotificationType sendNotificationType) {
 
         if (sendNotificationType.getRespondNotificationTypeCollection() == null) {
             sendNotificationType.setRespondNotificationTypeCollection(new ArrayList<>());
@@ -107,7 +109,7 @@ public class RespondNotificationService {
      * Clears the respondNotification fields, so the page can be reused.
      * @param caseData caseData to be cleared
      */
-    public void clearRespondNotificationFields(CaseData caseData) {
+    private void clearRespondNotificationFields(CaseData caseData) {
         caseData.setRespondNotificationTitle(null);
         caseData.setRespondNotificationAdditionalInfo(null);
         caseData.setRespondNotificationUploadDocument(null);
@@ -129,7 +131,7 @@ public class RespondNotificationService {
     }
 
     private String getRespondNotificationSingleDocumentMarkdown(UploadedDocumentType uploadedDocumentType) {
-        String document = "| Supporting material | |";
+        String document = SUPPORTING_MATERIAL;
         if (uploadedDocumentType != null) {
             document = String.format("| Supporting material | %s", createLinkForUploadedDocument(uploadedDocumentType));
         }
@@ -138,7 +140,7 @@ public class RespondNotificationService {
 
     private String getRespondNotificationDocumentsMarkdown(RespondNotificationType respondNotificationType) {
         if (respondNotificationType.getRespondNotificationUploadDocument() == null) {
-            return "| Supporting material | |";
+            return SUPPORTING_MATERIAL;
         }
         List<String> documents = respondNotificationType.getRespondNotificationUploadDocument().stream()
             .map(documentTypeItem ->

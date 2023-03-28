@@ -150,11 +150,13 @@ public class PseRespondToTribunalService {
      */
     public void addRespondentResponseToJON(CaseData caseData) {
         SendNotificationType sendNotificationType = getSelectedSendNotificationTypeItem(caseData).getValue();
-        if (CollectionUtils.isEmpty(sendNotificationType.getRespondCollection())) {
+        List<PseResponseTypeItem> responses = sendNotificationType.getRespondCollection();
+        if (CollectionUtils.isEmpty(responses)) {
             sendNotificationType.setRespondCollection(new ArrayList<>());
+            responses = sendNotificationType.getRespondCollection();
         }
 
-        sendNotificationType.getRespondCollection().add(
+        responses.add(
             PseResponseTypeItem.builder()
                 .id(UUID.randomUUID().toString())
                 .value(
@@ -168,6 +170,8 @@ public class PseRespondToTribunalService {
                         .copyNoGiveDetails(caseData.getPseRespondentOrdReqCopyNoGiveDetails())
                         .build()
                 ).build());
+
+        sendNotificationType.setSendNotificationResponsesCount(String.valueOf(responses.size()));
     }
 
     /**

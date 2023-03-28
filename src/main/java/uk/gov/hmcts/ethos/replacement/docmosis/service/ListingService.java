@@ -477,7 +477,7 @@ public class ListingService {
             }
             if (BROUGHT_FORWARD_REPORT.equals(listingData.getReportType())) {
                 return excelReportDocumentInfoService.generateBfExcelReportDocumentInfo(
-                        (BfActionReportData) listingData, caseTypeId, authToken);
+                        (BfActionReportData)listingData, caseTypeId, authToken);
             }
             return tornadoService.listingGeneration(authToken, listingData, caseTypeId);
         } catch (Exception ex) {

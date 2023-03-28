@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import java.util.ArrayList;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
@@ -20,6 +19,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReportData;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BfExcelReportService {
@@ -33,6 +33,7 @@ public class BfExcelReportService {
     private static final List<String> HEADERS = new ArrayList<>(List.of(
             CASE_NUMBER_HEADER, ACTION, DATE_TAKEN,
             BF_DATE, COMMENTS));
+
     public byte[] getReportExcelFile(BfActionReportData reportData) {
         if (reportData == null) {
             return new byte[0];

@@ -1,10 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction;
 
-import java.time.LocalDate;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
+import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
@@ -15,9 +13,11 @@ import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
 import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItemComparator;
 import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 
 public class BfActionReport {
     public ListingData runReport(ListingDetails listingDetails,
@@ -36,13 +36,13 @@ public class BfActionReport {
             bfActionReportData.setBfDateCollection(bfDateTypeItems);
         }
         bfActionReportData.clearReportFields();
-        bfActionReportData.setReportType(BROUGHT_FORWARD_REPORT);
-        bfActionReportData.setDocumentName(BROUGHT_FORWARD_REPORT);
+        bfActionReportData.setReportType(Constants.BROUGHT_FORWARD_REPORT);
+        bfActionReportData.setDocumentName(Constants.BROUGHT_FORWARD_REPORT);
         bfActionReportData.setReportPrintedOnDescription(
                 getReportedOnDetail(userName));
         String dateSearchFrom;
         String dateSearchTo;
-        if (RANGE_HEARING_DATE_TYPE.equals(caseData.getHearingDateType())) {
+        if (Constants.RANGE_HEARING_DATE_TYPE.equals(caseData.getHearingDateType())) {
             dateSearchFrom = LocalDate.parse(caseData.getListingDateFrom(), OLD_DATE_TIME_PATTERN2).toString();
             dateSearchTo = LocalDate.parse(caseData.getListingDateTo(), OLD_DATE_TIME_PATTERN2).toString();
         } else {
@@ -51,9 +51,7 @@ public class BfActionReport {
         }
         setReportListingDate(bfActionReportData, dateSearchFrom, dateSearchTo, caseData.getHearingDateType());
 
-
         String managingOffice = caseData.getManagingOffice();
-        //bfActionReportData.setOffice(ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), managingOffice));
         bfActionReportData.setManagingOffice(
                 ReportHelper.getReportOfficeForDisplay(listingDetails.getCaseTypeId(), managingOffice));
         bfActionReportData.setListingDate(caseData.getListingDate());
@@ -64,7 +62,7 @@ public class BfActionReport {
 
     private void setReportListingDate(BfActionReportData reportData,
                                       String listingDateFrom, String listingDateTo, String hearingDateType) {
-        if (SINGLE_HEARING_DATE_TYPE.equals(hearingDateType)) {
+        if (Constants.SINGLE_HEARING_DATE_TYPE.equals(hearingDateType)) {
             reportData.setListingDate(ReportHelper.getFormattedLocalDate(listingDateFrom));
             reportData.setListingDateFrom(null);
             reportData.setListingDateTo(null);

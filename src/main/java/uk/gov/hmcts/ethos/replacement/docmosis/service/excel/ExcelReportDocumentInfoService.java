@@ -17,8 +17,10 @@ public class ExcelReportDocumentInfoService {
     private static final String CLAIMS_BY_HEARING_VENUE_FILE_NAME = "_Hearings_By_Venue_Report.xlsx";
     private static final String BROUGHT_FORWARD_REPORT_FILE_NAME = "_Brought_Forward_Report.xlsx";
 
-    public DocumentInfo generateClaimsByHearingVenueExcelReportDocumentInfo(ClaimsByHearingVenueReportData reportData, String caseTypeId,
-                                                                            String userToken) {
+    public DocumentInfo generateClaimsByHearingVenueExcelReportDocumentInfo(
+            ClaimsByHearingVenueReportData reportData,
+            String caseTypeId,
+            String userToken) {
         byte[] excelBytes = claimsByHearingVenueExcelReportCreationService.getReportExcelFile(reportData);
         String outPutFileName = caseTypeId + CLAIMS_BY_HEARING_VENUE_FILE_NAME;
         return excelDocManagementService.uploadExcelReportDocument(userToken, outPutFileName, excelBytes);

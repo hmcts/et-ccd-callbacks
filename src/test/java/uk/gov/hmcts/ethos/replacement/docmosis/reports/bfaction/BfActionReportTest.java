@@ -171,7 +171,7 @@ public class BfActionReportTest {
         submitEvent.setCaseData(caseData);
         submitEvents.add(submitEvent);
 
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents,"userName");
+        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
         int expectedBfDateCount = 2;
         assertEquals(expectedBfDateCount, resultListingData.getBfDateCollection().size());
     }

@@ -1,8 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import java.util.List;
-import java.util.UUID;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -13,7 +10,8 @@ import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportDetail;
-
+import java.util.List;
+import java.util.UUID;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -93,7 +91,8 @@ public class ExcelReportDocumentInfoServiceTest {
         excelReportDocInfService.generateClaimsByHearingVenueExcelReportDocumentInfo(claimsByHearingVenueReportData,
                 ENGLANDWALES_LISTING_CASE_TYPE_ID, "dummyToken");
 
-        verify(claimsByHearingVenueExcelReportCreationService, times(1)).getReportExcelFile(claimsByHearingVenueReportData);
+        verify(claimsByHearingVenueExcelReportCreationService, times(1))
+                .getReportExcelFile(claimsByHearingVenueReportData);
         verifyNoMoreInteractions(claimsByHearingVenueExcelReportCreationService);
         verify(excelDocManagementService, times(1))
                 .uploadExcelReportDocument("dummyToken",

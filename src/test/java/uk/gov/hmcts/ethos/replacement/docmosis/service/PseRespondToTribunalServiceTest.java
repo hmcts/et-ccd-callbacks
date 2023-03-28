@@ -345,9 +345,10 @@ class PseRespondToTribunalServiceTest {
             SendNotificationTypeItem.builder()
                 .id(UUID.randomUUID().toString())
                 .value(SendNotificationType.builder()
-                    .number("1")
-                    .date("5 Aug 2022")
-                    .sendNotificationTitle("View notice of hearing, submit hearing agenda")
+                        .number("1")
+                        .date("5 Aug 2022")
+                        .sendNotificationTitle("View notice of hearing, submit hearing agenda")
+                        .sendNotificationResponsesCount("0")
                     .build())
                 .build()
         ));
@@ -369,16 +370,20 @@ class PseRespondToTribunalServiceTest {
             caseData.setPseRespondentOrdReqUploadDocument(supportingMaterials);
         }
 
+        SendNotificationType notificationType = caseData.getSendNotificationCollection().get(0).getValue();
+
+        assertEquals("0", notificationType.getSendNotificationResponsesCount());
+
         pseRespondToTribService.addRespondentResponseToJON(caseData);
 
-        PseResponseType savedResponse = caseData.getSendNotificationCollection().get(0).getValue()
-            .getRespondCollection().get(0).getValue();
+        PseResponseType savedResponse = notificationType.getRespondCollection().get(0).getValue();
 
         assertEquals(RESPONDENT_TITLE, savedResponse.getFrom());
         assertEquals(response, savedResponse.getResponse());
         assertEquals(hasSupportingMaterial, savedResponse.getHasSupportingMaterial());
         assertEquals(copyOtherParty, savedResponse.getCopyToOtherParty());
         assertEquals(copyDetails, savedResponse.getCopyNoGiveDetails());
+        assertEquals("1", notificationType.getSendNotificationResponsesCount());
 
         if (supportingDocsSize > 0) {
             assertEquals(savedResponse.getSupportingMaterial().size(), supportingDocsSize);

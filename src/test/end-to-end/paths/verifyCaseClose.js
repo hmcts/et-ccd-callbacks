@@ -10,7 +10,7 @@ Scenario('Verify Case Close', async ({I}) => {
     let caseId = await processCaseToAcceptedWithAJurisdiction();
     console.log("... case id =>" +caseId);
     //await jurisdiction(I, eventNames.JURISDICTION);
-    //await closeCase(I, eventNames.CLOSE_CASE, commonConfig.clerkResponsible, commonConfig.physicalLocation)
+    await closeCase(I, eventNames.CLOSE_CASE, commonConfig.clerkResponsible, commonConfig.physicalLocation)
 
 }).tag('@pats');
     //.retry(testConfig.TestRetryScenarios);

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.utils;
+package uk.gov.hmcts.ethos.utils;
 
 import com.google.common.base.Strings;
 import org.springframework.util.CollectionUtils;

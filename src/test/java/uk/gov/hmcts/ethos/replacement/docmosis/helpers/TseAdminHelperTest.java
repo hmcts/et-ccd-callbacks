@@ -6,8 +6,8 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationBuilder;
+import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
+import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
 import java.util.List;
 import java.util.UUID;

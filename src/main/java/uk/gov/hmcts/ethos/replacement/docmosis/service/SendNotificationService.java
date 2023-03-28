@@ -13,10 +13,10 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
@@ -54,18 +54,21 @@ public class SendNotificationService {
     @Value("${sendNotification.template.id}")
     private String templateId;
 
-    private static final String RESPONSE_DETAILS = "|  | |\r\n"
+    private static final String BLANK_DOCUMENT_MARKDOWN = "| Document | | \r\n| Description | |";
+
+    private static final String POPULATED_DOCUMENT_MARKDOWN = "| Document |%s|\r\n| Description |%s|";
+
+    private static final String NOTIFICATION_DETAILS = "|  | |\r\n"
              + "| --- | --- |\r\n"
              + "| Subject | %1$s |\r\n"
              + "| Notification | %2$s |\r\n"
              + "| Hearing | %3$s |\r\n"
              + "| Date Sent | %4$s |\r\n"
              + "| Sent By | %5$s  |\r\n"
-             + "| Case management order request | %6$s |\r\n"
+             + "| Case management order or request | %6$s |\r\n"
              + "| Response due | %7$s |\r\n"
              + "| Party or parties to respond | %8$s |\r\n"
              + "| Additional Information | %9$s |\r\n"
-             + "| Description | %1$s |\r\n"
              + " %10$s\r\n"
              + "| Case management order made by | %11$s |\r\n"
              + "| Name | %12$s |\r\n"
@@ -100,6 +103,8 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationFullName2(caseData.getSendNotificationFullName2());
         sendNotificationType.setSendNotificationDetails(caseData.getSendNotificationDetails());
         sendNotificationType.setSendNotificationRequestMadeBy(caseData.getSendNotificationRequestMadeBy());
+        sendNotificationType.setSendNotificationEccQuestion(caseData.getSendNotificationEccQuestion());
+        sendNotificationType.setSendNotificationWhoMadeJudgement(caseData.getSendNotificationWhoMadeJudgement());
         if (RESPONDENT_ONLY.equals(sendNotificationType.getSendNotificationSelectParties())) {
             sendNotificationType.setNotificationState(NOT_VIEWED_YET);
         } else {
@@ -145,21 +150,26 @@ public class SendNotificationService {
         caseData.setSendNotificationFullName2(null);
         caseData.setSendNotificationDetails(null);
         caseData.setSendNotificationRequestMadeBy(null);
+        caseData.setSendNotificationEccQuestion(null);
+        caseData.setSendNotificationWhoCaseOrder(null);
     }
 
+    /**
+     * Gets a list of notifications in the selected format.
+     * @param caseData data to get notifications from
+     * @param format lambda contains details for the formatting
+     * @return A list of notifications
+     */
     public List<DynamicValueType> getSendNotificationSelection(CaseData caseData,
                                                                Function<SendNotificationTypeItem, String> format) {
-        List<DynamicValueType> values = new ArrayList<>();
         List<SendNotificationTypeItem> sendNotificationTypeItemList = caseData.getSendNotificationCollection();
         if (CollectionUtils.isEmpty(sendNotificationTypeItemList)) {
-            return values;
+            return new ArrayList<>();
         }
-        for (SendNotificationTypeItem sendNotificationType : sendNotificationTypeItemList) {
-            String notificationId = sendNotificationType.getId();
-            String label = format.apply(sendNotificationType);
-            values.add(DynamicValueType.create(notificationId, label));
-        }
-        return values;
+        return sendNotificationTypeItemList.stream()
+            .map(sendNotificationType -> DynamicValueType.create(sendNotificationType.getId(),
+                format.apply(sendNotificationType)))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -191,24 +201,25 @@ public class SendNotificationService {
                 .findFirst();
     }
 
-    private String getSendNotificationSingleDocumentMarkdown(UploadedDocumentType uploadedDocumentType) {
-        String document = "| Document | |";
+    private String getSendNotificationSingleDocumentMarkdown(DocumentType uploadedDocumentType) {
+        String document = BLANK_DOCUMENT_MARKDOWN;
         if (uploadedDocumentType != null) {
-            document = String.format("| Document | %s", createLinkForUploadedDocument(uploadedDocumentType));
+            document = String.format(POPULATED_DOCUMENT_MARKDOWN,
+                createLinkForUploadedDocument(uploadedDocumentType.getUploadedDocument()),
+                uploadedDocumentType.getShortDescription());
         }
         return document;
     }
 
     private String getSendNotificationDocumentsMarkdown(SendNotificationType sendNotification) {
         if (sendNotification.getSendNotificationUploadDocument() == null) {
-            return "| Document | |";
+            return BLANK_DOCUMENT_MARKDOWN;
         }
         List<String> documents = sendNotification.getSendNotificationUploadDocument().stream()
                 .map(documentTypeItem ->
-                        getSendNotificationSingleDocumentMarkdown(documentTypeItem.getValue().getUploadedDocument()))
+                        getSendNotificationSingleDocumentMarkdown(documentTypeItem.getValue()))
                 .collect(Collectors.toList());
         return String.join("\r\n", documents);
-
     }
 
     public String getSendNotificationMarkDown(SendNotificationType sendNotification) {
@@ -216,8 +227,8 @@ public class SendNotificationService {
         Optional<DynamicFixedListType> sendNotificationSelectHearing
                 = Optional.ofNullable(sendNotification.getSendNotificationSelectHearing());
 
-        return String.format(RESPONSE_DETAILS, Strings.nullToEmpty(sendNotification.getSendNotificationTitle()),
-                Strings.nullToEmpty(sendNotification.getSendNotificationSubject().toString()),
+        return String.format(NOTIFICATION_DETAILS, Strings.nullToEmpty(sendNotification.getSendNotificationTitle()),
+                Strings.nullToEmpty(String.join(", ", sendNotification.getSendNotificationSubject())),
                 sendNotificationSelectHearing.isPresent() ? sendNotificationSelectHearing.get().getSelectedLabel() : "",
                 sendNotification.getDate(),
                 TRIBUNAL,

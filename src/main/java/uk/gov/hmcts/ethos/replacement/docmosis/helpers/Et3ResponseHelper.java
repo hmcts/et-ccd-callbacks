@@ -211,7 +211,8 @@ public class Et3ResponseHelper {
         data.setBeforeAnnually(UNCHECKED);
         data.setTakehomeAnnually(UNCHECKED);
 
-        if (NO.equals(caseData.getEt3ResponseEarningDetailsCorrect()) && caseData.getEt3ResponsePayFrequency() != null) {
+        if (NO.equals(caseData.getEt3ResponseEarningDetailsCorrect())
+                && caseData.getEt3ResponsePayFrequency() != null) {
             if ("Weekly".equals(caseData.getEt3ResponsePayFrequency())) {
                 data.setBeforeWeekly(CHECKED);
                 data.setTakehomeWeekly(CHECKED);

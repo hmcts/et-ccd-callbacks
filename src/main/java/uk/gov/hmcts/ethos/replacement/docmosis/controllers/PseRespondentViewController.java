@@ -63,8 +63,7 @@ public class PseRespondentViewController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setPseRespondentSelectJudgmentOrderNotification(
-            pseRespondentViewService.populateSelectDropdownView(caseData));
+        caseData.setPseRespondentSelectOrderOrRequest(pseRespondentViewService.populateSelectDropdownView(caseData));
 
         return getCallbackRespEntityNoErrors(caseData);
     }

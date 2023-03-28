@@ -1,15 +1,18 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.ADDITIONAL_INFORMATION;
@@ -23,12 +26,14 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConst
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_FROM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_TABLE_HEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_START_WITHOUT_HEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 
 @Slf4j
 public final class PseHelper {
 
-    private static final String ORDER_APP_MARKUP = "|Hearing, case management order or request | |\r\n"
+    private static final String ORDER_APP_MARKUP = "### Hearing, case management order or request \r\n "
+            + TABLE_START_WITHOUT_HEADER
             + TABLE_STRING
             + DECISION_NOTIFICATION_TITLE
             + "%s" // Hearing
@@ -37,11 +42,12 @@ public final class PseHelper {
             + "|Case management order or request? | %s|\r\n"
             + RESPONSE_DUE
             + PARTY_OR_PARTIES_TO_RESPOND
-            + ADDITIONAL_INFORMATION
+            + "%s" // Additional information
             + "%s" // APP_DETAILS_DOC
             + "%s" // Case management order / Request
             + "|Sent to | %s|\r\n"
             + "\r\n";
+
     private static final String ORDER_APP_CMO_MARKUP = "|%s made by | %s|\r\n"
             + NAME_MARKUP;
 
@@ -94,7 +100,9 @@ public final class PseHelper {
                 defaultString(sendNotificationType.getSendNotificationCaseManagement()),
                 defaultString(sendNotificationType.getSendNotificationResponseTribunal()),
                 defaultString(sendNotificationType.getSendNotificationSelectParties()),
-                defaultString(sendNotificationType.getSendNotificationAdditionalInfo()),
+                isBlank(sendNotificationType.getSendNotificationAdditionalInfo())
+                    ? ""
+                    : String.format(ADDITIONAL_INFORMATION, sendNotificationType.getSendNotificationAdditionalInfo()),
                 getSendNotificationUploadDocument(sendNotificationType),
                 getSendNotificationCmoRequestWhoMadeBy(sendNotificationType),
                 sendNotificationType.getSendNotificationNotify()
@@ -139,12 +147,21 @@ public final class PseHelper {
 
     /**
      * Markup for displaying Response(s).
-     *
-     * @param pseResponseType Legal Rep Respond
+     * @param sendNotificationType Send Notification Type with Response(s)
      * @return Response(s) Markup
      */
     // TODO: RET-2879: Update Claimant response after RET-2928 ready
-    public static String formatClaimantReply(PseResponseType pseResponseType, int respondCount) {
+    public static String formatRespondDetails(SendNotificationType sendNotificationType) {
+        if (CollectionUtils.isEmpty(sendNotificationType.getRespondCollection())) {
+            return "";
+        }
+        IntWrapper respondCount = new IntWrapper(0);
+        return sendNotificationType.getRespondCollection().stream()
+            .map(r -> formatClaimantReply(r.getValue(), respondCount.incrementAndReturnValue()))
+            .collect(Collectors.joining(""));
+    }
+
+    private static String formatClaimantReply(PseResponseType pseResponseType, int respondCount) {
         return String.format(
                 CLAIMANT_REPLY_MARKUP,
                 respondCount,

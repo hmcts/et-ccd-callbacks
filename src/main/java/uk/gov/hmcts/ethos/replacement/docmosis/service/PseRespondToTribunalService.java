@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -40,8 +39,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatClaimantReply;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatOrdReqDetails;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatRespondDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelectedSendNotificationTypeItem;
 
 @Slf4j
@@ -116,17 +115,7 @@ public class PseRespondToTribunalService {
         SendNotificationType sendNotificationType =
             getSelectedSendNotificationTypeItem(caseData).getValue();
         return formatOrdReqDetails(sendNotificationType)
-            + initialRespondDetails(sendNotificationType);
-    }
-
-    private String initialRespondDetails(SendNotificationType sendNotificationType) {
-        if (CollectionUtils.isEmpty(sendNotificationType.getRespondCollection())) {
-            return "";
-        }
-        IntWrapper respondCount = new IntWrapper(0);
-        return sendNotificationType.getRespondCollection().stream()
-            .map(r -> formatClaimantReply(r.getValue(), respondCount.incrementAndReturnValue()))
-            .collect(Collectors.joining(""));
+            + formatRespondDetails(sendNotificationType);
     }
 
     /**

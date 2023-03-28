@@ -222,7 +222,8 @@ class PseRespondToTribunalServiceTest {
             DynamicFixedListType.of(DynamicValueType.create("1",
                 "1 View notice of hearing")));
 
-        String expected = "|Hearing, case management order or request | |\r\n"
+        String expected = "### Hearing, case management order or request \r\n "
+            + "| | |\r\n"
             + "|--|--|\r\n"
             + "|Notification | View notice of hearing|\r\n"
             + "|Hearing | 3: Hearing - Leeds - 14 Aug 2022|\r\n"
@@ -296,7 +297,8 @@ class PseRespondToTribunalServiceTest {
             DynamicFixedListType.of(DynamicValueType.create("1",
                 "1 View notice of hearing")));
 
-        String expected = "|Hearing, case management order or request | |\r\n"
+        String expected = "### Hearing, case management order or request \r\n "
+            + "| | |\r\n"
             + "|--|--|\r\n"
             + "|Notification | View notice of hearing|\r\n"
             + "|Date sent | 5 Aug 2022|\r\n"
@@ -304,7 +306,6 @@ class PseRespondToTribunalServiceTest {
             + "|Case management order or request? | Request|\r\n"
             + "|Response due | No|\r\n"
             + "|Party or parties to respond | |\r\n"
-            + "|Additional information | |\r\n"
             + "|Request made by | Judge|\r\n"
             + "|Name | Mr Lee Gal Officer|\r\n"
             + "|Sent to | Both parties|\r\n"

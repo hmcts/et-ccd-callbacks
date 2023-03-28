@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.constants;
 
 public final class TableMarkupConstants {
 
+    public static final String TABLE_START_WITHOUT_HEADER = "| | |\r\n";
     public static final String TABLE_STRING = "|--|--|\r\n";
     public static final String RESPONSE_TABLE_HEADER = "|Response %s | |\r\n";
     public static final String SUPPORTING_MATERIAL_TABLE_HEADER = "|Supporting material | %s|\r\n";

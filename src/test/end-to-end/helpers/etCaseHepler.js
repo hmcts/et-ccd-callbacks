@@ -415,6 +415,61 @@ async function listTheCaseEvent(authToken, serviceToken, case_id, userId) {
     expect(listEventExecutionResponse.status).to.eql(201);
 }
 
+async function jurisdictionToTheCaseEvent(authToken, serviceToken, case_id, userId) {
+
+    console.log("... application vetted, starting accept event...");
+    const jurisdictionStartCasePath = `/caseworkers/${userId}/jurisdictions/EMPLOYMENT/case-types/${location}/cases/${case_id}/event-triggers/addAmendJurisdiction/token`;
+    const jurisdictionSaveCasePath = `/caseworkers/${userId}/jurisdictions/EMPLOYMENT/case-types/${location}/cases/${case_id}/events`;
+
+    let initiateJurisdictionUrl = ccdApiUrl + jurisdictionStartCasePath;
+    let startJurisdictionEventHeaders = {
+        'Authorization': `Bearer ${authToken}`,
+        'ServiceAuthorization': `Bearer ${serviceToken}`,
+        'experimental': true,
+        'Content-Type': 'application/json'
+    };
+
+    let startJurisdictionResponse = await I.sendGetRequest(initiateJurisdictionUrl, startJurisdictionEventHeaders);
+    expect(startJurisdictionResponse.status).to.eql(200);
+    let jurisdictionEventToken = startJurisdictionResponse.data.token;
+
+    let jurisdictionEventBody = {
+        "data": {
+            "jurCodesCollection": [
+                {
+                    "value": {
+                        "juridictionCodesList": "ADT",
+                        "judgmentOutcome": "Not allocated",
+                        "dateNotified": null,
+                        "disposalDate": null
+                    },
+                    "id": "ac8fe585-b37c-4e25-bc36-221275ca3c9a"
+                }
+            ]
+        },
+        "event": {
+            "id": "addAmendJurisdiction",
+            "summary": "",
+            "description": ""
+        },
+        "event_token": jurisdictionEventToken,
+        "ignore_warning": false
+    };
+
+    let jurisdictionSaveUrl = ccdApiUrl + jurisdictionSaveCasePath;
+    let jurisdictionHeaders = {
+        'Authorization': `Bearer ${authToken}`,
+        'ServiceAuthorization': `${serviceToken}`,
+        'Content-Type': 'application/json'
+    };
+
+    let jurisdictionPayload = JSON.stringify(jurisdictionEventBody)
+
+    const jurisdictionEventExecutionResponse = await I.sendPostRequest(jurisdictionSaveUrl, jurisdictionPayload, jurisdictionHeaders);
+    expect(jurisdictionEventExecutionResponse.status).to.eql(201);
+
+}
+
 async function navigateToCaseDetailsScreen(case_id) {
     await I.authenticateWithIdam(username, password);
     await I.amOnPage('/case-details/' + case_id);
@@ -506,11 +561,33 @@ async function processCaseToListedState() {
     return case_id;
 }
 
+async function processCaseToAcceptedWithAJurisdiction() {
+
+    // Login to IDAM to get the authentication token
+    const authToken = await getAuthToken();
+    const serviceToken = await getS2SServiceToken();
+
+    //Getting the User Id based on the Authentication Token that is passed for this User.
+    const userId = await getUserDetails(authToken);
+    const case_id = await createACase(authToken, serviceToken, userId);
+    await performCaseVettingEvent(authToken, serviceToken, case_id);
+
+    //Initiate accept case
+    await acceptTheCaseEvent(authToken, serviceToken, case_id);
+    await jurisdictionToTheCaseEvent(authToken, serviceToken, case_id, userId);
+
+    //Navigate to the Case Detail Page
+    await navigateToCaseDetailsScreen(case_id);
+    return case_id;
+}
+
+
 
 module.exports = {
     processCaseToSubmittedState,
     processCaseToET1VettedState,
     processCaseToAcceptedState,
     processCaseToRejectedState,
-    processCaseToListedState
+    processCaseToListedState,
+    processCaseToAcceptedWithAJurisdiction
 };

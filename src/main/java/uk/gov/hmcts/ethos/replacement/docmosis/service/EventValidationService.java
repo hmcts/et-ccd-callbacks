@@ -93,6 +93,9 @@ public class EventValidationService {
     public static final String DISPOSAL_DATE_IN_FUTURE = "Disposal Date cannot be a date in the future for "
             + "jurisdiction code %s.";
 
+    public static final String RECEIPT_DATE_LATER_THAN_REJECTED_ERROR_MESSAGE =
+            "Receipt date should not be later than rejected date";
+
     public static final String DISPOSAL_DATE_BEFORE_RECEIPT_DATE = "Disposal Date cannot be before receipt date for "
             + "jurisdiction code %s.";
     public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "The date entered does not match any of the "
@@ -104,13 +107,27 @@ public class EventValidationService {
     private static final List<String> NO_DISPOSAL =
         List.of(JURISDICTION_OUTCOME_NOT_ALLOCATED, JURISDICTION_OUTCOME_INPUT_IN_ERROR);
 
+    private boolean isReceiptDateEarlier(String date, String error, List<String> errors, LocalDate dateOfReceipt) {
+        if (Strings.isNullOrEmpty(date)) {
+            return false;
+        }
+        if (dateOfReceipt.isAfter(LocalDate.parse(date))) {
+            errors.add(error);
+            return true;
+        }
+        return false;
+    }
+
     public List<String> validateReceiptDate(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         LocalDate dateOfReceipt = LocalDate.parse(caseData.getReceiptDate());
-        if (caseData.getPreAcceptCase() != null && !isNullOrEmpty(caseData.getPreAcceptCase().getDateAccepted())) {
-            LocalDate dateAccepted = LocalDate.parse(caseData.getPreAcceptCase().getDateAccepted());
-            if (dateOfReceipt.isAfter(dateAccepted)) {
-                errors.add(RECEIPT_DATE_LATER_THAN_ACCEPTED_ERROR_MESSAGE);
+        if (caseData.getPreAcceptCase() != null) {
+            if (isReceiptDateEarlier(caseData.getPreAcceptCase().getDateAccepted(),
+                    RECEIPT_DATE_LATER_THAN_ACCEPTED_ERROR_MESSAGE, errors, dateOfReceipt)) {
+                return errors;
+            }
+            if (isReceiptDateEarlier(caseData.getPreAcceptCase().getDateRejected(),
+                    RECEIPT_DATE_LATER_THAN_REJECTED_ERROR_MESSAGE, errors, dateOfReceipt)) {
                 return errors;
             }
         }

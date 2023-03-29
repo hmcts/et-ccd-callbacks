@@ -17,11 +17,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 
 @SuppressWarnings({"PMD.LawOfDemeter"})
 public class BfActionReport {
-    public ListingData runReport(ListingDetails listingDetails,
+    public BfActionReportData runReport(ListingDetails listingDetails,
                                  List<SubmitEvent> submitEvents,
                                  String userName) {
         BfActionReportData bfActionReportData = new BfActionReportData();
@@ -41,17 +40,6 @@ public class BfActionReport {
         bfActionReportData.setDocumentName(Constants.BROUGHT_FORWARD_REPORT);
         bfActionReportData.setReportPrintedOnDescription(
                 getReportedOnDetail(userName));
-        String dateSearchFrom;
-        String dateSearchTo;
-        if (Constants.RANGE_HEARING_DATE_TYPE.equals(caseData.getHearingDateType())) {
-            dateSearchFrom = LocalDate.parse(caseData.getListingDateFrom(), OLD_DATE_TIME_PATTERN2).toString();
-            dateSearchTo = LocalDate.parse(caseData.getListingDateTo(), OLD_DATE_TIME_PATTERN2).toString();
-        } else {
-            dateSearchFrom = LocalDate.parse(caseData.getListingDate(), OLD_DATE_TIME_PATTERN2).toString();
-            dateSearchTo = dateSearchFrom;
-        }
-        setReportListingDate(bfActionReportData, dateSearchFrom, dateSearchTo, caseData.getHearingDateType());
-
         String managingOffice = caseData.getManagingOffice();
         bfActionReportData.setManagingOffice(
                 ReportHelper.getReportOfficeForDisplay(listingDetails.getCaseTypeId(), managingOffice));
@@ -61,33 +49,8 @@ public class BfActionReport {
         return bfActionReportData;
     }
 
-    private void setReportListingDate(BfActionReportData reportData,
-                                      String listingDateFrom, String listingDateTo, String hearingDateType) {
-        if (Constants.SINGLE_HEARING_DATE_TYPE.equals(hearingDateType)) {
-            reportData.setListingDate(ReportHelper.getFormattedLocalDate(listingDateFrom));
-            reportData.setListingDateFrom(null);
-            reportData.setListingDateTo(null);
-            reportData.setHearingDateType(hearingDateType);
-            String reportedOn = "On " + UtilHelper.listingFormatLocalDate(
-                    ReportHelper.getFormattedLocalDate(listingDateFrom));
-            reportData.setReportPeriodDescription(getReportTitle(reportedOn, reportData.getOffice()));
-        } else {
-            reportData.setListingDate(null);
-            reportData.setListingDateFrom(ReportHelper.getFormattedLocalDate(listingDateFrom));
-            reportData.setListingDateTo(ReportHelper.getFormattedLocalDate(listingDateTo));
-            reportData.setHearingDateType(hearingDateType);
-            String reportedBetween = "Between " + UtilHelper.listingFormatLocalDate(reportData.getListingDateFrom())
-                    + " and " + UtilHelper.listingFormatLocalDate(reportData.getListingDateTo());
-            reportData.setReportPeriodDescription(getReportTitle(reportedBetween, reportData.getOffice()));
-        }
-    }
-
     private String getReportedOnDetail(String userName) {
         return "Reported on: " + UtilHelper.formatCurrentDate(LocalDate.now()) + "   By: " + userName;
-    }
-
-    private String getReportTitle(String reportPeriod, String officeName) {
-        return "   Period: " + reportPeriod + "       Office: " + officeName;
     }
 
     private void addBfDateTypeItems(SubmitEvent submitEvent, ListingData listingData,

@@ -11,11 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class ClaimsByHearingVenueExcelReportCreationServiceTest {
     @Mock
     ClaimsByHearingVenueExcelReportCreationService service;
+    @Mock
+    ExcelCreationService excelCreationService;
     ClaimsByHearingVenueReportData reportData;
 
     @Before
     public void setUp() {
-        service = new ClaimsByHearingVenueExcelReportCreationService();
+        service = new ClaimsByHearingVenueExcelReportCreationService(excelCreationService);
         reportData = new ClaimsByHearingVenueReportData();
         ClaimsByHearingVenueReportDetail detailEntry = new ClaimsByHearingVenueReportDetail();
         detailEntry.setCaseReference("245000/2021");

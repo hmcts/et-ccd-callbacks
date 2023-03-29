@@ -30,6 +30,7 @@ import uk.gov.hmcts.et.common.model.listing.types.ListingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingVenueHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport;
@@ -315,7 +316,7 @@ public class ListingService {
         log.info("Number of cases found: " + submitEvents.size());
         switch (listingDetails.getCaseData().getReportType()) {
             case BROUGHT_FORWARD_REPORT:
-                return new BfActionReport().runReport(listingDetails,
+                return getBfReport(listingDetails,
                         submitEvents,
                         reportDataService.getUserFullName(authToken));
             case CLAIMS_ACCEPTED_REPORT:
@@ -335,6 +336,20 @@ public class ListingService {
             default:
                 return listingDetails.getCaseData();
         }
+    }
+
+    private BfActionReportData getBfReport(ListingDetails listingDetails,
+                                           List<SubmitEvent> submitEvents,
+                                           String authToken) {
+        ReportParams genericReportParams = reportDataService.setListingDateRangeForSearch(listingDetails);
+        BfActionReportData reportData =  new BfActionReport().runReport(listingDetails,
+                submitEvents,
+                reportDataService.getUserFullName(authToken));
+        reportData.setReportPeriodDescription(reportDataService.setReportListingDate(reportData,
+                genericReportParams.getDateFrom(),
+                genericReportParams.getDateTo(),
+                listingDetails.getCaseData().getHearingDateType()));
+        return reportData;
     }
 
     private void clearListingFields(ListingData listingData) {

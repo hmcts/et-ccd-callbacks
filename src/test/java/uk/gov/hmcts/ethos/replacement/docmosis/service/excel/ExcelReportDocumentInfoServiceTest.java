@@ -33,7 +33,7 @@ public class ExcelReportDocumentInfoServiceTest {
     BfActionReportData bfActionReportData;
     private DocumentInfo docInfo;
 
-    public void setUpClaimsReport() {
+    private void setUpClaimsReport() {
         claimsByHearingVenueReportData = new ClaimsByHearingVenueReportData();
         ClaimsByHearingVenueReportDetail detailEntry = new ClaimsByHearingVenueReportDetail();
         detailEntry.setCaseReference("245000/2021");
@@ -44,7 +44,7 @@ public class ExcelReportDocumentInfoServiceTest {
         docInfo = new DocumentInfo();
     }
 
-    public void setUpBfReport() {
+    private void setUpBfReport() {
         bfActionReportData = new BfActionReportData();
         BFDateTypeItem bfDateTypeItem = new BFDateTypeItem();
         bfDateTypeItem.setId(UUID.randomUUID().toString());

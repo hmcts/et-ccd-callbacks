@@ -1022,6 +1022,7 @@ public class ListingServiceTest {
     @Test
     public void processHearingDocument() throws IOException {
         when(tornadoService.listingGeneration(anyString(), any(), anyString())).thenReturn(documentInfo);
+        listingDetails.getCaseData().setReportType(CASES_COMPLETED_REPORT);
         DocumentInfo documentInfo1 = listingService
                 .processHearingDocument(listingDetails.getCaseData(),
                         listingDetails.getCaseTypeId(), "authToken");

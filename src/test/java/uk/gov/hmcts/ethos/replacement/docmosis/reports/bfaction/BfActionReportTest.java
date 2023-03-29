@@ -269,7 +269,7 @@ public class BfActionReportTest {
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         BfActionReportData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
-        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), resultListingData.getOffice());
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), resultListingData.getManagingOffice());
     }
 
     @Test
@@ -285,7 +285,7 @@ public class BfActionReportTest {
         listingDetails.getCaseData().setManagingOffice(null);
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
         BfActionReportData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
-        assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), resultListingData.getOffice());
+        assertEquals(TribunalOffice.GLASGOW.getOfficeName(), resultListingData.getManagingOffice());
     }
 
     private List<BFActionTypeItem> getBFActionTypeItems() {

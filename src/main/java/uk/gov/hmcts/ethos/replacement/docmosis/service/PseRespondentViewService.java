@@ -17,6 +17,9 @@ import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatOrdReqDetails;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatRespondDetails;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelectedNotificationWithCode;
 
 @Slf4j
 @Service
@@ -84,4 +87,23 @@ public class PseRespondentViewService {
                 "0"
         );
     }
+
+    /**
+     * Initial Application and Respond details table.
+     * @param caseData contains all the case data
+     */
+    public String initialOrdReqDetailsTableMarkUp(CaseData caseData) {
+        if (caseData.getPseRespondentSelectJudgmentOrderNotification() == null) {
+            return "";
+        }
+        SendNotificationTypeItem sendNotificationTypeItem = getSelectedNotificationWithCode(caseData,
+            caseData.getPseRespondentSelectJudgmentOrderNotification().getSelectedCode());
+        if (sendNotificationTypeItem == null) {
+            return "";
+        }
+        SendNotificationType sendNotificationType = sendNotificationTypeItem.getValue();
+        return formatOrdReqDetails(sendNotificationType)
+            + formatRespondDetails(sendNotificationType);
+    }
+
 }

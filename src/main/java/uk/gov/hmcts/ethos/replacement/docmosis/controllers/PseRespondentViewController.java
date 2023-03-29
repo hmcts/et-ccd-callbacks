@@ -63,8 +63,43 @@ public class PseRespondentViewController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setPseRespondentSelectOrderOrRequest(pseRespondentViewService.populateSelectDropdownView(caseData));
+        caseData.setPseRespondentSelectJudgmentOrderNotification(
+            pseRespondentViewService.populateSelectDropdownView(caseData));
 
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    /**
+     * Middle Event for initial Request/Order details.
+     * @param ccdRequest        CaseData which is a generic data type for most of the
+     *                          methods which holds case data
+     * @param  userToken        Used for authorisation
+     * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse that
+     *                          includes caseData which contains the upload document names of
+     *                          type "Another type of document" in a html string format.
+     */
+    @PostMapping(value = "/midDetailsTable", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Mid Event for initial Request/Order details")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> midDetailsTable(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setPseRespondentOrdReqTableMarkUp(pseRespondentViewService.initialOrdReqDetailsTableMarkUp(caseData));
         return getCallbackRespEntityNoErrors(caseData);
     }
 

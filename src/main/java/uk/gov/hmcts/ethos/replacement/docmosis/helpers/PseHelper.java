@@ -78,6 +78,16 @@ public final class PseHelper {
      */
     public static SendNotificationTypeItem getSelectedSendNotificationTypeItem(CaseData caseData) {
         String selectedAppId = caseData.getPseRespondentSelectOrderOrRequest().getSelectedCode();
+        return getSelectedNotificationWithCode(caseData, selectedAppId);
+    }
+
+    /**
+     * Gets the selected SendNotificationTypeItem with Selected Code.
+     * @param caseData contains all the case data
+     * @param selectedAppId Selected Code from the list
+     * @return the select application in GenericTseApplicationTypeItem
+     */
+    public static SendNotificationTypeItem getSelectedNotificationWithCode(CaseData caseData, String selectedAppId) {
         return caseData.getSendNotificationCollection().stream()
                 .filter(s -> s.getValue().getNumber().equals(selectedAppId))
                 .findFirst()

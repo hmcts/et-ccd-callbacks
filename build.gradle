@@ -261,7 +261,7 @@ ext {
     pact_version = '4.3.10'
     reformLoggingVersion = '5.1.9'
     serenity = '3.3.4'
-    tomcatEmbedVersion = '9.0.70'
+    tomcatEmbedVersion = '9.0.73'
 }
 
 ext["rest-assured.version"] = '5.1.0'
@@ -336,6 +336,19 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.86.Final'
 
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.5.0'
+
+    // CVE-2023-20861
+    implementation 'org.springframework:spring-aop:5.3.26'
+    implementation 'org.springframework:spring-aspects:5.3.26'
+    implementation 'org.springframework:spring-beans:5.3.26'
+    implementation 'org.springframework:spring-context:5.3.26'
+    implementation 'org.springframework:spring-core:5.3.26'
+    implementation 'org.springframework:spring-expression:5.3.26'
+    implementation 'org.springframework:spring-jcl:5.3.26'
+    implementation 'org.springframework:spring-jdbc:5.3.26'
+    implementation 'org.springframework:spring-orm:5.3.26'
+    implementation 'org.springframework:spring-tx:5.3.26'
+    implementation 'org.springframework:spring-webmvc:5.3.26'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

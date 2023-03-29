@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 /**
@@ -29,7 +30,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
  */
 @Slf4j
 @SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.LinguisticNaming",
-    "PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions", "PMD.PrematureDeclaration"})
+    "PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions", "PMD.PrematureDeclaration", "PMD.GodClass",
+    "PMD.CyclomaticComplexity"})
 public class Et3ResponseHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -210,15 +212,18 @@ public class Et3ResponseHelper {
         data.setBeforeAnnually(UNCHECKED);
         data.setTakehomeAnnually(UNCHECKED);
 
-        if ("Weekly".equals(caseData.getEt3ResponsePayFrequency())) {
-            data.setBeforeWeekly(CHECKED);
-            data.setTakehomeWeekly(CHECKED);
-        } else if ("Monthly".equals(caseData.getEt3ResponsePayFrequency())) {
-            data.setBeforeMonthly(CHECKED);
-            data.setTakehomeMonthly(CHECKED);
-        } else {
-            data.setBeforeAnnually(CHECKED);
-            data.setTakehomeAnnually(CHECKED);
+        if (NO.equals(caseData.getEt3ResponseEarningDetailsCorrect())
+                && caseData.getEt3ResponsePayFrequency() != null) {
+            if ("Weekly".equals(caseData.getEt3ResponsePayFrequency())) {
+                data.setBeforeWeekly(CHECKED);
+                data.setTakehomeWeekly(CHECKED);
+            } else if ("Monthly".equals(caseData.getEt3ResponsePayFrequency())) {
+                data.setBeforeMonthly(CHECKED);
+                data.setTakehomeMonthly(CHECKED);
+            } else {
+                data.setBeforeAnnually(CHECKED);
+                data.setTakehomeAnnually(CHECKED);
+            }
         }
 
         Et3ResponseDocument et3ResponseDocument = Et3ResponseDocument.builder()

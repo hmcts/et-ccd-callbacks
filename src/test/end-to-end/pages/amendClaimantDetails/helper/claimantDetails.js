@@ -88,5 +88,11 @@ function verifyClaimantDetails() {
     I.see('What are the claimant\'s hearing preferences');
     I.see('Video');
     I.see('Phone');
+    I.see('Tell us what support you need to request');
+    I.see('Wheelchair please');
+    I.see('Contact language');
+    I.see('English');
+    I.see('If a hearing is required, what language do you want to speak at a hearing?');
+    I.see('Welsh');
 }
 module.exports = { verifyClaimantDetails };

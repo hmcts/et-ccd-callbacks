@@ -30,7 +30,6 @@ import uk.gov.hmcts.et.common.model.listing.types.ListingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingVenueHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport;
@@ -100,7 +99,7 @@ public class ListingService {
     private final CaseSourceLocalReport caseSourceLocalReport;
     private final ExcelReportDocumentInfoService excelReportDocumentInfoService;
     private final VenueService venueService;
-    private final ReportDataService reportDataService;
+    private final BfActionReport bfActionReport;
     private static final String MISSING_DOCUMENT_NAME = "Missing document name";
     private static final String MESSAGE = "Failed to generate document for case id : ";
     public static final String ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND =
@@ -310,15 +309,16 @@ public class ListingService {
         }
     }
 
-    public ListingData getDateRangeReport(ListingDetails listingDetails, String authToken) throws IOException {
+    public ListingData getDateRangeReport(ListingDetails listingDetails,
+                                          String authToken,
+                                          String userName) throws IOException {
         clearListingFields(listingDetails.getCaseData());
         List<SubmitEvent> submitEvents = getDateRangeReportSearch(listingDetails, authToken);
         log.info("Number of cases found: " + submitEvents.size());
         switch (listingDetails.getCaseData().getReportType()) {
             case BROUGHT_FORWARD_REPORT:
-                return getBfReport(listingDetails,
-                        submitEvents,
-                        reportDataService.getUserFullName(authToken));
+                return bfActionReport.runReport(listingDetails,
+                        submitEvents, userName);
             case CLAIMS_ACCEPTED_REPORT:
                 return ReportHelper.processClaimsAcceptedRequest(listingDetails, submitEvents);
             case LIVE_CASELOAD_REPORT:
@@ -336,20 +336,6 @@ public class ListingService {
             default:
                 return listingDetails.getCaseData();
         }
-    }
-
-    private BfActionReportData getBfReport(ListingDetails listingDetails,
-                                           List<SubmitEvent> submitEvents,
-                                           String authToken) {
-        ReportParams genericReportParams = reportDataService.setListingDateRangeForSearch(listingDetails);
-        BfActionReportData reportData =  new BfActionReport().runReport(listingDetails,
-                submitEvents,
-                reportDataService.getUserFullName(authToken));
-        reportData.setReportPeriodDescription(reportDataService.setReportListingDate(reportData,
-                genericReportParams.getDateFrom(),
-                genericReportParams.getDateTo(),
-                listingDetails.getCaseData().getHearingDateType()));
-        return reportData;
     }
 
     private void clearListingFields(ListingData listingData) {

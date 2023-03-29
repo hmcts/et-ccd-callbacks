@@ -268,27 +268,24 @@ public class BfActionReportTest {
     public void shouldShowReportOfficeName_EngWales() {
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
-        BfActionReportData bfActionReportData = (BfActionReportData) resultListingData;
-        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), bfActionReportData.getOffice());
+        BfActionReportData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), resultListingData.getOffice());
     }
 
     @Test
     public void shouldShowManagingOffice() {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
-        BfActionReportData bfActionReportData = (BfActionReportData) resultListingData;
-        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), bfActionReportData.getManagingOffice());
+        BfActionReportData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
+        assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), resultListingData.getManagingOffice());
     }
 
     @Test
     public void shouldShowReportOfficeName_Scotland() {
         listingDetails.getCaseData().setManagingOffice(null);
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
-        BfActionReportData bfActionReportData = (BfActionReportData) resultListingData;
-        assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), bfActionReportData.getOffice());
+        BfActionReportData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
+        assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), resultListingData.getOffice());
     }
 
     private List<BFActionTypeItem> getBFActionTypeItems() {

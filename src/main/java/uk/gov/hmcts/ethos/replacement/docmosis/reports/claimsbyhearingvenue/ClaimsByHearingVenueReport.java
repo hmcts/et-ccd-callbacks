@@ -18,6 +18,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_BY_HEARING_V
 public final class ClaimsByHearingVenueReport {
     private static final String NULL_STRING_VALUE = "Null";
     private final ClaimsByHearingVenueReportDataSource dataSource;
+
     public ClaimsByHearingVenueReport(ClaimsByHearingVenueReportDataSource dataSource) {
 
         this.dataSource = dataSource;
@@ -35,6 +36,9 @@ public final class ClaimsByHearingVenueReport {
         List<ClaimsByHearingVenueSubmitEvent> submitEvents = dataSource.getData(
                 reportParams.getManagingOffice(), UtilHelper.getListingCaseTypeId(reportParams.getCaseTypeId()),
                 reportParams.getDateFrom(), reportParams.getDateTo());
+        claimsByHearingVenueReportData.setReportPeriodDescription(ReportHelper.getReportListingDate(
+                claimsByHearingVenueReportData, reportParams.getDateFrom(),
+                reportParams.getDateTo(), reportParams.getHearingDateType()));
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             setReportData(submitEvents, claimsByHearingVenueReportData);
         }

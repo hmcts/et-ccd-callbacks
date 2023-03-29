@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction;
 
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
@@ -13,13 +14,16 @@ import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
 import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItemComparator;
 import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 @SuppressWarnings({"PMD.LawOfDemeter"})
+@Service
 public class BfActionReport {
+
     public BfActionReportData runReport(ListingDetails listingDetails,
                                  List<SubmitEvent> submitEvents,
                                  String userName) {
@@ -43,10 +47,19 @@ public class BfActionReport {
         String managingOffice = caseData.getManagingOffice();
         bfActionReportData.setManagingOffice(
                 ReportHelper.getReportOfficeForDisplay(listingDetails.getCaseTypeId(), managingOffice));
+        setPeriodDescription(bfActionReportData, listingDetails);
         bfActionReportData.setListingDate(caseData.getListingDate());
         bfActionReportData.setListingDateFrom(caseData.getListingDateFrom());
         bfActionReportData.setListingDateTo(caseData.getListingDateTo());
         return bfActionReportData;
+    }
+
+    private void setPeriodDescription(BfActionReportData bfActionReportData, ListingDetails listingDetails) {
+        ReportParams genericReportParams = ReportHelper.getListingDateRangeForSearch(listingDetails);
+        bfActionReportData.setReportPeriodDescription(ReportHelper.getReportListingDate(bfActionReportData,
+                genericReportParams.getDateFrom(),
+                genericReportParams.getDateTo(),
+                listingDetails.getCaseData().getHearingDateType()));
     }
 
     private String getReportedOnDetail(String userName) {

@@ -9,7 +9,7 @@ Scenario('Verify Jurisdiction', async ({I}) => {
 
     let caseId = await processCaseToAcceptedState();
     console.log("... case id =>" +caseId);
-    await jurisdiction(I, eventNames.JURISDICTION);
+    await jurisdiction(I, eventNames.JURISDICTION, "Not allocated");
+    await jurisdiction(I, eventNames.JURISDICTION, "Withdrawn or private settlement");
 
-}).tag('@biggerrefactoring');
-    //.retry(testConfig.TestRetryScenarios);
+}).tag('@nightly').tag('@RET-BAT').retry(testConfig.TestRetryScenarios);

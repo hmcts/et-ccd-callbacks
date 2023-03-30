@@ -87,7 +87,7 @@ public class TseAdminService {
 
     private static final String CLOSE_APP_DECISION_DETAILS = "|Decision | |\r\n"
         + TABLE_STRING
-        +  "%s" // Notification title
+        + "|Notification | %s|\r\n"
         + "|Decision | %s|\r\n"
         + "%s" // Decision details
         + DATE_MARKUP
@@ -296,7 +296,7 @@ public class TseAdminService {
                 .stream()
                 .reduce((first, second) -> second)
                 .map(d -> String.format(CLOSE_APP_DECISION_DETAILS,
-                        formatNotificationTitle(d.getValue()),
+                    d.getValue().getEnterNotificationTitle(),
                     d.getValue().getDecision(),
                     formatDecisionDetails(d.getValue()),
                     d.getValue().getDate(),
@@ -333,11 +333,6 @@ public class TseAdminService {
     private String getAdditionInfoMarkdown(TseAdminRecordDecisionTypeItem decision) {
         return decision.getValue().getAdditionalInformation() == null ? ""
                 : String.format(ADDITIONAL_INFORMATION, decision.getValue().getAdditionalInformation());
-    }
-
-    private String formatNotificationTitle(TseAdminRecordDecisionType decision) {
-        return isBlank(decision.getEnterNotificationTitle()) ? "" :
-                String.format(DECISION_NOTIFICATION_TITLE, decision.getEnterNotificationTitle());
     }
 
     private String formatDecisionDetails(TseAdminRecordDecisionType decision) {

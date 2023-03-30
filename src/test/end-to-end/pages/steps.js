@@ -31,7 +31,7 @@ module.exports = () => {
         executeCaseTransferEngWales: steps.caseTransfer.caseTransferEngWales,
         executeCaseTransferECM: steps.caseTransfer.caseTransferECM,
         executeCaseTransferScotland: steps.caseTransfer.caseTransferScotland,
-        executeJudgment: steps.amendJudgment.addAmendJudgment,
+        executeJudgment: steps.judgment.judgment,
         executeCreateReport: steps.createReport.createReport,
         executeHearingListedInWeekend: steps.amendHearing.hearingListedInWeekend,
         executeUploadDocument: steps.uploadDocument.uploadDocument,

@@ -3,7 +3,7 @@ const {eventNames} = require('../pages/common/constants.js');
 const {respondentRepresentative} = require("../helpers/caseHelper");
 const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 
-Feature('Leeds Office Individual Case & Execute Respondent Representative');
+Feature('Individual Case & Execute Respondent Representative');
 
 Scenario('Verify Respondent Representative for a Representative without a myHMCTS account', async ({I}) => {
 

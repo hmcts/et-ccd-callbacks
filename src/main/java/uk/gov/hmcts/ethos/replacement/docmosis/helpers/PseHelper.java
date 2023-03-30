@@ -127,8 +127,8 @@ public final class PseHelper {
                 getSendNotificationCmoRequestWhoMadeBy(sendNotificationType),
                 getSendNotificationJudgement(sendNotificationType),
                 isBlank(sendNotificationType.getSendNotificationEccQuestion())
-                        ? ""
-                        : String.format(ORDER_APP_ECC_MARKUP, sendNotificationType.getSendNotificationEccQuestion()),
+                    ? ""
+                    : String.format(ORDER_APP_ECC_MARKUP, sendNotificationType.getSendNotificationEccQuestion()),
                 sendNotificationType.getSendNotificationNotify()
         );
     }
@@ -173,17 +173,17 @@ public final class PseHelper {
         return isBlank(sendNotificationType.getSendNotificationWhoMadeJudgement())
             ? ""
             : String.format(ORDER_APP_JUDGEMENT_MARKUP,
-            sendNotificationType.getSendNotificationWhoMadeJudgement(),
-            sendNotificationType.getSendNotificationFullName2(),
-            sendNotificationType.getSendNotificationDecision(),
-            getSendNotificationJudgementDetails(sendNotificationType));
+                sendNotificationType.getSendNotificationWhoMadeJudgement(),
+                sendNotificationType.getSendNotificationFullName2(),
+                sendNotificationType.getSendNotificationDecision(),
+                getSendNotificationJudgementDetails(sendNotificationType));
     }
 
     private static String getSendNotificationJudgementDetails(SendNotificationType sendNotificationType) {
         return isBlank(sendNotificationType.getSendNotificationDetails())
             ? ""
             : String.format(ORDER_APP_JUDGEMENT_DETAILS_MARKUP,
-            sendNotificationType.getSendNotificationDetails());
+                sendNotificationType.getSendNotificationDetails());
     }
 
     /**

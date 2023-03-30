@@ -43,13 +43,24 @@ public final class PseHelper {
             + RESPONSE_DUE
             + PARTY_OR_PARTIES_TO_RESPOND
             + "%s" // Additional information
-            + "%s" // APP_DETAILS_DOC
+            + "%s" // Description + Document
             + "%s" // Case management order / Request
+            + "%s" // Judgment + Full name + Decision + Details
+            + "%s" // ECC notification
             + "|Sent to | %s|\r\n"
             + "\r\n";
 
     private static final String ORDER_APP_CMO_MARKUP = "|%s made by | %s|\r\n"
             + NAME_MARKUP;
+
+    private static final String ORDER_APP_JUDGEMENT_MARKUP = "|Who made the judgment? | %s|\r\n"
+            + "|Full name | %s|\r\n"
+            + "|Decision | %s|\r\n"
+            + "%s"; // Details
+
+    private static final String ORDER_APP_JUDGEMENT_DETAILS_MARKUP = "|Details | %s|\r\n";
+
+    private static final String ORDER_APP_ECC_MARKUP = "|What is the ECC notification? | %s|\r\n";
 
     private static final String CLAIMANT_REPLY_MARKUP = RESPONSE_TABLE_HEADER
             + TABLE_STRING
@@ -100,7 +111,6 @@ public final class PseHelper {
      * @param sendNotificationType Target SendNotification Subject
      * @return Hearing, case management order or request Markup
      */
-    // TODO: RET-2879: Add Judgment and ECC
     public static String formatOrdReqDetails(SendNotificationType sendNotificationType) {
         return String.format(
                 ORDER_APP_MARKUP,
@@ -115,6 +125,10 @@ public final class PseHelper {
                     : String.format(ADDITIONAL_INFORMATION, sendNotificationType.getSendNotificationAdditionalInfo()),
                 getSendNotificationUploadDocument(sendNotificationType),
                 getSendNotificationCmoRequestWhoMadeBy(sendNotificationType),
+                getSendNotificationJudgement(sendNotificationType),
+                isBlank(sendNotificationType.getSendNotificationEccQuestion())
+                        ? ""
+                        : String.format(ORDER_APP_ECC_MARKUP, sendNotificationType.getSendNotificationEccQuestion()),
                 sendNotificationType.getSendNotificationNotify()
         );
     }
@@ -153,6 +167,23 @@ public final class PseHelper {
                         : defaultString(sendNotificationType.getSendNotificationRequestMadeBy()),
                 defaultString(sendNotificationType.getSendNotificationFullName())
         );
+    }
+
+    private static String getSendNotificationJudgement(SendNotificationType sendNotificationType) {
+        return isBlank(sendNotificationType.getSendNotificationWhoMadeJudgement())
+            ? ""
+            : String.format(ORDER_APP_JUDGEMENT_MARKUP,
+            sendNotificationType.getSendNotificationWhoMadeJudgement(),
+            sendNotificationType.getSendNotificationFullName2(),
+            sendNotificationType.getSendNotificationDecision(),
+            getSendNotificationJudgementDetails(sendNotificationType));
+    }
+
+    private static String getSendNotificationJudgementDetails(SendNotificationType sendNotificationType) {
+        return isBlank(sendNotificationType.getSendNotificationDetails())
+            ? ""
+            : String.format(ORDER_APP_JUDGEMENT_DETAILS_MARKUP,
+            sendNotificationType.getSendNotificationDetails());
     }
 
     /**

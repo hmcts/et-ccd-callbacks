@@ -94,7 +94,7 @@ class PseRespondentViewServiceTest {
                 .response("Response text entered")
                 .hasSupportingMaterial(YES)
                 .supportingMaterial(List.of(createDocumentTypeItem("My claimant hearing agenda.pdf",
-                    "ca35bccd-f507-4243-9133-f6081fb0fe5e")))
+                    "ca35bccd-f507-4243-9133-f6081fb0fe5e", null)))
                 .copyToOtherParty(YES)
                 .build())
             .build();
@@ -159,15 +159,6 @@ class PseRespondentViewServiceTest {
 
         assertThat(pseRespondentViewService.initialOrdReqDetailsTableMarkUp(caseData),
             is(expected));
-    }
-
-    private DocumentTypeItem createDocumentTypeItem(String fileName, String uuid) {
-        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
-        documentTypeItem.setId(UUID.randomUUID().toString());
-        documentTypeItem.setValue(DocumentTypeBuilder.builder()
-            .withUploadedDocument(fileName, uuid)
-            .build());
-        return documentTypeItem;
     }
 
     private DocumentTypeItem createDocumentTypeItem(String fileName, String uuid, String shortDescription) {

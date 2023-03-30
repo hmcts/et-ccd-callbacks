@@ -77,6 +77,7 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationSelectParties("Both parties");
         caseData.setSendNotificationFullName("John Doe");
         caseData.setSendNotificationFullName2("John Doe");
+        caseData.setSendNotificationDecision("Other");
         caseData.setSendNotificationDetails("details");
         caseData.setSendNotificationRequestMadeBy("Judge");
     }
@@ -100,6 +101,7 @@ class SendNotificationServiceTest {
         assertEquals("Both parties", sendNotificationType.getSendNotificationSelectParties());
         assertEquals("John Doe", sendNotificationType.getSendNotificationFullName());
         assertEquals("John Doe", sendNotificationType.getSendNotificationFullName2());
+        assertEquals("Other", sendNotificationType.getSendNotificationDecision());
         assertEquals("details", sendNotificationType.getSendNotificationDetails());
         assertEquals("Judge", sendNotificationType.getSendNotificationRequestMadeBy());
         assertEquals("notStartedYet", sendNotificationType.getNotificationState());
@@ -134,6 +136,7 @@ class SendNotificationServiceTest {
         assertNull(caseData.getSendNotificationSelectParties());
         assertNull(caseData.getSendNotificationFullName());
         assertNull(caseData.getSendNotificationFullName2());
+        assertNull(caseData.getSendNotificationDecision());
         assertNull(caseData.getSendNotificationDetails());
         assertNull(caseData.getSendNotificationRequestMadeBy());
     }

@@ -4,7 +4,7 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.0.14.RELEASE'
-    id 'org.springframework.boot' version '2.7.4'
+    id 'org.springframework.boot' version '2.7.10'
     id 'org.owasp.dependencycheck' version '8.0.1'
     id 'com.github.ben-manes.versions' version '0.42.0'
     id 'au.com.dius.pact' version '4.3.15'
@@ -336,19 +336,6 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.86.Final'
 
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.5.0'
-
-    // CVE-2023-20861
-    implementation 'org.springframework:spring-aop:5.3.26'
-    implementation 'org.springframework:spring-aspects:5.3.26'
-    implementation 'org.springframework:spring-beans:5.3.26'
-    implementation 'org.springframework:spring-context:5.3.26'
-    implementation 'org.springframework:spring-core:5.3.26'
-    implementation 'org.springframework:spring-expression:5.3.26'
-    implementation 'org.springframework:spring-jcl:5.3.26'
-    implementation 'org.springframework:spring-jdbc:5.3.26'
-    implementation 'org.springframework:spring-orm:5.3.26'
-    implementation 'org.springframework:spring-tx:5.3.26'
-    implementation 'org.springframework:spring-webmvc:5.3.26'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

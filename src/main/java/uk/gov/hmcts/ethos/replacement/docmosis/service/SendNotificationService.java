@@ -101,6 +101,7 @@ public class SendNotificationService {
         sendNotificationType.setSendNotificationSelectParties(caseData.getSendNotificationSelectParties());
         sendNotificationType.setSendNotificationFullName(caseData.getSendNotificationFullName());
         sendNotificationType.setSendNotificationFullName2(caseData.getSendNotificationFullName2());
+        sendNotificationType.setSendNotificationDecision(caseData.getSendNotificationDecision());
         sendNotificationType.setSendNotificationDetails(caseData.getSendNotificationDetails());
         sendNotificationType.setSendNotificationRequestMadeBy(caseData.getSendNotificationRequestMadeBy());
         sendNotificationType.setSendNotificationEccQuestion(caseData.getSendNotificationEccQuestion());
@@ -148,6 +149,7 @@ public class SendNotificationService {
         caseData.setSendNotificationSelectParties(null);
         caseData.setSendNotificationFullName(null);
         caseData.setSendNotificationFullName2(null);
+        caseData.setSendNotificationDecision(null);
         caseData.setSendNotificationDetails(null);
         caseData.setSendNotificationRequestMadeBy(null);
         caseData.setSendNotificationEccQuestion(null);

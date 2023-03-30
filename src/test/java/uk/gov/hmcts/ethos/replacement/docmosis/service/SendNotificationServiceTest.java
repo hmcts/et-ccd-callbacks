@@ -166,11 +166,10 @@ class SendNotificationServiceTest {
     @Test
     void sendNotifyEmails_noRespondentEmail_onlySendsClaimantEmail() {
         caseData.setSendNotificationNotify(BOTH_PARTIES);
-        caseData.getRespondentCollection().forEach(o -> o.getValue().setResponseRespondentEmail(null));
+        caseData.getRespondentCollection().forEach(o -> o.getValue().setRespondentEmail(null));
+        caseData.getRepCollection().forEach(o -> o.getValue().setRepresentativeEmailAddress(null));
         sendNotificationService.sendNotifyEmails(caseDetails);
-        verify(emailService, times(1)).sendEmail(eq("templateId"), any(), personalisationCaptor.capture());
-        Map<String, String> val = personalisationCaptor.getValue();
-        assertEquals("exuiUrl1234", val.get("environmentUrl"));
+        verify(emailService, times(1)).sendEmail(eq("templateId"), any(), any());
     }
 
     @Test

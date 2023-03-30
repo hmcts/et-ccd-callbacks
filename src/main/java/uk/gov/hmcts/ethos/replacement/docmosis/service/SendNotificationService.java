@@ -182,8 +182,9 @@ public class SendNotificationService {
 
         CaseData caseData = caseDetails.getCaseData();
 
-        if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {
-            emailService.sendEmail(templateId, caseData.getClaimantType().getClaimantEmailAddress(),
+        String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
+        if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify()) && !isNullOrEmpty(claimantEmailAddress)) {
+            emailService.sendEmail(templateId, claimantEmailAddress,
                 buildPersonalisation(caseDetails, citizenUrl));
         }
 

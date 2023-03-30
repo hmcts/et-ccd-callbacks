@@ -157,6 +157,25 @@ class SendNotificationServiceTest {
     }
 
     @Test
+    void sendNotifyEmails_noClaimantEmail_onlySendsRespondentEmail() {
+        caseData.setSendNotificationNotify(BOTH_PARTIES);
+        caseData.getClaimantType().setClaimantEmailAddress(null);
+        sendNotificationService.sendNotifyEmails(caseDetails);
+        verify(emailService, times(1)).sendEmail(eq("templateId"), any(), personalisationCaptor.capture());
+        Map<String, String> val = personalisationCaptor.getValue();
+        assertEquals("exuiUrl1234", val.get("environmentUrl"));
+    }
+
+    @Test
+    void sendNotifyEmails_noRespondentEmail_onlySendsClaimantEmail() {
+        caseData.setSendNotificationNotify(BOTH_PARTIES);
+        caseData.getRespondentCollection().forEach(o -> o.getValue().setRespondentEmail(null));
+        caseData.getRepCollection().forEach(o -> o.getValue().setRepresentativeEmailAddress(null));
+        sendNotificationService.sendNotifyEmails(caseDetails);
+        verify(emailService, times(1)).sendEmail(eq("templateId"), any(), any());
+    }
+
+    @Test
     void sendNotifyEmails_claimantOnly() {
         caseData.setSendNotificationNotify(CLAIMANT_ONLY);
         sendNotificationService.sendNotifyEmails(caseDetails);

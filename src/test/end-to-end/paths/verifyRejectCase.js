@@ -4,7 +4,7 @@ const {rejectCaseEvent} = require("../helpers/caseHelper");
 const {processCaseToET1VettedState} = require("../helpers/etCaseHepler");
 let caseNumber;
 
-Feature('Create a Leeds Singles Case and move to Rejected state');
+Feature('Create Singles Case and move to Rejected state');
 
 Scenario('Verify Reject Case', async ({I}) => {
     caseNumber = await processCaseToET1VettedState();

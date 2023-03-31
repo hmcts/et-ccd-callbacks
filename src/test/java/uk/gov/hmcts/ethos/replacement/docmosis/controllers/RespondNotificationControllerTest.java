@@ -30,7 +30,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondNotificationController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.UnusedPrivateField"})
+@SuppressWarnings({"PMD.TooManyMethods"})
 class RespondNotificationControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -38,6 +38,7 @@ class RespondNotificationControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/respondNotification/aboutToSubmit";
     private static final String MID_GET_NOTIFICATION_URL = "/respondNotification/midGetNotification";
     private static final String MID_GET_INPUT_URL = "/respondNotification/midValidateInput";
+    private static final String SUBMITTED_URL = "/respondNotification/submitted";
 
     @MockBean
     private RespondNotificationService respondNotificationService;
@@ -189,5 +190,38 @@ class RespondNotificationControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void submitted_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(SUBMITTED_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.confirmation_body", notNullValue()))
+                .andExpect(jsonPath("$.data", nullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void submitted_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(SUBMITTED_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void submitted_badRequest() throws Exception {
+        mockMvc.perform(post(SUBMITTED_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

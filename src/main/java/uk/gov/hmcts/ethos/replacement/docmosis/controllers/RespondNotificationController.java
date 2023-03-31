@@ -162,4 +162,42 @@ public class RespondNotificationController {
         List<String> errors = respondNotificationService.validateInput(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
     }
+
+    /**
+     * Returns data needed to populate the respond to a notification completed page.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Populates data for the submitted page")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> submitted(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        String body = String.format("### What happens next\r\n\r\n"
+                        + "You can still view the response in the"
+                        + " <a href=\"/cases/case-details/%s#Notifications\""
+                        + " target=\"_blank\">Notifications tab (opens in a new tab)</a>",
+                ccdRequest.getCaseDetails().getCaseId());
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .confirmation_body(body)
+                .build());
+    }
 }

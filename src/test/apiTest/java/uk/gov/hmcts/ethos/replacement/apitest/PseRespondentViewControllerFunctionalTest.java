@@ -21,6 +21,7 @@ class PseRespondentViewControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
 
     private static final String ABOUT_TO_START_URL = "/pseRespondentView/aboutToStart";
+    private static final String MID_TABLE_DETAILS = "/pseRespondentView/midDetailsTable";
 
     private CCDRequest ccdRequest;
 
@@ -53,4 +54,19 @@ class PseRespondentViewControllerFunctionalTest extends BaseFunctionalTest {
             .log()
             .all(true);
     }
+
+    @Test
+    void shouldReceiveSuccessResponseWhenMidDetailsTableInvoked() {
+        RestAssured.given()
+            .spec(spec)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(ccdRequest)
+            .post(MID_TABLE_DETAILS)
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log()
+            .all(true);
+    }
+
 }

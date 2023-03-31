@@ -41,7 +41,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConst
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.CLOSE_APP_DECISION_DETAILS_OTHER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.CLOSE_APP_TELL_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DECISION_NOTIFICATION_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DOCUMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.NAME_MARKUP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.STRING_BR;
@@ -87,7 +86,7 @@ public class TseAdminService {
 
     private static final String CLOSE_APP_DECISION_DETAILS = "|Decision | |\r\n"
         + TABLE_STRING
-        +  "%s" // Notification title
+        + "|Notification | %s|\r\n"
         + "|Decision | %s|\r\n"
         + "%s" // Decision details
         + DATE_MARKUP
@@ -296,7 +295,7 @@ public class TseAdminService {
                 .stream()
                 .reduce((first, second) -> second)
                 .map(d -> String.format(CLOSE_APP_DECISION_DETAILS,
-                        formatNotificationTitle(d.getValue()),
+                    d.getValue().getEnterNotificationTitle(),
                     d.getValue().getDecision(),
                     formatDecisionDetails(d.getValue()),
                     d.getValue().getDate(),
@@ -333,11 +332,6 @@ public class TseAdminService {
     private String getAdditionInfoMarkdown(TseAdminRecordDecisionTypeItem decision) {
         return decision.getValue().getAdditionalInformation() == null ? ""
                 : String.format(ADDITIONAL_INFORMATION, decision.getValue().getAdditionalInformation());
-    }
-
-    private String formatNotificationTitle(TseAdminRecordDecisionType decision) {
-        return isBlank(decision.getEnterNotificationTitle()) ? "" :
-                String.format(DECISION_NOTIFICATION_TITLE, decision.getEnterNotificationTitle());
     }
 
     private String formatDecisionDetails(TseAdminRecordDecisionType decision) {

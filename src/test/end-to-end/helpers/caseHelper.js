@@ -147,10 +147,14 @@ async function caseTransfer(I, eventName) {
     }
 }
 
-async function judgment(I, eventName) {
+async function judgment(I, eventName , hearingRequired) {
     await I.chooseNextStep(eventName, 3);
-    await I.wait(2);
-    await I.executeJudgment();
+    await I.wait(3);
+    if (hearingRequired) {
+        await I.executeJudgmentForHearingCases();
+    } else {
+        await I.executeJudgmentForNonHearingCases();
+    }
 }
 
 async function generateReport(I, jurisdiction, caseType, eventName, userName, password) {

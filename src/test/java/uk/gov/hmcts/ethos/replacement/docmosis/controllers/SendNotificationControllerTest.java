@@ -122,7 +122,7 @@ class SendNotificationControllerTest {
     }
 
     @Test
-    void submited_tokenOk() throws Exception {
+    void submitted_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -135,7 +135,7 @@ class SendNotificationControllerTest {
     }
 
     @Test
-    void submited_tokenFail() throws Exception {
+    void submitted_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(SUBMITTED_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -145,7 +145,7 @@ class SendNotificationControllerTest {
     }
 
     @Test
-    void submited_badRequest() throws Exception {
+    void submitted_badRequest() throws Exception {
         mockMvc.perform(post(SUBMITTED_URL)
             .content("garbage content")
             .header("Authorization", AUTH_TOKEN)

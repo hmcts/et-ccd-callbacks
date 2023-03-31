@@ -278,7 +278,7 @@ async function listTheCaseEvent(authToken, serviceToken, case_id, userId) {
     let startListingResponse = await I.sendGetRequest(initiateListUrl, startListEventHeaders);
     expect(startListingResponse.status).to.eql(200);
     let listEventToken = startListingResponse.data.token;
-    const date = new Date(new Date().setHours(0, 0, 0, 0));
+    const date = new Date(new Date().setUTCHours(0, 0, 0, 0));
     switch (date.getDay()) {
         case 0: //Sunday
             date.setDate(date.getDate() + 1);

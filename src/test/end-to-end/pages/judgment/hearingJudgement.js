@@ -32,7 +32,13 @@ module.exports = async function () {
     I.see('Has a reconsideration application been made? (Optional)');
 
     I.click('#judgementCollection_0_non_hearing_judgment_No');
-    I.selectOption('#judgementCollection_0_dynamicJudgementHearing', '1 : Preliminary Hearing - Hull Combined Court Centre - 29 Mar 2023')
+    let today = new Date().toLocaleDateString('en-GB', {
+        day : 'numeric',
+        month : 'short',
+        year : 'numeric'
+    }).split(' ').join(' ');
+    let hearingOption = '1 : Preliminary Hearing - Hull Combined Court Centre - '+today
+    I.selectOption('#judgementCollection_0_dynamicJudgementHearing', hearingOption);
     I.selectOption('#judgementCollection_0_judgement_type', commonConfig.judgmentType);
     I.selectOption('#judgementCollection_0_liability_optional', 'Liability');
     I.click('//div[@id=\'judgementCollection_0_jurisdictionCodes\']/div/button');

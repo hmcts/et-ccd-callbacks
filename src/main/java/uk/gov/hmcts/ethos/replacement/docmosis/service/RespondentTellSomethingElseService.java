@@ -86,6 +86,7 @@ public class RespondentTellSomethingElseService {
             + "event by %s.";
     private static final String RES_TSE_FILE_NAME = "resTse.pdf";
 
+    private static final String EMPTY_TABLE_MESSAGE = "There are no applications to view";
     private static final String TABLE_COLUMNS_MARKDOWN =
             "| No | Application type | Applicant | Application date | Response due | Number of responses | Status |\r\n"
                     + "|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n"
@@ -228,7 +229,7 @@ public class RespondentTellSomethingElseService {
     public String generateTableMarkdown(CaseData caseData) {
         List<GenericTseApplicationTypeItem> genericApplicationList = caseData.getGenericTseApplicationCollection();
         if (CollectionUtils.isEmpty(genericApplicationList)) {
-            return "";
+            return EMPTY_TABLE_MESSAGE;
         }
 
         AtomicInteger applicationNumber = new AtomicInteger(1);

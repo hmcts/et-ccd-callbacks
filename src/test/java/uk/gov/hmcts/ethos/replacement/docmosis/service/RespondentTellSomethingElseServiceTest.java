@@ -102,6 +102,7 @@ class RespondentTellSomethingElseServiceTest {
         + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
 
+    private static final String EXPECTED_EMPTY_TABLE_MESSAGE = "There are no applications to view";
     private static final String EXPECTED_TABLE_MARKDOWN = "| No | Application type | Applicant | Application date | "
         + "Response due | Number of responses | Status "
         + "|\r\n|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n|1|testType"
@@ -475,7 +476,8 @@ class RespondentTellSomethingElseServiceTest {
     void displayRespondentApplicationsTable_hasNoApplications() {
         CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
 
-        assertThat(respondentTellSomethingElseService.generateTableMarkdown(caseData), is(""));
+        assertThat(respondentTellSomethingElseService.generateTableMarkdown(caseData),
+                is(EXPECTED_EMPTY_TABLE_MESSAGE));
     }
 
     @Test

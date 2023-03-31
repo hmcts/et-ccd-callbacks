@@ -476,7 +476,8 @@ class RespondentTellSomethingElseServiceTest {
     void displayRespondentApplicationsTable_hasNoApplications() {
         CaseData caseData = createCaseData(TSE_APP_AMEND_RESPONSE, NO);
 
-        assertThat(respondentTellSomethingElseService.generateTableMarkdown(caseData), is(EXPECTED_EMPTY_TABLE_MESSAGE));
+        assertThat(respondentTellSomethingElseService.generateTableMarkdown(caseData),
+                is(EXPECTED_EMPTY_TABLE_MESSAGE));
     }
 
     @Test

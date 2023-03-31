@@ -5,23 +5,29 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming"})
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming", "PMD.TooManyMethods"})
 class Et3ResponseHelperTest {
 
     public static final String START_DATE_MUST_BE_IN_THE_PAST = "Start date must be in the past";
@@ -31,6 +37,8 @@ class Et3ResponseHelperTest {
     @BeforeEach
     void setUp() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
+                .withRespondent("test", NO, null, false)
+                .withEt3RepresentingRespondent("test")
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseData = caseDetails.getCaseData();
@@ -130,8 +138,8 @@ class Et3ResponseHelperTest {
         caseData.setEt3ResponseEmployerClaimDetails("ecc");
         caseData.setEt3ResponseRespondentSupportDetails("support details");
         caseData.setEt3ResponsePensionCorrectDetails("pension details");
-        caseData.setEt3ResponseHearingRespondent(Arrays.asList("Phone hearings"));
-        caseData.setEt3ResponseHearingRepresentative(Arrays.asList("Video hearings"));
+        caseData.setEt3ResponseHearingRespondent(List.of("Phone hearings"));
+        caseData.setEt3ResponseHearingRepresentative(List.of("Video hearings"));
         caseData.setEt3ResponseRespondentPreferredTitle("Mr");
         caseData.setEt3ResponseMultipleSites("Yes");
         caseData.setEt3ResponseAcasAgree("No");
@@ -149,9 +157,58 @@ class Et3ResponseHelperTest {
 
         // UTF-8 is required here for special characters to resolve on Windows correctly
         String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-            .getResource("et3ResponseDocument.json")).toURI())), UTF_8);
+                .getResource("et3ResponseDocument.json")).toURI())), UTF_8);
 
         String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any");
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void createDynamicListSelection() {
+        Et3ResponseHelper.createDynamicListSelection(caseData);
+        assertThat(caseData.getEt3RepresentingRespondent(), hasSize(1));
+    }
+
+    @Test
+    void validateRespondents_noErrors() {
+        List<String> errors = Et3ResponseHelper.validateRespondents(caseData);
+        assertThat(errors.isEmpty());
+    }
+
+    @Test
+    void validateRespondents_noOption() {
+        caseData.setEt3RepresentingRespondent(new ArrayList<>());
+        List<String> errors = Et3ResponseHelper.validateRespondents(caseData);
+        assertThat(errors, hasSize(1));
+        assertThat(errors.get(0)).isEqualTo("No respondents found");
+    }
+
+    @Test
+    void addEt3DataToRespondent() {
+        caseData.setEt3ResponseIsClaimantNameCorrect(YES);
+        caseData.setEt3ResponsePhone("1234");
+        Et3ResponseHelper.addEt3DataToRespondent(caseData);
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+        assertThat(respondentSumType.getEt3ResponseIsClaimantNameCorrect()).isEqualTo(YES);
+        assertThat(respondentSumType.getResponseReceived()).isEqualTo(YES);
+        assertThat(respondentSumType.getResponseReceivedDate()).isEqualTo(LocalDate.now().toString());
+    }
+
+    @Test
+    void reloadEt3Data() {
+        RespondentSumType respondentSumType = RespondentSumType.builder()
+                .et3ResponseAcasAgree(YES)
+                .et3ResponseSiteEmploymentCount("120")
+                .responseRespondentName("Test Test")
+                .respondentName("test")
+                .build();
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(respondentSumType);
+        caseData.setRespondentCollection(List.of(respondentSumTypeItem));
+
+        Et3ResponseHelper.reloadDataOntoEt3(caseData);
+        assertThat(caseData.getEt3ResponseAcasAgree()).isEqualTo(YES);
+        assertThat(caseData.getEt3ResponseSiteEmploymentCount()).isEqualTo("120");
+        assertThat(caseData.getEt3ResponseRespondentLegalName()).isEqualTo("Test Test");
     }
 }

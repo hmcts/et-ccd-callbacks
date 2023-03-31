@@ -1,13 +1,26 @@
 {
   "data": {
+    "jurCodesCollection": [
+      {
+        "id": "f7f10b22-88c0-43b9-a917-f7fff81e006y",
+        "value": {
+          "juridictionCodesList": "DAG"
+        }
+      }
+    ],
+    "typesOfClaim": [
+      "discrimination"
+    ],
+    "positionType": "ET1 Online submission",
+    "conciliationTrack": "Open Track",
     "receiptDate": "2022-08-17",
-    "feeGroupReference": "946403697619",
+    "feeGroupReference": "1675930663464973",
     "managingOffice": "Leeds",
     "stateAPI": null,
     "caseRefNumberCount": null,
     "startCaseRefNumber": null,
     "multipleRefNumber": null,
-    "caseType": null,
+    "caseType": "Single",
     "multipleReference": null,
     "leadClaimant": null,
     "claimant_TypeOfClaimant": "Individual",
@@ -91,7 +104,17 @@
         "id": "e764f874-e937-4642-ac67-4af2e2fd05f6"
       }
     ],
-    "claimantWorkAddressQuestion": "Yes",
+    "claimantWorkAddressQuestion": "No",
+    "claimantWorkAddress": {
+      "claimant_work_address": {
+        "Country": "United Kingdom",
+        "PostCode": "MK5 7HH",
+        "PostTown": "Milton Keynes",
+        "AddressLine1": "The Burnt Oak",
+        "AddressLine2": "Egerton Gate",
+        "AddressLine3": "Shenley Brook End"
+      }
+    },
     "claimantWorkAddressQRespondent": {
       "value": {
         "code": "Mrs Test Auto",

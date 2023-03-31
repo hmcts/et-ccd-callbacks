@@ -1,0 +1,15 @@
+{
+  "hearingCollection_0_hearingNumber" : "1",
+  "hearingCollection_0_Hearing_type" : "3: Preliminary Hearing",
+  "hearingCollection_0_hearingFormat" : "In person",
+  "hearingCollection_0_judicialMediation" : "Yes",
+  "hearingCollection_0_Hearing_venue" : "3: Hull Combined Court Centre",
+  "hearingCollection_0_hearingEstLengthNum" : "1",
+  "hearingCollection_0_hearingEstLengthNumType" : "1: Days",
+  "hearingCollection_0_hearingSitAlone-Sit Alone" : "Sit Alone",
+  "hearingCollection_0_Hearing_stage" : "1: Stage 1",
+  "hearingCollection_0_Hearing_notes" : "Notes for the Listing",
+  "listedDate-day" : "13",
+  "listedDate-month" : "03",
+  "listedDate-year" : "2023"
+}

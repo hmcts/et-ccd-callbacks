@@ -1,3 +1,4 @@
+const { default: execute } = require("webdriverio/build/commands/browser/execute");
 const caseTransferScotland = require("../pages/caseTransfer/caseTransferScotland");
 
 async function acceptCaseEvent(I, caseId, eventName) {
@@ -205,19 +206,22 @@ async function et1Vetting(I, eventName) {
     await I.et1VettingJourney();
 }
 
-async function createAdminReferral(emailAddress, details) {
-    await I.createAdminReferrals(emailAddress, details)
-    await I.wait(3);
+async function createAdminReferral(I) {
+    I.click("//div[text()='Referrals']");
+    I.click('Send a new referral');
+    await I.createAdminReferrals();
 }
 
-async function createJudgeReferral(emailAddress, details) {
-    await I.createJudgeReferrals(emailAddress, details)
-    await I.wait(3);
+async function createJudgeReferral(I) {
+    I.click("//div[text()='Referrals']");
+    I.click('Send a new referral');
+    await I.createJudgeReferrals();
 }
 
-async function createLegalRepReferral(emailAddress, details) {
-    await I.createLegalRepReferrals(emailAddress, details)
-    await I.wait(3);
+async function createLegalRepReferral(I) {
+    I.click("//div[text()='Referrals']");
+    I.click('Send a new referral');
+    await I.createLegalRepReferrals();
 }
 
 async function clickCreateCase(I) {
@@ -283,5 +287,8 @@ module.exports = {
     et3Response,
     clickCreateCase,
     verifyApplicationTabs,
-    enterDisposalDateJurisdiction
+    enterDisposalDateJurisdiction,
+    createAdminReferral,
+    createJudgeReferral,
+    createLegalRepReferral
 };

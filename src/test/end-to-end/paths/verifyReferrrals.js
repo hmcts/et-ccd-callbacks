@@ -1,36 +1,41 @@
 const {createAdminReferral, createJudgeReferral, createLegalRepReferral} = require("../helpers/caseHelper");
-const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
-Feature('Reform ET Referral Process');
+const {processCaseToListedState} = require("../helpers/etCaseHepler");
+//const testConfig = require('./../../config');
+//const {eventNames} = require('../pages/common/constants.js');
+//Feature('Reform ET Referral Process');
+const testConfig = require('./../../config');
+const {eventNames} = require('../pages/common/constants.js');
 
 const emailaddress = '';
 const details = '';
 
+//Verifying Referrals for an Admin
 Scenario('Create a new referral for admin', async ({ I }) => {
 
-    let caseId = await processCaseToAcceptedState();
-
+    let caseId = await processCaseToListedState();
     console.log("... case id =>" +caseId);
 
-    await createAdminReferral(emailaddress, details);
+    await createAdminReferral(I);
 
-}).tag('@biggerrefactoring');
+}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);
 
+//Verifying Referrals for a Judge
 Scenario('Create a new referral for a Judge', async ({ I }) => {
 
-    let caseId = await processCaseToAcceptedState();
-
+    let caseId = await processCaseToListedState();
     console.log("... case id =>" +caseId);
 
-    await createJudgeReferral(emailaddress, details);
+    await createJudgeReferral(I);
 
-}).tag('@biggerrefactoring');
+}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);
 
+//Verifying Referrals for a Legal Rep
 Scenario('Create a new referral for a legal Rep', async ({ I }) => {
 
-    let caseId = await processCaseToAcceptedState();
-
+    let caseId = await processCaseToListedState();
     console.log("... case id =>" +caseId);
 
-    await createLegalRepReferral(emailaddress, details);
+    await createLegalRepReferral(I);
 
-}).tag('@wip');
+}).tag('@RET-BAT').tag('@nightly').retry(testConfig.TestRetryScenarios);
+

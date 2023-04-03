@@ -151,15 +151,15 @@ public class TseAdmCloseService {
             .map(replyItem ->
                 ADMIN.equals(replyItem.getValue().getFrom())
                     ? formatAdminReply(
-                    replyItem.getValue(),
-                    respondCount.incrementAndReturnValue(),
-                    defaultString(documentManagementService.displayDocNameTypeSizeLink(
-                        replyItem.getValue().getAddDocument(), authToken)))
+                        replyItem.getValue(),
+                        respondCount.incrementAndReturnValue(),
+                        defaultString(documentManagementService.displayDocNameTypeSizeLink(
+                            replyItem.getValue().getAddDocument(), authToken)))
                     : formatLegalRepReplyOrClaimantWithRule92(
-                    replyItem.getValue(),
-                    respondCount.incrementAndReturnValue(),
-                    application.getApplicant(),
-                    populateListDocWithInfoAndLink(replyItem.getValue().getSupportingMaterial(), authToken)))
+                        replyItem.getValue(),
+                        respondCount.incrementAndReturnValue(),
+                        application.getApplicant(),
+                        populateListDocWithInfoAndLink(replyItem.getValue().getSupportingMaterial(), authToken)))
             .collect(Collectors.joining(""));
     }
 

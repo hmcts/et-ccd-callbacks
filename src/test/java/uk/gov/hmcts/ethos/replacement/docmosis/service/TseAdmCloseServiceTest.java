@@ -15,7 +15,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
-import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
@@ -157,7 +156,12 @@ class TseAdmCloseServiceTest {
                     .decisionMadeBy("decision made by")
                     .decisionMadeByFullName("made by full name")
                     .selectPartyNotify("party notify")
-                    .responseRequiredDoc(hasDoc ? createUploadedDocumentType("admin.txt") : null)
+                    .responseRequiredDoc(hasDoc
+                        ? UploadedDocumentBuilder.builder()
+                            .withFilename("admin.txt")
+                            .withUuid("1234")
+                            .build()
+                        : null)
                     .build()
             ).build();
 
@@ -182,13 +186,6 @@ class TseAdmCloseServiceTest {
         }
 
         return tseApplicationBuilder;
-    }
-
-    private static UploadedDocumentType createUploadedDocumentType(String fileName) {
-        return UploadedDocumentBuilder.builder()
-            .withFilename(fileName)
-            .withUuid("1234")
-            .build();
     }
 
 }

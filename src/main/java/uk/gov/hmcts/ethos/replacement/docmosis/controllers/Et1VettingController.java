@@ -196,7 +196,7 @@ public class Et1VettingController {
     })
     public ResponseEntity<CCDCallbackResponse> processingComplete(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();

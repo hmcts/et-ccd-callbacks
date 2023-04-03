@@ -55,7 +55,7 @@ public class PersistentQueueActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> afterSubmittedBulkPQ(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("AFTER SUBMITTED BULK PERSISTENT Q ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -92,7 +92,7 @@ public class PersistentQueueActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> preAcceptBulkPQ(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("PRE ACCEPT BULK PERSISTENT Q ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -124,7 +124,7 @@ public class PersistentQueueActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> updateBulkCasePQ(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("UPDATE BULK CASE IDS PERSISTENT Q ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {

@@ -25,14 +25,14 @@ public class StubApiController {
      * @param userToken authentication token used for IDAM
      * @return basic string
      */
-    @GetMapping(value = "/stubApi")
+    @GetMapping("/stubApi")
     @Operation(summary = "Stub API for test purposes only")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully"),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public String stubApi(@RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken) {
+    public String stubApi(@RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return "Invalid token";
         }

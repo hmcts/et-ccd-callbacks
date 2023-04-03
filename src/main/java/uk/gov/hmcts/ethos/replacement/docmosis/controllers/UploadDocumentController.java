@@ -66,7 +66,7 @@ public class UploadDocumentController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitReferralReply(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);

@@ -52,7 +52,7 @@ public class ClaimantHearingPreferencesController {
     })
     public ResponseEntity<CCDCallbackResponse> validateHearingPreferences(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();

@@ -44,7 +44,7 @@ public class ReferenceDataController {
     })
     public ResponseEntity<CCDCallbackResponse> hearingVenueReferenceData(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("HEARING VENUE REFERENCE DATA ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -69,7 +69,7 @@ public class ReferenceDataController {
     })
     public ResponseEntity<CCDCallbackResponse> dateListedReferenceData(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("DATE LISTED REFERENCE DATA ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {

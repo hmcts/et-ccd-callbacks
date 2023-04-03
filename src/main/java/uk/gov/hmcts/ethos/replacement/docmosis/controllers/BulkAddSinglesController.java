@@ -53,7 +53,7 @@ public class BulkAddSinglesController {
     })
     public ResponseEntity<MultipleCallbackResponse> bulkAddSingleCasesImportFileMidEventValidation(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -78,7 +78,7 @@ public class BulkAddSinglesController {
     })
     public ResponseEntity<MultipleCallbackResponse> bulkAddSingleCasesToMultiple(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();

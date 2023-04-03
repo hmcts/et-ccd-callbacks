@@ -61,7 +61,7 @@ public class CaseTransferMultiplesController {
     })
     public ResponseEntity<MultipleCallbackResponse> initTransferToEnglandWales(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -88,7 +88,7 @@ public class CaseTransferMultiplesController {
     })
     public ResponseEntity<MultipleCallbackResponse> initTransferToScotland(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -115,7 +115,7 @@ public class CaseTransferMultiplesController {
     })
     public ResponseEntity<MultipleCallbackResponse> transferSameCountry(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info(LOG_MESSAGE, "MULTIPLE TRANSFER SAME COUNTRY ---> ", multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -142,7 +142,7 @@ public class CaseTransferMultiplesController {
     })
     public ResponseEntity<MultipleCallbackResponse> transferDifferentCountry(
             @RequestBody MultipleRequest multipleRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info(LOG_MESSAGE, "MULTIPLE TRANSFER DIFFERENT COUNTRY ---> ",
                 multipleRequest.getCaseDetails().getCaseId());
 

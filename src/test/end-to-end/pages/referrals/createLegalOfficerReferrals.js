@@ -44,7 +44,7 @@ module.exports = async function() {
     I.click('Close and Return to case details');
 
     I.waitForText('has been updated with event: Referral', testConfig.TestTimeToWaitForText);
-    I.click("//div[text()='Referrals']");
+    I.click('#mat-tab-label-0-6'); ////div[text()='Referrals']"
     I.see('Referrals');
     I.click("[alt='image']");
     I.see('No');

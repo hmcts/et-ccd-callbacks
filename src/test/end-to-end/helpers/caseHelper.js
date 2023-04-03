@@ -1,4 +1,3 @@
-const { default: execute } = require("webdriverio/build/commands/browser/execute");
 const caseTransferScotland = require("../pages/caseTransfer/caseTransferScotland");
 
 async function acceptCaseEvent(I, caseId, eventName) {
@@ -211,19 +210,19 @@ async function et1Vetting(I, eventName) {
 }
 
 async function createAdminReferral(I) {
-    I.click("//div[text()='Referrals']");
+    I.click('#mat-tab-label-0-6'); //div[text()='Referrals']
     I.click('Send a new referral');
     await I.createAdminReferrals();
 }
 
 async function createJudgeReferral(I) {
-    I.click("//div[text()='Referrals']");
+    I.click('#mat-tab-label-0-6'); //div[text()='Referrals']
     I.click('Send a new referral');
     await I.createJudgeReferrals();
 }
 
 async function createLegalRepReferral(I) {
-    I.click("//div[text()='Referrals']");
+    I.click('#mat-tab-label-0-6'); //div[text()='Referrals']
     I.click('Send a new referral');
     await I.createLegalRepReferrals();
 }

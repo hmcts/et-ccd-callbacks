@@ -38,6 +38,7 @@ module.exports = async function () {
         year : 'numeric'
     }).split(' ').join(' ');
     let hearingOption = '1 : Preliminary Hearing - Hull Combined Court Centre - '+today
+    I.waitForVisible(hearingOption, 10);
     I.selectOption('#judgementCollection_0_dynamicJudgementHearing', hearingOption);
     I.selectOption('#judgementCollection_0_judgement_type', commonConfig.judgmentType);
     I.selectOption('#judgementCollection_0_liability_optional', 'Liability');

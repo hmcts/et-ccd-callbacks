@@ -26,7 +26,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequestMapping("/tseClaimant")
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class TseClaimantController {
 
     private final VerifyTokenService verifyTokenService;

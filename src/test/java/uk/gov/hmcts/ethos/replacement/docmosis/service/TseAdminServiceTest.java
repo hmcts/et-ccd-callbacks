@@ -62,7 +62,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
-@SuppressWarnings({"squid:S5961", "PMD.ExcessiveImports", "PMD.TooManyMethods"})
 class TseAdminServiceTest {
     private TseAdminService tseAdminService;
 

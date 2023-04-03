@@ -27,7 +27,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @Slf4j
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class AcasController {
     private final VerifyTokenService verifyTokenService;
 

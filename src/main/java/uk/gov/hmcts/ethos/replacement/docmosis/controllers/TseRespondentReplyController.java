@@ -34,7 +34,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/tseResponse")
 @RestController
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class TseRespondentReplyController {
 
     private final VerifyTokenService verifyTokenService;

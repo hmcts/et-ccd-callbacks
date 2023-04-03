@@ -39,7 +39,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondentTellSomethingElseController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 class RespondentTellSomethingElseControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String VALIDATE_GIVE_DETAILS = "/respondentTSE/validateGiveDetails";

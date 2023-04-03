@@ -19,7 +19,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LIST
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.TooManyMethods"})
 class HearingsByHearingTypeReportTest {
 
     HearingsByHearingTypeReportDataSource reportDataSource;

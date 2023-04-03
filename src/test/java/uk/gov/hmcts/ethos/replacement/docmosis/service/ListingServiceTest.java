@@ -91,9 +91,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.DUNDEE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper.CAUSE_LIST_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.UnusedPrivateMethod", "PMD.ExcessiveImports", "PMD.UnusedPrivateField",
-    "PMD.LinguisticNaming", "PMD.TooManyMethods", "PMD.ExcessiveClassLength", "PMD.ExcessiveMethodLength",
-    "PMD.NcssCount"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ListingServiceTest {
 

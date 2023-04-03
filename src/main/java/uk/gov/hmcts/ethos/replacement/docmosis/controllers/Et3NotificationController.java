@@ -30,7 +30,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/et3Notification")
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class Et3NotificationController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";

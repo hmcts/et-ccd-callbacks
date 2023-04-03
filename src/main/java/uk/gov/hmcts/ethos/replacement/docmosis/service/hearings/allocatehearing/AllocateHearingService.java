@@ -14,7 +14,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.C
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.JudgeSelectionService;
 
 @Service
-@SuppressWarnings({"PMD.ConfusingTernary"})
 public class AllocateHearingService {
 
     private final HearingSelectionService hearingSelectionService;

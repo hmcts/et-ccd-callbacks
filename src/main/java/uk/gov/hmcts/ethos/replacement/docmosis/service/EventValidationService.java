@@ -83,9 +83,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getActiveRe
 
 @Slf4j
 @Service("eventValidationService")
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.TooManyMethods",
-    "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.ExcessiveImports", "PMD.LiteralsFirstInComparisons",
-    "PMD.UnnecessaryFullyQualifiedName", "PMD.LawOfDemeter", "PMD.UseConcurrentHashMap", "PMD.CyclomaticComplexity"})
 public class EventValidationService {
 
     private static final List<String> INVALID_STATES_FOR_CLOSED_CURRENT_POSITION = List.of(

@@ -41,7 +41,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesSer
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({CaseTransferController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.LawOfDemeter"})
 public class CaseTransferControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";

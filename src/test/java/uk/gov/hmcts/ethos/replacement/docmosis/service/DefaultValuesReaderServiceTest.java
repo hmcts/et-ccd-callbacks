@@ -25,8 +25,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_CLOSED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.UseProperClassLoader", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.TooManyMethods"})
 public class DefaultValuesReaderServiceTest {
 
     private CaseDefaultValuesConfiguration config;

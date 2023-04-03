@@ -30,10 +30,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 @RequiredArgsConstructor
 @Service("multipleCreationService")
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
-    "PMD.LinguisticNaming", "PMD.LiteralsFirstInComparisons", "PMD.LooseCoupling",
-    "PMD.LawOfDemeter"})
 public class MultipleCreationService {
 
     @Value("${ccd_gateway_base_url}")

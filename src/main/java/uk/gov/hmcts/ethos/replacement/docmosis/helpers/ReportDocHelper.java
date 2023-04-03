@@ -53,12 +53,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDE
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_CASES;
 
 @Slf4j
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
-    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
-    "PMD.LawOfDemeter", "PMD.ExcessiveImports", "PMD.ExcessiveMethodLength", "PMD.NcssCount",
-    "PMD.ConsecutiveAppendsShouldReuse", "PMD.ConsecutiveLiteralAppends", "PMD.AppendCharacterWithChar",
-    "PMD.CyclomaticComplexity", "PMD.CyclomaticComplexity"})
 public class ReportDocHelper {
     private static final String REPORT_LIST = "\"Report_List\":[\n";
     private static final String DAY_1_LIST = "\"Day_1_List\":[\n";

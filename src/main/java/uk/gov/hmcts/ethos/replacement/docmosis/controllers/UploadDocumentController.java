@@ -31,7 +31,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequestMapping("/uploadDocument")
 @RestController
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class UploadDocumentController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";

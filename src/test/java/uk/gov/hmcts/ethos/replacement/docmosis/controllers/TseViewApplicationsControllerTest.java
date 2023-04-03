@@ -31,7 +31,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({TseViewApplicationsController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.ExcessiveImports", "PMD.TooManyMethods"})
 class TseViewApplicationsControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";

@@ -14,7 +14,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-@SuppressWarnings({"PMD.LinguisticNaming"})
 public class HearingSelectionServiceTest {
 
     @Test

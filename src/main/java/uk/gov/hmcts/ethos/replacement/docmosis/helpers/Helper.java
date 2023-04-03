@@ -53,10 +53,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.InsufficientStringBufferDeclaration",
-    "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions", "PMD.LawOfDemeter",
-    "PMD.SimpleDateFormatNeedsLocale", "PMD.ExcessiveImports", "PMD.CyclomaticComplexity"})
 public final class Helper {
 
     public static final String HEARING_CREATION_NUMBER_ERROR = "A new hearing can only "

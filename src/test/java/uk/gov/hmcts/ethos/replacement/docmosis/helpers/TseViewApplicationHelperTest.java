@@ -29,7 +29,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPO
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.LinguisticNaming", "PMD.ExcessiveImports"})
 public class TseViewApplicationHelperTest {
     private CaseData caseData;
 

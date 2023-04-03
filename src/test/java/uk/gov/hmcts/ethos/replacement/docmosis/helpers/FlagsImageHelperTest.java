@@ -16,7 +16,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.ExcessiveClassLength", "PMD.LawOfDemeter", "PMD.AvoidInstantiatingObjectsInLoops"})
 public class FlagsImageHelperTest {
 
     @Test

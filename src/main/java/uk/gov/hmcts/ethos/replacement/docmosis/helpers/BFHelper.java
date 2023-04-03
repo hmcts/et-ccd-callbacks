@@ -17,10 +17,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
 
 @Slf4j
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
-    "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
-    "PMD.ExcessiveImports", "PMD.ConfusingTernary", "PDM.UselessParentheses",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.AvoidInstantiatingObjectsInLoops"})
 public class BFHelper {
 
     private BFHelper() {

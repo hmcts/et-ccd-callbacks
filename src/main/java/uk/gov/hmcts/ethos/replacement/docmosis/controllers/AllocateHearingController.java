@@ -30,7 +30,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequestMapping("/allocatehearing")
 @Slf4j
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals", "PMD.UnnecessaryAnnotationValueElement", "PMD.LawOfDemeter"})
 public class AllocateHearingController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
 

@@ -34,7 +34,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO_CASES_SEARCHED;
 
-@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleLetterServiceTest {
 

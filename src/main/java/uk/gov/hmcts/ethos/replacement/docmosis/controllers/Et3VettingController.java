@@ -41,7 +41,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/et3Vetting")
 @RestController
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class Et3VettingController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";

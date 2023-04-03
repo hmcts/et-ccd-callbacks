@@ -6,7 +6,6 @@ import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @Data
-@SuppressWarnings({"PMD.LinguisticNaming", "PMD.TooManyFields"})
 public class RespondentTellSomethingElseDocument {
     @JsonProperty("accessKey")
     private String accessKey;

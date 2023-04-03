@@ -20,8 +20,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.UnusedPrivateField",
-    "PMD.LiteralsFirstInComparisons"})
 public class ServingService {
     public static final String SERVING_DOCUMENT_OTHER_TYPE = "Another type of document";
     private static final String SERVING_RECIPIENT_CLAIMANT = "Claimant";

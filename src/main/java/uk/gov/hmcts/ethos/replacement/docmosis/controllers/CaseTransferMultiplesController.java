@@ -30,7 +30,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequestMapping("/caseTransferMultiples")
 @Slf4j
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class CaseTransferMultiplesController {
 
     private static final String LOG_MESSAGE = "{} received notification request for case reference : {}";

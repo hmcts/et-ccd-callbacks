@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
-@SuppressWarnings({"PMD.LinguisticNaming"})
 @SuperBuilder
 @Data
 public class RespondentTellSomethingElseData {

@@ -22,7 +22,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CREATE_ACTION;
 @Slf4j
 @RequiredArgsConstructor
 @Service("subMultipleUpdateService")
-@SuppressWarnings({"PMD.ConfusingTernary"})
 public class SubMultipleUpdateService {
 
     private final ExcelReadingService excelReadingService;

@@ -44,7 +44,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
-@SuppressWarnings({"PMD.ExcessiveImports"})
 class RespondNotificationServiceTest {
     private static final String CLAIMANT_EMAIL = "claimant@test.com";
     private static final String RESPONDENT_EMAIL = "repondent@test.com";

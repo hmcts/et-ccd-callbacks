@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
-@SuppressWarnings({"PMD.MissingSerialVersionUID"})
 public class BulkPreAcceptTask implements Runnable {
 
     private final BulkDetails bulkDetails;

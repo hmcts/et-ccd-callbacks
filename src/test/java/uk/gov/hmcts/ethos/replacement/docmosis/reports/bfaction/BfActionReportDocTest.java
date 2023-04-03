@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 
-@SuppressWarnings({"PMD.UseProperClassLoader"})
 public class BfActionReportDocTest {
     private BfActionReportDoc bfActionReportDoc;
     private String bfActionReportDocTestDateRangeResource;

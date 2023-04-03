@@ -123,7 +123,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SUPERUSER_E
  */
 @Component
 @Slf4j
-@SuppressWarnings({"PMD.ExcessiveImports"})
 public class CftlibConfig implements CFTLibConfigurer {
 
     @Value("${cftlib.import-ccd-defs-on-boot}")

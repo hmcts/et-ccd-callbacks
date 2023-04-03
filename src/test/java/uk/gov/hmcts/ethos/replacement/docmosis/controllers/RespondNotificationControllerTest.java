@@ -30,7 +30,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondNotificationController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.TooManyMethods"})
 class RespondNotificationControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";

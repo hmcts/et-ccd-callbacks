@@ -23,7 +23,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 
 @Slf4j
-@SuppressWarnings({"PMD.AvoidCatchingNPE"})
 public final class NocNotificationHelper {
 
     public static final String UNKNOWN = "Unknown";

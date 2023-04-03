@@ -34,7 +34,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ExtendWith(SpringExtension.class)
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.FieldNamingConventions"})
 class AddSingleCaseToMultipleServiceTest {
 
     @Mock

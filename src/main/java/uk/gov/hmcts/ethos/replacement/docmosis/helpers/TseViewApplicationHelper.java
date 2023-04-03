@@ -38,7 +38,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConst
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRule92;
 
 @Slf4j
-@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 public final class TseViewApplicationHelper {
 
     private static final String RESPONDENT_REPLY_MARKUP_FOR_REPLY =

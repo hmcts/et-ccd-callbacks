@@ -30,7 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({PseRespondToTribunalController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 class PseRespondToTribunalControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_START_URL = "/pseRespondToTribunal/aboutToStart";

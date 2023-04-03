@@ -22,7 +22,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 
-@SuppressWarnings({"PMD.TooManyMethods"})
 public class UpdateDataModelBuilderTest {
     CaseData caseData;
 

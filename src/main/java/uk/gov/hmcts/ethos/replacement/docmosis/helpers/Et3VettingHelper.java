@@ -44,13 +44,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConst
  * Docmosis in order to generate a document.
  */
 @Slf4j
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
-    "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
-    "PMD.GodClass", "PMD.ConfusingTernary", "PDM.CyclomaticComplexity",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.ClassNamingConventions",
-    "PMD.AvoidInstantiatingObjectsInLoops", "PMD.CognitiveComplexity", "PMD.PrematureDeclaration",
-    "PMD.LinguisticNaming", "PMD.InsufficientStringBufferDeclaration", "PMD.ConsecutiveLiteralAppends",
-    "PMD.LiteralsFirstInComparisons", "PMD.LawOfDemeter", "PMD.ExcessiveImports"})
 public class Et3VettingHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();

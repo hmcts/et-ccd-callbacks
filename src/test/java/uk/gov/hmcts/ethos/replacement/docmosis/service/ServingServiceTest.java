@@ -25,7 +25,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
-@SuppressWarnings({"PMD.UseProperClassLoader"})
 @ExtendWith(SpringExtension.class)
 class ServingServiceTest {
     private static CaseDetails caseDetails;

@@ -33,7 +33,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/respondNotification")
 @RestController
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class RespondNotificationController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";

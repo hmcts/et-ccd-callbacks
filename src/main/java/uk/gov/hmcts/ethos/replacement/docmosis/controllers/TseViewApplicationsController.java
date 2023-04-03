@@ -33,7 +33,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplication
 @RequestMapping("/viewRespondentTSEApplications")
 @RestController
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class TseViewApplicationsController {
 
     private final VerifyTokenService verifyTokenService;

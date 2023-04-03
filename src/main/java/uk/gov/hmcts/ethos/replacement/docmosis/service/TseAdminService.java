@@ -55,7 +55,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelec
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings({"squid:S1192", "PMD.AvoidInstantiatingObjectsInLoops", "PMD.ExcessiveImports", "PMD.TooManyMethods"})
 public class TseAdminService {
 
     @Value("${tse.admin.record-a-decision.notify.claimant.template.id}")

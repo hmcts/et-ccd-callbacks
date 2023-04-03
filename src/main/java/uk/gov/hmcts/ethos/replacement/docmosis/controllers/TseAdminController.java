@@ -31,7 +31,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/tseAdmin")
 @RestController
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class TseAdminController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";

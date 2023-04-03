@@ -34,8 +34,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.fin
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.HEARING_CREATION_DAY_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.HEARING_CREATION_NUMBER_ERROR;
 
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LawOfDemeter", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 public class HearingsHelperTest {
 
     private CaseDetails caseDetails1;

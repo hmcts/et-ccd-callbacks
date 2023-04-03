@@ -26,7 +26,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
-@SuppressWarnings({"PMD.LawOfDemeter"})
 public class BfActionReportTest {
     private List<SubmitEvent> submitEvents;
     private ListingDetails listingDetails;

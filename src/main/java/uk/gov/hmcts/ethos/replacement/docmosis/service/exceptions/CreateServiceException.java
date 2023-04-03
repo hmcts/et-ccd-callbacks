@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions;
 /**
  * Is thrown when create service fails.
  */
-@SuppressWarnings({"PMD.MissingSerialVersionUID"})
 public class CreateServiceException extends RuntimeException {
     /**
      * Creates a {@link CreateServiceException} with a message and a cause.

@@ -58,8 +58,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@SuppressWarnings({"PMD.TooManyFields", "PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.AvoidDuplicateLiterals",
-    "PMD.UnnecessaryAnnotationValueElement", "PMD.LawOfDemeter", "PMD.ConfusingTernary"})
 public class ExcelActionsController {
 
     private static final String LOG_MESSAGE = "received notification request for multiple reference : ";

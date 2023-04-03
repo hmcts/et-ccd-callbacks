@@ -17,7 +17,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 @RequiredArgsConstructor
 @RestController
 @Slf4j
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class StubApiController {
     private final VerifyTokenService verifyTokenService;
 

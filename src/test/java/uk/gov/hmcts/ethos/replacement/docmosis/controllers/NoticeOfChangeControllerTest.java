@@ -44,7 +44,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     VerifyTokenService.class,
     CcdCaseAssignment.class
 })
-@SuppressWarnings({"PMD.ExcessiveImports"})
 class NoticeOfChangeControllerTest {
 
     @MockBean

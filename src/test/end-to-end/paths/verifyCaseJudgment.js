@@ -22,4 +22,4 @@ Scenario('Verify Case Judgment when a Hearing is part of the Case', async ({I}) 
     await judgment(I, eventNames.JUDGMENT, true);
 
 
-}).tag('@nightly').tag('@RET-BAT').retry(testConfig.TestRetryScenarios);
+}).tag('@RET-WIP').retry(testConfig.TestRetryScenarios);

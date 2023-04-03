@@ -13,7 +13,7 @@ Scenario('Verify Case Judgment When a Hearing is not Done on the Case', async ({
 
 
 
-}).tag('@nightly').tag('@RET-BAT').tag('sc2').retry(testConfig.TestRetryScenarios);
+}).tag('@nightly').tag('@RET-BAT').retry(testConfig.TestRetryScenarios);
 
 Scenario('Verify Case Judgment when a Hearing is part of the Case', async ({I}) => {
 

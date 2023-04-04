@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -643,30 +645,18 @@ public class CaseManagementForCaseWorkerServiceTest {
         assertEquals(LISTED_DATE_ON_WEEKEND_MESSAGE + hearingNumber, errors.get(0));
     }
 
-    @Test
-    public void midEventAmendHearingDateInPast() {
+    @ParameterizedTest
+    @CsvSource({"Listed, Yes", "Heard, No"})
+    public void midEventAmendHearingDateInPast(String hearingStatus, String warning) {
         CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         DateListedType dateListedType = caseData.getHearingCollection().get(0)
                 .getValue().getHearingDateCollection()
                 .get(0).getValue();
         dateListedType.setListedDate("2022-03-19T12:11:00.000");
-        dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
+        dateListedType.setHearingStatus(hearingStatus);
         caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
-        assertEquals(YES, caseData.getListedDateInPastWarning());
-    }
-
-    @Test
-    public void midEventAmendHearingDateInPastStatusHeard() {
-        CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
-        List<String> errors = new ArrayList<>();
-        DateListedType dateListedType = caseData.getHearingCollection().get(0)
-                .getValue().getHearingDateCollection()
-                .get(0).getValue();
-        dateListedType.setListedDate("2022-03-19T12:11:00.000");
-        dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
-        caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
-        assertEquals(NO, caseData.getListedDateInPastWarning());
+        assertEquals(warning, caseData.getListedDateInPastWarning());
     }
 
     @Test

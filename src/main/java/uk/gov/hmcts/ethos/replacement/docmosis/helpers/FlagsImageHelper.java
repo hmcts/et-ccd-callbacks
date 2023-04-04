@@ -27,7 +27,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ZERO;
 
 @Slf4j
-public class FlagsImageHelper {
+public final class FlagsImageHelper {
 
     private static final String COLOR_ORANGE = "Orange";
     private static final String COLOR_LIGHT_BLACK = "LightBlack";

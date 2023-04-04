@@ -76,7 +76,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.NO_CHANG
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.RESPONDENTS_REPORT;
 
 @Slf4j
-public class ListingHelper {
+public final class ListingHelper {
 
     private static final String ROOM_NOT_ALLOCATED = "* Not Allocated";
     private static final String NO_DOCUMENT_FOUND = "No document found";

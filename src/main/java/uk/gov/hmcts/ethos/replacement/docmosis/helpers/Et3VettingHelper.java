@@ -44,7 +44,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConst
  * Docmosis in order to generate a document.
  */
 @Slf4j
-public class Et3VettingHelper {
+public final class Et3VettingHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-01145.docx";

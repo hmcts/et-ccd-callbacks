@@ -31,7 +31,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 
 @Slf4j
-public class ReportHelper {
+public final class ReportHelper {
 
     public static final String CASES_SEARCHED = "Cases searched: ";
     private static final String SPACE = " ";

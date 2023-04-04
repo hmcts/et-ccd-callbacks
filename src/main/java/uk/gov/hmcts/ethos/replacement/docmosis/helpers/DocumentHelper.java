@@ -51,7 +51,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
-public class DocumentHelper {
+public final class DocumentHelper {
     private DocumentHelper() {
     }
 
@@ -676,7 +676,7 @@ public class DocumentHelper {
         String sectionName = getEWSectionName(correspondence);
         StringBuilder sb = new StringBuilder();
         if (!sectionName.equals("")) {
-            sb.append("\"").append("t").append(sectionName.replace(".", "_"))
+            sb.append('"').append('t').append(sectionName.replace(".", "_"))
                     .append("\":\"").append("true").append(NEW_LINE);
         }
         return sb;
@@ -687,7 +687,7 @@ public class DocumentHelper {
         String scotSectionName = getScotSectionName(correspondenceScotType);
         StringBuilder sb = new StringBuilder();
         if (!scotSectionName.equals("")) {
-            sb.append("\"").append("t_Scot_").append(scotSectionName.replace(".", "_"))
+            sb.append('"').append("t_Scot_").append(scotSectionName.replace(".", "_"))
                     .append("\":\"").append("true").append(NEW_LINE);
         }
         return sb;
@@ -793,7 +793,7 @@ public class DocumentHelper {
 
             if (pageLabelNumber == 1 || startingLabelAboveOne) {
                 startingLabelAboveOne = false;
-                sb.append("{");
+                sb.append('{');
             }
 
             String templateLabelNumber = pageLabelNumber < 10
@@ -801,7 +801,7 @@ public class DocumentHelper {
             sb.append(getAddressLabel(copiedAddressLabelCollection.get(i).getValue(), templateLabelNumber, showTelFax));
 
             if (pageLabelNumber == ADDRESS_LABELS_PAGE_SIZE || i == copiedAddressLabelCollection.size() - 1) {
-                sb.append("}");
+                sb.append('}');
             }
 
             if (i != copiedAddressLabelCollection.size() - 1) {
@@ -815,16 +815,16 @@ public class DocumentHelper {
     private static StringBuilder getAddressLabel(AddressLabelType addressLabelType,
                                                  String labelNumber, String showTelFax) {
         StringBuilder sb = new StringBuilder();
-        sb.append("\"").append(LABEL).append(labelNumber).append("_Entity_Name_01\":\"")
+        sb.append('"').append(LABEL).append(labelNumber).append("_Entity_Name_01\":\"")
                 .append(nullCheck(addressLabelType.getLabelEntityName01())).append(NEW_LINE);
-        sb.append("\"").append(LABEL).append(labelNumber).append("_Entity_Name_02\":\"")
+        sb.append('"').append(LABEL).append(labelNumber).append("_Entity_Name_02\":\"")
                 .append(nullCheck(addressLabelType.getLabelEntityName02())).append(NEW_LINE);
         sb.append(getAddressLines(addressLabelType, labelNumber));
         sb.append(getTelFaxLine(addressLabelType, labelNumber, showTelFax));
-        sb.append("\"").append(LBL).append(labelNumber).append("_Eef\":\"")
+        sb.append('"').append(LBL).append(labelNumber).append("_Eef\":\"")
                 .append(nullCheck(addressLabelType.getLabelEntityReference())).append(NEW_LINE);
-        sb.append("\"").append(LBL).append(labelNumber).append("_Cef\":\"")
-                .append(nullCheck(addressLabelType.getLabelCaseReference())).append("\"");
+        sb.append('"').append(LBL).append(labelNumber).append("_Cef\":\"")
+                .append(nullCheck(addressLabelType.getLabelCaseReference())).append('"');
         return sb;
     }
 
@@ -881,7 +881,7 @@ public class DocumentHelper {
     private static StringBuilder getAddressLine(String addressLine, String labelNumber, int lineNum) {
         StringBuilder sb = new StringBuilder();
         String lineNumber = "0" + lineNum;
-        sb.append("\"").append(LABEL).append(labelNumber).append("_Address_Line_").append(lineNumber)
+        sb.append('"').append(LABEL).append(labelNumber).append("_Address_Line_").append(lineNumber)
                 .append("\":\"").append(addressLine).append(NEW_LINE);
         return sb;
     }
@@ -907,8 +907,8 @@ public class DocumentHelper {
                 }
             }
 
-            sb.append("\"").append(LABEL).append(labelNumber).append("_Telephone\":\"").append(tel).append(NEW_LINE);
-            sb.append("\"").append(LABEL).append(labelNumber).append("_Fax\":\"").append(fax).append(NEW_LINE);
+            sb.append('"').append(LABEL).append(labelNumber).append("_Telephone\":\"").append(tel).append(NEW_LINE);
+            sb.append('"').append(LABEL).append(labelNumber).append("_Fax\":\"").append(fax).append(NEW_LINE);
         }
         return sb;
     }

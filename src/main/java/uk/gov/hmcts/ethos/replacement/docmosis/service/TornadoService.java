@@ -313,7 +313,7 @@ public class TornadoService {
                                           String caseTypeId)
             throws IOException {
         if (isNullOrEmpty(documentName)) {
-            throw new NullPointerException("Document name cannot be null or empty");
+            throw new IllegalArgumentException("Document name cannot be null or empty");
         }
         String documentContent = getDocumentContent(caseData, documentName, caseTypeId);
 

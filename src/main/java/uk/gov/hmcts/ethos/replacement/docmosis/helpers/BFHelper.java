@@ -17,7 +17,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
 
 @Slf4j
-public class BFHelper {
+public final class BFHelper {
 
     private BFHelper() {
     }

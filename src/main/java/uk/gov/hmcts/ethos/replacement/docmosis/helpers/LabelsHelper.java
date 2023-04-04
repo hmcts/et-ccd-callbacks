@@ -47,7 +47,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getActiveRe
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
 @Slf4j
-public class LabelsHelper {
+public final class LabelsHelper {
 
     public static final int MAX_NUMBER_LABELS = 2000;
     public static final String ADDRESS_LABELS_RESULT_SELECTION_ERROR =

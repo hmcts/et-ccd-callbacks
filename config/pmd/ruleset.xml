@@ -22,11 +22,12 @@
         <exclude name="DefaultPackage"/>
         <exclude name="CommentDefaultAccessModifier"/>
         <exclude name="ShortClassName"/>
+        <exclude name="ExcessiveImports"/>
     </rule>
     <rule ref="category/java/codestyle.xml/ClassNamingConventions">
         <properties>
             <!-- same as any other class -->
-            <property name="utilityClassPattern" value="[A-Z][a-zA-Z]+"/>
+            <property name="utilityClassPattern" value="[A-Z][a-zA-Z0-9]+"/>
         </properties>
     </rule>
     <rule ref="category/java/codestyle.xml/MethodNamingConventions">

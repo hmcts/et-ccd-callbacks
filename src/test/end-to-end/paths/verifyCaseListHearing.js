@@ -4,7 +4,7 @@ const {listHearing} = require("../helpers/caseHelper");
 const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 
 
-Feature('Create a Leeds Single Case & Execute List Hearing');
+Feature('Create a Single Case & Execute List Hearing');
 
 Scenario('Verify Leeds case List Hearing', async ({I}) => {
 

@@ -3,7 +3,7 @@ const {eventNames} = require('../pages/common/constants.js');
 const {jurisdiction} = require("../helpers/caseHelper");
 const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 
-Feature('Leeds Office Singles Case & Execute Jurisdiction Event');
+Feature('Office Singles Case & Execute Jurisdiction Event');
 
 Scenario('Verify Jurisdiction', async ({I}) => {
 

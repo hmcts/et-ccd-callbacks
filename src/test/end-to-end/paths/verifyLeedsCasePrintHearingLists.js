@@ -3,7 +3,7 @@ const {eventNames} = require('../pages/common/constants.js');
 const {listHearing, allocateHearing, printHearingLists} = require("../helpers/caseHelper");
 const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 
-Feature('Create a Leeds Single Case & Execute Print Hearing Lists');
+Feature('Create Single Case & Execute Print Hearing Lists');
 
 Scenario('Verify Print Hearing Lists', async ({I}) => {
 

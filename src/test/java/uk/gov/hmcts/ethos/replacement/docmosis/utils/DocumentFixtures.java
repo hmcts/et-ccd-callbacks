@@ -5,8 +5,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.util.UUID;
 
-public class DocumentFixtures {
-    public DocumentFixtures() {
+public final class DocumentFixtures {
+    private DocumentFixtures() {
         // Access through static methods
     }
 

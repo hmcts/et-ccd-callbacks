@@ -99,7 +99,7 @@ class Et3ResponseServiceTest {
                 List.of(DocumentTypeItem.fromUploadedDocument(DocumentFixtures.getUploadedDocumentType("claim.docx")))
         );
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
-        assertThat(caseData.getDocumentCollection().size(), is( 1));
+        assertThat(caseData.getDocumentCollection().size(), is(1));
     }
 
     @Test
@@ -109,6 +109,6 @@ class Et3ResponseServiceTest {
         );
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
-        assertThat(caseData.getDocumentCollection().size(), is( 1));
+        assertThat(caseData.getDocumentCollection().size(), is(1));
     }
 }

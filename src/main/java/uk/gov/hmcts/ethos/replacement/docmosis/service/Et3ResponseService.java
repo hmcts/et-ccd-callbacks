@@ -76,7 +76,7 @@ public class Et3ResponseService {
             if (documents.stream().anyMatch(x -> x.getId().equals(o.getId()))) {
                 return;
             }
-            caseData.getDocumentCollection().add(o);
+            documents.add(o);
         });
 
         if (caseData.getEt3ResponseEmployerClaimDocument() != null) {

@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -72,12 +73,14 @@ public class Et3ResponseService {
 
         List<DocumentTypeItem> documents = caseData.getDocumentCollection();
 
-        caseData.getEt3ResponseContestClaimDocument().forEach(o -> {
-            if (documents.stream().anyMatch(x -> x.getId().equals(o.getId()))) {
-                return;
-            }
-            documents.add(o);
-        });
+        Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
+                .orElse(List.of())
+                .forEach(o -> {
+                    if (documents.stream().anyMatch(x -> x.getId().equals(o.getId()))) {
+                        return;
+                    }
+                    documents.add(o);
+                });
 
         if (caseData.getEt3ResponseEmployerClaimDocument() != null) {
             documents.add(DocumentTypeItem.fromUploadedDocument(caseData.getEt3ResponseEmployerClaimDocument()));

@@ -33,7 +33,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -43,7 +42,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -60,6 +58,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -642,6 +641,32 @@ public class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
         assertFalse(errors.isEmpty());
         assertEquals(LISTED_DATE_ON_WEEKEND_MESSAGE + hearingNumber, errors.get(0));
+    }
+
+    @Test
+    public void midEventAmendHearingDateInPast() {
+        CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
+        List<String> errors = new ArrayList<>();
+        DateListedType dateListedType = caseData.getHearingCollection().get(0)
+                .getValue().getHearingDateCollection()
+                .get(0).getValue();
+        dateListedType.setListedDate("2022-03-19T12:11:00.000");
+        dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
+        caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
+        assertEquals(YES, caseData.getListedDateInPastWarning());
+    }
+
+    @Test
+    public void midEventAmendHearingDateInPastStatusHeard() {
+        CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
+        List<String> errors = new ArrayList<>();
+        DateListedType dateListedType = caseData.getHearingCollection().get(0)
+                .getValue().getHearingDateCollection()
+                .get(0).getValue();
+        dateListedType.setListedDate("2022-03-19T12:11:00.000");
+        dateListedType.setHearingStatus(HEARING_STATUS_HEARD);
+        caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
+        assertEquals(NO, caseData.getListedDateInPastWarning());
     }
 
     @Test

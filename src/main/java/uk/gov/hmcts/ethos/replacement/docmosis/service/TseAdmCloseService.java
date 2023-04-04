@@ -113,7 +113,8 @@ public class TseAdmCloseService {
     }
 
     private String getAdditionInfoMarkdown(TseAdminRecordDecisionTypeItem decision) {
-        return decision.getValue().getAdditionalInformation() == null ? ""
+        return decision.getValue().getAdditionalInformation() == null
+            ? ""
             : String.format(ADDITIONAL_INFORMATION, decision.getValue().getAdditionalInformation());
     }
 

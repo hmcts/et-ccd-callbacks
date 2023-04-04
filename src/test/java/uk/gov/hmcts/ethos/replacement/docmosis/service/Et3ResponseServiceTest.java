@@ -7,10 +7,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -73,5 +76,39 @@ class Et3ResponseServiceTest {
     void assertThatEt3DocumentIsSaved() {
         et3ResponseService.saveEt3ResponseDocument(caseData, documentInfo);
         assertThat(caseData.getDocumentCollection().size(), is(1));
+    }
+
+    @Test
+    void saveRelatedDocumentsToDocumentCollection_savesAllDocuments() {
+        caseData.setEt3ResponseEmployerClaimDocument(
+                DocumentFixtures.getUploadedDocumentType("ecc.docx")
+        );
+        caseData.setEt3ResponseRespondentSupportDocument(
+                DocumentFixtures.getUploadedDocumentType("support.docx")
+        );
+        caseData.setEt3ResponseContestClaimDocument(
+                List.of(DocumentTypeItem.fromUploadedDocument(DocumentFixtures.getUploadedDocumentType("claim.docx")))
+        );
+        et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
+        assertThat(caseData.getDocumentCollection().size(), is(3));
+    }
+
+    @Test
+    void saveRelatedDocumentsToDocumentCollection_doesNotSaveNullDocuments() {
+        caseData.setEt3ResponseContestClaimDocument(
+                List.of(DocumentTypeItem.fromUploadedDocument(DocumentFixtures.getUploadedDocumentType("claim.docx")))
+        );
+        et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
+        assertThat(caseData.getDocumentCollection().size(), is( 1));
+    }
+
+    @Test
+    void saveRelatedDocumentsToDocumentCollection_doesNotSaveSameDocumentTwice() {
+        caseData.setEt3ResponseContestClaimDocument(
+                List.of(DocumentTypeItem.fromUploadedDocument(DocumentFixtures.getUploadedDocumentType("claim.docx")))
+        );
+        et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
+        et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
+        assertThat(caseData.getDocumentCollection().size(), is( 1));
     }
 }

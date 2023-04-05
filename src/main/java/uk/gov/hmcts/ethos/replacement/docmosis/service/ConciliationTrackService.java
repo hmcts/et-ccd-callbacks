@@ -33,6 +33,7 @@ public class ConciliationTrackService {
                     break;
                 default:
                     caseData.setConciliationTrack(null);
+                    break;
             }
         } else {
             caseData.setConciliationTrack(null);

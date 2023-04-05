@@ -360,6 +360,7 @@ public class CaseManagementForCaseWorkerService {
                     default:
                         sendUpdateSingleCaseECC(authToken, caseDetails, submitEvent.getCaseData(),
                                 String.valueOf(submitEvent.getCaseId()));
+                        break;
                 }
             }
         } else {

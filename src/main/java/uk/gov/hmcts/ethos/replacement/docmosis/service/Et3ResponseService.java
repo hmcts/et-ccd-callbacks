@@ -8,6 +8,7 @@ import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
@@ -49,13 +50,9 @@ public class Et3ResponseService {
      */
     public void saveEt3ResponseDocument(CaseData caseData, DocumentInfo documentInfo) {
         UploadedDocumentType uploadedDocument = documentManagementService.addDocumentToDocumentField(documentInfo);
-        DocumentType documentType = new DocumentType();
-        documentType.setUploadedDocument(uploadedDocument);
-        documentType.setTypeOfDocument("ET3");
 
-        DocumentTypeItem documentTypeItem = new DocumentTypeItem();
-        documentTypeItem.setValue(documentType);
-        documentTypeItem.setId(UUID.randomUUID().toString());
+        DocumentTypeItem documentTypeItem = DocumentTypeItem.fromUploadedDocument(uploadedDocument);
+        documentTypeItem.getValue().setTypeOfDocument("ET3");
 
         if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
             caseData.setDocumentCollection(new ArrayList<>());

@@ -45,7 +45,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEAR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 
 class ReferralHelperTest {
-    private UserService userService;
     private CaseData caseData;
     private static final String JUDGE_ROLE_ENG = "caseworker-employment-etjudge-englandwales";
     private static final String JUDGE_ROLE_SCOT = "caseworker-employment-etjudge-scotland";
@@ -121,13 +120,6 @@ class ReferralHelperTest {
 
     @BeforeEach
     void setUp() {
-        userService = mock(UserService.class);
-        UserDetails userDetails = new UserDetails();
-        userDetails.setFirstName("Judge");
-        userDetails.setLastName("Judy");
-        userDetails.setEmail("judge.judy@aol.com");
-        userDetails.setRoles(new ArrayList<>(Arrays.asList(JUDGE_ROLE_ENG, JUDGE_ROLE_SCOT)));
-        when(userService.getUserDetails("")).thenReturn(userDetails);
         caseData = CaseDataBuilder.builder().build();
         caseData.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
         addHearingToCaseData(caseData);
@@ -178,10 +170,10 @@ class ReferralHelperTest {
         String expected = "ReferralType(referralNumber=1, referralHearingDate=11 Nov 2030, referCaseTo=Judge Judy, re"
             + "ferentE"
             + "mail=judge.judy@aol.com, isUrgent=Yes, referralSubject=Subject line here, referralSubjectSpecify=Cust"
-            + "om subject line, referralDetails=This is an explanation, referralDocument=[DocumentTypeItem(id=1, value"
+            + "om subject line, referralDetails=This is an explanation, referralDocument=[GenericTypeItem(id=1, value"
             + "=DocumentType(typeOfDocument=null, uploadedDocument=UploadedDocumentType(documentBinaryUrl=binaryUrl/d"
             + "ocuments/, documentFilename=testFileName, documentUrl=null), ownerDocument=null, creationDate=null, sho"
-            + "rtDescription=null)), DocumentTypeItem(id=2, value=DocumentType(typeOfDocument=null, uploadedDocument=U"
+            + "rtDescription=null)), GenericTypeItem(id=2, value=DocumentType(typeOfDocument=null, uploadedDocument=U"
             + "ploadedDocumentType(documentBinaryUrl=binaryUrl/documents/, documentFilename=testFileName, documentUrl="
             + "null), ownerDocument=null, creationDate=null, shortDescription=null))], referralInstruction=Custom inst"
             + "ructions for judge, referredBy=Judge Judy, referralDate="

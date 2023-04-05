@@ -75,7 +75,7 @@ public class MultipleTransferServiceTest {
 
     @Before
     public void setUp() {
-        ccdGatewayBaseUrl = null;
+        ccdGatewayBaseUrl = null; //NOPMD - suppressed NullAssignment - Null is intentional
         multipleObjects = MultipleUtil.getMultipleObjectsAll();
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID);

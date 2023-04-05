@@ -126,6 +126,7 @@ public final class FlagsImageHelper {
             default:
                 flagRequired = false;
                 flagColor = COLOR_WHITE;
+                break;
         }
         flagsImageFileName.append(flagRequired ? ONE : ZERO);
         flagsImageAltText.append(flagRequired && flagsImageAltText.length() > 0 ? "<font size='5'> - </font>" : "");

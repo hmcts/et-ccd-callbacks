@@ -5,7 +5,6 @@ LABEL maintainer="https://github.com/hmcts/et-ccd-callbacks"
 COPY lib/AI-Agent.xml /opt/app/
 COPY build/libs/et-cos.jar /opt/app/
 
-CMD ["et-cos.jar"]
 
 FROM debian:10 AS builder
 

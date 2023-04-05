@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Service to support ET3 Response journey. Contains methods for generating and saving ET3 Response documents.
@@ -73,11 +74,13 @@ public class Et3ResponseService {
 
         List<DocumentTypeItem> documents = caseData.getDocumentCollection();
 
-        Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
+        documents.addAll(
+                Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
                 .orElse(List.of())
                 .stream()
                 .filter(o -> documents.stream().noneMatch(x -> x.getId().equals(o.getId())))
-                .forEach(documents::add);
+                .collect(Collectors.toList())
+        );
 
         if (caseData.getEt3ResponseEmployerClaimDocument() != null) {
             documents.add(DocumentTypeItem.fromUploadedDocument(caseData.getEt3ResponseEmployerClaimDocument()));

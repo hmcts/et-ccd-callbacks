@@ -4,7 +4,7 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.0.14.RELEASE'
-    id 'org.springframework.boot' version '2.7.4'
+    id 'org.springframework.boot' version '2.7.10'
     id 'org.owasp.dependencycheck' version '8.0.1'
     id 'com.github.ben-manes.versions' version '0.42.0'
     id 'au.com.dius.pact' version '4.3.15'
@@ -296,8 +296,7 @@ dependencyManagement {
 dependencies {
 
     implementation group: 'com.github.hmcts', name: 'et-common', version:'1.0.14'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'1.7.1'
-
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'1.13.1'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLoggingVersion

@@ -13,9 +13,10 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -76,14 +77,15 @@ public class Et3ResponseService {
 
         List<DocumentTypeItem> documents = caseData.getDocumentCollection();
 
-        Map<String, DocumentType> documentMap = documents.stream()
-                .collect(Collectors.toMap(GenericTypeItem::getId, GenericTypeItem::getValue));
+        Set<String> documentSet = documents.stream()
+                .map(GenericTypeItem::getId)
+                .collect(Collectors.toCollection(HashSet::new));
 
         documents.addAll(
                 Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
                 .orElse(List.of())
                 .stream()
-                .filter(o -> !documentMap.containsKey(o.getId()))
+                .filter(o -> !documentSet.contains(o.getId()))
                 .collect(Collectors.toList())
         );
 

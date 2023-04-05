@@ -8,11 +8,13 @@ import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -74,11 +76,14 @@ public class Et3ResponseService {
 
         List<DocumentTypeItem> documents = caseData.getDocumentCollection();
 
+        Map<String, DocumentType> documentMap = documents.stream()
+                .collect(Collectors.toMap(GenericTypeItem::getId, GenericTypeItem::getValue));
+
         documents.addAll(
                 Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
                 .orElse(List.of())
                 .stream()
-                .filter(o -> documents.stream().noneMatch(x -> x.getId().equals(o.getId())))
+                .filter(o -> !documentMap.containsKey(o.getId()))
                 .collect(Collectors.toList())
         );
 

@@ -6,16 +6,20 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import java.util.UUID;
 
 public final class DocumentFixtures {
+
+    public static final String MOCK_DM_STORE_URL = "http://dm-store:8080/%s";
+
     private DocumentFixtures() {
         // Access through static methods
     }
 
     public static UploadedDocumentType getUploadedDocumentType(String documentName) {
         String uuid = UUID.randomUUID().toString();
+        String url = String.format(MOCK_DM_STORE_URL, uuid);
         return UploadedDocumentType.builder()
-                .documentBinaryUrl("http://dm-store:8080/" + uuid + "/binary")
+                .documentBinaryUrl(url)
                 .documentFilename(documentName)
-                .documentUrl("http://dm-store:8080/" + uuid)
+                .documentUrl(url)
                 .build();
     }
 

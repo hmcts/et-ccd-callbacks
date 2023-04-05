@@ -6,7 +6,7 @@ COPY lib/AI-Agent.xml /opt/app/
 COPY build/libs/et-cos.jar /opt/app/
 
 
-FROM debian:10 AS builder
+FROM debian:11 AS builder
 
 USER root
 RUN apt update

@@ -75,12 +75,9 @@ public class Et3ResponseService {
 
         Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
                 .orElse(List.of())
-                .forEach(o -> {
-                    if (documents.stream().anyMatch(x -> x.getId().equals(o.getId()))) {
-                        return;
-                    }
-                    documents.add(o);
-                });
+                .stream()
+                .filter(o -> documents.stream().noneMatch(x -> x.getId().equals(o.getId())))
+                .forEach(documents::add);
 
         if (caseData.getEt3ResponseEmployerClaimDocument() != null) {
             documents.add(DocumentTypeItem.fromUploadedDocument(caseData.getEt3ResponseEmployerClaimDocument()));

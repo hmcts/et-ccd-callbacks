@@ -178,6 +178,7 @@ public class Et3ResponseController {
         DocumentInfo documentInfo = et3ResponseService.generateEt3ResponseDocument(caseData, userToken,
             ccdRequest.getCaseDetails().getCaseTypeId());
         et3ResponseService.saveEt3ResponseDocument(caseData, documentInfo);
+        et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
         Et3ResponseHelper.addEt3DataToRespondent(caseData);
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
         Et3ResponseHelper.resetEt3FormFields(caseData);

@@ -72,9 +72,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.NcssCount", "PMD.AvoidInstantiatingObjectsInLoops",
     "PMD.UseProperClassLoader", "PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.ExcessivePublicCount",
-                   "PMD.TooManyFields"})
+                   "PMD.TooManyFields", "PMD.CyclomaticComplexity"})
 @RunWith(SpringJUnit4ClassRunner.class)
-public class CaseManagementForCaseWorkerServiceTest {
+class CaseManagementForCaseWorkerServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     public static final String UNASSIGNED_OFFICE = "Unassigned";
@@ -161,7 +161,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         eccCounterClaimTypeItem.setId(UUID.randomUUID().toString());
         eccCounterClaimTypeItem.setValue(counterClaimType);
         CaseDetails manchesterCaseDetails = new CaseDetails();
-        caseData.setEccCases(Arrays.asList(eccCounterClaimTypeItem));
+        caseData.setEccCases(List.of(eccCounterClaimTypeItem));
         caseData.setRespondentECC(createRespondentECC());
         manchesterCaseDetails.setCaseData(caseData);
         manchesterCaseDetails.setCaseId("123456");
@@ -576,7 +576,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = ccdRequest21.getCaseDetails().getCaseData();
         caseData.setHearingCollection(null);
         caseManagementForCaseWorkerService.amendHearing(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        assertEquals(null, caseData.getHearingCollection());
+        assertNull(caseData.getHearingCollection());
     }
 
     @Test
@@ -584,7 +584,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = ccdRequest21.getCaseDetails().getCaseData();
         caseData.getHearingCollection().get(0).getValue().setHearingDateCollection(null);
         caseManagementForCaseWorkerService.amendHearing(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        assertEquals(null, caseData.getHearingCollection().get(0).getValue().getHearingDateCollection());
+        assertNull(caseData.getHearingCollection().get(0).getValue().getHearingDateCollection());
     }
 
     @Test
@@ -610,7 +610,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         caseData.setHearingCollection(null);
         List<String> errors = new ArrayList<>();
         caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
-        assertEquals(null, caseData.getHearingCollection());
+        assertNull(caseData.getHearingCollection());
     }
 
     @Test
@@ -619,7 +619,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         caseData.getHearingCollection().get(0).getValue().setHearingDateCollection(null);
         List<String> errors = new ArrayList<>();
         caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
-        assertEquals(null, caseData.getHearingCollection().get(0).getValue().getHearingDateCollection());
+        assertNull(caseData.getHearingCollection().get(0).getValue().getHearingDateCollection());
     }
 
     @Test
@@ -872,7 +872,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseData.setClaimServedDate("");
         caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
-        assertEquals(null, caseData.getEt3DueDate());
+        assertNull(caseData.getEt3DueDate());
     }
 
     @Test

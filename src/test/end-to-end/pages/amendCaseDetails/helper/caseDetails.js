@@ -35,7 +35,7 @@ function verifyCaseDetails() {
     I.see('Submission Reference');
     I.see('1675930663464973');
     I.see('Date of Receipt');
-    I.see('17 Aug 2022');
+    I.see('17 Aug 2019');
 
     I.see('Case Accepted?');
     I.see('Yes');

@@ -231,6 +231,7 @@ public class Et1VettingService {
         }
     }
 
+    @SuppressWarnings({"checkstyle:FallThrough"}) // This is intentional as it acts like a loop
     private void populateRespondentAcasDetailsMarkUp(CaseData caseData) {
         List<RespondentSumTypeItem> respondentList = caseData.getRespondentCollection();
         switch (respondentList.size()) {

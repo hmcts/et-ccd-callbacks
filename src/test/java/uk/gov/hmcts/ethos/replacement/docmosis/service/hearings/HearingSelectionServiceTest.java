@@ -8,9 +8,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
-
 import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -25,11 +23,11 @@ public class HearingSelectionServiceTest {
 
         assertEquals(3, actualResult.size());
         assertEquals("id1", actualResult.get(0).getCode());
-        assertEquals("Hearing 1, 1 January 1970 10:00", actualResult.get(0).getLabel());
-        assertEquals("id2", actualResult.get(1).getCode());
-        assertEquals("Hearing 1, 2 January 1970 10:00", actualResult.get(1).getLabel());
-        assertEquals("id3", actualResult.get(2).getCode());
-        assertEquals("Hearing 2, 3 January 1970 10:00", actualResult.get(2).getLabel());
+        assertEquals("Hearing 2", actualResult.get(0).getLabel());
+        assertEquals("id5", actualResult.get(1).getCode());
+        assertEquals("Hearing 1", actualResult.get(1).getLabel());
+        assertEquals("id6", actualResult.get(2).getCode());
+        assertEquals("Hearing 2", actualResult.get(2).getLabel());
     }
 
     @Test
@@ -39,10 +37,10 @@ public class HearingSelectionServiceTest {
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
         HearingType selectedHearing = hearingSelectionService.getSelectedHearing(caseData,
             new DynamicFixedListType("id1"));
+        assertEquals("2", selectedHearing.getHearingNumber());
+        selectedHearing = hearingSelectionService.getSelectedHearing(caseData, new DynamicFixedListType("id5"));
         assertEquals("1", selectedHearing.getHearingNumber());
-        selectedHearing = hearingSelectionService.getSelectedHearing(caseData, new DynamicFixedListType("id2"));
-        assertEquals("1", selectedHearing.getHearingNumber());
-        selectedHearing = hearingSelectionService.getSelectedHearing(caseData, new DynamicFixedListType("id3"));
+        selectedHearing = hearingSelectionService.getSelectedHearing(caseData, new DynamicFixedListType("id6"));
         assertEquals("2", selectedHearing.getHearingNumber());
     }
 
@@ -59,23 +57,24 @@ public class HearingSelectionServiceTest {
     @Test
     public void getSelectedListing() {
         CaseData caseData = createCaseData();
-
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
-        DateListedType selectedListing = hearingSelectionService.getSelectedListing(caseData,
-            new DynamicFixedListType("id1"));
+        caseData.setAllocateHearingHearing(new DynamicFixedListType("id1"));
+        DateListedType selectedListing = hearingSelectionService.getSelectedListing(caseData);
         assertEquals("1970-01-01T10:00:00.000", selectedListing.getListedDate());
-        selectedListing = hearingSelectionService.getSelectedListing(caseData, new DynamicFixedListType("id2"));
-        assertEquals("1970-01-02T10:00:00.000", selectedListing.getListedDate());
-        selectedListing = hearingSelectionService.getSelectedListing(caseData, new DynamicFixedListType("id3"));
+        caseData.setAllocateHearingHearing(new DynamicFixedListType("id2"));
+        selectedListing = hearingSelectionService.getSelectedListing(caseData);
+        assertEquals("1970-01-03T10:00:00.000", selectedListing.getListedDate());
+        caseData.setAllocateHearingHearing(new DynamicFixedListType("id3"));
+        selectedListing = hearingSelectionService.getSelectedListing(caseData);
         assertEquals("1970-01-03T10:00:00.000", selectedListing.getListedDate());
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testGetSelectedListingNotFound() {
+    public void testGetListingsNotFound() {
         CaseData caseData = createCaseData();
-
         HearingSelectionService hearingSelectionService = new HearingSelectionService();
-        hearingSelectionService.getSelectedListing(caseData, new DynamicFixedListType("id4"));
+        caseData.setAllocateHearingHearing(new DynamicFixedListType("id4"));
+        hearingSelectionService.getSelectedListing(caseData);
         fail("No listing should be found");
     }
 
@@ -83,9 +82,9 @@ public class HearingSelectionServiceTest {
         CaseData caseData = new CaseData();
 
         List<HearingTypeItem> hearings = List.of(
-                createHearing("1", List.of(createListing("id1", "1970-01-01T10:00:00.000"),
-                        createListing("id2", "1970-01-02T10:00:00.000"))),
-                createHearing("2", List.of(createListing("id3", "1970-01-03T10:00:00.000")))
+                createHearing("id1", "2", List.of(createListing("id2", "1970-01-03T10:00:00.000"))),
+                createHearing("id5", "1", List.of(createListing("id1", "1970-01-01T10:00:00.000"))),
+                createHearing("id6", "2", List.of(createListing("id3", "1970-01-03T10:00:00.000")))
         );
 
         caseData.setHearingCollection(hearings);
@@ -93,11 +92,12 @@ public class HearingSelectionServiceTest {
         return caseData;
     }
 
-    private HearingTypeItem createHearing(String hearingNumber, List<DateListedTypeItem> listings) {
+    private HearingTypeItem createHearing(String id, String hearingNumber, List<DateListedTypeItem> listings) {
         HearingType hearing = new HearingType();
         hearing.setHearingNumber(hearingNumber);
         hearing.setHearingDateCollection(listings);
         HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        hearingTypeItem.setId(id);
         hearingTypeItem.setValue(hearing);
         return hearingTypeItem;
     }

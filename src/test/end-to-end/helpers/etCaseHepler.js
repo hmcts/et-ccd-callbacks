@@ -278,7 +278,7 @@ async function listTheCaseEvent(authToken, serviceToken, case_id, userId) {
     let startListingResponse = await I.sendGetRequest(initiateListUrl, startListEventHeaders);
     expect(startListingResponse.status).to.eql(200);
     let listEventToken = startListingResponse.data.token;
-    const date = new Date(new Date().setHours(0, 0, 0, 0));
+    const date = new Date(new Date().setUTCHours(0, 0, 0, 0));
     switch (date.getDay()) {
         case 0: //Sunday
             date.setDate(date.getDate() + 1);
@@ -581,6 +581,27 @@ async function processCaseToAcceptedWithAJurisdiction() {
     return case_id;
 }
 
+async function processCaseToListedStateWithAJursdiction() {
+
+    // Login to IDAM to get the authentication token
+    const authToken = await getAuthToken();
+    const serviceToken = await getS2SServiceToken();
+
+    //Getting the User Id based on the Authentication Token that is passed for this User.
+    const userId = await getUserDetails(authToken);
+    const case_id = await createACase(authToken, serviceToken, userId);
+    await performCaseVettingEvent(authToken, serviceToken, case_id);
+
+    //Initiate accept case
+    await acceptTheCaseEvent(authToken, serviceToken, case_id);
+    await listTheCaseEvent(authToken, serviceToken, case_id, userId);
+    await jurisdictionToTheCaseEvent(authToken, serviceToken, case_id, userId);
+
+    //Navigate to the Case Detail Page
+    await navigateToCaseDetailsScreen(case_id);
+    return case_id;
+}
+
 
 
 module.exports = {
@@ -589,5 +610,6 @@ module.exports = {
     processCaseToAcceptedState,
     processCaseToRejectedState,
     processCaseToListedState,
-    processCaseToAcceptedWithAJurisdiction
+    processCaseToAcceptedWithAJurisdiction,
+    processCaseToListedStateWithAJursdiction
 };

@@ -467,7 +467,7 @@ class PseRespondToTribunalServiceTest {
 
         DateListedType selectedListing = new DateListedType();
         selectedListing.setListedDate("2023-12-25T12:00:00.000");
-        when(hearingSelectionService.getSelectedListing(isA(CaseData.class),
+        when(hearingSelectionService.getSelectedListingWithList(isA(CaseData.class),
             isA(DynamicFixedListType.class))).thenReturn(selectedListing);
 
         ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailNoTemplateId", TEMPLATE_ID);
@@ -551,7 +551,7 @@ class PseRespondToTribunalServiceTest {
 
         DateListedType selectedListing = new DateListedType();
         selectedListing.setListedDate("2023-12-25T12:00:00.000");
-        when(hearingSelectionService.getSelectedListing(isA(CaseData.class),
+        when(hearingSelectionService.getSelectedListingWithList(isA(CaseData.class),
             isA(DynamicFixedListType.class))).thenReturn(selectedListing);
 
         ReflectionTestUtils.setField(pseRespondToTribService, "notificationToAdminTemplateId", TEMPLATE_ID);

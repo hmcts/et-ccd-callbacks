@@ -125,11 +125,11 @@ public class ScotlandAllocateHearingService {
     }
 
     private HearingType getSelectedHearing(CaseData caseData) {
-        return hearingSelectionService.getSelectedHearing(caseData, caseData.getAllocateHearingHearing());
+        return hearingSelectionService.getSelectedHearingAllocateHearing(caseData);
     }
 
     private DateListedType getSelectedListing(CaseData caseData) {
-        return hearingSelectionService.getSelectedListing(caseData, caseData.getAllocateHearingHearing());
+        return hearingSelectionService.getSelectedListing(caseData);
     }
 
     private boolean isVenueChanged(DateListedType listing, DynamicFixedListType newVenue) {

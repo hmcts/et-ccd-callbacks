@@ -3,7 +3,7 @@ const {eventNames} = require('../pages/common/constants.js');
 const {fixCaseAPI} = require("../helpers/caseHelper");
 const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 
-Feature('Create a Leeds Singles Case & Execute Fix Case API');
+Feature('Create Singles Case & Execute Fix Case API');
 
 Scenario('Verify Fix Case API', async ({I}) => {
 

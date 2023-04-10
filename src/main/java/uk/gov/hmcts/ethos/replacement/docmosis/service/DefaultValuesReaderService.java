@@ -3,16 +3,18 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
 
 import java.util.Optional;
-
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
@@ -23,12 +25,23 @@ public class DefaultValuesReaderService {
     private final TribunalOfficesService tribunalOfficesService;
     private final ConciliationTrackService conciliationTrackService;
 
+    public static final String ALL_OFFICES = "All";
+
     public DefaultValuesReaderService(CaseDefaultValuesConfiguration config,
                                       TribunalOfficesService tribunalOfficesService,
                                       ConciliationTrackService conciliationTrackService) {
         this.config = config;
         this.tribunalOfficesService = tribunalOfficesService;
         this.conciliationTrackService = conciliationTrackService;
+    }
+
+    public DefaultValues getListingDefaultValues(ListingDetails listingDetails) {
+        String managingOffice = listingDetails.getCaseData().getManagingOffice();
+        if (listingDetails.getCaseTypeId().equals(SCOTLAND_LISTING_CASE_TYPE_ID)
+                &&  ALL_OFFICES.equals(managingOffice)) {
+            managingOffice = TribunalOffice.GLASGOW.getOfficeName();
+        }
+        return getDefaultValues(managingOffice);
     }
 
     public DefaultValues getDefaultValues(String managingOffice) {

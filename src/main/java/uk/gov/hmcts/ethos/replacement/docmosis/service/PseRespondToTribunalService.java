@@ -201,7 +201,7 @@ public class PseRespondToTribunalService {
         if (sendNotificationType.getSendNotificationSelectHearing() == null) {
             return "";
         }
-        DateListedType dateListedType = hearingSelectionService.getSelectedListing(
+        DateListedType dateListedType = hearingSelectionService.getSelectedListingWithList(
             caseData, sendNotificationType.getSendNotificationSelectHearing());
         return UtilHelper.formatLocalDateTime(dateListedType.getListedDate());
     }

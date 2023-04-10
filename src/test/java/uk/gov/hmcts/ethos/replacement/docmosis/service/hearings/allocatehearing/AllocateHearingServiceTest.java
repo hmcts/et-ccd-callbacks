@@ -52,14 +52,6 @@ public class AllocateHearingServiceTest {
     }
 
     @Test
-    public void testInitialiseAllocatedHearing() {
-        allocateHearingService.initialiseAllocateHearing(caseData);
-
-        DynamicFixedListType hearings = caseData.getAllocateHearingHearing();
-        SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(hearings, "hearing", "Hearing ");
-    }
-
-    @Test
     public void testHandleListingSelectedNoExistingSelections() {
         // Arrange
         String hearingSitAlone = String.valueOf(Boolean.TRUE);
@@ -242,10 +234,9 @@ public class AllocateHearingServiceTest {
             "Hearing ");
         when(hearingSelectionService.getHearingSelection(isA(CaseData.class))).thenReturn(hearings);
 
-        when(hearingSelectionService.getSelectedHearing(isA(CaseData.class),
-                isA(DynamicFixedListType.class))).thenReturn(selectedHearing);
-        when(hearingSelectionService.getSelectedListing(isA(CaseData.class),
-                isA(DynamicFixedListType.class))).thenReturn(selectedListing);
+        when(hearingSelectionService.getSelectedHearingAllocateHearing(isA(CaseData.class)))
+                .thenReturn(selectedHearing);
+        when(hearingSelectionService.getSelectedListing(isA(CaseData.class))).thenReturn(selectedListing);
 
         return hearingSelectionService;
     }

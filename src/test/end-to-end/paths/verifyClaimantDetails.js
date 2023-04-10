@@ -3,7 +3,7 @@ const {eventNames} = require('../pages/common/constants.js');
 const {claimantDetails} = require("../helpers/caseHelper");
 const {processCaseToAcceptedState} = require("../helpers/etCaseHepler");
 
-Feature('Leeds Singles Case And Execute Claimant Details...');
+Feature('Singles Case And Execute Claimant Details...');
 
 Scenario('Verify Claimant Details', async ({I}) => {
 

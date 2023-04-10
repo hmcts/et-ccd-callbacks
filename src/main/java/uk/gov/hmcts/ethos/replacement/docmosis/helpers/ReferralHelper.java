@@ -505,6 +505,7 @@ public final class ReferralHelper {
     public static void setReferralStatusToClosed(CaseData caseData) {
         ReferralType referral = getSelectedReferral(caseData);
         referral.setReferralStatus(ReferralStatus.CLOSED);
+        referral.setCloseReferralGeneralNotes(caseData.getCloseReferralGeneralNotes());
     }
 
     /**

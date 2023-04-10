@@ -49,6 +49,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -63,6 +64,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LIST
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
@@ -72,17 +74,21 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 public class CaseManagementForCaseWorkerServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+    public static final String UNASSIGNED_OFFICE = "Unassigned";
+
     @InjectMocks
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private CCDRequest scotlandCcdRequest1;
     private CCDRequest scotlandCcdRequest2;
     private CCDRequest scotlandCcdRequest3;
+    private CCDRequest scotlandCcdRequest5;
     private CCDRequest ccdRequest10;
     private CCDRequest ccdRequest11;
     private CCDRequest ccdRequest12;
     private CCDRequest ccdRequest13;
     private CCDRequest ccdRequest14;
     private CCDRequest ccdRequest15;
+    private CCDRequest ccdRequest21;
     private CCDRequest manchesterCcdRequest;
     private SubmitEvent submitEvent;
 
@@ -107,6 +113,10 @@ public class CaseManagementForCaseWorkerServiceTest {
         CaseDetails caseDetailsScot3 = generateCaseDetails("caseDetailsScotTest3.json");
         scotlandCcdRequest3.setCaseDetails(caseDetailsScot3);
 
+        scotlandCcdRequest5 = new CCDRequest();
+        CaseDetails caseDetailsScot5 = generateCaseDetails("caseDetailsScotTest5.json");
+        scotlandCcdRequest5.setCaseDetails(caseDetailsScot5);
+
         ccdRequest10 = new CCDRequest();
         CaseDetails caseDetails10 = generateCaseDetails("caseDetailsTest10.json");
         ccdRequest10.setCaseDetails(caseDetails10);
@@ -130,6 +140,10 @@ public class CaseManagementForCaseWorkerServiceTest {
         ccdRequest15 = new CCDRequest();
         CaseDetails caseDetails15 = generateCaseDetails("caseDetailsTest15.json");
         ccdRequest15.setCaseDetails(caseDetails15);
+
+        ccdRequest21 = new CCDRequest();
+        CaseDetails caseDetails21 = generateCaseDetails("caseDetailsTest21.json");
+        ccdRequest21.setCaseDetails(caseDetails21);
 
         manchesterCcdRequest = new CCDRequest();
         CaseData caseData = new CaseData();
@@ -342,6 +356,12 @@ public class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
+    public void struckOutRespondentEmpty() {
+        CaseData caseData = caseManagementForCaseWorkerService.struckOutRespondents(scotlandCcdRequest5);
+        assertEquals(0, caseData.getRespondentCollection().size());
+    }
+
+    @Test
     public void struckOutRespondentFirstToLast() {
         CaseData caseData = caseManagementForCaseWorkerService.struckOutRespondents(scotlandCcdRequest1);
 
@@ -360,6 +380,42 @@ public class CaseManagementForCaseWorkerServiceTest {
                 .get(2).getValue().getRespondentName());
         assertEquals(YES, caseData.getRespondentCollection()
                 .get(2).getValue().getResponseStruckOut());
+    }
+
+    @Test
+    public void struckOutRespondentRespAddressLinesEmpty() {
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .setResponseRespondentAddress(new Address());
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .getResponseRespondentAddress().setAddressLine1("");
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .getResponseRespondentAddress().setAddressLine2("");
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .getResponseRespondentAddress().setAddressLine3("");
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .getResponseRespondentAddress().setCountry("");
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .getResponseRespondentAddress().setCounty("");
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .getResponseRespondentAddress().setPostCode("");
+        scotlandCcdRequest1.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue()
+                .getResponseRespondentAddress().setPostTown("");
+        CaseData caseData = caseManagementForCaseWorkerService.struckOutRespondents(scotlandCcdRequest1);
+        assertEquals(3, caseData.getRespondentCollection().size());
+        assertEquals("", caseData
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getAddressLine1());
+        assertEquals("", caseData
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getAddressLine2());
+        assertEquals("", caseData
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getAddressLine3());
+        assertEquals("", caseData
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getCountry());
+        assertEquals("", caseData
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getCounty());
+        assertEquals("", caseData
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getPostCode());
+        assertEquals("", caseData
+                .getRespondentCollection().get(0).getValue().getResponseRespondentAddress().getPostTown());
     }
 
     @Test
@@ -394,6 +450,12 @@ public class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = caseManagementForCaseWorkerService.continuingRespondent(scotlandCcdRequest3);
         assertEquals(1, caseData.getRespondentCollection().size());
         assertEquals(YES, caseData.getRespondentCollection().get(0).getValue().getResponseContinue());
+    }
+
+    @Test
+    public void continuingRespondentEmpty() {
+        CaseData caseData = caseManagementForCaseWorkerService.continuingRespondent(scotlandCcdRequest5);
+        assertEquals(0, caseData.getRespondentCollection().size());
     }
 
     @Test
@@ -485,6 +547,83 @@ public class CaseManagementForCaseWorkerServiceTest {
                 .getHearingDateCollection().get(0).getValue().getHearingTimingStart());
         assertEquals("2019-11-01T12:11:00.000", caseData.getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().getHearingTimingFinish());
+    }
+
+    @Test
+    public void amendHearingEmptyHearingCollection() {
+        CaseData caseData = ccdRequest21.getCaseDetails().getCaseData();
+        caseData.setHearingCollection(new ArrayList<>());
+        caseManagementForCaseWorkerService.amendHearing(caseData, ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals(0, caseData.getHearingCollection().size());
+    }
+
+    @Test
+    public void amendHearingCaseTypeIdSingle() {
+        CaseData caseData = ccdRequest21.getCaseDetails().getCaseData();
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            caseManagementForCaseWorkerService.amendHearing(caseData, SINGLE_CASE_TYPE);
+        });
+        assertEquals("Unexpected case type id " + SINGLE_CASE_TYPE, exception.getMessage());
+    }
+
+    @Test
+    public void amendHearingNullHearingCollection() {
+        CaseData caseData = ccdRequest21.getCaseDetails().getCaseData();
+        caseData.setHearingCollection(null);
+        caseManagementForCaseWorkerService.amendHearing(caseData, ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals(null, caseData.getHearingCollection());
+    }
+
+    @Test
+    public void amendHearingNullHearingDateCollection() {
+        CaseData caseData = ccdRequest21.getCaseDetails().getCaseData();
+        caseData.getHearingCollection().get(0).getValue().setHearingDateCollection(null);
+        caseManagementForCaseWorkerService.amendHearing(caseData, ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals(null, caseData.getHearingCollection().get(0).getValue().getHearingDateCollection());
+    }
+
+    @Test
+    public void amendHearingEmptyHearingDateCollection() {
+        CaseData caseData = ccdRequest21.getCaseDetails().getCaseData();
+        caseData.getHearingCollection().get(0).getValue().setHearingDateCollection(new ArrayList<>());
+        caseManagementForCaseWorkerService.amendHearing(caseData, ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals(0, caseData.getHearingCollection().get(0).getValue().getHearingDateCollection().size());
+    }
+
+    @Test
+    public void midEventAmendHearingEmptyHearingCollection() {
+        CaseData caseData = ccdRequest21.getCaseDetails().getCaseData();
+        caseData.setHearingCollection(new ArrayList<>());
+        List<String> errors = new ArrayList<>();
+        caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
+        assertEquals(0, caseData.getHearingCollection().size());
+    }
+
+    @Test
+    public void midEventAmendHearingNullHearingCollection() {
+        CaseData caseData = ccdRequest21.getCaseDetails().getCaseData();
+        caseData.setHearingCollection(null);
+        List<String> errors = new ArrayList<>();
+        caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
+        assertEquals(null, caseData.getHearingCollection());
+    }
+
+    @Test
+    public void midEventAmendHearingNullHearingDateCollection() {
+        CaseData caseData = ccdRequest21.getCaseDetails().getCaseData();
+        caseData.getHearingCollection().get(0).getValue().setHearingDateCollection(null);
+        List<String> errors = new ArrayList<>();
+        caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
+        assertEquals(null, caseData.getHearingCollection().get(0).getValue().getHearingDateCollection());
+    }
+
+    @Test
+    public void midEventAmendHearingEmptyHearingDateCollection() {
+        CaseData caseData = ccdRequest21.getCaseDetails().getCaseData();
+        caseData.getHearingCollection().get(0).getValue().setHearingDateCollection(new ArrayList<>());
+        List<String> errors = new ArrayList<>();
+        caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
+        assertEquals(0, caseData.getHearingCollection().get(0).getValue().getHearingDateCollection().size());
     }
 
     @Test
@@ -710,11 +849,54 @@ public class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
+    public void setEt3ResponseDueDate_Serving_Date_Empty() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        caseData.setClaimServedDate("");
+        caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
+        assertEquals(null, caseData.getEt3DueDate());
+    }
+
+    @Test
     public void respondentExtension_doesNotOverideExistingValue() {
         CaseData caseData = scotlandCcdRequest3.getCaseDetails().getCaseData();
         caseData.getRespondentCollection().get(0).getValue().setExtensionRequested(YES);
         caseManagementForCaseWorkerService.caseDataDefaults(caseData);
         assertThat(caseData.getRespondentCollection().get(0).getValue().getExtensionRequested(), is(YES));
+    }
+
+    @Test
+    public void testNotSetScotlandAllocatedOfficeWhenCaseTypeIdNotScotland() {
+        CaseData caseData = new CaseData();
+        caseData.setManagingOffice(UNASSIGNED_OFFICE);
+        caseManagementForCaseWorkerService.setScotlandAllocatedOffice(ENGLANDWALES_CASE_TYPE_ID, caseData);
+        assertNull(caseData.getAllocatedOffice());
+    }
+
+    @Test
+    public void testSetScotlandAllocatedOfficeManagingOfficeUnassigned() {
+        CaseData caseData = new CaseData();
+        caseData.setManagingOffice(UNASSIGNED_OFFICE);
+        caseManagementForCaseWorkerService.setScotlandAllocatedOffice(SCOTLAND_CASE_TYPE_ID, caseData);
+        assertNull(caseData.getAllocatedOffice());
+    }
+
+    @Test
+    public void testSetScotlandAllocatedOfficeManagingOfficeNull() {
+        CaseData caseData = new CaseData();
+        caseData.setManagingOffice(null);
+        caseManagementForCaseWorkerService.setScotlandAllocatedOffice(SCOTLAND_CASE_TYPE_ID, caseData);
+        assertNull(caseData.getAllocatedOffice());
+    }
+
+    @Test
+    public void testSetScotlandAllocatedOfficeManagingOfficeGlasgow() {
+        CaseData caseData = new CaseData();
+        caseData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
+        String expectedAllocatedOffice = TribunalOffice.GLASGOW.getOfficeName();
+        String expectedManagingOffice = TribunalOffice.GLASGOW.getOfficeName();
+        caseManagementForCaseWorkerService.setScotlandAllocatedOffice(SCOTLAND_CASE_TYPE_ID, caseData);
+        assertEquals(expectedAllocatedOffice, caseData.getAllocatedOffice());
+        assertEquals(expectedManagingOffice, caseData.getManagingOffice());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

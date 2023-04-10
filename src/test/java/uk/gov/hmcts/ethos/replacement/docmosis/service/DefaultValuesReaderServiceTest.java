@@ -11,19 +11,15 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.tribunaloffice.ContactDetails;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_CLOSED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 public class DefaultValuesReaderServiceTest {
 
@@ -60,9 +56,9 @@ public class DefaultValuesReaderServiceTest {
 
         String officeName = TribunalOffice.MANCHESTER.getOfficeName();
         when(tribunalOfficesService.getTribunalContactDetails(officeName)).thenReturn(contactDetails);
-        String caseType = MULTIPLE_CASE_TYPE;
+        String caseType = Constants.MULTIPLE_CASE_TYPE;
         when(config.getCaseType()).thenReturn(caseType);
-        String positionType = POSITION_TYPE_CASE_CLOSED;
+        String positionType = Constants.POSITION_TYPE_CASE_CLOSED;
         when(config.getPositionType()).thenReturn(positionType);
 
         // Act
@@ -84,6 +80,51 @@ public class DefaultValuesReaderServiceTest {
     }
 
     @Test
+    public void testGetListingDefaultValuesScottishOfficeAll() {
+        // Arrange
+        ContactDetails contactDetails = new ContactDetails();
+        contactDetails.setAddress1("TestAddress1");
+        contactDetails.setAddress2("TestAddress2");
+        contactDetails.setAddress3("TestAddress3");
+        contactDetails.setTown("TestTown");
+        contactDetails.setPostcode("TestPostcode");
+        contactDetails.setTelephone("TestTelephone");
+        contactDetails.setFax("TestFax");
+        contactDetails.setDx("TestDx");
+        contactDetails.setEmail("TestEmail");
+        contactDetails.setManagingOffice("Glasgow");
+
+        String officeName = TribunalOffice.GLASGOW.getOfficeName();
+        when(tribunalOfficesService.getTribunalContactDetails(officeName)).thenReturn(contactDetails);
+        String caseType = Constants.MULTIPLE_CASE_TYPE;
+        when(config.getCaseType()).thenReturn(caseType);
+        String positionType = Constants.POSITION_TYPE_CASE_CLOSED;
+        when(config.getPositionType()).thenReturn(positionType);
+        ListingDetails listingDetails = new ListingDetails();
+        listingDetails.setCaseTypeId(Constants.SCOTLAND_LISTING_CASE_TYPE_ID);
+        ListingData listingData = new ListingData();
+        listingData.setManagingOffice("All");
+        listingDetails.setCaseData(listingData);
+
+        // Act
+        DefaultValues defaultValues = defaultValuesReaderService.getListingDefaultValues(listingDetails);
+
+        // Assert
+        assertEquals(positionType, defaultValues.getPositionType());
+        assertEquals(caseType, defaultValues.getCaseType());
+        assertEquals("TestAddress1", defaultValues.getTribunalCorrespondenceAddressLine1());
+        assertEquals("TestAddress2", defaultValues.getTribunalCorrespondenceAddressLine2());
+        assertEquals("TestAddress3", defaultValues.getTribunalCorrespondenceAddressLine3());
+        assertEquals("TestTown", defaultValues.getTribunalCorrespondenceTown());
+        assertEquals("TestPostcode", defaultValues.getTribunalCorrespondencePostCode());
+        assertEquals("TestTelephone", defaultValues.getTribunalCorrespondenceTelephone());
+        assertEquals("TestFax", defaultValues.getTribunalCorrespondenceFax());
+        assertEquals("TestDx", defaultValues.getTribunalCorrespondenceDX());
+        assertEquals("TestEmail", defaultValues.getTribunalCorrespondenceEmail());
+        assertEquals("Glasgow", defaultValues.getManagingOffice());
+    }
+
+    @Test
     public void testGetClaimantTypeOfClaimant() {
         String claimantTypeOfClaimant = Constants.INDIVIDUAL_TYPE_CLAIMANT;
         when(config.getClaimantTypeOfClaimant()).thenReturn(claimantTypeOfClaimant);
@@ -93,7 +134,7 @@ public class DefaultValuesReaderServiceTest {
 
     @Test
     public void testGetPositionType() {
-        String positionType = POSITION_TYPE_CASE_CLOSED;
+        String positionType = Constants.POSITION_TYPE_CASE_CLOSED;
         when(config.getPositionType()).thenReturn(positionType);
 
         assertEquals(positionType, defaultValuesReaderService.getPositionType());
@@ -106,10 +147,10 @@ public class DefaultValuesReaderServiceTest {
 
         defaultValuesReaderService.getCaseData(caseData, defaultValues);
 
-        assertEquals(POSITION_TYPE_CASE_CLOSED, caseData.getPositionType());
-        assertEquals(POSITION_TYPE_CASE_CLOSED, caseData.getCaseSource());
+        assertEquals(Constants.POSITION_TYPE_CASE_CLOSED, caseData.getPositionType());
+        assertEquals(Constants.POSITION_TYPE_CASE_CLOSED, caseData.getCaseSource());
         assertEquals("TestManagingOffice", caseData.getManagingOffice());
-        assertEquals(MULTIPLE_CASE_TYPE, caseData.getEcmCaseType());
+        assertEquals(Constants.MULTIPLE_CASE_TYPE, caseData.getEcmCaseType());
         verifyAddress(caseData.getTribunalCorrespondenceAddress());
         assertEquals("TestTelephone", caseData.getTribunalCorrespondenceTelephone());
         assertEquals("TestFax", caseData.getTribunalCorrespondenceFax());
@@ -140,16 +181,16 @@ public class DefaultValuesReaderServiceTest {
     @Test
     public void testGetCaseDataWithClaimantWorkAddress() {
         CaseData caseData = new CaseData();
-        caseData.setClaimantWorkAddressQuestion(YES);
+        caseData.setClaimantWorkAddressQuestion(Constants.YES);
         caseData.setClaimantWorkAddressQRespondent(new DynamicFixedListType("Respondent 2"));
         caseData.setRespondentCollection(createRespondents());
         DefaultValues defaultValues = createDefaultValues();
         defaultValuesReaderService.getCaseData(caseData, defaultValues);
 
-        assertEquals(POSITION_TYPE_CASE_CLOSED, caseData.getPositionType());
-        assertEquals(POSITION_TYPE_CASE_CLOSED, caseData.getCaseSource());
+        assertEquals(Constants.POSITION_TYPE_CASE_CLOSED, caseData.getPositionType());
+        assertEquals(Constants.POSITION_TYPE_CASE_CLOSED, caseData.getCaseSource());
         assertEquals("TestManagingOffice", caseData.getManagingOffice());
-        assertEquals(MULTIPLE_CASE_TYPE, caseData.getEcmCaseType());
+        assertEquals(Constants.MULTIPLE_CASE_TYPE, caseData.getEcmCaseType());
         verifyAddress(caseData.getTribunalCorrespondenceAddress());
         assertEquals("TestTelephone", caseData.getTribunalCorrespondenceTelephone());
         assertEquals("TestFax", caseData.getTribunalCorrespondenceFax());
@@ -175,8 +216,8 @@ public class DefaultValuesReaderServiceTest {
 
     private DefaultValues createDefaultValues() {
         return DefaultValues.builder()
-                .positionType(POSITION_TYPE_CASE_CLOSED)
-                .caseType(MULTIPLE_CASE_TYPE)
+                .positionType(Constants.POSITION_TYPE_CASE_CLOSED)
+                .caseType(Constants.MULTIPLE_CASE_TYPE)
                 .tribunalCorrespondenceAddressLine1("TestAddress1")
                 .tribunalCorrespondenceAddressLine2("TestAddress2")
                 .tribunalCorrespondenceAddressLine3("TestAddress3")

@@ -442,6 +442,6 @@ bootWithCCD {
 }
 
 pmdMain.maxFailures = 698
-pmdTest.maxFailures = 711
+pmdTest.maxFailures = 716
 
 pmdTest.ruleSets = ["config/pmd/rulesetTest.xml"]

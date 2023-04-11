@@ -37,7 +37,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelec
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.ExcessiveImports"})
 public class TseAdmCloseService {
 
     private final DocumentManagementService documentManagementService;

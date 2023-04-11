@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-@SuppressWarnings({"PMD.MissingOverride"})
 public class JpaCourtWorkerService implements CourtWorkerService {
 
     private final CourtWorkerRepository courtWorkerRepository;

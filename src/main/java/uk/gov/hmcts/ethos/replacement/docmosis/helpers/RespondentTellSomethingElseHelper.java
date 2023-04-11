@@ -53,7 +53,6 @@ public final class RespondentTellSomethingElseHelper {
 
     }
 
-    @SuppressWarnings({"PMD.CyclomaticComplexity"})
     public static RespondentTSEApplicationTypeData getSelectedApplicationType(CaseData caseData) {
         switch (caseData.getResTseSelectApplication()) {
             case TSE_APP_AMEND_RESPONSE:

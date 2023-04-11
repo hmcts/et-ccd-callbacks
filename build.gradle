@@ -18,7 +18,7 @@ group = 'uk.gov.hmcts.et'
 version = '0.0.1'
 
 pmd {
-    toolVersion = "6.41.0"
+    toolVersion = "6.55.0"
     sourceSets = [sourceSets.main, sourceSets.test, sourceSets.cftlib]
     reportsDir = file("$project.buildDir/reports/pmd")
     // https://github.com/pmd/pmd/issues/876
@@ -440,3 +440,8 @@ bootWithCCD {
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'
 }
+
+pmdMain.maxFailures = 699
+pmdTest.maxFailures = 716
+
+pmdTest.ruleSets = ["config/pmd/rulesetTest.xml"]

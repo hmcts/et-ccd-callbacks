@@ -27,7 +27,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.TooManyMethods"})
 class TimeToFirstHearingReportTest {
 
     private ListingDetails listingDetails;

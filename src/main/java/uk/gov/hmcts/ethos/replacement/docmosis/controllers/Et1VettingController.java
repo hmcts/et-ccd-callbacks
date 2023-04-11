@@ -34,8 +34,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.LawOfDemeter",
-    "PMD.FieldNamingConventions", "PMD.ExcessiveImports"})
 
 public class Et1VettingController {
     public static final String PROCESSING_COMPLETE_TEXT = "<hr><h2>Do this next</h2>"
@@ -198,7 +196,7 @@ public class Et1VettingController {
     })
     public ResponseEntity<CCDCallbackResponse> processingComplete(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();

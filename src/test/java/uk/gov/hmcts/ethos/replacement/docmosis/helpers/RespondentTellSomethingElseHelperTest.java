@@ -25,7 +25,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PU
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_VARY_OR_REVOKE_AN_ORDER;
 
-@SuppressWarnings({"PMD.LinguisticNaming", "PMD.CyclomaticComplexity"})
 class RespondentTellSomethingElseHelperTest {
 
     private CaseData caseData;

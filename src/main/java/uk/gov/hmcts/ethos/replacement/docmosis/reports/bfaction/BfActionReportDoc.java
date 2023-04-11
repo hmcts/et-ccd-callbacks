@@ -11,10 +11,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_LINE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_OFFICE;
 
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.CognitiveComplexity",
-    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons",
-    "PMD.ConsecutiveAppendsShouldReuse" })
 public class BfActionReportDoc {
 
     private static final int ONE_REMAINING_ITEM = 1;

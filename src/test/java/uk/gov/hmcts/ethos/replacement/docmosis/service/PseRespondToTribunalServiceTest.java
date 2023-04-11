@@ -54,7 +54,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class PseRespondToTribunalServiceTest {
     private PseRespondToTribunalService pseRespondToTribService;

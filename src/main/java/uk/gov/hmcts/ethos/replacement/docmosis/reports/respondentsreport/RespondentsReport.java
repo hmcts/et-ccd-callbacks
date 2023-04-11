@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@SuppressWarnings({ "PMD.AvoidInstantiatingObjectsInLoops", "PMD.AvoidDeeplyNestedIfStmts", "PMD.CyclomaticComplexity",
-    "PMD.CognitiveComplexity"})
 public class RespondentsReport {
 
     private final RespondentsReportDataSource reportDataSource;

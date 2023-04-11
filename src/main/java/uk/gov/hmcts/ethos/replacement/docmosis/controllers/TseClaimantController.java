@@ -26,7 +26,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RestController
 @RequestMapping("/tseClaimant")
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class TseClaimantController {
 
     private final VerifyTokenService verifyTokenService;
@@ -46,7 +45,7 @@ public class TseClaimantController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitRespondentTSE(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();

@@ -33,7 +33,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/respondNotification")
 @RestController
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class RespondNotificationController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -125,7 +124,7 @@ public class RespondNotificationController {
     })
     public ResponseEntity<CCDCallbackResponse> midGetNotification(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);

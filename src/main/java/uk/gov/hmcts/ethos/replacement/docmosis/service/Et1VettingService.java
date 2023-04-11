@@ -41,9 +41,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrac
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.LiteralsFirstInComparisons",
-    "PMD.FieldNamingConventions", "PMD.LawOfDemeter", "PMD.TooManyMethods", "PMD.ImplicitSwitchFallThrough",
-    "PMD.SwitchStmtsShouldHaveDefault", "PMD.ExcessiveImports", "PMD.GodClass"})
 public class Et1VettingService {
 
     private final TornadoService tornadoService;
@@ -234,7 +231,7 @@ public class Et1VettingService {
         }
     }
 
-    @SuppressWarnings("checkstyle:FallThrough")
+    @SuppressWarnings({"checkstyle:FallThrough"}) // This is intentional as it acts like a loop
     private void populateRespondentAcasDetailsMarkUp(CaseData caseData) {
         List<RespondentSumTypeItem> respondentList = caseData.getRespondentCollection();
         switch (respondentList.size()) {

@@ -20,8 +20,6 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LawOfDemeter", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.LinguisticNaming"})
 public class HelperTest {
 
     private CaseDetails caseDetails1;

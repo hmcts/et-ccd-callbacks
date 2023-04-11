@@ -35,10 +35,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 
 @Slf4j
 @Service("bulkSearchService")
-@SuppressWarnings({"PMD.ConfusingTernary",  "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.DoNotUseThreads", "PMD.GodClass", "PMD.UnnecessaryFullyQualifiedName", "PMD.NPathComplexity",
-    "PMD.NcssCount", "PMD.LawOfDemeter", "PMD.TooManyMethods", "PMD.PreserveStackTrace", "PMD.ExcessiveMethodLength",
-    "PMD.CognitiveComplexity", "PMD.CyclomaticComplexity", "PMD.ExcessiveImports"})
 public class BulkSearchService {
 
     private static final String MESSAGE = "Failed to search cases for case id : ";

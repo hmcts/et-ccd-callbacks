@@ -43,8 +43,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.BulkCreationServic
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.AvoidDuplicateLiterals", "PMD.UnnecessaryAnnotationValueElement",
-    "PMD.LawOfDemeter", "PMD.ConfusingTernary", "PMD.ExcessiveImports"})
 public class BulkActionsController {
 
     private static final String LOG_MESSAGE = "received notification request for bulk reference :    ";
@@ -70,7 +68,7 @@ public class BulkActionsController {
     })
     @Deprecated public ResponseEntity<BulkCallbackResponse> createBulk(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("CREATE BULK ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -102,7 +100,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> createBulkES(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("CREATE BULKES ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -139,7 +137,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> afterSubmittedBulk(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("AFTER SUBMITTED BULK ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -173,7 +171,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> updateBulk(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("UPDATE BULK ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -204,7 +202,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> updateBulkCase(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("UPDATE BULK CASE IDS ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -233,7 +231,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> generateBulkLetter(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("GENERATE BULK LETTER ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -264,7 +262,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> generateBulkLetterConfirmation(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("GENERATE BULK LETTER CONFIRMATION ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -292,7 +290,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> midSearchBulk(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("MID SEARCH BULK ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -321,7 +319,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> searchBulk(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("SEARCH BULK ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -349,7 +347,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> midCreateSubMultiple(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("MID CREATE SUB MULTIPLE ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -378,7 +376,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> createSubMultiple(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("CREATE SUB MULTIPLE ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -407,7 +405,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> subMultipleDynamicList(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("SUB MULTIPLE DYNAMIC LIST ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -436,7 +434,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> filterDefaultedAllDynamicList(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("FILTER DEFAULTED ALL DYNAMIC LIST ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -465,7 +463,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> filterDefaultedNoneDynamicList(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("FILTER DEFAULTED NONE DYNAMIC LIST ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -494,7 +492,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> midUpdateSubMultiple(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("MID UPDATE SUB MULTIPLE ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -522,7 +520,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> updateSubMultiple1(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("UPDATE SUB MULTIPLE ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -550,7 +548,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> deleteSubMultiple(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("DELETE SUB MULTIPLE ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -578,7 +576,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> generateBulkSchedule(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("GENERATE BULK SCHEDULE ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -616,7 +614,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> generateBulkScheduleConfirmation(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("GENERATE BULK SCHEDULE CONFIRMATION ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -643,7 +641,7 @@ public class BulkActionsController {
     })
     public ResponseEntity<BulkCallbackResponse> preAcceptBulk(
             @RequestBody BulkRequest bulkRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
         log.info("PRE ACCEPT BULK ---> " + LOG_MESSAGE + bulkRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {

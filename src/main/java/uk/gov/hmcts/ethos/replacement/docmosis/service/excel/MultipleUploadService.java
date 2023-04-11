@@ -15,7 +15,6 @@ import java.util.SortedMap;
 
 @Slf4j
 @Service("multipleUploadService")
-@SuppressWarnings({"PMD.ConfusingTernary", "PMD.LawOfDemeter"})
 public class MultipleUploadService {
 
     public static final String ERROR_SHEET_NUMBER_ROWS = "Number of rows expected ";

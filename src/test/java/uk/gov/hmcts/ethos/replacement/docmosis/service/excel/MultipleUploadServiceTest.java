@@ -28,7 +28,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUplo
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadService.ERROR_SHEET_NUMBER_COLUMNS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleUploadService.ERROR_SHEET_NUMBER_ROWS;
 
-@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField", "PMD.LawOfDemeter"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleUploadServiceTest {
 

@@ -70,9 +70,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.NcssCount", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.UseProperClassLoader", "PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.ExcessivePublicCount",
-                   "PMD.TooManyFields"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class CaseManagementForCaseWorkerServiceTest {
 

@@ -32,7 +32,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SELECT_NONE_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@SuppressWarnings({"PMD.LooseCoupling"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleBatchUpdate3ServiceTest {
 

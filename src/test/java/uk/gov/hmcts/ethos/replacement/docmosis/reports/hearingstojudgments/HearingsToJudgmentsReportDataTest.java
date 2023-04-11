@@ -15,7 +15,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgment
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportData.TOTAL_PERCENT_WITHIN_4WEEKS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingstojudgments.HearingsToJudgmentsReportData.TOTAL_WITHIN_4WEEKS;
 
-@SuppressWarnings({"PMD.ConsecutiveAppendsShouldReuse", "PMD.ConsecutiveLiteralAppends", "PMD.LawOfDemeter"})
 class HearingsToJudgmentsReportDataTest {
 
     @Test

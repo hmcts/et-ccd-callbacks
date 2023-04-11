@@ -2,8 +2,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import java.util.List;
 
-@SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 public final class JurisdictionCodeTrackConstants {
+    private JurisdictionCodeTrackConstants() {
+        // Empty private constructor as per SonarLint ruling
+    }
 
     public static final List<String> JUR_CODE_CONCILIATION_TRACK_OP = List.of(
         "DAG", "DDA", "DRB", "DSO", "EQP", "PID", "RRD", "SXD", "MAT");

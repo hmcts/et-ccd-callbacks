@@ -30,7 +30,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/et3Notification")
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class Et3NotificationController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -65,7 +64,7 @@ public class Et3NotificationController {
     })
     public ResponseEntity<CCDCallbackResponse> et3Notification(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -97,7 +96,7 @@ public class Et3NotificationController {
     })
     public ResponseEntity<CCDCallbackResponse> et3NotificationSubmitted(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken) {
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);

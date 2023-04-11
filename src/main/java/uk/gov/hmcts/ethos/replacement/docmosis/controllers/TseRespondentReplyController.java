@@ -34,7 +34,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequestMapping("/tseResponse")
 @RestController
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class TseRespondentReplyController {
 
     private final VerifyTokenService verifyTokenService;
@@ -66,7 +65,7 @@ public class TseRespondentReplyController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToStart(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -98,7 +97,7 @@ public class TseRespondentReplyController {
     })
     public ResponseEntity<CCDCallbackResponse> midPopulateReply(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -130,7 +129,7 @@ public class TseRespondentReplyController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -168,7 +167,7 @@ public class TseRespondentReplyController {
     })
     public ResponseEntity<CCDCallbackResponse> submitted(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);

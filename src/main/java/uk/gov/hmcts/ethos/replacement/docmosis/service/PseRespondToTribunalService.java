@@ -46,7 +46,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelec
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 public class PseRespondToTribunalService {
 
     @Value("${pse.respondent.acknowledgement.yes.template.id}")

@@ -11,6 +11,7 @@
         <exclude name="JUnitTestContainsTooManyAsserts"/>
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
         <exclude name="JUnitTestsShouldIncludeAssert"/>
+        <exclude name="UnusedPrivateMethod"/>
     </rule>
     <rule ref="category/java/codestyle.xml">
         <exclude name="AtLeastOneConstructor"/>
@@ -22,6 +23,7 @@
         <exclude name="DefaultPackage"/>
         <exclude name="CommentDefaultAccessModifier"/>
         <exclude name="ShortClassName"/>
+        <exclude name="LinguisticNaming"/>
     </rule>
     <rule ref="category/java/codestyle.xml/ClassNamingConventions">
         <properties>
@@ -58,6 +60,8 @@
         <exclude name="DataClass"/>
         <exclude name="AvoidThrowingRawExceptionTypes"/>
         <exclude name="ExcessiveImports"/>
+        <exclude name="TooManyMethods"/>
+        <exclude name="TooManyFields"/>
     </rule>
     <rule ref="category/java/design.xml/LawOfDemeter">
         <properties>

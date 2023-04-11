@@ -57,7 +57,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.succe
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.successfulDocumentManagementUploadResponse;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.unsuccessfulDocumentManagementUploadResponse;
 
-@SuppressWarnings({"PMD.AvoidPrintStackTrace", "PMD.LinguisticNaming", "PMD.ExcessiveImports"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class DocumentManagementServiceTest {
 

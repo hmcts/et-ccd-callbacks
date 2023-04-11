@@ -49,7 +49,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIST_CASES_CONFIG;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.ExcessiveImports", "PMD.CloseResource", "PMD.TooManyMethods"})
 public class TornadoServiceTest {
     private TornadoService tornadoService;
     private TornadoConnection tornadoConnection;
@@ -230,7 +229,7 @@ public class TornadoServiceTest {
                 "random-string");
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void generateDocument_noDocumentName() throws IOException {
         mockConnectionSuccess();
         tornadoService.generateEventDocument(new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID,
@@ -241,7 +240,7 @@ public class TornadoServiceTest {
     public void generateDocumentAsBytes() throws IOException {
         mockConnectionSuccess();
         byte[] bytes = tornadoService.generateEventDocumentBytes(new CaseData(), ENGLANDWALES_CASE_TYPE_ID, "Initial "
-            + "Consideration" + ".pdf");
+            + "Consideration.pdf");
         assertThat(bytes.length, is(0));
     }
 

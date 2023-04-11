@@ -21,7 +21,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CA
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.generateListingDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.generateSubmitEventList;
 
-@SuppressWarnings({"PMD.LawOfDemeter"})
 class ReportHelperTest {
 
     @Test

@@ -36,7 +36,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({Et3NotificationController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.UnusedPrivateField", "PMD.ExcessiveImports"})
 class Et3NotificationControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String MID_UPLOAD_DOCUMENTS_URL = "/et3Notification/midUploadDocuments";

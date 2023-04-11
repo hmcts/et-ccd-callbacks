@@ -22,7 +22,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 
 @Slf4j
-@SuppressWarnings({ "PMD.AvoidInstantiatingObjectsInLoops"})
 public class NoPositionChangeReport {
     private final NoPositionChangeDataSource noPositionChangeDataSource;
     private final String reportDate;

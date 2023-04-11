@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.UnusedPrivateMethod"})
 @ExtendWith(SpringExtension.class)
 class PrintHearingListServiceTest {
 

@@ -25,7 +25,6 @@ import static org.junit.Assert.assertEquals;
     VenueAddressesService.class,
 })
 @EnableConfigurationProperties({VenueAddressesConfiguration.class})
-@SuppressWarnings({"PMD.UseShortArrayInitializer"})
 public class VenueAddressesServiceTest {
 
     @ClassRule

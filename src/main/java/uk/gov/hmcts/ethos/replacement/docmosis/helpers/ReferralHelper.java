@@ -47,13 +47,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 
 @Slf4j
-@SuppressWarnings({"PMD.TooManyMethods",
-                   "PMD.LinguisticNaming",
-                   "PMD.ConfusingTernary",
-                   "PMD.SimpleDateFormatNeedsLocale",
-                   "PMD.GodClass",
-                   "PMD.ExcessiveImports"
-})
 public final class ReferralHelper {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String TRUE = "True";

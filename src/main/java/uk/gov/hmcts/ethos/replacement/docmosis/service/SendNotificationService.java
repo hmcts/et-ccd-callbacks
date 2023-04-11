@@ -43,7 +43,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkF
 @Service("sendNotificationService")
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings({"PMD.ExcessiveImports"})
 public class SendNotificationService {
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;

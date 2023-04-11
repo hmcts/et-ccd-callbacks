@@ -27,7 +27,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({SendNotificationController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.UnusedPrivateField"})
 class SendNotificationControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";

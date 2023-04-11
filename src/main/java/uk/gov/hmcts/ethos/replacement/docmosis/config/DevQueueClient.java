@@ -25,7 +25,6 @@ import java.util.concurrent.ExecutorService;
  * @Profile("dev")
  * }</pre>
  */
-@SuppressWarnings({"PMD.DoNotUseThreads", "PMD.TooManyMethods", "PMD.ExcessivePublicCount"})
 public class DevQueueClient implements IQueueClient {
 
     @Override

@@ -37,7 +37,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERS
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({TseAdminController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessiveImports"})
 class TseAdminControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";

@@ -72,8 +72,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.DISPOSAL_DATE_BEFORE_RECEIPT_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.EventValidationService.RECEIPT_DATE_LATER_THAN_REJECTED_ERROR_MESSAGE;
 
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming", "PMD.TooManyMethods", "PMD.TooManyFields",
-    "PMD.ExcessiveImports"})
 @ExtendWith(SpringExtension.class)
 class EventValidationServiceTest {
 

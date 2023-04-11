@@ -31,9 +31,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEAR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingDurationInMinutes;
 
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.GodClass", "PMD.CognitiveComplexity", "PMD.InsufficientStringBufferDeclaration",
-    "PMD.LiteralsFirstInComparisons", "PMD.UnnecessaryFullyQualifiedName", "PMD.LawOfDemeter"})
 public final class SessionDaysReport {
 
     public static final String ONE_HOUR = "One Hour";

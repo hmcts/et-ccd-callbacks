@@ -20,7 +20,6 @@ import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.SELECT_ALL;
 
-@SuppressWarnings({"PMD.LooseCoupling", "PMD.UnusedPrivateField"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleDynamicListFlagsServiceTest {
 

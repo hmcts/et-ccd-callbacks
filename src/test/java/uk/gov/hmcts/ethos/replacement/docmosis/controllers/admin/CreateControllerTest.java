@@ -36,7 +36,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.controllers.admin.CreateCo
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CreateController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.ExcessiveImports"})
 class CreateControllerTest {
 
     private String token;

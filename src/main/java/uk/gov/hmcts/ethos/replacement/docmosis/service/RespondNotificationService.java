@@ -39,7 +39,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getResponde
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings({"PMD.ExcessiveImports"})
 public class RespondNotificationService {
 
     private final EmailService emailService;

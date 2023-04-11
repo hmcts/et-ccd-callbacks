@@ -11,7 +11,6 @@ import java.util.List;
 /**
  * This object captures information related to the referral object during creation event for docmosis.
  */
-@SuppressWarnings({"PMD.LinguisticNaming"})
 @SuperBuilder
 @Data
 public class ReferralTypeData {

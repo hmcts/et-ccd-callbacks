@@ -39,7 +39,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @Slf4j
 @RequestMapping("/createReferral")
 @RestController
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports"})
 public class CreateReferralController {
 
     private final String referralTemplateId;
@@ -88,7 +87,7 @@ public class CreateReferralController {
     })
     public ResponseEntity<CCDCallbackResponse> initReferralHearingDetails(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -119,7 +118,7 @@ public class CreateReferralController {
     })
     public ResponseEntity<CCDCallbackResponse> validateReferentEmail(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -155,7 +154,7 @@ public class CreateReferralController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitReferralDetails(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -206,7 +205,7 @@ public class CreateReferralController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
     public ResponseEntity<CCDCallbackResponse> completeCreateReferral(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);

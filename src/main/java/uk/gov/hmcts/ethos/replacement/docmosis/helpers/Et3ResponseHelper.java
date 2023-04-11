@@ -29,10 +29,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
  * ET3 Response Helper provides methods to assist with the ET3 Response Form event.
  */
 @Slf4j
-@SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.LinguisticNaming",
-    "PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions", "PMD.PrematureDeclaration", "PMD.GodClass",
-    "PMD.CyclomaticComplexity"})
-public class Et3ResponseHelper {
+public final class Et3ResponseHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-00700.docx";

@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADD_CASES_TO_MULTIPLE_AMENDMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LEAD_CASE_AMENDMENT;
 
-@SuppressWarnings({"PMD.LooseCoupling"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MultipleAmendServiceTest {
 
@@ -33,7 +32,6 @@ public class MultipleAmendServiceTest {
     private ExcelReadingService excelReadingService;
     @Mock
     private ExcelDocManagementService excelDocManagementService;
-    @SuppressWarnings({"PMD.UnusedPrivateField"})
     @Mock
     private MultipleAmendLeadCaseService multipleAmendLeadCaseService;
     @Mock

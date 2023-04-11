@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferToEcmService.NO_CASES_FOUND;
 
-@SuppressWarnings({"PMD.LawOfDemeter"})
 @ExtendWith(SpringExtension.class)
 class CaseTransferToEcmServiceTest {
 

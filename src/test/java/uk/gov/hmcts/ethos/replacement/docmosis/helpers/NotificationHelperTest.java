@@ -14,7 +14,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
-@SuppressWarnings({"PMD.LinguisticNaming"})
 public class NotificationHelperTest {
     private CaseData caseData;
     private CaseDetails caseDetails;

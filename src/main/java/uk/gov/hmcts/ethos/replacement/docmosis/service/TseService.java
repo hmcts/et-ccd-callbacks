@@ -26,7 +26,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.GodClass", "PMD.CyclomaticComplexity", "PMD.LawOfDemeter"})
 public class TseService {
     /**
      * Creates a new TSE collection if it doesn't exist.

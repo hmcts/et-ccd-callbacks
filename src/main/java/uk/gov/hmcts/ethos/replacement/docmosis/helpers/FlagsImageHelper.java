@@ -27,12 +27,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ZERO;
 
 @Slf4j
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.TooManyFields", "PMD.AvoidDuplicateLiterals",
-    "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
-    "PMD.GodClass", "PMD.ConfusingTernary", "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal",
-    "PMD.ImplicitSwitchFallThrough", "PMD.ConsecutiveAppendsShouldReuse", "PMD.LawOfDemeter",
-    "PMD.CyclomaticComplexity"})
-public class FlagsImageHelper {
+public final class FlagsImageHelper {
 
     private static final String COLOR_ORANGE = "Orange";
     private static final String COLOR_LIGHT_BLACK = "LightBlack";
@@ -131,6 +126,7 @@ public class FlagsImageHelper {
             default:
                 flagRequired = false;
                 flagColor = COLOR_WHITE;
+                break;
         }
         flagsImageFileName.append(flagRequired ? ONE : ZERO);
         flagsImageAltText.append(flagRequired && flagsImageAltText.length() > 0 ? "<font size='5'> - </font>" : "");

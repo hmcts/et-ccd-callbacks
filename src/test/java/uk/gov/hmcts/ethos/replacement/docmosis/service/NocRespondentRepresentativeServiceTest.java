@@ -44,7 +44,6 @@ import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalS
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CaseConverter.class, NoticeOfChangeFieldPopulator.class, ObjectMapper.class})
-@SuppressWarnings({"PMD.ExcessiveImports"})
 class NocRespondentRepresentativeServiceTest {
     public static final String CASE_ID_ONE = "723";
     private static final String RESPONDENT_NAME = "Harry Johnson";

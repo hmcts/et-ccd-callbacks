@@ -51,7 +51,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.BulkCreationServic
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.BulkCreationService.UPDATE_SINGLES_STEP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.FieldNamingConventions", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 @ExtendWith(SpringExtension.class)
  class BulkCreationServiceTest {
 

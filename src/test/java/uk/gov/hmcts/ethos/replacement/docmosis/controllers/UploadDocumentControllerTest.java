@@ -31,7 +31,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({UploadDocumentController.class, JsonMapper.class})
-@SuppressWarnings({"PMD.UnusedPrivateField"})
 class UploadDocumentControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";

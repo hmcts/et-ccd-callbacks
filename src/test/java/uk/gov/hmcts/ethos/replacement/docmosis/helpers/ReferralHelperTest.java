@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -22,11 +21,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.ReferralReplyType;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -37,16 +34,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 
-@SuppressWarnings({"PMD.SingularField", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 class ReferralHelperTest {
-    private UserService userService;
     private CaseData caseData;
     private static final String JUDGE_ROLE_ENG = "caseworker-employment-etjudge-englandwales";
     private static final String JUDGE_ROLE_SCOT = "caseworker-employment-etjudge-scotland";
@@ -122,13 +115,6 @@ class ReferralHelperTest {
 
     @BeforeEach
     void setUp() {
-        userService = mock(UserService.class);
-        UserDetails userDetails = new UserDetails();
-        userDetails.setFirstName("Judge");
-        userDetails.setLastName("Judy");
-        userDetails.setEmail("judge.judy@aol.com");
-        userDetails.setRoles(new ArrayList<>(Arrays.asList(JUDGE_ROLE_ENG, JUDGE_ROLE_SCOT)));
-        when(userService.getUserDetails("")).thenReturn(userDetails);
         caseData = CaseDataBuilder.builder().build();
         caseData.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
         addHearingToCaseData(caseData);

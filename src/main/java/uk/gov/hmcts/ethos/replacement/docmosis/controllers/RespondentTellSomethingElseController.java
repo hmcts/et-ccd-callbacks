@@ -36,7 +36,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/respondentTSE")
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class RespondentTellSomethingElseController {
 
     private final VerifyTokenService verifyTokenService;
@@ -80,7 +79,7 @@ public class RespondentTellSomethingElseController {
     })
     public ResponseEntity<CCDCallbackResponse> validateGiveDetails(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(value = "Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -105,7 +104,7 @@ public class RespondentTellSomethingElseController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitRespondentTSE(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -135,7 +134,7 @@ public class RespondentTellSomethingElseController {
     })
     public ResponseEntity<CCDCallbackResponse> displayRespondentApplicationsTable(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
@@ -167,7 +166,7 @@ public class RespondentTellSomethingElseController {
     })
     public ResponseEntity<CCDCallbackResponse> completeApplication(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);

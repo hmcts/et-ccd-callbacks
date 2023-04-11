@@ -23,7 +23,7 @@ import java.util.TreeMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@SuppressWarnings({"PMD.LooseCoupling", "PMD.LawOfDemeter"})
+@SuppressWarnings({"PMD.LooseCoupling", "PMD.LawOfDemeter", "PMD.TooManyMethods"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ExcelCreationServiceTest {
 

@@ -646,7 +646,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
     @ParameterizedTest
     @CsvSource({"Listed, Yes", "Heard, No"})
-    public void midEventAmendHearingDateInPast(String hearingStatus, String warning) {
+     void midEventAmendHearingDateInPast(String hearingStatus, String warning) {
         CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         DateListedType dateListedType = caseData.getHearingCollection().get(0)

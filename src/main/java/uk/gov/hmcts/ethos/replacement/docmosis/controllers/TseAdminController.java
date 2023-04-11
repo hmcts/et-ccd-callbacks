@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdminHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdmCloseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdminService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
@@ -36,6 +37,7 @@ public class TseAdminController {
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private final VerifyTokenService verifyTokenService;
     private final TseAdminService tseAdminService;
+    private final TseAdmCloseService tseAdmCloseService;
 
     /**
     * Populates the dynamic list for select an application to respond to.
@@ -200,7 +202,7 @@ public class TseAdminController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseAdminCloseApplicationTable(
-            tseAdminService
+            tseAdmCloseService
                 .generateCloseApplicationDetailsMarkdown(caseData, userToken));
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -232,7 +234,7 @@ public class TseAdminController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        tseAdminService.aboutToSubmitCloseApplication(caseData);
+        tseAdmCloseService.aboutToSubmitCloseApplication(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

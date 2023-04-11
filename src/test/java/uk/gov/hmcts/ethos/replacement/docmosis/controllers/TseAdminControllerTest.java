@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdmCloseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseAdminService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -51,6 +52,8 @@ class TseAdminControllerTest {
 
     @MockBean
     private TseAdminService tseAdminService;
+    @MockBean
+    private TseAdmCloseService tseAdmCloseService;
 
     @Autowired
     private JsonMapper jsonMapper;
@@ -250,7 +253,7 @@ class TseAdminControllerTest {
             .andExpect(jsonPath("$.data", notNullValue()))
             .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
-        verify(tseAdminService).aboutToSubmitCloseApplication(
+        verify(tseAdmCloseService).aboutToSubmitCloseApplication(
             ccdRequest.getCaseDetails().getCaseData());
     }
 
@@ -262,7 +265,7 @@ class TseAdminControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isForbidden());
-        verify(tseAdminService, never()).aboutToSubmitCloseApplication(
+        verify(tseAdmCloseService, never()).aboutToSubmitCloseApplication(
             ccdRequest.getCaseDetails().getCaseData());
     }
 
@@ -273,7 +276,7 @@ class TseAdminControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
-        verify(tseAdminService, never()).aboutToSubmitCloseApplication(
+        verify(tseAdmCloseService, never()).aboutToSubmitCloseApplication(
             ccdRequest.getCaseDetails().getCaseData());
     }
 

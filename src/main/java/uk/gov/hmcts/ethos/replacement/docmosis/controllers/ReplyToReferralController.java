@@ -213,8 +213,7 @@ public class ReplyToReferralController {
 
         log.info("Event: Referral Reply Email sent. "
             + "EventId: " + ccdRequest.getEventId() + "."
-            + "Emailed to: " + caseData.getReplyToEmailAddress() + " at : " + DateTime.now()
-            + " and sent by " + userDetails.getName() + ".");
+            + "Emailed at: " + DateTime.now());
 
         ReferralHelper.createReferralReply(
             caseData,

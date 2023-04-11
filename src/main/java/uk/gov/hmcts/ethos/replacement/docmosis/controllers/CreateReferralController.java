@@ -179,11 +179,10 @@ public class CreateReferralController {
                 userDetails.getName()
             )
         );
-
+        
         log.info("Event: Referral Email sent. "
             + "EventId: " + ccdRequest.getEventId() + "."
-            + "Emailed to: " + caseData.getReplyToEmailAddress() + " at : " + DateTime.now()
-            + " and sent by " + userDetails.getName() + ".");
+            + "Emailed at: " + DateTime.now());
 
         caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
         DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,

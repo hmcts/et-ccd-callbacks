@@ -270,6 +270,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void midEventAmendHearing(CaseData caseData, List<String> errors) {
+        caseData.setListedDateInPastWarning(NO);
         if (!CollectionUtils.isEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                 if (!CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
@@ -277,6 +278,7 @@ public class CaseManagementForCaseWorkerService {
                             : hearingTypeItem.getValue().getHearingDateCollection()) {
                         addHearingsOnWeekendError(dateListedTypeItem, errors,
                                 hearingTypeItem.getValue().getHearingNumber());
+                        addHearingsInPastWarning(dateListedTypeItem, caseData);
                     }
                 }
             }
@@ -301,6 +303,15 @@ public class CaseManagementForCaseWorkerService {
         if (SUNDAY.equals(dayOfWeek)
                 || SATURDAY.equals(dayOfWeek)) {
             errors.add(LISTED_DATE_ON_WEEKEND_MESSAGE + hearingNumber);
+        }
+    }
+
+    private void addHearingsInPastWarning(DateListedTypeItem dateListedTypeItem, CaseData caseData) {
+        LocalDate date = LocalDateTime.parse(
+                dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
+        if (HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus())
+                && date.isBefore(LocalDate.now())) {
+            caseData.setListedDateInPastWarning(YES);
         }
     }
 

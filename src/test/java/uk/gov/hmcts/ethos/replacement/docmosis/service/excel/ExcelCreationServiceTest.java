@@ -1,21 +1,25 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import java.util.List;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
-
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.TreeMap;
-
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @SuppressWarnings({"PMD.LooseCoupling"})
@@ -137,9 +141,9 @@ public class ExcelCreationServiceTest {
                 workbook,
                 workbook.getSheetAt(0),
                 List.of("header1", "header2", "header3", "header4", "header5"));
-        assertEquals("description",sheet.getRow(1).getCell(0).getStringCellValue());
+        assertEquals("description", sheet.getRow(1).getCell(0).getStringCellValue());
         for (int j = 0; j < 5; j++) {
-            assertEquals("header" + (j + 1),sheet.getRow(2).getCell(j).getStringCellValue());
+            assertEquals("header" + (j + 1), sheet.getRow(2).getCell(j).getStringCellValue());
         }
     }
 }

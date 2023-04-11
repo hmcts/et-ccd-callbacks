@@ -1,20 +1,19 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import java.util.List;
-import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.Mock;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
 import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReportData;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportData;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportDetail;
+import java.util.List;
+import java.util.UUID;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 
 public class BfExcelReportServiceTest {
     @Mock

@@ -1185,7 +1185,7 @@ public class CaseActionsForCaseWorkerControllerTest {
         when(defaultValuesReaderService.getDefaultValues(isA(String.class))).thenThrow(
                 new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(eventValidationService.validateReceiptDate(isA(CaseData.class))).thenThrow(
+        when(eventValidationService.validateReceiptDate(isA(CaseDetails.class))).thenThrow(
                 new InternalException(ERROR_MESSAGE));
         mvc.perform(post(POST_DEFAULT_VALUES_URL)
                 .content(requestContent.toString())

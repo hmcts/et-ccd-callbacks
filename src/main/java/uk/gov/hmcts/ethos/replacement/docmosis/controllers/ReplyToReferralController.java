@@ -216,7 +216,6 @@ public class ReplyToReferralController {
             + ". Referral code: " + referralCode
             + ". Emailed at: " + DateTime.now());
 
-
         ReferralHelper.createReferralReply(
             caseData,
             String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName())

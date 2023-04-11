@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -60,7 +61,7 @@ public class BfExcelReportService {
     private void initializeReportData(XSSFWorkbook workbook, XSSFSheet sheet,
                                       List<BFDateTypeItem> bfDateTypeCollection,
                                       String reportPrintedOnDescription) {
-        if (bfDateTypeCollection.isEmpty()) {
+        if (CollectionUtils.isEmpty(bfDateTypeCollection)) {
             return;
         }
 

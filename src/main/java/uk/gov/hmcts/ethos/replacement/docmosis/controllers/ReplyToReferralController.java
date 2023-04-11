@@ -205,7 +205,7 @@ public class ReplyToReferralController {
             caseData.getReplyToEmailAddress(),
             ReferralHelper.buildPersonalisation(
                 ccdRequest.getCaseDetails(),
-                caseData.getSelectReferral().getValue().getCode(),
+                referralCode,
                 false,
                 userDetails.getName()
             )

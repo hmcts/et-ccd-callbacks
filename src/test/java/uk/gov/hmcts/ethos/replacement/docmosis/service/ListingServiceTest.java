@@ -82,6 +82,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIVE_CASELOAD_REPOR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_CLOSED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
@@ -93,7 +94,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.UnusedPrivateMethod", "PMD.ExcessiveImports", "PMD.UnusedPrivateField",
     "PMD.LinguisticNaming", "PMD.TooManyMethods", "PMD.ExcessiveClassLength", "PMD.ExcessiveMethodLength",
-    "PMD.NcssCount"})
+    "PMD.NcssCount", "PMD.ExcessivePublicCount"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ListingServiceTest {
 
@@ -467,6 +468,21 @@ public class ListingServiceTest {
         dateListedTypeItem.setValue(dateListedType);
         assertFalse(listingService.isListingVenueValid(listingDetails.getCaseData(),
                 dateListedTypeItem, ENGLANDWALES_CASE_TYPE_ID, "123"));
+    }
+
+    @Test
+    public void testVenueScotlandAllOffices() {
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate("2019-12-12T12:11:00.000");
+        dateListedType.setHearingVenueDayScotland("Glasgow");
+        dateListedType.setHearingGlasgow(new DynamicFixedListType("GlasgowVenue"));
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setId("123");
+        dateListedTypeItem.setValue(dateListedType);
+        listingDetails.getCaseData().setListingVenue(new DynamicFixedListType("All"));
+        listingDetails.getCaseData().setManagingOffice("All");
+        assertTrue(listingService.isListingVenueValid(listingDetails.getCaseData(),
+                dateListedTypeItem, SCOTLAND_CASE_TYPE_ID, "123"));
     }
 
     @Test

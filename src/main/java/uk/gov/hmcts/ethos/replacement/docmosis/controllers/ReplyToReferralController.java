@@ -199,7 +199,7 @@ public class ReplyToReferralController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         UserDetails userDetails = userService.getUserDetails(userToken);
-
+        String referralCode = caseData.getSelectReferral().getValue().getCode();
         emailService.sendEmail(
             referralTemplateId,
             caseData.getReplyToEmailAddress(),
@@ -212,8 +212,10 @@ public class ReplyToReferralController {
         );
 
         log.info("Event: Referral Reply Email sent. "
-            + "EventId: " + ccdRequest.getEventId() + "."
-            + "Emailed at: " + DateTime.now());
+            + ". EventId: " + ccdRequest.getEventId()
+            + ". Referral code: " + referralCode
+            + ". Emailed at: " + DateTime.now());
+
 
         ReferralHelper.createReferralReply(
             caseData,

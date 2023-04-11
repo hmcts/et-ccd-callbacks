@@ -168,21 +168,22 @@ public class CreateReferralController {
             caseData.setReferralSubject("Party not responded/complied");
         }
         UserDetails userDetails = userService.getUserDetails(userToken);
-
+        String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(caseData));
         emailService.sendEmail(
             referralTemplateId,
             caseData.getReferentEmail(),
             ReferralHelper.buildPersonalisation(
                 ccdRequest.getCaseDetails(),
-                String.valueOf(ReferralHelper.getNextReferralNumber(caseData)),
+                referralNumber,
                 true,
                 userDetails.getName()
             )
         );
-        
+
         log.info("Event: Referral Email sent. "
-            + "EventId: " + ccdRequest.getEventId() + "."
-            + "Emailed at: " + DateTime.now());
+            + ". EventId: " + ccdRequest.getEventId()
+            + ". Referral number: " + referralNumber
+            + ". Emailed at: " + DateTime.now());
 
         caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
         DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,

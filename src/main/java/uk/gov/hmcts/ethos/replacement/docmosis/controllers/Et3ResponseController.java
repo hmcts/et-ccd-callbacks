@@ -109,7 +109,6 @@ public class Et3ResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = Et3ResponseHelper.validateRespondents(caseData);
-        Et3ResponseHelper.reloadDataOntoEt3(caseData);
 
         return getCallbackRespEntityErrors(errors, caseData);
     }

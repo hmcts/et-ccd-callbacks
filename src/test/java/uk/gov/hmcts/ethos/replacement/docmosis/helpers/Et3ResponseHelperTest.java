@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
@@ -192,23 +191,5 @@ class Et3ResponseHelperTest {
         assertThat(respondentSumType.getEt3ResponseIsClaimantNameCorrect()).isEqualTo(YES);
         assertThat(respondentSumType.getResponseReceived()).isEqualTo(YES);
         assertThat(respondentSumType.getResponseReceivedDate()).isEqualTo(LocalDate.now().toString());
-    }
-
-    @Test
-    void reloadEt3Data() {
-        RespondentSumType respondentSumType = RespondentSumType.builder()
-                .et3ResponseAcasAgree(YES)
-                .et3ResponseSiteEmploymentCount("120")
-                .responseRespondentName("Test Test")
-                .respondentName("test")
-                .build();
-        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
-        respondentSumTypeItem.setValue(respondentSumType);
-        caseData.setRespondentCollection(List.of(respondentSumTypeItem));
-
-        Et3ResponseHelper.reloadDataOntoEt3(caseData);
-        assertThat(caseData.getEt3ResponseAcasAgree()).isEqualTo(YES);
-        assertThat(caseData.getEt3ResponseSiteEmploymentCount()).isEqualTo("120");
-        assertThat(caseData.getEt3ResponseRespondentLegalName()).isEqualTo("Test Test");
     }
 }

@@ -37,7 +37,7 @@ module.exports = async function (jurisdictionOutcome) {
             I.selectOption('#jurCodesCollection_0_judgmentOutcome', commonConfig.jurisdictionRule3);
             I.fillField('#disposalDate-day','10');
             I.fillField('#disposalDate-month','06');
-            I.fillField('#disposalDate-year','2022');
+            I.fillField('#disposalDate-year','2023');
             I.click('Continue');
             I.waitForText('Jurisdiction',testConfig.TestTimeToWaitForText);
             I.click('Submit');

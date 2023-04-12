@@ -176,19 +176,18 @@ class ReferralHelperTest {
 
         ReferralHelper.createReferral(caseData, "Judge Judy", null);
 
-        String expected = "ReferralType(referralNumber=1, referralHearingDate=11 Nov 2030, referCaseTo=Judge Judy, re"
-            + "ferentE"
-            + "mail=judge.judy@aol.com, isUrgent=Yes, referralSubject=Subject line here, referralSubjectSpecify=Cust"
-            + "om subject line, referralDetails=This is an explanation, referralDocument=[DocumentTypeItem(id=1, value"
-            + "=DocumentType(typeOfDocument=null, uploadedDocument=UploadedDocumentType(documentBinaryUrl=binaryUrl/d"
-            + "ocuments/, documentFilename=testFileName, documentUrl=null), ownerDocument=null, creationDate=null, sho"
-            + "rtDescription=null)), DocumentTypeItem(id=2, value=DocumentType(typeOfDocument=null, uploadedDocument=U"
-            + "ploadedDocumentType(documentBinaryUrl=binaryUrl/documents/, documentFilename=testFileName, documentUrl="
-            + "null), ownerDocument=null, creationDate=null, shortDescription=null))], referralInstruction=Custom inst"
-            + "ructions for judge, referredBy=Judge Judy, referralDate="
-            + Helper.getCurrentDate()
-            + ", referralStatus=Awaiting instructions, referralRep"
-            + "lyCollection=null, referralSummaryPdf=null)";
+        String expected = "ReferralType(referralNumber=1, referralHearingDate=11 Nov 2030, referCaseTo=Judge Judy, "
+                + "referentEmail=judge.judy@aol.com, isUrgent=Yes, referralSubject=Subject line here, "
+                + "referralSubjectSpecify=Custom subject line, referralDetails=This is an explanation, "
+                + "referralDocument=[GenericTypeItem(id=1, value=DocumentType(typeOfDocument=null, "
+                + "uploadedDocument=UploadedDocumentType(documentBinaryUrl=binaryUrl/documents/, "
+                + "documentFilename=testFileName, documentUrl=null), ownerDocument=null, creationDate=null, "
+                + "shortDescription=null)), GenericTypeItem(id=2, value=DocumentType(typeOfDocument=null, "
+                + "uploadedDocument=UploadedDocumentType(documentBinaryUrl=binaryUrl/documents/, "
+                + "documentFilename=testFileName, documentUrl=null), ownerDocument=null, creationDate=null, "
+                + "shortDescription=null))], referralInstruction=Custom instructions for judge, referredBy=Judge Judy, "
+                + "referralDate=" + Helper.getCurrentDate() + ", referralStatus=Awaiting instructions, "
+                + "closeReferralGeneralNotes=null, referralReplyCollection=null, referralSummaryPdf=null)";
 
         String actual = caseData.getReferralCollection().get(0).getValue().toString();
         assertEquals(expected, actual);

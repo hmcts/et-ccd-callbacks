@@ -461,14 +461,14 @@
         <notes><![CDATA[
    file name: snakeyaml-1.33.jar
    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/org.yaml/snakeyaml@.*$</packageUrl>
         <cve>CVE-2022-1471</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
    file name: accessors-smart-2.4.9.jar
    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/net\.minidev/accessors\-smart@.*$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/net.minidev/accessors-smart@.*$</packageUrl>
         <cve>CVE-2022-45688</cve>
     </suppress>
 </suppressions>

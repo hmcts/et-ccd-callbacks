@@ -309,7 +309,8 @@ public class CaseManagementForCaseWorkerService {
     private void addHearingsInPastWarning(DateListedTypeItem dateListedTypeItem, CaseData caseData) {
         LocalDate date = LocalDateTime.parse(
                 dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
-        if (HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus())
+        if ((Strings.isNullOrEmpty(dateListedTypeItem.getValue().getHearingStatus())
+                || HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus()))
                 && date.isBefore(LocalDate.now())) {
             caseData.setListedDateInPastWarning(YES);
         }

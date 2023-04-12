@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -167,17 +168,22 @@ public class CreateReferralController {
             caseData.setReferralSubject("Party not responded/complied");
         }
         UserDetails userDetails = userService.getUserDetails(userToken);
-
+        String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(caseData));
         emailService.sendEmail(
             referralTemplateId,
             caseData.getReferentEmail(),
             ReferralHelper.buildPersonalisation(
                 ccdRequest.getCaseDetails(),
-                String.valueOf(ReferralHelper.getNextReferralNumber(caseData)),
+                referralNumber,
                 true,
                 userDetails.getName()
             )
         );
+
+        log.info("Event: Referral Email sent. "
+            + ". EventId: " + ccdRequest.getEventId()
+            + ". Referral number: " + referralNumber
+            + ". Emailed at: " + DateTime.now());
 
         caseData.setReferredBy(String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
         DocumentInfo documentInfo = createReferralService.generateCRDocument(caseData,

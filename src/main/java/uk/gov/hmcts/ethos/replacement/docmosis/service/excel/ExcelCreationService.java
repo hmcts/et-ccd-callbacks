@@ -280,8 +280,8 @@ public class ExcelCreationService {
     }
 
     public void addReportAdminDetails(XSSFWorkbook workbook, XSSFSheet sheet, int rowIndex,
-                                       String reportPrintedOnDescription) {
-        CellRangeAddress reportTitleCellRange = new CellRangeAddress(rowIndex, rowIndex, 0, 6);
+                                       String reportPrintedOnDescription, int lastCol) {
+        CellRangeAddress reportTitleCellRange = new CellRangeAddress(rowIndex, rowIndex, 0, lastCol);
         sheet.addMergedRegion(reportTitleCellRange);
         XSSFRow rowReportTitle = sheet.createRow(rowIndex);
         rowReportTitle.setHeight((short)(rowReportTitle.getHeight() * 8));

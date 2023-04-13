@@ -117,7 +117,7 @@ public class ExcelCreationServiceTest {
             excelCreationService.addReportAdminDetails(workbook,
                     workbook.getSheetAt(0),
                     1,
-                    "description");
+                    "description", 6);
             assertEquals("description", sheet.getRow(1).getCell(0).getStringCellValue());
         }
 

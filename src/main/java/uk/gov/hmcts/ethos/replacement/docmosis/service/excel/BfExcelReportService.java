@@ -93,6 +93,7 @@ public class BfExcelReportService {
         excelCreationService.createCell(row, columnIndex + 1, bfDateType.getBroughtForwardAction(), cellStyle);
         excelCreationService.createCell(row, columnIndex + 2, bfDateType.getBroughtForwardEnteredDate(), cellStyle);
         excelCreationService.createCell(row, columnIndex + 3, bfDateType.getBroughtForwardDate(), cellStyle);
+        cellStyle.setWrapText(true);
         excelCreationService.createCell(row, columnIndex + 4, bfDateType.getBroughtForwardDateReason(), cellStyle);
     }
 }

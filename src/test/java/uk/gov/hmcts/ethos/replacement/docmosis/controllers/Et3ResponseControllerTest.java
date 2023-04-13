@@ -30,6 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({Et3ResponseController.class, Et3ResponseService.class, JsonMapper.class})
@@ -63,7 +64,7 @@ class Et3ResponseControllerTest {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
 
         CaseDetails caseDetails = CaseDataBuilder.builder()
-                .withEt3RepresentingRespondent("test")
+                .withRespondent("test", NO, null, false)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         ccdRequest = CCDRequestBuilder.builder()
@@ -80,7 +81,6 @@ class Et3ResponseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
     }
 

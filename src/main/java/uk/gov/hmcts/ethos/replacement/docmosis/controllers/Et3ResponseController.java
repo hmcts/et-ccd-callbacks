@@ -82,9 +82,9 @@ public class Et3ResponseController {
         caseData.setEt3ResponseShowInset(YES);
         caseData.setEt3ResponseNameShowInset(YES);
         caseData.setEt3ResponseClaimantName(Et3ResponseHelper.formatClaimantNameForHtml(caseData));
-        Et3ResponseHelper.createDynamicListSelection(caseData);
+        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
 
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     @PostMapping(value = "/validateRespondent", consumes = APPLICATION_JSON_VALUE)
@@ -109,7 +109,6 @@ public class Et3ResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = Et3ResponseHelper.validateRespondents(caseData);
-        Et3ResponseHelper.reloadDataOntoEt3(caseData);
 
         return getCallbackRespEntityErrors(errors, caseData);
     }

@@ -17,6 +17,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -46,6 +47,7 @@ class Et3ResponseServiceTest {
                 "11 Small Street", "22 House", null,
                 "Manchester", "M12 42R", "United Kingdom",
                 "1234/5678/90")
+            .withEt3RepresentingRespondent("Antonio Vazquez")
             .build();
         caseData.setEt3NoEt3Response("Test data");
         documentInfo = DocumentInfo.builder()
@@ -76,6 +78,7 @@ class Et3ResponseServiceTest {
     void assertThatEt3DocumentIsSaved() {
         et3ResponseService.saveEt3ResponseDocument(caseData, documentInfo);
         assertThat(caseData.getDocumentCollection().size(), is(1));
+        assertNotNull(caseData.getRespondentCollection().get(0).getValue().getEt3Form());
     }
 
     @Test

@@ -6,7 +6,7 @@ COPY lib/applicationinsights.json /opt/app/
 COPY build/libs/et-cos.jar /opt/app/
 
 
-FROM debian:17 AS builder
+FROM debian:11 AS builder
 
 USER root
 RUN apt update

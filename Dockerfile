@@ -1,5 +1,5 @@
 ARG APP_INSIGHTS_AGENT_VERSION=3.2.6
-FROM hmctspublic.azurecr.io/base/java:11-distroless as base
+FROM hmctspublic.azurecr.io/base/java:17-distroless as base
 LABEL maintainer="https://github.com/hmcts/et-ccd-callbacks"
 
 COPY lib/applicationinsights.json /opt/app/

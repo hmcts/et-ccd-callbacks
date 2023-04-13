@@ -241,7 +241,11 @@ public class Et3ResponseHelper {
      * Create a collection of DynamicLists of respondent names.
      * @param caseData data for the case
      */
-    public static void createDynamicListSelection(CaseData caseData) {
+    public static List<String> createDynamicListSelection(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            return List.of("No respondents found");
+        }
+
         DynamicFixedListType dynamicList = DynamicFixedListType.from(DynamicListHelper.createDynamicRespondentName(
                 caseData.getRespondentCollection().stream()
                         .filter(r -> NO.equals(r.getValue().getResponseReceived()))
@@ -251,7 +255,7 @@ public class Et3ResponseHelper {
         DynamicListTypeItem dynamicListTypeItem = new DynamicListTypeItem();
         dynamicListTypeItem.setValue(dynamicListType);
         caseData.setEt3RepresentingRespondent(List.of(dynamicListTypeItem));
-
+        return new ArrayList<>();
     }
 
     /**

@@ -192,4 +192,12 @@ class Et3ResponseHelperTest {
         assertThat(respondentSumType.getResponseReceived()).isEqualTo(YES);
         assertThat(respondentSumType.getResponseReceivedDate()).isEqualTo(LocalDate.now().toString());
     }
+
+    @Test
+    void createDynamicListSelection_noRespondents() {
+        caseData.setRespondentCollection(null);
+        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
+        assertThat(errors, hasSize(1));
+        assertThat(errors.get(0)).isEqualTo("No respondents found");
+    }
 }

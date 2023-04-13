@@ -70,7 +70,7 @@ public class ClaimsByHearingVenueExcelReportCreationService {
             constructCaseExcelRow(workbook, sheet, rowIndex, claim);
             rowIndex++;
         }
-        excelCreationService.addReportAdminDetails(workbook, sheet, rowIndex, reportPrintedOnDescription);
+        excelCreationService.addReportAdminDetails(workbook, sheet, rowIndex, reportPrintedOnDescription, 6);
     }
 
     private void addColumnFilterCellRange(XSSFSheet sheet, int reportDetailsCount) {

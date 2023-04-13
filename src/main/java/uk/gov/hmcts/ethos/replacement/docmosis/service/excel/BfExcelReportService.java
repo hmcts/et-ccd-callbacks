@@ -74,7 +74,7 @@ public class BfExcelReportService {
             rowIndex++;
         }
 
-        excelCreationService.addReportAdminDetails(workbook, sheet, rowIndex, reportPrintedOnDescription);
+        excelCreationService.addReportAdminDetails(workbook, sheet, rowIndex, reportPrintedOnDescription, 5);
     }
 
     private void addColumnFilterCellRange(XSSFSheet sheet, int reportDetailsCount) {

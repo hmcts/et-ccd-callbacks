@@ -43,7 +43,8 @@ public class BfExcelReportServiceTest {
         excelCreationService = mock(ExcelCreationService.class);
         doAnswer((i) -> null).when(excelCreationService).initializeReportHeaders(anyString(),
                 anyString(), any(), any(), any());
-        doAnswer((i) -> null).when(excelCreationService).addReportAdminDetails(any(), any(), anyInt(), anyString());
+        doAnswer((i) -> null).when(excelCreationService).addReportAdminDetails(
+                any(), any(), anyInt(), anyString(), anyInt());
         service = new BfExcelReportService(excelCreationService);
     }
 

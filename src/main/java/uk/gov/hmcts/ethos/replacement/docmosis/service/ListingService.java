@@ -502,5 +502,8 @@ public class ListingService {
         DynamicFixedListType dynamicListingVenues = new DynamicFixedListType();
         dynamicListingVenues.setListItems(listItems);
         listingData.setListingVenue(dynamicListingVenues);
+        if (ALL_VENUES.equals(listingData.getManagingOffice())) {
+            listingData.getListingVenue().setValue(listingData.getListingVenue().getListItems().get(0));
+        }
     }
 }

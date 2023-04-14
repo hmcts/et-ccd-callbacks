@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -30,6 +31,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class BundlesRespondentController {
 
     private final VerifyTokenService verifyTokenService;
+    private final BundlesRespondentService bundlesRespondentService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
 
@@ -92,7 +94,8 @@ public class BundlesRespondentController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setBundlesRespondentPrepareDocNotesShow(null);
+        bundlesRespondentService.clearInputData(caseData);
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 

@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -14,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
@@ -37,8 +37,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.APP_DETAILS_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.STRING_BR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
@@ -52,15 +53,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelec
 @Service
 @RequiredArgsConstructor
 public class TseAdmReplyService {
-
-    @Value("${tse.admin.reply.notify.claimant.template.id}")
-    private String emailToClaimantTemplateId;
-    @Value("${tse.admin.reply.notify.respondent.template.id}")
-    private String emailToRespondentTemplateId;
-
     private final EmailService emailService;
 
     private final DocumentManagementService documentManagementService;
+
+    private final NotificationProperties notificationProperties;
 
     private static final String APP_DETAILS = "| | |\r\n"
             + TABLE_STRING
@@ -238,7 +235,7 @@ public class TseAdmReplyService {
                 if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
                     respondentDetails =
                         new TSEAdminEmailRecipientsData(
-                            emailToRespondentTemplateId,
+                            notificationProperties.getTseAdminReplyRespondentTemplateId(),
                             respondentSumTypeItem.getValue().getRespondentEmail());
 
                     if (isResponseRequired(caseData, RESPONDENT_TITLE)) {
@@ -261,7 +258,8 @@ public class TseAdmReplyService {
 
             if (claimantEmail != null) {
                 TSEAdminEmailRecipientsData claimantDetails =
-                    new TSEAdminEmailRecipientsData(emailToClaimantTemplateId, claimantEmail);
+                    new TSEAdminEmailRecipientsData(notificationProperties.getTseAdminReplyClaimantTemplateId(),
+                            claimantEmail);
 
                 if (isResponseRequired(caseData, CLAIMANT_TITLE)) {
                     claimantDetails.setCustomisedText(RESPONSE_REQUIRED);
@@ -287,7 +285,8 @@ public class TseAdmReplyService {
     private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String customText) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put(CASE_NUMBER, caseNumber);
-        personalisation.put(CASE_ID, caseId);
+        personalisation.put(LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenUrl() + caseId);
+        personalisation.put(LINK_TO_EXUI, notificationProperties.getExuiUrl() + caseId);
         personalisation.put("customisedText", customText);
         return personalisation;
     }

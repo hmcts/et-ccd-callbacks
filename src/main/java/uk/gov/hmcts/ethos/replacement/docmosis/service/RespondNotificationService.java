@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 
 import java.time.LocalDate;
@@ -43,15 +43,7 @@ public class RespondNotificationService {
 
     private final EmailService emailService;
     private final SendNotificationService sendNotificationService;
-
-    @Value("${url.exui.case-details}")
-    private String exuiUrl;
-    @Value("${url.citizen.case-details}")
-    private String citizenUrl;
-    @Value("${sendNotification.template.id}")
-    private String responseTemplateId;
-    @Value("${respondNotification.noResponseTemplate.id}")
-    private String noResponseTemplateId;
+    private final NotificationProperties notificationProperties;
 
     private static final String RESPONSE_DETAILS = "|  | |\r\n"
         + "| --- | --- |\r\n"
@@ -221,19 +213,20 @@ public class RespondNotificationService {
         CaseData caseData = caseDetails.getCaseData();
         String templateId;
         if (NO.equals(caseData.getRespondNotificationResponseRequired())) {
-            templateId = noResponseTemplateId;
+            templateId = notificationProperties.getNoResponseTemplateId();
         } else {
-            templateId = responseTemplateId;
+            templateId = notificationProperties.getResponseTemplateId();
         }
 
         String sendNotificationTitle = sendNotificationType.getSendNotificationTitle();
         if (!RESPONDENT_ONLY.equals(caseData.getRespondNotificationPartyToNotify())) {
             emailService.sendEmail(templateId, caseData.getClaimantType().getClaimantEmailAddress(),
-                buildPersonalisation(caseDetails, citizenUrl, sendNotificationTitle));
+                buildPersonalisation(caseDetails, notificationProperties.getCitizenUrl(), sendNotificationTitle));
         }
 
         if (!CLAIMANT_ONLY.equals(caseData.getRespondNotificationPartyToNotify())) {
-            Map<String, String> personalisation = buildPersonalisation(caseDetails, exuiUrl, sendNotificationTitle);
+            Map<String, String> personalisation = buildPersonalisation(caseDetails,
+                    notificationProperties.getExuiUrl(), sendNotificationTitle);
             List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
             respondents.forEach(obj -> sendRespondentEmail(caseData, personalisation, obj.getValue(), templateId));
         }

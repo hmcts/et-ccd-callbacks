@@ -10,6 +10,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.service.notify.NotificationClientException;
@@ -79,6 +81,9 @@ class RespondentTellSomethingElseServiceTest {
     @MockBean
     private TornadoService tornadoService;
 
+    @SpyBean
+    private NotificationProperties notificationProperties;
+
     @Captor
     ArgumentCaptor<Map<String, Object>> personalisationCaptor;
 
@@ -110,12 +115,13 @@ class RespondentTellSomethingElseServiceTest {
     void setUp() {
         respondentTellSomethingElseService =
                 new RespondentTellSomethingElseService(emailService, userService, tribunalOfficesService,
-                        tornadoService);
+                        tornadoService, notificationProperties);
         tseService = new TseService();
 
-        ReflectionTestUtils.setField(respondentTellSomethingElseService, "emailTemplateId", TEMPLATE_ID);
-        ReflectionTestUtils.setField(respondentTellSomethingElseService, "emailTypeCTemplateId", "TypeCTemplateId");
-        ReflectionTestUtils.setField(respondentTellSomethingElseService, "exuiUrl", "exui/cases/case-details/");
+        ReflectionTestUtils.setField(notificationProperties, "emailTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(notificationProperties, "emailTypeCTemplateId", "TypeCTemplateId");
+        ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl");
+        ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
 
         UserDetails userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);
@@ -321,7 +327,7 @@ class RespondentTellSomethingElseServiceTest {
             "caseNumber", caseData.getEthosCaseReference(),
             "claimant", caseData.getClaimant(),
             "respondents", getRespondentNames(caseData),
-            "caseId", CASE_ID
+            "linkToExUI", "exuiUrl669718251103419"
         );
 
         respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
@@ -339,7 +345,6 @@ class RespondentTellSomethingElseServiceTest {
         Map<String, Object> actual = respondentTellSomethingElseService.claimantPersonalisation(caseDetails, "test",
             new byte[]{});
 
-        assertThat(actual.get("ccdId"), is(caseDetails.getCaseId()));
         assertThat(actual.get("caseNumber"), is(caseData.getEthosCaseReference()));
         assertThat(actual.get("applicationType"), is(TSE_APP_AMEND_RESPONSE));
         assertThat(actual.get("instructions"), is("test"));
@@ -517,7 +522,7 @@ class RespondentTellSomethingElseServiceTest {
                 "claimant", "claimant",
                 "respondents", "Father Ted",
                 "date", "Not set",
-                "url", "exui/cases/case-details/669718251103419");
+                "url", "exuiUrl669718251103419");
 
         verify(emailService, times(1)).sendEmail(any(), any(), eq(caseNumber));
 
@@ -650,7 +655,7 @@ class RespondentTellSomethingElseServiceTest {
         personalisation.put("claimant", caseData.getClaimant());
         personalisation.put("respondents", getRespondentNames(caseData));
         personalisation.put("shortText", selectedApplication);
-        personalisation.put("caseId", CASE_ID);
+        personalisation.put("linkToExUI", "exuiUrl669718251103419");
         if (expectedAnswer != null) {
             personalisation.put("customisedText", String.format(expectedAnswer, selectedApplication));
         }

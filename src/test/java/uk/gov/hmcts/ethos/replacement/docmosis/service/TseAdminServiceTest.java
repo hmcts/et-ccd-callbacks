@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -63,6 +65,8 @@ class TseAdminServiceTest {
     private EmailService emailService;
     @MockBean
     private DocumentManagementService documentManagementService;
+    @SpyBean
+    private NotificationProperties notificationProperties;
 
     private CaseData caseData;
 
@@ -78,11 +82,17 @@ class TseAdminServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer authToken";
 
+    private static final String XUI_URL = "exuiUrl";
+
+    private static final String CITIZEN_URL = "citizenUrl";
+
     @BeforeEach
     void setUp() {
-        tseAdminService = new TseAdminService(emailService, documentManagementService);
-        ReflectionTestUtils.setField(tseAdminService, "emailToClaimantTemplateId", TEMPLATE_ID);
-        ReflectionTestUtils.setField(tseAdminService, "emailToRespondentTemplateId", TEMPLATE_ID);
+        tseAdminService = new TseAdminService(emailService, documentManagementService, notificationProperties);
+        ReflectionTestUtils.setField(notificationProperties, "tseAdminRecordClaimantTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(notificationProperties, "tseAdminRecordRespondentTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(notificationProperties, "exuiUrl", XUI_URL);
+        ReflectionTestUtils.setField(notificationProperties, "citizenUrl", CITIZEN_URL);
         caseData = CaseDataBuilder.builder().build();
     }
 
@@ -521,8 +531,9 @@ class TseAdminServiceTest {
                                                       String expectedName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
-        personalisation.put("caseId", CASE_ID);
         personalisation.put("name", expectedName);
+        personalisation.put("linkToExUI", XUI_URL + CASE_ID);
+        personalisation.put("linkToCitizenHub", CITIZEN_URL + CASE_ID);
         return personalisation;
     }
 

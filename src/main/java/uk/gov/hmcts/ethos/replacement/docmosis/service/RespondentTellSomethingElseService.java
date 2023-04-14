@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -13,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
@@ -38,12 +38,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_JUDGEMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EMAIL_FLAG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
@@ -55,17 +55,7 @@ public class RespondentTellSomethingElseService {
     private final UserService userService;
     private final TribunalOfficesService tribunalOfficesService;
     private final TornadoService tornadoService;
-
-    @Value("${tse.respondent.application.acknowledgement.template.id}")
-    private String emailTemplateId;
-    @Value("${tse.respondent.application.acknowledgement.type.c.template.id}")
-    private String emailTypeCTemplateId;
-    @Value("${tse.respondent.application.notify.claimant.template.id}")
-    private String claimantTemplateId;
-    @Value("${url.exui.case-details}")
-    private String exuiUrl;
-    @Value("${tse.respondent.application.tribunal.template.id}")
-    private String adminTemplateId;
+    private final NotificationProperties notificationProperties;
 
     private static final String GIVE_DETAIL_MISSING = "Use the text box or file upload to give details.";
     private static final List<String> GROUP_B_TYPES = List.of(TSE_APP_CHANGE_PERSONAL_DETAILS,
@@ -123,12 +113,14 @@ public class RespondentTellSomethingElseService {
         String email = userService.getUserDetails(userToken).getEmail();
 
         if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
-            emailService.sendEmail(emailTypeCTemplateId, email, buildPersonalisationTypeC(caseDetails));
+            emailService.sendEmail(notificationProperties.getEmailTypeCTemplateId(), email,
+                    buildPersonalisationTypeC(caseDetails));
             return;
         }
 
         if (NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())) {
-            emailService.sendEmail(emailTemplateId, email, buildPersonalisation(caseDetails, RULE92_ANSWERED_NO));
+            emailService.sendEmail(notificationProperties.getEmailTemplateId(), email,
+                    buildPersonalisation(caseDetails, RULE92_ANSWERED_NO));
             return;
         }
 
@@ -140,7 +132,8 @@ public class RespondentTellSomethingElseService {
             customisedText = String.format(RULE92_ANSWERED_YES_GROUP_A, caseData.getResTseSelectApplication());
         }
 
-        emailService.sendEmail(emailTemplateId, email, buildPersonalisation(caseDetails, customisedText));
+        emailService.sendEmail(notificationProperties.getEmailTemplateId(), email,
+                buildPersonalisation(caseDetails, customisedText));
     }
 
     private Map<String, String> buildPersonalisationTypeC(CaseDetails caseDetails) {
@@ -149,7 +142,7 @@ public class RespondentTellSomethingElseService {
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, getRespondentNames(caseData),
-                CASE_ID, caseDetails.getCaseId()
+                LINK_TO_EXUI, notificationProperties.getExuiUrl() + caseDetails.getCaseId()
         );
     }
 
@@ -181,7 +174,7 @@ public class RespondentTellSomethingElseService {
         try {
             bytes = tornadoService.generateEventDocumentBytes(caseData, "", RES_TSE_FILE_NAME);
             Map<String, Object> personalisation = claimantPersonalisation(caseDetails, instructions, bytes);
-            emailService.sendEmail(claimantTemplateId, claimantEmail, personalisation);
+            emailService.sendEmail(notificationProperties.getClaimantTemplateId(), claimantEmail, personalisation);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
@@ -195,7 +188,7 @@ public class RespondentTellSomethingElseService {
         personalisation.put(RESPONDENTS, getRespondentNames(caseData));
         personalisation.put("customisedText", customisedText);
         personalisation.put("shortText", caseData.getResTseSelectApplication());
-        personalisation.put(CASE_ID, detail.getCaseId());
+        personalisation.put(LINK_TO_EXUI, notificationProperties.getExuiUrl() + detail.getCaseId());
         return personalisation;
     }
 
@@ -215,7 +208,7 @@ public class RespondentTellSomethingElseService {
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
         return Map.of(
-                CCD_ID, caseDetails.getCaseId(),
+                LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenUrl() + caseDetails.getCaseId(),
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 "applicationType", caseData.getResTseSelectApplication(),
                 "instructions", instructions,
@@ -277,7 +270,7 @@ public class RespondentTellSomethingElseService {
         }
 
         Map<String, String> personalisation = buildPersonalisationForAdminEmail(caseDetails);
-        emailService.sendEmail(adminTemplateId, email, personalisation);
+        emailService.sendEmail(notificationProperties.getAdminTemplateId(), email, personalisation);
     }
 
     /**
@@ -291,7 +284,7 @@ public class RespondentTellSomethingElseService {
         personalisation.put(CLAIMANT, caseData.getClaimant());
         personalisation.put(RESPONDENTS, getRespondentNames(caseData));
         personalisation.put(DATE, ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
-        personalisation.put("url", exuiUrl + caseDetails.getCaseId());
+        personalisation.put("url", notificationProperties.getExuiUrl() + caseDetails.getCaseId());
         return personalisation;
     }
 }

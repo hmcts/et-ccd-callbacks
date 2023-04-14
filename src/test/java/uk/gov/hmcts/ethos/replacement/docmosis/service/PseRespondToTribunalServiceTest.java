@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
@@ -69,6 +71,10 @@ class PseRespondToTribunalServiceTest {
         + "The tribunal will consider all correspondence and let you know what happens next.";
     private static final String RULE92_ANSWERED_YES =
             "You have responded to the tribunal and copied your response to the other party.\r\n\r\n";
+    public static final String LINK_TO_CITIZEN_HUB = "linkToCitizenHub";
+    public static final String LINK_TO_EXUI = "linkToExUI";
+    public static final String CITIZEN_HUB_URL = "https://et-sya.test.platform.hmcts.net/citizen-hub/";
+    public static final String EXUI_URL = "https://manage-case.test.platform.hmcts.net/cases/case-details/";
 
     @MockBean
     private EmailService emailService;
@@ -78,12 +84,22 @@ class PseRespondToTribunalServiceTest {
     private HearingSelectionService hearingSelectionService;
     @MockBean
     private TribunalOfficesService tribunalOfficesService;
+    @SpyBean
+    private NotificationProperties notificationProperties;
 
     @BeforeEach
     void setUp() {
         pseRespondToTribService = new PseRespondToTribunalService(emailService, userService, hearingSelectionService,
-            tribunalOfficesService);
+            tribunalOfficesService, notificationProperties);
         caseData = CaseDataBuilder.builder().build();
+        ReflectionTestUtils.setField(notificationProperties, "citizenUrl",
+                CITIZEN_HUB_URL);
+        ReflectionTestUtils.setField(notificationProperties, "exuiUrl",
+                EXUI_URL);
+        ReflectionTestUtils.setField(notificationProperties, "acknowledgeEmailNoTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(notificationProperties, "notificationToClaimantTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(notificationProperties, "notificationToAdminTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(notificationProperties, "acknowledgeEmailYesTemplateId", TEMPLATE_ID);
     }
 
     @Test
@@ -424,11 +440,9 @@ class PseRespondToTribunalServiceTest {
 
         when(userService.getUserDetails(any())).thenReturn(HelperTest.getUserDetails());
 
-        ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailYesTemplateId", TEMPLATE_ID);
-
         Map<String, String> expectedMap = Map.of(
             "caseNumber", "6000001/2023",
-            "caseId", "1677174791076683"
+                LINK_TO_EXUI, EXUI_URL + "1677174791076683"
         );
 
         pseRespondToTribService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
@@ -470,14 +484,12 @@ class PseRespondToTribunalServiceTest {
         when(hearingSelectionService.getSelectedListingWithList(isA(CaseData.class),
             isA(DynamicFixedListType.class))).thenReturn(selectedListing);
 
-        ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailNoTemplateId", TEMPLATE_ID);
-
         Map<String, String> expectedMap = Map.of(
             "caseNumber", "6000001/2023",
             "claimant", "Claimant Name",
             "respondents", "Respondent One, Respondent Two",
             "hearingDate", "25 December 2023 12:00",
-            "caseId", "1677174791076683"
+            LINK_TO_EXUI, EXUI_URL + "1677174791076683"
         );
 
         pseRespondToTribService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
@@ -496,13 +508,11 @@ class PseRespondToTribunalServiceTest {
         caseDetails.setCaseId("1677174791076683");
         caseDetails.getCaseData().setPseRespondentOrdReqCopyToOtherParty(YES);
 
-        ReflectionTestUtils.setField(pseRespondToTribService, "notificationToClaimantTemplateId", TEMPLATE_ID);
-
         Map<String, String> expectedMap = Map.of(
             "caseNumber", "6000001/2023",
             "claimant", "Claimant Name",
             "respondents", "Respondent One, Respondent Two",
-            "caseId", "1677174791076683"
+            LINK_TO_CITIZEN_HUB, CITIZEN_HUB_URL + "1677174791076683"
         );
 
         pseRespondToTribService.sendClaimantEmail(caseDetails);
@@ -554,15 +564,13 @@ class PseRespondToTribunalServiceTest {
         when(hearingSelectionService.getSelectedListingWithList(isA(CaseData.class),
             isA(DynamicFixedListType.class))).thenReturn(selectedListing);
 
-        ReflectionTestUtils.setField(pseRespondToTribService, "notificationToAdminTemplateId", TEMPLATE_ID);
-
         Map<String, String> expectedMap = Map.of(
             "caseNumber", "6000001/2023",
             "application", "View notice of hearing",
             "claimant", "Claimant Name",
             "respondents", "Respondent One, Respondent Two",
             "hearingDate", "25 December 2023 12:00",
-            "caseId", "1677174791076683"
+                LINK_TO_EXUI, EXUI_URL + "1677174791076683"
         );
 
         pseRespondToTribService.sendTribunalEmail(caseDetails);
@@ -596,15 +604,13 @@ class PseRespondToTribunalServiceTest {
         when(tribunalOfficesService.getTribunalOffice(any()))
             .thenReturn(TribunalOffice.valueOfOfficeName("Manchester"));
 
-        ReflectionTestUtils.setField(pseRespondToTribService, "notificationToAdminTemplateId", TEMPLATE_ID);
-
         Map<String, String> expectedMap = Map.of(
             "caseNumber", "6000001/2023",
             "application", "View notice of hearing",
             "claimant", "Claimant Name",
             "respondents", "Respondent One",
             "hearingDate", "",
-            "caseId", "1677174791076683"
+                LINK_TO_EXUI, EXUI_URL + "1677174791076683"
         );
 
         pseRespondToTribService.sendTribunalEmail(caseDetails);

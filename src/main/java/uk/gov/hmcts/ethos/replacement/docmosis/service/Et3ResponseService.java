@@ -8,7 +8,9 @@ import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.util.ArrayList;
@@ -48,7 +50,7 @@ public class Et3ResponseService {
     }
 
     /**
-     * Saves the generated ET3 Response form document onto case data.
+     * Saves the generated ET3 Response form document in the document collection and the respondent.
      * @param caseData where the data is stored
      */
     public void saveEt3ResponseDocument(CaseData caseData, DocumentInfo documentInfo) {
@@ -57,6 +59,37 @@ public class Et3ResponseService {
         DocumentTypeItem documentTypeItem = DocumentTypeItem.fromUploadedDocument(uploadedDocument);
         documentTypeItem.getValue().setTypeOfDocument("ET3");
 
+        addDocumentToDocCollection(caseData, documentTypeItem);
+        addDocumentToRespondent(caseData, uploadedDocument);
+    }
+
+    private void addDocumentToRespondent(CaseData caseData, UploadedDocumentType uploadedDocument) {
+        if (CollectionUtils.isEmpty(caseData.getEt3RepresentingRespondent())) {
+            return;
+        }
+
+        Set<String> respondentSet = new HashSet<>();
+        for (DynamicListTypeItem dynamicListTypeItem : caseData.getEt3RepresentingRespondent()) {
+            respondentSet.add(dynamicListTypeItem.getValue().getDynamicList().getSelectedLabel());
+        }
+
+        for (String respondentSelected : respondentSet) {
+            Optional<RespondentSumTypeItem> respondent = caseData.getRespondentCollection().stream()
+                    .filter(r -> respondentSelected.equals(r.getValue().getRespondentName()))
+                    .findFirst();
+            if (respondent.isPresent()) {
+                respondent.get().getValue().setEt3Form(uploadedDocument);
+                for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
+                    if (respondentSelected.equals(respondentSumTypeItem.getValue().getRespondentName())) {
+                        respondentSumTypeItem.setValue(respondent.get().getValue());
+                    }
+                }
+            }
+        }
+
+    }
+
+    private static void addDocumentToDocCollection(CaseData caseData, DocumentTypeItem documentTypeItem) {
         if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
             caseData.setDocumentCollection(new ArrayList<>());
         }

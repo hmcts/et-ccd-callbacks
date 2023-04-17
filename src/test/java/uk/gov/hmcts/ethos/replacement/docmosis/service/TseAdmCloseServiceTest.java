@@ -97,7 +97,7 @@ class TseAdmCloseServiceTest {
             + "|Applicant | Respondent|\r\n"
             + "|Type of application | Amend response|\r\n"
             + "|Application date | 13 December 2022|\r\n"
-            + (appHasDetails ? "|What do you want to tell or ask the tribunal? | Details Text|\r\n" : "")
+            + (appHasDetails ? "|Details of the application | Details Text|\r\n" : "")
             + (appHasDoc
             ? "|Supporting material | <a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>|\r\n"
             : "")

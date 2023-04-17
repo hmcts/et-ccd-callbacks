@@ -25,7 +25,6 @@ public final class TableMarkupConstants {
     public static final String DATE_MARKUP = "|Date | %s|\r\n";
     public static final String RESPONSE_FROM = "|Response from | %s|\r\n";
     public static final String RESPONSE_DATE = "|Response date | %s|\r\n";
-    public static final String CLOSE_APP_TELL_DETAILS = "|What do you want to tell or ask the tribunal? | %s|\r\n";
 
     private TableMarkupConstants() {
         // restrict instantiation

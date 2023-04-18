@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DynamicRadioList;
 import uk.gov.hmcts.et.common.model.ccd.DynamicRadioListElement;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
@@ -36,6 +37,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class BundlesRespondentController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
+    private final BundlesRespondentService bundlesRespondentService;
     private final VerifyTokenService verifyTokenService;
 
      /**
@@ -67,12 +69,13 @@ public class BundlesRespondentController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        caseData.setBundlesRespondentSelectHearing(DynamicRadioList.builder().listItems(List.of(
-                DynamicRadioListElement.builder().code("Code One").label("Label One").build(),
-                DynamicRadioListElement.builder().code("Code Two").label("Label Two").build(),
-                DynamicRadioListElement.builder().code("Code Three").label("Label Three").build()
-        )).build());
+//        caseData.setBundlesRespondentSelectHearing(DynamicRadioList.builder().listItems(List.of(
+//                DynamicRadioListElement.builder().code("Code One").label("Label One").build(),
+//                DynamicRadioListElement.builder().code("Code Two").label("Label Two").build(),
+//                DynamicRadioListElement.builder().code("Code Three").label("Label Three").build()
+//        )).build());
 
+        bundlesRespondentService.populateSelectHearings(caseData);
         // Code here
         return getCallbackRespEntityNoErrors(caseData);
     }

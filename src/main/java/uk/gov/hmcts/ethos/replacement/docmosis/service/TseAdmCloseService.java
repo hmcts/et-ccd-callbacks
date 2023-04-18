@@ -21,9 +21,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.ADDITIONAL_INFORMATION;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.APP_DETAILS_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.CLOSE_APP_DECISION_DETAILS_OTHER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DETAILS_OF_THE_APPLICATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DOCUMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.NAME_MARKUP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.STRING_BR;
@@ -101,7 +101,7 @@ public class TseAdmCloseService {
             applicationTypeItem.getValue().getDate(),
             isBlank(applicationTypeItem.getValue().getDetails())
                 ? ""
-                : String.format(APP_DETAILS_DETAILS, applicationTypeItem.getValue().getDetails()),
+                : String.format(DETAILS_OF_THE_APPLICATION, applicationTypeItem.getValue().getDetails()),
             getApplicationDocumentLink(applicationTypeItem, authToken),
             formatRule92(applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo(),
                 applicationTypeItem.getValue().getCopyToOtherPartyText())

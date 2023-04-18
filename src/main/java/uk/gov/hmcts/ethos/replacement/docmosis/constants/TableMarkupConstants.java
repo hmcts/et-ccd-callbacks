@@ -17,7 +17,7 @@ public final class TableMarkupConstants {
     public static final String RESPONSE_LIST_TITLE = "|Responses | |\r\n"
             + TABLE_STRING
             + "\r\n";
-    public static final String APP_DETAILS_DETAILS = "|Details of the application | %s|\r\n";
+    public static final String DETAILS_OF_THE_APPLICATION = "|Details of the application | %s|\r\n";
     public static final String DOCUMENT = "|Document | %s|\r\n";
     public static final String STRING_BR = "<br>";
     public static final String CLOSE_APP_DECISION_DETAILS_OTHER = "|Decision details | %s|\r\n";

@@ -16,12 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.DynamicRadioList;
-import uk.gov.hmcts.et.common.model.ccd.DynamicRadioListElement;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-
-import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -40,7 +36,7 @@ public class BundlesRespondentController {
     private final BundlesRespondentService bundlesRespondentService;
     private final VerifyTokenService verifyTokenService;
 
-     /**
+    /**
      * Populates the hearing list on page 3.
      *
      * @param ccdRequest holds the request and case data
@@ -69,14 +65,7 @@ public class BundlesRespondentController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-//        caseData.setBundlesRespondentSelectHearing(DynamicRadioList.builder().listItems(List.of(
-//                DynamicRadioListElement.builder().code("Code One").label("Label One").build(),
-//                DynamicRadioListElement.builder().code("Code Two").label("Label Two").build(),
-//                DynamicRadioListElement.builder().code("Code Three").label("Label Three").build()
-//        )).build());
-
         bundlesRespondentService.populateSelectHearings(caseData);
-        // Code here
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

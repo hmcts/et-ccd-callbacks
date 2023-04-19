@@ -241,7 +241,9 @@ public final class HearingsHelper {
     }
 
     public static String getHearingVenue(HearingType hearing) {
-        return Optional.ofNullable(hearing.getHearingVenueScotland())
-                .orElse(hearing.getHearingVenue().getSelectedLabel());
+        if (hearing.getHearingVenueScotland() != null) {
+            return hearing.getHearingVenueScotland();
+        }
+        return hearing.getHearingVenue().getSelectedLabel();
     }
 }

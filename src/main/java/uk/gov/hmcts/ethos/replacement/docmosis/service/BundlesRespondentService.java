@@ -18,7 +18,7 @@ import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.formatLocalDate;
 @RequiredArgsConstructor
 @Service("bundlesRespondentService")
 public class BundlesRespondentService {
-    public void populateSelectHearings(CaseData caseData){
+    public void populateSelectHearings(CaseData caseData) {
         DynamicFixedListType listType = DynamicFixedListType.from(caseData.getHearingCollection().stream()
                 .map(this::createValueType)
                 .collect(Collectors.toList())

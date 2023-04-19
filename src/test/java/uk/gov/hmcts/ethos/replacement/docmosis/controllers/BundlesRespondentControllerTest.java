@@ -42,7 +42,6 @@ class BundlesRespondentControllerTest {
     private JsonMapper jsonMapper;
     private CCDRequest ccdRequest;
 
-
     @BeforeEach
     void setUp() throws Exception {
         CaseDetails caseDetails = CaseDataBuilder.builder()
@@ -54,10 +53,9 @@ class BundlesRespondentControllerTest {
             .withCaseData(caseDetails.getCaseData())
             .build();
     }
-    
 
     @Test
-    void MID_POPULATE_HEARINGS_tokenOk() throws Exception {
+    void midPopulateHearings_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(MID_POPULATE_HEARINGS_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -70,7 +68,7 @@ class BundlesRespondentControllerTest {
     }
 
     @Test
-    void MID_POPULATE_HEARINGS_tokenFail() throws Exception {
+    void midPopulateHearings_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(MID_POPULATE_HEARINGS_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -80,7 +78,7 @@ class BundlesRespondentControllerTest {
     }
 
     @Test
-    void MID_POPULATE_HEARINGS_badRequest() throws Exception {
+    void midPopulateHearings_badRequest() throws Exception {
         mockMvc.perform(post(MID_POPULATE_HEARINGS_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -88,5 +86,4 @@ class BundlesRespondentControllerTest {
             .andExpect(status().isBadRequest());
     }
     
-
 }

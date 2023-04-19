@@ -233,7 +233,7 @@ public final class HearingsHelper {
         return Collections.min(futureHearings, Comparator.comparing(c -> c.getValue().getListedDate()));
     }
 
-    public static List<DateListedTypeItem> filterFutureHearings(List<DateListedTypeItem> hearingDateCollection) {
+    private static List<DateListedTypeItem> filterFutureHearings(List<DateListedTypeItem> hearingDateCollection) {
         return hearingDateCollection.stream()
             .filter(d -> isDateInFuture(d.getValue().getListedDate(), LocalDateTime.now())
                     && HEARING_STATUS_LISTED.equals(d.getValue().getHearingStatus()))

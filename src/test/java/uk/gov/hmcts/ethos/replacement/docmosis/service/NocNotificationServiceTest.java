@@ -113,6 +113,8 @@ class NocNotificationServiceTest {
         nocNotificationService.sendNotificationOfChangeEmails(callbackRequest, caseData);
         // Claimant
         verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), any());
+        // We are not sending notification to Previous respondent here
+        verify(emailService, times(0)).sendEmail(any(), eq("oldres@rep.com"), any());
         //New respondent
         verify(emailService, times(1)).sendEmail(any(), eq("newres@rep.com"), any());
         // Tribunal

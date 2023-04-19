@@ -54,8 +54,6 @@ sonarqube {
     }
 }
 
-project.tasks['sonarqube'].dependsOn jacocoTestReport
-
 sourceSets {
     test {
         java.srcDir 'src/test/java'
@@ -77,8 +75,8 @@ sourceSets {
     }
     integrationTest {
         java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
             srcDir file('src/test/integration/java')
         }
         resources.srcDir file('src/test/integration/resources')
@@ -221,7 +219,7 @@ task fortifyScan(type: JavaExec)  {
 }
 
 jacocoTestReport {
-    executionData(test)
+    executionData(test, integration)
     reports {
         xml.required = true
         csv.required = false
@@ -254,6 +252,13 @@ repositories {
     mavenCentral()
     maven { url "https://jitpack.io" }
 }
+
+project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
+check.dependsOn integration
+checkstyleMain.shouldRunAfter(compileJava)
+test.shouldRunAfter(checkstyleTest)
+integration.shouldRunAfter(checkstyleIntegrationTest)
+integration.shouldRunAfter(test)
 
 ext {
     junitJupiterVersion = '5.9.1'
@@ -372,8 +377,8 @@ dependencies {
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 
-    integrationTestImplementation sourceSets.main.runtimeClasspath
-    integrationTestImplementation sourceSets.test.runtimeClasspath
+    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
+    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '4.7.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'

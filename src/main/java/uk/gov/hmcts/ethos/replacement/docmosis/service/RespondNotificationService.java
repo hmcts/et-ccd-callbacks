@@ -226,9 +226,11 @@ public class RespondNotificationService {
             templateId = responseTemplateId;
         }
 
+        String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
+
         String sendNotificationTitle = sendNotificationType.getSendNotificationTitle();
-        if (!RESPONDENT_ONLY.equals(caseData.getRespondNotificationPartyToNotify())) {
-            emailService.sendEmail(templateId, caseData.getClaimantType().getClaimantEmailAddress(),
+        if (!RESPONDENT_ONLY.equals(caseData.getRespondNotificationPartyToNotify()) && !isNullOrEmpty(claimantEmail)) {
+            emailService.sendEmail(templateId, claimantEmail,
                 buildPersonalisation(caseDetails, citizenUrl, sendNotificationTitle));
         }
 

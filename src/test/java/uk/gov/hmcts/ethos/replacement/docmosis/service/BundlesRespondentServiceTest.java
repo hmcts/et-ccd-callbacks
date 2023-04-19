@@ -26,15 +26,15 @@ class BundlesRespondentServiceTest {
     @Test
     void clearInputData() {
         caseData.setBundlesRespondentPrepareDocNotesShow(YES);
-        caseData.setBundlesRespondentAgreedDocWithOtherParty(NO);
-        caseData.setBundlesRespondentAgreedDocWithOtherPartyBut("Some input");
-        caseData.setBundlesRespondentAgreedDocWithOtherPartyNo("Some input");
+        caseData.setBundlesRespondentAgreedDocWith(NO);
+        caseData.setBundlesRespondentAgreedDocWithBut("Some input");
+        caseData.setBundlesRespondentAgreedDocWithNo("Some input");
 
         bundlesRespondentService.clearInputData(caseData);
 
         assertThat(caseData.getBundlesRespondentPrepareDocNotesShow()).isNull();
-        assertThat(caseData.getBundlesRespondentAgreedDocWithOtherParty()).isNull();
-        assertThat(caseData.getBundlesRespondentAgreedDocWithOtherPartyBut()).isNull();
-        assertThat(caseData.getBundlesRespondentAgreedDocWithOtherPartyNo()).isNull();
+        assertThat(caseData.getBundlesRespondentAgreedDocWith()).isNull();
+        assertThat(caseData.getBundlesRespondentAgreedDocWithBut()).isNull();
+        assertThat(caseData.getBundlesRespondentAgreedDocWithNo()).isNull();
     }
 }

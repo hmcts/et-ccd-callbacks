@@ -16,9 +16,9 @@ public class BundlesRespondentService {
      */
     public void clearInputData(CaseData caseData) {
         caseData.setBundlesRespondentPrepareDocNotesShow(null);
-        caseData.setBundlesRespondentAgreedDocWithOtherParty(null);
-        caseData.setBundlesRespondentAgreedDocWithOtherPartyBut(null);
-        caseData.setBundlesRespondentAgreedDocWithOtherPartyNo(null);
+        caseData.setBundlesRespondentAgreedDocWith(null);
+        caseData.setBundlesRespondentAgreedDocWithBut(null);
+        caseData.setBundlesRespondentAgreedDocWithNo(null);
     }
 
 }

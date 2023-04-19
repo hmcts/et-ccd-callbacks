@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,8 +30,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepos
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRestrictedReporting;
-import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
-import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationsResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCloseValidator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseCreationForCaseWorkerService;
@@ -84,9 +81,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
     "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
     "PMD.ExcessiveImports", "PMD.CyclomaticComplexity"})
 public class CaseActionsForCaseWorkerController {
-    @Autowired
-    OrganisationClient organisationClient;
-
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String EVENT_FIELDS_VALIDATION = "Event fields validation: ";
@@ -472,23 +466,13 @@ public class CaseActionsForCaseWorkerController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        var representative = caseData.getRepCollection().get(0).getValue();
-
-        String reference = representative.getRespondentOrganisation().getOrganisationID();
-        OrganisationsResponse organisation = organisationClient.getOrganisations(userToken).stream()
-            .filter(o -> o.getOrganisationIdentifier().equals(reference))
-            .findFirst().get(); // todo deal with doesn't exist
-
-        // todo can't save into representative as it can be overriden in the page. Has to be saved with organisation object.
-        String postCode = organisation.getContactInformation().get(0).getPostCode();
-        representative.getRepresentativeAddress().setPostCode(postCode);
-
         List<String> errors = eventValidationService.validateRespRepNames(caseData);
 
         if (errors.isEmpty()) {
             //add org policy and NOC elements
             caseData.setRepCollection(nocRespondentHelper.updateWithRespondentIds(caseData));
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+            caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
         }
 
         log.info(EVENT_FIELDS_VALIDATION + errors);

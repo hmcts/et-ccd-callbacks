@@ -36,6 +36,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -95,6 +96,8 @@ class NocRespondentRepresentativeServiceTest {
     private AdminUserService adminUserService;
     @MockBean
     private NocCcdService nocCcdService;
+    @MockBean
+    private EmailService emailService;
     private NocRespondentHelper nocRespondentHelper;
     private CaseData caseData;
 
@@ -105,7 +108,7 @@ class NocRespondentRepresentativeServiceTest {
         CaseConverter converter = new CaseConverter(objectMapper);
         nocRespondentRepresentativeService =
             new NocRespondentRepresentativeService(noticeOfChangeFieldPopulator, converter, nocCcdService,
-                adminUserService, nocRespondentHelper);
+                adminUserService, nocRespondentHelper, emailService);
 
         // Respondent
         caseData.setRespondentCollection(new ArrayList<>());
@@ -288,6 +291,10 @@ class NocRespondentRepresentativeServiceTest {
 
         verify(nocCcdService, times(2))
             .updateCaseRepresentation(any(), any(), any(), any(), any());
+
+        verify(emailService, times(1)).sendEmail(any(), eq("oldRep1@test.com"), any());
+        verify(emailService, times(1)).sendEmail(any(), eq("oldRep2@test.com"), any());
+
     }
 
     private CallbackRequest getCallBackCallbackRequest() {
@@ -364,6 +371,8 @@ class NocRespondentRepresentativeServiceTest {
         CaseData caseDataBefore = new CaseData();
 
         caseDataBefore.setRespondentCollection(new ArrayList<>());
+        caseDataBefore.setClaimant("claimant");
+        caseDataBefore.setEthosCaseReference("caseRef");
 
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME)
@@ -418,7 +427,8 @@ class NocRespondentRepresentativeServiceTest {
             RepresentedTypeR.builder()
                 .nameOfRepresentative(RESPONDENT_REP_NAME_TWO)
                 .respRepName(RESPONDENT_NAME_TWO)
-                .respondentOrganisation(org2).build();
+                .respondentOrganisation(org2)
+                .representativeEmailAddress("oldRep1@test.com").build();
         representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId(RESPONDENT_REP_ID_TWO);
         representedTypeRItem.setValue(representedType);
@@ -429,7 +439,8 @@ class NocRespondentRepresentativeServiceTest {
             RepresentedTypeR.builder()
                 .nameOfRepresentative(RESPONDENT_REP_NAME_THREE)
                 .respRepName(RESPONDENT_NAME_THREE)
-                .respondentOrganisation(org3).build();
+                .respondentOrganisation(org3)
+                .representativeEmailAddress("oldRep2@test.com").build();
         representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId(RESPONDENT_REP_ID_THREE);
         representedTypeRItem.setValue(representedType);

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 
@@ -48,6 +50,11 @@ public class NocRespondentRepresentativeService {
     private final AdminUserService adminUserService;
 
     private final NocRespondentHelper nocRespondentHelper;
+
+    private final EmailService emailService;
+
+    @Value("${nocNotification.template.previousrespondentsolicitor.id}")
+    private String previousRespondentSolicitorTemplateId;
 
     /**
      * Add respondent organisation policy and notice of change answer fields to the case data.
@@ -118,6 +125,7 @@ public class NocRespondentRepresentativeService {
      * Gets the case data before and after and checks respondent org policies for differences.
      * For each difference creates a change organisation request to remove old organisation and add new.
      * For each change request trigger the updateRepresentation event against CCD
+     * If the representative's email field is being updated, a notification will be sent to the old email address.
      * @param callbackRequest - containing case details before event and after the event
      * @throws IOException - exception thrown by ccd
      */
@@ -135,7 +143,21 @@ public class NocRespondentRepresentativeService {
             log.info("About to apply representation change {}", changeRequest);
 
             nocCcdService.updateCaseRepresentation(accessToken, changeRequest,
-                caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
+                    caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
+
+            String email = caseDataBefore.getRepCollection()
+                    .stream().filter(r -> r.getValue().getRespondentOrganisation().getOrganisationID()
+                            .equals(changeRequest.getOrganisationToRemove().getOrganisationID()))
+                    .findAny().get().getValue().getRepresentativeEmailAddress();
+
+            if (email != null) {
+                emailService.sendEmail(
+                        previousRespondentSolicitorTemplateId,
+                        email,
+                        NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDataBefore)
+                );
+
+            }
 
             log.info("Representation change applied {}", changeRequest);
         }

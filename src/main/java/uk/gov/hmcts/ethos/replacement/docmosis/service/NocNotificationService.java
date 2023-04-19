@@ -46,17 +46,6 @@ public class NocNotificationService {
             );
         }
 
-        String oldSolicitorEmail = NocNotificationHelper.getOldSolicitorEmail(callbackRequest);
-        if (isNullOrEmpty(oldSolicitorEmail)) {
-            log.warn("missing oldSolicitorEmail");
-        } else {
-            emailService.sendEmail(
-                previousRespondentSolicitorTemplateId,
-                oldSolicitorEmail,
-                NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseData)
-            );
-        }
-
         String newSolicitorEmail = NocNotificationHelper.getNewSolicitorEmail(callbackRequest);
         if (isNullOrEmpty(newSolicitorEmail)) {
             log.warn("missing newSolicitorEmail");

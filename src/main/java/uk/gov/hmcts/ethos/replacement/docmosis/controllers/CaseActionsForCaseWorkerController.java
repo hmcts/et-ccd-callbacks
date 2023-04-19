@@ -472,6 +472,17 @@ public class CaseActionsForCaseWorkerController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
+        var representative = caseData.getRepCollection().get(0).getValue();
+
+        String reference = representative.getRespondentOrganisation().getOrganisationID();
+        OrganisationsResponse organisation = organisationClient.getOrganisations(userToken).stream()
+            .filter(o -> o.getOrganisationIdentifier().equals(reference))
+            .findFirst().get(); // todo deal with doesn't exist
+
+        // todo can't save into representative as it can be overriden in the page. Has to be saved with organisation object.
+        String postCode = organisation.getContactInformation().get(0).getPostCode();
+        representative.getRepresentativeAddress().setPostCode(postCode);
+
         List<String> errors = eventValidationService.validateRespRepNames(caseData);
 
         if (errors.isEmpty()) {
@@ -517,8 +528,6 @@ public class CaseActionsForCaseWorkerController {
             @RequestHeader(value = "Authorization") String userToken) {
         log.info("DYNAMIC RESPONDENT REPRESENTATIVE NAMES ---> " + LOG_MESSAGE
                 + ccdRequest.getCaseDetails().getCaseId());
-
-        OrganisationsResponse temp = organisationClient.getOrganisationById(userToken, "Q1KOKP2");
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);

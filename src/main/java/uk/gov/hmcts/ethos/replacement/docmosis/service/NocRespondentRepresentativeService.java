@@ -145,9 +145,10 @@ public class NocRespondentRepresentativeService {
             nocCcdService.updateCaseRepresentation(accessToken, changeRequest,
                     caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
 
+            String orgIdToChange = changeRequest.getOrganisationToRemove().getOrganisationID();
             String email = caseDataBefore.getRepCollection()
                     .stream().filter(r -> r.getValue().getRespondentOrganisation().getOrganisationID()
-                            .equals(changeRequest.getOrganisationToRemove().getOrganisationID()))
+                            .equals(orgIdToChange))
                     .findAny().get().getValue().getRepresentativeEmailAddress();
 
             if (email != null) {

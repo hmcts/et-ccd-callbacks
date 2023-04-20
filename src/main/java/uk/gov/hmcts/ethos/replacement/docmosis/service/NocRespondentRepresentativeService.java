@@ -3,13 +3,20 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.et.common.model.ccd.*;
+import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.*;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
@@ -45,8 +52,7 @@ public class NocRespondentRepresentativeService {
 
     private final NocRespondentHelper nocRespondentHelper;
 
-    @Autowired
-    OrganisationClient organisationClient;
+    private final OrganisationClient organisationClient;
 
     /**
      * Add respondent organisation policy and notice of change answer fields to the case data.
@@ -211,24 +217,35 @@ public class NocRespondentRepresentativeService {
     public CaseData prepopulateOrgAddress(CaseData caseData, String userToken) {
         List<RepresentedTypeRItem> repCollection = caseData.getRepCollection();
 
+        if (CollectionUtils.isEmpty(repCollection)
+                || repCollection.stream()
+                        .noneMatch(r -> r.getValue() != null && YES.equals(r.getValue().getMyHmctsYesNo()))) {
+            return caseData;
+        }
+
+        // get all Organisation Details
+        List<OrganisationsResponse> organisationList = organisationClient.getOrganisations(userToken);
+
         for (RepresentedTypeRItem representative : repCollection) {
             RepresentedTypeR representativeDetails = representative.getValue();
 
-            if (YES.equals(representativeDetails.getMyHmctsYesNo())) {
-                // Representative's Organisation, missing Address
+            if (representativeDetails != null && YES.equals(representativeDetails.getMyHmctsYesNo())) {
+                // Representative's Organisation is missing Address
                 Organisation repOrg = representativeDetails.getRespondentOrganisation();
 
-                // get Organisation Details with Address
+                // get Organisation Details including Address
                 Optional<OrganisationsResponse> organisation =
-                        organisationClient.getOrganisations(userToken)
+                        organisationList
                                 .stream()
                                 .filter(o -> o.getOrganisationIdentifier().equals(repOrg.getOrganisationID()))
                                 .findFirst();
 
                 // if found update representative's Organisation Address
                 if (organisation.isPresent()) {
-                    OrganisationAddress organisationAddress = organisation.get().getContactInformation().get(0);
-                    repOrg.setOrganisationAddress(organisationAddress);
+                    OrganisationsResponse ordRes = organisation.get();
+                    if (!CollectionUtils.isEmpty(ordRes.getContactInformation())) {
+                        repOrg.setOrganisationAddress(ordRes.getContactInformation().get(0));
+                    }
                 }
             }
         }

@@ -58,5 +58,4 @@ public class BundlesRespondentService {
 
         return DynamicValueType.create(value.getHearingNumber(), label);
     }
-
 }

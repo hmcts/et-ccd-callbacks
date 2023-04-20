@@ -11,7 +11,8 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -53,10 +54,10 @@ class BundlesRespondentServiceTest {
 
         bundlesRespondentService.clearInputData(englandCaseData);
 
-        assertThat(englandCaseData.getBundlesRespondentPrepareDocNotesShow(), is(null));
-        assertThat(englandCaseData.getBundlesRespondentAgreedDocWith(), is(null));
-        assertThat(englandCaseData.getBundlesRespondentAgreedDocWithBut(), is(null));
-        assertThat(englandCaseData.getBundlesRespondentAgreedDocWithNo(), is(null));
+        assertNull(englandCaseData.getBundlesRespondentPrepareDocNotesShow());
+        assertNull(englandCaseData.getBundlesRespondentAgreedDocWith());
+        assertNull(englandCaseData.getBundlesRespondentAgreedDocWithBut());
+        assertNull(englandCaseData.getBundlesRespondentAgreedDocWithNo());
     }
 
     @Test

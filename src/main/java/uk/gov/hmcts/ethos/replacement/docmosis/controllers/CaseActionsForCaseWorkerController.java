@@ -469,7 +469,7 @@ public class CaseActionsForCaseWorkerController {
         List<String> errors = eventValidationService.validateRespRepNames(caseData);
 
         if (errors.isEmpty()) {
-            //add org policy and NOC elements
+            // add org policy and NOC elements
             caseData.setRepCollection(nocRespondentHelper.updateWithRespondentIds(caseData));
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
             caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);

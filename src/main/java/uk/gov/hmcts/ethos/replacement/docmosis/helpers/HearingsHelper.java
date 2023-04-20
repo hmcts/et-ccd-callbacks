@@ -224,7 +224,7 @@ public final class HearingsHelper {
             .getValue().getListedDate();
     }
 
-    private static DateListedTypeItem mapEarliest(HearingTypeItem hearingTypeItem) {
+    public static DateListedTypeItem mapEarliest(HearingTypeItem hearingTypeItem) {
         List<DateListedTypeItem> futureHearings = filterFutureHearings(hearingTypeItem.getValue()
             .getHearingDateCollection());
         if (futureHearings.isEmpty()) {
@@ -238,5 +238,12 @@ public final class HearingsHelper {
             .filter(d -> isDateInFuture(d.getValue().getListedDate(), LocalDateTime.now())
                     && HEARING_STATUS_LISTED.equals(d.getValue().getHearingStatus()))
             .collect(Collectors.toList());
+    }
+
+    public static String getHearingVenue(HearingType hearing) {
+        if (hearing.getHearingVenueScotland() != null) {
+            return hearing.getHearingVenueScotland();
+        }
+        return hearing.getHearingVenue().getSelectedLabel();
     }
 }

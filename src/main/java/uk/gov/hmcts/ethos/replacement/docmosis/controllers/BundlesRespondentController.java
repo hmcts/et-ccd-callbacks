@@ -53,7 +53,7 @@ public class BundlesRespondentController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> initEt3Response(
+    public ResponseEntity<CCDCallbackResponse> aboutToStart(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
@@ -86,7 +86,7 @@ public class BundlesRespondentController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
         @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+        @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -99,4 +99,36 @@ public class BundlesRespondentController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    /**
+     * Populates the hearing list on page 3.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/midPopulateHearings", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Populates the hearing list on page 3.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> midPopulateHearings(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+
+        bundlesRespondentService.populateSelectHearings(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
 }

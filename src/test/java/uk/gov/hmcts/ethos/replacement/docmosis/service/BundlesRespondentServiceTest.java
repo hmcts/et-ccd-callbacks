@@ -4,10 +4,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -49,10 +53,10 @@ class BundlesRespondentServiceTest {
 
         bundlesRespondentService.clearInputData(englandCaseData);
 
-        assertThat(englandCaseData.getBundlesRespondentPrepareDocNotesShow()).isNull();
-        assertThat(englandCaseData.getBundlesRespondentAgreedDocWith()).isNull();
-        assertThat(englandCaseData.getBundlesRespondentAgreedDocWithBut()).isNull();
-        assertThat(englandCaseData.getBundlesRespondentAgreedDocWithNo()).isNull();
+        assertThat(englandCaseData.getBundlesRespondentPrepareDocNotesShow(), is(null));
+        assertThat(englandCaseData.getBundlesRespondentAgreedDocWith(), is(null));
+        assertThat(englandCaseData.getBundlesRespondentAgreedDocWithBut(), is(null));
+        assertThat(englandCaseData.getBundlesRespondentAgreedDocWithNo(), is(null));
     }
 
     @Test

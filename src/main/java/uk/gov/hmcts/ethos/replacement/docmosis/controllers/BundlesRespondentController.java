@@ -21,20 +21,83 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
-/**
- * REST controller for the Bundles Respondent event.
- */
 @Slf4j
 @RequestMapping("/bundlesRespondent")
 @RestController
 @RequiredArgsConstructor
 public class BundlesRespondentController {
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-    private final BundlesRespondentService bundlesRespondentService;
     private final VerifyTokenService verifyTokenService;
+    private final BundlesRespondentService bundlesRespondentService;
+
+    private static final String INVALID_TOKEN = "Invalid Token {}";
+
+    /**
+     * Called at the start of Bundles Respondent Prepare Doc for Hearing journey.
+     * Sets hidden inset fields to YES to enable inset text functionality in ExUI.
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "initialize data for bundles respondent")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> initEt3Response(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setBundlesRespondentPrepareDocNotesShow(YES);
+
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    /**
+     * About to Submit for Bundles Respondent Prepare Doc for Hearing journey.
+     * @param ccdRequest generic request from CCD
+     * @param userToken authentication token to verify the user
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "About to Submit for bundles respondent")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader(value = "Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        bundlesRespondentService.clearInputData(caseData);
+
+        return getCallbackRespEntityNoErrors(caseData);
+    }
 
     /**
      * Populates the hearing list on page 3.

@@ -52,7 +52,7 @@ public class NoticeOfChangeController {
 
         CaseData caseData =
             nocRespondentRepresentativeService
-                .updateRepresentation(callbackRequest.getCaseDetails());
+                .updateRepresentation(callbackRequest.getCaseDetails(), null);
 
         callbackRequest.getCaseDetails().setCaseData(caseData);
 
@@ -60,44 +60,44 @@ public class NoticeOfChangeController {
 
     }
 
-    @PostMapping(value = "/update-respondents", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "noc decision update")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
-        @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public ResponseEntity<CCDCallbackResponse> updateNocRespondents(@RequestBody CallbackRequest callbackRequest,
-                                                                    @RequestHeader("Authorization")
-                                                                    String userToken) {
-        log.info("Noc update respondents ---> {}", callbackRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        try {
-            nocNotificationService.sendNotificationOfChangeEmails(callbackRequest,
-                    callbackRequest.getCaseDetails().getCaseData());
-        } catch (Exception exception) {
-            log.error(exception.getMessage(), exception);
-        }
-
-        ChangeOrganisationRequest changeOrganisationRequestField =
-            callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField();
-
-        if (changeOrganisationRequestField != null
-            && changeOrganisationRequestField.getOrganisationToRemove() != null) {
-            try {
-                nocRespondentRepresentativeService.removeOrganisationRepresentativeAccess(
-                    callbackRequest.getCaseDetails().getCaseId(), changeOrganisationRequestField);
-            } catch (IOException e) {
-                throw new CcdInputOutputException("Failed to remove organisation representitive access", e);
-            }
-        }
-
-        return ResponseEntity.ok(ccdCaseAssignment.applyNocAsAdmin(callbackRequest));
-    }
+//    @PostMapping(value = "/update-respondents", consumes = APPLICATION_JSON_VALUE)
+//    @Operation(summary = "noc decision update")
+//    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Accessed successfully", content = {
+//        @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
+//        @ApiResponse(responseCode = "400", description = "Bad Request"),
+//        @ApiResponse(responseCode = "500", description = "Internal Server Error")})
+//    public ResponseEntity<CCDCallbackResponse> updateNocRespondents(@RequestBody CallbackRequest callbackRequest,
+//                                                                    @RequestHeader("Authorization")
+//                                                                    String userToken) {
+//        log.info("Noc update respondents ---> {}", callbackRequest.getCaseDetails().getCaseId());
+//
+//        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+//            log.error(INVALID_TOKEN, userToken);
+//            return ResponseEntity.status(FORBIDDEN.value()).build();
+//        }
+//
+//        try {
+//            nocNotificationService.sendNotificationOfChangeEmails(callbackRequest,
+//                    callbackRequest.getCaseDetails().getCaseData());
+//        } catch (Exception exception) {
+//            log.error(exception.getMessage(), exception);
+//        }
+//
+//        ChangeOrganisationRequest changeOrganisationRequestField =
+//            callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField();
+//
+//        if (changeOrganisationRequestField != null
+//            && changeOrganisationRequestField.getOrganisationToRemove() != null) {
+//            try {
+//                nocRespondentRepresentativeService.removeOrganisationRepresentativeAccess(
+//                    callbackRequest.getCaseDetails().getCaseId(), changeOrganisationRequestField);
+//            } catch (IOException e) {
+//                throw new CcdInputOutputException("Failed to remove organisation representitive access", e);
+//            }
+//        }
+//
+//        return ResponseEntity.ok(ccdCaseAssignment.applyNocAsAdmin(callbackRequest));
+//    }
 
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "noc decision update")
@@ -121,7 +121,7 @@ public class NoticeOfChangeController {
             //send emails here
             try {
                 nocNotificationService.sendNotificationOfChangeEmails(callbackRequest,
-                    caseData);
+                        callbackRequest.getCaseDetailsBefore().getCaseData(), caseData, false, callbackRequest.getCaseDetailsBefore().getCaseData().getChangeOrganisationRequestField());
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);
             }

@@ -4,7 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 
@@ -15,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -48,6 +51,24 @@ public final class NocNotificationHelper {
 
     }
 
+    public static String getOldSolicitorEmailForRepUpdate(CaseData previousCaseData, ChangeOrganisationRequest changeRequest) {
+        try {
+            String previousOrgId = changeRequest.getOrganisationToRemove().getOrganisationID();
+            Optional<RepresentedTypeRItem> representedTypeRItem = previousCaseData.getRepCollection()
+                    .stream().filter(r -> r.getValue().getRespondentOrganisation().getOrganisationID()
+                            .equals(previousOrgId))
+                    .findAny();
+
+            if (representedTypeRItem.isPresent()) {
+                return representedTypeRItem.get().getValue().getRepresentativeEmailAddress();
+            }
+            return null;
+        } catch (NullPointerException ex) {
+            return null;
+        }
+
+    }
+
     public static String getNewSolicitorEmail(CallbackRequest callbackRequest) {
         try {
             CaseData oldCaseData = callbackRequest.getCaseDetailsBefore().getCaseData();
@@ -61,19 +82,31 @@ public final class NocNotificationHelper {
 
     }
 
-    public static String getRespondentNameForNewSolicitor(CallbackRequest callbackRequest) {
+    public static String getNewSolicitorEmailForRepUpdate(CaseData caseData, ChangeOrganisationRequest changeRequest) {
+        try {
+            String newOrgId = changeRequest.getOrganisationToAdd().getOrganisationID();
+            return caseData.getRepCollection()
+                    .stream().filter(r -> r.getValue().getRespondentOrganisation().getOrganisationID()
+                            .equals(newOrgId))
+                    .findAny().get().getValue().getRepresentativeEmailAddress();
+        } catch (NullPointerException e) {
+            return null;
+        }
+
+    }
+
+    public static String getRespondentNameForNewSolicitor(ChangeOrganisationRequest changeRequest, CaseData caseDataNew) {
         String respondentName = null;
         try {
-            CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
-            CaseData caseDetailsBefore = callbackRequest.getCaseDetailsBefore().getCaseData();
-            String selectedRole =
-                    caseDetailsBefore.getChangeOrganisationRequestField().getCaseRoleId()
+//            CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
+//            CaseData caseDetailsBefore = callbackRequest.getCaseDetailsBefore().getCaseData();
+            String selectedRole = changeRequest.getCaseRoleId()
                             .getSelectedCode();
 
             SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
 
             respondentName =
-                    solicitorRole.getRepresentationItem(caseData).map(respondentSumTypeItem ->
+                    solicitorRole.getRepresentationItem(caseDataNew).map(respondentSumTypeItem ->
                             respondentSumTypeItem.getValue().getRespondentName()).orElseThrow();
         } catch (NullPointerException e) {
             log.warn("Failed to get RespondentNameForNewSolicitor");
@@ -81,14 +114,30 @@ public final class NocNotificationHelper {
         return isNullOrEmpty(respondentName) ? UNKNOWN : respondentName;
     }
 
-    public static RespondentSumType getRespondent(CallbackRequest callbackRequest, CaseData caseData,
+//    public static RespondentSumType getRespondent(CallbackRequest callbackRequest, CaseData caseData,
+//                                                  NocRespondentHelper nocRespondentHelper) {
+//
+//        try {
+//
+//            CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore().getCaseData();
+//            String selectedRole =
+//                    caseDataBefore.getChangeOrganisationRequestField().getCaseRoleId().getSelectedCode();
+////            changeRequest.getCaseRoleId().getSelectedCode();
+//            SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
+//            RespondentSumTypeItem respondentSumTypeItem = solicitorRole.getRepresentationItem(caseData).orElseThrow();
+//            return nocRespondentHelper.getRespondent(respondentSumTypeItem.getValue().getRespondentName(), caseData);
+//        } catch (NullPointerException e) {
+//            return null;
+//        }
+//
+//    }
+
+    public static RespondentSumType getRespondent(ChangeOrganisationRequest changeRequest, CaseData caseData,
                                                   NocRespondentHelper nocRespondentHelper) {
 
         try {
 
-            CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore().getCaseData();
-            String selectedRole =
-                    caseDataBefore.getChangeOrganisationRequestField().getCaseRoleId().getSelectedCode();
+            String selectedRole = changeRequest.getCaseRoleId().getSelectedCode();
             SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
             RespondentSumTypeItem respondentSumTypeItem = solicitorRole.getRepresentationItem(caseData).orElseThrow();
             return nocRespondentHelper.getRespondent(respondentSumTypeItem.getValue().getRespondentName(), caseData);

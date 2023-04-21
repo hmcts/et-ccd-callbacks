@@ -31,27 +31,21 @@ public class NocCcdService {
             .max(Comparator.comparing(AuditEvent::getCreatedDate));
     }
 
-    public void updateCaseRepresentation(String authToken, ChangeOrganisationRequest changeRequest,
+    public CCDRequest updateCaseRepresentation(String authToken, ChangeOrganisationRequest changeRequest,
                                          String jurisdiction, String caseType,
                                          String caseId) throws IOException {
-        CCDRequest ccdRequest = ccdClient.startEventForUpdateRep(
+        return ccdClient.startEventForUpdateRep(
             authToken,
             caseType,
             jurisdiction,
-            caseId);
-
-        ccdClient.submitUpdateRepEvent(
-            authToken,
-            Map.of("changeOrganisationRequestField", changeRequest),
-            caseType,
-            jurisdiction,
-            ccdRequest,
             caseId);
     }
 
     /**
      * Gets all case assignments for a given case id.
-     * @param userToken - bearer token
+     * @param userToken - bprevCaseData.getRepCollection()
+                    .get(getIndexOfSolicitor(prevCaseData))
+                    .getValue().getRepresentativeEmailAddress();earer token
      * @param caseId - ccd case id
      * @return list of case assignments for given case id
      */

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
@@ -33,8 +34,8 @@ public class NocNotificationService {
     @Value("${nocNotification.template.tribunal.id}")
     private String tribunalTemplateId;
 
-    public void sendNotificationOfChangeEmails(CallbackRequest callbackRequest, CaseData caseData) {
-        String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(callbackRequest);
+    public void sendNotificationOfChangeEmails(CallbackRequest callbackRequest, CaseData caseData, CaseData caseDataNew, boolean isUpdateRep, ChangeOrganisationRequest changeRequest) {
+        String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
         String claimantEmail = NotificationHelper.buildMapForClaimant(caseData, "").get("emailAddress");
         if (isNullOrEmpty(claimantEmail)) {
             log.warn("missing claimantEmail");
@@ -45,15 +46,28 @@ public class NocNotificationService {
                 NocNotificationHelper.buildPersonalisationWithPartyName(caseData, partyName)
             );
         }
-
-        String newSolicitorEmail = NocNotificationHelper.getNewSolicitorEmail(callbackRequest);
+        String oldSolicitorEmail = NocNotificationHelper.getOldSolicitorEmailForRepUpdate(caseData, changeRequest);
+//        String oldSolicitorEmail = isUpdateRep ? NocNotificationHelper.getOldSolicitorEmailForRepUpdate(caseData, changeRequest)
+//                : NocNotificationHelper.getOldSolicitorEmail(callbackRequest);
+        if (isNullOrEmpty(oldSolicitorEmail)) {
+            log.warn("missing oldSolicitorEmail");
+        } else {
+            emailService.sendEmail(
+                    previousRespondentSolicitorTemplateId,
+                    oldSolicitorEmail,
+                    NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseData)
+            );
+        }
+        String newSolicitorEmail = NocNotificationHelper.getNewSolicitorEmailForRepUpdate(caseDataNew, changeRequest);
+//        String newSolicitorEmail = isUpdateRep ? NocNotificationHelper.getNewSolicitorEmailForRepUpdate(caseDataNew, changeRequest)
+//                : NocNotificationHelper.getNewSolicitorEmail(callbackRequest);
         if (isNullOrEmpty(newSolicitorEmail)) {
             log.warn("missing newSolicitorEmail");
         } else {
             emailService.sendEmail(
                 newRespondentSolicitorTemplateId,
                 newSolicitorEmail,
-                NocNotificationHelper.buildPersonalisationWithPartyName(caseData, partyName)
+                NocNotificationHelper.buildPersonalisationWithPartyName(caseDataNew, partyName)
             );
         }
 
@@ -68,8 +82,10 @@ public class NocNotificationService {
             );
         }
 
+        // need to check the email is to the org admin
         RespondentSumType respondent =
-            NocNotificationHelper.getRespondent(callbackRequest, caseData, nocRespondentHelper);
+//            NocNotificationHelper.getRespondent(changeRequest, caseData, nocRespondentHelper);
+                NocNotificationHelper.getRespondent(changeRequest, caseData, nocRespondentHelper);
         String respondentEmail = respondent == null ? null : respondent.getRespondentEmail();
         if (isNullOrEmpty(respondentEmail)) {
             log.warn("Missing respondentEmail");

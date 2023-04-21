@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -18,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
@@ -53,6 +57,12 @@ public class NocRespondentRepresentativeService {
 
     private final EmailService emailService;
 
+    private final NocNotificationService nocNotificationService;
+
+    private final CcdClient ccdClient;
+
+    private final CcdCaseAssignment ccdCaseAssignment;
+
     @Value("${nocNotification.template.previousrespondentsolicitor.id}")
     private String previousRespondentSolicitorTemplateId;
 
@@ -75,17 +85,17 @@ public class NocRespondentRepresentativeService {
      * @param caseDetails containing case data with change organisation request field
      * @return updated case
      */
-    public CaseData updateRepresentation(CaseDetails caseDetails) throws IOException {
+    public CaseData updateRepresentation(CaseDetails caseDetails, ChangeOrganisationRequest changeRequest) throws IOException {
         CaseData caseData = caseDetails.getCaseData();
         Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
-        Map<String, Object> repCollection = updateRepresentationMap(caseData, caseDetails.getCaseId());
+        Map<String, Object> repCollection = updateRepresentationMap(caseData, caseDetails.getCaseId(), changeRequest);
         caseDataAsMap.putAll(repCollection);
         return  caseConverter.convert(caseDataAsMap, CaseData.class);
     }
 
-    private Map<String, Object> updateRepresentationMap(CaseData caseData, String caseId) throws IOException {
+    private Map<String, Object> updateRepresentationMap(CaseData caseData, String caseId, ChangeOrganisationRequest changeRequest) throws IOException {
 
-        final ChangeOrganisationRequest change = caseData.getChangeOrganisationRequestField();
+        final ChangeOrganisationRequest change = changeRequest;
 
         if (isEmpty(change) || isEmpty(change.getCaseRoleId()) || isEmpty(change.getOrganisationToAdd())) {
             throw new IllegalStateException("Invalid or missing ChangeOrganisationRequest: " + change);
@@ -124,7 +134,7 @@ public class NocRespondentRepresentativeService {
     /**
      * Gets the case data before and after and checks respondent org policies for differences.
      * For each difference creates a change organisation request to remove old organisation and add new.
-     * For each change request trigger the updateRepresentation event against CCD
+     * For each change request trigger the updateRepresentation event against CCD41
      * If the representative's email field is being updated, a notification will be sent to the old email address.
      * @param callbackRequest - containing case details before event and after the event
      * @throws IOException - exception thrown by ccd
@@ -142,25 +152,45 @@ public class NocRespondentRepresentativeService {
         for (ChangeOrganisationRequest changeRequest : changeRequests) {
             log.info("About to apply representation change {}", changeRequest);
 
-            nocCcdService.updateCaseRepresentation(accessToken, changeRequest,
+            CCDRequest ccdRequest = nocCcdService.updateCaseRepresentation(accessToken, changeRequest,
                     caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
 
-            String orgIdToChange = changeRequest.getOrganisationToRemove().getOrganisationID();
-            String email = caseDataBefore.getRepCollection()
-                    .stream().filter(r -> r.getValue().getRespondentOrganisation().getOrganisationID()
-                            .equals(orgIdToChange))
-                    .findAny().get().getValue().getRepresentativeEmailAddress();
-
-            if (email != null) {
-                emailService.sendEmail(
-                        previousRespondentSolicitorTemplateId,
-                        email,
-                        NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDataBefore)
-                );
-
-            }
+            caseData = updateRepresentation(callbackRequest.getCaseDetails(), changeRequest);
 
             log.info("Representation change applied {}", changeRequest);
+
+            Organisation removedOrg = changeRequest.getOrganisationToRemove();
+            try {
+                nocNotificationService.sendNotificationOfChangeEmails(callbackRequest,
+                        caseDataBefore, caseData, false, changeRequest);
+            } catch (Exception exception) {
+                log.error(exception.getMessage(), exception);
+            }
+
+            ChangeOrganisationRequest changeOrganisationRequestField =
+                    caseDataBefore.getChangeOrganisationRequestField();
+
+            if (changeOrganisationRequestField != null
+                    && changeOrganisationRequestField.getOrganisationToRemove() != null) {
+                try {
+                    removeOrganisationRepresentativeAccess(
+                            callbackRequest.getCaseDetails().getCaseId(), changeOrganisationRequestField);
+                } catch (IOException e) {
+                    throw new CcdInputOutputException("Failed to remove organisation representitive access", e);
+                }
+            }
+
+
+            callbackRequest.getCaseDetails().setCaseData(caseData);
+            CaseData finalCaseData = ccdCaseAssignment.applyNocAsAdmin(callbackRequest).getData();
+            ccdRequest.getCaseDetails().setCaseData(finalCaseData);
+            ccdClient.submitUpdateRepEvent(
+                    accessToken,
+                    Map.of("changeOrganisationRequestField", changeRequest),
+                    caseDetails.getCaseTypeId(),
+                    caseDetails.getJurisdiction(),
+                    ccdRequest,
+                    caseDetails.getCaseId());
         }
 
     }

@@ -79,4 +79,12 @@ class BundlesRespondentServiceTest {
         assertThat(actual.get(0).getLabel(), is("1 Hearing - Edinburgh - 16 May 2069"));
         assertThat(actual.get(1).getLabel(), is("2 Costs Hearing - Aberdeen - 16 May 2069"));
     }
+
+    @Test
+    void populateSelectHearings_doesNothingWhenNoHearings() {
+        scotlandCaseData.setHearingCollection(null);
+        bundlesRespondentService.populateSelectHearings(scotlandCaseData);
+
+        assertNull(scotlandCaseData.getBundlesRespondentSelectHearing());
+    }
 }

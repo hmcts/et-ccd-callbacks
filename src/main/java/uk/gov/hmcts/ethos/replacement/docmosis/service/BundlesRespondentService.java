@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -34,6 +35,9 @@ public class BundlesRespondentService {
      * Populates select hearing field with available hearings.
      */
     public void populateSelectHearings(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
+            return;
+        }
         DynamicFixedListType listType = DynamicFixedListType.from(caseData.getHearingCollection().stream()
                 .map(this::createValueType)
                 .collect(Collectors.toList())

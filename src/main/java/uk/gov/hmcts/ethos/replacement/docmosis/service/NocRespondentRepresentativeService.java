@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
@@ -242,14 +244,30 @@ public class NocRespondentRepresentativeService {
 
                 // if found update representative's Organisation Address
                 if (organisation.isPresent()) {
-                    OrganisationsResponse ordRes = organisation.get();
-                    if (!CollectionUtils.isEmpty(ordRes.getContactInformation())) {
-                        repOrg.setOrganisationAddress(ordRes.getContactInformation().get(0));
-                    }
+                    updateAddress(organisation.get(), representativeDetails);
                 }
             }
         }
 
         return caseData;
+    }
+
+    private void updateAddress(OrganisationsResponse ordRes, RepresentedTypeR representativeDetails) {
+        if (!CollectionUtils.isEmpty(ordRes.getContactInformation())) {
+            Address repAddress = representativeDetails.getRepresentativeAddress();
+            repAddress = repAddress != null ? repAddress : new Address();
+            OrganisationAddress orgAddress = ordRes.getContactInformation().get(0);
+
+            // update Representative Address with Org Address
+            repAddress.setAddressLine1(orgAddress.getAddressLine1());
+            repAddress.setAddressLine2(orgAddress.getAddressLine2());
+            repAddress.setAddressLine3(orgAddress.getAddressLine3());
+            repAddress.setPostTown(orgAddress.getTownCity());
+            repAddress.setCounty(orgAddress.getCounty());
+            repAddress.setCountry(orgAddress.getCountry());
+            repAddress.setPostCode(orgAddress.getPostCode());
+
+            representativeDetails.setRepresentativeAddress(repAddress);
+        }
     }
 }

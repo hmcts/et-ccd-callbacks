@@ -425,9 +425,10 @@ public class CaseActionsForCaseWorkerControllerTest {
 
     @Test
     public void amendRespondentRepresentative() throws Exception {
-
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any()))
+                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
+        when(nocRespondentRepresentativeService.prepopulateOrgAddress(any(), anyString()))
                 .thenReturn(ccdRequest.getCaseDetails().getCaseData());
 
         mvc.perform(post(AMEND_RESPONDENT_REPRESENTATIVE_URL)

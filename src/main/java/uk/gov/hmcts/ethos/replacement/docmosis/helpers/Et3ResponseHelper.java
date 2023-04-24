@@ -189,27 +189,7 @@ public class Et3ResponseHelper {
                 UNCHECKED)
             .build();
 
-        Optional<RepresentedTypeRItem> representative = caseData.getRepCollection().stream().filter(
-            rep -> rep.getValue().getRespRepName().equals(
-                caseData.getEt3RepresentingRespondent().get(0).getValue().getDynamicList().getSelectedLabel()
-            )
-        ).findFirst();
-
-        if (representative.isPresent()) {
-            RepresentedTypeR rep = representative.get().getValue();
-            data.setRepName(rep.getNameOfRepresentative());
-            data.setRepOrgName(rep.getNameOfOrganisation());
-
-            Address address = rep.getRepresentativeAddress();
-            data.setRepAddressLine1(address.getAddressLine1());
-            data.setRepAddressLine2(address.getAddressLine2());
-            data.setRepTown(address.getPostTown());
-            data.setRepCounty(address.getCounty());
-            data.setRepPostcode(address.getPostCode());
-
-            data.setRepPhoneNumber(rep.getRepresentativePhoneNumber());
-            data.setRepEmailAddress(rep.getRepresentativeEmailAddress());
-        }
+        addRepDetails(caseData, data);
 
         setTitle(data, caseData.getEt3ResponseRespondentPreferredTitle());
         setCheck(caseData.getEt3ResponseMultipleSites(), data::setSiteYes, data::setSiteNo, null);
@@ -260,6 +240,30 @@ public class Et3ResponseHelper {
             .build();
 
         return OBJECT_MAPPER.writeValueAsString(et3ResponseDocument);
+    }
+
+    private static void addRepDetails(CaseData caseData, Et3ResponseData data) {
+        Optional<RepresentedTypeRItem> representative = caseData.getRepCollection().stream().filter(
+            rep -> rep.getValue().getRespRepName().equals(
+                caseData.getEt3RepresentingRespondent().get(0).getValue().getDynamicList().getSelectedLabel()
+            )
+        ).findFirst();
+
+        if (representative.isPresent()) {
+            RepresentedTypeR rep = representative.get().getValue();
+            data.setRepName(rep.getNameOfRepresentative());
+            data.setRepOrgName(rep.getNameOfOrganisation());
+
+            Address address = rep.getRepresentativeAddress();
+            data.setRepAddressLine1(address.getAddressLine1());
+            data.setRepAddressLine2(address.getAddressLine2());
+            data.setRepTown(address.getPostTown());
+            data.setRepCounty(address.getCounty());
+            data.setRepPostcode(address.getPostCode());
+
+            data.setRepPhoneNumber(rep.getRepresentativePhoneNumber());
+            data.setRepEmailAddress(rep.getRepresentativeEmailAddress());
+        }
     }
 
     /**

@@ -168,8 +168,7 @@ public class NocRespondentRepresentativeService {
                 log.error(exception.getMessage(), exception);
             }
 
-            ChangeOrganisationRequest changeOrganisationRequestField =
-                    caseDataBefore.getChangeOrganisationRequestField();
+            ChangeOrganisationRequest changeOrganisationRequestField = changeRequest;
 
             if (changeOrganisationRequestField != null
                     && changeOrganisationRequestField.getOrganisationToRemove() != null) {
@@ -182,18 +181,18 @@ public class NocRespondentRepresentativeService {
             }
 
 
-//            callbackRequest.getCaseDetails().setCaseData(caseData);
+            callbackRequest.getCaseDetails().setCaseData(caseData);
+            callbackRequest.getCaseDetails().getCaseData().setChangeOrganisationRequestField(changeRequest);
             CaseData finalCaseData = ccdCaseAssignment.applyNocAsAdmin(callbackRequest).getData();
-//            ccdRequest.getCaseDetails().setCaseData(finalCaseData);
-            SubmitEvent submitEvent = ccdClient.submitUpdateRepEvent(
+            ccdRequest.getCaseDetails().setCaseData(finalCaseData);
+
+            ccdClient.submitUpdateRepEvent(
                     accessToken,
-                    Map.of("changeOrganisationRequestField", changeRequest),
+                    Map.of("changeOrganisationRequestField", ccdRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField()),
                     caseDetails.getCaseTypeId(),
                     caseDetails.getJurisdiction(),
                     ccdRequest,
                     caseDetails.getCaseId());
-
-            SubmitEvent submitEvent1 = submitEvent;
         }
 
     }

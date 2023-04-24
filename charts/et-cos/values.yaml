@@ -50,6 +50,7 @@ java:
     ET_COS_DB_PORT: '5432'
     ET_COS_DB_USER_NAME: et_cos@et-cos-{{ .Values.global.environment }}
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    RD_PROFESSIONAL_API_URL: http://rd-professional-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SECURE_DOC_STORE_FEATURE: true
     REFERRAL_TEMPLATE_ID: 6ad8c05b-5c0b-4d10-a5e3-f39fdea4647e
     REJECTED_TEMPLATE_ID: 3f932a27-3960-4135-9ef5-5f2b9ec35da0

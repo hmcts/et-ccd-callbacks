@@ -339,6 +339,8 @@ dependencies {
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.3'
     implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.90.Final'
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.90.Final'
+    // CVE-2023-20863
+    implementation group: 'org.springframework', name: 'spring-core', version: '5.3.27'
 
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.5.0'
 

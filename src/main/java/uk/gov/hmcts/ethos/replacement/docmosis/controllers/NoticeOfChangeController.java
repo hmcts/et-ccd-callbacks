@@ -52,7 +52,7 @@ public class NoticeOfChangeController {
 
         CaseData caseData =
             nocRespondentRepresentativeService
-                .updateRepresentation(callbackRequest.getCaseDetails(), null);
+                    .updateRepresentation(callbackRequest.getCaseDetails());
 
         callbackRequest.getCaseDetails().setCaseData(caseData);
 

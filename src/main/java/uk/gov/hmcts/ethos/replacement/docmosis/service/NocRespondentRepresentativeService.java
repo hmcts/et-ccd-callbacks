@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -85,17 +86,17 @@ public class NocRespondentRepresentativeService {
      * @param caseDetails containing case data with change organisation request field
      * @return updated case
      */
-    public CaseData updateRepresentation(CaseDetails caseDetails, ChangeOrganisationRequest changeRequest) throws IOException {
+    public CaseData updateRepresentation(CaseDetails caseDetails) throws IOException {
         CaseData caseData = caseDetails.getCaseData();
         Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
-        Map<String, Object> repCollection = updateRepresentationMap(caseData, caseDetails.getCaseId(), changeRequest);
+        Map<String, Object> repCollection = updateRepresentationMap(caseData, caseDetails.getCaseId());
         caseDataAsMap.putAll(repCollection);
         return  caseConverter.convert(caseDataAsMap, CaseData.class);
     }
 
-    private Map<String, Object> updateRepresentationMap(CaseData caseData, String caseId, ChangeOrganisationRequest changeRequest) throws IOException {
+    private Map<String, Object> updateRepresentationMap(CaseData caseData, String caseId) throws IOException {
 
-        final ChangeOrganisationRequest change = changeRequest;
+        final ChangeOrganisationRequest change = caseData.getChangeOrganisationRequestField();
 
         if (isEmpty(change) || isEmpty(change.getCaseRoleId()) || isEmpty(change.getOrganisationToAdd())) {
             throw new IllegalStateException("Invalid or missing ChangeOrganisationRequest: " + change);
@@ -155,7 +156,7 @@ public class NocRespondentRepresentativeService {
             CCDRequest ccdRequest = nocCcdService.updateCaseRepresentation(accessToken, changeRequest,
                     caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
 
-            caseData = updateRepresentation(callbackRequest.getCaseDetails(), changeRequest);
+//            caseData = updateRepresentation(callbackRequest.getCaseDetails(), changeRequest);
 
             log.info("Representation change applied {}", changeRequest);
 
@@ -181,16 +182,18 @@ public class NocRespondentRepresentativeService {
             }
 
 
-            callbackRequest.getCaseDetails().setCaseData(caseData);
+//            callbackRequest.getCaseDetails().setCaseData(caseData);
             CaseData finalCaseData = ccdCaseAssignment.applyNocAsAdmin(callbackRequest).getData();
-            ccdRequest.getCaseDetails().setCaseData(finalCaseData);
-            ccdClient.submitUpdateRepEvent(
+//            ccdRequest.getCaseDetails().setCaseData(finalCaseData);
+            SubmitEvent submitEvent = ccdClient.submitUpdateRepEvent(
                     accessToken,
                     Map.of("changeOrganisationRequestField", changeRequest),
                     caseDetails.getCaseTypeId(),
                     caseDetails.getJurisdiction(),
                     ccdRequest,
                     caseDetails.getCaseId());
+
+            SubmitEvent submitEvent1 = submitEvent;
         }
 
     }

@@ -195,7 +195,6 @@ public class Et3ResponseHelper {
             )
         ).findFirst();
 
-        // todo deal with null values
         if (representative.isPresent()) {
             RepresentedTypeR rep = representative.get().getValue();
             data.setRepName(rep.getNameOfRepresentative());

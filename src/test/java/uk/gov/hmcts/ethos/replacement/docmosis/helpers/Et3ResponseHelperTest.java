@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
@@ -153,6 +155,20 @@ class Et3ResponseHelperTest {
         caseData.setEt3ResponseIsPensionCorrect("No");
         caseData.setEt3ResponseContactPreference("Post");
         caseData.setEt3ResponsePayFrequency("Weekly");
+
+        Address repAddress = CaseDataBuilder.builder().createAddress(
+            "r1", "r2", "r3", "rTown", "rCounty",
+            "rPostcode", "rCountry"
+        );
+
+        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
+        representedTypeRItem.setId("id");
+        representedTypeRItem.setValue(RepresentedTypeR.builder()
+                .respRepName("test")
+                .representativeAddress(repAddress)
+                .representativePhoneNumber("phone")
+                .build());
+        caseData.setRepCollection(List.of(representedTypeRItem));
 
         // UTF-8 is required here for special characters to resolve on Windows correctly
         String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()

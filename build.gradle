@@ -4,7 +4,7 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.1.0'
-    id 'org.springframework.boot' version '2.7.10'
+    id 'org.springframework.boot' version '2.7.11'
     id 'org.owasp.dependencycheck' version '8.2.1'
     id 'com.github.ben-manes.versions' version '0.46.0'
     id 'au.com.dius.pact' version '4.3.15'
@@ -54,8 +54,6 @@ sonarqube {
     }
 }
 
-project.tasks['sonarqube'].dependsOn jacocoTestReport
-
 sourceSets {
     test {
         java.srcDir 'src/test/java'
@@ -77,8 +75,8 @@ sourceSets {
     }
     integrationTest {
         java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
             srcDir file('src/test/integration/java')
         }
         resources.srcDir file('src/test/integration/resources')
@@ -166,6 +164,10 @@ task integration(type: Test) {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
     failFast = true
+    reports {
+        html.enabled(true)
+        html.destination file("${buildDir}/integration/")
+    }
 }
 
 project.tasks['check'].dependsOn integration
@@ -221,7 +223,7 @@ task fortifyScan(type: JavaExec)  {
 }
 
 jacocoTestReport {
-    executionData(test)
+    executionData(test, integration)
     reports {
         xml.required = true
         csv.required = false
@@ -254,6 +256,13 @@ repositories {
     mavenCentral()
     maven { url "https://jitpack.io" }
 }
+
+project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
+check.dependsOn integration
+checkstyleMain.shouldRunAfter(compileJava)
+test.shouldRunAfter(checkstyleTest)
+integration.shouldRunAfter(checkstyleIntegrationTest)
+integration.shouldRunAfter(test)
 
 ext {
     junitJupiterVersion = '5.9.2'
@@ -291,7 +300,7 @@ dependencyManagement {
 dependencies {
 
     implementation group: 'com.github.hmcts', name: 'et-common', version:'1.0.14'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'1.15.3'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'1.17.0'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLoggingVersion
@@ -336,6 +345,19 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.90.Final'
 
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '6.5.0'
+    
+    // CVE-2023-20863
+    implementation group: 'org.springframework', name: 'spring-aop', version: '5.3.27'
+    implementation group: 'org.springframework', name: 'spring-aspects', version: '5.3.27'
+    implementation group: 'org.springframework', name: 'spring-beans', version: '5.3.27'
+    implementation group: 'org.springframework', name: 'spring-context', version: '5.3.27'
+    implementation group: 'org.springframework', name: 'spring-core', version: '5.3.27'
+    implementation group: 'org.springframework', name: 'spring-expression', version: '5.3.27'
+    implementation group: 'org.springframework', name: 'spring-jcl', version: '5.3.27'
+    implementation group: 'org.springframework', name: 'spring-jdbc', version: '5.3.27'
+    implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.3.27'
+    implementation group: 'org.springframework', name: 'spring-orm', version: '5.3.27'
+    implementation group: 'org.springframework', name: 'spring-tx', version: '5.3.27'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -373,8 +395,8 @@ dependencies {
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 
-    integrationTestImplementation sourceSets.main.runtimeClasspath
-    integrationTestImplementation sourceSets.test.runtimeClasspath
+    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
+    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.2.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'

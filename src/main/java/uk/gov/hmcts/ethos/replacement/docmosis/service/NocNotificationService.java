@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
@@ -33,8 +34,9 @@ public class NocNotificationService {
     @Value("${nocNotification.template.tribunal.id}")
     private String tribunalTemplateId;
 
-    public void sendNotificationOfChangeEmails(CallbackRequest callbackRequest, CaseData caseData) {
+    public void sendNotificationOfChangeEmails(CallbackRequest callbackRequest, CaseDetails caseDetails) {
         String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(callbackRequest);
+        CaseData caseData = caseDetails.getCaseData();
         String claimantEmail = NotificationHelper.buildMapForClaimant(caseData, "").get("emailAddress");
         if (isNullOrEmpty(claimantEmail)) {
             log.warn("missing claimantEmail");
@@ -42,7 +44,7 @@ public class NocNotificationService {
             emailService.sendEmail(
                 claimantTemplateId,
                 claimantEmail,
-                NocNotificationHelper.buildPersonalisationWithPartyName(caseData, partyName)
+                NocNotificationHelper.buildPersonalisationWithPartyName(caseDetails, partyName)
             );
         }
 
@@ -64,7 +66,7 @@ public class NocNotificationService {
             emailService.sendEmail(
                 newRespondentSolicitorTemplateId,
                 newSolicitorEmail,
-                NocNotificationHelper.buildPersonalisationWithPartyName(caseData, partyName)
+                NocNotificationHelper.buildPersonalisationWithPartyName(caseDetails, partyName)
             );
         }
 

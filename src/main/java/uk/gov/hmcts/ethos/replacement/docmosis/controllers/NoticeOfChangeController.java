@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
@@ -78,7 +79,7 @@ public class NoticeOfChangeController {
 
         try {
             nocNotificationService.sendNotificationOfChangeEmails(callbackRequest,
-                    callbackRequest.getCaseDetails().getCaseData());
+                    callbackRequest.getCaseDetails());
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
         }
@@ -116,12 +117,12 @@ public class NoticeOfChangeController {
         GenericCallbackResponse callbackResponse = new GenericCallbackResponse();
 
         if (APPLY_NOC_DECISION.equals(callbackRequest.getEventId())) {
-            CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
+            CaseDetails caseDetails = callbackRequest.getCaseDetails();
+            CaseData caseData = caseDetails.getCaseData();
 
             //send emails here
             try {
-                nocNotificationService.sendNotificationOfChangeEmails(callbackRequest,
-                    caseData);
+                nocNotificationService.sendNotificationOfChangeEmails(callbackRequest, caseDetails);
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);
             }

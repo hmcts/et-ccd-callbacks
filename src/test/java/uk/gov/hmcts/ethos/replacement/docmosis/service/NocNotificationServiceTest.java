@@ -30,6 +30,7 @@ class NocNotificationServiceTest {
     @Mock
     private EmailService emailService;
     private CaseData caseData;
+    private CaseDetails caseDetails;
     private CaseDetails caseDetailsBefore;
     private CallbackRequest callbackRequest;
 
@@ -45,7 +46,7 @@ class NocNotificationServiceTest {
             .organisationID("2")
             .organisationName("Old Organisation").build();
 
-        CaseDetails caseDetails = CaseDataBuilder.builder()
+        caseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")
             .withClaimantType("claimant@unrepresented.com")
             .withRepresentativeClaimantType("Claimant Rep", "claimant@represented.com")
@@ -110,7 +111,7 @@ class NocNotificationServiceTest {
         respondentSumType.setRespondentName("Respondent");
         respondentSumType.setRespondentEmail("res@rep.com");
         when(nocRespondentHelper.getRespondent(any(), any())).thenReturn(respondentSumType);
-        nocNotificationService.sendNotificationOfChangeEmails(callbackRequest, caseData);
+        nocNotificationService.sendNotificationOfChangeEmails(callbackRequest, caseDetails);
         // Claimant
         verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), any());
         // Previous respondent
@@ -139,7 +140,7 @@ class NocNotificationServiceTest {
 
         when(nocRespondentHelper.getRespondent(any(), any())).thenReturn(respondentSumType);
 
-        nocNotificationService.sendNotificationOfChangeEmails(callbackRequest, caseData);
+        nocNotificationService.sendNotificationOfChangeEmails(callbackRequest, caseDetails);
         verify(emailService, times(0)).sendEmail(any(), any(), any());
     }
 }

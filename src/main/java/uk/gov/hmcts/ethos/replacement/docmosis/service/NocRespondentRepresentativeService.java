@@ -61,9 +61,6 @@ public class NocRespondentRepresentativeService {
 
     private final CcdCaseAssignment ccdCaseAssignment;
 
-    @Value("${nocNotification.template.previousrespondentsolicitor.id}")
-    private String previousRespondentSolicitorTemplateId;
-
     /**
      * Add respondent organisation policy and notice of change answer fields to the case data.
      * @param caseData case data

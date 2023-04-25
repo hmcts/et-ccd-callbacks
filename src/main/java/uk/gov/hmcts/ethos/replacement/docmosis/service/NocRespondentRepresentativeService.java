@@ -44,7 +44,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings({"PMD.ExcessiveImports"})
+@SuppressWarnings("PMD.ExcessiveImports")
 public class NocRespondentRepresentativeService {
     public static final String NOC_REQUEST = "nocRequest";
     private final NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;

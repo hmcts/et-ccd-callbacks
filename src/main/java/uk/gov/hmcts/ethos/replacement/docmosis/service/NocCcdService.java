@@ -41,9 +41,7 @@ public class NocCcdService {
 
     /**
      * Gets all case assignments for a given case id.
-     * @param userToken - bprevCaseData.getRepCollection()
-                    .get(getIndexOfSolicitor(prevCaseData))
-                    .getValue().getRepresentativeEmailAddress();earer token
+     * @param userToken - bearer token
      * @param caseId - ccd case id
      * @return list of case assignments for given case id
      */

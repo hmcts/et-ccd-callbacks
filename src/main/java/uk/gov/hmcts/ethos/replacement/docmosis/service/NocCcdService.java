@@ -31,7 +31,7 @@ public class NocCcdService {
             .max(Comparator.comparing(AuditEvent::getCreatedDate));
     }
 
-    public CCDRequest updateCaseRepresentation(String authToken, ChangeOrganisationRequest changeRequest,
+    public CCDRequest updateCaseRepresentation(String authToken,
                                          String jurisdiction, String caseType,
                                          String caseId) throws IOException {
         return ccdClient.startEventForUpdateRep(

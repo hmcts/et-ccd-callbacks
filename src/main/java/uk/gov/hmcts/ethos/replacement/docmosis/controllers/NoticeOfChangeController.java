@@ -120,8 +120,9 @@ public class NoticeOfChangeController {
 
             //send emails here
             try {
-                nocNotificationService.sendNotificationOfChangeEmails(callbackRequest,
-                        callbackRequest.getCaseDetailsBefore().getCaseData(), caseData, false, callbackRequest.getCaseDetailsBefore().getCaseData().getChangeOrganisationRequestField());
+                nocNotificationService.sendNotificationOfChangeEmails(
+                        callbackRequest.getCaseDetailsBefore().getCaseData(), caseData,
+                        callbackRequest.getCaseDetailsBefore().getCaseData().getChangeOrganisationRequestField());
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);
             }

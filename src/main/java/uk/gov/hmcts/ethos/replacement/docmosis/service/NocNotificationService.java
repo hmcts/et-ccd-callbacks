@@ -34,7 +34,7 @@ public class NocNotificationService {
     @Value("${nocNotification.template.tribunal.id}")
     private String tribunalTemplateId;
 
-    public void sendNotificationOfChangeEmails(CallbackRequest callbackRequest, CaseData caseData, CaseData caseDataNew, boolean isUpdateRep, ChangeOrganisationRequest changeRequest) {
+    public void sendNotificationOfChangeEmails(CaseData caseData, CaseData caseDataNew, ChangeOrganisationRequest changeRequest) {
         String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
         String claimantEmail = NotificationHelper.buildMapForClaimant(caseData, "").get("emailAddress");
         if (isNullOrEmpty(claimantEmail)) {
@@ -47,8 +47,6 @@ public class NocNotificationService {
             );
         }
         String oldSolicitorEmail = NocNotificationHelper.getOldSolicitorEmailForRepUpdate(caseData, changeRequest);
-//        String oldSolicitorEmail = isUpdateRep ? NocNotificationHelper.getOldSolicitorEmailForRepUpdate(caseData, changeRequest)
-//                : NocNotificationHelper.getOldSolicitorEmail(callbackRequest);
         if (isNullOrEmpty(oldSolicitorEmail)) {
             log.warn("missing oldSolicitorEmail");
         } else {
@@ -59,8 +57,6 @@ public class NocNotificationService {
             );
         }
         String newSolicitorEmail = NocNotificationHelper.getNewSolicitorEmailForRepUpdate(caseDataNew, changeRequest);
-//        String newSolicitorEmail = isUpdateRep ? NocNotificationHelper.getNewSolicitorEmailForRepUpdate(caseDataNew, changeRequest)
-//                : NocNotificationHelper.getNewSolicitorEmail(callbackRequest);
         if (isNullOrEmpty(newSolicitorEmail)) {
             log.warn("missing newSolicitorEmail");
         } else {
@@ -82,9 +78,7 @@ public class NocNotificationService {
             );
         }
 
-        // need to check the email is to the org admin
         RespondentSumType respondent =
-//            NocNotificationHelper.getRespondent(changeRequest, caseData, nocRespondentHelper);
                 NocNotificationHelper.getRespondent(changeRequest, caseData, nocRespondentHelper);
         String respondentEmail = respondent == null ? null : respondent.getRespondentEmail();
         if (isNullOrEmpty(respondentEmail)) {

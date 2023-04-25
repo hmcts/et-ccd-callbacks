@@ -153,38 +153,28 @@ public class NocRespondentRepresentativeService {
         for (ChangeOrganisationRequest changeRequest : changeRequests) {
             log.info("About to apply representation change {}", changeRequest);
 
-            CCDRequest ccdRequest = nocCcdService.updateCaseRepresentation(accessToken, changeRequest,
+            CCDRequest ccdRequest = nocCcdService.updateCaseRepresentation(accessToken,
                     caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
-
-//            caseData = updateRepresentation(callbackRequest.getCaseDetails(), changeRequest);
 
             log.info("Representation change applied {}", changeRequest);
 
-            Organisation removedOrg = changeRequest.getOrganisationToRemove();
             try {
-                nocNotificationService.sendNotificationOfChangeEmails(callbackRequest,
-                        caseDataBefore, caseData, false, changeRequest);
+                nocNotificationService.sendNotificationOfChangeEmails(caseDataBefore, caseData, changeRequest);
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);
             }
 
-            ChangeOrganisationRequest changeOrganisationRequestField = changeRequest;
-
-            if (changeOrganisationRequestField != null
-                    && changeOrganisationRequestField.getOrganisationToRemove() != null) {
+            if (changeRequest != null
+                    && changeRequest.getOrganisationToRemove() != null) {
                 try {
-                    removeOrganisationRepresentativeAccess(
-                            callbackRequest.getCaseDetails().getCaseId(), changeOrganisationRequestField);
+                    removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
                 } catch (IOException e) {
-                    throw new CcdInputOutputException("Failed to remove organisation representitive access", e);
+                    throw new CcdInputOutputException("Failed to remove organisation representative access", e);
                 }
             }
 
-
-            callbackRequest.getCaseDetails().setCaseData(caseData);
             callbackRequest.getCaseDetails().getCaseData().setChangeOrganisationRequestField(changeRequest);
-            CaseData finalCaseData = ccdCaseAssignment.applyNocAsAdmin(callbackRequest).getData();
-            ccdRequest.getCaseDetails().setCaseData(finalCaseData);
+            ccdRequest.getCaseDetails().setCaseData(ccdCaseAssignment.applyNocAsAdmin(callbackRequest).getData());
 
             ccdClient.submitUpdateRepEvent(
                     accessToken,

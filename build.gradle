@@ -166,7 +166,7 @@ task integration(type: Test) {
     failFast = true
     reports {
         html.enabled(true)
-        html.destination file("${buildDir}/reports/integration/integration-test-results.xml")
+        html.destination file("${buildDir}/integration/integration-test-results.xml")
     }
 }
 

@@ -59,14 +59,14 @@ withPipeline(type, product, component) {
   enableSlackNotifications('#et-builds')
 
   afterAlways('test') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/integration/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/integration/**'
 
     publishHTML target: [
             allowMissing : true,
             alwaysLinkToLastBuild: true,
             keepAll : true,
             reportDir : "integration",
-            reportFiles : "integration-test-results.html",
+            reportFiles : "index.html",
             reportName : "Integration test report"
     ]
   }

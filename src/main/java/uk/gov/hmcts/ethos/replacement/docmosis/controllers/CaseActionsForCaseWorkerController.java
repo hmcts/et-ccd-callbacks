@@ -81,7 +81,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
     "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
     "PMD.ExcessiveImports", "PMD.CyclomaticComplexity"})
 public class CaseActionsForCaseWorkerController {
-
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String EVENT_FIELDS_VALIDATION = "Event fields validation: ";
@@ -470,9 +469,10 @@ public class CaseActionsForCaseWorkerController {
         List<String> errors = eventValidationService.validateRespRepNames(caseData);
 
         if (errors.isEmpty()) {
-            //add org policy and NOC elements
+            // add org policy and NOC elements
             caseData.setRepCollection(nocRespondentHelper.updateWithRespondentIds(caseData));
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+            caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
         }
 
         log.info(EVENT_FIELDS_VALIDATION + errors);

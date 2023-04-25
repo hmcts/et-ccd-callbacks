@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -15,7 +14,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
-import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -24,7 +22,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 
@@ -43,7 +40,7 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("PMD.ExcessiveImports")
+@SuppressWarnings({"PMD.ExcessiveImports"})
 public class NocRespondentRepresentativeService {
     public static final String NOC_REQUEST = "nocRequest";
     private final NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
@@ -135,11 +132,13 @@ public class NocRespondentRepresentativeService {
     /**
      * Gets the case data before and after and checks respondent org policies for differences.
      * For each difference creates a change organisation request to remove old organisation and add new.
-     * For each change request trigger the updateRepresentation event against CCD41
-     * If the representative's email field is being updated, a notification will be sent to the old email address.
+     * For each change request trigger the updateRepresentation event against CCD.
+     * Notifications are sent to Tribunal, Claimant, Respondent, New Rep, Old Rep (if there is existing org).
+     * Previous Representative's access is revoked.
      * @param callbackRequest - containing case details before event and after the event
      * @throws IOException - exception thrown by ccd
      */
+    @SuppressWarnings({"PMD.PrematureDeclaration", "checkstyle:VariableDeclarationUsageDistance"})
     public void updateRepresentativesAccess(CallbackRequest callbackRequest) throws IOException {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore().getCaseData();
@@ -178,7 +177,8 @@ public class NocRespondentRepresentativeService {
 
             ccdClient.submitUpdateRepEvent(
                     accessToken,
-                    Map.of("changeOrganisationRequestField", ccdRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField()),
+                    Map.of("changeOrganisationRequestField",
+                            ccdRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField()),
                     caseDetails.getCaseTypeId(),
                     caseDetails.getJurisdiction(),
                     ccdRequest,

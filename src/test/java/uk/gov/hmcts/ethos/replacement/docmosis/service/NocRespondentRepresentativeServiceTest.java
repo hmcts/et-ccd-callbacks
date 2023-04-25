@@ -8,10 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
+import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -36,7 +39,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -98,6 +100,12 @@ class NocRespondentRepresentativeServiceTest {
     private NocCcdService nocCcdService;
     @MockBean
     private EmailService emailService;
+    @MockBean
+    private NocNotificationService nocNotificationService;
+    @MockBean
+    private CcdClient ccdClient;
+    @MockBean
+    private CcdCaseAssignment ccdCaseAssignment;
     private NocRespondentHelper nocRespondentHelper;
     private CaseData caseData;
 
@@ -108,7 +116,8 @@ class NocRespondentRepresentativeServiceTest {
         CaseConverter converter = new CaseConverter(objectMapper);
         nocRespondentRepresentativeService =
             new NocRespondentRepresentativeService(noticeOfChangeFieldPopulator, converter, nocCcdService,
-                adminUserService, nocRespondentHelper, emailService);
+                    adminUserService, nocRespondentHelper, emailService,
+                    nocNotificationService, ccdClient, ccdCaseAssignment);
 
         // Respondent
         caseData.setRespondentCollection(new ArrayList<>());
@@ -189,6 +198,14 @@ class NocRespondentRepresentativeServiceTest {
         representedTypeRItem.setValue(representedType);
         representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_THREE);
         caseData.getRepCollection().add(representedTypeRItem);
+
+        caseData.setChangeOrganisationRequestField(ChangeOrganisationRequest.builder()
+                .organisationToAdd(org1)
+                .organisationToRemove(org2)
+                .caseRoleId(null)
+                .requestTimestamp(null)
+                .approvalStatus(null)
+                .build());
     }
 
     @Test
@@ -282,19 +299,26 @@ class NocRespondentRepresentativeServiceTest {
 
     @Test
     void updateRepresentativesAccess() throws IOException {
-        CallbackRequest callbackRequest = getCallBackCallbackRequest();
+        CCDRequest ccdRequest = getCCDRequest();
 
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
-        doNothing().when(nocCcdService).updateCaseRepresentation(any(), any(), any(), any(), any());
+        when(nocCcdService.updateCaseRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
+        when(nocCcdService.getCaseAssignments(any(), any())).thenReturn(
+                mockCaseAssignmentData());
+        when(ccdCaseAssignment.applyNocAsAdmin(any())).thenReturn(CCDCallbackResponse.builder()
+                .data(caseData)
+                .build());
 
-        nocRespondentRepresentativeService.updateRepresentativesAccess(callbackRequest);
+        nocRespondentRepresentativeService.updateRepresentativesAccess(getCallBackCallbackRequest());
 
         verify(nocCcdService, times(2))
-            .updateCaseRepresentation(any(), any(), any(), any(), any());
+            .updateCaseRepresentation(any(), any(), any(), any());
 
-        verify(emailService, times(1)).sendEmail(any(), eq("oldRep1@test.com"), any());
-        verify(emailService, times(1)).sendEmail(any(), eq("oldRep2@test.com"), any());
+        verify(nocNotificationService, times(2))
+                .sendNotificationOfChangeEmails(any(), any(), any());
 
+        verify(ccdClient, times(2))
+                .submitUpdateRepEvent(any(), any(), any(), any(), any(), any());
     }
 
     private CallbackRequest getCallBackCallbackRequest() {
@@ -306,6 +330,14 @@ class NocRespondentRepresentativeServiceTest {
         caseDetailsAfter.setCaseData(getCaseDataAfter());
         callbackRequest.setCaseDetails(caseDetailsAfter);
         return callbackRequest;
+    }
+
+    private CCDRequest getCCDRequest() {
+        CCDRequest ccdRequest = new CCDRequest();
+        CaseDetails caseDetailsAfter = new CaseDetails();
+        caseDetailsAfter.setCaseData(getCaseDataAfter());
+        ccdRequest.setCaseDetails(caseDetailsAfter);
+        return ccdRequest;
     }
 
     @Test

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -34,26 +33,28 @@ public class NocNotificationService {
     @Value("${nocNotification.template.tribunal.id}")
     private String tribunalTemplateId;
 
-    public void sendNotificationOfChangeEmails(CaseData caseData, CaseData caseDataNew, ChangeOrganisationRequest changeRequest) {
+    public void sendNotificationOfChangeEmails(CaseData caseDataPrevious, CaseData caseDataNew,
+                                               ChangeOrganisationRequest changeRequest) {
         String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
-        String claimantEmail = NotificationHelper.buildMapForClaimant(caseData, "").get("emailAddress");
+        String claimantEmail = NotificationHelper.buildMapForClaimant(caseDataPrevious, "").get("emailAddress");
         if (isNullOrEmpty(claimantEmail)) {
             log.warn("missing claimantEmail");
         } else {
             emailService.sendEmail(
                 claimantTemplateId,
                 claimantEmail,
-                NocNotificationHelper.buildPersonalisationWithPartyName(caseData, partyName)
+                NocNotificationHelper.buildPersonalisationWithPartyName(caseDataPrevious, partyName)
             );
         }
-        String oldSolicitorEmail = NocNotificationHelper.getOldSolicitorEmailForRepUpdate(caseData, changeRequest);
+        String oldSolicitorEmail = NocNotificationHelper
+                .getOldSolicitorEmailForRepUpdate(caseDataPrevious, changeRequest);
         if (isNullOrEmpty(oldSolicitorEmail)) {
             log.warn("missing oldSolicitorEmail");
         } else {
             emailService.sendEmail(
                     previousRespondentSolicitorTemplateId,
                     oldSolicitorEmail,
-                    NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseData)
+                    NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious)
             );
         }
         String newSolicitorEmail = NocNotificationHelper.getNewSolicitorEmailForRepUpdate(caseDataNew, changeRequest);
@@ -67,19 +68,19 @@ public class NocNotificationService {
             );
         }
 
-        String tribunalEmail = caseData.getTribunalCorrespondenceEmail();
+        String tribunalEmail = caseDataPrevious.getTribunalCorrespondenceEmail();
         if (isNullOrEmpty(tribunalEmail)) {
             log.warn("missing tribunalEmail");
         } else {
             emailService.sendEmail(
                 tribunalTemplateId,
-                caseData.getTribunalCorrespondenceEmail(),
-                NocNotificationHelper.buildTribunalPersonalisation(caseData)
+                caseDataPrevious.getTribunalCorrespondenceEmail(),
+                NocNotificationHelper.buildTribunalPersonalisation(caseDataPrevious)
             );
         }
 
         RespondentSumType respondent =
-                NocNotificationHelper.getRespondent(changeRequest, caseData, nocRespondentHelper);
+                NocNotificationHelper.getRespondent(changeRequest, caseDataPrevious, nocRespondentHelper);
         String respondentEmail = respondent == null ? null : respondent.getRespondentEmail();
         if (isNullOrEmpty(respondentEmail)) {
             log.warn("Missing respondentEmail");
@@ -87,7 +88,7 @@ public class NocNotificationService {
             emailService.sendEmail(
                 respondentTemplateId,
                 respondent.getRespondentEmail(),
-                NocNotificationHelper.buildRespondentPersonalisation(caseData, respondent));
+                NocNotificationHelper.buildRespondentPersonalisation(caseDataPrevious, respondent));
         }
     }
 }

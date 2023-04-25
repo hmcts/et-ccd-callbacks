@@ -570,6 +570,18 @@ public class Et3ResponseHelper {
         return new ArrayList<>();
     }
 
+    public static boolean checkRespondentSection(CaseData caseData) {
+        if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
+            for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
+                if (checkRespondentSections(respondentSumTypeItem)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     private static boolean checkRespondentSections(RespondentSumTypeItem respondentSumTypeItem) {
         RespondentSumType respondent = respondentSumTypeItem.getValue();
         return YES.equals(respondent.getPersonalDetailsSection())

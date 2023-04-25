@@ -47,13 +47,14 @@ public class Et3ResponseController {
         "<h3>What happens next</h3>\r\n\r\nYou should receive confirmation from the tribunal office to process your"
             + " application within 5 working days. If you have not heard from them within 5 days, "
             + "contact the office directly.";
-    private static final String SECTION_COMPLETE_BODY =
+    private static String SECTION_COMPLETE_BODY =
             "You may want to complete the rest of the ET3 Form using the links below"
             + "<br><a href=\"/cases/case-details/%s/trigger/et3Response/et3Response1\">ET3 - Respondent Details</a>"
             + "<br><a href=\"/cases/case-details/%s/trigger/et3ResponseEmploymentDetails/et3ResponseEmploymentDetails1"
             + "\">ET3 - Employment Details</a>"
             + "<br><a href=\"/cases/case-details/%s/trigger/et3ResponseClaimDetails/et3ResponseClaimDetails1\">ET3 - "
             + "Claim Details</a>";
+    private static final String SUBMIT_ET3_BODY = "<br><a href=\"/cases/case-details/%s/trigger/submitEt3/submitEt31\">Submit ET3</a>";
     private final VerifyTokenService verifyTokenService;
     private final Et3ResponseService et3ResponseService;
 
@@ -199,6 +200,11 @@ public class Et3ResponseController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
+
+        if (Et3ResponseHelper.checkRespondentSection(ccdRequest.getCaseDetails().getCaseData())) {
+            SECTION_COMPLETE_BODY += SUBMIT_ET3_BODY;
+        }
+
         String ccdId = ccdRequest.getCaseDetails().getCaseId();
         String body = String.format(SECTION_COMPLETE_BODY, ccdId, ccdId, ccdId, ccdId);
         return ResponseEntity.ok(CCDCallbackResponse.builder()

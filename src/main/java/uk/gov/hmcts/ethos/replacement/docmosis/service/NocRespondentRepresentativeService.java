@@ -144,7 +144,8 @@ public class NocRespondentRepresentativeService {
     @SuppressWarnings({"PMD.PrematureDeclaration", "checkstyle:VariableDeclarationUsageDistance"})
     public void updateRepresentativesAccess(CallbackRequest callbackRequest) throws IOException {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
-        CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore().getCaseData();
+        CaseDetails caseDetailsBefore = callbackRequest.getCaseDetailsBefore();
+        CaseData caseDataBefore = caseDetailsBefore.getCaseData();
         CaseData caseData = caseDetails.getCaseData();
 
         List<ChangeOrganisationRequest> changeRequests = identifyRepresentationChanges(caseData,
@@ -161,7 +162,7 @@ public class NocRespondentRepresentativeService {
             log.info("Representation change applied {}", changeRequest);
 
             try {
-                nocNotificationService.sendNotificationOfChangeEmails(caseDataBefore, caseData, changeRequest);
+                nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest);
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);
             }

@@ -28,6 +28,7 @@ class NocNotificationHelperTest {
     private static final String OLD_ORG_ID = "2";
 
     private CaseData caseData;
+    private CaseDetails caseDetails;
 
     private RespondentSumType respondentSumType;
 
@@ -45,7 +46,7 @@ class NocNotificationHelperTest {
                 .organisationID(OLD_ORG_ID)
                 .organisationName("Old Organisation").build();
 
-        CaseDetails caseDetails = CaseDataBuilder.builder()
+        caseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")
             .withClaimantType("claimant@unrepresented.com")
             .withRepresentativeClaimantType("Claimant Rep", "claimant@represented.com")
@@ -79,8 +80,8 @@ class NocNotificationHelperTest {
     @Test
     void testbuildClaimantPersonalisation() {
         Map<String, String> claimantPersonalisation =
-            NocNotificationHelper.buildPersonalisationWithPartyName(caseData, "test_party");
-        assertThat(claimantPersonalisation.size(), is(4));
+            NocNotificationHelper.buildPersonalisationWithPartyName(caseDetails, "test_party");
+        assertThat(claimantPersonalisation.size(), is(5));
         for (String value : claimantPersonalisation.values()) {
             assertThat(value, notNullValue());
         }
@@ -99,8 +100,8 @@ class NocNotificationHelperTest {
     @Test
     void testBuildNewRespondentSolicitorPersonalisation() {
         Map<String, String> claimantPersonalisation =
-            NocNotificationHelper.buildPersonalisationWithPartyName(caseData, "test_party");
-        assertThat(claimantPersonalisation.size(), is(4));
+            NocNotificationHelper.buildPersonalisationWithPartyName(caseDetails, "test_party");
+        assertThat(claimantPersonalisation.size(), is(5));
         for (String value : claimantPersonalisation.values()) {
             assertThat(value, notNullValue());
         }

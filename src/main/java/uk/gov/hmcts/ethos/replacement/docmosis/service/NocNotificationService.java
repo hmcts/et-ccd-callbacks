@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
@@ -33,9 +34,11 @@ public class NocNotificationService {
     @Value("${nocNotification.template.tribunal.id}")
     private String tribunalTemplateId;
 
-    public void sendNotificationOfChangeEmails(CaseData caseDataPrevious, CaseData caseDataNew,
+    public void sendNotificationOfChangeEmails(CaseDetails caseDetailsPrevious, CaseDetails caseDetailsNew,
                                                ChangeOrganisationRequest changeRequest) {
+        CaseData caseDataNew = caseDetailsNew.getCaseData();
         String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
+        CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
         String claimantEmail = NotificationHelper.buildMapForClaimant(caseDataPrevious, "").get("emailAddress");
         if (isNullOrEmpty(claimantEmail)) {
             log.warn("missing claimantEmail");
@@ -43,7 +46,7 @@ public class NocNotificationService {
             emailService.sendEmail(
                 claimantTemplateId,
                 claimantEmail,
-                NocNotificationHelper.buildPersonalisationWithPartyName(caseDataPrevious, partyName)
+                NocNotificationHelper.buildPersonalisationWithPartyName(caseDetailsPrevious, partyName)
             );
         }
         String oldSolicitorEmail = NocNotificationHelper
@@ -64,7 +67,7 @@ public class NocNotificationService {
             emailService.sendEmail(
                 newRespondentSolicitorTemplateId,
                 newSolicitorEmail,
-                NocNotificationHelper.buildPersonalisationWithPartyName(caseDataNew, partyName)
+                NocNotificationHelper.buildPersonalisationWithPartyName(caseDetailsNew, partyName)
             );
         }
 

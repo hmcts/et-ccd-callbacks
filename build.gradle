@@ -4,7 +4,7 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.1.0'
-    id 'org.springframework.boot' version '2.7.10'
+    id 'org.springframework.boot' version '2.7.11'
     id 'org.owasp.dependencycheck' version '8.2.1'
     id 'com.github.ben-manes.versions' version '0.46.0'
     id 'au.com.dius.pact' version '4.3.15'
@@ -54,8 +54,6 @@ sonarqube {
     }
 }
 
-project.tasks['sonarqube'].dependsOn jacocoTestReport
-
 sourceSets {
     test {
         java.srcDir 'src/test/java'
@@ -77,8 +75,8 @@ sourceSets {
     }
     integrationTest {
         java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
             srcDir file('src/test/integration/java')
         }
         resources.srcDir file('src/test/integration/resources')
@@ -166,6 +164,10 @@ task integration(type: Test) {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
     failFast = true
+    reports {
+        html.enabled(true)
+        html.destination file("${buildDir}/integration/")
+    }
 }
 
 project.tasks['check'].dependsOn integration
@@ -221,7 +223,7 @@ task fortifyScan(type: JavaExec)  {
 }
 
 jacocoTestReport {
-    executionData(test)
+    executionData(test, integration)
     reports {
         xml.required = true
         csv.required = false
@@ -254,6 +256,13 @@ repositories {
     mavenCentral()
     maven { url "https://jitpack.io" }
 }
+
+project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
+check.dependsOn integration
+checkstyleMain.shouldRunAfter(compileJava)
+test.shouldRunAfter(checkstyleTest)
+integration.shouldRunAfter(checkstyleIntegrationTest)
+integration.shouldRunAfter(test)
 
 ext {
     junitJupiterVersion = '5.9.2'
@@ -373,8 +382,8 @@ dependencies {
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 
-    integrationTestImplementation sourceSets.main.runtimeClasspath
-    integrationTestImplementation sourceSets.test.runtimeClasspath
+    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
+    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.2.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'

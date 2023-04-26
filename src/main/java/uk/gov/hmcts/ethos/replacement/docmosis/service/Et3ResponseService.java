@@ -100,18 +100,16 @@ public class Et3ResponseService {
                 .map(GenericTypeItem::getId)
                 .collect(Collectors.toCollection(HashSet::new));
 
-        var list = Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
+        List<DocumentTypeItem> documentList = Optional.ofNullable(caseData.getEt3ResponseContestClaimDocument())
                 .orElse(List.of())
                 .stream()
                 .filter(o -> !documentSet.contains(o.getId()))
                 .collect(Collectors.toList());
-        for (DocumentTypeItem documentTypeItem : list) {
+        for (DocumentTypeItem documentTypeItem : documentList) {
             documentTypeItem.getValue().setTypeOfDocument(ET3_ATTACHMENT);
         }
 
-        log.info(list.toString());
-
-        documents.addAll(list);
+        documents.addAll(documentList);
 
         if (caseData.getEt3ResponseEmployerClaimDocument() != null) {
             documents.add(DocumentHelper.createDocumenTypeItem(

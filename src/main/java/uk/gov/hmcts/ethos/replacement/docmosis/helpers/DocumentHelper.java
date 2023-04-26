@@ -984,9 +984,10 @@ public class DocumentHelper {
      * @return a document to be added to the doc collection
      */
     public static DocumentTypeItem createDocumenTypeItem(UploadedDocumentType uploadedDocument, String typeOfDocument) {
-        DocumentType documentType = new DocumentType();
-        documentType.setUploadedDocument(uploadedDocument);
-        documentType.setTypeOfDocument(typeOfDocument);
+        DocumentType documentType = DocumentType.builder()
+                .typeOfDocument(typeOfDocument)
+                .uploadedDocument(uploadedDocument)
+                .build();
 
         DocumentTypeItem documentTypeItem = new DocumentTypeItem();
         documentTypeItem.setValue(documentType);

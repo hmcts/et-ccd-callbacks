@@ -54,7 +54,6 @@ public class Et3ResponseController {
             + "\">ET3 - Employment Details</a>"
             + "<br><a href=\"/cases/case-details/%s/trigger/et3ResponseClaimDetails/et3ResponseClaimDetails1\">ET3 - "
             + "Claim Details</a>";
-    private static final String SUBMIT_ET3_BODY = "<br><a href=\"/cases/case-details/%s/trigger/submitEt3/submitEt31\">Submit ET3</a>";
     private final VerifyTokenService verifyTokenService;
     private final Et3ResponseService et3ResponseService;
 
@@ -201,10 +200,6 @@ public class Et3ResponseController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        if (Et3ResponseHelper.checkRespondentSection(ccdRequest.getCaseDetails().getCaseData())) {
-            SECTION_COMPLETE_BODY += SUBMIT_ET3_BODY;
-        }
-
         String ccdId = ccdRequest.getCaseDetails().getCaseId();
         String body = String.format(SECTION_COMPLETE_BODY, ccdId, ccdId, ccdId, ccdId);
         return ResponseEntity.ok(CCDCallbackResponse.builder()
@@ -240,7 +235,6 @@ public class Et3ResponseController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        System.out.println("CASEDATAHARPREET" + caseData);
         DocumentInfo documentInfo = et3ResponseService.generateEt3ResponseDocument(caseData, userToken,
             ccdRequest.getCaseDetails().getCaseTypeId());
         et3ResponseService.saveEt3ResponseDocument(caseData, documentInfo);

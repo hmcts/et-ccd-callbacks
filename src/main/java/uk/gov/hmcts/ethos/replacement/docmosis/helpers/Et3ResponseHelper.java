@@ -285,6 +285,14 @@ public class Et3ResponseHelper {
             return List.of("No respondents found");
         }
 
+        var t = caseData.getRespondentCollection().stream()
+                .filter(r -> NO.equals(r.getValue().getResponseReceived()))
+                .collect(Collectors.toList());
+
+        if (CollectionUtils.isEmpty(t)) {
+            return List.of("There are no respondents that require an ET3");
+        }
+
         DynamicFixedListType dynamicList = DynamicFixedListType.from(DynamicListHelper.createDynamicRespondentName(
                 caseData.getRespondentCollection().stream()
                         .filter(r -> NO.equals(r.getValue().getResponseReceived()))
@@ -550,6 +558,11 @@ public class Et3ResponseHelper {
         caseData.setEt3ResponseRespondentSupportDocument(null);
     }
 
+    /**
+     * Create a list of respondents for ET3 submission.
+     * @param caseData casedata
+     * @return a list of errors if any
+     */
     public static List<String> et3SubmitRespondents(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return List.of("No respondents found");
@@ -560,7 +573,8 @@ public class Et3ResponseHelper {
                 .collect(Collectors.toList());
 
         if (CollectionUtils.isEmpty(validRespondents)) {
-            return List.of("There are no respondents that can currently submit an ET3 Form. Please make sure all 3 sections have been completed for a respondent");
+            return List.of("There are no respondents that can currently submit an ET3 Form. Please make sure all "
+                    + "3 sections have been completed for a respondent");
         }
         DynamicFixedListType dynamicList = DynamicFixedListType.from(
                 DynamicListHelper.createDynamicRespondentName(validRespondents));
@@ -568,18 +582,6 @@ public class Et3ResponseHelper {
         dynamicListType.setDynamicList(dynamicList);
         caseData.setSubmitEt3Respondent(dynamicList);
         return new ArrayList<>();
-    }
-
-    public static boolean checkRespondentSection(CaseData caseData) {
-        if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
-            for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-                if (checkRespondentSections(respondentSumTypeItem)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     private static boolean checkRespondentSections(RespondentSumTypeItem respondentSumTypeItem) {
@@ -590,6 +592,11 @@ public class Et3ResponseHelper {
                 && NO.equals(respondent.getResponseReceived());
     }
 
+    /**
+     * Reloads the data from the respondent to the toplevel casedata to generate the ET3 for submission and attach
+     * documents to document collection.
+     * @param caseData casedata
+     */
     public static void reloadSubmitOntoEt3(CaseData caseData) {
         if (caseData.getSubmitEt3Respondent() == null
                 || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {

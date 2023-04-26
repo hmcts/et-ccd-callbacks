@@ -201,7 +201,7 @@ public class Et3ResponseController {
         }
 
         String ccdId = ccdRequest.getCaseDetails().getCaseId();
-        String body = String.format(SECTION_COMPLETE_BODY, ccdId, ccdId, ccdId, ccdId);
+        String body = String.format(SECTION_COMPLETE_BODY, ccdId, ccdId, ccdId);
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
                 .confirmation_body(body)

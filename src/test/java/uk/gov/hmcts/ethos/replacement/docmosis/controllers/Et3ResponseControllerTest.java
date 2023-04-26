@@ -44,6 +44,12 @@ class Et3ResponseControllerTest {
     private static final String MID_EMPLOYMENT_DATES_URL = "/et3Response/midEmploymentDates";
     private static final String ABOUT_TO_SUBMIT_URL = "/et3Response/aboutToSubmit";
     private static final String VALIDATE_RESPONDENT_URL = "/et3Response/validateRespondent";
+    private static final String SUBMIT_SECTION_URL = "/et3Response/submitSection";
+    private static final String SUBMIT_COMPLETE_URL = "/et3Response/sectionComplete";
+    private static final String START_SUBMIT_ET3_URL = "/et3Response/startSubmitEt3";
+    private static final String RELOAD_SUBMIT_DATA_URL = "/et3Response/reloadSubmitData";
+
+
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -65,6 +71,7 @@ class Et3ResponseControllerTest {
 
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withRespondent("test", NO, null, false)
+                .withSubmitEt3Respondent("test")
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         ccdRequest = CCDRequestBuilder.builder()
@@ -227,6 +234,129 @@ class Et3ResponseControllerTest {
     @Test
     void validateRespondent_badRequest() throws Exception {
         mvc.perform(post(VALIDATE_RESPONDENT_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void submitSection_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(SUBMIT_SECTION_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void submitSection_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(SUBMIT_SECTION_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void submitSection_badRequest() throws Exception {
+        mvc.perform(post(SUBMIT_SECTION_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    void submitComplete_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(SUBMIT_COMPLETE_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void submitComplete_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(SUBMIT_COMPLETE_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void submitComplete_badRequest() throws Exception {
+        mvc.perform(post(SUBMIT_COMPLETE_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void startSubmitEt3_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(START_SUBMIT_ET3_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void startSubmitEt3_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(START_SUBMIT_ET3_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void startSubmitEt3_badRequest() throws Exception {
+        mvc.perform(post(START_SUBMIT_ET3_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void reloadSubmitData_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(RELOAD_SUBMIT_DATA_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void reloadSubmitData_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(RELOAD_SUBMIT_DATA_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void reloadSubmitData_badRequest() throws Exception {
+        mvc.perform(post(RELOAD_SUBMIT_DATA_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))

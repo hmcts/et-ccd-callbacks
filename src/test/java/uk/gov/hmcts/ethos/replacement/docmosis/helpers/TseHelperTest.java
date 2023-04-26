@@ -73,6 +73,29 @@ public class TseHelperTest {
     }
 
     @Test
+    public void populateSelectApplicationDropdown_withAnApplication_returnsEmpty() {
+        CaseData caseData1 = CaseDataBuilder.builder()
+                .withClaimantIndType("First", "Last")
+                .withEthosCaseReference("1234")
+                .withClaimant("First Last")
+                .withRespondent("Respondent Name", YES, "13 December 2022", false)
+                .build();
+
+        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
+                .withDate("13 December 2022").withDue("20 December 2022").withType("Order a witness to attend")
+                .withDetails("Text").withNumber("1")
+                .withResponsesCount("0").withStatus(OPEN_STATE).build();
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
+        genericTseApplicationTypeItem.setValue(build);
+        caseData1.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+
+        DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData1);
+        assertThat(actual.getListItems().size(), is(0));
+    }
+
+    @Test
     public void populateSelectApplicationDropdown_withRespondentReply_returnsNothing() {
         caseData.getGenericTseApplicationCollection().get(0).getValue()
             .setRespondCollection(List.of(TseRespondTypeItem.builder()

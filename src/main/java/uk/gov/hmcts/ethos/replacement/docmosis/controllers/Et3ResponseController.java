@@ -47,7 +47,7 @@ public class Et3ResponseController {
         "<h3>What happens next</h3>\r\n\r\nYou should receive confirmation from the tribunal office to process your"
             + " application within 5 working days. If you have not heard from them within 5 days, "
             + "contact the office directly.";
-    private static String SECTION_COMPLETE_BODY =
+    private static final String SECTION_COMPLETE_BODY =
             "You may want to complete the rest of the ET3 Form using the links below"
             + "<br><a href=\"/cases/case-details/%s/trigger/et3Response/et3Response1\">ET3 - Respondent Details</a>"
             + "<br><a href=\"/cases/case-details/%s/trigger/et3ResponseEmploymentDetails/et3ResponseEmploymentDetails1"

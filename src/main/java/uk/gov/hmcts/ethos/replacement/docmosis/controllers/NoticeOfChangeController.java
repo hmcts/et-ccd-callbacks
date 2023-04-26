@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
@@ -75,12 +76,13 @@ public class NoticeOfChangeController {
         GenericCallbackResponse callbackResponse = new GenericCallbackResponse();
 
         if (APPLY_NOC_DECISION.equals(callbackRequest.getEventId())) {
-            CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
+            CaseDetails caseDetails = callbackRequest.getCaseDetails();
+            CaseData caseData = caseDetails.getCaseData();
 
             //send emails here
             try {
                 nocNotificationService.sendNotificationOfChangeEmails(
-                        callbackRequest.getCaseDetailsBefore().getCaseData(), caseData,
+                        callbackRequest.getCaseDetailsBefore(), caseDetails,
                         callbackRequest.getCaseDetailsBefore().getCaseData().getChangeOrganisationRequestField());
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);

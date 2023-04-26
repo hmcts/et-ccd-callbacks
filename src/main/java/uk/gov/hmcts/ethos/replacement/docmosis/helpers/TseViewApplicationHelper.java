@@ -143,12 +143,11 @@ public final class TseViewApplicationHelper {
     /**
      * Checks if application is viewable for respondent.
      *
-     * @param genericTseApplicationTypeItem - generic application type
+     * @param applicationTypeItem - generic application type
      */
-    public static boolean applicationsSharedWithRespondent(
-            GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
-        String applicant = genericTseApplicationTypeItem.getValue().getApplicant();
-        String copyToRespondent = genericTseApplicationTypeItem.getValue().getCopyToOtherPartyYesOrNo();
+    public static boolean applicationsSharedWithRespondent(GenericTseApplicationTypeItem applicationTypeItem) {
+        String applicant = applicationTypeItem.getValue().getApplicant();
+        String copyToRespondent = applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo();
         boolean isClaimantAndRule92Shared = CLAIMANT_TITLE.equals(applicant)
                 && YES.equals(copyToRespondent);
 

@@ -27,6 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,6 +67,8 @@ public class NocRespondentRepresentativeService {
     private final CcdCaseAssignment ccdCaseAssignment;
 
     private final OrganisationClient organisationClient;
+
+    private final AuthTokenGenerator authTokenGenerator;
 
     /**
      * Add respondent organisation policy and notice of change answer fields to the case data.
@@ -267,7 +270,8 @@ public class NocRespondentRepresentativeService {
         }
 
         // get all Organisation Details
-        List<OrganisationsResponse> organisationList = organisationClient.getOrganisations(userToken);
+        List<OrganisationsResponse> organisationList = organisationClient.getOrganisations(
+                userToken, authTokenGenerator.generate());
         if (CollectionUtils.isEmpty(organisationList)) {
             log.info("ORGANISATION CLIENT LIST COUNT ---> Null");
         } else {

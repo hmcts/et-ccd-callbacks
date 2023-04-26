@@ -94,6 +94,8 @@ class NocNotificationServiceTest {
                 null)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
+        caseDetailsBefore.setCaseId("1682497607486678");
+        caseDetailsNew.setCaseId("1682497607486678");
         caseDetailsBefore.getCaseData().setClaimant("Claimant LastName");
         caseDetailsNew.getCaseData().setClaimant("Claimant LastName");
         caseDetailsBefore.getCaseData().setTribunalCorrespondenceEmail("respondent@unrepresented.com");
@@ -106,8 +108,8 @@ class NocNotificationServiceTest {
         respondentSumType.setRespondentEmail("res@rep.com");
         when(nocRespondentHelper.getRespondent(any(), any())).thenReturn(respondentSumType);
         nocNotificationService.sendNotificationOfChangeEmails(
-                caseDetailsBefore.getCaseData(),
-                caseDetailsNew.getCaseData(),
+                caseDetailsBefore,
+                caseDetailsNew,
                 caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
         // Claimant
         verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), any());
@@ -142,8 +144,8 @@ class NocNotificationServiceTest {
         when(nocRespondentHelper.getRespondent(any(), any())).thenReturn(respondentSumType);
 
         nocNotificationService.sendNotificationOfChangeEmails(
-                caseDetailsBefore.getCaseData(),
-                caseDetailsNew.getCaseData(),
+                caseDetailsBefore,
+                caseDetailsNew,
                 caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
         verify(emailService, times(0)).sendEmail(any(), any(), any());
     }

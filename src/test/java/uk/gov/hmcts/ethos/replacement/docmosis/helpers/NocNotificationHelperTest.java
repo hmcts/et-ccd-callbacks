@@ -28,6 +28,7 @@ class NocNotificationHelperTest {
     private static final String OLD_ORG_ID = "2";
 
     private CaseData caseData;
+    private CaseDetails caseDetails;
 
     private RespondentSumType respondentSumType;
 
@@ -45,7 +46,7 @@ class NocNotificationHelperTest {
                 .organisationID(OLD_ORG_ID)
                 .organisationName("Old Organisation").build();
 
-        CaseDetails caseDetails = CaseDataBuilder.builder()
+        caseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")
             .withClaimantType("claimant@unrepresented.com")
             .withRepresentativeClaimantType("Claimant Rep", "claimant@represented.com")
@@ -79,11 +80,15 @@ class NocNotificationHelperTest {
     @Test
     void testbuildClaimantPersonalisation() {
         Map<String, String> claimantPersonalisation =
-            NocNotificationHelper.buildPersonalisationWithPartyName(caseData, "test_party");
-        assertThat(claimantPersonalisation.size(), is(4));
-        for (String value : claimantPersonalisation.values()) {
-            assertThat(value, notNullValue());
-        }
+            NocNotificationHelper.buildPersonalisationWithPartyName(caseDetails, "test_party");
+        assertThat(claimantPersonalisation.size(), is(5));
+        assertThat(claimantPersonalisation.get("party_name"), is("test_party"));
+        assertThat(claimantPersonalisation.get("ccdId"), is("1234"));
+        assertThat(claimantPersonalisation.get("claimant"), is("Claimant LastName"));
+        assertThat(claimantPersonalisation.get("list_of_respondents"),
+                is("Respondent Respondent Unrepresented Respondent Represented Respondent")
+        );
+        assertThat(claimantPersonalisation.get("case_number"), is("12345/6789"));
     }
 
     @Test
@@ -91,16 +96,6 @@ class NocNotificationHelperTest {
         Map<String, String> claimantPersonalisation =
             NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseData);
         assertThat(claimantPersonalisation.size(), is(3));
-        for (String value : claimantPersonalisation.values()) {
-            assertThat(value, notNullValue());
-        }
-    }
-
-    @Test
-    void testBuildNewRespondentSolicitorPersonalisation() {
-        Map<String, String> claimantPersonalisation =
-            NocNotificationHelper.buildPersonalisationWithPartyName(caseData, "test_party");
-        assertThat(claimantPersonalisation.size(), is(4));
         for (String value : claimantPersonalisation.values()) {
             assertThat(value, notNullValue());
         }

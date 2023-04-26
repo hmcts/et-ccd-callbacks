@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -102,11 +103,12 @@ public final class NocNotificationHelper {
 
     }
 
-    public static Map<String, String> buildPersonalisationWithPartyName(CaseData caseData, String partyName) {
+    public static Map<String, String> buildPersonalisationWithPartyName(CaseDetails caseDetails, String partyName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
-        addCommonValues(caseData, personalisation);
+        addCommonValues(caseDetails.getCaseData(), personalisation);
         personalisation.put("party_name", partyName);
+        personalisation.put("ccdId", caseDetails.getCaseId());
 
         return personalisation;
     }

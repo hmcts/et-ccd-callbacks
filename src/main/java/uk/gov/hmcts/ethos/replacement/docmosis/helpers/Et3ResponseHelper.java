@@ -240,13 +240,13 @@ public class Et3ResponseHelper {
                 data::setHelpYes, data::setHelpNo, data::setHelpNA);
         setCheck(respondentSumType.getEt3ResponseEmployerClaim(), data::setEccYes, null, null);
         setCheck(respondentSumType.getEt3ResponseContinuingEmployment(), data::setContinueYes, data::setContinueNo,
-        addRepDetails(caseData, data);
-
+                data::setContinueNA);
         setCheck(respondentSumType.getEt3ResponseIsPensionCorrect(), data::setPensionYes, data::setPensionNo,
-            data::setPensionNA);
+                data::setPensionNA);
         setCheck("Post".equals(respondentSumType.getResponseRespondentContactPreference()) ? "Yes" : "No",
                 data::setContactPost, data::setContactEmail, null);
 
+        addRepDetails(caseData, data);
         data.setRepContactEmail(UNCHECKED);
         data.setRepContactPost(UNCHECKED);
         data.setBeforeWeekly(UNCHECKED);

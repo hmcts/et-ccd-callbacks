@@ -7,10 +7,14 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 
+import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.formatLocalDate;
@@ -61,5 +65,20 @@ public class BundlesRespondentService {
         );
 
         return DynamicValueType.create(value.getHearingNumber(), label);
+    }
+
+    public List<String> validateFileUpload(CaseData caseData) {
+        List<DocumentTypeItem> fileCollection = caseData.getBundlesRespondentUploadFile();
+        if (CollectionUtils.isEmpty(fileCollection)) {
+            return List.of("You must upload a PDF file");
+        }
+
+        UploadedDocumentType uploadedDocument = fileCollection.get(0).getValue().getUploadedDocument();
+
+        if (uploadedDocument.getDocumentFilename().toLowerCase(Locale.ENGLISH).endsWith(".pdf")) {
+            return List.of();
+        }
+
+        return List.of("Your upload contains a disallowed file type");
     }
 }

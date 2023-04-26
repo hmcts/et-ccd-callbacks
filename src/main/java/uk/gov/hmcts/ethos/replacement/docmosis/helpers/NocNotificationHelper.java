@@ -54,10 +54,15 @@ public final class NocNotificationHelper {
     public static String getNewSolicitorEmailForRepUpdate(CaseData caseData, ChangeOrganisationRequest changeRequest) {
         try {
             String newOrgId = changeRequest.getOrganisationToAdd().getOrganisationID();
-            return caseData.getRepCollection()
+            Optional<RepresentedTypeRItem> representedTypeRItem = caseData.getRepCollection()
                     .stream().filter(r -> r.getValue().getRespondentOrganisation().getOrganisationID()
                             .equals(newOrgId))
-                    .findAny().get().getValue().getRepresentativeEmailAddress();
+                    .findAny();
+            if (representedTypeRItem.isPresent()) {
+                return representedTypeRItem.get().getValue().getRepresentativeEmailAddress();
+            }
+            return null;
+
         } catch (NullPointerException e) {
             return null;
         }

@@ -82,9 +82,13 @@ class NocNotificationHelperTest {
         Map<String, String> claimantPersonalisation =
             NocNotificationHelper.buildPersonalisationWithPartyName(caseDetails, "test_party");
         assertThat(claimantPersonalisation.size(), is(5));
-        for (String value : claimantPersonalisation.values()) {
-            assertThat(value, notNullValue());
-        }
+        assertThat(claimantPersonalisation.get("party_name"), is("test_party"));
+        assertThat(claimantPersonalisation.get("ccdId"), is("1234"));
+        assertThat(claimantPersonalisation.get("claimant"), is("Claimant LastName"));
+        assertThat(claimantPersonalisation.get("list_of_respondents"),
+                is("Respondent Respondent Unrepresented Respondent Represented Respondent")
+        );
+        assertThat(claimantPersonalisation.get("case_number"), is("12345/6789"));
     }
 
     @Test
@@ -92,16 +96,6 @@ class NocNotificationHelperTest {
         Map<String, String> claimantPersonalisation =
             NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseData);
         assertThat(claimantPersonalisation.size(), is(3));
-        for (String value : claimantPersonalisation.values()) {
-            assertThat(value, notNullValue());
-        }
-    }
-
-    @Test
-    void testBuildNewRespondentSolicitorPersonalisation() {
-        Map<String, String> claimantPersonalisation =
-            NocNotificationHelper.buildPersonalisationWithPartyName(caseDetails, "test_party");
-        assertThat(claimantPersonalisation.size(), is(5));
         for (String value : claimantPersonalisation.values()) {
             assertThat(value, notNullValue());
         }

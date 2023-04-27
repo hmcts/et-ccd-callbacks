@@ -182,7 +182,7 @@ public class Et3ResponseController {
     }
 
     @PostMapping(value = "/sectionComplete", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "display the next steps after ET3 response")
+    @Operation(summary = "display the next steps after ET3 response section")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -251,7 +251,7 @@ public class Et3ResponseController {
      * @return this will return and display a message to the user on the next steps.
      */
     @PostMapping(value = "/processingComplete", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "display the next steps after ET3 response")
+    @Operation(summary = "display the next steps after ET3 response submission")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -277,7 +277,7 @@ public class Et3ResponseController {
     }
 
     @PostMapping(value = "/startSubmitEt3", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "display the next steps after ET3 response")
+    @Operation(summary = "start et3 submission")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -302,7 +302,7 @@ public class Et3ResponseController {
     }
 
     @PostMapping(value = "/reloadSubmitData", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "display the next steps after ET3 response")
+    @Operation(summary = "reloads the data onto the case for submission")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {

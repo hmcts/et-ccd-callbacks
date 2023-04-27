@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -174,8 +175,8 @@ class Et3ResponseHelperTest {
         caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "test")));
 
         // UTF-8 is required here for special characters to resolve on Windows correctly
-        String expected = Files.readString(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("et3ResponseDocument.json")).toURI()));
+        String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
+                .getResource("et3ResponseDocument.json")).toURI())), UTF_8);
 
         String actual = Et3ResponseHelper.getDocumentRequest(caseData, "any");
         assertThat(actual).isEqualTo(expected);

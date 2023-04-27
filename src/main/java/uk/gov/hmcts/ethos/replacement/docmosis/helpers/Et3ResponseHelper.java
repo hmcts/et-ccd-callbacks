@@ -49,7 +49,6 @@ public class Et3ResponseHelper {
     public static final String CHECKED = "■"; // U+25A0
     public static final String UNCHECKED = "□"; // U+25A1
     private static final String ET3_RESPONSE = "et3Response";
-
     private static final String ET3_RESPONSE_EMPLOYMENT_DETAILS = "et3ResponseEmploymentDetails";
     private static final String ET3_RESPONSE_CLAIM_DETAILS = "et3ResponseClaimDetails";
     public static final String ALL_RESPONDENTS_INCOMPLETE_SECTIONS = "There are no respondents that can currently "
@@ -607,7 +606,7 @@ public class Et3ResponseHelper {
             return List.of("No respondents found");
         }
 
-        var validRespondents = caseData.getRespondentCollection().stream()
+        List<RespondentSumTypeItem> validRespondents = caseData.getRespondentCollection().stream()
                 .filter(Et3ResponseHelper::checkRespondentSections)
                 .collect(Collectors.toList());
 

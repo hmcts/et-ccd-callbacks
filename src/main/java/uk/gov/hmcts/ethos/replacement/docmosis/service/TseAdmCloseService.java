@@ -22,8 +22,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.ADDITIONAL_INFORMATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.CLOSE_APP_DECISION_DETAILS_OTHER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.CLOSE_APP_TELL_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DETAILS_OF_THE_APPLICATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DOCUMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.NAME_MARKUP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.STRING_BR;
@@ -46,7 +46,7 @@ public class TseAdmCloseService {
         + "|Applicant | %s|\r\n"
         + "|Type of application | %s|\r\n"
         + "|Application date | %s|\r\n"
-        + "%s" // What do you want to tell or ask the tribunal?
+        + "%s" // Details of the application
         + "%s" // Supporting material
         + "%s" // Rule92
         + "\r\n";
@@ -101,7 +101,7 @@ public class TseAdmCloseService {
             applicationTypeItem.getValue().getDate(),
             isBlank(applicationTypeItem.getValue().getDetails())
                 ? ""
-                : String.format(CLOSE_APP_TELL_DETAILS, applicationTypeItem.getValue().getDetails()),
+                : String.format(DETAILS_OF_THE_APPLICATION, applicationTypeItem.getValue().getDetails()),
             getApplicationDocumentLink(applicationTypeItem, authToken),
             formatRule92(applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo(),
                 applicationTypeItem.getValue().getCopyToOtherPartyText())

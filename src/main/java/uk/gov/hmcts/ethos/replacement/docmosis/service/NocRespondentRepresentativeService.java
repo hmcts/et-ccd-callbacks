@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -15,11 +16,14 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
+import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +36,7 @@ import java.util.Optional;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +52,8 @@ public class NocRespondentRepresentativeService {
     private final AdminUserService adminUserService;
 
     private final NocRespondentHelper nocRespondentHelper;
+
+    private final OrganisationClient organisationClient;
 
     /**
      * Add respondent organisation policy and notice of change answer fields to the case data.
@@ -200,6 +207,71 @@ public class NocRespondentRepresentativeService {
         if (!CollectionUtils.isEmpty(usersToRevoke)) {
             nocCcdService.revokeCaseAssignments(adminUserService.getAdminUserToken(),
                 CaseUserAssignmentData.builder().caseUserAssignments(usersToRevoke).build());
+        }
+    }
+
+    /**
+     * Add respondent representative organisation address to the case data.
+     * @param caseData case data
+     * @return modified case data
+     */
+    public CaseData prepopulateOrgAddress(CaseData caseData, String userToken) {
+        List<RepresentedTypeRItem> repCollection = caseData.getRepCollection();
+
+        if (CollectionUtils.isEmpty(repCollection)
+                || repCollection.stream()
+                        .noneMatch(r -> r.getValue() != null && YES.equals(r.getValue().getMyHmctsYesNo()))) {
+            return caseData;
+        }
+
+        // get all Organisation Details
+        List<OrganisationsResponse> organisationList = organisationClient.getOrganisations(userToken);
+        if (CollectionUtils.isEmpty(organisationList)) {
+            log.info("ORGANISATION CLIENT LIST COUNT ---> Null");
+        } else {
+            log.info("ORGANISATION CLIENT LIST COUNT ---> " + organisationList.size());
+        }
+
+        for (RepresentedTypeRItem representative : repCollection) {
+            RepresentedTypeR representativeDetails = representative.getValue();
+
+            if (representativeDetails != null && YES.equals(representativeDetails.getMyHmctsYesNo())) {
+                // Representative's Organisation is missing Address
+                Organisation repOrg = representativeDetails.getRespondentOrganisation();
+
+                // get Organisation Details including Address
+                Optional<OrganisationsResponse> organisation =
+                        organisationList
+                                .stream()
+                                .filter(o -> o.getOrganisationIdentifier().equals(repOrg.getOrganisationID()))
+                                .findFirst();
+
+                // if found update representative's Organisation Address
+                if (organisation.isPresent()) {
+                    updateAddress(organisation.get(), representativeDetails);
+                }
+            }
+        }
+
+        return caseData;
+    }
+
+    private void updateAddress(OrganisationsResponse ordRes, RepresentedTypeR representativeDetails) {
+        if (!CollectionUtils.isEmpty(ordRes.getContactInformation())) {
+            Address repAddress = representativeDetails.getRepresentativeAddress();
+            repAddress = repAddress == null ? new Address() : repAddress;
+            OrganisationAddress orgAddress = ordRes.getContactInformation().get(0);
+
+            // update Representative Address with Org Address
+            repAddress.setAddressLine1(orgAddress.getAddressLine1());
+            repAddress.setAddressLine2(orgAddress.getAddressLine2());
+            repAddress.setAddressLine3(orgAddress.getAddressLine3());
+            repAddress.setPostTown(orgAddress.getTownCity());
+            repAddress.setCounty(orgAddress.getCounty());
+            repAddress.setCountry(orgAddress.getCountry());
+            repAddress.setPostCode(orgAddress.getPostCode());
+
+            representativeDetails.setRepresentativeAddress(repAddress);
         }
     }
 }

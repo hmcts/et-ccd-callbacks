@@ -40,7 +40,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.APP_DETAILS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DETAILS_OF_THE_APPLICATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.STRING_BR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
@@ -97,7 +97,7 @@ public class TseAdmReplyService {
             applicationType.getDate(),
             isBlank(applicationType.getDetails())
                 ? ""
-                : String.format(APP_DETAILS_DETAILS, applicationType.getDetails()),
+                : String.format(DETAILS_OF_THE_APPLICATION, applicationType.getDetails()),
             applicationType.getDocumentUpload() == null
                 ? ""
                 : String.format(SUPPORTING_MATERIAL_TABLE_HEADER, documentManagementService.displayDocNameTypeSizeLink(
@@ -258,8 +258,7 @@ public class TseAdmReplyService {
 
             if (claimantEmail != null) {
                 TSEAdminEmailRecipientsData claimantDetails =
-                    new TSEAdminEmailRecipientsData(notificationProperties.getTseAdminReplyClaimantTemplateId(),
-                            claimantEmail);
+                    new TSEAdminEmailRecipientsData(emailToClaimantTemplateId, claimantEmail);
 
                 if (isResponseRequired(caseData, CLAIMANT_TITLE)) {
                     claimantDetails.setCustomisedText(RESPONSE_REQUIRED);

@@ -27,6 +27,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -390,6 +391,23 @@ class RespondNotificationServiceTest {
     }
 
     @Test
+    void sendNotifyEmailsNoResponseClaimantOnlyMissingEmail() {
+        setUpNotifyEmail();
+
+        caseData.setRespondNotificationPartyToNotify(CLAIMANT_ONLY);
+        caseData.setRespondNotificationResponseRequired(NO);
+        caseData.getClaimantType().setClaimantEmailAddress(null);
+        caseDetails.setCaseData(caseData);
+        SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();
+        respondNotificationService.sendNotifyEmails(caseDetails, sendNotification);
+        verify(emailService, times(0)).sendEmail(eq("noResponseTemplateId"),
+            eq(CLAIMANT_EMAIL), any());
+        verify(emailService, times(0)).sendEmail(eq("noResponseTemplateId"),
+            eq(RESPONDENT_EMAIL), any());
+
+    }
+
+    @Test
     void sendNotifyEmailsResponseRequiredRespondentOnly() {
         setUpNotifyEmail();
 
@@ -401,6 +419,23 @@ class RespondNotificationServiceTest {
         verify(emailService, times(0)).sendEmail(eq("responseTemplateId"),
             eq(CLAIMANT_EMAIL), any());
         verify(emailService, times(1)).sendEmail(eq("responseTemplateId"),
+            eq(RESPONDENT_EMAIL), any());
+
+    }
+
+    @Test
+    void sendNotifyEmailsResponseRequiredRespondentOnlyMissingEmail() {
+        setUpNotifyEmail();
+
+        caseData.setRespondNotificationPartyToNotify(RESPONDENT_ONLY);
+        caseData.setRespondNotificationResponseRequired(YES);
+        caseData.getRespondentCollection().get(0).getValue().setRespondentEmail(null);
+        caseDetails.setCaseData(caseData);
+        SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();
+        respondNotificationService.sendNotifyEmails(caseDetails, sendNotification);
+        verify(emailService, times(0)).sendEmail(eq("responseTemplateId"),
+            eq(CLAIMANT_EMAIL), any());
+        verify(emailService, times(0)).sendEmail(eq("responseTemplateId"),
             eq(RESPONDENT_EMAIL), any());
 
     }

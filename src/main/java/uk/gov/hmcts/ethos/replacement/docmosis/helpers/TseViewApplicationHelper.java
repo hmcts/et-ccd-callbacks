@@ -20,8 +20,11 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.ADDITIONAL_INFORMATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.NAME_MARKUP;
@@ -98,6 +101,7 @@ public final class TseViewApplicationHelper {
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
                 .filter(o -> selectedClosed == CLOSED_STATE.equals(o.getValue().getStatus()))
+                .filter(TseViewApplicationHelper::applicationsSharedWithRespondent)
                 .map(TseViewApplicationHelper::formatDropdownOption)
                 .collect(Collectors.toList()));
     }
@@ -134,6 +138,20 @@ public final class TseViewApplicationHelper {
         );
 
         caseData.setTseApplicationSummaryAndResponsesMarkup(applicationSummary + respondTablesCollection);
+    }
+
+    /**
+     * Checks if application is viewable for respondent.
+     *
+     * @param applicationTypeItem - generic application type
+     */
+    public static boolean applicationsSharedWithRespondent(GenericTseApplicationTypeItem applicationTypeItem) {
+        String applicant = applicationTypeItem.getValue().getApplicant();
+        String copyToRespondent = applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo();
+        boolean isClaimantAndRule92Shared = CLAIMANT_TITLE.equals(applicant)
+                && YES.equals(copyToRespondent);
+
+        return RESPONDENT_TITLE.equals(applicant) || isClaimantAndRule92Shared;
     }
 
     private static String formatAminResponseTitle(TseRespondType reply) {

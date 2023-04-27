@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et3ResponseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.Et3ResponseDocument;
@@ -183,6 +186,8 @@ public final class Et3ResponseHelper {
                 UNCHECKED)
             .build();
 
+        addRepDetails(caseData, data);
+
         setTitle(data, caseData.getEt3ResponseRespondentPreferredTitle());
         setCheck(caseData.getEt3ResponseMultipleSites(), data::setSiteYes, data::setSiteNo, null);
         setCheck(caseData.getEt3ResponseAcasAgree(), data::setAcasYes, data::setAcasNo, null);
@@ -232,6 +237,30 @@ public final class Et3ResponseHelper {
             .build();
 
         return OBJECT_MAPPER.writeValueAsString(et3ResponseDocument);
+    }
+
+    private static void addRepDetails(CaseData caseData, Et3ResponseData data) {
+        Optional<RepresentedTypeRItem> representative = caseData.getRepCollection().stream().filter(
+            rep -> rep.getValue().getRespRepName().equals(
+                caseData.getEt3RepresentingRespondent().get(0).getValue().getDynamicList().getSelectedLabel()
+            )
+        ).findFirst();
+
+        if (representative.isPresent()) {
+            RepresentedTypeR rep = representative.get().getValue();
+            data.setRepName(rep.getNameOfRepresentative());
+            data.setRepOrgName(rep.getNameOfOrganisation());
+
+            Address address = rep.getRepresentativeAddress();
+            data.setRepAddressLine1(address.getAddressLine1());
+            data.setRepAddressLine2(address.getAddressLine2());
+            data.setRepTown(address.getPostTown());
+            data.setRepCounty(address.getCounty());
+            data.setRepPostcode(address.getPostCode());
+
+            data.setRepPhoneNumber(rep.getRepresentativePhoneNumber());
+            data.setRepEmailAddress(rep.getRepresentativeEmailAddress());
+        }
     }
 
     /**

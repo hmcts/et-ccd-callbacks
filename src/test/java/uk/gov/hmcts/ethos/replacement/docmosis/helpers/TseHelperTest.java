@@ -50,7 +50,8 @@ public class TseHelperTest {
 
         GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
             .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
-            .withDetails("Text").withNumber("1").withResponsesCount("0").withStatus(OPEN_STATE).build();
+            .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1")
+            .withResponsesCount("0").withStatus(OPEN_STATE).build();
 
         GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
@@ -69,6 +70,29 @@ public class TseHelperTest {
     public void populateSelectApplicationDropdown_withAnApplication_returnsDynamicList() {
         DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData);
         assertThat(actual.getListItems().size(), is(1));
+    }
+
+    @Test
+    public void populateSelectApplicationDropdown_withAnApplication_returnsEmpty() {
+        CaseData caseData1 = CaseDataBuilder.builder()
+                .withClaimantIndType("First", "Last")
+                .withEthosCaseReference("1234")
+                .withClaimant("First Last")
+                .withRespondent("Respondent Name", YES, "13 December 2022", false)
+                .build();
+
+        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
+                .withDate("13 December 2022").withDue("20 December 2022").withType("Order a witness to attend")
+                .withDetails("Text").withNumber("1")
+                .withResponsesCount("0").withStatus(OPEN_STATE).build();
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
+        genericTseApplicationTypeItem.setValue(build);
+        caseData1.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
+
+        DynamicFixedListType actual = TseHelper.populateRespondentSelectApplication(caseData1);
+        assertThat(actual.getListItems().size(), is(0));
     }
 
     @Test

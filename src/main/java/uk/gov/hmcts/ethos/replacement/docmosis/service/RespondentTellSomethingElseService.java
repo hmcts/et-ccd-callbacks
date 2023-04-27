@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
@@ -29,15 +31,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_JUDGEMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
@@ -93,8 +94,7 @@ public class RespondentTellSomethingElseService {
         List<String> errors = new ArrayList<>();
         RespondentTSEApplicationTypeData selectedAppData =
                 RespondentTellSomethingElseHelper.getSelectedApplicationType(caseData);
-        if (selectedAppData == null
-                || selectedAppData.getResTseDocument() == null && isNullOrEmpty(selectedAppData.getSelectedTextBox())) {
+        if (selectedAppData.getResTseDocument() == null && isNullOrEmpty(selectedAppData.getSelectedTextBox())) {
             errors.add(GIVE_DETAIL_MISSING);
         }
         return errors;
@@ -227,20 +227,11 @@ public class RespondentTellSomethingElseService {
         AtomicInteger applicationNumber = new AtomicInteger(1);
 
         String tableRows = genericApplicationList.stream()
-                .filter(this::applicationsSharedWithRespondent)
+                .filter(TseViewApplicationHelper::applicationsSharedWithRespondent)
                 .map(o -> formatRow(o, applicationNumber))
                 .collect(Collectors.joining());
 
         return String.format(TABLE_COLUMNS_MARKDOWN, tableRows);
-    }
-
-    private boolean applicationsSharedWithRespondent(GenericTseApplicationTypeItem genericTseApplicationTypeItem) {
-        String applicant = genericTseApplicationTypeItem.getValue().getApplicant();
-        String copyToRespondent = genericTseApplicationTypeItem.getValue().getCopyToOtherPartyYesOrNo();
-        boolean isClaimantAndRule92Shared = CLAIMANT_TITLE.equals(applicant)
-                && YES.equals(copyToRespondent);
-
-        return RESPONDENT_TITLE.equals(applicant) || isClaimantAndRule92Shared;
     }
 
     private String formatRow(GenericTseApplicationTypeItem genericTseApplicationTypeItem, AtomicInteger count) {

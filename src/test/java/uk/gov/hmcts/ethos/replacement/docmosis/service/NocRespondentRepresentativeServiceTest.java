@@ -8,11 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
+import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -31,6 +34,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -54,7 +58,7 @@ import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalS
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CaseConverter.class, NoticeOfChangeFieldPopulator.class, ObjectMapper.class})
-@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.ExcessiveMethodLength"})
 class NocRespondentRepresentativeServiceTest {
     private static final String CASE_ID_ONE = "723";
     private static final String RESPONDENT_NAME = "Harry Johnson";
@@ -108,7 +112,17 @@ class NocRespondentRepresentativeServiceTest {
     @MockBean
     private NocCcdService nocCcdService;
     @MockBean
+    private EmailService emailService;
+    @MockBean
+    private NocNotificationService nocNotificationService;
+    @MockBean
+    private CcdClient ccdClient;
+    @MockBean
+    private CcdCaseAssignment ccdCaseAssignment;
+    @MockBean
     private OrganisationClient organisationClient;
+    @MockBean
+    private AuthTokenGenerator authTokenGenerator;
 
     private NocRespondentHelper nocRespondentHelper;
     private CaseData caseData;
@@ -120,14 +134,10 @@ class NocRespondentRepresentativeServiceTest {
         CaseConverter converter = new CaseConverter(objectMapper);
 
         nocRespondentRepresentativeService =
-            new NocRespondentRepresentativeService(
-                    noticeOfChangeFieldPopulator,
-                    converter,
-                    nocCcdService,
-                    adminUserService,
-                    nocRespondentHelper,
-                    organisationClient);
-
+            new NocRespondentRepresentativeService(noticeOfChangeFieldPopulator, converter, nocCcdService,
+                    adminUserService, nocRespondentHelper, emailService,
+                    nocNotificationService, ccdClient, ccdCaseAssignment, organisationClient, authTokenGenerator);
+                    
         // Respondent
         caseData.setRespondentCollection(new ArrayList<>());
 
@@ -211,6 +221,15 @@ class NocRespondentRepresentativeServiceTest {
         representedTypeRItem.setValue(representedType);
         representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_THREE);
         caseData.getRepCollection().add(representedTypeRItem);
+
+        caseData.setChangeOrganisationRequestField(ChangeOrganisationRequest.builder()
+                .organisationToAdd(org1)
+                .organisationToRemove(org2)
+                .caseRoleId(null)
+                .requestTimestamp(null)
+                .approvalStatus(null)
+                .build());
+        when(authTokenGenerator.generate()).thenReturn("s2sToken");
     }
 
     @Test
@@ -304,15 +323,26 @@ class NocRespondentRepresentativeServiceTest {
 
     @Test
     void updateRepresentativesAccess() throws IOException {
-        CallbackRequest callbackRequest = getCallBackCallbackRequest();
+        CCDRequest ccdRequest = getCCDRequest();
 
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
-        doNothing().when(nocCcdService).updateCaseRepresentation(any(), any(), any(), any(), any());
+        when(nocCcdService.updateCaseRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
+        when(nocCcdService.getCaseAssignments(any(), any())).thenReturn(
+                mockCaseAssignmentData());
+        when(ccdCaseAssignment.applyNocAsAdmin(any())).thenReturn(CCDCallbackResponse.builder()
+                .data(caseData)
+                .build());
 
-        nocRespondentRepresentativeService.updateRepresentativesAccess(callbackRequest);
+        nocRespondentRepresentativeService.updateRepresentativesAccess(getCallBackCallbackRequest());
 
         verify(nocCcdService, times(2))
-            .updateCaseRepresentation(any(), any(), any(), any(), any());
+            .updateCaseRepresentation(any(), any(), any(), any());
+
+        verify(nocNotificationService, times(2))
+                .sendNotificationOfChangeEmails(any(), any(), any());
+
+        verify(ccdClient, times(2))
+                .submitUpdateRepEvent(any(), any(), any(), any(), any(), any());
     }
 
     private CallbackRequest getCallBackCallbackRequest() {
@@ -324,6 +354,14 @@ class NocRespondentRepresentativeServiceTest {
         caseDetailsAfter.setCaseData(getCaseDataAfter());
         callbackRequest.setCaseDetails(caseDetailsAfter);
         return callbackRequest;
+    }
+
+    private CCDRequest getCCDRequest() {
+        CCDRequest ccdRequest = new CCDRequest();
+        CaseDetails caseDetailsAfter = new CaseDetails();
+        caseDetailsAfter.setCaseData(getCaseDataAfter());
+        ccdRequest.setCaseDetails(caseDetailsAfter);
+        return ccdRequest;
     }
 
     @Test
@@ -389,6 +427,8 @@ class NocRespondentRepresentativeServiceTest {
         CaseData caseDataBefore = new CaseData();
 
         caseDataBefore.setRespondentCollection(new ArrayList<>());
+        caseDataBefore.setClaimant("claimant");
+        caseDataBefore.setEthosCaseReference("caseRef");
 
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME)
@@ -443,7 +483,8 @@ class NocRespondentRepresentativeServiceTest {
             RepresentedTypeR.builder()
                 .nameOfRepresentative(RESPONDENT_REP_NAME_TWO)
                 .respRepName(RESPONDENT_NAME_TWO)
-                .respondentOrganisation(org2).build();
+                .respondentOrganisation(org2)
+                .representativeEmailAddress("oldRep1@test.com").build();
         representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId(RESPONDENT_REP_ID_TWO);
         representedTypeRItem.setValue(representedType);
@@ -454,7 +495,8 @@ class NocRespondentRepresentativeServiceTest {
             RepresentedTypeR.builder()
                 .nameOfRepresentative(RESPONDENT_REP_NAME_THREE)
                 .respRepName(RESPONDENT_NAME_THREE)
-                .respondentOrganisation(org3).build();
+                .respondentOrganisation(org3)
+                .representativeEmailAddress("oldRep2@test.com").build();
         representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId(RESPONDENT_REP_ID_THREE);
         representedTypeRItem.setValue(representedType);
@@ -579,11 +621,11 @@ class NocRespondentRepresentativeServiceTest {
         orgDetails.add(resOrg2);
         orgDetails.add(resOrg3);
 
-        when(organisationClient.getOrganisations(anyString())).thenReturn(orgDetails);
+        when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(orgDetails);
 
         CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
 
-        verify(organisationClient, times(1)).getOrganisations(anyString());
+        verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
 
         List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
 
@@ -600,14 +642,14 @@ class NocRespondentRepresentativeServiceTest {
     void prepopulateOrgAddress_RepCollection_Null() {
         caseData.setRepCollection(null);
         nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
-        verify(organisationClient, never()).getOrganisations(anyString());
+        verify(organisationClient, never()).getOrganisations(anyString(), anyString());
     }
 
     @Test
     void prepopulateOrgAddress_RepCollection_Empty() {
         caseData.setRepCollection(new ArrayList<>());
         nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
-        verify(organisationClient, never()).getOrganisations(anyString());
+        verify(organisationClient, never()).getOrganisations(anyString(), anyString());
     }
 
     @Test
@@ -616,16 +658,16 @@ class NocRespondentRepresentativeServiceTest {
             representative.getValue().setMyHmctsYesNo(NO);
         }
         nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
-        verify(organisationClient, never()).getOrganisations(anyString());
+        verify(organisationClient, never()).getOrganisations(anyString(), anyString());
     }
 
     @Test
     void prepopulateOrgAddress_NoActiveOrganisations() {
-        when(organisationClient.getOrganisations(anyString())).thenReturn(new ArrayList<>());
+        when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(new ArrayList<>());
 
         CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
 
-        verify(organisationClient, times(1)).getOrganisations(anyString());
+        verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
 
         List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
 
@@ -641,11 +683,11 @@ class NocRespondentRepresentativeServiceTest {
         List<OrganisationsResponse> orgDetails = new ArrayList<>();
         orgDetails.add(resOrg1);
 
-        when(organisationClient.getOrganisations(anyString())).thenReturn(orgDetails);
+        when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(orgDetails);
 
         CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
 
-        verify(organisationClient, times(1)).getOrganisations(anyString());
+        verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
 
         List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
 
@@ -670,11 +712,11 @@ class NocRespondentRepresentativeServiceTest {
         orgDetails.add(resOrg2);
         orgDetails.add(resOrg3);
 
-        when(organisationClient.getOrganisations(anyString())).thenReturn(orgDetails);
+        when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(orgDetails);
 
         CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
 
-        verify(organisationClient, times(1)).getOrganisations(anyString());
+        verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
 
         List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
 
@@ -705,11 +747,11 @@ class NocRespondentRepresentativeServiceTest {
         rep3Address.setAddressLine1("Rep 3 - Address 1");
         existingRepCollection.get(2).getValue().setRepresentativeAddress(rep3Address);
 
-        when(organisationClient.getOrganisations(anyString())).thenReturn(orgDetails);
+        when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(orgDetails);
 
         CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
 
-        verify(organisationClient, times(1)).getOrganisations(anyString());
+        verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
 
         List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
 

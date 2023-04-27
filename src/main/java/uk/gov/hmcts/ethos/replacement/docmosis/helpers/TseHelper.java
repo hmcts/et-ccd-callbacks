@@ -36,6 +36,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
@@ -126,7 +127,8 @@ public final class TseHelper {
 
         return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
                 .filter(o -> !CLOSED_STATE.equals(o.getValue().getStatus())
-                        && isNoRespondentReply(o.getValue().getRespondCollection()))
+                        && isNoRespondentReply(o.getValue().getRespondCollection())
+                        && YES.equals(o.getValue().getCopyToOtherPartyYesOrNo()))
                 .map(TseHelper::formatDropdownOption)
                 .collect(Collectors.toList()));
     }

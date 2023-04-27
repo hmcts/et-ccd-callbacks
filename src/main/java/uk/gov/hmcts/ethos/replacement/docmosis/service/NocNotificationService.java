@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
@@ -33,54 +34,56 @@ public class NocNotificationService {
     @Value("${nocNotification.template.tribunal.id}")
     private String tribunalTemplateId;
 
-    public void sendNotificationOfChangeEmails(CallbackRequest callbackRequest, CaseData caseData) {
-        String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(callbackRequest);
-        String claimantEmail = NotificationHelper.buildMapForClaimant(caseData, "").get("emailAddress");
+    public void sendNotificationOfChangeEmails(CaseDetails caseDetailsPrevious, CaseDetails caseDetailsNew,
+                                               ChangeOrganisationRequest changeRequest) {
+        CaseData caseDataNew = caseDetailsNew.getCaseData();
+        String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
+        CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
+        String claimantEmail = NotificationHelper.buildMapForClaimant(caseDataPrevious, "").get("emailAddress");
         if (isNullOrEmpty(claimantEmail)) {
             log.warn("missing claimantEmail");
         } else {
             emailService.sendEmail(
                 claimantTemplateId,
                 claimantEmail,
-                NocNotificationHelper.buildPersonalisationWithPartyName(caseData, partyName)
+                NocNotificationHelper.buildPersonalisationWithPartyName(caseDetailsPrevious, partyName)
             );
         }
-
-        String oldSolicitorEmail = NocNotificationHelper.getOldSolicitorEmail(callbackRequest);
+        String oldSolicitorEmail = NocNotificationHelper
+                .getOldSolicitorEmailForRepUpdate(caseDataPrevious, changeRequest);
         if (isNullOrEmpty(oldSolicitorEmail)) {
             log.warn("missing oldSolicitorEmail");
         } else {
             emailService.sendEmail(
-                previousRespondentSolicitorTemplateId,
-                oldSolicitorEmail,
-                NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseData)
+                    previousRespondentSolicitorTemplateId,
+                    oldSolicitorEmail,
+                    NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious)
             );
         }
-
-        String newSolicitorEmail = NocNotificationHelper.getNewSolicitorEmail(callbackRequest);
+        String newSolicitorEmail = NocNotificationHelper.getNewSolicitorEmailForRepUpdate(caseDataNew, changeRequest);
         if (isNullOrEmpty(newSolicitorEmail)) {
             log.warn("missing newSolicitorEmail");
         } else {
             emailService.sendEmail(
                 newRespondentSolicitorTemplateId,
                 newSolicitorEmail,
-                NocNotificationHelper.buildPersonalisationWithPartyName(caseData, partyName)
+                NocNotificationHelper.buildPersonalisationWithPartyName(caseDetailsNew, partyName)
             );
         }
 
-        String tribunalEmail = caseData.getTribunalCorrespondenceEmail();
+        String tribunalEmail = caseDataPrevious.getTribunalCorrespondenceEmail();
         if (isNullOrEmpty(tribunalEmail)) {
             log.warn("missing tribunalEmail");
         } else {
             emailService.sendEmail(
                 tribunalTemplateId,
-                caseData.getTribunalCorrespondenceEmail(),
-                NocNotificationHelper.buildTribunalPersonalisation(caseData)
+                caseDataPrevious.getTribunalCorrespondenceEmail(),
+                NocNotificationHelper.buildTribunalPersonalisation(caseDataPrevious)
             );
         }
 
         RespondentSumType respondent =
-            NocNotificationHelper.getRespondent(callbackRequest, caseData, nocRespondentHelper);
+                NocNotificationHelper.getRespondent(changeRequest, caseDataPrevious, nocRespondentHelper);
         String respondentEmail = respondent == null ? null : respondent.getRespondentEmail();
         if (isNullOrEmpty(respondentEmail)) {
             log.warn("Missing respondentEmail");
@@ -88,7 +91,7 @@ public class NocNotificationService {
             emailService.sendEmail(
                 respondentTemplateId,
                 respondent.getRespondentEmail(),
-                NocNotificationHelper.buildRespondentPersonalisation(caseData, respondent));
+                NocNotificationHelper.buildRespondentPersonalisation(caseDataPrevious, respondent));
         }
     }
 }

@@ -34,6 +34,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -120,6 +121,8 @@ class NocRespondentRepresentativeServiceTest {
     private CcdCaseAssignment ccdCaseAssignment;
     @MockBean
     private OrganisationClient organisationClient;
+    @MockBean
+    private AuthTokenGenerator authTokenGenerator;
 
     private NocRespondentHelper nocRespondentHelper;
     private CaseData caseData;
@@ -133,7 +136,7 @@ class NocRespondentRepresentativeServiceTest {
         nocRespondentRepresentativeService =
             new NocRespondentRepresentativeService(noticeOfChangeFieldPopulator, converter, nocCcdService,
                     adminUserService, nocRespondentHelper, emailService,
-                    nocNotificationService, ccdClient, ccdCaseAssignment, organisationClient);
+                    nocNotificationService, ccdClient, ccdCaseAssignment, organisationClient, authTokenGenerator);
                     
         // Respondent
         caseData.setRespondentCollection(new ArrayList<>());
@@ -226,6 +229,7 @@ class NocRespondentRepresentativeServiceTest {
                 .requestTimestamp(null)
                 .approvalStatus(null)
                 .build());
+        when(authTokenGenerator.generate()).thenReturn("s2sToken");
     }
 
     @Test
@@ -617,11 +621,11 @@ class NocRespondentRepresentativeServiceTest {
         orgDetails.add(resOrg2);
         orgDetails.add(resOrg3);
 
-        when(organisationClient.getOrganisations(anyString())).thenReturn(orgDetails);
+        when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(orgDetails);
 
         CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
 
-        verify(organisationClient, times(1)).getOrganisations(anyString());
+        verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
 
         List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
 
@@ -638,14 +642,14 @@ class NocRespondentRepresentativeServiceTest {
     void prepopulateOrgAddress_RepCollection_Null() {
         caseData.setRepCollection(null);
         nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
-        verify(organisationClient, never()).getOrganisations(anyString());
+        verify(organisationClient, never()).getOrganisations(anyString(), anyString());
     }
 
     @Test
     void prepopulateOrgAddress_RepCollection_Empty() {
         caseData.setRepCollection(new ArrayList<>());
         nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
-        verify(organisationClient, never()).getOrganisations(anyString());
+        verify(organisationClient, never()).getOrganisations(anyString(), anyString());
     }
 
     @Test
@@ -654,16 +658,16 @@ class NocRespondentRepresentativeServiceTest {
             representative.getValue().setMyHmctsYesNo(NO);
         }
         nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
-        verify(organisationClient, never()).getOrganisations(anyString());
+        verify(organisationClient, never()).getOrganisations(anyString(), anyString());
     }
 
     @Test
     void prepopulateOrgAddress_NoActiveOrganisations() {
-        when(organisationClient.getOrganisations(anyString())).thenReturn(new ArrayList<>());
+        when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(new ArrayList<>());
 
         CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
 
-        verify(organisationClient, times(1)).getOrganisations(anyString());
+        verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
 
         List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
 
@@ -679,11 +683,11 @@ class NocRespondentRepresentativeServiceTest {
         List<OrganisationsResponse> orgDetails = new ArrayList<>();
         orgDetails.add(resOrg1);
 
-        when(organisationClient.getOrganisations(anyString())).thenReturn(orgDetails);
+        when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(orgDetails);
 
         CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
 
-        verify(organisationClient, times(1)).getOrganisations(anyString());
+        verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
 
         List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
 
@@ -708,11 +712,11 @@ class NocRespondentRepresentativeServiceTest {
         orgDetails.add(resOrg2);
         orgDetails.add(resOrg3);
 
-        when(organisationClient.getOrganisations(anyString())).thenReturn(orgDetails);
+        when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(orgDetails);
 
         CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
 
-        verify(organisationClient, times(1)).getOrganisations(anyString());
+        verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
 
         List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
 
@@ -743,11 +747,11 @@ class NocRespondentRepresentativeServiceTest {
         rep3Address.setAddressLine1("Rep 3 - Address 1");
         existingRepCollection.get(2).getValue().setRepresentativeAddress(rep3Address);
 
-        when(organisationClient.getOrganisations(anyString())).thenReturn(orgDetails);
+        when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(orgDetails);
 
         CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
 
-        verify(organisationClient, times(1)).getOrganisations(anyString());
+        verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
 
         List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
 

@@ -258,7 +258,8 @@ public class TseAdmReplyService {
 
             if (claimantEmail != null) {
                 TSEAdminEmailRecipientsData claimantDetails =
-                    new TSEAdminEmailRecipientsData(notificationProperties.getTseAdminReplyClaimantTemplateId(), claimantEmail);
+                    new TSEAdminEmailRecipientsData(
+                            notificationProperties.getTseAdminReplyClaimantTemplateId(), claimantEmail);
 
                 if (isResponseRequired(caseData, CLAIMANT_TITLE)) {
                     claimantDetails.setCustomisedText(RESPONSE_REQUIRED);

@@ -65,6 +65,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
+@SuppressWarnings({"PMD.GodClass"})
 class RespondentTellSomethingElseServiceTest {
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
     private TseService tseService;
@@ -94,14 +95,14 @@ class RespondentTellSomethingElseServiceTest {
     private static final String CASE_ID = "669718251103419";
 
     private static final String GIVE_DETAIL_MISSING = "Use the text box or file upload to give details.";
-    private static final String rule92AnsweredNoText = "You have said that you do not want to copy this "
+    private static final String RULE_92_ANSWERED_NO_TEXT = "You have said that you do not want to copy this "
         + "correspondence to "
         + "the other party. \n \n"
         + "The tribunal will consider all correspondence and let you know what happens next.";
-    private static final String rule92AnsweredYesGroupA = "The other party will be notified that any objections "
+    private static final String RULE_92_ANSWERED_YES_GROUP_A = "The other party will be notified that any objections "
         + "to your %s application should be sent to the tribunal as soon as possible, and in any event "
         + "within 7 days.";
-    private static final String rule92AnsweredYesGroupB = "The other party is not expected to respond to this "
+    private static final String RULE_92_ANSWERED_YES_GROUP_B = "The other party is not expected to respond to this "
         + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
 
@@ -290,29 +291,30 @@ class RespondentTellSomethingElseServiceTest {
 
     private static Stream<Arguments> sendAcknowledgeEmailAndGeneratePdf() {
         return Stream.of(
-            Arguments.of(TSE_APP_AMEND_RESPONSE, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_POSTPONE_A_HEARING, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, NO, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_AMEND_RESPONSE, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_POSTPONE_A_HEARING, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, NO, RULE_92_ANSWERED_NO_TEXT, true),
 
-            Arguments.of(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_POSTPONE_A_HEARING, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupB, true),
-            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupB, true),
-            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupB, true)
+            Arguments.of(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, I_DO_WANT_TO_COPY,
+                    RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_POSTPONE_A_HEARING, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_B, true),
+            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_B, true),
+            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_B, true)
         );
     }
 

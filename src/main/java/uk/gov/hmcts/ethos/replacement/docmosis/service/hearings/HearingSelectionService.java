@@ -69,6 +69,10 @@ public class HearingSelectionService {
                 dynamicFixedListType.getValue().getLabel(), caseData.getEthosCaseReference()));
     }
 
+    public List<DateListedTypeItem> getDateListedItemFromSelectedHearing(CaseData caseData, DynamicFixedListType dynamicFixedListType) {
+        return getSelectedHearing(caseData, dynamicFixedListType).getHearingDateCollection();
+    }
+
     public DateListedType getSelectedListing(CaseData caseData) {
         DynamicFixedListType dynamicFixedListType = caseData.getAllocateHearingHearing();
         String id = dynamicFixedListType.getValue().getCode();

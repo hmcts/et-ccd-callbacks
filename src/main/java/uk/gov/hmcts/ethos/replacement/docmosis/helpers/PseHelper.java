@@ -67,7 +67,7 @@ public final class PseHelper {
             + RESPONSE_FROM
             + RESPONSE_DATE
             + "|What's your response to the tribunal? | %s|\r\n"
-            + SUPPORTING_MATERIAL_TABLE_HEADER
+            + "%s"
             + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | %s|\r\n"
             + "%s" // Rule92 No Details
             + "\r\n";
@@ -203,20 +203,27 @@ public final class PseHelper {
     }
 
     private static String formatClaimantReply(PseResponseType pseResponseType, int respondCount) {
+        var supportingMaterial = pseResponseType.getSupportingMaterial();
+        String supportingMaterialString = "";
+        if (supportingMaterial != null) {
+            supportingMaterialString = supportingMaterial.stream()
+                .map(d -> String.format(
+                    DOC_MARKUP,
+                    Helper.getDocumentMatcher(d.getValue().getUploadedDocument().getDocumentBinaryUrl())
+                        .replaceFirst(""),
+                    d.getValue().getUploadedDocument().getDocumentFilename()
+                ))
+                .collect(Collectors.joining());
+            supportingMaterialString = String.format(SUPPORTING_MATERIAL_TABLE_HEADER, supportingMaterialString);
+        }
+
         return String.format(
                 CLAIMANT_REPLY_MARKUP,
                 respondCount,
                 pseResponseType.getFrom(),
                 pseResponseType.getDate(),
                 pseResponseType.getResponse(),
-                pseResponseType.getSupportingMaterial().stream()
-                        .map(d -> String.format(
-                                DOC_MARKUP,
-                                Helper.getDocumentMatcher(d.getValue().getUploadedDocument().getDocumentBinaryUrl())
-                                        .replaceFirst(""),
-                                d.getValue().getUploadedDocument().getDocumentFilename()
-                        ))
-                        .collect(Collectors.joining()),
+                supportingMaterialString,
                 pseResponseType.getCopyToOtherParty(),
                 NO.equals(pseResponseType.getCopyToOtherParty())
                         ? String.format(

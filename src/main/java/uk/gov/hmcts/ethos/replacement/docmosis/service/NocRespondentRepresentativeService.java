@@ -273,11 +273,6 @@ public class NocRespondentRepresentativeService {
         // get all Organisation Details
         List<OrganisationsResponse> organisationList = organisationClient.getOrganisations(
                 userToken, authTokenGenerator.generate());
-        if (CollectionUtils.isEmpty(organisationList)) {
-            log.info("ORGANISATION CLIENT LIST COUNT ---> Null");
-        } else {
-            log.info("ORGANISATION CLIENT LIST COUNT ---> " + organisationList.size());
-        }
 
         for (RepresentedTypeRItem representative : repCollection) {
             RepresentedTypeR representativeDetails = representative.getValue();

@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import java.util.List;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi.SERVICE_AUTHORIZATION;
 
 @FeignClient(name = "organisation-client", url = "${rd_professional.api.url}")
 public interface OrganisationClient {
@@ -19,7 +20,8 @@ public interface OrganisationClient {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     List<OrganisationsResponse> getOrganisations(
-        @RequestHeader(AUTHORIZATION) String authorisation
+        @RequestHeader(AUTHORIZATION) String authorisation,
+        @RequestHeader(SERVICE_AUTHORIZATION) String s2sToken
     );
 
 }

@@ -451,6 +451,34 @@ public class CaseDataBuilder {
     }
 
     /**
+     * Add two respondent representatives with org ids and an emails.
+     */
+    public CaseDataBuilder withTwoRespondentRepresentative(String org1Id, String org2Id,
+                                                           String rep1Email, String rep2Email) {
+
+        RepresentedTypeR rep1 = RepresentedTypeR.builder()
+                .respondentOrganisation(Organisation.builder().organisationID(org1Id).build())
+                .respRepName("res1 name")
+                .nameOfRepresentative("rep1 name")
+                .representativeEmailAddress(rep1Email).build();
+        RepresentedTypeR rep2 = RepresentedTypeR.builder()
+                .respondentOrganisation(Organisation.builder().organisationID(org2Id).build())
+                .respRepName("res2 name")
+                .nameOfRepresentative("rep2 name")
+                .representativeEmailAddress(rep2Email).build();
+        RepresentedTypeRItem itemType1 = new RepresentedTypeRItem();
+        itemType1.setValue(rep1);
+        RepresentedTypeRItem itemType2 = new RepresentedTypeRItem();
+        itemType2.setValue(rep2);
+        if (CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            caseData.setRepCollection(new ArrayList<>());
+        }
+        caseData.getRepCollection().add(itemType1);
+        caseData.getRepCollection().add(itemType2);
+        return this;
+    }
+
+    /**
      * Creates an Address object from its properties.
      */
     public Address createAddress(String addressLine1, String addressLine2, String addressLine3,

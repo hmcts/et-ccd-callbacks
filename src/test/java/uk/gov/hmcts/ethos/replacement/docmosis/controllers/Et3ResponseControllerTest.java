@@ -49,8 +49,6 @@ class Et3ResponseControllerTest {
     private static final String START_SUBMIT_ET3_URL = "/et3Response/startSubmitEt3";
     private static final String RELOAD_SUBMIT_DATA_URL = "/et3Response/reloadSubmitData";
 
-
-
     @Autowired
     private WebApplicationContext applicationContext;
     @MockBean
@@ -270,6 +268,7 @@ class Et3ResponseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
     @Test
     void submitComplete_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);

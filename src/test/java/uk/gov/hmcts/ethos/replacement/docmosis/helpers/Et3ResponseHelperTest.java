@@ -249,5 +249,4 @@ class Et3ResponseHelperTest {
         assertThat(errors.get(0)).isEqualTo(ALL_RESPONDENTS_INCOMPLETE_SECTIONS);
     }
 
-
 }

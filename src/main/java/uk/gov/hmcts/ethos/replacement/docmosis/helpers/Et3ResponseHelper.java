@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -36,7 +37,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 @SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.LinguisticNaming",
     "PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions", "PMD.PrematureDeclaration", "PMD.GodClass",
-    "PMD.CyclomaticComplexity"})
+    "PMD.CyclomaticComplexity", "PMD.TooManyMethods"})
 public class Et3ResponseHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -51,8 +52,8 @@ public class Et3ResponseHelper {
 
     private static final String ET3_RESPONSE_EMPLOYMENT_DETAILS = "et3ResponseEmploymentDetails";
     private static final String ET3_RESPONSE_CLAIM_DETAILS = "et3ResponseClaimDetails";
-    public static final String ALL_RESPONDENTS_INCOMPLETE_SECTIONS = "There are no respondents that can currently submit an ET3 Form. Please make sure all "
-            + "3 sections have been completed for a respondent";
+    public static final String ALL_RESPONDENTS_INCOMPLETE_SECTIONS = "There are no respondents that can currently "
+            + "submit an ET3 Form. Please make sure all 3 sections have been completed for a respondent";
 
     private Et3ResponseHelper() {
         // Access through static methods
@@ -159,9 +160,9 @@ public class Et3ResponseHelper {
      * @param accessKey required to use docmosis
      * @return document request for docmosis to create the final ET3 Response form
      */
-    public static String getDocumentRequest(CaseData caseData, String accessKey)  throws JsonProcessingException {
+    public static String getDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
         if (caseData.getSubmitEt3Respondent() == null || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
-            throw new NullPointerException("submitEt3Respondent or respondentCollection is null");
+            throw new NotFoundException("submitEt3Respondent or respondentCollection is null");
         }
         String submitRespondent = caseData.getSubmitEt3Respondent().getSelectedLabel();
         RespondentSumType respondentSumType = caseData.getRespondentCollection().stream()
@@ -224,6 +225,19 @@ public class Et3ResponseHelper {
             .build();
 
         setTitle(data, respondentSumType.getEt3ResponseRespondentPreferredTitle());
+        et3CheckBoxes(caseData, respondentSumType, data);
+
+        Et3ResponseDocument et3ResponseDocument = Et3ResponseDocument.builder()
+            .accessKey(accessKey)
+            .outputName(OUTPUT_NAME)
+            .templateName(TEMPLATE_NAME)
+            .et3ResponseData(data)
+            .build();
+
+        return OBJECT_MAPPER.writeValueAsString(et3ResponseDocument);
+    }
+
+    private static void et3CheckBoxes(CaseData caseData, RespondentSumType respondentSumType, Et3ResponseData data) {
         setCheck(respondentSumType.getEt3ResponseMultipleSites(), data::setSiteYes, data::setSiteNo, null);
         setCheck(respondentSumType.getEt3ResponseAcasAgree(), data::setAcasYes, data::setAcasNo, null);
         setCheck(respondentSumType.getEt3ResponseAreDatesCorrect(),
@@ -271,15 +285,6 @@ public class Et3ResponseHelper {
                 data.setTakehomeAnnually(CHECKED);
             }
         }
-
-        Et3ResponseDocument et3ResponseDocument = Et3ResponseDocument.builder()
-            .accessKey(accessKey)
-            .outputName(OUTPUT_NAME)
-            .templateName(TEMPLATE_NAME)
-            .et3ResponseData(data)
-            .build();
-
-        return OBJECT_MAPPER.writeValueAsString(et3ResponseDocument);
     }
 
     private static void addRepDetails(CaseData caseData, Et3ResponseData data) {
@@ -315,11 +320,11 @@ public class Et3ResponseHelper {
             return List.of("No respondents found");
         }
 
-        var t = caseData.getRespondentCollection().stream()
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection().stream()
                 .filter(r -> NO.equals(r.getValue().getResponseReceived()))
                 .collect(Collectors.toList());
 
-        if (CollectionUtils.isEmpty(t)) {
+        if (CollectionUtils.isEmpty(respondents)) {
             return List.of("There are no respondents that require an ET3");
         }
 
@@ -376,27 +381,31 @@ public class Et3ResponseHelper {
             Optional<RespondentSumTypeItem> respondent = caseData.getRespondentCollection().stream()
                     .filter(r -> respondentSelected.equals(r.getValue().getRespondentName()))
                     .findFirst();
-            if (respondent.isPresent()) {
-                RespondentSumType respondentSumType;
-                switch (eventId) {
-                    case ET3_RESPONSE :
-                        respondentSumType = addPersonalDetailsToRespondent(caseData, respondent.get().getValue());
-                        break;
-                    case ET3_RESPONSE_EMPLOYMENT_DETAILS:
-                        respondentSumType = addEmploymentDetailsToRespondent(caseData, respondent.get().getValue());
-                        break;
-                    case ET3_RESPONSE_CLAIM_DETAILS:
-                        respondentSumType = addClaimDetailsToRespondent(caseData, respondent.get().getValue());
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Invalid eventId: " + eventId);
+            respondent.ifPresent(respondentSumTypeItem -> addEt3Data(caseData, eventId, respondentSelected,
+                    respondentSumTypeItem));
+        }
+    }
 
-                }
-                for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-                    if (respondentSelected.equals(respondentSumTypeItem.getValue().getRespondentName())) {
-                        respondentSumTypeItem.setValue(respondentSumType);
-                    }
-                }
+    private static void addEt3Data(CaseData caseData, String eventId, String respondentSelected,
+                                   RespondentSumTypeItem respondent) {
+        RespondentSumType respondentSumType;
+        switch (eventId) {
+            case ET3_RESPONSE :
+                respondentSumType = addPersonalDetailsToRespondent(caseData, respondent.getValue());
+                break;
+            case ET3_RESPONSE_EMPLOYMENT_DETAILS:
+                respondentSumType = addEmploymentDetailsToRespondent(caseData, respondent.getValue());
+                break;
+            case ET3_RESPONSE_CLAIM_DETAILS:
+                respondentSumType = addClaimDetailsToRespondent(caseData, respondent.getValue());
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid eventId: " + eventId);
+
+        }
+        for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
+            if (respondentSelected.equals(respondentSumTypeItem.getValue().getRespondentName())) {
+                respondentSumTypeItem.setValue(respondentSumType);
             }
         }
     }

@@ -26,23 +26,25 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+@SuppressWarnings({"PMD.NcssCount"})
 public class HearingDetailServiceTest {
 
     private HearingDetailsService hearingDetailsService;
     private DateListedType selectedListing;
+    private HearingSelectionService hearingSelectionService;
+    private static final String TEST_ID = UUID.randomUUID().toString();
 
     @Before
     public void setup() {
         selectedListing = new DateListedType();
+        hearingSelectionService = mock(HearingSelectionService.class);
         hearingDetailsService = new HearingDetailsService(mockHearingSelectionService());
     }
 
     @Test
     public void testInitialiseHearingDetails() {
         CaseData caseData = new CaseData();
-
         hearingDetailsService.initialiseHearingDetails(caseData);
-
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
                 caseData.getHearingDetailsHearing(), "hearing", "Hearing ");
     }
@@ -182,6 +184,13 @@ public class HearingDetailServiceTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
 
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setId(UUID.randomUUID().toString());
+        dateListedTypeItem.setValue(selectedListing);
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
+        when(hearingSelectionService.getSelectedHearing(isA(CaseData.class), isA(DynamicFixedListType.class)))
+            .thenReturn(hearingType);
         hearingDetailsService.updateCase(caseDetails);
 
         assertEquals(hearingStatus, selectedListing.getHearingStatus());
@@ -227,39 +236,35 @@ public class HearingDetailServiceTest {
     @Test
     public void testUpdateCase_Null_Or_Empty_HearingDateCollection() {
         HearingTypeItem hearingTypeItem = new HearingTypeItem();
-        String test_id = "id1";
-        hearingTypeItem.setId(test_id);
+        hearingTypeItem.setId(TEST_ID);
         String expectedHearingType =  "Preliminary Hearing";
         String expectedHearingNotes = "Test hearing notes";
-
         HearingType hearingType = new HearingType();
         hearingType.setHearingType(expectedHearingType);
         hearingType.setHearingNotes(expectedHearingNotes);
-        List<DateListedTypeItem> dateListedTypeItemList = new ArrayList<>();
-        dateListedTypeItemList.add(new DateListedTypeItem());
         hearingTypeItem.setValue(hearingType);
-
         CaseData caseData2 = createCaseData();
         caseData2.getHearingCollection().get(0).getValue().getHearingDateCollection().remove(0);
-
         DynamicFixedListType fixedListType = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode(test_id);
+        dynamicValueType.setCode(TEST_ID);
         fixedListType.setValue(dynamicValueType);
         caseData2.setHearingDetailsHearing(fixedListType);
-
         HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
         caseData2.setHearingDetailsCollection(List.of(hearingDetailTypeItem));
-
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData2);
+
+        when(hearingSelectionService.getDateListedItemsFromSelectedHearing(isA(CaseData.class),
+            isA(DynamicFixedListType.class))).thenReturn(new ArrayList<>());
+
         hearingDetailsService.updateCase(caseDetails);
         assertEquals(0, caseData2.getHearingCollection().get(0).getValue().getHearingDateCollection().size());
     }
 
     private HearingSelectionService mockHearingSelectionService() {
-        HearingSelectionService hearingSelectionService = mock(HearingSelectionService.class);
-        List<DynamicValueType> hearings = SelectionServiceTestUtils.createListItems("hearing", "Hearing ");
+        List<DynamicValueType> hearings = SelectionServiceTestUtils.createListItems("hearing",
+            "Hearing ");
         when(hearingSelectionService.getHearingSelection(isA(CaseData.class))).thenReturn(hearings);
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setId(UUID.randomUUID().toString());
@@ -268,25 +273,24 @@ public class HearingDetailServiceTest {
         hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
         when(hearingSelectionService.getSelectedHearing(isA(CaseData.class), isA(DynamicFixedListType.class)))
                 .thenReturn(hearingType);
-        when(hearingSelectionService.getDateListedItemFromSelectedHearing(isA(CaseData.class), isA(DynamicFixedListType.class)))
-                .thenReturn(List.of(dateListedTypeItem));
+        when(hearingSelectionService.getDateListedItemsFromSelectedHearing(isA(CaseData.class),
+            isA(DynamicFixedListType.class))).thenReturn(List.of(dateListedTypeItem));
         return hearingSelectionService;
     }
 
     private CaseData createCaseData() {
         HearingTypeItem hearingTypeItem = new HearingTypeItem();
-        hearingTypeItem.setId("id1");
-        HearingType hearingType = new HearingType();
+        hearingTypeItem.setId(TEST_ID);
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setValue(selectedListing);
-
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode("id1");
+        dynamicValueType.setCode(TEST_ID);
         dynamicFixedListType.setValue(dynamicValueType);
 
         List<DateListedTypeItem> dateListedTypeItemList = new ArrayList<>();
         dateListedTypeItemList.add(dateListedTypeItem);
+        HearingType hearingType = new HearingType();
         hearingType.setHearingDateCollection(dateListedTypeItemList);
         hearingTypeItem.setValue(hearingType);
 

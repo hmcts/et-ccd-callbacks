@@ -19,7 +19,7 @@ import java.util.UUID;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Service
-@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.NcssCount"})
 public class HearingDetailsService {
 
     private final HearingSelectionService hearingSelectionService;
@@ -81,33 +81,36 @@ public class HearingDetailsService {
     }
 
     public void updateCase(CaseDetails caseDetails) {
-            CaseData caseData = caseDetails.getCaseData();
-            List<DateListedTypeItem> dateListedTypeItems = getDateListedItemFromSelectedHearing(caseData);
-            List<HearingDetailTypeItem> hearingDetailTypeItemsList = caseData.getHearingDetailsCollection();
-            if (!CollectionUtils.isEmpty(hearingDetailTypeItemsList)
-                && !CollectionUtils.isEmpty(dateListedTypeItems)) {
-                for (DateListedTypeItem dateListedTypeItem : dateListedTypeItems) {
-                    DateListedType dateListedType = dateListedTypeItem.getValue();
-                    if (dateListedType != null) {
-                        for (HearingDetailTypeItem hearingDetailTypeItem : hearingDetailTypeItemsList) {
-                            HearingDetailType hearingDetailType = hearingDetailTypeItem.getValue();
-                            if (hearingDetailType != null &&
-                                hearingDetailType.getHearingDetailsDate() != null &&
-                                hearingDetailType.getHearingDetailsDate().equals(dateListedType.getListedDate())) {
-                                updateDateListedTypeDetails(dateListedType, hearingDetailType);
-                            }
-                        }
+        CaseData caseData = caseDetails.getCaseData();
+        List<DateListedTypeItem> dateListedTypeItems = getDateListedItemFromSelectedHearing(caseData);
+        List<HearingDetailTypeItem> hearingDetailTypeItemsList = caseData.getHearingDetailsCollection();
+
+        if (!CollectionUtils.isEmpty(hearingDetailTypeItemsList)
+            && !CollectionUtils.isEmpty(dateListedTypeItems)) {
+            updatedMatchingHearing(dateListedTypeItems, hearingDetailTypeItemsList);
+            Helper.updatePostponedDate(caseData);
+        }
+        FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+    }
+
+    private void updatedMatchingHearing(List<DateListedTypeItem> dateListedTypeItems,
+                                        List<HearingDetailTypeItem> hearingDetailTypeItemsList) {
+        for (DateListedTypeItem dateListedTypeItem : dateListedTypeItems) {
+            DateListedType dateListedType = dateListedTypeItem.getValue();
+            if (dateListedType != null) {
+                for (HearingDetailTypeItem hearingDetailTypeItem : hearingDetailTypeItemsList) {
+                    HearingDetailType hearingDetailType = hearingDetailTypeItem.getValue();
+                    if (hearingDetailType != null && hearingDetailType.getHearingDetailsDate() != null
+                        && hearingDetailType.getHearingDetailsDate().equals(dateListedType.getListedDate())) {
+                        updateDateListedTypeDetails(dateListedType, hearingDetailType);
                     }
                 }
-
-                Helper.updatePostponedDate(caseData);
             }
-
-            FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+        }
     }
 
     private List<DateListedTypeItem> getDateListedItemFromSelectedHearing(CaseData caseData) {
-        return hearingSelectionService.getDateListedItemFromSelectedHearing(caseData,
+        return hearingSelectionService.getDateListedItemsFromSelectedHearing(caseData,
             caseData.getHearingDetailsHearing());
     }
 
@@ -115,7 +118,7 @@ public class HearingDetailsService {
         return hearingSelectionService.getSelectedHearing(caseData, caseData.getHearingDetailsHearing());
     }
 
-    private void updateDateListedTypeDetails(DateListedType dateListedType, HearingDetailType hearingDetailType ) {
+    private void updateDateListedTypeDetails(DateListedType dateListedType, HearingDetailType hearingDetailType) {
         dateListedType.setHearingStatus(hearingDetailType.getHearingDetailsStatus());
         dateListedType.setPostponedBy(hearingDetailType.getHearingDetailsPostponedBy());
         dateListedType.setHearingCaseDisposed(hearingDetailType.getHearingDetailsCaseDisposed());

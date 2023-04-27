@@ -35,12 +35,11 @@ public class HearingDetailsService {
     }
 
     public void handleListingSelected(CaseData caseData) {
-
         HearingType selectedHearing = getSelectedHearing(caseData);
         HearingDetailTypeItem hearingDetailTypeItem;
         HearingDetailType hearingDetailType;
         List<HearingDetailTypeItem> hearingDetailTypeItemList = new ArrayList<>();
-        if (selectedHearing != null && !CollectionUtils.isEmpty(selectedHearing.getHearingDateCollection())) {
+        if (!CollectionUtils.isEmpty(selectedHearing.getHearingDateCollection())) {
             for (DateListedTypeItem dateListedTypeItem : selectedHearing.getHearingDateCollection()) {
                 DateListedType dateListedType = dateListedTypeItem.getValue();
                 hearingDetailTypeItem = new HearingDetailTypeItem();
@@ -82,42 +81,58 @@ public class HearingDetailsService {
     }
 
     public void updateCase(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
-        HearingType selectedHearing = getSelectedHearing(caseData);
-        if (!CollectionUtils.isEmpty(selectedHearing.getHearingDateCollection())) {
-            for (DateListedTypeItem dateListedTypeItem : selectedHearing.getHearingDateCollection()) {
-                DateListedType dateListedType = dateListedTypeItem.getValue();
-                for (HearingDetailTypeItem hearingDetailTypeItem : caseData.getHearingDetailsCollection()) {
-                    HearingDetailType hearingDetailType = hearingDetailTypeItem.getValue();
-                    if (hearingDetailType.getHearingDetailsDate().equals(dateListedType.getListedDate())) {
-                        dateListedType.setHearingStatus(hearingDetailType.getHearingDetailsStatus());
-                        dateListedType.setPostponedBy(hearingDetailType.getHearingDetailsPostponedBy());
-                        dateListedType.setHearingCaseDisposed(hearingDetailType.getHearingDetailsCaseDisposed());
-                        dateListedType.setHearingPartHeard(hearingDetailType.getHearingDetailsPartHeard());
-                        dateListedType.setHearingReservedJudgement(
-                                hearingDetailType.getHearingDetailsReservedJudgment());
-                        dateListedType.setAttendeeClaimant(hearingDetailType.getHearingDetailsAttendeeClaimant());
-                        dateListedType.setAttendeeNonAttendees(
-                                hearingDetailType.getHearingDetailsAttendeeNonAttendees());
-                        dateListedType.setAttendeeRespNoRep(hearingDetailType.getHearingDetailsAttendeeRespNoRep());
-                        dateListedType.setAttendeeRespAndRep(hearingDetailType.getHearingDetailsAttendeeRespAndRep());
-                        dateListedType.setAttendeeRepOnly(hearingDetailType.getHearingDetailsAttendeeRepOnly());
-                        dateListedType.setHearingTimingStart(hearingDetailType.getHearingDetailsTimingStart());
-                        dateListedType.setHearingTimingBreak(hearingDetailType.getHearingDetailsTimingBreak());
-                        dateListedType.setHearingTimingResume(hearingDetailType.getHearingDetailsTimingResume());
-                        dateListedType.setHearingTimingFinish(hearingDetailType.getHearingDetailsTimingFinish());
-                        dateListedType.setHearingTimingDuration(hearingDetailType.getHearingDetailsTimingDuration());
-                        dateListedType.setHearingNotes2(hearingDetailType.getHearingDetailsHearingNotes2());
+            CaseData caseData = caseDetails.getCaseData();
+            List<DateListedTypeItem> dateListedTypeItems = getDateListedItemFromSelectedHearing(caseData);
+            List<HearingDetailTypeItem> hearingDetailTypeItemsList = caseData.getHearingDetailsCollection();
+            if (!CollectionUtils.isEmpty(hearingDetailTypeItemsList)
+                && !CollectionUtils.isEmpty(dateListedTypeItems)) {
+                for (DateListedTypeItem dateListedTypeItem : dateListedTypeItems) {
+                    DateListedType dateListedType = dateListedTypeItem.getValue();
+                    if (dateListedType != null) {
+                        for (HearingDetailTypeItem hearingDetailTypeItem : hearingDetailTypeItemsList) {
+                            HearingDetailType hearingDetailType = hearingDetailTypeItem.getValue();
+                            if (hearingDetailType != null &&
+                                hearingDetailType.getHearingDetailsDate() != null &&
+                                hearingDetailType.getHearingDetailsDate().equals(dateListedType.getListedDate())) {
+                                updateDateListedTypeDetails(dateListedType, hearingDetailType);
+                            }
+                        }
                     }
                 }
+
+                Helper.updatePostponedDate(caseData);
             }
-        }
-        Helper.updatePostponedDate(caseData);
-        FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+
+            FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+    }
+
+    private List<DateListedTypeItem> getDateListedItemFromSelectedHearing(CaseData caseData) {
+        return hearingSelectionService.getDateListedItemFromSelectedHearing(caseData,
+            caseData.getHearingDetailsHearing());
     }
 
     private HearingType getSelectedHearing(CaseData caseData) {
         return hearingSelectionService.getSelectedHearing(caseData, caseData.getHearingDetailsHearing());
     }
 
+    private void updateDateListedTypeDetails(DateListedType dateListedType, HearingDetailType hearingDetailType ) {
+        dateListedType.setHearingStatus(hearingDetailType.getHearingDetailsStatus());
+        dateListedType.setPostponedBy(hearingDetailType.getHearingDetailsPostponedBy());
+        dateListedType.setHearingCaseDisposed(hearingDetailType.getHearingDetailsCaseDisposed());
+        dateListedType.setHearingPartHeard(hearingDetailType.getHearingDetailsPartHeard());
+        dateListedType.setHearingReservedJudgement(
+            hearingDetailType.getHearingDetailsReservedJudgment());
+        dateListedType.setAttendeeClaimant(hearingDetailType.getHearingDetailsAttendeeClaimant());
+        dateListedType.setAttendeeNonAttendees(
+            hearingDetailType.getHearingDetailsAttendeeNonAttendees());
+        dateListedType.setAttendeeRespNoRep(hearingDetailType.getHearingDetailsAttendeeRespNoRep());
+        dateListedType.setAttendeeRespAndRep(hearingDetailType.getHearingDetailsAttendeeRespAndRep());
+        dateListedType.setAttendeeRepOnly(hearingDetailType.getHearingDetailsAttendeeRepOnly());
+        dateListedType.setHearingTimingStart(hearingDetailType.getHearingDetailsTimingStart());
+        dateListedType.setHearingTimingBreak(hearingDetailType.getHearingDetailsTimingBreak());
+        dateListedType.setHearingTimingResume(hearingDetailType.getHearingDetailsTimingResume());
+        dateListedType.setHearingTimingFinish(hearingDetailType.getHearingDetailsTimingFinish());
+        dateListedType.setHearingTimingDuration(hearingDetailType.getHearingDetailsTimingDuration());
+        dateListedType.setHearingNotes2(hearingDetailType.getHearingDetailsHearingNotes2());
+    }
 }

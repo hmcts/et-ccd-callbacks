@@ -51,6 +51,8 @@ public class Et3ResponseHelper {
 
     private static final String ET3_RESPONSE_EMPLOYMENT_DETAILS = "et3ResponseEmploymentDetails";
     private static final String ET3_RESPONSE_CLAIM_DETAILS = "et3ResponseClaimDetails";
+    public static final String ALL_RESPONDENTS_INCOMPLETE_SECTIONS = "There are no respondents that can currently submit an ET3 Form. Please make sure all "
+            + "3 sections have been completed for a respondent";
 
     private Et3ResponseHelper() {
         // Access through static methods
@@ -159,7 +161,7 @@ public class Et3ResponseHelper {
      */
     public static String getDocumentRequest(CaseData caseData, String accessKey)  throws JsonProcessingException {
         if (caseData.getSubmitEt3Respondent() == null || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
-            throw new RuntimeException();
+            throw new NullPointerException("submitEt3Respondent or respondentCollection is null");
         }
         String submitRespondent = caseData.getSubmitEt3Respondent().getSelectedLabel();
         RespondentSumType respondentSumType = caseData.getRespondentCollection().stream()
@@ -387,7 +389,7 @@ public class Et3ResponseHelper {
                         respondentSumType = addClaimDetailsToRespondent(caseData, respondent.get().getValue());
                         break;
                     default:
-                        throw new IllegalArgumentException("Invalid eventId");
+                        throw new IllegalArgumentException("Invalid eventId: " + eventId);
 
                 }
                 for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
@@ -601,8 +603,7 @@ public class Et3ResponseHelper {
                 .collect(Collectors.toList());
 
         if (CollectionUtils.isEmpty(validRespondents)) {
-            return List.of("There are no respondents that can currently submit an ET3 Form. Please make sure all "
-                    + "3 sections have been completed for a respondent");
+            return List.of(ALL_RESPONDENTS_INCOMPLETE_SECTIONS);
         }
         DynamicFixedListType dynamicList = DynamicFixedListType.from(
                 DynamicListHelper.createDynamicRespondentName(validRespondents));

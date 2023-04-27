@@ -48,6 +48,7 @@ class Et3ResponseServiceTest {
                 "Manchester", "M12 42R", "United Kingdom",
                 "1234/5678/90")
             .withEt3RepresentingRespondent("Antonio Vazquez")
+            .withSubmitEt3Respondent("Antonio Vazquez")
             .build();
         caseData.setEt3NoEt3Response("Test data");
         documentInfo = DocumentInfo.builder()

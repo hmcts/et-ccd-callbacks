@@ -6,6 +6,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.IN_PROGRESS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
@@ -32,7 +34,8 @@ public class TseService {
      * Create a new application in the list and assign the TSE data from CaseData to it.
      * At last, clears the existing TSE data from CaseData to ensure fields will be empty when user
      * starts a new application in the same case.
-     * @param caseData contains all the case data.
+     *
+     * @param caseData   contains all the case data.
      * @param isClaimant create a claimant application or a respondent application
      */
 
@@ -87,17 +90,29 @@ public class TseService {
         application.setCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
         application.setCopyToOtherPartyText(caseData.getResTseCopyToOtherPartyTextArea());
         application.setApplicationState(NOT_STARTED_YET);
+        addSupportingMaterialToDocumentCollection(caseData, application);
 
         clearRespondentTseDataFromCaseData(caseData);
     }
 
+    private void addSupportingMaterialToDocumentCollection(CaseData caseData, GenericTseApplicationType application) {
+        if (application.getDocumentUpload() != null) {
+            DocumentTypeItem documentTypeItem = DocumentTypeItem.fromUploadedDocument(application.getDocumentUpload());
+            documentTypeItem.getValue().setTypeOfDocument("Respondent correspondence");
+            documentTypeItem.getValue().setShortDescription("Application supporting material");
+
+            if (isEmpty(caseData.getDocumentCollection())) {
+                caseData.setDocumentCollection(new ArrayList<>());
+            }
+            caseData.getDocumentCollection().add(documentTypeItem);
+        }
+    }
+
     private void assignDataToFieldsFromApplicationType(GenericTseApplicationType respondentTseType, CaseData caseData) {
         RespondentTSEApplicationTypeData selectedAppData =
-            RespondentTellSomethingElseHelper.getSelectedApplicationType(caseData);
-        if (selectedAppData != null) {
-            respondentTseType.setDetails(selectedAppData.getSelectedTextBox());
-            respondentTseType.setDocumentUpload(selectedAppData.getResTseDocument());
-        }
+                RespondentTellSomethingElseHelper.getSelectedApplicationType(caseData);
+        respondentTseType.setDetails(selectedAppData.getSelectedTextBox());
+        respondentTseType.setDocumentUpload(selectedAppData.getResTseDocument());
     }
 
     private void clearRespondentTseDataFromCaseData(CaseData caseData) {
@@ -134,6 +149,7 @@ public class TseService {
 
     /**
      * Gets the number a new TSE application should be labelled as.
+     *
      * @param caseData contains all the case data
      */
     private static int getNextApplicationNumber(CaseData caseData) {

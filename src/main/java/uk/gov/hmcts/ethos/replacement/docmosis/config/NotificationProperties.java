@@ -36,13 +36,13 @@ public class NotificationProperties {
     @Value("${respondNotification.noResponseTemplate.id}")
     private String noResponseTemplateId;
     @Value("${tse.respondent.application.acknowledgement.template.id}")
-    private String emailTemplateId;
+    private String tseRespondentAcknowledgeTemplateId;
     @Value("${tse.respondent.application.acknowledgement.type.c.template.id}")
-    private String emailTypeCTemplateId;
+    private String tseRespondentAcknowledgeTypeCTemplateId;
     @Value("${tse.respondent.application.notify.claimant.template.id}")
-    private String claimantTemplateId;
+    private String tseRespondentToClaimantTemplateId;
     @Value("${tse.respondent.application.tribunal.template.id}")
-    private String adminTemplateId;
+    private String tseNewApplicationAdminTemplateId;
     @Value("${tse.respondent.respond.notify.claimant.template.id}")
     private String tseRespondentResponseTemplateId;
     @Value("${tse.respondent.respond.acknowledgement.rule92no.template.id}")
@@ -50,5 +50,5 @@ public class NotificationProperties {
     @Value("${tse.respondent.respond.acknowledgement.rule92yes.template.id}")
     private String acknowledgementRule92YesEmailTemplateId;
     @Value("${sendNotification.template.id}")
-    private String templateId;
+    private String sendNotificationTemplateId;
 }

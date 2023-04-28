@@ -180,7 +180,7 @@ public class SendNotificationService {
 
         String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify()) && !isNullOrEmpty(claimantEmailAddress)) {
-            emailService.sendEmail(notificationProperties.getTemplateId(), claimantEmailAddress,
+            emailService.sendEmail(notificationProperties.getSendNotificationTemplateId(), claimantEmailAddress,
                 buildPersonalisation(caseDetails, notificationProperties.getCitizenUrl()));
         }
 
@@ -245,7 +245,7 @@ public class SendNotificationService {
         if (isNullOrEmpty(respondentEmail)) {
             return;
         }
-        emailService.sendEmail(notificationProperties.getTemplateId(), respondentEmail, emailData);
+        emailService.sendEmail(notificationProperties.getSendNotificationTemplateId(), respondentEmail, emailData);
     }
 
     private Map<String, String> buildPersonalisation(CaseDetails caseDetails, String envUrl) {

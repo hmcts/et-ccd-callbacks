@@ -110,13 +110,13 @@ public class RespondentTellSomethingElseService {
         String email = userService.getUserDetails(userToken).getEmail();
 
         if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
-            emailService.sendEmail(notificationProperties.getEmailTypeCTemplateId(), email,
+            emailService.sendEmail(notificationProperties.getTseRespondentAcknowledgeTypeCTemplateId(), email,
                     buildPersonalisationTypeC(caseDetails));
             return;
         }
 
         if (NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())) {
-            emailService.sendEmail(notificationProperties.getEmailTemplateId(), email,
+            emailService.sendEmail(notificationProperties.getTseRespondentAcknowledgeTemplateId(), email,
                     buildPersonalisation(caseDetails, RULE92_ANSWERED_NO));
             return;
         }
@@ -129,7 +129,7 @@ public class RespondentTellSomethingElseService {
             customisedText = String.format(RULE92_ANSWERED_YES_GROUP_A, caseData.getResTseSelectApplication());
         }
 
-        emailService.sendEmail(notificationProperties.getEmailTemplateId(), email,
+        emailService.sendEmail(notificationProperties.getTseRespondentAcknowledgeTemplateId(), email,
                 buildPersonalisation(caseDetails, customisedText));
     }
 
@@ -171,7 +171,7 @@ public class RespondentTellSomethingElseService {
         try {
             bytes = tornadoService.generateEventDocumentBytes(caseData, "", RES_TSE_FILE_NAME);
             Map<String, Object> personalisation = claimantPersonalisation(caseDetails, instructions, bytes);
-            emailService.sendEmail(notificationProperties.getClaimantTemplateId(), claimantEmail, personalisation);
+            emailService.sendEmail(notificationProperties.getTseRespondentToClaimantTemplateId(), claimantEmail, personalisation);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
@@ -258,7 +258,7 @@ public class RespondentTellSomethingElseService {
         }
 
         Map<String, String> personalisation = buildPersonalisationForAdminEmail(caseDetails);
-        emailService.sendEmail(notificationProperties.getAdminTemplateId(), email, personalisation);
+        emailService.sendEmail(notificationProperties.getTseNewApplicationAdminTemplateId(), email, personalisation);
     }
 
     /**

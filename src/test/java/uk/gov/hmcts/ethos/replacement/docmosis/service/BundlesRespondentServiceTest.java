@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.List;
@@ -86,5 +87,30 @@ class BundlesRespondentServiceTest {
         bundlesRespondentService.populateSelectHearings(scotlandCaseData);
 
         assertNull(scotlandCaseData.getBundlesRespondentSelectHearing());
+    }
+
+    @Test
+    void validateFileUpload_noFile_returnsError() {
+        englandCaseData.setBundlesRespondentUploadFile(null);
+        List<String> errors = bundlesRespondentService.validateFileUpload(englandCaseData);
+        assertThat(errors.size(), is(1));
+        assertThat(errors.get(0), is("You must upload a PDF file"));
+    }
+
+    @Test
+    void validateFileUpload_wrongFileType_returnsError() {
+        UploadedDocumentType uploadedDocumentType = UploadedDocumentType.builder().documentFilename("file.txt").build();
+        englandCaseData.setBundlesRespondentUploadFile(uploadedDocumentType);
+        List<String> errors = bundlesRespondentService.validateFileUpload(englandCaseData);
+        assertThat(errors.size(), is(1));
+        assertThat(errors.get(0), is("Your upload contains a disallowed file type"));
+    }
+
+    @Test
+    void validateFileUpload_correctFileType_noErrors() {
+        UploadedDocumentType uploadedDocumentType = UploadedDocumentType.builder().documentFilename("file.pdf").build();
+        englandCaseData.setBundlesRespondentUploadFile(uploadedDocumentType);
+        List<String> errors = bundlesRespondentService.validateFileUpload(englandCaseData);
+        assertThat(errors.size(), is(0));
     }
 }

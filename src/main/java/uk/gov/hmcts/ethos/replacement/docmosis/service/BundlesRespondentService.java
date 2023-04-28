@@ -9,8 +9,11 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 
+import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.formatLocalDate;
@@ -61,5 +64,21 @@ public class BundlesRespondentService {
         );
 
         return DynamicValueType.create(value.getHearingNumber(), label);
+    }
+
+    /**
+     * Validates that the file uploaded for bundles is a PDF file.
+     */
+    public List<String> validateFileUpload(CaseData caseData) {
+        UploadedDocumentType document = caseData.getBundlesRespondentUploadFile();
+        if (document == null) {
+            return List.of("You must upload a PDF file");
+        }
+
+        if (document.getDocumentFilename().toLowerCase(Locale.ENGLISH).endsWith(".pdf")) {
+            return List.of();
+        }
+
+        return List.of("Your upload contains a disallowed file type");
     }
 }

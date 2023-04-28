@@ -66,6 +66,9 @@ public class BundlesRespondentService {
         return DynamicValueType.create(value.getHearingNumber(), label);
     }
 
+    /**
+     * Validates that the file uploaded for bundles is a PDF file.
+     */
     public List<String> validateFileUpload(CaseData caseData) {
         UploadedDocumentType document = caseData.getBundlesRespondentUploadFile();
         if (document == null) {

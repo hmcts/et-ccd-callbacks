@@ -433,6 +433,8 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
             .getType(), is(selectedApplication));
 
+        assertThat(caseData.getDocumentCollection().size(), is(1));
+
         assertThat(caseData.getResTseSelectApplication(), is(nullValue()));
         assertThat(caseData.getResTseCopyToOtherPartyYesOrNo(), is(nullValue()));
         assertThat(caseData.getResTseCopyToOtherPartyTextArea(), is(nullValue()));

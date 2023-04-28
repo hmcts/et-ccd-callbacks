@@ -108,7 +108,7 @@ class BundlesRespondentServiceTest {
 
     @Test
     void validateFileUpload_correctFileType_noErrors() {
-        UploadedDocumentType uploadedDocumentType = UploadedDocumentType.builder().documentFilename("file.txt").build();
+        UploadedDocumentType uploadedDocumentType = UploadedDocumentType.builder().documentFilename("file.pdf").build();
         englandCaseData.setBundlesRespondentUploadFile(uploadedDocumentType);
         List<String> errors = bundlesRespondentService.validateFileUpload(englandCaseData);
         assertThat(errors.size(), is(0));

@@ -68,14 +68,12 @@ public class BundlesRespondentService {
     }
 
     public List<String> validateFileUpload(CaseData caseData) {
-        List<DocumentTypeItem> fileCollection = caseData.getBundlesRespondentUploadFile();
-        if (CollectionUtils.isEmpty(fileCollection)) {
+        UploadedDocumentType document = caseData.getBundlesRespondentUploadFile();
+        if (document == null) {
             return List.of("You must upload a PDF file");
         }
 
-        UploadedDocumentType uploadedDocument = fileCollection.get(0).getValue().getUploadedDocument();
-
-        if (uploadedDocument.getDocumentFilename().toLowerCase(Locale.ENGLISH).endsWith(".pdf")) {
+        if (document.getDocumentFilename().toLowerCase(Locale.ENGLISH).endsWith(".pdf")) {
             return List.of();
         }
 

@@ -101,8 +101,7 @@ class BundlesRespondentServiceTest {
     @Test
     void validateFileUpload_wrongFileType_returnsError() {
         UploadedDocumentType uploadedDocumentType = UploadedDocumentType.builder().documentFilename("file.txt").build();
-        DocumentTypeItem document = DocumentTypeItem.fromUploadedDocument(uploadedDocumentType);
-        englandCaseData.setBundlesRespondentUploadFile(List.of(document));
+        englandCaseData.setBundlesRespondentUploadFile(uploadedDocumentType);
         List<String> errors = bundlesRespondentService.validateFileUpload(englandCaseData);
         assertThat(errors.size(), is(1));
         assertThat(errors.get(0), is("Your upload contains a disallowed file type"));
@@ -110,9 +109,8 @@ class BundlesRespondentServiceTest {
 
     @Test
     void validateFileUpload_correctFileType_noErrors() {
-        UploadedDocumentType uploadedDocumentType = UploadedDocumentType.builder().documentFilename("file.pdf").build();
-        DocumentTypeItem document = DocumentTypeItem.fromUploadedDocument(uploadedDocumentType);
-        englandCaseData.setBundlesRespondentUploadFile(List.of(document));
+        UploadedDocumentType uploadedDocumentType = UploadedDocumentType.builder().documentFilename("file.txt").build();
+        englandCaseData.setBundlesRespondentUploadFile(uploadedDocumentType);
         List<String> errors = bundlesRespondentService.validateFileUpload(englandCaseData);
         assertThat(errors.size(), is(0));
     }

@@ -272,11 +272,6 @@ public class NocRespondentRepresentativeService {
         // get all Organisation Details
         List<OrganisationsResponse> organisationList = organisationClient.getOrganisations(
                 userToken, authTokenGenerator.generate());
-        if (CollectionUtils.isEmpty(organisationList)) {
-            log.info("ORGANISATION CLIENT LIST COUNT ---> Null");
-        } else {
-            log.info("ORGANISATION CLIENT LIST COUNT ---> " + organisationList.size());
-        }
 
         for (RepresentedTypeRItem representative : repCollection) {
             RepresentedTypeR representativeDetails = representative.getValue();
@@ -285,16 +280,18 @@ public class NocRespondentRepresentativeService {
                 // Representative's Organisation is missing Address
                 Organisation repOrg = representativeDetails.getRespondentOrganisation();
 
-                // get Organisation Details including Address
-                Optional<OrganisationsResponse> organisation =
-                        organisationList
-                                .stream()
-                                .filter(o -> o.getOrganisationIdentifier().equals(repOrg.getOrganisationID()))
-                                .findFirst();
+                if (repOrg != null && repOrg.getOrganisationID() != null) {
+                    // get Organisation Details including Address
+                    Optional<OrganisationsResponse> organisation =
+                            organisationList
+                                    .stream()
+                                    .filter(o -> o.getOrganisationIdentifier().equals(repOrg.getOrganisationID()))
+                                    .findFirst();
 
-                // if found update representative's Organisation Address
-                if (organisation.isPresent()) {
-                    updateAddress(organisation.get(), representativeDetails);
+                    // if found update representative's Organisation Address
+                    if (organisation.isPresent()) {
+                        updateAddress(organisation.get(), representativeDetails);
+                    }
                 }
             }
         }

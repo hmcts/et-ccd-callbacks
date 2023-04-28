@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -20,10 +22,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,7 +57,17 @@ public class NocRespondentRepresentativeService {
 
     private final NocRespondentHelper nocRespondentHelper;
 
+    private final EmailService emailService;
+
+    private final NocNotificationService nocNotificationService;
+
+    private final CcdClient ccdClient;
+
+    private final CcdCaseAssignment ccdCaseAssignment;
+
     private final OrganisationClient organisationClient;
+
+    private final AuthTokenGenerator authTokenGenerator;
 
     /**
      * Add respondent organisation policy and notice of change answer fields to the case data.
@@ -123,13 +137,17 @@ public class NocRespondentRepresentativeService {
     /**
      * Gets the case data before and after and checks respondent org policies for differences.
      * For each difference creates a change organisation request to remove old organisation and add new.
-     * For each change request trigger the updateRepresentation event against CCD
+     * For each change request trigger the updateRepresentation event against CCD.
+     * Notifications are sent to Tribunal, Claimant, Respondent, New Rep, Old Rep (if there is existing org).
+     * Previous Representative's access is revoked.
      * @param callbackRequest - containing case details before event and after the event
      * @throws IOException - exception thrown by ccd
      */
+    @SuppressWarnings({"PMD.PrematureDeclaration", "checkstyle:VariableDeclarationUsageDistance"})
     public void updateRepresentativesAccess(CallbackRequest callbackRequest) throws IOException {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
-        CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore().getCaseData();
+        CaseDetails caseDetailsBefore = callbackRequest.getCaseDetailsBefore();
+        CaseData caseDataBefore = caseDetailsBefore.getCaseData();
         CaseData caseData = caseDetails.getCaseData();
 
         List<ChangeOrganisationRequest> changeRequests = identifyRepresentationChanges(caseData,
@@ -140,10 +158,37 @@ public class NocRespondentRepresentativeService {
         for (ChangeOrganisationRequest changeRequest : changeRequests) {
             log.info("About to apply representation change {}", changeRequest);
 
-            nocCcdService.updateCaseRepresentation(accessToken, changeRequest,
-                caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
+            CCDRequest ccdRequest = nocCcdService.updateCaseRepresentation(accessToken,
+                    caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
 
             log.info("Representation change applied {}", changeRequest);
+
+            try {
+                nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest);
+            } catch (Exception exception) {
+                log.error(exception.getMessage(), exception);
+            }
+
+            if (changeRequest != null
+                    && changeRequest.getOrganisationToRemove() != null) {
+                try {
+                    removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
+                } catch (IOException e) {
+                    throw new CcdInputOutputException("Failed to remove organisation representative access", e);
+                }
+            }
+
+            callbackRequest.getCaseDetails().getCaseData().setChangeOrganisationRequestField(changeRequest);
+            ccdRequest.getCaseDetails().setCaseData(ccdCaseAssignment.applyNocAsAdmin(callbackRequest).getData());
+
+            ccdClient.submitUpdateRepEvent(
+                    accessToken,
+                    Map.of("changeOrganisationRequestField",
+                            ccdRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField()),
+                    caseDetails.getCaseTypeId(),
+                    caseDetails.getJurisdiction(),
+                    ccdRequest,
+                    caseDetails.getCaseId());
         }
 
     }
@@ -225,7 +270,8 @@ public class NocRespondentRepresentativeService {
         }
 
         // get all Organisation Details
-        List<OrganisationsResponse> organisationList = organisationClient.getOrganisations(userToken);
+        List<OrganisationsResponse> organisationList = organisationClient.getOrganisations(
+                userToken, authTokenGenerator.generate());
         if (CollectionUtils.isEmpty(organisationList)) {
             log.info("ORGANISATION CLIENT LIST COUNT ---> Null");
         } else {

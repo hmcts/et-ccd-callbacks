@@ -8,12 +8,10 @@ import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.AuditEventsResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
-import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 
 import java.io.IOException;
 import java.util.Comparator;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -31,21 +29,13 @@ public class NocCcdService {
             .max(Comparator.comparing(AuditEvent::getCreatedDate));
     }
 
-    public void updateCaseRepresentation(String authToken, ChangeOrganisationRequest changeRequest,
+    public CCDRequest updateCaseRepresentation(String authToken,
                                          String jurisdiction, String caseType,
                                          String caseId) throws IOException {
-        CCDRequest ccdRequest = ccdClient.startEventForUpdateRep(
+        return ccdClient.startEventForUpdateRep(
             authToken,
             caseType,
             jurisdiction,
-            caseId);
-
-        ccdClient.submitUpdateRepEvent(
-            authToken,
-            Map.of("changeOrganisationRequestField", changeRequest),
-            caseType,
-            jurisdiction,
-            ccdRequest,
             caseId);
     }
 

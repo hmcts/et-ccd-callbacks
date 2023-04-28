@@ -12,7 +12,6 @@ import uk.gov.hmcts.et.common.model.ccd.AuditEventsResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 
 import java.io.IOException;
@@ -103,17 +102,14 @@ class NocCcdServiceTest {
 
     @Test
     void shouldCallCcdUpdateCaseRepresentation() throws IOException {
-        ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder().build();
         CCDRequest request = new CCDRequest();
         when(ccdClient.startEventForUpdateRep(AUTH_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID)).thenReturn(request);
         when(ccdClient.submitUpdateRepEvent(eq(AUTH_TOKEN), any(), eq(CASE_TYPE), eq(JURISDICTION),
             eq(request), eq(CASE_ID))).thenReturn(new SubmitEvent());
 
-        nocCcdService.updateCaseRepresentation(AUTH_TOKEN, changeOrganisationRequest, JURISDICTION, CASE_TYPE,
+        nocCcdService.updateCaseRepresentation(AUTH_TOKEN, JURISDICTION, CASE_TYPE,
             CASE_ID);
 
         verify(ccdClient, times(1)).startEventForUpdateRep(AUTH_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID);
-        verify(ccdClient, times(1)).submitUpdateRepEvent(eq(AUTH_TOKEN), any(), eq(CASE_TYPE), eq(JURISDICTION),
-            eq(request), eq(CASE_ID));
     }
 }

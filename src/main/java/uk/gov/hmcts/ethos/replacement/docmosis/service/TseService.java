@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.IN_PROGRESS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
@@ -100,7 +101,7 @@ public class TseService {
             documentTypeItem.getValue().setTypeOfDocument("Respondent correspondence");
             documentTypeItem.getValue().setShortDescription("Application supporting material");
 
-            if (org.springframework.util.CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
+            if (isEmpty(caseData.getDocumentCollection())) {
                 caseData.setDocumentCollection(new ArrayList<>());
             }
             caseData.getDocumentCollection().add(documentTypeItem);

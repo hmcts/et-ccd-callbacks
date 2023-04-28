@@ -5,15 +5,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -23,15 +29,22 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
+@SuppressWarnings({"PMD.LawOfDemeter"})
 class NocNotificationServiceTest {
-    private static final String NEW_REP_EMAIL = "rep1@test.com";
-    private static final String OLD_REP_EMAIL = "rep2@test.com";
+    private static final String NEW_ORG_ADMIN_EMAIL = "orgadmin1@test.com";
+    private static final String OLD_ORG_ADMIN_EMAIL = "orgadmin2@test.com";
     private static final String NEW_ORG_ID = "1";
     private static final String OLD_ORG_ID = "2";
     @InjectMocks
     private NocNotificationService nocNotificationService;
     @Mock
     private EmailService emailService;
+    @Mock
+    private OrganisationClient organisationClient;
+    @Mock
+    private AdminUserService adminUserService;
+    @Mock
+    private AuthTokenGenerator authTokenGenerator;
     private CaseDetails caseDetailsBefore;
     private CaseDetails caseDetailsNew;
 
@@ -60,7 +73,7 @@ class NocNotificationServiceTest {
                 "32 Sweet Street", "14 House", null,
                 "Manchester", "M11 4ED", "United Kingdom",
                 null)
-            .withTwoRespondentRepresentative(NEW_ORG_ID, OLD_ORG_ID, NEW_REP_EMAIL, OLD_REP_EMAIL)
+            .withTwoRespondentRepresentative(NEW_ORG_ID, OLD_ORG_ID, NEW_ORG_ADMIN_EMAIL, OLD_ORG_ADMIN_EMAIL)
             .withRespondent("Respondent", YES, "2022-03-01", "res@rep.com", false)
             .withChangeOrganisationRequestField(
                 organisationToAdd,
@@ -83,7 +96,7 @@ class NocNotificationServiceTest {
                 "32 Sweet Street", "14 House", null,
                 "Manchester", "M11 4ED", "United Kingdom",
                 null)
-            .withTwoRespondentRepresentative(NEW_ORG_ID, OLD_ORG_ID, NEW_REP_EMAIL, OLD_REP_EMAIL)
+            .withTwoRespondentRepresentative(NEW_ORG_ID, OLD_ORG_ID, NEW_ORG_ADMIN_EMAIL, OLD_ORG_ADMIN_EMAIL)
             .withRespondent("Respondent", YES, "2022-03-01",
                 "res@rep.com", false)
             .withChangeOrganisationRequestField(
@@ -99,10 +112,27 @@ class NocNotificationServiceTest {
         caseDetailsBefore.getCaseData().setClaimant("Claimant LastName");
         caseDetailsNew.getCaseData().setClaimant("Claimant LastName");
         caseDetailsBefore.getCaseData().setTribunalCorrespondenceEmail("respondent@unrepresented.com");
+
+        when(authTokenGenerator.generate()).thenReturn("authToken");
+        when(adminUserService.getAdminUserToken()).thenReturn("adminUserToken");
     }
 
     @Test
     void sendNotificationsShouldSendFiveNotifications() {
+        RetrieveOrgByIdResponse.SuperUser oldSuperUser = RetrieveOrgByIdResponse.SuperUser.builder()
+                .email(OLD_ORG_ADMIN_EMAIL).build();
+        RetrieveOrgByIdResponse retrieveOrgByIdResponse1 = RetrieveOrgByIdResponse.builder()
+                .superUser(oldSuperUser).build();
+        when(organisationClient.getOrganisationById(anyString(), anyString(), eq(OLD_ORG_ID)))
+                .thenReturn(ResponseEntity.ok(retrieveOrgByIdResponse1));
+
+        RetrieveOrgByIdResponse.SuperUser newSuperUser = RetrieveOrgByIdResponse.SuperUser.builder()
+                .email(NEW_ORG_ADMIN_EMAIL).build();
+        RetrieveOrgByIdResponse retrieveOrgByIdResponse2 = RetrieveOrgByIdResponse.builder()
+                .superUser(newSuperUser).build();
+        when(organisationClient.getOrganisationById(anyString(), anyString(), eq(NEW_ORG_ID)))
+                .thenReturn(ResponseEntity.ok(retrieveOrgByIdResponse2));
+
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName("Respondent");
         respondentSumType.setRespondentEmail("res@rep.com");
@@ -114,9 +144,9 @@ class NocNotificationServiceTest {
         // Claimant
         verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), any());
         //New Representative
-        verify(emailService, times(1)).sendEmail(any(), eq(NEW_REP_EMAIL), any());
+        verify(emailService, times(1)).sendEmail(any(), eq(NEW_ORG_ADMIN_EMAIL), any());
         //Old Representative
-        verify(emailService, times(1)).sendEmail(any(), eq(OLD_REP_EMAIL), any());
+        verify(emailService, times(1)).sendEmail(any(), eq(OLD_ORG_ADMIN_EMAIL), any());
         // Tribunal
         verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), any());
         // Respondent
@@ -126,6 +156,9 @@ class NocNotificationServiceTest {
     @Test
     void handleMissingEmails() {
         reset(emailService);
+
+        when(organisationClient.getOrganisationById(anyString(), anyString(), anyString()))
+                .thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
         CaseData oldCaseData = caseDetailsBefore.getCaseData();
 

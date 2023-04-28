@@ -21,8 +21,11 @@ import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
@@ -43,7 +46,8 @@ public class TseViewApplicationHelperTest {
 
         GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
             .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
-            .withDetails("Text").withNumber("1").withResponsesCount("0").withStatus(OPEN_STATE).build();
+            .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1").withResponsesCount("0")
+            .withStatus(OPEN_STATE).build();
 
         GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
@@ -95,7 +99,7 @@ public class TseViewApplicationHelperTest {
                 + "|What do you want to tell or ask the tribunal? | Text|\r\n"
                 + "|Supporting material | N/A|\r\n"
                 + "|Do you want to copy this correspondence to the other party"
-                + " to satisfy the Rules of Procedure? | N/A |\r\n\r\n";
+                + " to satisfy the Rules of Procedure? | Yes |\r\n\r\n";
         assertThat(caseData.getTseApplicationSummaryAndResponsesMarkup(), is(expected));
     }
 
@@ -113,7 +117,7 @@ public class TseViewApplicationHelperTest {
                 + "|What do you want to tell or ask the tribunal? | Text|\r\n"
                 + "|Supporting material | N/A|\r\n"
                 + "|Do you want to copy this correspondence to the other party"
-                + " to satisfy the Rules of Procedure? | N/A |\r\n\r\n";
+                + " to satisfy the Rules of Procedure? | Yes |\r\n\r\n";
 
         assertThat(caseData.getTseApplicationSummaryAndResponsesMarkup(), is(expected));
     }
@@ -132,7 +136,7 @@ public class TseViewApplicationHelperTest {
                 + "|What do you want to tell or ask the tribunal? | Text|\r\n"
                 + "|Supporting material | <a href=\"/documents/1234/binary\" target=\"_blank\">image.png</a>|\r\n"
                 + "|Do you want to copy this correspondence to the other party "
-                + "to satisfy the Rules of Procedure? | N/A |\r\n\r\n";
+                + "to satisfy the Rules of Procedure? | Yes |\r\n\r\n";
 
         assertThat(caseData.getTseApplicationSummaryAndResponsesMarkup(), is(expected));
     }
@@ -207,6 +211,32 @@ public class TseViewApplicationHelperTest {
         
         assertThat(caseData.getTseApplicationSummaryAndResponsesMarkup(), is(expected));
 
+    }
+
+    @Test
+    public void shouldNotShareApplicationWithRespondent() {
+        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(CLAIMANT_TITLE)
+                .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
+                .withCopyToOtherPartyYesOrNo(NO).withDetails("Text").withNumber("1").withResponsesCount("0")
+                .withStatus(OPEN_STATE).build();
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
+        genericTseApplicationTypeItem.setValue(build);
+        assertFalse(TseViewApplicationHelper.applicationsSharedWithRespondent(genericTseApplicationTypeItem));
+    }
+
+    @Test
+    public void shouldShareApplicationWithRespondentForRespondentApplication() {
+        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(RESPONDENT_TITLE)
+                .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
+                .withCopyToOtherPartyYesOrNo(NO).withDetails("Text").withNumber("1").withResponsesCount("0")
+                .withStatus(OPEN_STATE).build();
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
+        genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
+        genericTseApplicationTypeItem.setValue(build);
+        assertTrue(TseViewApplicationHelper.applicationsSharedWithRespondent(genericTseApplicationTypeItem));
     }
 
     private UploadedDocumentType createUploadedDocumentType(String fileName) {

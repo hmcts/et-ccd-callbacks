@@ -15,12 +15,20 @@ import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 class NocNotificationHelperTest {
+    private static final String RESPONDENT_NAME = "Respondent";
+    private static final String NEW_REP_EMAIL = "rep1@test.com";
+    private static final String OLD_REP_EMAIL = "rep2@test.com";
+    private static final String NEW_ORG_ID = "1";
+    private static final String OLD_ORG_ID = "2";
+
     private CaseData caseData;
+    private CaseDetails caseDetails;
 
     private RespondentSumType respondentSumType;
 
@@ -28,17 +36,17 @@ class NocNotificationHelperTest {
     void setUp() {
 
         respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentName("Respondent");
+        respondentSumType.setRespondentName(RESPONDENT_NAME);
         respondentSumType.setRespondentEmail("res@rep.com");
 
         Organisation organisationToAdd = Organisation.builder()
-                .organisationID("1")
+                .organisationID(NEW_ORG_ID)
                 .organisationName("New Organisation").build();
         Organisation organisationToRemove = Organisation.builder()
-                .organisationID("2")
+                .organisationID(OLD_ORG_ID)
                 .organisationName("Old Organisation").build();
 
-        CaseDetails caseDetails = CaseDataBuilder.builder()
+        caseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")
             .withClaimantType("claimant@unrepresented.com")
             .withRepresentativeClaimantType("Claimant Rep", "claimant@represented.com")
@@ -52,7 +60,7 @@ class NocNotificationHelperTest {
                 "32 Sweet Street", "14 House", null,
                 "Manchester", "M11 4ED", "United Kingdom",
                 null)
-            .withRespondentRepresentative("Respondent Represented", "Rep LastName", "newres@rep.com")
+            .withTwoRespondentRepresentative(NEW_ORG_ID, OLD_ORG_ID, NEW_REP_EMAIL, OLD_REP_EMAIL)
             .withRespondent("Respondent", YES, "2022-03-01", "res@rep.com", false)
             .withChangeOrganisationRequestField(
                 organisationToAdd,
@@ -72,11 +80,15 @@ class NocNotificationHelperTest {
     @Test
     void testbuildClaimantPersonalisation() {
         Map<String, String> claimantPersonalisation =
-            NocNotificationHelper.buildPersonalisationWithPartyName(caseData, "test_party");
-        assertThat(claimantPersonalisation.size(), is(4));
-        for (String value : claimantPersonalisation.values()) {
-            assertThat(value, notNullValue());
-        }
+            NocNotificationHelper.buildPersonalisationWithPartyName(caseDetails, "test_party");
+        assertThat(claimantPersonalisation.size(), is(5));
+        assertThat(claimantPersonalisation.get("party_name"), is("test_party"));
+        assertThat(claimantPersonalisation.get("ccdId"), is("1234"));
+        assertThat(claimantPersonalisation.get("claimant"), is("Claimant LastName"));
+        assertThat(claimantPersonalisation.get("list_of_respondents"),
+                is("Respondent Respondent Unrepresented Respondent Represented Respondent")
+        );
+        assertThat(claimantPersonalisation.get("case_number"), is("12345/6789"));
     }
 
     @Test
@@ -84,16 +96,6 @@ class NocNotificationHelperTest {
         Map<String, String> claimantPersonalisation =
             NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseData);
         assertThat(claimantPersonalisation.size(), is(3));
-        for (String value : claimantPersonalisation.values()) {
-            assertThat(value, notNullValue());
-        }
-    }
-
-    @Test
-    void testBuildNewRespondentSolicitorPersonalisation() {
-        Map<String, String> claimantPersonalisation =
-            NocNotificationHelper.buildPersonalisationWithPartyName(caseData, "test_party");
-        assertThat(claimantPersonalisation.size(), is(4));
         for (String value : claimantPersonalisation.values()) {
             assertThat(value, notNullValue());
         }
@@ -116,5 +118,34 @@ class NocNotificationHelperTest {
         for (String value : claimantPersonalisation.values()) {
             assertThat(value, notNullValue());
         }
+    }
+
+    @Test
+    void testGetOldSolicitorEmailForRepUpdate_haveExistingOrg() {
+        String oldSolicitorEmail = NocNotificationHelper
+                .getOldSolicitorEmailForRepUpdate(caseData, caseData.getChangeOrganisationRequestField());
+        assertThat(oldSolicitorEmail, is(OLD_REP_EMAIL));
+    }
+
+    @Test
+    void testGetOldSolicitorEmailForRepUpdate_noExistingOrg() {
+        caseData.getChangeOrganisationRequestField().setOrganisationToRemove(null);
+        String oldSolicitorEmail = NocNotificationHelper
+                .getOldSolicitorEmailForRepUpdate(caseData, caseData.getChangeOrganisationRequestField());
+        assertThat(oldSolicitorEmail, is(nullValue()));
+    }
+
+    @Test
+    void testGetNewSolicitorEmailForRepUpdate() {
+        String newSolicitorEmail = NocNotificationHelper
+                .getNewSolicitorEmailForRepUpdate(caseData, caseData.getChangeOrganisationRequestField());
+        assertThat(newSolicitorEmail, is(NEW_REP_EMAIL));
+    }
+
+    @Test
+    void testGetRespondentNameForNewSolicitor() {
+        String respondentName = NocNotificationHelper
+                .getRespondentNameForNewSolicitor(caseData.getChangeOrganisationRequestField(), caseData);
+        assertThat(respondentName, is(RESPONDENT_NAME));
     }
 }

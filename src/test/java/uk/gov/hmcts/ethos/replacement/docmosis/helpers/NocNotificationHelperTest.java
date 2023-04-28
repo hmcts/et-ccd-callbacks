@@ -15,7 +15,6 @@ import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -118,28 +117,6 @@ class NocNotificationHelperTest {
         for (String value : claimantPersonalisation.values()) {
             assertThat(value, notNullValue());
         }
-    }
-
-    @Test
-    void testGetOldSolicitorEmailForRepUpdate_haveExistingOrg() {
-        String oldSolicitorEmail = NocNotificationHelper
-                .getOldSolicitorEmailForRepUpdate(caseData, caseData.getChangeOrganisationRequestField());
-        assertThat(oldSolicitorEmail, is(OLD_REP_EMAIL));
-    }
-
-    @Test
-    void testGetOldSolicitorEmailForRepUpdate_noExistingOrg() {
-        caseData.getChangeOrganisationRequestField().setOrganisationToRemove(null);
-        String oldSolicitorEmail = NocNotificationHelper
-                .getOldSolicitorEmailForRepUpdate(caseData, caseData.getChangeOrganisationRequestField());
-        assertThat(oldSolicitorEmail, is(nullValue()));
-    }
-
-    @Test
-    void testGetNewSolicitorEmailForRepUpdate() {
-        String newSolicitorEmail = NocNotificationHelper
-                .getNewSolicitorEmailForRepUpdate(caseData, caseData.getChangeOrganisationRequestField());
-        assertThat(newSolicitorEmail, is(NEW_REP_EMAIL));
     }
 
     @Test

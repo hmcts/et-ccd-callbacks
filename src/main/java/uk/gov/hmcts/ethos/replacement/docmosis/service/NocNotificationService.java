@@ -94,15 +94,20 @@ public class NocNotificationService {
     private void sendEmailToOldOrgAdmin(String orgId, CaseData caseDataPrevious) {
         ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
         if (HttpStatus.OK.equals(getOrgResponse.getStatusCode())) {
-            if (isNullOrEmpty(getOrgResponse.getBody().getSuperUser().getEmail())) {
-                log.warn("Previous Org " + orgId + " is missing org admin email");
-            } else {
-                emailService.sendEmail(
-                        previousRespondentSolicitorTemplateId,
-                        getOrgResponse.getBody().getSuperUser().getEmail(),
-                        NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious)
-                );
+            Object resBody = getOrgResponse.getBody();
+            if (resBody != null) {
+                String oldOrgAdminEmail = ((RetrieveOrgByIdResponse)resBody).getSuperUser().getEmail();
+                if (isNullOrEmpty(oldOrgAdminEmail)) {
+                    log.warn("Previous Org " + orgId + " is missing org admin email");
+                } else {
+                    emailService.sendEmail(
+                            previousRespondentSolicitorTemplateId,
+                            oldOrgAdminEmail,
+                            NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious)
+                    );
+                }
             }
+
         } else {
             log.error("Cannot retrieve old org by id " + orgId
                     + " [" + getOrgResponse.getStatusCode() + "] " + getOrgResponse.getBody());
@@ -112,14 +117,18 @@ public class NocNotificationService {
     private void sendEmailToNewOrgAdmin(String orgId, CaseDetails caseDetailsNew, String partyName) {
         ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
         if (HttpStatus.OK.equals(getOrgResponse.getStatusCode())) {
-            if (isNullOrEmpty(getOrgResponse.getBody().getSuperUser().getEmail())) {
-                log.warn("New Org " + orgId + " is missing org admin email");
-            } else {
-                emailService.sendEmail(
-                        newRespondentSolicitorTemplateId,
-                        getOrgResponse.getBody().getSuperUser().getEmail(),
-                        NocNotificationHelper.buildPersonalisationWithPartyName(caseDetailsNew, partyName)
-                );
+            Object resBody = getOrgResponse.getBody();
+            if (resBody != null) {
+                String newOrgAdminEmail = ((RetrieveOrgByIdResponse)resBody).getSuperUser().getEmail();
+                if (isNullOrEmpty(newOrgAdminEmail)) {
+                    log.warn("New Org " + orgId + " is missing org admin email");
+                } else {
+                    emailService.sendEmail(
+                            newRespondentSolicitorTemplateId,
+                            newOrgAdminEmail,
+                            NocNotificationHelper.buildPersonalisationWithPartyName(caseDetailsNew, partyName)
+                    );
+                }
             }
         } else {
             log.error("Cannot retrieve new org by id " + orgId

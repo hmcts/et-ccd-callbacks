@@ -59,8 +59,10 @@ public class NocNotificationService {
             );
         }
 
-        String previousOrgId = changeRequest.getOrganisationToRemove().getOrganisationID();
-        sendEmailToOldOrgAdmin(previousOrgId, caseDataPrevious);
+        if (changeRequest.getOrganisationToRemove() != null) {
+            String previousOrgId = changeRequest.getOrganisationToRemove().getOrganisationID();
+            sendEmailToOldOrgAdmin(previousOrgId, caseDataPrevious);
+        }
 
         String newOrgId = changeRequest.getOrganisationToAdd().getOrganisationID();
         sendEmailToNewOrgAdmin(newOrgId, caseDetailsNew, partyName);

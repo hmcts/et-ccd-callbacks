@@ -91,8 +91,8 @@ class TseAdmReplyServiceTest {
         tseAdmReplyService = new TseAdmReplyService(emailService, documentManagementService, notificationProperties);
         ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl");
         ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
-        ReflectionTestUtils.setField(notificationProperties, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);
-        ReflectionTestUtils.setField(notificationProperties, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
 
         caseData = CaseDataBuilder.builder().build();
     }

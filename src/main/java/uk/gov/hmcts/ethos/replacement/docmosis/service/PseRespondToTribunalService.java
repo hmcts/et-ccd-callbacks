@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -53,6 +54,15 @@ public class PseRespondToTribunalService {
     private final HearingSelectionService hearingSelectionService;
     private final TribunalOfficesService tribunalOfficesService;
     private final NotificationProperties notificationProperties;
+
+    @Value("${pse.respondent.acknowledgement.yes.template.id}")
+    private String acknowledgeEmailYesTemplateId;
+    @Value("${pse.respondent.acknowledgement.no.template.id}")
+    private String acknowledgeEmailNoTemplateId;
+    @Value("${pse.respondent.notification.claimant.template.id}")
+    private String notificationToClaimantTemplateId;
+    @Value("${pse.respondent.notification.admin.template.id}")
+    private String notificationToAdminTemplateId;
 
     private static final String GIVE_MISSING_DETAIL =
         "Use the text box or supporting materials to give details.";
@@ -163,10 +173,10 @@ public class PseRespondToTribunalService {
         CaseData caseData = caseDetails.getCaseData();
         String email = userService.getUserDetails(userToken).getEmail();
         if (YES.equals(caseData.getPseRespondentOrdReqCopyToOtherParty())) {
-            emailService.sendEmail(notificationProperties.getAcknowledgeEmailYesTemplateId(), email,
+            emailService.sendEmail(acknowledgeEmailYesTemplateId, email,
                     buildPersonalisationYes(caseDetails));
         } else {
-            emailService.sendEmail(notificationProperties.getAcknowledgeEmailNoTemplateId(), email,
+            emailService.sendEmail(acknowledgeEmailNoTemplateId, email,
                     buildPersonalisationNo(caseDetails));
         }
     }
@@ -175,7 +185,7 @@ public class PseRespondToTribunalService {
         CaseData caseData = caseDetails.getCaseData();
         return Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
-                LINK_TO_EXUI,  notificationProperties.getExuiUrl() + caseDetails.getCaseId()
+                LINK_TO_EXUI,  notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId())
         );
     }
 
@@ -187,7 +197,7 @@ public class PseRespondToTribunalService {
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
                 HEARING_DATE, getHearingDate(caseData, sendNotificationType),
-                LINK_TO_EXUI, notificationProperties.getExuiUrl() + caseDetails.getCaseId()
+                LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId())
         );
     }
 
@@ -207,7 +217,7 @@ public class PseRespondToTribunalService {
     public void sendClaimantEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         if (YES.equals(caseData.getPseRespondentOrdReqCopyToOtherParty())) {
-            emailService.sendEmail(notificationProperties.getNotificationToClaimantTemplateId(),
+            emailService.sendEmail(notificationToClaimantTemplateId,
                 caseData.getClaimantType().getClaimantEmailAddress(),
                 buildPersonalisationNotify(caseDetails));
         }
@@ -219,7 +229,7 @@ public class PseRespondToTribunalService {
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
-                LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenUrl() + caseDetails.getCaseId()
+                LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenLinkWithCaseId(caseDetails.getCaseId())
         );
     }
 
@@ -239,7 +249,7 @@ public class PseRespondToTribunalService {
             return;
         }
 
-        emailService.sendEmail(notificationProperties.getNotificationToAdminTemplateId(),
+        emailService.sendEmail(notificationToAdminTemplateId,
             adminEmail,
             buildPersonalisationAdmin(caseDetails));
     }
@@ -253,7 +263,7 @@ public class PseRespondToTribunalService {
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
                 HEARING_DATE, getHearingDate(caseData, sendNotificationType),
-                LINK_TO_EXUI, notificationProperties.getExuiUrl() + caseDetails.getCaseId()
+                LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId())
         );
     }
 

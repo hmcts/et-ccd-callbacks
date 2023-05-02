@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -50,7 +51,10 @@ public class TseAdminService {
     private final EmailService emailService;
     private final DocumentManagementService documentManagementService;
     private final NotificationProperties notificationProperties;
-
+    @Value("${tse.admin.record-a-decision.notify.claimant.template.id}")
+    private String tseAdminRecordClaimantTemplateId;
+    @Value("${tse.admin.record-a-decision.notify.respondent.template.id}")
+    private String tseAdminRecordRespondentTemplateId;
     private static final String RECORD_DECISION_DETAILS = "| | |\r\n"
         + TABLE_STRING
         + "|%s application | %s|\r\n"
@@ -183,7 +187,7 @@ public class TseAdminService {
                 if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
                     respondentDetails =
                         new TSEAdminEmailRecipientsData(
-                            notificationProperties.getTseAdminRecordRespondentTemplateId(),
+                            tseAdminRecordRespondentTemplateId,
                             respondentSumTypeItem.getValue().getRespondentEmail());
                     respondentDetails.setRecipientName(respondentSumTypeItem.getValue().getRespondentName());
 
@@ -200,7 +204,7 @@ public class TseAdminService {
 
             if (claimantEmail != null) {
                 TSEAdminEmailRecipientsData claimantDetails =
-                    new TSEAdminEmailRecipientsData(notificationProperties.getTseAdminRecordClaimantTemplateId(),
+                    new TSEAdminEmailRecipientsData(tseAdminRecordClaimantTemplateId,
                             claimantEmail);
                 claimantDetails.setRecipientName(claimantName);
 
@@ -219,8 +223,8 @@ public class TseAdminService {
     private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String recipientName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put(CASE_NUMBER, caseNumber);
-        personalisation.put(LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenUrl() + caseId);
-        personalisation.put(LINK_TO_EXUI, notificationProperties.getExuiUrl() + caseId);
+        personalisation.put(LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenLinkWithCaseId(caseId));
+        personalisation.put(LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseId));
         personalisation.put("name", recipientName);
         return personalisation;
     }

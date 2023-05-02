@@ -56,7 +56,8 @@ class SendNotificationServiceTest {
     public void setUp() {
         sendNotificationService = new SendNotificationService(hearingSelectionService, emailService,
                 notificationProperties);
-        ReflectionTestUtils.setField(notificationProperties, SEND_NOTIFICATION_TEMPLATE_ID, "sendNotificationTemplateId");
+        ReflectionTestUtils.setField(sendNotificationService,
+                SEND_NOTIFICATION_TEMPLATE_ID, "sendNotificationTemplateId");
         ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
         ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl");
 
@@ -157,7 +158,8 @@ class SendNotificationServiceTest {
     void sendNotifyEmails_bothParties() {
         caseData.setSendNotificationNotify(BOTH_PARTIES);
         sendNotificationService.sendNotifyEmails(caseDetails);
-        verify(emailService, times(2)).sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
+        verify(emailService, times(2))
+                .sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("exuiUrl1234", val.get("environmentUrl"));
     }
@@ -167,7 +169,8 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationNotify(BOTH_PARTIES);
         caseData.getClaimantType().setClaimantEmailAddress(null);
         sendNotificationService.sendNotifyEmails(caseDetails);
-        verify(emailService, times(1)).sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
+        verify(emailService, times(1))
+                .sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("exuiUrl1234", val.get("environmentUrl"));
     }
@@ -185,7 +188,8 @@ class SendNotificationServiceTest {
     void sendNotifyEmails_claimantOnly() {
         caseData.setSendNotificationNotify(CLAIMANT_ONLY);
         sendNotificationService.sendNotifyEmails(caseDetails);
-        verify(emailService, times(1)).sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
+        verify(emailService, times(1))
+                .sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("citizenUrl1234", val.get("environmentUrl"));
     }
@@ -194,7 +198,8 @@ class SendNotificationServiceTest {
     void sendNotifyEmails_respondentOnly() {
         caseData.setSendNotificationNotify(RESPONDENT_ONLY);
         sendNotificationService.sendNotifyEmails(caseDetails);
-        verify(emailService, times(1)).sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
+        verify(emailService, times(1))
+                .sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("exuiUrl1234", val.get("environmentUrl"));
     }

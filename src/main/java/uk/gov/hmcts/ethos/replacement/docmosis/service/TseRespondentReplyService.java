@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -18,6 +19,12 @@ public class TseRespondentReplyService {
     private final EmailService emailService;
     private final UserService userService;
     private final NotificationProperties notificationProperties;
+    @Value("${tse.respondent.respond.notify.claimant.template.id}")
+    private String tseRespondentResponseTemplateId;
+    @Value("${tse.respondent.respond.acknowledgement.rule92no.template.id}")
+    private String acknowledgementRule92NoEmailTemplateId;
+    @Value("${tse.respondent.respond.acknowledgement.rule92yes.template.id}")
+    private String acknowledgementRule92YesEmailTemplateId;
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
@@ -29,7 +36,7 @@ public class TseRespondentReplyService {
                 String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
                 Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
                         bytes, notificationProperties.getCitizenUrl());
-                emailService.sendEmail(notificationProperties.getTseRespondentResponseTemplateId(),
+                emailService.sendEmail(tseRespondentResponseTemplateId,
                         claimantEmail, personalisation);
             } catch (Exception e) {
                 throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
@@ -39,8 +46,8 @@ public class TseRespondentReplyService {
         String legalRepEmail = userService.getUserDetails(userToken).getEmail();
         emailService.sendEmail(
             YES.equals(caseData.getTseResponseCopyToOtherParty())
-                ? notificationProperties.getAcknowledgementRule92YesEmailTemplateId()
-                : notificationProperties.getAcknowledgementRule92NoEmailTemplateId(),
+                ? acknowledgementRule92YesEmailTemplateId
+                : acknowledgementRule92NoEmailTemplateId,
             legalRepEmail,
             TseHelper.getPersonalisationForAcknowledgement(caseDetails, notificationProperties.getExuiUrl()));
     }

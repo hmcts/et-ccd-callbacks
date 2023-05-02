@@ -5,6 +5,7 @@ import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -47,6 +48,8 @@ public class SendNotificationService {
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
     private final NotificationProperties notificationProperties;
+    @Value("${sendNotification.template.id}")
+    private String sendNotificationTemplateId;
 
     private static final String BLANK_DOCUMENT_MARKDOWN = "| Document | | \r\n| Description | |";
 
@@ -180,7 +183,7 @@ public class SendNotificationService {
 
         String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify()) && !isNullOrEmpty(claimantEmailAddress)) {
-            emailService.sendEmail(notificationProperties.getSendNotificationTemplateId(), claimantEmailAddress,
+            emailService.sendEmail(sendNotificationTemplateId, claimantEmailAddress,
                 buildPersonalisation(caseDetails, notificationProperties.getCitizenUrl()));
         }
 
@@ -245,7 +248,7 @@ public class SendNotificationService {
         if (isNullOrEmpty(respondentEmail)) {
             return;
         }
-        emailService.sendEmail(notificationProperties.getSendNotificationTemplateId(), respondentEmail, emailData);
+        emailService.sendEmail(sendNotificationTemplateId, respondentEmail, emailData);
     }
 
     private Map<String, String> buildPersonalisation(CaseDetails caseDetails, String envUrl) {

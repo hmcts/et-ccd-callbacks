@@ -96,10 +96,11 @@ class PseRespondToTribunalServiceTest {
                 CITIZEN_HUB_URL);
         ReflectionTestUtils.setField(notificationProperties, "exuiUrl",
                 EXUI_URL);
-        ReflectionTestUtils.setField(notificationProperties, "acknowledgeEmailNoTemplateId", TEMPLATE_ID);
-        ReflectionTestUtils.setField(notificationProperties, "notificationToClaimantTemplateId", TEMPLATE_ID);
-        ReflectionTestUtils.setField(notificationProperties, "notificationToAdminTemplateId", TEMPLATE_ID);
-        ReflectionTestUtils.setField(notificationProperties, "acknowledgeEmailYesTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailYesTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(pseRespondToTribService, "acknowledgeEmailNoTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(pseRespondToTribService, "notificationToClaimantTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(pseRespondToTribService, "notificationToAdminTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(pseRespondToTribService, "notificationToAdminTemplateId", TEMPLATE_ID);
     }
 
     @Test

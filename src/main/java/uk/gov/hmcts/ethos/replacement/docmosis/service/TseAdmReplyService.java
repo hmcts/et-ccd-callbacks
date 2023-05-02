@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -58,7 +59,10 @@ public class TseAdmReplyService {
     private final DocumentManagementService documentManagementService;
 
     private final NotificationProperties notificationProperties;
-
+    @Value("${tse.admin.reply.notify.claimant.template.id}")
+    private String tseAdminReplyClaimantTemplateId;
+    @Value("${tse.admin.reply.notify.respondent.template.id}")
+    private String tseAdminReplyRespondentTemplateId;
     private static final String APP_DETAILS = "| | |\r\n"
             + TABLE_STRING
             + "|Applicant | %s|\r\n"
@@ -235,7 +239,7 @@ public class TseAdmReplyService {
                 if (respondentSumTypeItem.getValue().getRespondentEmail() != null) {
                     respondentDetails =
                         new TSEAdminEmailRecipientsData(
-                            notificationProperties.getTseAdminReplyRespondentTemplateId(),
+                            tseAdminReplyRespondentTemplateId,
                             respondentSumTypeItem.getValue().getRespondentEmail());
 
                     if (isResponseRequired(caseData, RESPONDENT_TITLE)) {
@@ -259,7 +263,7 @@ public class TseAdmReplyService {
             if (claimantEmail != null) {
                 TSEAdminEmailRecipientsData claimantDetails =
                     new TSEAdminEmailRecipientsData(
-                            notificationProperties.getTseAdminReplyClaimantTemplateId(), claimantEmail);
+                            tseAdminReplyClaimantTemplateId, claimantEmail);
 
                 if (isResponseRequired(caseData, CLAIMANT_TITLE)) {
                     claimantDetails.setCustomisedText(RESPONSE_REQUIRED);
@@ -285,8 +289,8 @@ public class TseAdmReplyService {
     private Map<String, String> buildPersonalisation(String caseNumber, String caseId, String customText) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put(CASE_NUMBER, caseNumber);
-        personalisation.put(LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenUrl() + caseId);
-        personalisation.put(LINK_TO_EXUI, notificationProperties.getExuiUrl() + caseId);
+        personalisation.put(LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenLinkWithCaseId(caseId));
+        personalisation.put(LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseId));
         personalisation.put("customisedText", customText);
         return personalisation;
     }

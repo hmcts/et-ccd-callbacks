@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -44,7 +45,10 @@ public class RespondNotificationService {
     private final EmailService emailService;
     private final SendNotificationService sendNotificationService;
     private final NotificationProperties notificationProperties;
-
+    @Value("${sendNotification.template.id}")
+    private String responseTemplateId;
+    @Value("${respondNotification.noResponseTemplate.id}")
+    private String noResponseTemplateId;
     private static final String RESPONSE_DETAILS = "|  | |\r\n"
         + "| --- | --- |\r\n"
         + "| Response %1$S | |\r\n"
@@ -213,9 +217,9 @@ public class RespondNotificationService {
         CaseData caseData = caseDetails.getCaseData();
         String templateId;
         if (NO.equals(caseData.getRespondNotificationResponseRequired())) {
-            templateId = notificationProperties.getNoResponseTemplateId();
+            templateId = noResponseTemplateId;
         } else {
-            templateId = notificationProperties.getResponseTemplateId();
+            templateId = responseTemplateId;
         }
 
         String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();

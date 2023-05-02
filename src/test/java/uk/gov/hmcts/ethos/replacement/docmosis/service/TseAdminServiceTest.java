@@ -89,8 +89,8 @@ class TseAdminServiceTest {
     @BeforeEach
     void setUp() {
         tseAdminService = new TseAdminService(emailService, documentManagementService, notificationProperties);
-        ReflectionTestUtils.setField(notificationProperties, "tseAdminRecordClaimantTemplateId", TEMPLATE_ID);
-        ReflectionTestUtils.setField(notificationProperties, "tseAdminRecordRespondentTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordClaimantTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordRespondentTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(notificationProperties, "exuiUrl", XUI_URL);
         ReflectionTestUtils.setField(notificationProperties, "citizenUrl", CITIZEN_URL);
         caseData = CaseDataBuilder.builder().build();

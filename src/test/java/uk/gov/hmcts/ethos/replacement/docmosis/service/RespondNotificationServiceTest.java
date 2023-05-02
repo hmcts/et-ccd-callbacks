@@ -74,8 +74,6 @@ class RespondNotificationServiceTest {
                 notificationProperties);
         ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl");
         ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
-        ReflectionTestUtils.setField(notificationProperties, "responseTemplateId", "responseTemplateId");
-        ReflectionTestUtils.setField(notificationProperties, "noResponseTemplateId", "noResponseTemplateId");
 
         caseDetails = new CaseDetails();
         caseData = new CaseData();
@@ -351,10 +349,10 @@ class RespondNotificationServiceTest {
                 .withClaimantType(CLAIMANT_EMAIL)
                 .withRespondent(respondentSumType).build();
         caseData.setSendNotificationTitle("TEST");
-        ReflectionTestUtils.setField(notificationProperties,
-            "noResponseTemplateId", "noResponseTemplateId");
-        ReflectionTestUtils.setField(notificationProperties,
-            "responseTemplateId", "responseTemplateId");
+        ReflectionTestUtils.setField(respondNotificationService,
+                "noResponseTemplateId", "noResponseTemplateId");
+        ReflectionTestUtils.setField(respondNotificationService,
+                "responseTemplateId", "responseTemplateId");
 
     }
 

@@ -317,7 +317,7 @@ dependencies {
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '3.0.1'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.5'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.8'
     //to remove CVEs
     implementation group: 'org.apache.xmlgraphics', name: 'batik-all', version: '1.16', ext: 'pom'
     //To Remove vulnerability CVE-2020-11988

@@ -24,6 +24,7 @@
         <exclude name="CommentDefaultAccessModifier"/>
         <exclude name="ShortClassName"/>
         <exclude name="LinguisticNaming"/>
+        <exclude name="GodClass"/>
     </rule>
     <rule ref="category/java/codestyle.xml/ClassNamingConventions">
         <properties>

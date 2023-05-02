@@ -65,7 +65,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
-@SuppressWarnings({"PMD.GodClass"})
 class RespondentTellSomethingElseServiceTest {
     private RespondentTellSomethingElseService respondentTellSomethingElseService;
     private TseService tseService;

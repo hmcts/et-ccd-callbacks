@@ -39,7 +39,7 @@ public class HearingDetailsService {
         HearingDetailTypeItem hearingDetailTypeItem;
         HearingDetailType hearingDetailType;
         List<HearingDetailTypeItem> hearingDetailTypeItemList = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(selectedHearing.getHearingDateCollection())) {
+        if (selectedHearing != null && !CollectionUtils.isEmpty(selectedHearing.getHearingDateCollection())) {
             for (DateListedTypeItem dateListedTypeItem : selectedHearing.getHearingDateCollection()) {
                 DateListedType dateListedType = dateListedTypeItem.getValue();
                 hearingDetailTypeItem = new HearingDetailTypeItem();

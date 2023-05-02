@@ -82,8 +82,10 @@ public class HearingDetailsService {
 
     public void updateCase(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
-        List<DateListedTypeItem> dateListedTypeItems = getDateListedItemFromSelectedHearing(caseData);
+        // A collection of hearing update detail entries
         List<HearingDetailTypeItem> hearingDetailTypeItemsList = caseData.getHearingDetailsCollection();
+        // The DateListedTypeItems from the currently selected hearing, to which the hearing updates get applied
+        List<DateListedTypeItem> dateListedTypeItems = getDateListedItemFromSelectedHearing(caseData);
 
         if (!CollectionUtils.isEmpty(hearingDetailTypeItemsList)
             && !CollectionUtils.isEmpty(dateListedTypeItems)) {

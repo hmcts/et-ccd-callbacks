@@ -171,7 +171,8 @@ public class RespondentTellSomethingElseService {
         try {
             bytes = tornadoService.generateEventDocumentBytes(caseData, "", RES_TSE_FILE_NAME);
             Map<String, Object> personalisation = claimantPersonalisation(caseDetails, instructions, bytes);
-            emailService.sendEmail(notificationProperties.getTseRespondentToClaimantTemplateId(), claimantEmail, personalisation);
+            emailService.sendEmail(notificationProperties.getTseRespondentToClaimantTemplateId(),
+                    claimantEmail, personalisation);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }

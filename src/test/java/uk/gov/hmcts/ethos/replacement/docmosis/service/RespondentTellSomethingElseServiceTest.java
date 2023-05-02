@@ -119,8 +119,8 @@ class RespondentTellSomethingElseServiceTest {
                         tornadoService, notificationProperties);
         tseService = new TseService();
 
-        ReflectionTestUtils.setField(notificationProperties, "emailTemplateId", TEMPLATE_ID);
-        ReflectionTestUtils.setField(notificationProperties, "emailTypeCTemplateId", "TypeCTemplateId");
+        ReflectionTestUtils.setField(notificationProperties, "tseRespondentAcknowledgeTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(notificationProperties, "tseRespondentAcknowledgeTypeCTemplateId", "TypeCTemplateId");
         ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl");
         ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
 

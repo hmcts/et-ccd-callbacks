@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
@@ -34,10 +35,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatOrdReqDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatRespondDetails;
@@ -47,6 +49,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.getSelec
 @Service
 @RequiredArgsConstructor
 public class PseRespondToTribunalService {
+    private final EmailService emailService;
+    private final UserService userService;
+    private final HearingSelectionService hearingSelectionService;
+    private final TribunalOfficesService tribunalOfficesService;
+    private final NotificationProperties notificationProperties;
 
     @Value("${pse.respondent.acknowledgement.yes.template.id}")
     private String acknowledgeEmailYesTemplateId;
@@ -56,11 +63,6 @@ public class PseRespondToTribunalService {
     private String notificationToClaimantTemplateId;
     @Value("${pse.respondent.notification.admin.template.id}")
     private String notificationToAdminTemplateId;
-
-    private final EmailService emailService;
-    private final UserService userService;
-    private final HearingSelectionService hearingSelectionService;
-    private final TribunalOfficesService tribunalOfficesService;
 
     private static final String GIVE_MISSING_DETAIL =
         "Use the text box or supporting materials to give details.";
@@ -171,17 +173,19 @@ public class PseRespondToTribunalService {
         CaseData caseData = caseDetails.getCaseData();
         String email = userService.getUserDetails(userToken).getEmail();
         if (YES.equals(caseData.getPseRespondentOrdReqCopyToOtherParty())) {
-            emailService.sendEmail(acknowledgeEmailYesTemplateId, email, buildPersonalisationYes(caseDetails));
+            emailService.sendEmail(acknowledgeEmailYesTemplateId, email,
+                    buildPersonalisationYes(caseDetails));
         } else {
-            emailService.sendEmail(acknowledgeEmailNoTemplateId, email, buildPersonalisationNo(caseDetails));
+            emailService.sendEmail(acknowledgeEmailNoTemplateId, email,
+                    buildPersonalisationNo(caseDetails));
         }
     }
 
     private Map<String, String> buildPersonalisationYes(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         return Map.of(
-            CASE_NUMBER, caseData.getEthosCaseReference(),
-                CASE_ID, caseDetails.getCaseId()
+                CASE_NUMBER, caseData.getEthosCaseReference(),
+                LINK_TO_EXUI,  notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId())
         );
     }
 
@@ -193,7 +197,7 @@ public class PseRespondToTribunalService {
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
                 HEARING_DATE, getHearingDate(caseData, sendNotificationType),
-                CASE_ID, caseDetails.getCaseId()
+                LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId())
         );
     }
 
@@ -225,7 +229,7 @@ public class PseRespondToTribunalService {
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
-                CASE_ID, caseDetails.getCaseId()
+                LINK_TO_CITIZEN_HUB, notificationProperties.getCitizenLinkWithCaseId(caseDetails.getCaseId())
         );
     }
 
@@ -259,7 +263,7 @@ public class PseRespondToTribunalService {
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
                 HEARING_DATE, getHearingDate(caseData, sendNotificationType),
-                CASE_ID, caseDetails.getCaseId()
+                LINK_TO_EXUI, notificationProperties.getExuiLinkWithCaseId(caseDetails.getCaseId())
         );
     }
 

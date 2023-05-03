@@ -10,6 +10,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.service.notify.NotificationClientException;
@@ -79,6 +81,9 @@ class RespondentTellSomethingElseServiceTest {
     @MockBean
     private TornadoService tornadoService;
 
+    @SpyBean
+    private NotificationProperties notificationProperties;
+
     @Captor
     ArgumentCaptor<Map<String, Object>> personalisationCaptor;
 
@@ -89,14 +94,14 @@ class RespondentTellSomethingElseServiceTest {
     private static final String CASE_ID = "669718251103419";
 
     private static final String GIVE_DETAIL_MISSING = "Use the text box or file upload to give details.";
-    private static final String rule92AnsweredNoText = "You have said that you do not want to copy this "
+    private static final String RULE_92_ANSWERED_NO_TEXT = "You have said that you do not want to copy this "
         + "correspondence to "
         + "the other party. \n \n"
         + "The tribunal will consider all correspondence and let you know what happens next.";
-    private static final String rule92AnsweredYesGroupA = "The other party will be notified that any objections "
+    private static final String RULE_92_ANSWERED_YES_GROUP_A = "The other party will be notified that any objections "
         + "to your %s application should be sent to the tribunal as soon as possible, and in any event "
         + "within 7 days.";
-    private static final String rule92AnsweredYesGroupB = "The other party is not expected to respond to this "
+    private static final String RULE_92_ANSWERED_YES_GROUP_B = "The other party is not expected to respond to this "
         + "application.\n \nHowever, they have been notified that any objections to your %s application should be "
         + "sent to the tribunal as soon as possible, and in any event within 7 days.";
 
@@ -110,12 +115,15 @@ class RespondentTellSomethingElseServiceTest {
     void setUp() {
         respondentTellSomethingElseService =
                 new RespondentTellSomethingElseService(emailService, userService, tribunalOfficesService,
-                        tornadoService);
+                        tornadoService, notificationProperties);
         tseService = new TseService();
 
-        ReflectionTestUtils.setField(respondentTellSomethingElseService, "emailTemplateId", TEMPLATE_ID);
-        ReflectionTestUtils.setField(respondentTellSomethingElseService, "emailTypeCTemplateId", "TypeCTemplateId");
-        ReflectionTestUtils.setField(respondentTellSomethingElseService, "exuiUrl", "exui/cases/case-details/");
+        ReflectionTestUtils.setField(respondentTellSomethingElseService,
+                "tseRespondentAcknowledgeTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(respondentTellSomethingElseService,
+                "tseRespondentAcknowledgeTypeCTemplateId", "TypeCTemplateId");
+        ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl");
+        ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
 
         UserDetails userDetails = HelperTest.getUserDetails();
         when(userService.getUserDetails(anyString())).thenReturn(userDetails);
@@ -284,29 +292,30 @@ class RespondentTellSomethingElseServiceTest {
 
     private static Stream<Arguments> sendAcknowledgeEmailAndGeneratePdf() {
         return Stream.of(
-            Arguments.of(TSE_APP_AMEND_RESPONSE, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_POSTPONE_A_HEARING, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, NO, rule92AnsweredNoText, true),
-            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, NO, rule92AnsweredNoText, true),
+            Arguments.of(TSE_APP_AMEND_RESPONSE, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_POSTPONE_A_HEARING, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, NO, RULE_92_ANSWERED_NO_TEXT, true),
+            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, NO, RULE_92_ANSWERED_NO_TEXT, true),
 
-            Arguments.of(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_POSTPONE_A_HEARING, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupA, true),
-            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupB, true),
-            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupB, true),
-            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, I_DO_WANT_TO_COPY, rule92AnsweredYesGroupB, true)
+            Arguments.of(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, I_DO_WANT_TO_COPY,
+                    RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_POSTPONE_A_HEARING, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_A, true),
+            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_B, true),
+            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_B, true),
+            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, I_DO_WANT_TO_COPY, RULE_92_ANSWERED_YES_GROUP_B, true)
         );
     }
 
@@ -321,7 +330,7 @@ class RespondentTellSomethingElseServiceTest {
             "caseNumber", caseData.getEthosCaseReference(),
             "claimant", caseData.getClaimant(),
             "respondents", getRespondentNames(caseData),
-            "caseId", CASE_ID
+            "linkToExUI", "exuiUrl669718251103419"
         );
 
         respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
@@ -339,7 +348,6 @@ class RespondentTellSomethingElseServiceTest {
         Map<String, Object> actual = respondentTellSomethingElseService.claimantPersonalisation(caseDetails, "test",
             new byte[]{});
 
-        assertThat(actual.get("ccdId"), is(caseDetails.getCaseId()));
         assertThat(actual.get("caseNumber"), is(caseData.getEthosCaseReference()));
         assertThat(actual.get("applicationType"), is(TSE_APP_AMEND_RESPONSE));
         assertThat(actual.get("instructions"), is("test"));
@@ -519,7 +527,7 @@ class RespondentTellSomethingElseServiceTest {
                 "claimant", "claimant",
                 "respondents", "Father Ted",
                 "date", "Not set",
-                "url", "exui/cases/case-details/669718251103419");
+                "url", "exuiUrl669718251103419");
 
         verify(emailService, times(1)).sendEmail(any(), any(), eq(caseNumber));
 
@@ -652,7 +660,7 @@ class RespondentTellSomethingElseServiceTest {
         personalisation.put("claimant", caseData.getClaimant());
         personalisation.put("respondents", getRespondentNames(caseData));
         personalisation.put("shortText", selectedApplication);
-        personalisation.put("caseId", CASE_ID);
+        personalisation.put("linkToExUI", "exuiUrl669718251103419");
         if (expectedAnswer != null) {
             personalisation.put("customisedText", String.format(expectedAnswer, selectedApplication));
         }

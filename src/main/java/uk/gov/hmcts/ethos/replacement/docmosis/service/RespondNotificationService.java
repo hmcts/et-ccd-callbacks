@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 
 import java.time.LocalDate;
@@ -43,16 +44,11 @@ public class RespondNotificationService {
 
     private final EmailService emailService;
     private final SendNotificationService sendNotificationService;
-
-    @Value("${url.exui.case-details}")
-    private String exuiUrl;
-    @Value("${url.citizen.case-details}")
-    private String citizenUrl;
+    private final NotificationProperties notificationProperties;
     @Value("${sendNotification.template.id}")
     private String responseTemplateId;
     @Value("${respondNotification.noResponseTemplate.id}")
     private String noResponseTemplateId;
-
     private static final String RESPONSE_DETAILS = "|  | |\r\n"
         + "| --- | --- |\r\n"
         + "| Response %1$S | |\r\n"
@@ -231,11 +227,12 @@ public class RespondNotificationService {
         String sendNotificationTitle = sendNotificationType.getSendNotificationTitle();
         if (!RESPONDENT_ONLY.equals(caseData.getRespondNotificationPartyToNotify()) && !isNullOrEmpty(claimantEmail)) {
             emailService.sendEmail(templateId, claimantEmail,
-                buildPersonalisation(caseDetails, citizenUrl, sendNotificationTitle));
+                buildPersonalisation(caseDetails, notificationProperties.getCitizenUrl(), sendNotificationTitle));
         }
 
         if (!CLAIMANT_ONLY.equals(caseData.getRespondNotificationPartyToNotify())) {
-            Map<String, String> personalisation = buildPersonalisation(caseDetails, exuiUrl, sendNotificationTitle);
+            Map<String, String> personalisation = buildPersonalisation(caseDetails,
+                    notificationProperties.getExuiUrl(), sendNotificationTitle);
             List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
             respondents.forEach(obj -> sendRespondentEmail(caseData, personalisation, obj.getValue(), templateId));
         }

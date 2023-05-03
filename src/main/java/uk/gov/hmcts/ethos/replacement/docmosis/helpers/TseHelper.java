@@ -37,10 +37,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.ADDITIONAL_INFORMATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
@@ -290,14 +290,15 @@ public final class TseHelper {
      * @return Personalisation For Response
      * @throws NotificationClientException Throw Exception
      */
-    public static Map<String, Object> getPersonalisationForResponse(CaseDetails caseDetails, byte[] document)
+    public static Map<String, Object> getPersonalisationForResponse(CaseDetails caseDetails, byte[] document,
+                                                                    String citizenUrl)
             throws NotificationClientException {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
         return Map.of(
-                CCD_ID, caseDetails.getCaseId(),
+                LINK_TO_CITIZEN_HUB, citizenUrl + caseDetails.getCaseId(),
                 CASE_NUMBER, caseData.getEthosCaseReference(),
                 "applicationType", selectedApplication.getType(),
                 "response", isNullOrEmpty(caseData.getTseResponseText()) ? "" : caseData.getTseResponseText(),
@@ -307,7 +308,7 @@ public final class TseHelper {
         );
     }
 
-    public static Map<String, Object> getPersonalisationForAcknowledgement(CaseDetails caseDetails) {
+    public static Map<String, Object> getPersonalisationForAcknowledgement(CaseDetails caseDetails, String exuiUrl) {
         CaseData caseData = caseDetails.getCaseData();
         GenericTseApplicationType selectedApplication = getSelectedApplication(caseData);
 
@@ -316,7 +317,7 @@ public final class TseHelper {
                 CLAIMANT, caseData.getClaimant(),
                 RESPONDENTS, Helper.getRespondentNames(caseData),
                 "shortText", selectedApplication.getType(),
-                CASE_ID, caseDetails.getCaseId()
+                LINK_TO_EXUI, exuiUrl + caseDetails.getCaseId()
         );
     }
 

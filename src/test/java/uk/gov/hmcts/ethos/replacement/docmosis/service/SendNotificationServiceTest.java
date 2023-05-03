@@ -7,11 +7,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -38,6 +40,8 @@ class SendNotificationServiceTest {
 
     @Mock
     private HearingSelectionService hearingSelectionService;
+    @SpyBean
+    private NotificationProperties notificationProperties;
     private CaseData caseData;
     private CaseDetails caseDetails;
     private SendNotificationService sendNotificationService;
@@ -46,12 +50,16 @@ class SendNotificationServiceTest {
     @Captor
     ArgumentCaptor<Map<String, String>> personalisationCaptor;
 
+    private static final String SEND_NOTIFICATION_TEMPLATE_ID = "sendNotificationTemplateId";
+
     @BeforeEach
     public void setUp() {
-        sendNotificationService = new SendNotificationService(hearingSelectionService, emailService);
-        ReflectionTestUtils.setField(sendNotificationService, "templateId", "templateId");
-        ReflectionTestUtils.setField(sendNotificationService, "citizenUrl", "citizenUrl");
-        ReflectionTestUtils.setField(sendNotificationService, "exuiUrl", "exuiUrl");
+        sendNotificationService = new SendNotificationService(hearingSelectionService, emailService,
+                notificationProperties);
+        ReflectionTestUtils.setField(sendNotificationService,
+                SEND_NOTIFICATION_TEMPLATE_ID, "sendNotificationTemplateId");
+        ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
+        ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl");
 
         caseDetails = CaseDataBuilder.builder().withEthosCaseReference("1234")
             .withClaimantType("claimant@email.com")
@@ -150,7 +158,8 @@ class SendNotificationServiceTest {
     void sendNotifyEmails_bothParties() {
         caseData.setSendNotificationNotify(BOTH_PARTIES);
         sendNotificationService.sendNotifyEmails(caseDetails);
-        verify(emailService, times(2)).sendEmail(eq("templateId"), any(), personalisationCaptor.capture());
+        verify(emailService, times(2))
+                .sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("exuiUrl1234", val.get("environmentUrl"));
     }
@@ -160,7 +169,8 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationNotify(BOTH_PARTIES);
         caseData.getClaimantType().setClaimantEmailAddress(null);
         sendNotificationService.sendNotifyEmails(caseDetails);
-        verify(emailService, times(1)).sendEmail(eq("templateId"), any(), personalisationCaptor.capture());
+        verify(emailService, times(1))
+                .sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("exuiUrl1234", val.get("environmentUrl"));
     }
@@ -171,14 +181,15 @@ class SendNotificationServiceTest {
         caseData.getRespondentCollection().forEach(o -> o.getValue().setRespondentEmail(null));
         caseData.getRepCollection().forEach(o -> o.getValue().setRepresentativeEmailAddress(null));
         sendNotificationService.sendNotifyEmails(caseDetails);
-        verify(emailService, times(1)).sendEmail(eq("templateId"), any(), any());
+        verify(emailService, times(1)).sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID), any(), any());
     }
 
     @Test
     void sendNotifyEmails_claimantOnly() {
         caseData.setSendNotificationNotify(CLAIMANT_ONLY);
         sendNotificationService.sendNotifyEmails(caseDetails);
-        verify(emailService, times(1)).sendEmail(eq("templateId"), any(), personalisationCaptor.capture());
+        verify(emailService, times(1))
+                .sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("citizenUrl1234", val.get("environmentUrl"));
     }
@@ -187,7 +198,8 @@ class SendNotificationServiceTest {
     void sendNotifyEmails_respondentOnly() {
         caseData.setSendNotificationNotify(RESPONDENT_ONLY);
         sendNotificationService.sendNotifyEmails(caseDetails);
-        verify(emailService, times(1)).sendEmail(eq("templateId"), any(), personalisationCaptor.capture());
+        verify(emailService, times(1))
+                .sendEmail(eq(SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("exuiUrl1234", val.get("environmentUrl"));
     }

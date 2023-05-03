@@ -387,7 +387,7 @@ public final class ReferralHelper {
      * @param caseData contains all the case data
      * @return Returns next hearing date in "dd MMM yyyy" format or "None"
      */
-    private static String getNearestHearingToReferral(CaseData caseData, String defaultValue) {
+    public static String getNearestHearingToReferral(CaseData caseData, String defaultValue) {
         String earliestFutureHearingDate = HearingsHelper.getEarliestFutureHearingDate(caseData.getHearingCollection());
 
         if (earliestFutureHearingDate == null) {

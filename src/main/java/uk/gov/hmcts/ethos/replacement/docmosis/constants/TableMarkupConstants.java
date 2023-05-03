@@ -10,7 +10,7 @@ public final class TableMarkupConstants {
     public static final String ORDER_APP_DOC_MARKUP = "|Description | %s|\r\n"
             + "|Document | <a href=\"/documents/%s\" target=\"_blank\">%s</a>|\r\n";
     public static final String PARTY_OR_PARTIES_TO_RESPOND = "|Party or parties to respond | %s|\r\n";
-    public static final String RESPONSE_DUE = "|Response due | %s|\r\n";
+    public static final String RESPONSE_DUE = "|Is a response required?| %s|\r\n";
     public static final String NAME_MARKUP = "|Name | %s|\r\n";
     public static final String RESPONSE_TITLE = "|Response | %s|\r\n";
     public static final String ADDITIONAL_INFORMATION = "|Additional information | %s|\r\n";

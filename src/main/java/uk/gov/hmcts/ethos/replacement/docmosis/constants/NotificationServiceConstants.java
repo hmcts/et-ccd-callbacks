@@ -11,6 +11,8 @@ public final class NotificationServiceConstants {
     public static final String CCD_ID = "ccdId";
     public static final String DATE = "date";
     public static final String EMAIL_FLAG = "emailFlag";
+    public static final String LINK_TO_CITIZEN_HUB = "linkToCitizenHub";
+    public static final String LINK_TO_EXUI = "linkToExUI";
 
     private NotificationServiceConstants() {
         // restrict instantiation

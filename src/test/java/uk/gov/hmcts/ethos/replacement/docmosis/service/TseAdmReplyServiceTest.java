@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
@@ -66,6 +68,8 @@ class TseAdmReplyServiceTest {
     @MockBean
     private DocumentManagementService documentManagementService;
 
+    @SpyBean
+    private NotificationProperties notificationProperties;
     private CaseData caseData;
 
     private static final String AUTH_TOKEN = "Bearer authToken";
@@ -84,9 +88,11 @@ class TseAdmReplyServiceTest {
 
     @BeforeEach
     void setUp() {
-        tseAdmReplyService = new TseAdmReplyService(emailService, documentManagementService);
-        ReflectionTestUtils.setField(tseAdmReplyService, "emailToClaimantTemplateId", TEMPLATE_ID);
-        ReflectionTestUtils.setField(tseAdmReplyService, "emailToRespondentTemplateId", TEMPLATE_ID);
+        tseAdmReplyService = new TseAdmReplyService(emailService, documentManagementService, notificationProperties);
+        ReflectionTestUtils.setField(notificationProperties, "exuiUrl", "exuiUrl");
+        ReflectionTestUtils.setField(notificationProperties, "citizenUrl", "citizenUrl");
+        ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);
+        ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
 
         caseData = CaseDataBuilder.builder().build();
     }
@@ -545,7 +551,8 @@ class TseAdmReplyServiceTest {
                                                       String expectedCustomText) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
         personalisation.put("caseNumber", caseData.getEthosCaseReference());
-        personalisation.put("caseId", CASE_ID);
+        personalisation.put("linkToCitizenHub", "citizenUrlsomeCaseId");
+        personalisation.put("linkToExUI", "exuiUrlsomeCaseId");
         if (expectedCustomText != null) {
             personalisation.put("customisedText", expectedCustomText);
         }

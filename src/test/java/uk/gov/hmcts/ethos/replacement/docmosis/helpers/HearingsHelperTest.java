@@ -98,26 +98,6 @@ public class HearingsHelperTest {
     }
 
     @Test
-    public void updatePostponedDate() {
-
-        caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
-                .getHearingDateCollection().get(0).getValue().setHearingStatus(HEARING_STATUS_POSTPONED);
-
-        HearingsHelper.updatePostponedDate(caseDetails1.getCaseData());
-
-        assertNotNull(caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
-                .getHearingDateCollection().get(0).getValue().getPostponedDate());
-
-        caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
-                .getHearingDateCollection().get(0).getValue().setHearingStatus(HEARING_STATUS_SETTLED);
-
-        HearingsHelper.updatePostponedDate(caseDetails1.getCaseData());
-
-        assertNull(caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
-                .getHearingDateCollection().get(0).getValue().getPostponedDate());
-    }
-
-    @Test
     public void findDateOfHearingTest() {
         String hearingDate = caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
                 .getHearingDateCollection().get(0).getValue().getListedDate().substring(0, 10);

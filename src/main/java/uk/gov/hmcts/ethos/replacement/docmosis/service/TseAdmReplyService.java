@@ -8,26 +8,16 @@ import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.*;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
-import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
@@ -42,11 +32,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DETAILS_OF_THE_APPLICATION;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.STRING_BR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
@@ -57,6 +44,8 @@ public class TseAdmReplyService {
     private final EmailService emailService;
 
     private final DocumentManagementService documentManagementService;
+
+    private final TseService tseService;
 
     private final NotificationProperties notificationProperties;
     @Value("${tse.admin.reply.notify.claimant.template.id}")
@@ -88,7 +77,7 @@ public class TseAdmReplyService {
         GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem != null) {
             return initialAppDetails(applicationTypeItem.getValue(), authToken)
-                    + initialRespondDetailsWithRule92(applicationTypeItem.getValue(), authToken);
+                    + tseService.formatApplicationResponses(applicationTypeItem.getValue(), authToken);
         }
         throw new NotFoundException("No selected application type item found.");
     }
@@ -109,38 +98,6 @@ public class TseAdmReplyService {
             formatRule92(applicationType.getCopyToOtherPartyYesOrNo(),
                 applicationType.getCopyToOtherPartyText())
         );
-    }
-
-    private String initialRespondDetailsWithRule92(GenericTseApplicationType application, String authToken) {
-        if (CollectionUtils.isEmpty(application.getRespondCollection())) {
-            return "";
-        }
-        IntWrapper respondCount = new IntWrapper(0);
-        return application.getRespondCollection().stream()
-            .map(replyItem ->
-                ADMIN.equals(replyItem.getValue().getFrom())
-                ? formatAdminReply(
-                    replyItem.getValue(),
-                    respondCount.incrementAndReturnValue(),
-                    defaultString(documentManagementService.displayDocNameTypeSizeLink(
-                        replyItem.getValue().getAddDocument(), authToken)))
-                : formatLegalRepReplyOrClaimantWithRule92(
-                    replyItem.getValue(),
-                    respondCount.incrementAndReturnValue(),
-                    application.getApplicant(),
-                    populateListDocWithInfoAndLink(replyItem.getValue().getSupportingMaterial(), authToken)))
-            .collect(Collectors.joining(""));
-    }
-
-    private String populateListDocWithInfoAndLink(List<DocumentTypeItem> supportingMaterial, String authToken) {
-        if (CollectionUtils.isEmpty(supportingMaterial)) {
-            return "";
-        }
-        return supportingMaterial.stream()
-            .map(documentTypeItem ->
-                documentManagementService.displayDocNameTypeSizeLink(
-                    documentTypeItem.getValue().getUploadedDocument(), authToken) + STRING_BR)
-            .collect(Collectors.joining());
     }
 
     /**

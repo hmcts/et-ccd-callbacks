@@ -349,54 +349,29 @@ public final class TseHelper {
         );
     }
 
-    /**
-     * Format Admin response markup.
-     *
-     * @param reply        Respond as TseRespondType
-     * @param respondCount Respond count as incrementAndReturnValue()
-     * @param docInfo      Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
-     * @return Markup String
-     */
-    public static String formatAdminReply(TseRespondType reply, int respondCount, String docInfo) {
-        return MarkdownHelper.createTwoColumnTable(new String[] {"Response " + respondCount, ""}, List.of(
-                new String[]{"Response", reply.getEnterResponseTitle()},
-                new String[]{"Date", reply.getDate()},
-                new String[]{"Sent by", "Tribunal"},
-                new String[]{"Case management order or request?", reply.getIsCmoOrRequest()},
-                new String[]{"Is a response required?", reply.getIsResponseRequired()},
-                new String[]{"Party or parties to respond", reply.getSelectPartyRespond()},
-                new String[]{"Additional information", reply.getAdditionalInformation()},
-                new String[]{"Supporting material", docInfo},
-                new String[]{"Case management order made by", reply.getCmoMadeBy()},
-                new String[]{"Request made by", reply.getRequestMadeBy()},
-                new String[]{"Full name", reply.getMadeByFullName()},
-                new String[]{"Sent to", reply.getSelectPartyNotify()}
-        )) + "\r\n";
-    }
-
-    /**
-     * Format Respondent or Claimant response markup for Respond to an application.
-     *
-     * @param reply        Respond as TseRespondType
-     * @param respondCount Respond count as incrementAndReturnValue()
-     * @param applicant    GenericTseApplicationType getApplicant()
-     * @param docInfo      Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
-     * @return Markup String
-     */
-    public static String formatLegalRepReplyOrClaimantWithRule92(TseRespondType reply, int respondCount,
-                                                                 String applicant, String docInfo) {
-        return String.format(
-                RESPONDENT_REPLY_MARKUP_FOR_REPLY,
-                respondCount,
-                reply.getFrom(),
-                reply.getDate(),
-                applicant.toLowerCase(Locale.ENGLISH),
-                defaultString(reply.getResponse()),
-                docInfo,
-                formatRule92(reply.getCopyToOtherParty(),
-                        reply.getCopyNoGiveDetails())
-        );
-    }
+//    /**
+//     * Format Respondent or Claimant response markup for Respond to an application.
+//     *
+//     * @param reply        Respond as TseRespondType
+//     * @param respondCount Respond count as incrementAndReturnValue()
+//     * @param applicant    GenericTseApplicationType getApplicant()
+//     * @param docInfo      Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
+//     * @return Markup String
+//     */
+//    public static String formatLegalRepReplyOrClaimantWithRule92(TseRespondType reply, int respondCount,
+//                                                                 String applicant, String docInfo) {
+//        return String.format(
+//                RESPONDENT_REPLY_MARKUP_FOR_REPLY,
+//                respondCount,
+//                reply.getFrom(),
+//                reply.getDate(),
+//                applicant.toLowerCase(Locale.ENGLISH),
+//                defaultString(reply.getResponse()),
+//                docInfo,
+//                formatRule92(reply.getCopyToOtherParty(),
+//                        reply.getCopyNoGiveDetails())
+//        );
+//    }
 
     /**
      * Format Respondent or Claimant response markup for Record a Decision.
@@ -417,5 +392,4 @@ public final class TseHelper {
                 docInfo
         );
     }
-
 }

@@ -5,32 +5,27 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.*;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.StringUtils.defaultString;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
+import static org.apache.commons.lang3.StringUtils.*;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.ADDITIONAL_INFORMATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.CLOSE_APP_DECISION_DETAILS_OTHER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DETAILS_OF_THE_APPLICATION;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DOCUMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.NAME_MARKUP;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.STRING_BR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatAdminReply;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatLegalRepReplyOrClaimantWithRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
@@ -40,6 +35,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelec
 public class TseAdmCloseService {
 
     private final DocumentManagementService documentManagementService;
+    private final TseService tseService;
 
     private static final String CLOSE_APP_DETAILS = "| | |\r\n"
         + TABLE_STRING
@@ -106,7 +102,7 @@ public class TseAdmCloseService {
             formatRule92(applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo(),
                 applicationTypeItem.getValue().getCopyToOtherPartyText())
         )
-            + initialRespondDetailsWithRule92(applicationTypeItem.getValue(), authToken)
+            + tseService.formatApplicationResponses(applicationTypeItem.getValue(), authToken)
             + decisionsMarkdown;
 
     }
@@ -128,8 +124,10 @@ public class TseAdmCloseService {
             return "";
         }
 
-        return String.format(DOCUMENT, documentManagementService
-            .displayDocNameTypeSizeLink(decisionType.getResponseRequiredDoc(), authToken));
+        return decisionType.getResponseRequiredDoc().stream()
+                .map(GenericTypeItem::getValue)
+                .map(o -> tseService.formatDocumentForTwoColumnTable(o, authToken))
+                .collect(Collectors.joining(""));
     }
 
     private String getApplicationDocumentLink(GenericTseApplicationTypeItem applicationTypeItem, String authToken) {
@@ -140,38 +138,6 @@ public class TseAdmCloseService {
         return String.format(SUPPORTING_MATERIAL_TABLE_HEADER,
             documentManagementService.displayDocNameTypeSizeLink(
                 applicationTypeItem.getValue().getDocumentUpload(), authToken));
-    }
-
-    private String initialRespondDetailsWithRule92(GenericTseApplicationType application, String authToken) {
-        if (CollectionUtils.isEmpty(application.getRespondCollection())) {
-            return "";
-        }
-        IntWrapper respondCount = new IntWrapper(0);
-        return application.getRespondCollection().stream()
-            .map(replyItem ->
-                ADMIN.equals(replyItem.getValue().getFrom())
-                    ? formatAdminReply(
-                        replyItem.getValue(),
-                        respondCount.incrementAndReturnValue(),
-                        defaultString(documentManagementService.displayDocNameTypeSizeLink(
-                            replyItem.getValue().getAddDocument(), authToken)))
-                    : formatLegalRepReplyOrClaimantWithRule92(
-                        replyItem.getValue(),
-                        respondCount.incrementAndReturnValue(),
-                        application.getApplicant(),
-                        populateListDocWithInfoAndLink(replyItem.getValue().getSupportingMaterial(), authToken)))
-            .collect(Collectors.joining(""));
-    }
-
-    private String populateListDocWithInfoAndLink(List<DocumentTypeItem> supportingMaterial, String authToken) {
-        if (CollectionUtils.isEmpty(supportingMaterial)) {
-            return "";
-        }
-        return supportingMaterial.stream()
-            .map(documentTypeItem ->
-                documentManagementService.displayDocNameTypeSizeLink(
-                    documentTypeItem.getValue().getUploadedDocument(), authToken) + STRING_BR)
-            .collect(Collectors.joining());
     }
 
     /**

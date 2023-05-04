@@ -13,17 +13,8 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
-import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.et.common.model.ccd.items.*;
+import uk.gov.hmcts.et.common.model.ccd.types.*;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
@@ -67,6 +58,8 @@ class TseAdminServiceTest {
     private DocumentManagementService documentManagementService;
     @SpyBean
     private NotificationProperties notificationProperties;
+    @MockBean
+    private TseService tseService;
 
     private CaseData caseData;
 
@@ -88,7 +81,7 @@ class TseAdminServiceTest {
 
     @BeforeEach
     void setUp() {
-        tseAdminService = new TseAdminService(emailService, documentManagementService, notificationProperties);
+        tseAdminService = new TseAdminService(emailService, documentManagementService, tseService, notificationProperties);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordRespondentTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(notificationProperties, "exuiUrl", XUI_URL);
@@ -189,7 +182,7 @@ class TseAdminServiceTest {
                     .isResponseRequired("Yes - view document for details")
                     .selectPartyRespond("Both parties")
                     .additionalInformation("Optional Text entered by admin")
-                    .addDocument(createUploadedDocumentType("admin.txt"))
+                    .addDocument(createDocumentList("admin.txt"))
                     .requestMadeBy("Caseworker")
                     .madeByFullName("Mr Jimmy")
                     .selectPartyNotify("Both parties")
@@ -209,6 +202,10 @@ class TseAdminServiceTest {
                 adminReply
             ))
             .build();
+    }
+
+    private List<GenericTypeItem<DocumentType>> createDocumentList(String fileName) {
+        return List.of(GenericTypeItem.from(DocumentType.from(createUploadedDocumentType(fileName))));
     }
 
     private static UploadedDocumentType createUploadedDocumentType(String fileName) {
@@ -320,7 +317,7 @@ class TseAdminServiceTest {
         caseData.setTseAdminDecision("Granted");
         caseData.setTseAdminTypeOfDecision("Judgment");
         caseData.setTseAdminAdditionalInformation("Additional information");
-        caseData.setTseAdminResponseRequiredNoDoc(createUploadedDocumentType("document.txt"));
+        caseData.setTseAdminResponseRequiredNoDoc(createDocumentList("document.txt"));
         caseData.setTseAdminDecisionMadeBy("Legal officer");
         caseData.setTseAdminDecisionMadeByFullName("Legal Officer Full Name");
         caseData.setTseAdminSelectPartyNotify(BOTH_PARTIES);
@@ -348,7 +345,7 @@ class TseAdminServiceTest {
         assertThat(actual.getAdditionalInformation())
             .isEqualTo("Additional information");
         assertThat(actual.getResponseRequiredDoc())
-            .isEqualTo(createUploadedDocumentType("document.txt"));
+            .isEqualTo(createDocumentList("document.txt"));
         assertThat(actual.getDecisionMadeBy())
             .isEqualTo("Legal officer");
         assertThat(actual.getDecisionMadeByFullName())
@@ -379,7 +376,7 @@ class TseAdminServiceTest {
         caseData.setTseAdminIsResponseRequired(YES);
         caseData.setTseAdminSelectPartyRespond(CLAIMANT_TITLE);
         caseData.setTseAdminAdditionalInformation("Additional information text");
-        caseData.setTseAdminResponseRequiredYesDoc(createUploadedDocumentType("document.txt"));
+        caseData.setTseAdminResponseRequiredYesDoc(createDocumentList("document.txt"));
         caseData.setTseAdminDecisionMadeBy("Judge");
         caseData.setTseAdminDecisionMadeByFullName("Judge Full Name");
         caseData.setTseAdminSelectPartyNotify(CLAIMANT_ONLY);
@@ -407,7 +404,7 @@ class TseAdminServiceTest {
         assertThat(actual.getAdditionalInformation())
             .isEqualTo("Additional information text");
         assertThat(actual.getResponseRequiredDoc())
-            .isEqualTo(createUploadedDocumentType("document.txt"));
+            .isEqualTo(createDocumentList("document.txt"));
         assertThat(actual.getDecisionMadeBy())
             .isEqualTo("Judge");
         assertThat(actual.getDecisionMadeByFullName())
@@ -434,7 +431,7 @@ class TseAdminServiceTest {
         caseData.setTseAdminDecision("Refused");
         caseData.setTseAdminTypeOfDecision(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdminIsResponseRequired(NO);
-        caseData.setTseAdminResponseRequiredNoDoc(createUploadedDocumentType("document.txt"));
+        caseData.setTseAdminResponseRequiredNoDoc(createDocumentList("document.txt"));
         caseData.setTseAdminDecisionMadeBy("Judge");
         caseData.setTseAdminDecisionMadeByFullName("Judge Full Name");
         caseData.setTseAdminSelectPartyNotify(RESPONDENT_ONLY);
@@ -462,7 +459,7 @@ class TseAdminServiceTest {
         assertThat(actual.getAdditionalInformation())
             .isNull();
         assertThat(actual.getResponseRequiredDoc())
-            .isEqualTo(createUploadedDocumentType("document.txt"));
+            .isEqualTo(createDocumentList("document.txt"));
         assertThat(actual.getDecisionMadeBy())
             .isEqualTo("Judge");
         assertThat(actual.getDecisionMadeByFullName())
@@ -543,7 +540,7 @@ class TseAdminServiceTest {
         caseData.setTseAdminIsResponseRequired(YES);
         caseData.setTseAdminSelectPartyRespond(CLAIMANT_TITLE);
         caseData.setTseAdminAdditionalInformation("Additional information text");
-        caseData.setTseAdminResponseRequiredYesDoc(createUploadedDocumentType("document.txt"));
+        caseData.setTseAdminResponseRequiredYesDoc(createDocumentList("document.txt"));
         caseData.setTseAdminResponseRequiredNoDoc(null);
         caseData.setTseAdminDecisionMadeBy("Judge");
         caseData.setTseAdminDecisionMadeByFullName("Judge Full Name");

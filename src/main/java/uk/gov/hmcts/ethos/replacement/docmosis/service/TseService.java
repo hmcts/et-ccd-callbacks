@@ -6,29 +6,40 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.*;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.IN_PROGRESS;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.STRING_BR;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class TseService {
+    private static final String RULE92_QUESTION =
+            "Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?";
+    private static final String RULE92_DETAILS =
+            "Details of why you do not want to inform the other party";
+    public static final String WHATS_YOUR_RESPONSE = "What's your response to the %s's application";
+    private final DocumentManagementService documentManagementService;
+
     /**
      * Creates a new TSE collection if it doesn't exist.
      * Create a new application in the list and assign the TSE data from CaseData to it.
@@ -157,5 +168,136 @@ public class TseService {
             return 1;
         }
         return caseData.getGenericTseApplicationCollection().size() + 1;
+    }
+
+    public String getDocNameAndSizeLinks(List<GenericTypeItem<DocumentType>> documents, String authToken) {
+        if (CollectionUtils.isEmpty(documents)) {
+            return "";
+        }
+
+        return documents.stream()
+                .map(GenericTypeItem::getValue)
+                .map(o -> formatDocumentForTwoColumnTable(o, authToken))
+                .collect(Collectors.joining(""));
+    }
+
+    public String formatDocumentForTwoColumnTable(DocumentType document, String authToken) {
+        UploadedDocumentType uploadedDocument = document.getUploadedDocument();
+        String nameTypeSizeLink = documentManagementService.displayDocNameTypeSizeLink(uploadedDocument, authToken);
+
+        return MarkdownHelper.createTwoColumnRows(List.of(
+                new String[]{"Document", nameTypeSizeLink},
+                new String[]{"Description", document.getShortDescription()})
+        );
+    }
+    public List<String[]> addDocumentRow(DocumentType document, String authToken) {
+        UploadedDocumentType uploadedDocument = document.getUploadedDocument();
+        String nameTypeSizeLink = documentManagementService.displayDocNameTypeSizeLink(uploadedDocument, authToken);
+
+        return List.of(
+                new String[]{"Document", nameTypeSizeLink},
+                new String[]{"Description", document.getShortDescription()}
+        );
+    }
+    public List<String[]> addDocumentRows(List<GenericTypeItem<DocumentType>> documents, String authToken) {
+        if (CollectionUtils.isEmpty(documents)) {
+            return Collections.emptyList();
+        }
+
+        return documents.stream()
+                .flatMap(o -> addDocumentRow(o.getValue(), authToken).stream())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Format Admin response markup.
+     *
+     * @param reply Respond as TseRespondType
+     * @param respondCount Respond count as incrementAndReturnValue()
+     * @param authToken authorisation token for caller
+     * @return Markup String
+     */
+    public String formatAdminReply(TseRespondType reply, int respondCount, String authToken) {
+        List<String[]> rows = new ArrayList<>();
+
+        rows.addAll(List.of(
+                new String[]{"Response", reply.getEnterResponseTitle()},
+                new String[]{"Date", reply.getDate()},
+                new String[]{"Sent by", "Tribunal"},
+                new String[]{"Case management order or request?", reply.getIsCmoOrRequest()},
+                new String[]{"Is a response required?", reply.getIsResponseRequired()},
+                new String[]{"Party or parties to respond", reply.getSelectPartyRespond()},
+                new String[]{"Additional information", reply.getAdditionalInformation()}
+        ));
+        rows.addAll(addDocumentRows(reply.getAddDocument(), authToken));
+        rows.addAll(List.of(
+                new String[]{"Case management order made by", reply.getCmoMadeBy()},
+                new String[]{"Request made by", reply.getRequestMadeBy()},
+                new String[]{"Full name", reply.getMadeByFullName()},
+                new String[]{"Sent to", reply.getSelectPartyNotify()}
+        ));
+
+        return MarkdownHelper.createTwoColumnTable(new String[] {"Response " + respondCount, ""}, rows) + "\r\n";
+    }
+
+    public String formatApplicationResponses(GenericTseApplicationType application, String authToken) {
+        List<TseRespondTypeItem> respondCollection = application.getRespondCollection();
+
+        if (CollectionUtils.isEmpty(respondCollection)) {
+            return "";
+        }
+
+        IntWrapper respondCount = new IntWrapper(0);
+        String applicant = application.getApplicant().toLowerCase(Locale.ENGLISH);
+
+        return application.getRespondCollection().stream()
+                .map(TseRespondTypeItem::getValue)
+                .map(o -> ADMIN.equals(o.getFrom())
+                        ? formatAdminReply(o, respondCount.incrementAndReturnValue(), authToken)
+                        : formatReply(o, respondCount.incrementAndReturnValue(), applicant, authToken)
+                ).collect(Collectors.joining());
+    }
+
+    private String formatReply(TseRespondType reply, int count, String applicant, String authToken) {
+        List<String[]> rows = new ArrayList<>();
+
+        rows.addAll(List.of(
+                new String[]{"Response from", reply.getFrom()},
+                new String[]{"Response date", reply.getDate()},
+                new String[]{String.format(WHATS_YOUR_RESPONSE, applicant), reply.getResponse()}
+        ));
+        rows.addAll(addDocumentRows(reply.getSupportingMaterial(), authToken));
+        rows.addAll(List.of(
+                new String[]{RULE92_QUESTION, reply.getCopyToOtherParty()},
+                new String[]{RULE92_DETAILS, reply.getCopyNoGiveDetails()}
+        ));
+
+        return MarkdownHelper.createTwoColumnTable(new String[] {"Response " + count, ""}, rows) + "\r\n";
+    }
+
+    public String formatViewApplication(CaseData caseData, String authToken) {
+        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
+        GenericTseApplicationType application = TseHelper.getSelectedApplication(caseData);
+
+        if (CollectionUtils.isEmpty(applications) || application == null) {
+            return "";
+        }
+
+        UploadedDocumentType document = application.getDocumentUpload();
+        String supportingMaterial = documentManagementService.displayDocNameTypeSizeLink(document, authToken);
+
+        String applicationTable = MarkdownHelper.createTwoColumnTable(new String[]{"Application", ""}, List.of(
+                new String[]{"Applicant", application.getApplicant()},
+                new String[]{"Type of application", application.getType()},
+                new String[]{"Application date", application.getDate()},
+                new String[]{"What do you want to tell or ask the tribunal?", application.getDetails()},
+                new String[]{"Supporting material", supportingMaterial},
+                new String[]{RULE92_QUESTION, application.getCopyToOtherPartyYesOrNo()},
+                new String[]{RULE92_DETAILS, application.getCopyToOtherPartyText()}
+        ));
+
+        String responses = formatApplicationResponses(application, authToken);
+
+        return applicationTable + "\r\n" + responses;
     }
 }

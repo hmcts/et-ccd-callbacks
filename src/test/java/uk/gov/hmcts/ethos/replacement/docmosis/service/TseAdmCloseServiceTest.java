@@ -13,7 +13,9 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -156,10 +158,10 @@ class TseAdmCloseServiceTest {
                     .decisionMadeByFullName("made by full name")
                     .selectPartyNotify("party notify")
                     .responseRequiredDoc(hasDoc
-                        ? UploadedDocumentBuilder.builder()
+                        ? List.of(GenericTypeItem.from(DocumentType.from(UploadedDocumentBuilder.builder()
                             .withFilename("admin.txt")
                             .withUuid("1234")
-                            .build()
+                            .build())))
                         : null)
                     .build()
             ).build();

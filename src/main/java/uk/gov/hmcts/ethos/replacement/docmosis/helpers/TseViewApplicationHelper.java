@@ -7,7 +7,9 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 
 import java.util.List;
@@ -232,7 +234,11 @@ public final class TseViewApplicationHelper {
     private static String createAdminResponse(TseRespondType response, AtomicInteger count) {
         String doc = "N/A";
         if (response.getAddDocument() != null) {
-            doc = Helper.createLinkForUploadedDocument(response.getAddDocument());
+            doc = response.getAddDocument().stream()
+                    .map(GenericTypeItem::getValue)
+                    .map(DocumentType::getUploadedDocument)
+                    .map(Helper::createLinkForUploadedDocument)
+                    .collect(Collectors.joining("\r\n"));
         }
         return String.format(
                 VIEW_APPLICATION_ADMIN_REPLY_MARKUP,

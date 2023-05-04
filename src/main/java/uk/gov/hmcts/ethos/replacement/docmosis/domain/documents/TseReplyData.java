@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 
 import java.util.List;
 
@@ -20,7 +22,7 @@ public class TseReplyData {
     @JsonProperty("supportingYesNo")
     private String supportingYesNo;
     @JsonProperty("documentCollection")
-    private List<DocumentTypeItem> documentCollection;
+    private List<GenericTypeItem<DocumentType>> documentCollection;
     @JsonProperty("copy")
     private String copy;
     @JsonProperty("response")

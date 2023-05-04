@@ -58,7 +58,8 @@ withPipeline(type, product, component) {
   syncBranchesWithMaster(branchesToSync)
   enableSlackNotifications('#et-builds')
 
-  afterAlways('test') {
+  afterAlways('smoketest:preview') {
+    sh "./gradlew :integration"
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/integration/index.html'
 
     publishHTML target: [

@@ -144,17 +144,17 @@ class TseAdminServiceTest {
             + "\r\n"
             + "|Response 2 | |\r\n"
             + "|--|--|\r\n"
-            + "|Response | Title of Response|\r\n"
-            + "|Date | 24 December 2022|\r\n"
-            + "|Sent by | Tribunal|\r\n"
-            + "|Case management order or request? | Request|\r\n"
-            + "|Response due | Yes - view document for details|\r\n"
-            + "|Party or parties to respond | Both parties|\r\n"
-            + "|Additional information | Optional Text entered by admin|\r\n"
-            + "|Supporting material | " + fileDisplay4 + "|\r\n"
-            + "|Request made by | Caseworker|\r\n"
-            + "|Full name | Mr Jimmy|\r\n"
-            + "|Sent to | Both parties|\r\n"
+            + "|Response|Title of Response|\r\n"
+            + "|Date|24 December 2022|\r\n"
+            + "|Sent by|Tribunal|\r\n"
+            + "|Case management order or request?|Request|\r\n"
+            + "|Is a response required?|Yes - view document for details|\r\n"
+            + "|Party or parties to respond| Both parties|\r\n"
+            + "|Additional information|Optional Text entered by admin|\r\n"
+            + "|Supporting material|" + fileDisplay4 + "|\r\n"
+            + "|Request made by|Caseworker|\r\n"
+            + "|Full name|Mr Jimmy|\r\n"
+            + "|Sent to|Both parties|\r\n"
             + "\r\n";
 
         tseAdminService.initialTseAdminTableMarkUp(caseData, AUTH_TOKEN);
@@ -288,18 +288,12 @@ class TseAdminServiceTest {
             + "|Details | Response Details|\r\n"
             + "|Supporting material | |\r\n" // TODO: Remove Empty Row
             + "\r\n"
-            + "|Response 2 | |\r\n"
+            + "|Response 2||\r\n"
             + "|--|--|\r\n"
-            + "|Response | |\r\n" // TODO: Remove Empty Row
-            + "|Date | 24 December 2022|\r\n"
-            + "|Sent by | Tribunal|\r\n"
-            + "|Case management order or request? | Neither|\r\n"
-            + "|Response due | |\r\n" // TODO: Remove Empty Row
-            + "|Party or parties to respond | |\r\n" // TODO: Remove Empty Row
-            + "|Additional information | |\r\n" // TODO: Remove Empty Row
-            + "|Supporting material | |\r\n" // TODO: Remove Empty Row
-            + "|Full name | |\r\n" // TODO: Remove Empty Row
-            + "|Sent to | Both parties|\r\n"
+            + "|Date|24 December 2022|\r\n"
+            + "|Sent by|Tribunal|\r\n"
+            + "|Case management order or request?|Neither|\r\n"
+            + "|Sent to|Both parties|\r\n"
             + "\r\n";
 
         tseAdminService.initialTseAdminTableMarkUp(caseData, AUTH_TOKEN);

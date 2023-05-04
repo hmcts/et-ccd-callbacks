@@ -30,11 +30,9 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultString;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
@@ -108,8 +106,6 @@ public final class TseHelper {
                     + "|Full name | %s|\r\n"
                     + "|Sent to | %s|\r\n"
                     + "\r\n";
-
-    private static final String ADMIN_REPLY_MARKUP_MADE_BY = "|%s made by | %s|\r\n";
 
     private TseHelper() {
         // Access through static methods
@@ -362,35 +358,20 @@ public final class TseHelper {
      * @return Markup String
      */
     public static String formatAdminReply(TseRespondType reply, int respondCount, String docInfo) {
-        return String.format(
-                ADMIN_REPLY_MARKUP,
-                respondCount,
-                defaultString(reply.getEnterResponseTitle()),
-                reply.getDate(),
-                defaultString(reply.getIsCmoOrRequest()),
-                defaultString(reply.getIsResponseRequired()),
-                defaultString(reply.getSelectPartyRespond()),
-                defaultString(reply.getAdditionalInformation()),
-                docInfo,
-                formatAdminReplyMadeBy(reply),
-                defaultString(reply.getMadeByFullName()),
-                defaultString(reply.getSelectPartyNotify())
-        );
-    }
-
-    private static String formatAdminReplyMadeBy(TseRespondType reply) {
-        if (CASE_MANAGEMENT_ORDER.equals(reply.getIsCmoOrRequest())) {
-            return String.format(
-                    ADMIN_REPLY_MARKUP_MADE_BY,
-                    reply.getIsCmoOrRequest(),
-                    reply.getCmoMadeBy());
-        } else if (REQUEST.equals(reply.getIsCmoOrRequest())) {
-            return String.format(
-                    ADMIN_REPLY_MARKUP_MADE_BY,
-                    reply.getIsCmoOrRequest(),
-                    reply.getRequestMadeBy());
-        }
-        return "";
+        return MarkdownHelper.createTwoColumnTable(new String[] {"Response " + respondCount, ""}, List.of(
+                new String[]{"Response", reply.getEnterResponseTitle()},
+                new String[]{"Date", reply.getDate()},
+                new String[]{"Sent by", "Tribunal"},
+                new String[]{"Case management order or request?", reply.getIsCmoOrRequest()},
+                new String[]{"Is a response required?", reply.getIsResponseRequired()},
+                new String[]{"Party or parties to respond", reply.getSelectPartyRespond()},
+                new String[]{"Additional information", reply.getAdditionalInformation()},
+                new String[]{"Supporting material", docInfo},
+                new String[]{"Case management order made by", reply.getCmoMadeBy()},
+                new String[]{"Request made by", reply.getRequestMadeBy()},
+                new String[]{"Full name", reply.getMadeByFullName()},
+                new String[]{"Sent to", reply.getSelectPartyNotify()}
+        )) + "\r\n";
     }
 
     /**

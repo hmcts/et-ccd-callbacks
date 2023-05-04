@@ -1,6 +1,5 @@
 package controllers;
 
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
@@ -10,7 +9,6 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -27,7 +25,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.ScotlandAllocateHearingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
-
 
 @WebMvcTest(AllocateHearingController.class)
 @ContextConfiguration(classes = {DocmosisApplication.class, AllocateHearingController.class})
@@ -69,7 +66,9 @@ public class AllocateHearingControllerTest {
                 .extract();
     }
 
-    // Add similar tests for other endpoints: handleListingSelected, handleManagingOfficeSelected, populateRooms, aboutToSubmit
+    //todo Will add similar tests for other endpoints: handleListingSelected, handleManagingOfficeSelected,
+    // populateRooms,
+    // aboutToSubmit tomorrow
 
     private CCDRequest generateCCDRequest() {
         // Implement this method to return a valid CCDRequest object

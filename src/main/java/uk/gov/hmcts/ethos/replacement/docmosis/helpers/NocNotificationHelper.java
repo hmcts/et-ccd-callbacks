@@ -11,8 +11,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
@@ -109,8 +107,7 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
-        personalisation.put(DATE,
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")));
+        personalisation.put(DATE, ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
         personalisation.put("tribunal", isNullOrEmpty(caseData.getTribunalAndOfficeLocation()) ? UNKNOWN :
                 caseData.getTribunalAndOfficeLocation());
 

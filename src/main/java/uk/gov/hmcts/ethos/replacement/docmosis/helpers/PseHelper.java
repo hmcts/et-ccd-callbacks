@@ -191,7 +191,6 @@ public final class PseHelper {
      * @param sendNotificationType Send Notification Type with Response(s)
      * @return Response(s) Markup
      */
-    // TODO: RET-2879: Update Claimant response after RET-2928 ready
     public static String formatRespondDetails(SendNotificationType sendNotificationType) {
         if (CollectionUtils.isEmpty(sendNotificationType.getRespondCollection())) {
             return "";

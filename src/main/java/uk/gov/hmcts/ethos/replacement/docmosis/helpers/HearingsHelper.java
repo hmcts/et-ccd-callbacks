@@ -68,11 +68,11 @@ public final class HearingsHelper {
         List<String> errors = new ArrayList<>();
         if (caseData.getHearingCollection() != null) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-                getHearingNumberErrors(errors, hearingTypeItem);
+                findHearingNumberErrors(errors, hearingTypeItem);
                 if (!errors.isEmpty()) {
                     return errors;
                 }
-                getHearingDayErrors(errors, hearingTypeItem);
+                findHearingDayErrors(errors, hearingTypeItem);
                 if (!errors.isEmpty()) {
                     return errors;
                 }
@@ -81,7 +81,14 @@ public final class HearingsHelper {
         return errors;
     }
 
-    private static void getHearingDayErrors(List<String> errors, HearingTypeItem hearingTypeItem) {
+    private static void findHearingNumberErrors(List<String> errors, HearingTypeItem hearingTypeItem) {
+        if (hearingTypeItem.getValue().getHearingNumber() == null
+                || hearingTypeItem.getValue().getHearingNumber().isEmpty()) {
+            errors.add(HEARING_CREATION_NUMBER_ERROR);
+        }
+    }
+
+    private static void findHearingDayErrors(List<String> errors, HearingTypeItem hearingTypeItem) {
         if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
             for (DateListedTypeItem dateListedTypeItem
                     : hearingTypeItem.getValue().getHearingDateCollection()) {
@@ -90,13 +97,6 @@ public final class HearingsHelper {
                     errors.add(HEARING_CREATION_DAY_ERROR);
                 }
             }
-        }
-    }
-
-    private static void getHearingNumberErrors(List<String> errors, HearingTypeItem hearingTypeItem) {
-        if (hearingTypeItem.getValue().getHearingNumber() == null
-                || hearingTypeItem.getValue().getHearingNumber().isEmpty()) {
-            errors.add(HEARING_CREATION_NUMBER_ERROR);
         }
     }
 

@@ -58,6 +58,15 @@ sourceSets {
     test {
         java.srcDir 'src/test/java'
     }
+
+
+    javaFunctional {
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+        java.srcDir file('src/test/javaFunctional')
+        resources.srcDir file('src/test/javaFunctional/resources')
+    }
+
     functional {
         java.srcDir 'src/test/functional/java'
         resources.srcDir 'src/test/functional/resources'
@@ -90,6 +99,8 @@ configurations {
     contractTestRuntimeOnly.extendsFrom testRuntimeOnly
     integrationTestImplementation.extendsFrom testImplementation
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+    javaFunctionalImplementation.extendsFrom testImplementation
+    javaFunctionalRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 test {
@@ -105,6 +116,15 @@ task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verificatio
         includeCategories 'uk.gov.hmcts.ethos.replacement.functional.SmokeTest'
     }
     systemProperty('VAULTNAME', System.getenv('VAULTNAME'))
+}
+
+task javaFunctionalTest(type: Test) {
+    testClassesDirs = sourceSets.javaFunctional.output.classesDirs
+    classpath = sourceSets.javaFunctional.runtimeClasspath
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
 
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification', dependsOn: ':codeceptFunctional') {
@@ -124,7 +144,7 @@ task yarnInstall(type: Exec) {
     commandLine 'yarn', 'install'
 }
 
-task yarnAudit(type: Exec,  dependsOn: ':yarnInstall') {
+task yarnAudit(type: Exec, dependsOn: ':yarnInstall') {
     workingDir '.'
     commandLine 'yarn', 'npm', 'audit', '--groups', 'dependencies', '--json', '|', 'grep', 'auditAdvisory', '>', 'yarn-audit-known-issues'
 }
@@ -133,7 +153,7 @@ task codeceptSmoke(type: Exec, dependsOn: ':yarnInstall') {
     commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@smoke', '--steps', '--reporter', 'mocha-multi'
 }
 
-task codeceptFunctional(type: Exec, dependsOn :'yarnInstall') {
+task codeceptFunctional(type: Exec, dependsOn: 'yarnInstall') {
     commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@RET-BAT', '--steps', '--reporter', 'mocha-multi'
 }
 
@@ -154,7 +174,7 @@ task codeceptFunctionalSauce(type: Exec, dependsOn: ':yarnInstall') {
     commandLine 'node_modules/.bin/codeceptjs', 'run-multiple', '--all', '-c', './src/test/end-to-end/saucelabs.conf.js', '--grep', '@crossbrowser', '--reporter', 'mocha-multi'
 }
 
-task codeceptFunctionalNightly(type: Exec, dependsOn :'yarnInstall') {
+task codeceptFunctionalNightly(type: Exec, dependsOn: 'yarnInstall') {
     commandLine './node_modules/codeceptjs/bin/codecept.js', 'run', '-c', './src/test/end-to-end/', '--grep', '@RET-BAT', '--steps', '--reporter', 'mocha-multi'
 }
 
@@ -216,7 +236,7 @@ pact {
     }
 }
 
-task fortifyScan(type: JavaExec)  {
+task fortifyScan(type: JavaExec) {
     main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
     classpath += sourceSets.test.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
@@ -299,8 +319,8 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version:'1.0.14'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version:'1.13.1'
+    implementation group: 'com.github.hmcts', name: 'et-common', version: '1.0.14'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version: '1.13.1'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLoggingVersion
@@ -361,14 +381,16 @@ dependencies {
         exclude module: 'jaxb-osgi'
     }
     testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: serenity
-    testImplementation (group: 'org.docx4j', name: 'docx4j', version: '6.1.2') {
+    testImplementation(group: 'org.docx4j', name: 'docx4j', version: '6.1.2') {
         exclude module: 'slf4j-log4j12'
     }
     testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine', version: junitJupiterVersion
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.18.0'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
-
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.3.0'
+    testImplementation group: 'io.rest-assured', name: 'spring-mock-mvc', version: '5.3.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.3.1'
     // Contract Tests
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.5.6'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.41'
@@ -381,7 +403,7 @@ dependencies {
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 
-    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
+    integrationTestImplementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.3.1'

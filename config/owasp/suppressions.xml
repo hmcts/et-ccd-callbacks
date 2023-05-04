@@ -9,31 +9,10 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: spring-security-crypto-5.7.2.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org.springframework.security/spring-security-crypto@.*$</packageUrl>
-        <cve>CVE-2020-5408</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-web-5.3.21.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org.springframework/spring-web@.*$</packageUrl>
-        <cve>CVE-2016-1000027</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
    file name: xalan-2.7.2.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/xalan/xalan@.*$</packageUrl>
         <cve>CVE-2022-34169</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: snakeyaml-1.32.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-        <vulnerabilityName>CVE-2022-38752</vulnerabilityName>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -44,53 +23,10 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-    file name: jackson-databind-2.13.4.jar
-    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
-        <cve>CVE-2022-42003</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: poi-5.0.0.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.poi/poi@.*$</packageUrl>
-        <cve>CVE-2022-26336</cve>
-    </suppress>
-
-    <suppress>
-        <notes><![CDATA[
-   file name: poi-ooxml-lite-5.0.0.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.poi/poi\-ooxml\-lite@.*$</packageUrl>
-        <cpe>cpe:/a:apache:poi</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: poi-ooxml-5.0.0.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.poi/poi\-ooxml@.*$</packageUrl>
-        <cve>CVE-2022-26336</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
    file name: minimatch:3.0.4
    ]]></notes>
         <packageUrl regex="true">^pkg:npm/minimatch@.*$</packageUrl>
         <vulnerabilityName>1084765</vulnerabilityName>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-crypto-5.7.3.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@.*$</packageUrl>
-        <cve>CVE-2022-31692</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-crypto-5.7.3.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@.*$</packageUrl>
-        <cve>CVE-2022-31690</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -171,263 +107,32 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: qs:6.9.3
+   file name: LatencyUtils-2.0.3.jar
    ]]></notes>
-        <packageUrl regex="true">^pkg:npm/qs@.*$</packageUrl>
-        <vulnerabilityName>1085139</vulnerabilityName>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-buffer-4.1.78.Final.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-buffer@.*$</packageUrl>
-        <cve>CVE-2022-41881</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-codec-socks-4.1.78.Final.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec\-socks@.*$</packageUrl>
-        <cve>CVE-2022-41915</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-buffer-4.1.78.Final.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-buffer@.*$</packageUrl>
-        <cpe>cpe:/a:netty:netty</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-codec-4.1.78.Final.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec@.*$</packageUrl>
-        <cpe>cpe:/a:netty:netty</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-codec-http-4.1.78.Final.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec\-http@.*$</packageUrl>
-        <cpe>cpe:/a:netty:netty</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-codec-socks-4.1.78.Final.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec\-socks@.*$</packageUrl>
-        <cpe>cpe:/a:netty:netty</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-common-4.1.78.Final.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-common@.*$</packageUrl>
-        <cpe>cpe:/a:netty:netty</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-handler-4.1.78.Final.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-handler@.*$</packageUrl>
-        <cpe>cpe:/a:netty:netty</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-handler-proxy-4.1.78.Final.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-handler\-proxy@.*$</packageUrl>
-        <cpe>cpe:/a:netty:netty</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-resolver-4.1.78.Final.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-resolver@.*$</packageUrl>
-        <cpe>cpe:/a:netty:netty</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-transport-4.1.78.Final.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport@.*$</packageUrl>
-        <cpe>cpe:/a:netty:netty</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-transport-classes-epoll-4.1.82.Final.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-classes\-epoll@.*$</packageUrl>
-        <cpe>cpe:/a:netty:netty</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-transport-classes-kqueue-4.1.82.Final.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-classes\-kqueue@.*$</packageUrl>
-        <cpe>cpe:/a:netty:netty</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-transport-native-epoll-4.1.78.Final-linux-x86_64.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-native\-epoll@.*$</packageUrl>
-        <cpe>cpe:/a:netty:netty</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-transport-native-kqueue-4.1.78.Final-osx-x86_64.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-native\-kqueue@.*$</packageUrl>
-        <cpe>cpe:/a:netty:netty</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: netty-transport-native-unix-common-4.1.78.Final.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-native\-unix\-common@.*$</packageUrl>
-        <cpe>cpe:/a:netty:netty</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-    file name: flat:4.1.1
-    ]]></notes>
-        <packageUrl regex="true">^pkg:npm/flat@.*$</packageUrl>
-        <vulnerabilityName>1085318</vulnerabilityName>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-    file name: json5:1.0.1
-    ]]></notes>
-        <packageUrl regex="true">^pkg:npm/json5@.*$</packageUrl>
-        <vulnerabilityName>1085311</vulnerabilityName>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-    file name: json5:1.0.1
-    ]]></notes>
-        <packageUrl regex="true">^pkg:npm/json5@.*$</packageUrl>
-        <vulnerabilityName>1085311</vulnerabilityName>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-    file name: LatencyUtils-2.0.3.jar
-    ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.latencyutils/LatencyUtils@.*$</packageUrl>
         <cpe>cpe:/a:utils_project:utils</cpe>
     </suppress>
     <suppress>
         <notes><![CDATA[
-        file name: LatencyUtils-2.0.3.jar
-        ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.latencyutils/LatencyUtils@.*$</packageUrl>
-        <cve>CVE-2021-4277</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-        file name: async-http-client-netty-utils-2.12.1.jar
-        ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async\-http\-client\-netty\-utils@.*$</packageUrl>
-        <cpe>cpe:/a:utils_project:utils</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-    file name: async-http-client-netty-utils-2.12.1.jar
-    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async\-http\-client\-netty\-utils@.*$</packageUrl>
-        <cve>CVE-2021-4277</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-        file name: async-http-client-netty-utils-2.12.1.jar
-        ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async\-http\-client\-netty\-utils@.*$</packageUrl>
-        <cve>CVE-2021-4277</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-    file name: snakeyaml-1.33.jar
-    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-        <cpe>cpe:/a:snakeyaml_project:snakeyaml</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-    file name: snakeyaml-1.33.jar
-    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-        <cpe>cpe:/a:yaml_project:yaml</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-    file name: snakeyaml-1.33.jar
-    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-        <cve>CVE-2022-3064</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-        file name: snakeyaml-1.33.jar
-        ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-        <cve>CVE-2021-4235</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-    file name: debug:2.6.9
-    ]]></notes>
+   file name: debug:2.6.9
+   ]]></notes>
         <packageUrl regex="true">^pkg:npm/debug@.*$</packageUrl>
         <vulnerabilityName>1087958</vulnerabilityName>
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: json5:1.0.1
+   file name: async-http-client-netty-utils-2.12.3.jar
    ]]></notes>
-        <packageUrl regex="true">^pkg:npm/json5@.*$</packageUrl>
-        <vulnerabilityName>1088341</vulnerabilityName>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: woodstox-core-6.2.8.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.woodstox/woodstox\-core@.*$</packageUrl>
-        <cpe>cpe:/a:fasterxml:woodstox</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: woodstox-core-6.2.8.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.woodstox/woodstox\-core@.*$</packageUrl>
-        <cve>CVE-2022-40152</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: jackson-core-2.13.4.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com.fasterxml.jackson.core/jackson-core@2.13.4.*$</packageUrl>
-        <cve>CVE-2022-45688</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: json-20210307.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org.json/json@20210307.*$</packageUrl>
-        <cve>CVE-2022-45688</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: json-smart-2.4.8.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/net.minidev/json-smart@2.4.8.*$</packageUrl>
-        <cve>CVE-2022-45688</cve>
+        <packageUrl regex="true">^pkg:maven/org\.asynchttpclient/async\-http\-client\-netty\-utils@.*$</packageUrl>
+        <cpe>cpe:/a:utils_project:utils</cpe>
     </suppress>
     <suppress>
         <notes><![CDATA[
      file name: woodstox-core-6.2.8.jar
      ]]></notes>
-    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.woodstox\/woodstox-core@.*$</packageUrl>
-    <cpe>cpe:2.3:a:fasterxml:woodstox</cpe>
-    <cve>CVE-2022-40152</cve>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.woodstox\/woodstox-core@.*$</packageUrl>
+        <cpe>cpe:2.3:a:fasterxml:woodstox</cpe>
+        <cve>CVE-2022-40152</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -456,13 +161,6 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/commons-fileupload/commons-fileupload@.*$</packageUrl>
         <cve>CVE-2023-24998</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: snakeyaml-1.33.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org.yaml/snakeyaml@.*$</packageUrl>
-        <cve>CVE-2022-1471</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[

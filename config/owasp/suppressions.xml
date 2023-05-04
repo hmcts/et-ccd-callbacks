@@ -9,31 +9,10 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: spring-security-crypto-5.7.2.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org.springframework.security/spring-security-crypto@.*$</packageUrl>
-        <cve>CVE-2020-5408</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-web-5.3.21.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org.springframework/spring-web@.*$</packageUrl>
-        <cve>CVE-2016-1000027</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
    file name: xalan-2.7.2.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/xalan/xalan@.*$</packageUrl>
         <cve>CVE-2022-34169</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: snakeyaml-1.32.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-        <vulnerabilityName>CVE-2022-38752</vulnerabilityName>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -44,67 +23,10 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-    file name: jackson-databind-2.13.4.jar
-    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
-        <cve>CVE-2022-42003</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: poi-5.0.0.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.poi/poi@.*$</packageUrl>
-        <cve>CVE-2022-26336</cve>
-    </suppress>
-
-    <suppress>
-        <notes><![CDATA[
-   file name: poi-ooxml-lite-5.0.0.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.poi/poi\-ooxml\-lite@.*$</packageUrl>
-        <cpe>cpe:/a:apache:poi</cpe>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: poi-ooxml-5.0.0.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.poi/poi\-ooxml@.*$</packageUrl>
-        <cve>CVE-2022-26336</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
    file name: minimatch:3.0.4
    ]]></notes>
         <packageUrl regex="true">^pkg:npm/minimatch@.*$</packageUrl>
         <vulnerabilityName>1084765</vulnerabilityName>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-crypto-5.7.3.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@.*$</packageUrl>
-        <cve>CVE-2022-31692</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: spring-security-crypto-5.7.3.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@.*$</packageUrl>
-        <cve>CVE-2022-31690</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: tomcat-embed-core-9.0.67.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-core@.*$</packageUrl>
-        <cve>CVE-2022-42252</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: tomcat-embed-websocket-9.0.67.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-websocket@.*$</packageUrl>
-        <cve>CVE-2022-42252</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -192,34 +114,6 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: snakeyaml-1.33.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-        <cve>CVE-2022-3064</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: snakeyaml-1.33.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-        <cve>CVE-2021-4235</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: tomcat-embed-core-9.0.68.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-core@.*$</packageUrl>
-        <cve>CVE-2022-45143</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: tomcat-embed-websocket-9.0.68.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-websocket@.*$</packageUrl>
-        <cve>CVE-2022-45143</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
    file name: debug:2.6.9
    ]]></notes>
         <packageUrl regex="true">^pkg:npm/debug@.*$</packageUrl>
@@ -267,13 +161,6 @@
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/commons-fileupload/commons-fileupload@.*$</packageUrl>
         <cve>CVE-2023-24998</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: snakeyaml-1.33.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org.yaml/snakeyaml@.*$</packageUrl>
-        <cve>CVE-2022-1471</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[

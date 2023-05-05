@@ -9,32 +9,32 @@ import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.*;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_MANAGEMENT_ORDER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEITHER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DETAILS_OF_THE_APPLICATION;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.formatRule92;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelectedApplicationTypeItem;
 
 @Slf4j
@@ -43,8 +43,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getSelec
 public class TseAdmReplyService {
     private final EmailService emailService;
 
-    private final DocumentManagementService documentManagementService;
-
     private final TseService tseService;
 
     private final NotificationProperties notificationProperties;
@@ -52,15 +50,6 @@ public class TseAdmReplyService {
     private String tseAdminReplyClaimantTemplateId;
     @Value("${tse.admin.reply.notify.respondent.template.id}")
     private String tseAdminReplyRespondentTemplateId;
-    private static final String APP_DETAILS = "| | |\r\n"
-            + TABLE_STRING
-            + "|Applicant | %s|\r\n"
-            + "|Type of application | %s|\r\n"
-            + "|Application date | %s|\r\n"
-            + "%s" // Details of the application
-            + "%s" // Supporting material
-            + "%s" // Rule92
-            + "\r\n";
 
     private static final String RESPONSE_REQUIRED =
         "The tribunal requires some information from you about an application.";
@@ -76,28 +65,10 @@ public class TseAdmReplyService {
     public String initialTseAdmReplyTableMarkUp(CaseData caseData, String authToken) {
         GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem != null) {
-            return initialAppDetails(applicationTypeItem.getValue(), authToken)
+            return tseService.formatViewApplication(caseData, authToken)
                     + tseService.formatApplicationResponses(applicationTypeItem.getValue(), authToken);
         }
         throw new NotFoundException("No selected application type item found.");
-    }
-
-    private String initialAppDetails(GenericTseApplicationType applicationType, String authToken) {
-        return String.format(
-            APP_DETAILS,
-            applicationType.getApplicant(),
-            applicationType.getType(),
-            applicationType.getDate(),
-            isBlank(applicationType.getDetails())
-                ? ""
-                : String.format(DETAILS_OF_THE_APPLICATION, applicationType.getDetails()),
-            applicationType.getDocumentUpload() == null
-                ? ""
-                : String.format(SUPPORTING_MATERIAL_TABLE_HEADER, documentManagementService.displayDocNameTypeSizeLink(
-                    applicationType.getDocumentUpload(), authToken)),
-            formatRule92(applicationType.getCopyToOtherPartyYesOrNo(),
-                applicationType.getCopyToOtherPartyText())
-        );
     }
 
     /**
@@ -114,11 +85,13 @@ public class TseAdmReplyService {
     }
 
     private boolean addDocumentMissing(CaseData caseData) {
-        return caseData.getTseAdmReplyAddDocument() == null
-            && (CASE_MANAGEMENT_ORDER.equals(caseData.getTseAdmReplyIsCmoOrRequest())
-                || REQUEST.equals(caseData.getTseAdmReplyIsCmoOrRequest()))
-            && (YES.equals(caseData.getTseAdmReplyCmoIsResponseRequired())
-                || YES.equals(caseData.getTseAdmReplyRequestIsResponseRequired()));
+        List<GenericTypeItem<DocumentType>> documents = caseData.getTseAdmReplyAddDocument();
+        if (NEITHER.equals(caseData.getTseAdmReplyIsCmoOrRequest()) || isNotEmpty(documents)) {
+            return false;
+        }
+
+        return YES.equals(caseData.getTseAdmReplyCmoIsResponseRequired())
+                || YES.equals(caseData.getTseAdmReplyRequestIsResponseRequired());
     }
 
     /**

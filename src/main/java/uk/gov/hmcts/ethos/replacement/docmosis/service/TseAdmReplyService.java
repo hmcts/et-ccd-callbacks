@@ -8,7 +8,11 @@ import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.*;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.NotificationProperties;
@@ -65,8 +69,7 @@ public class TseAdmReplyService {
     public String initialTseAdmReplyTableMarkUp(CaseData caseData, String authToken) {
         GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
         if (applicationTypeItem != null) {
-            return tseService.formatViewApplication(caseData, authToken)
-                    + tseService.formatApplicationResponses(applicationTypeItem.getValue(), authToken);
+            return tseService.formatViewApplication(caseData, authToken);
         }
         throw new NotFoundException("No selected application type item found.");
     }

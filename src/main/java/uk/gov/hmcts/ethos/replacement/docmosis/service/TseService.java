@@ -6,7 +6,11 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.*;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -18,11 +22,20 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.*;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.IN_PROGRESS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 
 @Slf4j
 @Service
@@ -172,10 +185,9 @@ public class TseService {
      * @return two column Markdown table string
      */
     public String formatViewApplication(CaseData caseData, String authToken) {
-        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
         GenericTseApplicationType application = TseHelper.getSelectedApplication(caseData);
 
-        if (CollectionUtils.isEmpty(applications) || application == null) {
+        if (application == null) {
             return "";
         }
 
@@ -308,7 +320,7 @@ public class TseService {
     }
 
     /**
-     * Returns a list of rows for multiple documents for use in a two columned Markdown table
+     * Returns a list of rows for multiple documents for use in a two columned Markdown table.
      * @param documents document data
      * @param authToken user token for getting each document's metadata
      * @return A list of String arrays, one string array for each document's name and another for the short description

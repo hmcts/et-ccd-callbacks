@@ -13,7 +13,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
@@ -75,7 +74,6 @@ public class TseAdmCloseService {
         }
 
         return tseService.formatViewApplication(caseData, authToken)
-            + tseService.formatApplicationResponses(applicationTypeItem.getValue(), authToken)
             + decisionsMarkdown;
 
     }

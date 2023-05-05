@@ -14,6 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -52,6 +53,8 @@ class TseViewApplicationsControllerTest {
     @Autowired
     private JsonMapper jsonMapper;
 
+    @MockBean
+    private TseService tseService;
     @MockBean
     private TornadoService tornadoService;
     private CCDRequest ccdRequest;

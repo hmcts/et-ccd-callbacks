@@ -17,15 +17,12 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper.setDataForTseApplicationSummaryAndResponses;
 
 /**
  * REST controller for the "View open or closed applications" event.

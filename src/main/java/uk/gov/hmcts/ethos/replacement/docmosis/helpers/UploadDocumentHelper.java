@@ -65,11 +65,15 @@ public final class UploadDocumentHelper {
 
     private static String getClaimantTitleOrInitial(CaseData caseData) {
         ClaimantIndType claimantIndType = caseData.getClaimantIndType();
+
         if (!isNullOrEmpty(claimantIndType.getClaimantPreferredTitle())) {
             return claimantIndType.getClaimantPreferredTitle();
-        } else if (!isNullOrEmpty(claimantIndType.getClaimantTitle())) {
+        }
+
+        if (!isNullOrEmpty(claimantIndType.getClaimantTitle())) {
             return claimantIndType.getClaimantTitle();
         }
+
         return caseData.getClaimant().substring(0, 1).toUpperCase(Locale.ROOT);
     }
 

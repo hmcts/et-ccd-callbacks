@@ -22,14 +22,12 @@ import uk.gov.service.notify.NotificationClientException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.apache.commons.lang3.StringUtils.defaultString;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -40,15 +38,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.ADDITIONAL_INFORMATION;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.PARTY_OR_PARTIES_TO_RESPOND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_DATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_DUE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_FROM;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_TABLE_HEADER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.RESPONSE_TITLE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.SUPPORTING_MATERIAL_TABLE_HEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 
 @Slf4j
@@ -74,38 +63,6 @@ public final class TseHelper {
                     + "%s";
     private static final String RULE92_DETAILS_MARKUP =
             "|Details of why you do not want to inform the other party | %s|\r\n";
-    private static final String RESPONDENT_REPLY_MARKUP_FOR_REPLY =
-            RESPONSE_TABLE_HEADER
-                    + TABLE_STRING
-                    + RESPONSE_FROM
-                    + RESPONSE_DATE
-                    + "|What’s your response to the %s’s application? | %s|\r\n"
-                    + SUPPORTING_MATERIAL_TABLE_HEADER
-                    + "%s" // Rule92
-                    + "\r\n";
-    private static final String RESPONDENT_REPLY_MARKUP_FOR_DECISION =
-            RESPONSE_TABLE_HEADER
-                    + TABLE_STRING
-                    + RESPONSE_FROM
-                    + RESPONSE_DATE
-                    + "|Details | %s|\r\n"
-                    + SUPPORTING_MATERIAL_TABLE_HEADER
-                    + "\r\n";
-    private static final String ADMIN_REPLY_MARKUP =
-            RESPONSE_TABLE_HEADER
-                    + TABLE_STRING
-                    + RESPONSE_TITLE
-                    + DATE_MARKUP
-                    + "|Sent by | Tribunal|\r\n"
-                    + "|Case management order or request? | %s|\r\n"
-                    + RESPONSE_DUE
-                    + PARTY_OR_PARTIES_TO_RESPOND
-                    + ADDITIONAL_INFORMATION
-                    + SUPPORTING_MATERIAL_TABLE_HEADER
-                    + "%s"
-                    + "|Full name | %s|\r\n"
-                    + "|Sent to | %s|\r\n"
-                    + "\r\n";
 
     private TseHelper() {
         // Access through static methods
@@ -241,7 +198,13 @@ public final class TseHelper {
      * @return the select application
      */
     public static GenericTseApplicationType getSelectedApplication(CaseData caseData) {
-        return caseData.getGenericTseApplicationCollection()
+        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
+
+        if (CollectionUtils.isEmpty(applications) || caseData.getTseRespondSelectApplication() == null) {
+            return null;
+        }
+
+        return applications
                 .get(Integer.parseInt(caseData.getTseRespondSelectApplication().getValue().getCode()) - 1).getValue();
     }
 
@@ -346,50 +309,6 @@ public final class TseHelper {
                         copyToOtherPartyText
                 )
                         : ""
-        );
-    }
-
-//    /**
-//     * Format Respondent or Claimant response markup for Respond to an application.
-//     *
-//     * @param reply        Respond as TseRespondType
-//     * @param respondCount Respond count as incrementAndReturnValue()
-//     * @param applicant    GenericTseApplicationType getApplicant()
-//     * @param docInfo      Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
-//     * @return Markup String
-//     */
-//    public static String formatLegalRepReplyOrClaimantWithRule92(TseRespondType reply, int respondCount,
-//                                                                 String applicant, String docInfo) {
-//        return String.format(
-//                RESPONDENT_REPLY_MARKUP_FOR_REPLY,
-//                respondCount,
-//                reply.getFrom(),
-//                reply.getDate(),
-//                applicant.toLowerCase(Locale.ENGLISH),
-//                defaultString(reply.getResponse()),
-//                docInfo,
-//                formatRule92(reply.getCopyToOtherParty(),
-//                        reply.getCopyNoGiveDetails())
-//        );
-//    }
-
-    /**
-     * Format Respondent or Claimant response markup for Record a Decision.
-     *
-     * @param reply        Respond as TseRespondType
-     * @param respondCount Respond count as incrementAndReturnValue()
-     * @param docInfo      Supporting material info as documentManagementService.displayDocNameTypeSizeLink()
-     * @return Markup String
-     */
-    public static String formatLegalRepReplyOrClaimantWithoutRule92(TseRespondType reply, int respondCount,
-                                                                    String docInfo) {
-        return String.format(
-                RESPONDENT_REPLY_MARKUP_FOR_DECISION,
-                respondCount,
-                reply.getFrom(),
-                reply.getDate(),
-                defaultString(reply.getResponse()),
-                docInfo
         );
     }
 }

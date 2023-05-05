@@ -11,7 +11,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeBuilder;
@@ -250,7 +252,7 @@ public class TseHelperTest {
         assertThat(replyDocumentRequest, is(expected));
     }
 
-    private List<DocumentTypeItem> createSupportingMaterial() {
+    private List<GenericTypeItem<DocumentType>> createSupportingMaterial() {
         DocumentTypeItem documentTypeItem = new DocumentTypeItem();
         documentTypeItem.setId("1234");
         documentTypeItem.setValue(DocumentTypeBuilder.builder().withUploadedDocument("image.png", "1234").build());

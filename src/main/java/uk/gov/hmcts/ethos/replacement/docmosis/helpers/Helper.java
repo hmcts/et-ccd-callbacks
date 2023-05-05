@@ -161,7 +161,7 @@ public final class Helper {
     public static String getDocumentName(CorrespondenceType correspondenceType,
                                          CorrespondenceScotType correspondenceScotType) {
         String ewSection = DocumentHelper.getEWSectionName(correspondenceType);
-        String sectionName = ewSection.equals("")
+        String sectionName = "".equals(ewSection)
                 ? DocumentHelper.getScotSectionName(correspondenceScotType) : ewSection;
         return DocumentHelper.getTemplateName(correspondenceType, correspondenceScotType) + "_" + sectionName;
     }

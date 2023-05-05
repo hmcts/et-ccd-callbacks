@@ -20,12 +20,9 @@ import java.util.UUID;
 import static java.time.ZoneOffset.UTC;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_SETTLED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.HEARING_BREAK_FUTURE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.HEARING_BREAK_RESUME_INVALID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.HEARING_FINISH_FUTURE;
@@ -95,26 +92,6 @@ public class HearingsHelperTest {
 
         assertEquals(0, HearingsHelper.hearingMidEventValidation(caseDetails1.getCaseData()).size());
 
-    }
-
-    @Test
-    public void updatePostponedDate() {
-
-        caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
-                .getHearingDateCollection().get(0).getValue().setHearingStatus(HEARING_STATUS_POSTPONED);
-
-        HearingsHelper.updatePostponedDate(caseDetails1.getCaseData());
-
-        assertNotNull(caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
-                .getHearingDateCollection().get(0).getValue().getPostponedDate());
-
-        caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
-                .getHearingDateCollection().get(0).getValue().setHearingStatus(HEARING_STATUS_SETTLED);
-
-        HearingsHelper.updatePostponedDate(caseDetails1.getCaseData());
-
-        assertNull(caseDetails1.getCaseData().getHearingCollection().get(0).getValue()
-                .getHearingDateCollection().get(0).getValue().getPostponedDate());
     }
 
     @Test

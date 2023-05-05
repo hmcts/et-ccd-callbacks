@@ -56,7 +56,7 @@ public class AllocateHearingControllerTest {
         CCDRequest ccdRequest = generateCCDRequest();
         String userToken = "validToken";
 
-        RestAssured.given()
+        RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .header("Authorization", userToken)
                 .body(ccdRequest)

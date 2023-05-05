@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -12,12 +11,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -31,43 +27,6 @@ public final class NocNotificationHelper {
 
     private NocNotificationHelper() {
         // Access through static methods
-    }
-
-    public static String getOldSolicitorEmailForRepUpdate(CaseData previousCaseData,
-                                                          ChangeOrganisationRequest changeRequest) {
-        try {
-            String previousOrgId = changeRequest.getOrganisationToRemove().getOrganisationID();
-            Optional<RepresentedTypeRItem> representedTypeRItem = previousCaseData.getRepCollection()
-                    .stream().filter(r -> r.getValue().getRespondentOrganisation().getOrganisationID()
-                            .equals(previousOrgId))
-                    .findAny();
-
-            if (representedTypeRItem.isPresent()) {
-                return representedTypeRItem.get().getValue().getRepresentativeEmailAddress();
-            }
-            return null;
-        } catch (NullPointerException ex) {
-            return null;
-        }
-
-    }
-
-    public static String getNewSolicitorEmailForRepUpdate(CaseData caseData, ChangeOrganisationRequest changeRequest) {
-        try {
-            String newOrgId = changeRequest.getOrganisationToAdd().getOrganisationID();
-            Optional<RepresentedTypeRItem> representedTypeRItem = caseData.getRepCollection()
-                    .stream().filter(r -> r.getValue().getRespondentOrganisation().getOrganisationID()
-                            .equals(newOrgId))
-                    .findAny();
-            if (representedTypeRItem.isPresent()) {
-                return representedTypeRItem.get().getValue().getRepresentativeEmailAddress();
-            }
-            return null;
-
-        } catch (NullPointerException e) {
-            return null;
-        }
-
     }
 
     public static String getRespondentNameForNewSolicitor(ChangeOrganisationRequest changeRequest,
@@ -147,8 +106,7 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
-        personalisation.put("date",
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")));
+        personalisation.put("date", ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
         personalisation.put("tribunal", isNullOrEmpty(caseData.getTribunalAndOfficeLocation()) ? UNKNOWN :
                 caseData.getTribunalAndOfficeLocation());
 

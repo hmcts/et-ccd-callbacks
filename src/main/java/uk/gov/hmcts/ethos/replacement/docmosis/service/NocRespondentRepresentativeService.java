@@ -45,7 +45,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("PMD.ExcessiveImports")
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.CognitiveComplexity"})
 public class NocRespondentRepresentativeService {
     public static final String NOC_REQUEST = "nocRequest";
     private final NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
@@ -281,16 +281,18 @@ public class NocRespondentRepresentativeService {
                 // Representative's Organisation is missing Address
                 Organisation repOrg = representativeDetails.getRespondentOrganisation();
 
-                // get Organisation Details including Address
-                Optional<OrganisationsResponse> organisation =
-                        organisationList
-                                .stream()
-                                .filter(o -> o.getOrganisationIdentifier().equals(repOrg.getOrganisationID()))
-                                .findFirst();
+                if (repOrg != null && repOrg.getOrganisationID() != null) {
+                    // get Organisation Details including Address
+                    Optional<OrganisationsResponse> organisation =
+                            organisationList
+                                    .stream()
+                                    .filter(o -> o.getOrganisationIdentifier().equals(repOrg.getOrganisationID()))
+                                    .findFirst();
 
-                // if found update representative's Organisation Address
-                if (organisation.isPresent()) {
-                    updateAddress(organisation.get(), representativeDetails);
+                    // if found update representative's Organisation Address
+                    if (organisation.isPresent()) {
+                        updateAddress(organisation.get(), representativeDetails);
+                    }
                 }
             }
         }

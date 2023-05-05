@@ -299,11 +299,14 @@ public class Et3ResponseHelper {
             data.setRepOrgName(rep.getNameOfOrganisation());
 
             Address address = rep.getRepresentativeAddress();
-            data.setRepAddressLine1(address.getAddressLine1());
-            data.setRepAddressLine2(address.getAddressLine2());
-            data.setRepTown(address.getPostTown());
-            data.setRepCounty(address.getCounty());
-            data.setRepPostcode(address.getPostCode());
+
+            if (address != null) {
+                data.setRepAddressLine1(address.getAddressLine1());
+                data.setRepAddressLine2(address.getAddressLine2());
+                data.setRepTown(address.getPostTown());
+                data.setRepCounty(address.getCounty());
+                data.setRepPostcode(address.getPostCode());
+            }
 
             data.setRepPhoneNumber(rep.getRepresentativePhoneNumber());
             data.setRepEmailAddress(rep.getRepresentativeEmailAddress());

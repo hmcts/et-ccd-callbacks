@@ -4,18 +4,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -68,6 +70,14 @@ class NocNotificationHelperTest {
                 null,
                 null,
                 null)
+            .withHearing("1", "test", "Judy", "Venue", List.of("Telephone", "Video"),
+                        "length num", "type", "Yes")
+            .withHearingSession(
+                        0,
+                        "1",
+                        "2029-11-25T12:11:00.000",
+                        Constants.HEARING_STATUS_LISTED,
+                        true)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseDetails.setCaseId("1234");
@@ -115,31 +125,21 @@ class NocNotificationHelperTest {
     void testBuildTribunalPersonalisation() {
         Map<String, String> claimantPersonalisation = NocNotificationHelper.buildTribunalPersonalisation(caseData);
         assertThat(claimantPersonalisation.size(), is(5));
+        assertThat(claimantPersonalisation.get("date"), is("25 Nov 2029"));
         for (String value : claimantPersonalisation.values()) {
             assertThat(value, notNullValue());
         }
     }
 
     @Test
-    void testGetOldSolicitorEmailForRepUpdate_haveExistingOrg() {
-        String oldSolicitorEmail = NocNotificationHelper
-                .getOldSolicitorEmailForRepUpdate(caseData, caseData.getChangeOrganisationRequestField());
-        assertThat(oldSolicitorEmail, is(OLD_REP_EMAIL));
-    }
-
-    @Test
-    void testGetOldSolicitorEmailForRepUpdate_noExistingOrg() {
-        caseData.getChangeOrganisationRequestField().setOrganisationToRemove(null);
-        String oldSolicitorEmail = NocNotificationHelper
-                .getOldSolicitorEmailForRepUpdate(caseData, caseData.getChangeOrganisationRequestField());
-        assertThat(oldSolicitorEmail, is(nullValue()));
-    }
-
-    @Test
-    void testGetNewSolicitorEmailForRepUpdate() {
-        String newSolicitorEmail = NocNotificationHelper
-                .getNewSolicitorEmailForRepUpdate(caseData, caseData.getChangeOrganisationRequestField());
-        assertThat(newSolicitorEmail, is(NEW_REP_EMAIL));
+    void testBuildTribunalPersonalisationWithHearingDate() {
+        caseData.setHearingCollection(new ArrayList<>());
+        Map<String, String> claimantPersonalisation = NocNotificationHelper.buildTribunalPersonalisation(caseData);
+        assertThat(claimantPersonalisation.size(), is(5));
+        assertThat(claimantPersonalisation.get("date"), is("Not set"));
+        for (String value : claimantPersonalisation.values()) {
+            assertThat(value, notNullValue());
+        }
     }
 
     @Test

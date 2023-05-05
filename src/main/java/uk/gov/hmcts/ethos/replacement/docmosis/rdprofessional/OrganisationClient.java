@@ -2,8 +2,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
+import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 
 import java.util.List;
@@ -22,6 +25,17 @@ public interface OrganisationClient {
     List<OrganisationsResponse> getOrganisations(
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestHeader(SERVICE_AUTHORIZATION) String s2sToken
+    );
+
+    @GetMapping(
+            value = "/refdata/internal/v1/organisations?id={orgId}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    ResponseEntity<RetrieveOrgByIdResponse> getOrganisationById(
+            @RequestHeader(AUTHORIZATION) String authorisation,
+            @RequestHeader(SERVICE_AUTHORIZATION) String s2sToken,
+            @PathVariable("orgId") String userId
     );
 
 }

@@ -4,6 +4,8 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -16,7 +18,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -46,119 +47,6 @@ class Et3ResponseHelperTest {
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseData = caseDetails.getCaseData();
-    }
-
-    @Test
-    void givenClaimant_shouldFormatToTable() {
-        caseData.setClaimant("Test Person");
-
-        String expected = "<pre> ET1 claimant name&#09&#09&#09&#09 Test Person</pre><hr>";
-        assertThat(Et3ResponseHelper.formatClaimantNameForHtml(caseData), is(expected));
-    }
-
-    @Test
-    void givenValidStartDateAndEndDate_shouldReturnNoErrors() {
-        caseData.setEt3ResponseEmploymentStartDate("2022-02-02");
-        caseData.setEt3ResponseEmploymentEndDate("2022-02-02");
-
-        assertThat(Et3ResponseHelper.validateEmploymentDates(caseData).size(), is(0));
-    }
-
-    @Test
-    void givenNoStartDateAndEndDate_shouldNotValidateDates() {
-        caseData.setEt3ResponseEmploymentEndDate("2022-02-02");
-
-        assertThat(Et3ResponseHelper.validateEmploymentDates(caseData).size(), is(0));
-    }
-
-    @Test
-    void givenStartDateAndNoEndDate_shouldNotValidateDates() {
-        caseData.setEt3ResponseEmploymentStartDate("2022-02-02");
-
-        assertThat(Et3ResponseHelper.validateEmploymentDates(caseData).size(), is(0));
-    }
-
-    @Test
-    void givenNoStartDateAndNoEndDate_shouldNotValidateDates() {
-        assertThat(Et3ResponseHelper.validateEmploymentDates(caseData).size(), is(0));
-    }
-
-    @Test
-    void givenInvalidStartDateAndEndDate_shouldReturnAnError() {
-        caseData.setEt3ResponseEmploymentStartDate("2022-02-03");
-        caseData.setEt3ResponseEmploymentEndDate("2022-02-02");
-
-        List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
-
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(0), is(END_DATE_MUST_BE_AFTER_THE_START_DATE));
-    }
-
-    @Test
-    void givenStartDateInTheFuture_shouldReturnAnError() {
-        caseData.setEt3ResponseEmploymentStartDate("2099-02-02");
-
-        List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
-
-        assertThat(errors.size(), is(1));
-        assertThat(errors.get(0), is(START_DATE_MUST_BE_IN_THE_PAST));
-    }
-
-    @Test
-    void givenStartDateInTheFutureAndEndDateBeforeStartDate_shouldReturnErrors() {
-        caseData.setEt3ResponseEmploymentStartDate("2099-02-02");
-        caseData.setEt3ResponseEmploymentEndDate("2022-02-02");
-
-        List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
-
-        assertThat(errors.size(), is(2));
-        assertThat(errors.get(0), is(START_DATE_MUST_BE_IN_THE_PAST));
-        assertThat(errors.get(1), is(END_DATE_MUST_BE_AFTER_THE_START_DATE));
-    }
-
-    @Test
-    void getDocumentRequest_buildsCorrectData() throws IOException, URISyntaxException {
-        Address et3Address = CaseDataBuilder.builder().createAddress("line1", "line2", "line3", "town", "county",
-            "postcode", "country");
-        caseData.setEthosCaseReference("1800001/2021");
-        caseData.setClaimant("claimant name");
-        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
-        respondentSumType.setResponseRespondentAddress(et3Address);
-        respondentSumType.setResponseRespondentName("legal name");
-        respondentSumType.setEt3ResponseRespondentCompanyNumber("1234");
-        respondentSumType.setEt3ResponseRespondentEmployerType("employer type");
-        respondentSumType.setEt3ResponseRespondentContactName("contact name");
-        respondentSumType.setEt3ResponseEmploymentCount("100");
-        respondentSumType.setEt3ResponseSiteEmploymentCount("100");
-        respondentSumType.setEt3ResponseAcasAgreeReason("acas agree reason");
-        respondentSumType.setEt3ResponseEmploymentStartDate("2022-01-01");
-        respondentSumType.setEt3ResponseEmploymentEndDate("2022-01-02");
-        respondentSumType.setEt3ResponseEmploymentInformation("employment information");
-        respondentSumType.setEt3ResponseCorrectJobTitle("fall guy");
-        respondentSumType.setEt3ResponseClaimantCorrectHours("168");
-        respondentSumType.setEt3ResponsePayBeforeTax("69000");
-        respondentSumType.setEt3ResponsePayTakehome("25000");
-        respondentSumType.setEt3ResponseCorrectNoticeDetails("notice details");
-        respondentSumType.setEt3ResponseContestClaimDetails("contest claim");
-        respondentSumType.setEt3ResponseEmployerClaimDetails("ecc");
-        respondentSumType.setEt3ResponseRespondentSupportDetails("support details");
-        respondentSumType.setEt3ResponsePensionCorrectDetails("pension details");
-        respondentSumType.setEt3ResponseHearingRespondent(List.of("Phone hearings"));
-        respondentSumType.setEt3ResponseHearingRepresentative(List.of("Video hearings"));
-        respondentSumType.setEt3ResponseRespondentPreferredTitle("Mr");
-        respondentSumType.setEt3ResponseMultipleSites("Yes");
-        respondentSumType.setEt3ResponseAcasAgree("No");
-        respondentSumType.setEt3ResponseAreDatesCorrect("No");
-        respondentSumType.setEt3ResponseIsJobTitleCorrect("No");
-        respondentSumType.setEt3ResponseClaimantWeeklyHours("No");
-        respondentSumType.setEt3ResponseEarningDetailsCorrect("No");
-        respondentSumType.setEt3ResponseIsNoticeCorrect("Not applicable");
-        respondentSumType.setEt3ResponseRespondentContestClaim("Yes");
-        respondentSumType.setEt3ResponseRespondentSupportNeeded("Yes");
-        respondentSumType.setEt3ResponseContinuingEmployment("No");
-        respondentSumType.setEt3ResponseIsPensionCorrect("No");
-        respondentSumType.setResponseRespondentContactPreference("Post");
-        respondentSumType.setEt3ResponsePayFrequency("Weekly");
 
         Address repAddress = CaseDataBuilder.builder().createAddress(
                 "r1", "r2", "r3", "rTown", "rCounty",
@@ -201,7 +89,6 @@ class Et3ResponseHelperTest {
     @Test
     void givenStartDateAndNoEndDate_shouldNotValidateDates() {
         caseData.setEt3ResponseEmploymentStartDate("2022-02-02");
-        caseData.setEt3ResponseEmploymentEndDate(null);
 
         assertThat(Et3ResponseHelper.validateEmploymentDates(caseData).size(), is(0));
     }
@@ -215,7 +102,6 @@ class Et3ResponseHelperTest {
     void givenInvalidStartDateAndEndDate_shouldReturnAnError() {
         caseData.setEt3ResponseEmploymentStartDate("2022-02-03");
         caseData.setEt3ResponseEmploymentEndDate("2022-02-02");
-        caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "test")));
 
         List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
 
@@ -226,7 +112,6 @@ class Et3ResponseHelperTest {
     @Test
     void givenStartDateInTheFuture_shouldReturnAnError() {
         caseData.setEt3ResponseEmploymentStartDate("2099-02-02");
-        caseData.setEt3ResponseEmploymentEndDate(null);
 
         List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
 
@@ -248,6 +133,26 @@ class Et3ResponseHelperTest {
 
     @Test
     void getDocumentRequest_buildsCorrectData() throws IOException, URISyntaxException {
+        caseData.setEthosCaseReference("1800001/2021");
+        caseData.setClaimant("claimant name");
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+        addEt3RespondentData(respondentSumType);
+
+        Address repAddress = CaseDataBuilder.builder().createAddress(
+                "r1", "r2", "r3", "rTown", "rCounty",
+                "rPostcode", "rCountry"
+        );
+
+        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
+        representedTypeRItem.setId("id");
+        representedTypeRItem.setValue(RepresentedTypeR.builder()
+                .respRepName("test")
+                .representativeAddress(repAddress)
+                .representativePhoneNumber("phone")
+                .build());
+        caseData.setRepCollection(List.of(representedTypeRItem));
+        caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "test")));
+
         // UTF-8 is required here for special characters to resolve on Windows correctly
         String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("et3ResponseDocument.json")).toURI())), UTF_8);
@@ -259,6 +164,10 @@ class Et3ResponseHelperTest {
     @Test
     void getDocumentRequest_buildsCorrectData_withoutRespondentRepAddress() throws IOException, URISyntaxException {
         caseData.getRepCollection().get(0).getValue().setRepresentativeAddress(null);
+        caseData.setEthosCaseReference("1800001/2021");
+        caseData.setClaimant("claimant name");
+        addEt3RespondentData(caseData.getRespondentCollection().get(0).getValue());
+        caseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "test")));
 
         // UTF-8 is required here for special characters to resolve on Windows correctly
         String expected = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(getClass().getClassLoader()
@@ -344,6 +253,48 @@ class Et3ResponseHelperTest {
         List<String> errors = Et3ResponseHelper.et3SubmitRespondents(caseData);
         assertThat(errors.size()).isEqualTo(1);
         assertThat(errors.get(0)).isEqualTo(ALL_RESPONDENTS_INCOMPLETE_SECTIONS);
+    }
+
+    private static void addEt3RespondentData(RespondentSumType respondentSumType) {
+        Address et3Address = CaseDataBuilder.builder().createAddress("line1", "line2", "line3", "town", "county",
+                "postcode", "country");
+
+        respondentSumType.setResponseRespondentAddress(et3Address);
+        respondentSumType.setResponseRespondentName("legal name");
+        respondentSumType.setEt3ResponseRespondentCompanyNumber("1234");
+        respondentSumType.setEt3ResponseRespondentEmployerType("employer type");
+        respondentSumType.setEt3ResponseRespondentContactName("contact name");
+        respondentSumType.setEt3ResponseEmploymentCount("100");
+        respondentSumType.setEt3ResponseSiteEmploymentCount("100");
+        respondentSumType.setEt3ResponseAcasAgreeReason("acas agree reason");
+        respondentSumType.setEt3ResponseEmploymentStartDate("2022-01-01");
+        respondentSumType.setEt3ResponseEmploymentEndDate("2022-01-02");
+        respondentSumType.setEt3ResponseEmploymentInformation("employment information");
+        respondentSumType.setEt3ResponseCorrectJobTitle("fall guy");
+        respondentSumType.setEt3ResponseClaimantCorrectHours("168");
+        respondentSumType.setEt3ResponsePayBeforeTax("69000");
+        respondentSumType.setEt3ResponsePayTakehome("25000");
+        respondentSumType.setEt3ResponseCorrectNoticeDetails("notice details");
+        respondentSumType.setEt3ResponseContestClaimDetails("contest claim");
+        respondentSumType.setEt3ResponseEmployerClaimDetails("ecc");
+        respondentSumType.setEt3ResponseRespondentSupportDetails("support details");
+        respondentSumType.setEt3ResponsePensionCorrectDetails("pension details");
+        respondentSumType.setEt3ResponseHearingRespondent(List.of("Phone hearings"));
+        respondentSumType.setEt3ResponseHearingRepresentative(List.of("Video hearings"));
+        respondentSumType.setEt3ResponseRespondentPreferredTitle("Mr");
+        respondentSumType.setEt3ResponseMultipleSites("Yes");
+        respondentSumType.setEt3ResponseAcasAgree("No");
+        respondentSumType.setEt3ResponseAreDatesCorrect("No");
+        respondentSumType.setEt3ResponseIsJobTitleCorrect("No");
+        respondentSumType.setEt3ResponseClaimantWeeklyHours("No");
+        respondentSumType.setEt3ResponseEarningDetailsCorrect("No");
+        respondentSumType.setEt3ResponseIsNoticeCorrect("Not applicable");
+        respondentSumType.setEt3ResponseRespondentContestClaim("Yes");
+        respondentSumType.setEt3ResponseRespondentSupportNeeded("Yes");
+        respondentSumType.setEt3ResponseContinuingEmployment("No");
+        respondentSumType.setEt3ResponseIsPensionCorrect("No");
+        respondentSumType.setResponseRespondentContactPreference("Post");
+        respondentSumType.setEt3ResponsePayFrequency("Weekly");
     }
 
 }

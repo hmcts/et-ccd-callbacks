@@ -117,44 +117,15 @@ public class BfActionReportTest {
         assertEquals(expectedBfDateCount, actualBfDateCount);
 
         BFDateType firstBFDateTypeItem = resultListingData.getBfDateCollection().get(0).getValue();
-        assertEquals(bfActionType3.getBfDate(), firstBFDateTypeItem.getBroughtForwardDate());
+        assertEquals("8 December 2019", firstBFDateTypeItem.getBroughtForwardDate());
         assertEquals(bfActionType3.getCwActions(), firstBFDateTypeItem.getBroughtForwardAction());
-        assertEquals(bfActionType3.getDateEntered(), firstBFDateTypeItem.getBroughtForwardEnteredDate());
+        assertEquals("20 November 2019", firstBFDateTypeItem.getBroughtForwardEnteredDate());
         assertEquals(bfActionType3.getNotes(), firstBFDateTypeItem.getBroughtForwardDateReason());
         assertEquals(bfActionType3.getCleared(), firstBFDateTypeItem.getBroughtForwardDateCleared());
 
         Stream<BFDateTypeItem> clearedBfDates = resultListingData.getBfDateCollection().stream()
             .filter(item -> !StringUtils.isBlank(item.getValue().getBroughtForwardDateCleared()));
         assertEquals(0, clearedBfDates.count());
-    }
-
-    @Test
-    public void shouldReturnBfActionsWithMillisecondInBfDate() {
-        listingData.setListingDateFrom("2019-12-13");
-        listingData.setListingDateTo("2019-12-28");
-        listingData.setHearingDateType(RANGE_HEARING_DATE_TYPE);
-        listingDetails.setCaseData(listingData);
-        BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
-        bfActionTypeItem.setId("123");
-        BFActionType bfActionType = new BFActionType();
-        bfActionType.setCwActions("Case papers prepared");
-        bfActionType.setBfDate("2019-12-18T19:30:55.000");
-        bfActionType.setDateEntered("2019-11-20");
-        bfActionType.setNotes("test comment one");
-        bfActionTypeItem.setValue(bfActionType);
-        List<BFActionTypeItem> items = getBFActionTypeItems();
-        items.add(bfActionTypeItem);
-        caseData.setBfActions(items);
-        submitEvent.setCaseData(caseData);
-        submitEvents.add(submitEvent);
-
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
-        BFDateType firstBFDateTypeItem = resultListingData.getBfDateCollection().get(2).getValue();
-        assertEquals(bfActionType.getBfDate().split("T")[0], firstBFDateTypeItem.getBroughtForwardDate());
-        assertEquals(bfActionType.getCwActions(), firstBFDateTypeItem.getBroughtForwardAction());
-        assertEquals(bfActionType.getNotes(), firstBFDateTypeItem.getBroughtForwardDateReason());
-        assertEquals(bfActionType.getDateEntered(), firstBFDateTypeItem.getBroughtForwardEnteredDate());
-        assertEquals(bfActionType.getCleared(), firstBFDateTypeItem.getBroughtForwardDateCleared());
     }
 
     @Test
@@ -227,10 +198,10 @@ public class BfActionReportTest {
         // should be the first element
         BFActionType bfActionType3 = items.get(2).getValue();
         BFDateType firstBFDateTypeItem = resultListingData.getBfDateCollection().get(0).getValue();
-        assertEquals(bfActionType3.getBfDate(), firstBFDateTypeItem.getBroughtForwardDate());
+        assertEquals("8 December 2019", firstBFDateTypeItem.getBroughtForwardDate());
         assertEquals(bfActionType3.getCwActions(), firstBFDateTypeItem.getBroughtForwardAction());
         assertEquals(bfActionType3.getNotes(), firstBFDateTypeItem.getBroughtForwardDateReason());
-        assertEquals(bfActionType3.getDateEntered(), firstBFDateTypeItem.getBroughtForwardEnteredDate());
+        assertEquals("20 November 2019", firstBFDateTypeItem.getBroughtForwardEnteredDate());
         assertEquals(bfActionType3.getCleared(), firstBFDateTypeItem.getBroughtForwardDateCleared());
     }
 

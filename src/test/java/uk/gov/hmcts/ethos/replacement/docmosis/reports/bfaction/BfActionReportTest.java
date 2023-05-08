@@ -303,7 +303,7 @@ public class BfActionReportTest {
         bfActionTypeItem4.setId("99456");
         BFActionType bfActionType4 = new BFActionType();
         bfActionType4.setCwActions("Interlocutory new order requested");
-        bfActionType4.setBfDate("2019-12-16 08:30:55");
+        bfActionType4.setBfDate("2019-12-16");
         bfActionType4.setDateEntered("2019-11-23");
         bfActionType4.setNotes("test another non-cleared bf three");
         bfActionTypeItem4.setValue(bfActionType4);

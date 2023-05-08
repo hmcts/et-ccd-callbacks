@@ -98,12 +98,13 @@ withPipeline(type, product, component) {
 
     sh "./gradlew :javaFunctionalTest"
 
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/javaFunctionalTest/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
     publishHTML target: [
             allowMissing : true,
             alwaysLinkToLastBuild: true,
             keepAll: true,
-            reportDir: "build/reports/tests/javaFunctionalTest/index.html"
+            reportDir: "functional-output",
+            reportFiles: "javaFunctionalreport.log"
     ]
   }
 

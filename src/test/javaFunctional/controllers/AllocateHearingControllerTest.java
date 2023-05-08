@@ -9,7 +9,6 @@ import net.serenitybdd.rest.SerenityRest;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -88,6 +87,12 @@ public class AllocateHearingControllerTest {
         return ccdRequest;
     }
 
+    public static String getAuthTokenFromLocal(String tidamUrl) {
+        RequestSpecification httpRequest = RestAssured.given();
+        Response response = httpRequest.post(tidamUrl + "/testing-support/lease?id=1&role=ccd-import");
+        return "Bearer " + response.body().asString();
+    }
+
     public static String getProperty(String name) throws IOException {
 
         if (properties == null) {
@@ -109,13 +114,14 @@ public class AllocateHearingControllerTest {
         httpRequest.header("Accept", "application/json");
         httpRequest.header("Content-Type", "application/x-www-form-urlencoded");
         httpRequest.formParam("username", getProperty(environment.toLowerCase() + ".ccd.username"));
-        httpRequest.formParam("password",  getProperty(environment.toLowerCase() + ".ccd.password"));
+        httpRequest.formParam("password", getProperty(environment.toLowerCase() + ".ccd.password"));
         Response response = httpRequest.post(getProperty(environment.toLowerCase() + ".idam.auth.url"));
 
         Assert.assertEquals(200, response.getStatusCode());
 
         return response.body().jsonPath().getString("access_token");
     }
+
     private CaseData generateCaseData() {
         uk.gov.hmcts.et.common.model.ccd.CaseData caseData = CaseDataBuilder.builder()
                 .withHearingScotland("hearingNumber", Constants.HEARING_TYPE_JUDICIAL_HEARING, "Judge",

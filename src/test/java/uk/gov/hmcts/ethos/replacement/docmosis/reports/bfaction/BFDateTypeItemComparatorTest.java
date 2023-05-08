@@ -1,11 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction;
 
-import java.util.ArrayList;
-import java.util.List;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
+import java.util.ArrayList;
+import java.util.List;
+import static org.junit.Assert.assertEquals;
 
 public class BFDateTypeItemComparatorTest {
     @Test

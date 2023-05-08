@@ -339,7 +339,6 @@ public class ExcelCreationService {
             rowHead.createCell(j).setCellValue(headers.get(j));
             createCell(rowHead, j, headers.get(j), styleForColHeaderCell);
         }
-        //createCell(rowHead, headers.size(), "", styleForColHeaderCell);
     }
 
 }

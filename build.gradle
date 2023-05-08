@@ -17,6 +17,10 @@ plugins {
 group = 'uk.gov.hmcts.et'
 version = '0.0.1'
 
+jacoco {
+    toolVersion = "0.8.10"
+}
+
 pmd {
     toolVersion = "6.41.0"
     sourceSets = [sourceSets.main, sourceSets.test, sourceSets.cftlib]

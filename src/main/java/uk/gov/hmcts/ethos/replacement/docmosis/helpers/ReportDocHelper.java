@@ -12,7 +12,6 @@ import uk.gov.hmcts.et.common.model.listing.types.AdhocReportType;
 import uk.gov.hmcts.et.common.model.listing.types.ClaimServedType;
 import uk.gov.hmcts.et.common.model.listing.types.ClaimServedTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportException;
-import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReportDoc;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesawaitingjudgment.CasesAwaitingJudgmentReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.eccreport.EccReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.hearingsbyhearingtype.HearingsByHearingTypeReportData;
@@ -162,9 +161,6 @@ public class ReportDocHelper {
                 break;
             case NO_CHANGE_IN_CURRENT_POSITION_REPORT:
                 sb.append(getNoPositionChangeReport(listingData));
-                break;
-            case BROUGHT_FORWARD_REPORT:
-                sb.append(new BfActionReportDoc().getReportDocPart(listingData));
                 break;
             case MEMBER_DAYS_REPORT:
                 sb.append(new MemberDaysReportDoc().getReportDocPart(listingData));

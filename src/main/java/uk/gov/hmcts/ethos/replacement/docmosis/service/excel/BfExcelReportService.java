@@ -56,7 +56,7 @@ public class BfExcelReportService {
         for (int i = 0; i < 4; i++) {
             sheet.setColumnWidth(i, 9000);
         }
-        sheet.setColumnWidth(4, 15000);
+        sheet.setColumnWidth(4, 15_000);
     }
 
     private void initializeReportData(XSSFWorkbook workbook, XSSFSheet sheet,

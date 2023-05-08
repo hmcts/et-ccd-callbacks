@@ -6,15 +6,13 @@ import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import net.serenitybdd.rest.SerenityRest;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
@@ -22,10 +20,6 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
-import uk.gov.hmcts.ethos.replacement.docmosis.controllers.AllocateHearingController;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.AllocateHearingService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.ScotlandAllocateHearingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
@@ -34,41 +28,39 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-@WebMvcTest(AllocateHearingController.class)
-@ContextConfiguration(classes = {DocmosisApplication.class, AllocateHearingController.class})
-@ActiveProfiles("test")
+@WebMvcTest(DocmosisApplication.class)
+@ContextConfiguration(classes = {DocmosisApplication.class})
 public class AllocateHearingControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
     private uk.gov.hmcts.et.common.model.ccd.CCDRequest ccdRequest;
     private static Properties properties;
-    @MockBean
-    private VerifyTokenService verifyTokenService;
-
-    @MockBean
-    private AllocateHearingService allocateHearingService;
-
-    @MockBean
-    private ScotlandAllocateHearingService scotlandAllocateHearingService;
+    private String userToken;
 
     @BeforeEach
     public void setup() {
         RestAssuredMockMvc.mockMvc(mockMvc);
-        Mockito.when(verifyTokenService.verifyTokenSignature("validToken")).thenReturn(true);
     }
 
     @Test
     public void testInitialiseHearingDynamicList() throws IOException {
-        String environment = System.getProperty("VAULTNAME").replace("ethos-", "");
+        try {
+            String environment = System.getProperty("VAULTNAME").replace("ethos-", "");
+            userToken = getAuthToken(environment);
+        } catch (NullPointerException e) {
+            userToken = getAuthTokenFromLocal();
+        }
         CCDRequest ccdRequest = generateCCDRequest();
-        String userToken = getAuthToken(environment);
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
+                .baseUri("http://localhost:8081")
+                .basePath("/allocatehearing/initialiseHearings")
+                .header("Content-type", ContentType.JSON)
                 .header("Authorization", userToken)
                 .body(ccdRequest)
-                .post("/allocatehearing/initialiseHearings")
+                .when()
+                .post()
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
@@ -79,7 +71,6 @@ public class AllocateHearingControllerTest {
     // aboutToSubmit tomorrow
 
     private CCDRequest generateCCDRequest() {
-        // Implement this method to return a valid CCDRequest object
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(generateCaseData())
                 .withCaseId("123")
@@ -87,10 +78,19 @@ public class AllocateHearingControllerTest {
         return ccdRequest;
     }
 
-    public static String getAuthTokenFromLocal(String tidamUrl) {
-        RequestSpecification httpRequest = RestAssured.given();
-        Response response = httpRequest.post(tidamUrl + "/testing-support/lease?id=1&role=ccd-import");
-        return "Bearer " + response.body().asString();
+    public static String getAuthTokenFromLocal() {
+        Response response = RestAssured.given()
+                .contentType(ContentType.URLENC)
+                .formParam("client_id", "fake")
+                .formParam("client_secret", "fake")
+                .formParam("grant_type", "password")
+                .formParam("redirect_uri", "example.com")
+                .formParam("username", "citizen@gmail.com")
+                .formParam("password", "Pa55word11")
+                .formParam("scope", "openid profile roles")
+                .post("http://localhost:5000/o/token");
+        JSONObject jsonResponse = new JSONObject(response.getBody().asString());
+        return "Bearer " + jsonResponse.getString("access_token");
     }
 
     public static String getProperty(String name) throws IOException {

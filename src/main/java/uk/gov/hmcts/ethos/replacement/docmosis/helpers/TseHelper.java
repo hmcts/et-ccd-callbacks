@@ -200,12 +200,23 @@ public final class TseHelper {
     public static GenericTseApplicationType getSelectedApplication(CaseData caseData) {
         List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
 
-        if (CollectionUtils.isEmpty(applications) || caseData.getTseRespondSelectApplication() == null) {
+        if (CollectionUtils.isEmpty(applications)) {
             return null;
         }
 
-        return applications
-                .get(Integer.parseInt(caseData.getTseRespondSelectApplication().getValue().getCode()) - 1).getValue();
+        DynamicFixedListType respondSelectApplication = caseData.getTseRespondSelectApplication();
+
+        if (caseData.getTseRespondSelectApplication() != null) {
+            return applications.get(Integer.parseInt(respondSelectApplication.getValue().getCode()) - 1).getValue();
+        }
+
+        DynamicFixedListType tseAdminSelectApplication = caseData.getTseAdminSelectApplication();
+
+        if (tseAdminSelectApplication != null) {
+            return applications.get(Integer.parseInt(tseAdminSelectApplication.getValue().getCode()) - 1).getValue();
+        }
+
+        return null;
     }
 
     /**

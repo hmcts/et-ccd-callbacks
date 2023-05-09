@@ -36,8 +36,7 @@ public class TseViewApplicationsController {
     private final VerifyTokenService verifyTokenService;
     private final TseService tseService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
-
-
+    
     /**
      * Resets the dynamic list for select an application to view either an open or closed application.
      *

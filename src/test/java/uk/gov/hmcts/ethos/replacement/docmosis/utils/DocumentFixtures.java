@@ -34,5 +34,4 @@ public final class DocumentFixtures {
     public static DocumentType getDocumentType(String documentName) {
         return DocumentType.from(getUploadedDocumentType(documentName));
     }
-
 }

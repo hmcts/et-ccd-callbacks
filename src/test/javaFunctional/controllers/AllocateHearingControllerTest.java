@@ -28,10 +28,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.util.Properties;
 
 @WebMvcTest(DocmosisApplication.class)
@@ -50,9 +48,7 @@ public class AllocateHearingControllerTest {
     private String cftPassword;
 
     @BeforeEach
-    public void setup() throws FileNotFoundException {
-        String reportingDirectory = "functional-output";
-
+    public void setup() {
 
         RestAssured.config = RestAssured.config()
                 .logConfig(LogConfig.logConfig().defaultStream(System.out));

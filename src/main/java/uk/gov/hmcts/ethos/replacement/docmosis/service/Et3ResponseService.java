@@ -2,10 +2,12 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
@@ -22,6 +24,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.buildPersonalisation;
+
 /**
  * Service to support ET3 Response journey. Contains methods for generating and saving ET3 Response documents.
  */
@@ -32,6 +36,10 @@ public class Et3ResponseService {
 
     private final DocumentManagementService documentManagementService;
     private final TornadoService tornadoService;
+    private final EmailService emailService;
+
+    @Value("${et3Response.notification.tribunal.template.id}")
+    private String et3EmailTribunalTemplateId;
 
     private static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
 
@@ -130,4 +138,16 @@ public class Et3ResponseService {
             documents.add(DocumentTypeItem.fromUploadedDocument(caseData.getEt3ResponseRespondentSupportDocument()));
         }
     }
+
+    /**
+     * Sends notification emails to Tribunal.
+     * @param caseDetails Contains details about the case.
+     */
+    public void sendNotifications(CaseDetails caseDetails) {
+        emailService.sendEmail(et3EmailTribunalTemplateId,
+            caseDetails.getCaseData().getTribunalCorrespondenceEmail(),
+            buildPersonalisation(caseDetails)
+        );
+    }
+
 }

@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataBuilder;
@@ -14,6 +16,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -21,9 +24,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
@@ -33,12 +41,14 @@ class Et3ResponseServiceTest {
     private DocumentManagementService documentManagementService;
     @MockBean
     private TornadoService tornadoService;
+    @MockBean
+    private EmailService emailService;
     private CaseData caseData;
     private DocumentInfo documentInfo;
 
     @BeforeEach
     void setUp() {
-        et3ResponseService = new Et3ResponseService(documentManagementService, tornadoService);
+        et3ResponseService = new Et3ResponseService(documentManagementService, tornadoService, emailService);
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("Doris", "Johnson")
             .withClaimantType("232 Petticoat Square", "3 House", null,
@@ -113,5 +123,29 @@ class Et3ResponseServiceTest {
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
         assertThat(caseData.getDocumentCollection().size(), is(1));
+    }
+
+    @Test
+    void sendNotifications_returnEmail() {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+            .withEthosCaseReference("1234567/1234")
+            .withRespondent("Respondent", NO, null, false)
+            .withHearing("1", HEARING_TYPE_JUDICIAL_HEARING, "Judge", "Venue", null, null, null, null)
+            .withHearingSession(0, "1", "2099-11-25T12:11:00.000", Constants.HEARING_STATUS_LISTED, false)
+            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId("1683646754393041");
+        caseDetails.getCaseData().setClaimant("Claimant LastName");
+        caseDetails.getCaseData().setTribunalCorrespondenceEmail("tribunal@email.com");
+
+        et3ResponseService.sendNotifications(caseDetails);
+
+        Map<String, String> expected = Map.of(
+            "case_number", "1234567/1234",
+            "claimant", "Claimant LastName",
+            "list_of_respondents", "Respondent",
+            "date", "25 Nov 2099",
+            "ccdId", "1683646754393041"
+        );
+        verify(emailService, times(1)).sendEmail(any(), eq("tribunal@email.com"), eq(expected));
     }
 }

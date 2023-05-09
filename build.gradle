@@ -129,6 +129,10 @@ task javaFunctionalTest(type: Test) {
     testLogging {
         events "passed", "skipped", "failed"
     }
+    reports {
+        junitXml.enabled true
+        html.enabled true
+    }
 }
 
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification', dependsOn: ':codeceptFunctional') {

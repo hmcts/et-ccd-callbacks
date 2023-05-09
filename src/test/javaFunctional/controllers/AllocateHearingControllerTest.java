@@ -124,7 +124,8 @@ public class AllocateHearingControllerTest {
     public static String getProperty(String name) throws IOException {
 
         if (properties == null) {
-            try (InputStream inputStream = new FileInputStream("src/test/javaFunctional/resources/config.properties")) {
+            try (InputStream inputStream =
+                         new FileInputStream("src/test/javaFunctional/resources/application.properties")) {
                 properties = new Properties();
                 properties.load(inputStream);
             }

@@ -53,11 +53,9 @@ public class AllocateHearingControllerTest {
     public void setup() throws FileNotFoundException {
         String reportingDirectory = "functional-output";
 
-        PrintStream fileOutputStream = new PrintStream(new FileOutputStream(reportingDirectory
-                + "/javaFunctionalreport.log", true));
 
         RestAssured.config = RestAssured.config()
-                .logConfig(LogConfig.logConfig().defaultStream(fileOutputStream));
+                .logConfig(LogConfig.logConfig().defaultStream(System.out));
 
         RestAssuredMockMvc.mockMvc(mockMvc);
     }
@@ -100,6 +98,7 @@ public class AllocateHearingControllerTest {
 
     public String getAuthTokenFromLocal() {
         Response response = RestAssured.given()
+                .log().all()
                 .contentType(ContentType.URLENC)
                 .formParam("client_id", "fake")
                 .formParam("client_secret", "fake")

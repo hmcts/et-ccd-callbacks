@@ -216,6 +216,12 @@ public final class TseHelper {
             return applications.get(Integer.parseInt(tseAdminSelectApplication.getValue().getCode()) - 1).getValue();
         }
 
+        DynamicFixedListType tseViewSelectApplication = caseData.getTseViewApplicationSelect();
+
+        if (tseViewSelectApplication != null) {
+            return applications.get(Integer.parseInt(tseViewSelectApplication.getValue().getCode()) - 1).getValue();
+        }
+
         return null;
     }
 

@@ -19,8 +19,8 @@ public final class MarkdownHelper {
      * @return formatted string representing data in a two column Markdown table
      */
     public static String createTwoColumnTable(String[] header, List<String[]> rows) {
-        if (header.length < 2) {
-            throw new IllegalArgumentException("header array should contain two items");
+        if (header.length != 2) {
+            throw new IllegalArgumentException("header array should contain only two items");
         }
 
         return String.format("|%s|%s|\r\n|--|--|\r\n%s", header[0], header[1], createTwoColumnRows(rows));

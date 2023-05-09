@@ -4,7 +4,7 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.0.14.RELEASE'
-    id 'org.springframework.boot' version '2.7.10'
+    id 'org.springframework.boot' version '2.7.11'
     id 'org.owasp.dependencycheck' version '8.0.1'
     id 'com.github.ben-manes.versions' version '0.42.0'
     id 'au.com.dius.pact' version '4.3.15'
@@ -317,7 +317,7 @@ dependencies {
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '3.0.1'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.5'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.8'
     //to remove CVEs
     implementation group: 'org.apache.xmlgraphics', name: 'batik-all', version: '1.16', ext: 'pom'
     //To Remove vulnerability CVE-2020-11988

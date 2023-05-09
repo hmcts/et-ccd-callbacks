@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -22,6 +23,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 @SuppressWarnings({"PMD.LawOfDemeter"})
 @Service
+@Slf4j
 public class BfActionReport {
 
     public BfActionReportData runReport(ListingDetails listingDetails,
@@ -83,7 +85,7 @@ public class BfActionReport {
                                                     ListingData listingData, CaseData caseData) {
         BFActionType bfActionType = bfActionTypeItem.getValue();
         if (!isNullOrEmpty(bfActionType.getBfDate()) && isNullOrEmpty(bfActionType.getCleared())) {
-            String bfDate = ReportHelper.getFormattedLocalDate(bfActionType.getBfDate());
+            String bfDate = bfActionType.getBfDate();
             boolean isValidBfDate = ReportHelper.validateMatchingDate(listingData, bfDate);
 
             if (isValidBfDate) {
@@ -105,8 +107,8 @@ public class BfActionReport {
             bfDateType.setBroughtForwardAction(bfActionType.getCwActions());
         }
 
-        bfDateType.setBroughtForwardEnteredDate(bfActionType.getDateEntered());
-        bfDateType.setBroughtForwardDate(bfDate);
+        bfDateType.setBroughtForwardEnteredDate(ReportHelper.getFormattedLocalDate(bfActionType.getDateEntered()));
+        bfDateType.setBroughtForwardDate(ReportHelper.getFormattedLocalDate(bfDate));
 
         if (!isNullOrEmpty(bfActionType.getNotes())) {
             String bfReason = bfActionType.getNotes().replace("\n", ". ");

@@ -81,6 +81,7 @@ public class AllocateHearingControllerTest {
                 .when()
                 .post()
                 .then()
+                .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
     }

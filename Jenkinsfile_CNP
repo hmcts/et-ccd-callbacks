@@ -104,7 +104,8 @@ withPipeline(type, product, component) {
             alwaysLinkToLastBuild: true,
             keepAll: true,
             reportDir: "functional-output",
-            reportFiles: "javaFunctionalreport.log"
+            reportFiles: "javaFunctionalreport.log",
+            reportName : "Java Functional Test Report"
     ]
   }
 

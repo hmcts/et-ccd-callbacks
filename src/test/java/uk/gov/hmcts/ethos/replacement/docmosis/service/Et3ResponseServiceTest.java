@@ -35,6 +35,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
+@SuppressWarnings({"PMD.ExcessiveImports"})
 class Et3ResponseServiceTest {
     private Et3ResponseService et3ResponseService;
     @MockBean

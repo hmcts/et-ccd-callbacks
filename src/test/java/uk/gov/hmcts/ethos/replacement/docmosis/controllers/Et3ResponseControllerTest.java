@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -53,6 +54,8 @@ class Et3ResponseControllerTest {
     private DocumentManagementService documentManagementService;
     @MockBean
     private TornadoService tornadoService;
+    @MockBean
+    private EmailService emailService;
     private MockMvc mvc;
     private CCDRequest ccdRequest;
 
@@ -64,12 +67,17 @@ class Et3ResponseControllerTest {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
 
         CaseDetails caseDetails = CaseDataBuilder.builder()
-                .withRespondent("test", NO, null, false)
+            .withEthosCaseReference("1234567/1234")
+            .withRespondent("test", NO, null, false)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.getCaseData().setClaimant("Claimant LastName");
+        caseDetails.getCaseData().setTribunalCorrespondenceEmail("tribunal@email.com");
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseDetails.getCaseData())
             .build();
+        ccdRequest.getCaseDetails().setCaseId("1683646754393041");
+
     }
 
     @Test

@@ -12,12 +12,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Locale.UK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 
@@ -80,23 +80,23 @@ public final class NocNotificationHelper {
         return personalisation;
     }
 
-    public static Map<String, String> buildRespondentPersonalisation(CaseData caseData, RespondentSumType respondent) {
+    public static Map<String, String> buildRespondentPersonalisation(CaseDetails detail, RespondentSumType respondent) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
+        CaseData caseData = detail.getCaseData();
         addCommonValues(caseData, personalisation);
         personalisation.put("respondent_name", respondent.getRespondentName());
+        personalisation.put("ccdId", detail.getCaseId());
+        personalisation.put("date", "Not set");
 
         String nextHearingDate = HearingsHelper.getEarliestFutureHearingDate(caseData.getHearingCollection());
 
-        if (nextHearingDate == null) {
-            personalisation.put(DATE, "Not set");
-        } else {
+        if (nextHearingDate != null) {
             try {
-                Date hearingStartDate =
-                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.UK).parse(nextHearingDate);
-                personalisation.put(DATE, new SimpleDateFormat("dd MMM yyyy", Locale.UK).format(hearingStartDate));
-            } catch (ParseException e) {
-                personalisation.put(DATE, "Not set");
+                Date hearingStartDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", UK).parse(nextHearingDate);
+                personalisation.put("date", new SimpleDateFormat("dd MMM yyyy", UK).format(hearingStartDate));
+            } catch (ParseException ignored) {
+                log.warn("Failed to parse nextHearingDate");
             }
         }
 

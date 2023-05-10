@@ -30,74 +30,15 @@ public class TseAdmCloseService {
 
     private final TseService tseService;
 
-    private static final String CLOSE_APP_DECISION_DETAILS = "|Decision | |\r\n"
-        + TABLE_STRING
-        + "|Notification | %s|\r\n"
-        + "|Decision | %s|\r\n"
-        + "%s" // Decision details
-        + DATE_MARKUP
-        + "|Sent by | %s|\r\n"
-        + "|Type of decision | %s|\r\n"
-        + "%s%s"
-        + "|Decision made by | %s|\r\n"
-        + NAME_MARKUP
-        + "|Sent to | %s|\r\n"
-        + "\r\n";
-
     public String generateCloseApplicationDetailsMarkdown(CaseData caseData, String authToken) {
         if (getSelectedApplicationTypeItem(caseData) == null) {
             return null;
         }
         GenericTseApplicationTypeItem applicationTypeItem = getSelectedApplicationTypeItem(caseData);
-        String decisionsMarkdown = "";
-        if (applicationTypeItem.getValue().getAdminDecision() != null) {
-            // Multiple decisions can be made for the same application but we are only showing the last one for now
-            Optional<String> decisionsMarkdownResult = applicationTypeItem.getValue().getAdminDecision()
-                .stream()
-                .reduce((first, second) -> second)
-                .map(d -> String.format(CLOSE_APP_DECISION_DETAILS,
-                    d.getValue().getEnterNotificationTitle(),
-                    d.getValue().getDecision(),
-                    formatDecisionDetails(d.getValue()),
-                    d.getValue().getDate(),
-                    "Tribunal",
-                    d.getValue().getTypeOfDecision(),
-                    getAdditionInfoMarkdown(d),
-                    getDecisionDocumentLink(d.getValue(), authToken),
-                    d.getValue().getDecisionMadeBy(),
-                    d.getValue().getDecisionMadeByFullName(),
-                    d.getValue().getSelectPartyNotify()));
 
-            if (decisionsMarkdownResult.isPresent()) {
-                decisionsMarkdown = decisionsMarkdownResult.get();
-            }
-        }
-
-        return tseService.formatViewApplication(caseData, authToken)
-            + decisionsMarkdown;
-
+        return tseService.formatViewApplication(caseData, authToken);
     }
 
-    private String getAdditionInfoMarkdown(TseAdminRecordDecisionTypeItem decision) {
-        return decision.getValue().getAdditionalInformation() == null
-            ? ""
-            : String.format(ADDITIONAL_INFORMATION, decision.getValue().getAdditionalInformation());
-    }
-
-    private String formatDecisionDetails(TseAdminRecordDecisionType decision) {
-        return isBlank(decision.getDecisionDetails())
-            ? ""
-            : String.format(CLOSE_APP_DECISION_DETAILS_OTHER, decision.getDecisionDetails());
-    }
-
-    private String getDecisionDocumentLink(TseAdminRecordDecisionType decisionType, String authToken) {
-        List<GenericTypeItem<DocumentType>> documents = decisionType.getResponseRequiredDoc();
-        if (documents == null) {
-            return "";
-        }
-
-        return MarkdownHelper.createTwoColumnRows(tseService.addDocumentRows(documents, authToken));
-    }
 
     /**
      * About to Submit Close Application.

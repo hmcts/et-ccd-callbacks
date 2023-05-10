@@ -11,8 +11,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 
@@ -265,7 +267,69 @@ class TseServiceTest {
                 + "|Case management order made by|Legal officer|\r\n"
                 + "|Request made by|Caseworker|\r\n"
                 + "|Full name|Mr Lee Gal Officer|\r\n"
-                + "|Sent to|Respondent|\r\n\r\n";
+                + "|Sent to|Respondent|\r\n\r\n\r\n";
+
+        assertThat(tseService.formatViewApplication(caseData, AUTH_TOKEN)).isEqualTo(expected);
+    }
+    @Test
+    void formatViewApplication_withAllDataAndDecision() {
+        CaseData caseData = setupCaseDataWithAnApplication();
+
+        TseAdminRecordDecisionType tseAdminRecordDecisionType = new TseAdminRecordDecisionType();
+        tseAdminRecordDecisionType.setDecision("Granted");
+        tseAdminRecordDecisionType.setDate("2023-01-01");
+        tseAdminRecordDecisionType.setTypeOfDecision("type");
+        tseAdminRecordDecisionType.setAdditionalInformation("MORE INFO");
+        tseAdminRecordDecisionType.setEnterNotificationTitle("title");
+        tseAdminRecordDecisionType.setDecisionMadeBy("Judge");
+        tseAdminRecordDecisionType.setDecisionMadeByFullName("John Doe");
+
+        TseAdminRecordDecisionTypeItem decisionTypeItem = new TseAdminRecordDecisionTypeItem();
+        decisionTypeItem.setValue(tseAdminRecordDecisionType);
+
+        caseData.getGenericTseApplicationCollection().get(0).getValue().setAdminDecision(List.of(decisionTypeItem));
+        DynamicFixedListType listType = DynamicFixedListType.from(List.of(DynamicValueType.create("1", "")));
+        listType.setValue(listType.getListItems().get(0));
+        caseData.setTseRespondSelectApplication(listType);
+
+        String expected = "|Application||\r\n"
+            + "|--|--|\r\n"
+            + "|Applicant|Respondent|\r\n"
+            + "|Type of application|Amend response|\r\n"
+            + "|Application date|2000-01-01|\r\n"
+            + "|What do you want to tell or ask the tribunal?|Details|\r\n"
+            + "|Supporting material|Document (txt, 1MB)|\r\n"
+            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|No|\r\n"
+            + "|Details of why you do not want to inform the other party|Details|\r\n"
+            + "\r\n"
+            + "|Response 1||\r\n"
+            + "|--|--|\r\n"
+            + "|Response|Title|\r\n"
+            + "|Date|2000-01-01|\r\n"
+            + "|Sent by|Tribunal|\r\n"
+            + "|Case management order or request?|Request|\r\n"
+            + "|Is a response required?|No|\r\n"
+            + "|Party or parties to respond|Both parties|\r\n"
+            + "|Additional information|More data|\r\n"
+            + "|Document|Document (txt, 1MB)|\r\n"
+            + "|Description|Description1|\r\n"
+            + "|Document|Document (txt, 1MB)|\r\n"
+            + "|Description|Description2|\r\n"
+            + "|Case management order made by|Legal officer|\r\n"
+            + "|Request made by|Caseworker|\r\n"
+            + "|Full name|Mr Lee Gal Officer|\r\n"
+            + "|Sent to|Respondent|\r\n"
+            + "\r\n\r\n"
+            + "|Decision||\r\n"
+            + "|--|--|\r\n"
+            + "|Notification|title|\r\n"
+            + "|Decision|Granted|\r\n"
+            + "|Date|2023-01-01|\r\n"
+            + "|Sent by|Tribunal|\r\n"
+            + "|Type of decision|type|\r\n"
+            + "|Additional information|MORE INFO|\r\n"
+            + "|Decision made by|Judge|\r\n"
+            + "|Name|John Doe|\r\n";
 
         assertThat(tseService.formatViewApplication(caseData, AUTH_TOKEN)).isEqualTo(expected);
     }

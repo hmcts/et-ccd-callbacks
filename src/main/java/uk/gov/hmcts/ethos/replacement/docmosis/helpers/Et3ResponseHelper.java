@@ -169,6 +169,7 @@ public class Et3ResponseHelper {
             .respondentPostcode(caseData.getEt3RespondentAddress().getPostCode())
             .et3ResponseDXAddress(caseData.getEt3ResponseDXAddress())
             .et3ResponsePhone(caseData.getEt3ResponsePhone())
+            .et3ResponseReference(caseData.getEt3ResponseReference())
             .et3ResponseEmploymentCount(caseData.getEt3ResponseEmploymentCount())
             .et3ResponseSiteEmploymentCount(caseData.getEt3ResponseSiteEmploymentCount())
             .et3ResponseAcasAgreeReason(caseData.getEt3ResponseAcasAgreeReason())
@@ -353,6 +354,7 @@ public class Et3ResponseHelper {
         respondent.setResponseRespondentName(caseData.getEt3ResponseRespondentLegalName());
         respondent.setResponseRespondentAddress(caseData.getEt3RespondentAddress());
         respondent.setResponseRespondentPhone1(caseData.getEt3ResponsePhone());
+        respondent.setResponseReference(caseData.getEt3ResponseReference());
         respondent.setResponseRespondentContactPreference(caseData.getEt3ResponseContactPreference());
         respondent.setEt3ResponseContactReason(caseData.getEt3ResponseContactReason());
         respondent.setEt3ResponseRespondentCompanyNumber(caseData.getEt3ResponseRespondentCompanyNumber());
@@ -438,6 +440,7 @@ public class Et3ResponseHelper {
         caseData.setEt3RespondentAddress(null);
         caseData.setEt3ResponseDXAddress(null);
         caseData.setEt3ResponsePhone(null);
+        caseData.setEt3ResponseReference(null);
         caseData.setEt3ResponseContactPreference(null);
         caseData.setEt3ResponseContactReason(null);
         caseData.setEt3ResponseHearingRepresentative(null);

@@ -26,6 +26,7 @@ public class Et3ResponseData {
     private String respondentPostcode;
     private String et3ResponseDXAddress;
     private String et3ResponsePhone;
+    private String et3ResponseReference;
     private String et3ResponseContactPreference;
     private List<String> et3ResponseHearingRepresentative;
     private List<String> et3ResponseHearingRespondent;

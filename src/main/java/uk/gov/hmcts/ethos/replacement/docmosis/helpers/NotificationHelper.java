@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
@@ -52,15 +54,17 @@ public final class NotificationHelper {
                 throw new NotFoundException("Could not find claimant");
             }
 
-            if (!isNullOrEmpty(caseData.getClaimantIndType().getClaimantTitle())) {
-                initialTitle = caseData.getClaimantIndType().getClaimantTitle();
-            } else if (!isNullOrEmpty(caseData.getClaimantIndType().getClaimantPreferredTitle())) {
-                initialTitle = caseData.getClaimantIndType().getClaimantPreferredTitle();
+            ClaimantIndType claimantIndType = caseData.getClaimantIndType();
+
+            if (StringUtils.isNotEmpty(claimantIndType.getClaimantTitle())) {
+                initialTitle = claimantIndType.getClaimantTitle();
+            } else if (StringUtils.isNotEmpty(claimantIndType.getClaimantPreferredTitle())) {
+                initialTitle = claimantIndType.getClaimantPreferredTitle();
             } else {
                 initialTitle = caseData.getClaimant().substring(0, 1).toUpperCase(Locale.ROOT);
             }
 
-            personalisation.put("name", buildName(initialTitle, caseData.getClaimantIndType().getClaimantLastName()));
+            personalisation.put("name", buildName(initialTitle, claimantIndType.getClaimantLastName()));
             return personalisation;
         }
 

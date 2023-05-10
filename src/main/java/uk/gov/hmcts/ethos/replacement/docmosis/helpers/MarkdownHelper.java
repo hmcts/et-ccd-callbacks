@@ -19,11 +19,20 @@ public final class MarkdownHelper {
      * @return formatted string representing data in a two column Markdown table
      */
     public static String createTwoColumnTable(String[] header, List<String[]> rows) {
-        if (header.length < 2) {
-            throw new IllegalArgumentException("header array should contain two items");
+        if (header.length != 2) {
+            throw new IllegalArgumentException("header array should contain only two items");
         }
 
-        StringBuilder stringBuilder = new StringBuilder(String.format("|%s|%s|\r\n|--|--|\r\n", header[0], header[1]));
+        return String.format("|%s|%s|\r\n|--|--|\r\n%s", header[0], header[1], createTwoColumnRows(rows));
+    }
+
+    /**
+     * Formats data for use in a two column table. Ignores rows if any cell is null.
+     * @param rows Rows to format
+     * @return formatted string for use in a two column table
+     */
+    public static String createTwoColumnRows(List<String[]> rows) {
+        StringBuilder stringBuilder = new StringBuilder();
 
         for (String[] columns : rows) {
             if (columns.length < 2 || isEmpty(columns[0]) || isEmpty(columns[1])) {

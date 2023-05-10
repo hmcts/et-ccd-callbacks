@@ -83,6 +83,8 @@ class RespondentTellSomethingElseServiceTest {
 
     @SpyBean
     private NotificationProperties notificationProperties;
+    @MockBean
+    private DocumentManagementService documentManagementService;
 
     @Captor
     ArgumentCaptor<Map<String, Object>> personalisationCaptor;
@@ -116,7 +118,7 @@ class RespondentTellSomethingElseServiceTest {
         respondentTellSomethingElseService =
                 new RespondentTellSomethingElseService(emailService, userService, tribunalOfficesService,
                         tornadoService, notificationProperties);
-        tseService = new TseService();
+        tseService = new TseService(documentManagementService);
 
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
                 "tseRespondentAcknowledgeTemplateId", TEMPLATE_ID);

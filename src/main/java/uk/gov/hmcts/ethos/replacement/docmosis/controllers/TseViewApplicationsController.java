@@ -17,14 +17,12 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper.setDataForTseApplicationSummaryAndResponses;
 
 /**
  * REST controller for the "View open or closed applications" event.
@@ -36,10 +34,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplication
 public class TseViewApplicationsController {
 
     private final VerifyTokenService verifyTokenService;
-    private final TornadoService tornadoService;
-    private final UserService userService;
+    private final TseService tseService;
     private static final String INVALID_TOKEN = "Invalid Token {}";
-
+    
     /**
      * Resets the dynamic list for select an application to view either an open or closed application.
      *
@@ -117,7 +114,6 @@ public class TseViewApplicationsController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> populateSelectedApplicationData(
-
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
@@ -126,7 +122,7 @@ public class TseViewApplicationsController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        setDataForTseApplicationSummaryAndResponses(caseData);
+        caseData.setTseApplicationSummaryAndResponsesMarkup(tseService.formatViewApplication(caseData, userToken));
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

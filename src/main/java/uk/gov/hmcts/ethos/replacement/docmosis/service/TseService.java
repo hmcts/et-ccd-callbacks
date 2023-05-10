@@ -9,16 +9,28 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTypeData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.IN_PROGRESS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
@@ -29,6 +41,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 @Service
 @RequiredArgsConstructor
 public class TseService {
+    private static final String RULE92_QUESTION =
+            "Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?";
+    private static final String RULE92_DETAILS =
+            "Details of why you do not want to inform the other party";
+    public static final String WHATS_YOUR_RESPONSE = "What's your response to the %s's application";
+    private final DocumentManagementService documentManagementService;
+
     /**
      * Creates a new TSE collection if it doesn't exist.
      * Create a new application in the list and assign the TSE data from CaseData to it.
@@ -157,5 +176,162 @@ public class TseService {
             return 1;
         }
         return caseData.getGenericTseApplicationCollection().size() + 1;
+    }
+
+    /**
+     * Builds a two column Markdown table with both application details and all responses.
+     * @param caseData parent object for all case data
+     * @param authToken user token for getting document metadata
+     * @return two column Markdown table string
+     */
+    public String formatViewApplication(CaseData caseData, String authToken) {
+        GenericTseApplicationType application = TseHelper.getSelectedApplication(caseData);
+
+        if (application == null) {
+            return "";
+        }
+
+        String applicationTable = formatApplicationDetails(application, authToken, true);
+        String responses = formatApplicationResponses(application, authToken);
+
+        return applicationTable + "\r\n" + responses;
+    }
+
+    /**
+     * Builds a two column Markdown table for details of an application without any responses or decisions.
+     * @param application the application to build from
+     * @param authToken user token for getting document metadata
+     * @param rule92 Whether to include rows about rule92 declaration
+     * @return two column Markdown table string
+     */
+    public String formatApplicationDetails(GenericTseApplicationType application, String authToken, boolean rule92) {
+        UploadedDocumentType document = application.getDocumentUpload();
+        String supportingMaterial = documentManagementService.displayDocNameTypeSizeLink(document, authToken);
+
+        List<String[]> rows = new ArrayList<>(List.of(
+                new String[]{"Applicant", application.getApplicant()},
+                new String[]{"Type of application", application.getType()},
+                new String[]{"Application date", application.getDate()},
+                new String[]{"What do you want to tell or ask the tribunal?", application.getDetails()},
+                new String[]{"Supporting material", supportingMaterial}
+        ));
+
+        if (rule92) {
+            rows.add(new String[]{RULE92_QUESTION, application.getCopyToOtherPartyYesOrNo()});
+            rows.add(new String[]{RULE92_DETAILS, application.getCopyToOtherPartyText()});
+        }
+
+        return MarkdownHelper.createTwoColumnTable(new String[]{"Application", ""}, rows);
+    }
+
+    /**
+     * Formats all responses for an application into a two column Markdown table.
+     * @param application the application that owns the responses
+     * @param authToken user token for getting document metadata
+     * @return Two column Markdown table string of all responses
+     */
+    public String formatApplicationResponses(GenericTseApplicationType application, String authToken) {
+        List<TseRespondTypeItem> respondCollection = application.getRespondCollection();
+
+        if (CollectionUtils.isEmpty(respondCollection)) {
+            return "";
+        }
+
+        IntWrapper respondCount = new IntWrapper(0);
+        String applicant = application.getApplicant().toLowerCase(Locale.ENGLISH);
+
+        return application.getRespondCollection().stream()
+                .map(TseRespondTypeItem::getValue)
+                .map(o -> ADMIN.equals(o.getFrom())
+                        ? formatAdminReply(o, respondCount.incrementAndReturnValue(), authToken)
+                        : formatNonAdminReply(o, respondCount.incrementAndReturnValue(), applicant, authToken)
+                ).collect(Collectors.joining());
+    }
+
+    /**
+     * Formats an admin response into a two column Markdown table.
+     *
+     * @param reply the admin response to format
+     * @param count an arbitrary number representing the position of this response
+     * @param authToken user token for getting document metadata
+     * @return Two columned Markdown table detailing the admin response
+     */
+    public String formatAdminReply(TseRespondType reply, int count, String authToken) {
+        List<String[]> rows = new ArrayList<>();
+
+        rows.addAll(List.of(
+                new String[]{"Response", reply.getEnterResponseTitle()},
+                new String[]{"Date", reply.getDate()},
+                new String[]{"Sent by", "Tribunal"},
+                new String[]{"Case management order or request?", reply.getIsCmoOrRequest()},
+                new String[]{"Is a response required?", reply.getIsResponseRequired()},
+                new String[]{"Party or parties to respond", reply.getSelectPartyRespond()},
+                new String[]{"Additional information", reply.getAdditionalInformation()}
+        ));
+        rows.addAll(addDocumentRows(reply.getAddDocument(), authToken));
+        rows.addAll(List.of(
+                new String[]{"Case management order made by", reply.getCmoMadeBy()},
+                new String[]{"Request made by", reply.getRequestMadeBy()},
+                new String[]{"Full name", reply.getMadeByFullName()},
+                new String[]{"Sent to", reply.getSelectPartyNotify()}
+        ));
+
+        return MarkdownHelper.createTwoColumnTable(new String[] {"Response " + count, ""}, rows) + "\r\n";
+    }
+
+    /**
+     * Formats an admin response into a two column Markdown table.
+     * @param reply the admin response to format
+     * @param count an arbitrary number representing the position of this response
+     * @param authToken user token for getting document metadata
+     * @return Two columned Markdown table detailing the admin response
+     */
+    private String formatNonAdminReply(TseRespondType reply, int count, String applicant, String authToken) {
+        List<String[]> rows = new ArrayList<>();
+
+        rows.addAll(List.of(
+                new String[]{"Response from", reply.getFrom()},
+                new String[]{"Response date", reply.getDate()},
+                new String[]{String.format(WHATS_YOUR_RESPONSE, applicant), reply.getResponse()}
+        ));
+        rows.addAll(addDocumentRows(reply.getSupportingMaterial(), authToken));
+        rows.addAll(List.of(
+                new String[]{RULE92_QUESTION, reply.getCopyToOtherParty()},
+                new String[]{RULE92_DETAILS, reply.getCopyNoGiveDetails()}
+        ));
+
+        return MarkdownHelper.createTwoColumnTable(new String[] {"Response " + count, ""}, rows) + "\r\n";
+    }
+
+    /**
+     * Returns two rows of two columns for a document representing its name and description.
+     * @param document Document data
+     * @param authToken user token for getting document metadata
+     * @return A list of String arrays representing the two columned rows
+     */
+    public List<String[]> addDocumentRow(DocumentType document, String authToken) {
+        UploadedDocumentType uploadedDocument = document.getUploadedDocument();
+        String nameTypeSizeLink = documentManagementService.displayDocNameTypeSizeLink(uploadedDocument, authToken);
+
+        return List.of(
+                new String[]{"Document", nameTypeSizeLink},
+                new String[]{"Description", document.getShortDescription()}
+        );
+    }
+
+    /**
+     * Returns a list of rows for multiple documents for use in a two columned Markdown table.
+     * @param documents document data
+     * @param authToken user token for getting each document's metadata
+     * @return A list of String arrays, one string array for each document's name and another for the short description
+     */
+    public List<String[]> addDocumentRows(List<GenericTypeItem<DocumentType>> documents, String authToken) {
+        if (CollectionUtils.isEmpty(documents)) {
+            return Collections.emptyList();
+        }
+
+        return documents.stream()
+                .flatMap(o -> addDocumentRow(o.getValue(), authToken).stream())
+                .collect(Collectors.toList());
     }
 }

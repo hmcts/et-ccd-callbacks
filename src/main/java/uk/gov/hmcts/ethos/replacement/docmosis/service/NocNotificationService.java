@@ -86,7 +86,7 @@ public class NocNotificationService {
             emailService.sendEmail(
                 respondentTemplateId,
                 respondent.getRespondentEmail(),
-                NocNotificationHelper.buildRespondentPersonalisation(caseDataPrevious, respondent));
+                NocNotificationHelper.buildRespondentPersonalisation(caseDetailsPrevious, respondent));
         }
     }
 

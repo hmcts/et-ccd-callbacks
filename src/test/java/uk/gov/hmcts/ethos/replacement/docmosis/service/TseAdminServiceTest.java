@@ -16,10 +16,12 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
@@ -39,6 +41,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,6 +70,8 @@ class TseAdminServiceTest {
     private DocumentManagementService documentManagementService;
     @SpyBean
     private NotificationProperties notificationProperties;
+    @MockBean
+    private TseService tseService;
 
     private CaseData caseData;
 
@@ -88,7 +93,7 @@ class TseAdminServiceTest {
 
     @BeforeEach
     void setUp() {
-        tseAdminService = new TseAdminService(emailService, documentManagementService, notificationProperties);
+        tseAdminService = new TseAdminService(emailService, tseService, notificationProperties);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdminService, "tseAdminRecordRespondentTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(notificationProperties, "exuiUrl", XUI_URL);
@@ -97,65 +102,23 @@ class TseAdminServiceTest {
     }
 
     @Test
-    void initialTseAdminTableMarkUp_withDoc_ReturnString() {
+    void initialTseAdminTableMarkUp_ReturnString() {
+        GenericTseApplicationType application = getGenericTseApplicationTypeItemBuild();
 
         caseData.setGenericTseApplicationCollection(
             List.of(GenericTseApplicationTypeItem.builder()
                 .id(UUID.randomUUID().toString())
-                .value(getGenericTseApplicationTypeItemBuild())
+                .value(application)
                 .build())
         );
 
         caseData.setTseAdminSelectApplication(
             DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
 
-        String fileDisplay1 = "<a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>";
-        when(documentManagementService.displayDocNameTypeSizeLink(
-            createUploadedDocumentType("document.txt"), AUTH_TOKEN))
-            .thenReturn(fileDisplay1);
+        when(tseService.formatApplicationDetails(application, AUTH_TOKEN, false)).thenReturn("Application Details");
+        when(tseService.formatApplicationResponses(any(), any())).thenReturn("Responses");
 
-        String fileDisplay2 = "<a href=\"/documents/%s\" target=\"_blank\">image (PNG, 2MB)</a>";
-        when(documentManagementService.displayDocNameTypeSizeLink(
-            createUploadedDocumentType("image.png"), AUTH_TOKEN))
-            .thenReturn(fileDisplay2);
-
-        String fileDisplay3 = "<a href=\"/documents/%s\" target=\"_blank\">Form (PDF, 3MB)</a>";
-        when(documentManagementService.displayDocNameTypeSizeLink(
-            createUploadedDocumentType("Form.pdf"), AUTH_TOKEN))
-            .thenReturn(fileDisplay3);
-
-        String fileDisplay4 = "<a href=\"/documents/%s\" target=\"_blank\">Admin (TXT, 1MB)</a>";
-        when(documentManagementService.displayDocNameTypeSizeLink(
-            createUploadedDocumentType("admin.txt"), AUTH_TOKEN))
-            .thenReturn(fileDisplay4);
-
-        String expected = "| | |\r\n"
-            + "|--|--|\r\n"
-            + "|Respondent application | Amend response|\r\n"
-            + "|Application date | 13 December 2022|\r\n"
-            + "|Supporting material | " + fileDisplay1 + "|\r\n"
-            + "\r\n"
-            + "|Response 1 | |\r\n"
-            + "|--|--|\r\n"
-            + "|Response from | Claimant|\r\n"
-            + "|Response date | 23 December 2022|\r\n"
-            + "|Details | Response Details|\r\n"
-            + "|Supporting material | " + fileDisplay2 + "<br>" + fileDisplay3 + "<br>" + "|\r\n"
-            + "\r\n"
-            + "|Response 2||\r\n"
-            + "|--|--|\r\n"
-            + "|Response|Title of Response|\r\n"
-            + "|Date|24 December 2022|\r\n"
-            + "|Sent by|Tribunal|\r\n"
-            + "|Case management order or request?|Request|\r\n"
-            + "|Is a response required?|Yes - view document for details|\r\n"
-            + "|Party or parties to respond|Both parties|\r\n"
-            + "|Additional information|Optional Text entered by admin|\r\n"
-            + "|Supporting material|" + fileDisplay4 + "|\r\n"
-            + "|Request made by|Caseworker|\r\n"
-            + "|Full name|Mr Jimmy|\r\n"
-            + "|Sent to|Both parties|\r\n"
-            + "\r\n";
+        String expected = "Application Details\r\nResponses";
 
         tseAdminService.initialTseAdminTableMarkUp(caseData, AUTH_TOKEN);
         assertThat(caseData.getTseAdminTableMarkUp())
@@ -189,7 +152,7 @@ class TseAdminServiceTest {
                     .isResponseRequired("Yes - view document for details")
                     .selectPartyRespond("Both parties")
                     .additionalInformation("Optional Text entered by admin")
-                    .addDocument(createUploadedDocumentType("admin.txt"))
+                    .addDocument(createDocumentList("admin.txt"))
                     .requestMadeBy("Caseworker")
                     .madeByFullName("Mr Jimmy")
                     .selectPartyNotify("Both parties")
@@ -211,6 +174,10 @@ class TseAdminServiceTest {
             .build();
     }
 
+    private List<GenericTypeItem<DocumentType>> createDocumentList(String fileName) {
+        return List.of(GenericTypeItem.from(DocumentType.from(createUploadedDocumentType(fileName))));
+    }
+
     private static UploadedDocumentType createUploadedDocumentType(String fileName) {
         return UploadedDocumentBuilder.builder()
             .withFilename(fileName)
@@ -223,82 +190,6 @@ class TseAdminServiceTest {
         documentTypeItem.setId("1234");
         documentTypeItem.setValue(DocumentTypeBuilder.builder().withUploadedDocument(fileName, "1234").build());
         return documentTypeItem;
-    }
-
-    @Test
-    void initialTseAdminTableMarkUp_NoDoc_ReturnString() {
-
-        TseRespondTypeItem claimantReply = TseRespondTypeItem.builder()
-            .id(UUID.randomUUID().toString())
-            .value(
-                TseRespondType.builder()
-                    .from(CLAIMANT_TITLE)
-                    .date("23 December 2022")
-                    .response("Response Details")
-                    .hasSupportingMaterial(NO)
-                    .copyToOtherParty(YES)
-                    .build()
-            ).build();
-
-        TseRespondTypeItem adminReply = TseRespondTypeItem.builder()
-            .id(UUID.randomUUID().toString())
-            .value(
-                TseRespondType.builder()
-                    .from(ADMIN)
-                    .date("24 December 2022")
-                    .isCmoOrRequest("Neither")
-                    .selectPartyNotify("Both parties")
-                    .build()
-            )
-            .build();
-
-        GenericTseApplicationType genericTseApplication = TseApplicationBuilder.builder()
-            .withNumber("1")
-            .withType(TSE_APP_AMEND_RESPONSE)
-            .withApplicant(RESPONDENT_TITLE)
-            .withDate("13 December 2022")
-            .withDetails("Details Text")
-            .withStatus(OPEN_STATE)
-            .withRespondCollection(List.of(
-                claimantReply,
-                adminReply
-            ))
-            .build();
-
-        caseData.setGenericTseApplicationCollection(
-            List.of(GenericTseApplicationTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(genericTseApplication)
-                .build())
-        );
-
-        caseData.setTseAdminSelectApplication(
-            DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
-
-        String expected = "| | |\r\n"
-            + "|--|--|\r\n"
-            + "|Respondent application | Amend response|\r\n"
-            + "|Application date | 13 December 2022|\r\n"
-            + "|Details of the application | Details Text|\r\n"
-            + "\r\n"
-            + "|Response 1 | |\r\n"
-            + "|--|--|\r\n"
-            + "|Response from | Claimant|\r\n"
-            + "|Response date | 23 December 2022|\r\n"
-            + "|Details | Response Details|\r\n"
-            + "|Supporting material | |\r\n" // TODO: Remove Empty Row
-            + "\r\n"
-            + "|Response 2||\r\n"
-            + "|--|--|\r\n"
-            + "|Date|24 December 2022|\r\n"
-            + "|Sent by|Tribunal|\r\n"
-            + "|Case management order or request?|Neither|\r\n"
-            + "|Sent to|Both parties|\r\n"
-            + "\r\n";
-
-        tseAdminService.initialTseAdminTableMarkUp(caseData, AUTH_TOKEN);
-        assertThat(caseData.getTseAdminTableMarkUp())
-            .isEqualTo(expected);
     }
 
     @Test
@@ -320,7 +211,8 @@ class TseAdminServiceTest {
         caseData.setTseAdminDecision("Granted");
         caseData.setTseAdminTypeOfDecision("Judgment");
         caseData.setTseAdminAdditionalInformation("Additional information");
-        caseData.setTseAdminResponseRequiredNoDoc(createUploadedDocumentType("document.txt"));
+        List<GenericTypeItem<DocumentType>> documentList = createDocumentList("document.txt");
+        caseData.setTseAdminResponseRequiredNoDoc(documentList);
         caseData.setTseAdminDecisionMadeBy("Legal officer");
         caseData.setTseAdminDecisionMadeByFullName("Legal Officer Full Name");
         caseData.setTseAdminSelectPartyNotify(BOTH_PARTIES);
@@ -348,7 +240,7 @@ class TseAdminServiceTest {
         assertThat(actual.getAdditionalInformation())
             .isEqualTo("Additional information");
         assertThat(actual.getResponseRequiredDoc())
-            .isEqualTo(createUploadedDocumentType("document.txt"));
+            .isEqualTo(documentList);
         assertThat(actual.getDecisionMadeBy())
             .isEqualTo("Legal officer");
         assertThat(actual.getDecisionMadeByFullName())
@@ -379,7 +271,8 @@ class TseAdminServiceTest {
         caseData.setTseAdminIsResponseRequired(YES);
         caseData.setTseAdminSelectPartyRespond(CLAIMANT_TITLE);
         caseData.setTseAdminAdditionalInformation("Additional information text");
-        caseData.setTseAdminResponseRequiredYesDoc(createUploadedDocumentType("document.txt"));
+        List<GenericTypeItem<DocumentType>> documentList = createDocumentList("document.txt");
+        caseData.setTseAdminResponseRequiredYesDoc(documentList);
         caseData.setTseAdminDecisionMadeBy("Judge");
         caseData.setTseAdminDecisionMadeByFullName("Judge Full Name");
         caseData.setTseAdminSelectPartyNotify(CLAIMANT_ONLY);
@@ -407,7 +300,7 @@ class TseAdminServiceTest {
         assertThat(actual.getAdditionalInformation())
             .isEqualTo("Additional information text");
         assertThat(actual.getResponseRequiredDoc())
-            .isEqualTo(createUploadedDocumentType("document.txt"));
+            .isEqualTo(documentList);
         assertThat(actual.getDecisionMadeBy())
             .isEqualTo("Judge");
         assertThat(actual.getDecisionMadeByFullName())
@@ -434,7 +327,8 @@ class TseAdminServiceTest {
         caseData.setTseAdminDecision("Refused");
         caseData.setTseAdminTypeOfDecision(CASE_MANAGEMENT_ORDER);
         caseData.setTseAdminIsResponseRequired(NO);
-        caseData.setTseAdminResponseRequiredNoDoc(createUploadedDocumentType("document.txt"));
+        List<GenericTypeItem<DocumentType>> documentList = createDocumentList("document.txt");
+        caseData.setTseAdminResponseRequiredNoDoc(documentList);
         caseData.setTseAdminDecisionMadeBy("Judge");
         caseData.setTseAdminDecisionMadeByFullName("Judge Full Name");
         caseData.setTseAdminSelectPartyNotify(RESPONDENT_ONLY);
@@ -462,7 +356,7 @@ class TseAdminServiceTest {
         assertThat(actual.getAdditionalInformation())
             .isNull();
         assertThat(actual.getResponseRequiredDoc())
-            .isEqualTo(createUploadedDocumentType("document.txt"));
+            .isEqualTo(documentList);
         assertThat(actual.getDecisionMadeBy())
             .isEqualTo("Judge");
         assertThat(actual.getDecisionMadeByFullName())
@@ -543,7 +437,7 @@ class TseAdminServiceTest {
         caseData.setTseAdminIsResponseRequired(YES);
         caseData.setTseAdminSelectPartyRespond(CLAIMANT_TITLE);
         caseData.setTseAdminAdditionalInformation("Additional information text");
-        caseData.setTseAdminResponseRequiredYesDoc(createUploadedDocumentType("document.txt"));
+        caseData.setTseAdminResponseRequiredYesDoc(createDocumentList("document.txt"));
         caseData.setTseAdminResponseRequiredNoDoc(null);
         caseData.setTseAdminDecisionMadeBy("Judge");
         caseData.setTseAdminDecisionMadeByFullName("Judge Full Name");

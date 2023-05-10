@@ -13,7 +13,9 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -38,6 +40,8 @@ class TseAdmCloseServiceTest {
 
     @MockBean
     private DocumentManagementService documentManagementService;
+    @MockBean
+    private TseService tseService;
 
     private CaseData caseData;
 
@@ -45,8 +49,9 @@ class TseAdmCloseServiceTest {
 
     @BeforeEach
     void setUp() {
-        tseAdmCloseService = new TseAdmCloseService(documentManagementService);
+        tseAdmCloseService = new TseAdmCloseService(tseService);
         caseData = CaseDataBuilder.builder().build();
+        when(tseService.formatViewApplication(any(), any())).thenReturn("Application Details\r\n");
     }
 
     @Test
@@ -85,6 +90,7 @@ class TseAdmCloseServiceTest {
                                           boolean hasDoc, boolean hasAdditionalInfo) {
         GenericTseApplicationType tseApplicationType =
             getTseAppType(appHasDoc, appHasDetails, hasDoc, hasAdditionalInfo);
+
         caseData.setGenericTseApplicationCollection(
             List.of(GenericTseApplicationTypeItem.builder()
                 .id(UUID.randomUUID().toString())
@@ -92,18 +98,7 @@ class TseAdmCloseServiceTest {
                 .build())
         );
 
-        String expected = "| | |\r\n"
-            + "|--|--|\r\n"
-            + "|Applicant | Respondent|\r\n"
-            + "|Type of application | Amend response|\r\n"
-            + "|Application date | 13 December 2022|\r\n"
-            + (appHasDetails ? "|Details of the application | Details Text|\r\n" : "")
-            + (appHasDoc
-            ? "|Supporting material | <a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>|\r\n"
-            : "")
-            + "|Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure? | "
-            + null + "|\r\n"
-            + "\r\n"
+        String expected = "Application Details\r\n"
             + "|Decision | |\r\n"
             + "|--|--|\r\n"
             + "|Notification | Response Details|\r\n"
@@ -113,16 +108,18 @@ class TseAdmCloseServiceTest {
             + "|Sent by | Tribunal|\r\n"
             + "|Type of decision | type of decision|\r\n"
             + (hasAdditionalInfo ? "|Additional information | additional info|\r\n" : "")
-            + (hasDoc ? "|Document | <a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>|\r\n" : "")
+            + (hasDoc ? "|Document|<a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>|\r\n" : "")
             + "|Decision made by | decision made by|\r\n"
             + "|Name | made by full name|\r\n"
             + "|Sent to | party notify|\r\n"
             + "\r\n";
 
         String fileDisplay1 = "<a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>";
-        when(documentManagementService.displayDocNameTypeSizeLink(
-            any(), any()))
-            .thenReturn(fileDisplay1);
+
+        when(tseService.addDocumentRows(any(), any())).thenReturn(List.of(
+                new String[]{"Document", fileDisplay1},
+                new String[]{"Description", ""})
+        );
 
         caseData.setTseAdminSelectApplication(
             DynamicFixedListType.of(DynamicValueType.create("1", "1 - Amend response")));
@@ -156,10 +153,10 @@ class TseAdmCloseServiceTest {
                     .decisionMadeByFullName("made by full name")
                     .selectPartyNotify("party notify")
                     .responseRequiredDoc(hasDoc
-                        ? UploadedDocumentBuilder.builder()
+                        ? List.of(GenericTypeItem.from(DocumentType.from(UploadedDocumentBuilder.builder()
                             .withFilename("admin.txt")
                             .withUuid("1234")
-                            .build()
+                            .build())))
                         : null)
                     .build()
             ).build();

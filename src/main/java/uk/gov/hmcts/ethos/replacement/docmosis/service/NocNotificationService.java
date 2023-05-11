@@ -85,9 +85,9 @@ public class NocNotificationService {
             log.warn("Missing respondentEmail");
         } else {
             emailService.sendEmail(
-                    respondentTemplateId,
-                    respondent.getRespondentEmail(),
-                    NocNotificationHelper.buildRespondentPersonalisation(caseDataPrevious, respondent));
+                respondentTemplateId,
+                respondent.getRespondentEmail(),
+                NocNotificationHelper.buildRespondentPersonalisation(caseDataPrevious, respondent));
         }
     }
 

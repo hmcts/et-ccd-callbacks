@@ -58,7 +58,7 @@ public class Et3ResponseController {
     private final Et3ResponseService et3ResponseService;
 
     /**
-     * Called at the start of the ET3 Response journey. 
+     * Called at the start of the ET3 Response journey.
      * Sets hidden inset fields to YES to enable inset text functionality in ExUI.
      *
      * @param ccdRequest holds the request and case data
@@ -240,6 +240,7 @@ public class Et3ResponseController {
         et3ResponseService.saveEt3ResponseDocument(caseData, documentInfo);
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
+        et3ResponseService.sendNotifications(ccdRequest.getCaseDetails());
         Et3ResponseHelper.resetEt3FormFields(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }

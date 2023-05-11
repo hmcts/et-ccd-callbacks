@@ -9,12 +9,10 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
-
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_BY_HEARING_VENUE_REPORT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 
 @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
 public final class ClaimsByHearingVenueReport {
@@ -22,6 +20,7 @@ public final class ClaimsByHearingVenueReport {
     private final ClaimsByHearingVenueReportDataSource dataSource;
 
     public ClaimsByHearingVenueReport(ClaimsByHearingVenueReportDataSource dataSource) {
+
         this.dataSource = dataSource;
     }
 
@@ -29,9 +28,6 @@ public final class ClaimsByHearingVenueReport {
         String reportOffice = ReportHelper.getReportOffice(reportParams.getCaseTypeId(),
             reportParams.getManagingOffice());
         ClaimsByHearingVenueReportData claimsByHearingVenueReportData = initReport(reportOffice);
-
-        setReportListingDate(claimsByHearingVenueReportData, reportParams.getDateFrom(),
-                reportParams.getDateTo(), reportParams.getHearingDateType());
         claimsByHearingVenueReportData.setReportPrintedOnDescription(
                 getReportedOnDetail(reportParams.getUserFullName()));
         claimsByHearingVenueReportData.setManagingOffice(
@@ -40,6 +36,9 @@ public final class ClaimsByHearingVenueReport {
         List<ClaimsByHearingVenueSubmitEvent> submitEvents = dataSource.getData(
                 reportParams.getManagingOffice(), UtilHelper.getListingCaseTypeId(reportParams.getCaseTypeId()),
                 reportParams.getDateFrom(), reportParams.getDateTo());
+        claimsByHearingVenueReportData.setReportPeriodDescription(ReportHelper.getReportListingDate(
+                claimsByHearingVenueReportData, reportParams.getDateFrom(),
+                reportParams.getDateTo(), reportParams.getHearingDateType()));
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             setReportData(submitEvents, claimsByHearingVenueReportData);
         }
@@ -57,31 +56,6 @@ public final class ClaimsByHearingVenueReport {
 
     private String getReportedOnDetail(String userName) {
         return "Reported on: " + UtilHelper.formatCurrentDate(LocalDate.now()) + "   By: " + userName;
-    }
-
-    private String getReportTitle(String reportPeriod, String officeName) {
-        return "   Period: " + reportPeriod + "       Office: " + officeName;
-    }
-
-    private void setReportListingDate(ClaimsByHearingVenueReportData reportData,
-                                      String listingDateFrom, String listingDateTo, String hearingDateType) {
-        if (SINGLE_HEARING_DATE_TYPE.equals(hearingDateType)) {
-            reportData.setListingDate(ReportHelper.getFormattedLocalDate(listingDateFrom));
-            reportData.setListingDateFrom(null);
-            reportData.setListingDateTo(null);
-            reportData.setHearingDateType(hearingDateType);
-            String reportedOn = "On " + UtilHelper.listingFormatLocalDate(
-                    ReportHelper.getFormattedLocalDate(listingDateFrom));
-            reportData.setReportPeriodDescription(getReportTitle(reportedOn, reportData.getOffice()));
-        } else {
-            reportData.setListingDate(null);
-            reportData.setListingDateFrom(ReportHelper.getFormattedLocalDate(listingDateFrom));
-            reportData.setListingDateTo(ReportHelper.getFormattedLocalDate(listingDateTo));
-            reportData.setHearingDateType(hearingDateType);
-            String reportedBetween = "Between " + UtilHelper.listingFormatLocalDate(reportData.getListingDateFrom())
-                    + " and " + UtilHelper.listingFormatLocalDate(reportData.getListingDateTo());
-            reportData.setReportPeriodDescription(getReportTitle(reportedBetween, reportData.getOffice()));
-        }
     }
 
     private void setReportData(List<ClaimsByHearingVenueSubmitEvent> submitEvents,

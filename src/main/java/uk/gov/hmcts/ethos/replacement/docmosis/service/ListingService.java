@@ -31,13 +31,14 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingVenueHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReport;
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction.BfActionReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.casesourcelocalreport.CaseSourceLocalReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.claimsbyhearingvenue.ClaimsByHearingVenueReportData;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays.MemberDaysReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.servingclaims.ServingClaimsReport;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.timetofirsthearing.TimeToFirstHearingReport;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ClaimsByHearingVenueExcelReportDocumentInfoService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelReportDocumentInfoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.VenueService;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -97,8 +98,9 @@ public class ListingService {
     private final TimeToFirstHearingReport timeToFirstHearingReport;
     private final ServingClaimsReport servingClaimsReport;
     private final CaseSourceLocalReport caseSourceLocalReport;
-    private final ClaimsByHearingVenueExcelReportDocumentInfoService claimsByHearingVenueExcelReportDocumentInfoService;
+    private final ExcelReportDocumentInfoService excelReportDocumentInfoService;
     private final VenueService venueService;
+    private final BfActionReport bfActionReport;
     private static final String MISSING_DOCUMENT_NAME = "Missing document name";
     private static final String MESSAGE = "Failed to generate document for case id : ";
     public static final String ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND =
@@ -305,13 +307,16 @@ public class ListingService {
         return TribunalOffice.getCaseTypeId(getSelectedOfficeForPrintLists(caseData));
     }
 
-    public ListingData getDateRangeReport(ListingDetails listingDetails, String authToken) throws IOException {
+    public ListingData getDateRangeReport(ListingDetails listingDetails,
+                                          String authToken,
+                                          String userName) throws IOException {
         clearListingFields(listingDetails.getCaseData());
         List<SubmitEvent> submitEvents = getDateRangeReportSearch(listingDetails, authToken);
         log.info("Number of cases found: " + submitEvents.size());
         switch (listingDetails.getCaseData().getReportType()) {
             case BROUGHT_FORWARD_REPORT:
-                return new BfActionReport().runReport(listingDetails, submitEvents);
+                return bfActionReport.runReport(listingDetails,
+                        submitEvents, userName);
             case CLAIMS_ACCEPTED_REPORT:
                 return ReportHelper.processClaimsAcceptedRequest(listingDetails, submitEvents);
             case LIVE_CASELOAD_REPORT:
@@ -467,8 +472,12 @@ public class ListingService {
     public DocumentInfo processHearingDocument(ListingData listingData, String caseTypeId, String authToken) {
         try {
             if (CLAIMS_BY_HEARING_VENUE_REPORT.equals(listingData.getReportType())) {
-                return claimsByHearingVenueExcelReportDocumentInfoService.generateExcelReportDocumentInfo(
+                return excelReportDocumentInfoService.generateClaimsByHearingVenueExcelReportDocumentInfo(
                         (ClaimsByHearingVenueReportData)listingData, caseTypeId, authToken);
+            }
+            if (BROUGHT_FORWARD_REPORT.equals(listingData.getReportType())) {
+                return excelReportDocumentInfoService.generateBfExcelReportDocumentInfo(
+                        (BfActionReportData)listingData, caseTypeId, authToken);
             }
             return tornadoService.listingGeneration(authToken, listingData, caseTypeId);
         } catch (Exception ex) {
@@ -495,5 +504,8 @@ public class ListingService {
         DynamicFixedListType dynamicListingVenues = new DynamicFixedListType();
         dynamicListingVenues.setListItems(listItems);
         listingData.setListingVenue(dynamicListingVenues);
+        if (ALL_VENUES.equals(listingData.getManagingOffice())) {
+            listingData.getListingVenue().setValue(listingData.getListingVenue().getListItems().get(0));
+        }
     }
 }

@@ -54,6 +54,7 @@ public class DocumentManagementService {
     private static final String JURISDICTION = "EMPLOYMENT";
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     private static final String FILE_DISPLAY = "<a href=\"/documents/%s\" target=\"_blank\">%s (%s, %s)</a>";
+    private static final String FILE_DISPLAY_FALLBACK = "<a href=\"/documents/%s\" target=\"_blank\">%s</a>";
 
     private final DocumentUploadClientApi documentUploadClient;
     private final AuthTokenGenerator authTokenGenerator;
@@ -217,14 +218,20 @@ public class DocumentManagementService {
             documentType = document.getDocumentFilename().substring(lastIndexDot + 1).toUpperCase(Locale.ENGLISH);
         }
 
-        ResponseEntity<DocumentDetails> documentDetails =
-                getDocumentDetails(authToken, UUID.fromString(getDocumentUUID(document.getDocumentUrl())));
+        try {
+            ResponseEntity<DocumentDetails> documentDetails =
+                    getDocumentDetails(authToken, UUID.fromString(getDocumentUUID(document.getDocumentUrl())));
 
-        DocumentDetails docDetails = documentDetails.getBody();
-        String fileSize = (docDetails == null) 
-            ? "" : FileUtils.byteCountToDisplaySize(Long.parseLong(docDetails.getSize()));
+            DocumentDetails docDetails = documentDetails.getBody();
+            String fileSize = (docDetails == null)
+                    ? "" : FileUtils.byteCountToDisplaySize(Long.parseLong(docDetails.getSize()));
 
-        return String.format(FILE_DISPLAY, documentLink, documentName, documentType, fileSize);
+            return String.format(FILE_DISPLAY, documentLink, documentName, documentType, fileSize);
+        } catch (DocumentManagementException e) {
+            log.warn(e.getMessage());
+            return String.format(FILE_DISPLAY_FALLBACK, documentLink, documentName);
+        }
+
     }
 
     private ResponseEntity<DocumentDetails> getDocumentDetails(String authToken, UUID documentId) {

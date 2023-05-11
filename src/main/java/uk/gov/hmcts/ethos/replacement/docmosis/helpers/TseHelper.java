@@ -103,11 +103,15 @@ public final class TseHelper {
      */
     public static void setDataForRespondingToApplication(CaseData caseData) {
         List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
-        if (CollectionUtils.isEmpty(applications) || getSelectedApplication(caseData) == null) {
+        if (CollectionUtils.isEmpty(applications)) {
             return;
         }
 
         GenericTseApplicationType genericTseApplicationType = getSelectedApplication(caseData);
+
+        if (genericTseApplicationType == null) {
+            return;
+        }
 
         LocalDate date = LocalDate.parse(genericTseApplicationType.getDate(), NEW_DATE_PATTERN);
 
@@ -189,6 +193,7 @@ public final class TseHelper {
         caseData.setTseResponseSupportingMaterial(null);
         caseData.setTseResponseCopyToOtherParty(null);
         caseData.setTseResponseCopyNoGiveDetails(null);
+        caseData.setTseRespondSelectApplication(null);
     }
 
     /**

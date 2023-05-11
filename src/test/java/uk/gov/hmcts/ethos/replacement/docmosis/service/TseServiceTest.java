@@ -282,6 +282,7 @@ class TseServiceTest {
         tseAdminRecordDecisionType.setEnterNotificationTitle("title");
         tseAdminRecordDecisionType.setDecisionMadeBy("Judge");
         tseAdminRecordDecisionType.setDecisionMadeByFullName("John Doe");
+        tseAdminRecordDecisionType.setSelectPartyNotify("Respondent");
 
         TseAdminRecordDecisionTypeItem decisionTypeItem = new TseAdminRecordDecisionTypeItem();
         decisionTypeItem.setValue(tseAdminRecordDecisionType);
@@ -329,7 +330,8 @@ class TseServiceTest {
             + "|Type of decision|Judgment|\r\n"
             + "|Additional information|MORE INFO|\r\n"
             + "|Decision made by|Judge|\r\n"
-            + "|Name|John Doe|\r\n";
+            + "|Name|John Doe|\r\n"
+            + "|Sent to|Respondent|\r\n";
 
         assertThat(tseService.formatViewApplication(caseData, AUTH_TOKEN)).isEqualTo(expected);
     }

@@ -9,7 +9,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
@@ -31,7 +30,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
@@ -40,11 +38,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.ADDITIONAL_INFORMATION;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.CLOSE_APP_DECISION_DETAILS_OTHER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.NAME_MARKUP;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 
 @Slf4j
 @Service
@@ -56,19 +49,6 @@ public class TseService {
             "Details of why you do not want to inform the other party";
     public static final String WHATS_YOUR_RESPONSE = "What's your response to the %s's application";
 
-    private static final String CLOSE_APP_DECISION_DETAILS = "|Decision | |\r\n"
-        + TABLE_STRING
-        + "|Notification | %s|\r\n"
-        + "|Decision | %s|\r\n"
-        + "%s" // Decision details
-        + DATE_MARKUP
-        + "|Sent by | %s|\r\n"
-        + "|Type of decision | %s|\r\n"
-        + "%s%s"
-        + "|Decision made by | %s|\r\n"
-        + NAME_MARKUP
-        + "|Sent to | %s|\r\n"
-        + "\r\n";
     private final DocumentManagementService documentManagementService;
 
     /**
@@ -201,27 +181,6 @@ public class TseService {
         return caseData.getGenericTseApplicationCollection().size() + 1;
     }
 
-    private String getAdditionInfoMarkdown(TseAdminRecordDecisionTypeItem decision) {
-        return decision.getValue().getAdditionalInformation() == null
-            ? ""
-            : String.format(ADDITIONAL_INFORMATION, decision.getValue().getAdditionalInformation());
-    }
-
-    private String getDecisionDocumentLink(TseAdminRecordDecisionType decisionType, String authToken) {
-        List<GenericTypeItem<DocumentType>> documents = decisionType.getResponseRequiredDoc();
-        if (documents == null) {
-            return "";
-        }
-
-        return MarkdownHelper.createTwoColumnRows(addDocumentRows(documents, authToken));
-    }
-
-    private String formatDecisionDetails(TseAdminRecordDecisionType decision) {
-        return isBlank(decision.getDecisionDetails())
-            ? ""
-            : String.format(CLOSE_APP_DECISION_DETAILS_OTHER, decision.getDecisionDetails());
-    }
-
     /**
      * Builds a two column Markdown table with both application details and all responses.
      * @param caseData parent object for all case data
@@ -308,7 +267,7 @@ public class TseService {
             new String[]{"Additional information", decision.getAdditionalInformation()},
             new String[]{"Decision made by", decision.getDecisionMadeBy()},
             new String[]{"Name", decision.getDecisionMadeByFullName()},
-            new String[]{"Sent To", decision.getSelectPartyNotify()}
+            new String[]{"Sent to", decision.getSelectPartyNotify()}
         ));
 
         return MarkdownHelper.createTwoColumnTable(new String[]{"Decision", ""}, rows);

@@ -276,15 +276,16 @@ public class TseService {
     private String formatApplicationDecision(GenericTseApplicationType application, String authToken) {
 
         String decisionsMarkdown = "";
-        if (application.getAdminDecision() != null) {
-            // Multiple decisions can be made for the same application but we are only showing the last one for now
-            Optional<String> decisionsMarkdownResult = application.getAdminDecision()
-                .stream()
-                .reduce((first, second) -> second)
-                .map(d -> getSingleDecisionMarkdown(d.getValue(), authToken));
-            if (decisionsMarkdownResult.isPresent()) {
-                decisionsMarkdown = decisionsMarkdownResult.get();
-            }
+        if (application.getAdminDecision() == null) {
+            return decisionsMarkdown;
+        }
+        // Multiple decisions can be made for the same application but we are only showing the last one for now
+        Optional<String> decisionsMarkdownResult = application.getAdminDecision()
+            .stream()
+            .reduce((first, second) -> second)
+            .map(d -> getSingleDecisionMarkdown(d.getValue(), authToken));
+        if (decisionsMarkdownResult.isPresent()) {
+            decisionsMarkdown = decisionsMarkdownResult.get();
         }
 
         return decisionsMarkdown;

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataValidation;
@@ -12,6 +13,8 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Name;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -19,17 +22,17 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.multiples.MultipleObject;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
-
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
-
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.CONSTRAINT_KEY;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.HIDDEN_SHEET_NAME;
 import static uk.gov.hmcts.et.common.model.multiples.MultipleConstants.SHEET_NAME;
 
 @Slf4j
 @Service("excelCreationService")
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.CloseResource", "PMD.LawOfDemeter",
+                   "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 public class ExcelCreationService {
 
     public byte[] writeExcel(List<?> multipleCollection, List<String> subMultipleCollection, String leadCaseString) {
@@ -142,7 +145,7 @@ public class ExcelCreationService {
         }
     }
 
-    private void createCell(XSSFRow row, int cellIndex, String value, CellStyle style) {
+    public void createCell(XSSFRow row, int cellIndex, String value, CellStyle style) {
         Cell cell = row.createCell(cellIndex);
         cell.setCellStyle(style);
 
@@ -228,4 +231,114 @@ public class ExcelCreationService {
             createCell(row, columnIndex, multipleObject.getFlag4(), styleForUnLocking);
         }
     }
+
+    public CellStyle getReportTitleCellStyle(XSSFWorkbook workbook) {
+        Font font = getFont(workbook);
+        font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        font.setFontHeightInPoints((short)25);
+        CellStyle cellStyle = getHeadersCellStyle(workbook);
+        cellStyle.setFont(font);
+        cellStyle.setFillBackgroundColor(IndexedColors.BLUE_GREY.getIndex());
+        return cellStyle;
+    }
+
+    public CellStyle getHeaderCellStyle(XSSFWorkbook workbook) {
+        Font font = getFont(workbook);
+        font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        CellStyle cellStyle = getHeadersCellStyle(workbook);
+        cellStyle.setFont(font);
+        cellStyle.setBorderBottom(BorderStyle.THIN);
+        cellStyle.setBottomBorderColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        return cellStyle;
+    }
+
+    private CellStyle getHeadersCellStyle(XSSFWorkbook workbook) {
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
+        cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        return cellStyle;
+    }
+
+    private Font getFont(XSSFWorkbook workbook) {
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setFontName("Calibre");
+        font.setColor(IndexedColors.DARK_GREEN.getIndex());
+        font.setFontHeightInPoints((short)16);
+        return font;
+    }
+
+    public CellStyle getReportSubTitleCellStyle(XSSFWorkbook workbook) {
+        Font font = getFont(workbook);
+        font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        font.setFontHeightInPoints((short)20);
+        CellStyle cellStyle = getHeadersCellStyle(workbook);
+        cellStyle.setFont(font);
+        return cellStyle;
+    }
+
+    public void addReportAdminDetails(XSSFWorkbook workbook, XSSFSheet sheet, int rowIndex,
+                                       String reportPrintedOnDescription, int lastCol) {
+        CellRangeAddress reportTitleCellRange = new CellRangeAddress(rowIndex, rowIndex, 0, lastCol);
+        sheet.addMergedRegion(reportTitleCellRange);
+        XSSFRow rowReportTitle = sheet.createRow(rowIndex);
+        rowReportTitle.setHeight((short)(rowReportTitle.getHeight() * 8));
+        CellStyle styleForHeaderCell = getCellStyle(workbook);
+        styleForHeaderCell.setAlignment(HorizontalAlignment.CENTER);
+        styleForHeaderCell.setBorderTop(BorderStyle.THIN);
+        styleForHeaderCell.setBorderLeft(BorderStyle.THIN);
+        styleForHeaderCell.setBorderRight(BorderStyle.THIN);
+        styleForHeaderCell.setBorderBottom(BorderStyle.THIN);
+        styleForHeaderCell.setFillForegroundColor(IndexedColors.SEA_GREEN.getIndex());
+        styleForHeaderCell.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        styleForHeaderCell.setFont(getFont(workbook));
+        createCell(rowReportTitle, 0, reportPrintedOnDescription, styleForHeaderCell);
+    }
+
+    public CellStyle getCellStyle(XSSFWorkbook workbook) {
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        Font font = getFont(workbook);
+        font.setColor(IndexedColors.BLACK1.getIndex());
+        font.setFontHeightInPoints((short)14);
+        font.setBold(false);
+        cellStyle.setFont(font);
+        cellStyle.setFillForegroundColor(IndexedColors.WHITE1.getIndex());
+        cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle.setBorderTop(BorderStyle.NONE);
+        cellStyle.setBorderLeft(BorderStyle.NONE);
+        cellStyle.setBorderRight(BorderStyle.NONE);
+        cellStyle.setBorderBottom(BorderStyle.THIN);
+        cellStyle.setBottomBorderColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        return cellStyle;
+    }
+
+    public void initializeReportHeaders(String documentName, String periodDescription, XSSFWorkbook workbook,
+                                         XSSFSheet sheet, List<String> headers) {
+        CellRangeAddress reportTitleCellRange = new CellRangeAddress(0, 0, 0, headers.size() - 1);
+        sheet.addMergedRegion(reportTitleCellRange);
+        XSSFRow rowReportTitle = sheet.createRow(0);
+        rowReportTitle.setHeight((short)(rowReportTitle.getHeight() * 8));
+        CellStyle styleForHeaderCell = getReportTitleCellStyle(workbook);
+        createCell(rowReportTitle, 0, documentName, styleForHeaderCell);
+
+        CellRangeAddress reportPeriodCellRange = new CellRangeAddress(1, 1, 0, headers.size() - 1);
+        sheet.addMergedRegion(reportPeriodCellRange);
+        XSSFRow rowReportPeriod = sheet.createRow(1);
+        rowReportPeriod.setHeight((short)(rowReportPeriod.getHeight() * 6));
+        CellStyle styleForSubTitleCell = getReportSubTitleCellStyle(workbook);
+        createCell(rowReportPeriod, 0, periodDescription, styleForSubTitleCell);
+
+        XSSFRow rowHead = sheet.createRow(2);
+        rowHead.setHeight((short)(rowHead.getHeight() * 4));
+        CellStyle styleForColHeaderCell = getHeaderCellStyle(workbook);
+        for (int j = 0; j < headers.size(); j++) {
+            rowHead.createCell(j).setCellValue(headers.get(j));
+            createCell(rowHead, j, headers.get(j), styleForColHeaderCell);
+        }
+    }
+
 }

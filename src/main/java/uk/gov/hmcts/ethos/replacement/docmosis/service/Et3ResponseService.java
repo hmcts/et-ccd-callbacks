@@ -23,9 +23,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.buildPersonalisation;
-
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.buildPersonalisation;
 
 /**
  * Service to support ET3 Response journey. Contains methods for generating and saving ET3 Response documents.
@@ -112,7 +111,7 @@ public class Et3ResponseService {
                 .orElse(List.of())
                 .stream()
                 .filter(o -> !documentSet.contains(o.getId()))
-                .collect(Collectors.toList());
+                .toList();
         for (DocumentTypeItem documentTypeItem : documentList) {
             documentTypeItem.getValue().setTypeOfDocument(ET3_ATTACHMENT);
         }

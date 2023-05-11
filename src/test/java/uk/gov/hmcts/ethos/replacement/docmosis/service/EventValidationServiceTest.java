@@ -149,8 +149,9 @@ class EventValidationServiceTest {
     @Test
     void shouldValidatePastReceiptDate() {
         caseData.setReceiptDate(PAST_RECEIPT_DATE.toString());
-
-        List<String> errors = eventValidationService.validateReceiptDate(caseData);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
 
         assertEquals(0, errors.size());
         assertEquals(caseData.getTargetHearingDate(), PAST_TARGET_HEARING_DATE.toString());
@@ -163,7 +164,10 @@ class EventValidationServiceTest {
         CasePreAcceptType casePreAcceptType = new CasePreAcceptType();
         casePreAcceptType.setDateRejected(rejectedDate);
         caseData.setPreAcceptCase(casePreAcceptType);
-        List<String> errors = eventValidationService.validateReceiptDate(caseData);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setState(REJECTED_STATE);
+        caseDetails.setCaseData(caseData);
+        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
         if ("2023-01-01".equals(rejectedDate)) {
             assertEquals(0, errors.size());
         }
@@ -175,8 +179,9 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateCurrentReceiptDate() {
         caseData.setReceiptDate(CURRENT_RECEIPT_DATE.toString());
-
-        List<String> errors = eventValidationService.validateReceiptDate(caseData);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
 
         assertEquals(0, errors.size());
         assertEquals(caseData.getTargetHearingDate(), CURRENT_TARGET_HEARING_DATE.toString());
@@ -185,8 +190,9 @@ class EventValidationServiceTest {
     @Test
     void shouldValidateFutureReceiptDate() {
         caseData.setReceiptDate(FUTURE_RECEIPT_DATE.toString());
-
-        List<String> errors = eventValidationService.validateReceiptDate(caseData);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
 
         assertEquals(1, errors.size());
         assertEquals(FUTURE_RECEIPT_DATE_ERROR_MESSAGE, errors.get(0));
@@ -218,8 +224,10 @@ class EventValidationServiceTest {
         CasePreAcceptType casePreAcceptType = new CasePreAcceptType();
         casePreAcceptType.setDateAccepted(PAST_ACCEPTED_DATE.toString());
         caseData.setPreAcceptCase(casePreAcceptType);
-
-        List<String> errors = eventValidationService.validateReceiptDate(caseData);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setState(ACCEPTED_STATE);
+        caseDetails.setCaseData(caseData);
+        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
 
         assertEquals(1, errors.size());
         assertEquals(RECEIPT_DATE_LATER_THAN_ACCEPTED_ERROR_MESSAGE, errors.get(0));

@@ -28,8 +28,8 @@ public class ClaimsByHearingVenueExcelReportCreationService {
     private static final String RESPONDENT_ET3_POSTCODE_HEADER = "Respondent ET3 Postcode";
     private final ExcelCreationService excelCreationService;
     private static final List<String> HEADERS = new ArrayList<>(List.of(
-        CASE_NUMBER_HEADER, DATE_OF_RECEIPT_HEADER, CLAIMANT_POSTCODE_HEADER,
-        CLAIMANT_WORK_POSTCODE_HEADER, RESPONDENT_POSTCODE_HEADER, RESPONDENT_ET3_POSTCODE_HEADER));
+            CASE_NUMBER_HEADER, DATE_OF_RECEIPT_HEADER, CLAIMANT_POSTCODE_HEADER,
+            CLAIMANT_WORK_POSTCODE_HEADER, RESPONDENT_POSTCODE_HEADER, RESPONDENT_ET3_POSTCODE_HEADER));
 
     public byte[] getReportExcelFile(ClaimsByHearingVenueReportData reportData) {
         if (reportData == null) {
@@ -77,24 +77,6 @@ public class ClaimsByHearingVenueExcelReportCreationService {
         int firstRow = 2;
         int lastRow = firstRow + reportDetailsCount;
         sheet.setAutoFilter(new CellRangeAddress(firstRow, lastRow, 0, 5));
-    }
-
-    private void addReportAdminDetails(XSSFWorkbook workbook, XSSFSheet sheet, int rowIndex,
-                                       String reportPrintedOnDescription) {
-        CellRangeAddress reportTitleCellRange = new CellRangeAddress(rowIndex, rowIndex, 0, 6);
-        sheet.addMergedRegion(reportTitleCellRange);
-        XSSFRow rowReportTitle = sheet.createRow(rowIndex);
-        rowReportTitle.setHeight((short)(rowReportTitle.getHeight() * 8));
-        CellStyle styleForHeaderCell = getCellStyle(workbook);
-        styleForHeaderCell.setAlignment(HorizontalAlignment.CENTER);
-        styleForHeaderCell.setBorderTop(BorderStyle.THIN);
-        styleForHeaderCell.setBorderLeft(BorderStyle.THIN);
-        styleForHeaderCell.setBorderRight(BorderStyle.THIN);
-        styleForHeaderCell.setBorderBottom(BorderStyle.THIN);
-        styleForHeaderCell.setFillForegroundColor(IndexedColors.SEA_GREEN.getIndex());
-        styleForHeaderCell.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        styleForHeaderCell.setFont(getFont(workbook));
-        createCell(rowReportTitle, 0, reportPrintedOnDescription, styleForHeaderCell);
     }
 
     private void constructCaseExcelRow(XSSFWorkbook workbook, XSSFSheet sheet, int rowIndex,

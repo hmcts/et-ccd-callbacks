@@ -33,6 +33,7 @@ class BundlesRespondentControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/bundlesRespondent/aboutToSubmit";
     private static final String MID_POPULATE_HEARINGS_URL = "/bundlesRespondent/midPopulateHearings";
     private static final String MID_VALIDATE_UPLOAD_URL = "/bundlesRespondent/midValidateUpload";
+    private static final String SUBMITTED_URL = "/bundlesRespondent/submitted";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -180,6 +181,38 @@ class BundlesRespondentControllerTest {
     @Test
     void midValidateUpload_badRequest() throws Exception {
         mockMvc.perform(post(MID_VALIDATE_UPLOAD_URL)
+                .content("garbage content")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void submitted_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(SUBMITTED_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data", notNullValue()))
+            .andExpect(jsonPath("$.errors", nullValue()))
+            .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void submitted_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(SUBMITTED_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void submitted_badRequest() throws Exception {
+        mockMvc.perform(post(SUBMITTED_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))

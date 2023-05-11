@@ -97,6 +97,7 @@ public class BundlesRespondentController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        bundlesRespondentService.addToBundlesCollection(caseData);
         bundlesRespondentService.clearInputData(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
@@ -166,5 +167,39 @@ public class BundlesRespondentController {
         List<String> errors = bundlesRespondentService.validateFileUpload(caseData);
 
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    /**
+     * Renders data for the submitted page.
+     */
+    @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Renders data for the submitted page.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> submitted(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            log.error(INVALID_TOKEN, userToken);
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
+
+        String header = "<h1>You have sent your hearing documents to the tribunal</h1>";
+        String body = "<h2>What happens next</h2>\r\n\r\nThe tribunal will let you know"
+                + " if they have any questions about the hearing documents you have submitted.";
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .data(ccdRequest.getCaseDetails().getCaseData())
+                .confirmation_header(header)
+                .confirmation_body(body)
+                .build());
     }
 }

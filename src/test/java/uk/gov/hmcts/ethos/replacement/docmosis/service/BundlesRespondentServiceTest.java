@@ -1,14 +1,20 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -112,5 +118,56 @@ class BundlesRespondentServiceTest {
         englandCaseData.setBundlesRespondentUploadFile(uploadedDocumentType);
         List<String> errors = bundlesRespondentService.validateFileUpload(englandCaseData);
         assertThat(errors.size(), is(0));
+    }
+
+    @Test
+    void addToBundlesCollection_whenEmptyCollection_createsNewCollection() {
+        englandCaseData.setBundlesRespondentCollection(null);
+        englandCaseData.setBundlesRespondentSelectHearing(getTestSelectHearing());
+
+        bundlesRespondentService.addToBundlesCollection(englandCaseData);
+
+        assertThat(englandCaseData.getBundlesRespondentCollection().size(), is(1));
+    }
+
+    @NotNull
+    private static DynamicFixedListType getTestSelectHearing() {
+        DynamicFixedListType selectHearing = DynamicFixedListType.from(List.of(
+                DynamicValueType.create("1", "1 Hearing - Bodmin - 16 May 2069")));
+
+        selectHearing.setValue(selectHearing.getListItems().get(0));
+        return selectHearing;
+    }
+
+    @Test
+    void addToBundlesCollection_addsBundlesObject() {
+        List<GenericTypeItem<HearingBundleType>> collection = new ArrayList<>();
+        englandCaseData.setBundlesRespondentCollection(collection);
+
+        String respondentsDocumentsOnly = "Respondent's documents only";
+        String witnessStatementsOnly = "Witness statements only";
+        String butReason = "ButReason";
+        String disagree = "Disagree";
+        UploadedDocumentType file = UploadedDocumentType.builder().documentFilename("file.txt").build();
+
+        englandCaseData.setBundlesRespondentWhoseDocuments(respondentsDocumentsOnly);
+        englandCaseData.setBundlesRespondentWhatDocuments(witnessStatementsOnly);
+        englandCaseData.setBundlesRespondentSelectHearing(getTestSelectHearing());
+        englandCaseData.setBundlesRespondentUploadFile(file);
+        englandCaseData.setBundlesRespondentAgreedDocWith(YES);
+        englandCaseData.setBundlesRespondentAgreedDocWithBut(butReason);
+        englandCaseData.setBundlesRespondentAgreedDocWithNo(disagree);
+
+        bundlesRespondentService.addToBundlesCollection(englandCaseData);
+        HearingBundleType actual = collection.get(0).getValue();
+
+        assertThat(englandCaseData.getBundlesRespondentCollection(), is(collection));
+        assertThat(actual.getAgreedDocWith(), is(YES));
+        assertThat(actual.getAgreedDocWithBut(), is(butReason));
+        assertThat(actual.getAgreedDocWithNo(), is(disagree));
+        assertThat(actual.getHearing(), is("1"));
+        assertThat(actual.getUploadFile(), is(file));
+        assertThat(actual.getWhatDocuments(), is(witnessStatementsOnly));
+        assertThat(actual.getWhoseDocuments(), is(respondentsDocumentsOnly));
     }
 }

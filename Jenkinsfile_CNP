@@ -96,7 +96,21 @@ withPipeline(type, product, component) {
             reportName : "ET E2E test report"
     ]
 
-    sh "./gradlew :javaFunctionalTest"
+    try {
+      sh "./gradlew :api"
+    } finally {
+      junit '**/test-results/api/*.xml'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/api/**'
+
+      publishHTML target: [
+              allowMissing : true,
+              alwaysLinkToLastBuild: true,
+              keepAll : true,
+              reportDir : "build/reports/tests/api",
+              reportFiles : "index.html",
+              reportName : "API Testing Report"
+      ]
+    }
   }
 
   afterAlways('smoketest:aat') {

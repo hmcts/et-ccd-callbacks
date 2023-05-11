@@ -257,7 +257,7 @@ public class CaseActionsForCaseWorkerController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        List<String> errors = eventValidationService.validateReceiptDate(caseData);
+        List<String> errors = eventValidationService.validateReceiptDate(ccdRequest.getCaseDetails());
 
         if (errors.isEmpty()) {
             DefaultValues defaultValues = getPostDefaultValues(ccdRequest.getCaseDetails());
@@ -333,7 +333,7 @@ public class CaseActionsForCaseWorkerController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        List<String> errors = eventValidationService.validateReceiptDate(caseData);
+        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
 
         if (!eventValidationService.validateCaseState(caseDetails)) {
             errors.add(caseData.getEthosCaseReference() + " Case has not been Accepted.");

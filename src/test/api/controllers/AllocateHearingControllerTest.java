@@ -1,19 +1,14 @@
 package controllers;
 
 import io.restassured.RestAssured;
-import io.restassured.config.LogConfig;
 import io.restassured.http.ContentType;
-import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
-import net.serenitybdd.rest.SerenityRest;
+import org.apache.commons.codec.binary.Base64;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -31,7 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-@WebMvcTest(DocmosisApplication.class)
+//@WebMvcTest(DocmosisApplication.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
 @ContextConfiguration(classes = {DocmosisApplication.class})
 public class AllocateHearingControllerTest {
@@ -49,24 +44,20 @@ public class AllocateHearingControllerTest {
     @BeforeEach
     public void setup() {
 
-        RestAssured.config = RestAssured.config()
-                .logConfig(LogConfig.logConfig().defaultStream(System.out));
-
-        RestAssuredMockMvc.mockMvc(mockMvc);
     }
 
     @Test
     public void testInitialiseHearingDynamicList() throws IOException {
         try {
-            String environment = System.getProperty("VAULTNAME").replace("ethos-", "");
-            userToken = getAuthToken(environment);
+            userToken = getAuthToken();
         } catch (NullPointerException e) {
             userToken = getAuthTokenFromLocal();
         }
         CCDRequest ccdRequest = generateCCDRequest();
 
         RestAssured.given().log().all()
-                .baseUri("http://localhost:8081")
+                .relaxedHTTPSValidation()
+                .baseUri("https://et-cos-pr-927.preview.platform.hmcts.net")
                 .basePath("/allocatehearing/initialiseHearings")
                 .header("Content-type", ContentType.JSON)
                 .header("Authorization", userToken)
@@ -125,7 +116,7 @@ public class AllocateHearingControllerTest {
 
         if (properties == null) {
             try (InputStream inputStream =
-                         new FileInputStream("src/test/javaFunctional/resources/application.properties")) {
+                         new FileInputStream("src/test/apiTest/resources/application.properties")) {
                 properties = new Properties();
                 properties.load(inputStream);
             }
@@ -134,21 +125,40 @@ public class AllocateHearingControllerTest {
         return properties.getProperty(name);
     }
 
-    public static String getAuthToken(String environment) throws IOException {
+    public static String getAuthToken() throws IOException {
+        String idamBaseUrl = "https://idam-api.aat.platform.hmcts.net";
+        String redirectUri = "https://et-cos-pr-927.preview.platform.hmcts.net/oauth2/callback";
+        String clientId = "xuiwebapp";
+        String clientSecret = System.getenv("IDAM_CLIENT_SECRET");
+        String username = System.getenv("ET_CCD_CASEWORKER_USER_NAME");
+        String password = System.getenv("ET_CCD_CASEWORKER_PASSWORD");
+        String scope = "openid profile roles";
+        String idamCodePath =
+                "/oauth2/authorize?response_type=code&client_id=" + clientId + "&redirect_uri=" + redirectUri;
 
-        //Generate Auth token using code
-        RestAssured.useRelaxedHTTPSValidation();
-        //RestAssured.config = RestAssuredConfig.config().sslConfig(SSLConfig.sslConfig().allowAllHostnames());
-        RequestSpecification httpRequest = SerenityRest.given().relaxedHTTPSValidation().config(RestAssured.config);
-        httpRequest.header("Accept", "application/json");
-        httpRequest.header("Content-Type", "application/x-www-form-urlencoded");
-        httpRequest.formParam("username", getProperty(environment.toLowerCase() + ".ccd.username"));
-        httpRequest.formParam("password", getProperty(environment.toLowerCase() + ".ccd.password"));
-        Response response = httpRequest.post(getProperty(environment.toLowerCase() + ".idam.auth.url"));
+        String auth = username + ":" + password;
+        byte[] encodedAuth = Base64.encodeBase64(auth.getBytes());
+        String authHeader = "Basic " + new String(encodedAuth);
 
-        Assert.assertEquals(200, response.getStatusCode());
+        Response codeResponse = RestAssured.given()
+                .header("Authorization", authHeader)
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .post(idamBaseUrl + idamCodePath);
 
-        return response.body().jsonPath().getString("access_token");
+        String code = codeResponse.jsonPath().getString("code");
+
+        String idamAuthPath =
+                "/oauth2/token?grant_type=authorization_code&client_id=" + clientId + "&client_secret=" + clientSecret
+                        + "&redirect_uri=" + redirectUri + "&code=" + code + "&scope=" + scope;
+
+        Response authTokenResponse = RestAssured.given()
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .post(idamBaseUrl + idamAuthPath);
+
+        String accessToken = authTokenResponse.jsonPath().getString("access_token");
+        System.out.println("Access Token: " + accessToken);
+
+        return accessToken;
     }
 
 }

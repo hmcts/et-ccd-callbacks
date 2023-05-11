@@ -68,17 +68,14 @@ public class MultipleLetterService {
             errors.add(NO_CASES_SEARCHED);
 
         }
-
         if (!validation) {
 
             log.info("Resetting mid fields");
 
             MultiplesHelper.resetMidFields(multipleDetails.getCaseData());
-
         }
 
         return documentInfo;
-
     }
 
     private DocumentInfo checkGenerationLetterOrLabel(String userToken, MultipleDetails multipleDetails,
@@ -173,7 +170,6 @@ public class MultipleLetterService {
         }
 
         return documentInfo;
-
     }
 
     private DocumentInfo generateLetterOrLabel(String userToken, MultipleDetails multipleDetails,

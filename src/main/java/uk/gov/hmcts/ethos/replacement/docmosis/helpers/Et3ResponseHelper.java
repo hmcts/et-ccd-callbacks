@@ -7,6 +7,7 @@ import org.apache.commons.collections.CollectionUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -20,8 +21,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -58,7 +61,7 @@ public final class Et3ResponseHelper {
     }
 
     /**
-     * Validates that the employment start date is in the past and not after 
+     * Validates that the employment start date is in the past and not after
      * the employment end date if both dates are provided.
      * @param caseData data for the current case
      * @return List of validation errors encountered
@@ -389,6 +392,28 @@ public final class Et3ResponseHelper {
         respondent.setEt3ResponseRespondentSupportDocument(caseData.getEt3ResponseRespondentSupportDocument());
 
         return respondent;
+    }
+
+    /**
+     * Sends notification emails to Tribunal.
+     * @param caseDetails Contains details about the case.
+     * @return Map of Personalisation
+     */
+    public static Map<String, String> buildPersonalisation(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
+        personalisation.put("case_number", caseData.getEthosCaseReference());
+        personalisation.put("claimant", caseData.getClaimant());
+        personalisation.put("list_of_respondents", getRespondentNames(caseData));
+        personalisation.put("date", ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
+        personalisation.put("ccdId", caseDetails.getCaseId());
+        return personalisation;
+    }
+
+    private static String getRespondentNames(CaseData caseData) {
+        return caseData.getRespondentCollection().stream()
+            .map(o -> o.getValue().getRespondentName())
+            .collect(Collectors.joining(", "));
     }
 
     /**

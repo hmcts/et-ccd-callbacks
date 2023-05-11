@@ -2,8 +2,10 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.joda.time.LocalDate;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -33,7 +35,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -43,7 +44,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -70,8 +70,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.NcssCount", "PMD.AvoidInstantiatingObjectsInLoops",
+    "PMD.UseProperClassLoader", "PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.ExcessivePublicCount",
+                   "PMD.TooManyFields", "PMD.CyclomaticComplexity"})
 @RunWith(SpringJUnit4ClassRunner.class)
-public class CaseManagementForCaseWorkerServiceTest {
+class CaseManagementForCaseWorkerServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     public static final String UNASSIGNED_OFFICE = "Unassigned";
@@ -99,7 +102,7 @@ public class CaseManagementForCaseWorkerServiceTest {
     @MockBean
     private ClerkService clerkService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         scotlandCcdRequest1 = new CCDRequest();
         CaseDetails caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
@@ -158,7 +161,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         eccCounterClaimTypeItem.setId(UUID.randomUUID().toString());
         eccCounterClaimTypeItem.setValue(counterClaimType);
         CaseDetails manchesterCaseDetails = new CaseDetails();
-        caseData.setEccCases(Arrays.asList(eccCounterClaimTypeItem));
+        caseData.setEccCases(List.of(eccCounterClaimTypeItem));
         caseData.setRespondentECC(createRespondentECC());
         manchesterCaseDetails.setCaseData(caseData);
         manchesterCaseDetails.setCaseId("123456");
@@ -571,7 +574,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = ccdRequest21.getCaseDetails().getCaseData();
         caseData.setHearingCollection(null);
         caseManagementForCaseWorkerService.amendHearing(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        assertEquals(null, caseData.getHearingCollection());
+        assertNull(caseData.getHearingCollection());
     }
 
     @Test
@@ -579,7 +582,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = ccdRequest21.getCaseDetails().getCaseData();
         caseData.getHearingCollection().get(0).getValue().setHearingDateCollection(null);
         caseManagementForCaseWorkerService.amendHearing(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        assertEquals(null, caseData.getHearingCollection().get(0).getValue().getHearingDateCollection());
+        assertNull(caseData.getHearingCollection().get(0).getValue().getHearingDateCollection());
     }
 
     @Test
@@ -605,7 +608,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         caseData.setHearingCollection(null);
         List<String> errors = new ArrayList<>();
         caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
-        assertEquals(null, caseData.getHearingCollection());
+        assertNull(caseData.getHearingCollection());
     }
 
     @Test
@@ -614,7 +617,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         caseData.getHearingCollection().get(0).getValue().setHearingDateCollection(null);
         List<String> errors = new ArrayList<>();
         caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
-        assertEquals(null, caseData.getHearingCollection().get(0).getValue().getHearingDateCollection());
+        assertNull(caseData.getHearingCollection().get(0).getValue().getHearingDateCollection());
     }
 
     @Test
@@ -637,6 +640,20 @@ public class CaseManagementForCaseWorkerServiceTest {
         caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
         assertFalse(errors.isEmpty());
         assertEquals(LISTED_DATE_ON_WEEKEND_MESSAGE + hearingNumber, errors.get(0));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"Listed, Yes", " , Yes"})
+     void midEventAmendHearingDateInPast(String hearingStatus, String warning) {
+        CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
+        List<String> errors = new ArrayList<>();
+        DateListedType dateListedType = caseData.getHearingCollection().get(0)
+                .getValue().getHearingDateCollection()
+                .get(0).getValue();
+        dateListedType.setListedDate("2022-03-19T12:11:00.000");
+        dateListedType.setHearingStatus(hearingStatus);
+        caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
+        assertEquals(warning, caseData.getListedDateInPastWarning());
     }
 
     @Test
@@ -853,7 +870,7 @@ public class CaseManagementForCaseWorkerServiceTest {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseData.setClaimServedDate("");
         caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
-        assertEquals(null, caseData.getEt3DueDate());
+        assertNull(caseData.getEt3DueDate());
     }
 
     @Test

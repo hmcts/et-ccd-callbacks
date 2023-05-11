@@ -7,11 +7,14 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -32,6 +35,10 @@ public class BundlesRespondentService {
         caseData.setBundlesRespondentAgreedDocWith(null);
         caseData.setBundlesRespondentAgreedDocWithBut(null);
         caseData.setBundlesRespondentAgreedDocWithNo(null);
+        caseData.setBundlesRespondentSelectHearing(null);
+        caseData.setBundlesRespondentUploadFile(null);
+        caseData.setBundlesRespondentWhatDocuments(null);
+        caseData.setBundlesRespondentWhoseDocuments(null);
     }
 
     /**
@@ -80,5 +87,27 @@ public class BundlesRespondentService {
         }
 
         return List.of("Your upload contains a disallowed file type");
+    }
+
+    /**
+     * Creates a HearingBundleType and adds to the Bundles collection on CaseData.
+     */
+    public void addToBundlesCollection(CaseData caseData) {
+        if (caseData.getBundlesRespondentCollection() == null) {
+            caseData.setBundlesRespondentCollection(new ArrayList<>());
+        }
+
+        caseData.getBundlesRespondentCollection().add(
+            GenericTypeItem.from(HearingBundleType.builder()
+                .agreedDocWith(caseData.getBundlesRespondentAgreedDocWith())
+                .agreedDocWithBut(caseData.getBundlesRespondentAgreedDocWithBut())
+                .agreedDocWithNo(caseData.getBundlesRespondentAgreedDocWithNo())
+                .hearing(caseData.getBundlesRespondentSelectHearing().getSelectedCode())
+                .uploadFile(caseData.getBundlesRespondentUploadFile())
+                .whatDocuments(caseData.getBundlesRespondentWhatDocuments())
+                .whoseDocuments(caseData.getBundlesRespondentWhoseDocuments())
+                .build()
+            )
+        );
     }
 }

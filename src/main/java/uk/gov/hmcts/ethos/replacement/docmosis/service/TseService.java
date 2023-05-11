@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
@@ -24,9 +25,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentTSEApplicationTyp
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -275,20 +276,17 @@ public class TseService {
 
     private String formatApplicationDecision(GenericTseApplicationType application, String authToken) {
 
-        String decisionsMarkdown = "";
         if (application.getAdminDecision() == null) {
-            return decisionsMarkdown;
+            return "";
         }
-        // Multiple decisions can be made for the same application but we are only showing the last one for now
-        Optional<String> decisionsMarkdownResult = application.getAdminDecision()
+        List<String> decisionsMarkdown = application.getAdminDecision()
             .stream()
-            .reduce((first, second) -> second)
-            .map(d -> getSingleDecisionMarkdown(d.getValue(), authToken));
-        if (decisionsMarkdownResult.isPresent()) {
-            decisionsMarkdown = decisionsMarkdownResult.get();
-        }
+            .sorted(Comparator.comparing((TseAdminRecordDecisionTypeItem d) -> d.getValue().getDate()).reversed())
+            .limit(2)
+            .map(d -> getSingleDecisionMarkdown(d.getValue(), authToken))
+            .collect(Collectors.toList());
 
-        return decisionsMarkdown;
+        return String.join("\r\n", decisionsMarkdown);
     }
 
     /**

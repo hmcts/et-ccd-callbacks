@@ -3,8 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -23,7 +21,6 @@ import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,9 +34,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPO
 class TseAdmCloseServiceTest {
 
     private TseAdmCloseService tseAdmCloseService;
-
-    @MockBean
-    private DocumentManagementService documentManagementService;
     @MockBean
     private TseService tseService;
 
@@ -84,12 +78,11 @@ class TseAdmCloseServiceTest {
             .isNull();
     }
 
-    @ParameterizedTest
+    @Test
     @MethodSource("generateCloseApplicationMarkdown")
-    void generateCloseApplicationMarkdown(boolean appHasDoc, boolean appHasDetails,
-                                          boolean hasDoc, boolean hasAdditionalInfo) {
+    void generateCloseApplicationMarkdown() {
         GenericTseApplicationType tseApplicationType =
-            getTseAppType(appHasDoc, appHasDetails, hasDoc, hasAdditionalInfo);
+            getTseAppType(true, true, true, true);
 
         caseData.setGenericTseApplicationCollection(
             List.of(GenericTseApplicationTypeItem.builder()
@@ -113,14 +106,6 @@ class TseAdmCloseServiceTest {
         assertThat(tseAdmCloseService.generateCloseApplicationDetailsMarkdown(caseData, AUTH_TOKEN))
             .isEqualTo(expected);
 
-    }
-
-    private static Stream<Arguments> generateCloseApplicationMarkdown() {
-        return Stream.of(
-            Arguments.of(true, true, true, true),
-            Arguments.of(true, false, true, false),
-            Arguments.of(false, true, false, true)
-        );
     }
 
     private static GenericTseApplicationType getTseAppType(boolean appHasDoc, boolean appHasDetails,

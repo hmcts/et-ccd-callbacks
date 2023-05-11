@@ -40,7 +40,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @Slf4j
 @SuppressWarnings({"PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.LinguisticNaming",
     "PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions", "PMD.PrematureDeclaration", "PMD.GodClass",
-    "PMD.CyclomaticComplexity", "PMD.TooManyMethods"})
+    "PMD.CyclomaticComplexity", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 public class Et3ResponseHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();

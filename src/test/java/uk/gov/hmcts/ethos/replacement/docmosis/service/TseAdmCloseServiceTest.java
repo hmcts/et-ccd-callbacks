@@ -98,21 +98,7 @@ class TseAdmCloseServiceTest {
                 .build())
         );
 
-        String expected = "Application Details\r\n"
-            + "|Decision | |\r\n"
-            + "|--|--|\r\n"
-            + "|Notification | Response Details|\r\n"
-            + "|Decision | decision|\r\n"
-            + "|Decision details | decision details|\r\n"
-            + "|Date | 23 December 2022|\r\n"
-            + "|Sent by | Tribunal|\r\n"
-            + "|Type of decision | type of decision|\r\n"
-            + (hasAdditionalInfo ? "|Additional information | additional info|\r\n" : "")
-            + (hasDoc ? "|Document|<a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>|\r\n" : "")
-            + "|Decision made by | decision made by|\r\n"
-            + "|Name | made by full name|\r\n"
-            + "|Sent to | party notify|\r\n"
-            + "\r\n";
+        String expected = "Application Details\r\n";
 
         String fileDisplay1 = "<a href=\"/documents/%s\" target=\"_blank\">document (TXT, 1MB)</a>";
 

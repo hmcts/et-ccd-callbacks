@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -83,7 +82,7 @@ public class TseService {
      */
 
     public void createApplication(CaseData caseData, boolean isClaimant) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+        if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             caseData.setGenericTseApplicationCollection(new ArrayList<>());
         }
 
@@ -196,7 +195,7 @@ public class TseService {
      * @param caseData contains all the case data
      */
     private static int getNextApplicationNumber(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+        if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             return 1;
         }
         return caseData.getGenericTseApplicationCollection().size() + 1;
@@ -207,7 +206,6 @@ public class TseService {
             ? ""
             : String.format(ADDITIONAL_INFORMATION, decision.getValue().getAdditionalInformation());
     }
-
 
     private String getDecisionDocumentLink(TseAdminRecordDecisionType decisionType, String authToken) {
         List<GenericTypeItem<DocumentType>> documents = decisionType.getResponseRequiredDoc();
@@ -279,7 +277,7 @@ public class TseService {
     public String formatApplicationResponses(GenericTseApplicationType application, String authToken) {
         List<TseRespondTypeItem> respondCollection = application.getRespondCollection();
 
-        if (CollectionUtils.isEmpty(respondCollection)) {
+        if (isEmpty(respondCollection)) {
             return "";
         }
 
@@ -294,11 +292,8 @@ public class TseService {
                 ).collect(Collectors.joining());
     }
 
-
     private String getSingleDecisionMarkdown(TseAdminRecordDecisionType decision, String authToken) {
         List<GenericTypeItem<DocumentType>> documents = decision.getResponseRequiredDoc();
-        List<String[]> documentRows = addDocumentRows(documents, authToken);
-
         List<String[]> documentsRows = addDocumentRows(documents, authToken);
         List<String[]> rows = new ArrayList<>(List.of(
             new String[]{"Notification", decision.getEnterNotificationTitle()},
@@ -318,7 +313,6 @@ public class TseService {
 
         return MarkdownHelper.createTwoColumnTable(new String[]{"Decision", ""}, rows);
     }
-
 
     private String formatApplicationDecision(GenericTseApplicationType application, String authToken) {
 
@@ -415,7 +409,7 @@ public class TseService {
      * @return A list of String arrays, one string array for each document's name and another for the short description
      */
     public List<String[]> addDocumentRows(List<GenericTypeItem<DocumentType>> documents, String authToken) {
-        if (CollectionUtils.isEmpty(documents)) {
+        if (isEmpty(documents)) {
             return Collections.emptyList();
         }
 

@@ -271,14 +271,13 @@ class TseServiceTest {
 
         assertThat(tseService.formatViewApplication(caseData, AUTH_TOKEN)).isEqualTo(expected);
     }
+
     @Test
     void formatViewApplication_withAllDataAndDecision() {
-        CaseData caseData = setupCaseDataWithAnApplication();
-
         TseAdminRecordDecisionType tseAdminRecordDecisionType = new TseAdminRecordDecisionType();
         tseAdminRecordDecisionType.setDecision("Granted");
         tseAdminRecordDecisionType.setDate("2023-01-01");
-        tseAdminRecordDecisionType.setTypeOfDecision("type");
+        tseAdminRecordDecisionType.setTypeOfDecision("Judgment");
         tseAdminRecordDecisionType.setAdditionalInformation("MORE INFO");
         tseAdminRecordDecisionType.setEnterNotificationTitle("title");
         tseAdminRecordDecisionType.setDecisionMadeBy("Judge");
@@ -287,6 +286,7 @@ class TseServiceTest {
         TseAdminRecordDecisionTypeItem decisionTypeItem = new TseAdminRecordDecisionTypeItem();
         decisionTypeItem.setValue(tseAdminRecordDecisionType);
 
+        CaseData caseData = setupCaseDataWithAnApplication();
         caseData.getGenericTseApplicationCollection().get(0).getValue().setAdminDecision(List.of(decisionTypeItem));
         DynamicFixedListType listType = DynamicFixedListType.from(List.of(DynamicValueType.create("1", "")));
         listType.setValue(listType.getListItems().get(0));
@@ -326,7 +326,7 @@ class TseServiceTest {
             + "|Decision|Granted|\r\n"
             + "|Date|2023-01-01|\r\n"
             + "|Sent by|Tribunal|\r\n"
-            + "|Type of decision|type|\r\n"
+            + "|Type of decision|Judgment|\r\n"
             + "|Additional information|MORE INFO|\r\n"
             + "|Decision made by|Judge|\r\n"
             + "|Name|John Doe|\r\n";

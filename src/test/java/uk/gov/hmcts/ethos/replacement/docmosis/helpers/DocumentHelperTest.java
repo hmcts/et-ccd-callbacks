@@ -2188,7 +2188,7 @@ public class DocumentHelperTest {
         DocumentTypeItem et1Doc = DocumentFixtures.getDocumentTypeItem("Visible", "ET1");
         DocumentTypeItem caseFileDoc = DocumentFixtures.getDocumentTypeItem("Hidden", "Tribunal case file");
         DocumentTypeItem otherDoc = DocumentFixtures.getDocumentTypeItem("Hidden", "Other");
-        DocumentTypeItem referralsDoc = DocumentFixtures.getDocumentTypeItem("Hidden", "Referrals/judicial direction");
+        DocumentTypeItem referralsDoc = DocumentFixtures.getDocumentTypeItem("Hidden", "Referral/Judicial direction");
 
         caseData.setDocumentCollection(List.of(et1Doc, caseFileDoc, otherDoc, referralsDoc));
 

@@ -980,7 +980,7 @@ public class DocumentHelper {
         if (caseData.getDocumentCollection() == null) {
             return;
         }
-        List<String> docTypes = List.of("Tribunal case file", "Other", "Referrals/judicial direction");
+        List<String> docTypes = List.of("Tribunal case file", "Other", "Referral/Judicial direction");
         caseData.setLegalrepDocumentCollection(caseData.getDocumentCollection().stream()
                 .filter(d -> !docTypes.contains(d.getValue().getTypeOfDocument()))
                 .toList());

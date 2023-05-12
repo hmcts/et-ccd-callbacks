@@ -390,6 +390,7 @@ dependencies {
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.5.6'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.41'
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.11'
+
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
     contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.9.3'
@@ -403,7 +404,6 @@ dependencies {
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.3.1'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
-
 }
 
 bootJar {

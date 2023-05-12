@@ -183,6 +183,7 @@ public final class Et3ResponseHelper {
             .et3ResponsePensionCorrectDetails(caseData.getEt3ResponsePensionCorrectDetails())
             .hearingPhone(caseData.getEt3ResponseHearingRespondent().contains("Phone hearings") ? CHECKED : UNCHECKED)
             .hearingVideo(caseData.getEt3ResponseHearingRespondent().contains("Video hearings") ? CHECKED : UNCHECKED)
+            .repReference(caseData.getEt3ResponseReference())
             .repHearingPhone(caseData.getEt3ResponseHearingRepresentative().contains("Phone hearings") ? CHECKED :
                 UNCHECKED)
             .repHearingVideo(caseData.getEt3ResponseHearingRepresentative().contains("Video hearings") ? CHECKED :
@@ -350,6 +351,7 @@ public final class Et3ResponseHelper {
         respondent.setResponseRespondentName(caseData.getEt3ResponseRespondentLegalName());
         respondent.setResponseRespondentAddress(caseData.getEt3RespondentAddress());
         respondent.setResponseRespondentPhone1(caseData.getEt3ResponsePhone());
+        respondent.setResponseReference(caseData.getEt3ResponseReference());
         respondent.setResponseRespondentContactPreference(caseData.getEt3ResponseContactPreference());
         respondent.setEt3ResponseContactReason(caseData.getEt3ResponseContactReason());
         respondent.setEt3ResponseRespondentCompanyNumber(caseData.getEt3ResponseRespondentCompanyNumber());
@@ -435,6 +437,7 @@ public final class Et3ResponseHelper {
         caseData.setEt3RespondentAddress(null);
         caseData.setEt3ResponseDXAddress(null);
         caseData.setEt3ResponsePhone(null);
+        caseData.setEt3ResponseReference(null);
         caseData.setEt3ResponseContactPreference(null);
         caseData.setEt3ResponseContactReason(null);
         caseData.setEt3ResponseHearingRepresentative(null);

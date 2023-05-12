@@ -113,6 +113,7 @@ public class Et3ResponseData {
     private String repDXNumber;
     private String repPhoneNumber;
     private String repMobileNumber;
+    private String repReference;
     private String repContactEmail;
     private String repContactPost;
     private String repEmailAddress;

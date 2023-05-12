@@ -964,4 +964,16 @@ public final class DocumentHelper {
 
     }
 
+    /**
+     *  Filter documents that only the legal rep should be able to see.
+     */
+    public static void setLegalRepVisibleDocuments(CaseData caseData) {
+        if (caseData.getDocumentCollection() == null) {
+            return;
+        }
+        List<String> docTypes = List.of("Tribunal case file", "Other", "Referrals/judicial direction");
+        caseData.setLegalrepDocumentCollection(caseData.getDocumentCollection().stream()
+                .filter(d -> !docTypes.contains(d.getValue().getTypeOfDocument()))
+                .toList());
+    }
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
@@ -33,5 +34,18 @@ public final class DocumentFixtures {
 
     public static DocumentType getDocumentType(String documentName) {
         return DocumentType.from(getUploadedDocumentType(documentName));
+    }
+
+    public static DocumentType getDocumentType(String documentName, String type) {
+        DocumentType from = DocumentType.from(getUploadedDocumentType(documentName));
+        from.setTypeOfDocument(type);
+        return from;
+    }
+
+    public static DocumentTypeItem getDocumentTypeItem(String documentName, String type) {
+        DocumentTypeItem item = new DocumentTypeItem();
+        item.setId(UUID.randomUUID().toString());
+        item.setValue(getDocumentType(documentName, type));
+        return item;
     }
 }

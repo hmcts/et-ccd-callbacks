@@ -978,6 +978,10 @@ public class DocumentHelper {
      */
     public static void setLegalRepVisibleDocuments(CaseData caseData) {
         List<String> docTypes = List.of("Tribunal case file", "Other", "Referrals/judicial direction");
+        if (caseData.getDocumentCollection() == null) {
+            return;
+        }
+        
         caseData.setLegalrepDocumentCollection(caseData.getDocumentCollection().stream()
                 .filter(d -> !docTypes.contains(d.getValue().getTypeOfDocument()))
                 .toList());

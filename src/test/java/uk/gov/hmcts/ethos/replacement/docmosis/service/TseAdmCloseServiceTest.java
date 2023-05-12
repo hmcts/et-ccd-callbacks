@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -79,10 +78,8 @@ class TseAdmCloseServiceTest {
     }
 
     @Test
-    @MethodSource("generateCloseApplicationMarkdown")
     void generateCloseApplicationMarkdown() {
-        GenericTseApplicationType tseApplicationType =
-            getTseAppType(true, true, true, true);
+        GenericTseApplicationType tseApplicationType = getTseAppType();
 
         caseData.setGenericTseApplicationCollection(
             List.of(GenericTseApplicationTypeItem.builder()
@@ -108,8 +105,7 @@ class TseAdmCloseServiceTest {
 
     }
 
-    private static GenericTseApplicationType getTseAppType(boolean appHasDoc, boolean appHasDetails,
-                                                           boolean hasDoc, boolean hasAdditionalInfo) {
+    private static GenericTseApplicationType getTseAppType() {
         TseAdminRecordDecisionTypeItem recordDecisionTypeItem = TseAdminRecordDecisionTypeItem.builder()
             .id(UUID.randomUUID().toString())
             .value(
@@ -119,16 +115,15 @@ class TseAdmCloseServiceTest {
                     .decision("decision")
                     .decisionDetails("decision details")
                     .typeOfDecision("type of decision")
-                    .additionalInformation(hasAdditionalInfo ? "additional info" : null)
+                    .additionalInformation("additional info")
                     .decisionMadeBy("decision made by")
                     .decisionMadeByFullName("made by full name")
                     .selectPartyNotify("party notify")
-                    .responseRequiredDoc(hasDoc
-                        ? List.of(GenericTypeItem.from(DocumentType.from(UploadedDocumentBuilder.builder()
+                    .responseRequiredDoc(
+                        List.of(GenericTypeItem.from(DocumentType.from(UploadedDocumentBuilder.builder()
                             .withFilename("admin.txt")
                             .withUuid("1234")
-                            .build())))
-                        : null)
+                            .build()))))
                     .build()
             ).build();
 
@@ -137,21 +132,18 @@ class TseAdmCloseServiceTest {
             .withType(TSE_APP_AMEND_RESPONSE)
             .withApplicant(RESPONDENT_TITLE)
             .withDate("13 December 2022")
-            .withDetails(appHasDetails ? "Details Text" : null)
+            .withDetails("Details Text")
             .withStatus(OPEN_STATE)
             .withDecisionCollection(List.of(
                 recordDecisionTypeItem
             ))
             .build();
 
-        if (appHasDoc) {
-            tseApplicationBuilder.setDocumentUpload(
-                UploadedDocumentBuilder.builder()
-                    .withFilename("test")
-                    .withUuid("1234")
-                    .build());
-        }
-
+        tseApplicationBuilder.setDocumentUpload(
+            UploadedDocumentBuilder.builder()
+                .withFilename("test")
+                .withUuid("1234")
+                .build());
         return tseApplicationBuilder;
     }
 

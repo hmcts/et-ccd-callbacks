@@ -233,7 +233,7 @@ class TseServiceTest {
     }
 
     @Test
-    void formatViewApplication_withAllData() {
+    void formatViewApplication_withAllResponse() {
         CaseData caseData = setupCaseDataWithAnApplication();
 
         DynamicFixedListType listType = DynamicFixedListType.from(List.of(DynamicValueType.create("1", "")));
@@ -273,22 +273,49 @@ class TseServiceTest {
     }
 
     @Test
-    void formatViewApplication_withAllDataAndDecision() {
-        TseAdminRecordDecisionType tseAdminRecordDecisionType = new TseAdminRecordDecisionType();
-        tseAdminRecordDecisionType.setDecision("Granted");
-        tseAdminRecordDecisionType.setDate("2023-01-01");
-        tseAdminRecordDecisionType.setTypeOfDecision("Judgment");
-        tseAdminRecordDecisionType.setAdditionalInformation("MORE INFO");
-        tseAdminRecordDecisionType.setEnterNotificationTitle("title");
-        tseAdminRecordDecisionType.setDecisionMadeBy("Judge");
-        tseAdminRecordDecisionType.setDecisionMadeByFullName("John Doe");
-        tseAdminRecordDecisionType.setSelectPartyNotify("Respondent");
+    void formatViewApplication_withResponseAndDecisions() {
+        TseAdminRecordDecisionType tseAdminRecordDecisionType1 = new TseAdminRecordDecisionType();
+        tseAdminRecordDecisionType1.setDecision("Granted");
+        tseAdminRecordDecisionType1.setDate("2023-01-01");
+        tseAdminRecordDecisionType1.setTypeOfDecision("Judgment");
+        tseAdminRecordDecisionType1.setAdditionalInformation("MORE INFO");
+        tseAdminRecordDecisionType1.setEnterNotificationTitle("title");
+        tseAdminRecordDecisionType1.setDecisionMadeBy("Judge");
+        tseAdminRecordDecisionType1.setDecisionMadeByFullName("John Doe");
+        tseAdminRecordDecisionType1.setSelectPartyNotify("Respondent");
+        TseAdminRecordDecisionTypeItem decisionType1 = new TseAdminRecordDecisionTypeItem();
+        decisionType1.setId("1");
+        decisionType1.setValue(tseAdminRecordDecisionType1);
 
-        TseAdminRecordDecisionTypeItem decisionTypeItem = new TseAdminRecordDecisionTypeItem();
-        decisionTypeItem.setValue(tseAdminRecordDecisionType);
+        TseAdminRecordDecisionType tseAdminRecordDecisionType2 = new TseAdminRecordDecisionType();
+        tseAdminRecordDecisionType2.setDecision("Granted");
+        tseAdminRecordDecisionType2.setDate("2023-01-02");
+        tseAdminRecordDecisionType2.setTypeOfDecision("Judgment");
+        tseAdminRecordDecisionType2.setAdditionalInformation("MORE INFO");
+        tseAdminRecordDecisionType2.setEnterNotificationTitle("title2");
+        tseAdminRecordDecisionType2.setDecisionMadeBy("Judge");
+        tseAdminRecordDecisionType2.setDecisionMadeByFullName("John Doe");
+        tseAdminRecordDecisionType2.setSelectPartyNotify("Respondent");
+        TseAdminRecordDecisionTypeItem decisionType2 = new TseAdminRecordDecisionTypeItem();
+        decisionType2.setId("2");
+        decisionType2.setValue(tseAdminRecordDecisionType2);
+
+        TseAdminRecordDecisionType tseAdminRecordDecisionType3 = new TseAdminRecordDecisionType();
+        tseAdminRecordDecisionType3.setDecision("Granted");
+        tseAdminRecordDecisionType3.setDate("2023-01-03");
+        tseAdminRecordDecisionType3.setTypeOfDecision("Judgment");
+        tseAdminRecordDecisionType3.setAdditionalInformation("MORE INFO");
+        tseAdminRecordDecisionType3.setEnterNotificationTitle("title3");
+        tseAdminRecordDecisionType3.setDecisionMadeBy("Judge");
+        tseAdminRecordDecisionType3.setDecisionMadeByFullName("John Doe");
+        tseAdminRecordDecisionType3.setSelectPartyNotify("Respondent");
+        TseAdminRecordDecisionTypeItem decisionType3 = new TseAdminRecordDecisionTypeItem();
+        decisionType3.setId("3");
+        decisionType3.setValue(tseAdminRecordDecisionType3);
 
         CaseData caseData = setupCaseDataWithAnApplication();
-        caseData.getGenericTseApplicationCollection().get(0).getValue().setAdminDecision(List.of(decisionTypeItem));
+        caseData.getGenericTseApplicationCollection().get(0).getValue().setAdminDecision(List.of(decisionType1,
+            decisionType2, decisionType3));
         DynamicFixedListType listType = DynamicFixedListType.from(List.of(DynamicValueType.create("1", "")));
         listType.setValue(listType.getListItems().get(0));
         caseData.setTseRespondSelectApplication(listType);
@@ -323,9 +350,20 @@ class TseServiceTest {
             + "\r\n\r\n"
             + "|Decision||\r\n"
             + "|--|--|\r\n"
-            + "|Notification|title|\r\n"
+            + "|Notification|title3|\r\n"
             + "|Decision|Granted|\r\n"
-            + "|Date|2023-01-01|\r\n"
+            + "|Date|2023-01-03|\r\n"
+            + "|Sent by|Tribunal|\r\n"
+            + "|Type of decision|Judgment|\r\n"
+            + "|Additional information|MORE INFO|\r\n"
+            + "|Decision made by|Judge|\r\n"
+            + "|Name|John Doe|\r\n"
+            + "|Sent to|Respondent|\r\n\r\n"
+            + "|Decision||\r\n"
+            + "|--|--|\r\n"
+            + "|Notification|title2|\r\n"
+            + "|Decision|Granted|\r\n"
+            + "|Date|2023-01-02|\r\n"
             + "|Sent by|Tribunal|\r\n"
             + "|Type of decision|Judgment|\r\n"
             + "|Additional information|MORE INFO|\r\n"

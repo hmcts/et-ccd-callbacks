@@ -197,7 +197,7 @@ public class TseService {
 
         String applicationTable = formatApplicationDetails(application, authToken, true);
         String responses = formatApplicationResponses(application, authToken);
-        String decisions = formatApplicationDecision(application, authToken);
+        String decisions = formatApplicationDecisions(application, authToken);
         return applicationTable + "\r\n" + responses + "\r\n" +  decisions;
     }
 
@@ -274,7 +274,7 @@ public class TseService {
         return MarkdownHelper.createTwoColumnTable(new String[]{"Decision", ""}, rows);
     }
 
-    private String formatApplicationDecision(GenericTseApplicationType application, String authToken) {
+    private String formatApplicationDecisions(GenericTseApplicationType application, String authToken) {
 
         if (application.getAdminDecision() == null) {
             return "";

@@ -48,7 +48,7 @@ public class AllocateHearingControllerTest {
 
     @Test
     public void testInitialiseHearingDynamicList() throws IOException {
-        String test_url = System.getenv("TEST_URL") != null ? System.getenv("TEST_URL")
+        String testUrl = System.getenv("TEST_URL") != null ? System.getenv("TEST_URL")
                 : "http://localhost:8080";
         try {
             userToken = getAuthToken();
@@ -59,7 +59,7 @@ public class AllocateHearingControllerTest {
 
         RestAssured.given().log().all()
                 .relaxedHTTPSValidation()
-                .baseUri(test_url)
+                .baseUri(testUrl)
                 .basePath("/allocatehearing/initialiseHearings")
                 .header("Content-type", ContentType.JSON)
                 .header("Authorization", userToken)

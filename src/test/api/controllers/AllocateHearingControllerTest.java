@@ -96,7 +96,6 @@ public class AllocateHearingControllerTest {
 
         CaseData caseData = generateCaseData();
 
-
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .withCaseData(caseData)
                 .build();

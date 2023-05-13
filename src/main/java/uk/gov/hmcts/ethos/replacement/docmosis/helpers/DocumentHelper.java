@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
@@ -982,7 +983,16 @@ public class DocumentHelper {
         }
         List<String> docTypes = List.of("Tribunal case file", "Other", "Referral/Judicial direction");
         caseData.setLegalrepDocumentCollection(caseData.getDocumentCollection().stream()
-                .filter(d -> !docTypes.contains(d.getValue().getTypeOfDocument()))
+                .filter(d -> !containsTypeOfDocument(d.getValue(), docTypes))
                 .toList());
+    }
+
+    private static boolean containsTypeOfDocument(DocumentType documentType, List<String> types) {
+        String typeOfDocument = documentType.getTypeOfDocument();
+        if (typeOfDocument == null) {
+            return false;
+        }
+
+        return types.contains(typeOfDocument);
     }
 }

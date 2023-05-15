@@ -49,9 +49,9 @@ public class NoticeOfChangeController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData =
-            nocRespondentRepresentativeService
-                    .updateRepresentation(callbackRequest.getCaseDetails());
+        CaseData caseData = nocRespondentRepresentativeService.updateRepresentation(callbackRequest.getCaseDetails());
+        caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
+
 
         callbackRequest.getCaseDetails().setCaseData(caseData);
 

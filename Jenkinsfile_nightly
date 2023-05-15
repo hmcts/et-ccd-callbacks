@@ -74,6 +74,22 @@ withNightlyPipeline(type, product, component) {
                 reportFiles : "ET-CCD-Callbacks-tests.html",
                 reportName : "ET E2E functional tests result"
         ]
+
+        try {
+            sh "./gradlew :api"
+        } finally {
+            junit '**/test-results/api/*.xml'
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/api/**'
+
+            publishHTML target: [
+                    allowMissing : true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll : true,
+                    reportDir : "build/reports/tests/api",
+                    reportFiles : "index.html",
+                    reportName : "API Testing Report"
+            ]
+        }
     }
 
     afterAlways('fortify-scan') {

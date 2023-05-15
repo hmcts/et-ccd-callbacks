@@ -2186,15 +2186,17 @@ public class DocumentHelperTest {
         DocumentTypeItem et1Doc = DocumentFixtures.getDocumentTypeItem("Visible", "ET1");
         DocumentTypeItem caseFileDoc = DocumentFixtures.getDocumentTypeItem("Hidden", "Tribunal case file");
         DocumentTypeItem otherDoc = DocumentFixtures.getDocumentTypeItem("Hidden", "Other");
-        DocumentTypeItem referralsDoc = DocumentFixtures.getDocumentTypeItem("Hidden", "Referrals/judicial direction");
+        DocumentTypeItem referralsDoc = DocumentFixtures.getDocumentTypeItem("Hidden", "Referral/Judicial direction");
+        DocumentTypeItem nullDoc = DocumentFixtures.getDocumentTypeItem("Visible", null);
 
-        caseData.setDocumentCollection(List.of(et1Doc, caseFileDoc, otherDoc, referralsDoc));
+        caseData.setDocumentCollection(List.of(et1Doc, caseFileDoc, otherDoc, referralsDoc, nullDoc));
 
         DocumentHelper.setLegalRepVisibleDocuments(caseData);
 
         List<DocumentTypeItem> legalRepDocuments = caseData.getLegalrepDocumentCollection();
 
-        assertEquals(legalRepDocuments.size(), 1);
+        assertEquals(legalRepDocuments.size(), 2);
         assertEquals(legalRepDocuments.get(0).getValue().getUploadedDocument().getDocumentFilename(), "Visible");
+        assertEquals(legalRepDocuments.get(1).getValue().getUploadedDocument().getDocumentFilename(), "Visible");
     }
 }

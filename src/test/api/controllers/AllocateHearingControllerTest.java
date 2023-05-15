@@ -35,7 +35,6 @@ import java.util.Properties;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @TestPropertySource(locations = "classpath:application-test.properties")
-@ContextConfiguration(classes = {DocmosisApplication.class})
 public class AllocateHearingControllerTest {
 
     private static Properties properties;

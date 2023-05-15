@@ -995,4 +995,25 @@ public class DocumentHelper {
         return documentTypeItem;
     }
 
+    /**
+     *  Filter documents that only the legal rep should be able to see.
+     */
+    public static void setLegalRepVisibleDocuments(CaseData caseData) {
+        if (caseData.getDocumentCollection() == null) {
+            return;
+        }
+        List<String> docTypes = List.of("Tribunal case file", "Other", "Referral/Judicial direction");
+        caseData.setLegalrepDocumentCollection(caseData.getDocumentCollection().stream()
+                .filter(d -> !containsTypeOfDocument(d.getValue(), docTypes))
+                .toList());
+    }
+
+    private static boolean containsTypeOfDocument(DocumentType documentType, List<String> types) {
+        String typeOfDocument = documentType.getTypeOfDocument();
+        if (typeOfDocument == null) {
+            return false;
+        }
+
+        return types.contains(typeOfDocument);
+    }
 }

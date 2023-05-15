@@ -609,7 +609,7 @@ class NocRespondentRepresentativeServiceTest {
     }
 
     @Test
-    void prepopulateOrgAddress() {
+    void prepopulateOrgAddressAndName() {
         OrganisationsResponse resOrg1 = createOrganisationsResponse(ORGANISATION_ID, ET_ORG_1);
         OrganisationsResponse resOrg2 = createOrganisationsResponse(ORGANISATION_ID_TWO, ET_ORG_2);
         OrganisationsResponse resOrg3 = createOrganisationsResponse(ORGANISATION_ID_THREE, ET_ORG_3);
@@ -627,13 +627,19 @@ class NocRespondentRepresentativeServiceTest {
 
         List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
 
-        assertThat(repCollection.get(0).getValue().getRepresentativeAddress().getAddressLine1())
+        RepresentedTypeR rep1 = repCollection.get(0).getValue();
+        assertThat(rep1.getRepresentativeAddress().getAddressLine1())
                 .isEqualTo(resOrg1.getContactInformation().get(0).getAddressLine1());
+        assertThat(rep1.getNameOfOrganisation()).isEqualTo(resOrg1.getName());
 
-        assertNull(repCollection.get(1).getValue().getRepresentativeAddress());
+        RepresentedTypeR rep2 = repCollection.get(1).getValue();
+        assertNull(rep2.getRepresentativeAddress());
+        assertNull(rep2.getNameOfOrganisation());
 
-        assertThat(repCollection.get(2).getValue().getRepresentativeAddress().getAddressLine1())
+        RepresentedTypeR rep3 = repCollection.get(2).getValue();
+        assertThat(rep3.getRepresentativeAddress().getAddressLine1())
                 .isEqualTo(resOrg3.getContactInformation().get(0).getAddressLine1());
+        assertThat(rep3.getNameOfOrganisation()).isEqualTo(resOrg3.getName());
     }
 
     @Test

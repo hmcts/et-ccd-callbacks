@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -57,8 +56,6 @@ public class NocRespondentRepresentativeService {
     private final AdminUserService adminUserService;
 
     private final NocRespondentHelper nocRespondentHelper;
-
-    private final EmailService emailService;
 
     private final NocNotificationService nocNotificationService;
 
@@ -248,7 +245,7 @@ public class NocRespondentRepresentativeService {
                     .caseRole(roleOfRemovedOrg)
                     .caseId(caseId)
                     .build()
-            ).collect(toList());
+            ).toList();
 
         if (!CollectionUtils.isEmpty(usersToRevoke)) {
             nocCcdService.revokeCaseAssignments(adminUserService.getAdminUserToken(),
@@ -290,9 +287,7 @@ public class NocRespondentRepresentativeService {
                                     .findFirst();
 
                     // if found update representative's Organisation Address
-                    if (organisation.isPresent()) {
-                        updateAddress(organisation.get(), representativeDetails);
-                    }
+                    organisation.ifPresent(organisationsResponse -> updateAddress(organisationsResponse, representativeDetails));
                 }
             }
         }

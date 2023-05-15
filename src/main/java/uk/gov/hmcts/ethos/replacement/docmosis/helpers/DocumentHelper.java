@@ -390,7 +390,7 @@ public class DocumentHelper {
                         && !respondentSumTypeItem.getValue().getRespondentName().equals(firstRespondentName))
                 .map(respondentSumTypeItem -> atomicInteger.getAndIncrement() + ". "
                         + respondentSumTypeItem.getValue().getRespondentName())
-                .collect(Collectors.toList());
+                .toList();
         sb.append("\"resp_others\":\"").append(nullCheck(String.join("\\n", respOthers))).append(NEW_LINE);
         return sb;
     }
@@ -408,7 +408,7 @@ public class DocumentHelper {
                         || YES.equals(respondentSumTypeItem.getValue().getResponseContinue())))
                 .map(respondentSumTypeItem -> (size > 1 ? atomicInteger.getAndIncrement() + ". " : "")
                         + getRespondentAddressET3(respondentSumTypeItem.getValue()))
-                .collect(Collectors.toList());
+                .toList();
         sb.append("\"resp_address\":\"").append(nullCheck(String.join("\\n", respAddressList)))
                 .append(NEW_LINE);
         return sb;
@@ -938,7 +938,7 @@ public class DocumentHelper {
                             && addressLabelTypeItem.getValue().getPrintLabel().equals(YES))
                     .filter(addressLabelTypeItem -> addressLabelTypeItem.getValue().getFullName() != null
                             || addressLabelTypeItem.getValue().getFullAddress() != null)
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
         return selectedAddressLabels;

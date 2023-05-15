@@ -465,7 +465,7 @@ public class LabelsHelper {
                     .stream()
                     .filter(addressLabelTypeItem -> addressLabelTypeItem.getValue().getFullName() != null
                             || addressLabelTypeItem.getValue().getFullAddress() != null)
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
         return selectedAddressLabels;

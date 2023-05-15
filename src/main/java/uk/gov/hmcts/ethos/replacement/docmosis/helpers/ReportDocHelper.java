@@ -566,7 +566,7 @@ public class ReportDocHelper {
         AdhocReportTypeItem itemsList = listingData.getLocalReportsDetail().get(0);
         List<ClaimServedTypeItem> claimServedTypeItems = itemsList.getValue().getClaimServedItems()
                 .stream().filter(item -> Integer.parseInt(item.getValue().getReportedNumberOfDays()) == dayNumber)
-                .collect(Collectors.toList());
+                .toList();
         int claimServedTypeItemsCount = claimServedTypeItems.size();
         String claimServedTypeItemsListSize = String.valueOf(claimServedTypeItems.size());
 

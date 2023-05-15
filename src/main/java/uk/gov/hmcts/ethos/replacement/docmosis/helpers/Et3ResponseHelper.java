@@ -56,6 +56,7 @@ public class Et3ResponseHelper {
     private static final String ET3_RESPONSE_CLAIM_DETAILS = "et3ResponseClaimDetails";
     public static final String ALL_RESPONDENTS_INCOMPLETE_SECTIONS = "There are no respondents that can currently "
             + "submit an ET3 Form. Please make sure all 3 sections have been completed for a respondent";
+    private static final String NO_RESPONDENTS_FOUND = "No respondents found";
 
     private Et3ResponseHelper() {
         // Access through static methods
@@ -63,6 +64,7 @@ public class Et3ResponseHelper {
 
     /**
      * Formats the name of the claimant for display on the Claimant name correct page.
+     *
      * @param caseData data for the current case
      * @return Name ready for presentation on web
      */
@@ -73,6 +75,7 @@ public class Et3ResponseHelper {
     /**
      * Validates that the employment start date is in the past and not after
      * the employment end date if both dates are provided.
+     *
      * @param caseData data for the current case
      * @return List of validation errors encountered
      */
@@ -136,29 +139,22 @@ public class Et3ResponseHelper {
             return;
         }
 
-        switch  (title) {
-            case "Mr":
-                data.setTitleMr(CHECKED);
-                break;
-            case "Mrs":
-                data.setTitleMrs(CHECKED);
-                break;
-            case "Miss":
-                data.setTitleMiss(CHECKED);
-                break;
-            case "Ms":
-                data.setTitleMs(CHECKED);
-                break;
-            default:
+        switch (title) {
+            case "Mr" -> data.setTitleMr(CHECKED);
+            case "Mrs" -> data.setTitleMrs(CHECKED);
+            case "Miss" -> data.setTitleMiss(CHECKED);
+            case "Ms" -> data.setTitleMs(CHECKED);
+            default -> {
                 data.setTitleOther(CHECKED);
                 data.setTitleText(title);
-                break;
+            }
         }
     }
 
     /**
      * Formats data needed for the ET3 Response form document.
-     * @param caseData data for the case
+     *
+     * @param caseData  data for the case
      * @param accessKey required to use docmosis
      * @return document request for docmosis to create the final ET3 Response form
      */
@@ -169,7 +165,7 @@ public class Et3ResponseHelper {
         String submitRespondent = caseData.getSubmitEt3Respondent().getSelectedLabel();
         RespondentSumType respondentSumType = caseData.getRespondentCollection().stream()
                 .filter(r -> submitRespondent.equals(r.getValue().getRespondentName()))
-                .collect(Collectors.toList()).get(0).getValue();
+                .toList().get(0).getValue();
 
         Et3ResponseData data = Et3ResponseData.builder()
             .ethosCaseReference(caseData.getEthosCaseReference())
@@ -230,11 +226,11 @@ public class Et3ResponseHelper {
         et3CheckBoxes(caseData, respondentSumType, data);
 
         Et3ResponseDocument et3ResponseDocument = Et3ResponseDocument.builder()
-            .accessKey(accessKey)
-            .outputName(OUTPUT_NAME)
-            .templateName(TEMPLATE_NAME)
-            .et3ResponseData(data)
-            .build();
+                .accessKey(accessKey)
+                .outputName(OUTPUT_NAME)
+                .templateName(TEMPLATE_NAME)
+                .et3ResponseData(data)
+                .build();
 
         return OBJECT_MAPPER.writeValueAsString(et3ResponseDocument);
     }
@@ -291,9 +287,9 @@ public class Et3ResponseHelper {
 
     private static void addRepDetails(CaseData caseData, Et3ResponseData data) {
         Optional<RepresentedTypeRItem> representative = caseData.getRepCollection().stream().filter(
-            rep -> rep.getValue().getRespRepName().equals(
-                caseData.getEt3RepresentingRespondent().get(0).getValue().getDynamicList().getSelectedLabel()
-            )
+                rep -> rep.getValue().getRespRepName().equals(
+                        caseData.getEt3RepresentingRespondent().get(0).getValue().getDynamicList().getSelectedLabel()
+                )
         ).findFirst();
 
         if (representative.isPresent()) {
@@ -318,16 +314,17 @@ public class Et3ResponseHelper {
 
     /**
      * Create a collection of DynamicLists of respondent names.
+     *
      * @param caseData data for the case
      */
     public static List<String> createDynamicListSelection(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
-            return List.of("No respondents found");
+            return List.of(NO_RESPONDENTS_FOUND);
         }
 
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection().stream()
                 .filter(r -> NO.equals(r.getValue().getResponseReceived()))
-                .collect(Collectors.toList());
+                .toList();
 
         if (CollectionUtils.isEmpty(respondents)) {
             return List.of("There are no respondents that require an ET3");
@@ -336,7 +333,7 @@ public class Et3ResponseHelper {
         DynamicFixedListType dynamicList = DynamicFixedListType.from(DynamicListHelper.createDynamicRespondentName(
                 caseData.getRespondentCollection().stream()
                         .filter(r -> NO.equals(r.getValue().getResponseReceived()))
-                        .collect(Collectors.toList())));
+                        .toList()));
         DynamicListType dynamicListType = new DynamicListType();
         dynamicListType.setDynamicList(dynamicList);
         DynamicListTypeItem dynamicListTypeItem = new DynamicListTypeItem();
@@ -347,12 +344,13 @@ public class Et3ResponseHelper {
 
     /**
      * Validate the selection of respondents.
+     *
      * @param caseData data for the case
      * @return an error is the user has selected the same respondent multiple times
      */
     public static List<String> validateRespondents(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getEt3RepresentingRespondent())) {
-            return List.of("No respondents found");
+            return List.of(NO_RESPONDENTS_FOUND);
         }
 
         Set<String> respondentSet = new HashSet<>();
@@ -369,6 +367,7 @@ public class Et3ResponseHelper {
 
     /**
      * Saves the data from the ET3 Form event to the respondent.
+     *
      * @param caseData data for the case
      */
     public static void addEt3DataToRespondent(CaseData caseData, String eventId) {
@@ -393,21 +392,12 @@ public class Et3ResponseHelper {
 
     private static void addEt3Data(CaseData caseData, String eventId, String respondentSelected,
                                    RespondentSumTypeItem respondent) {
-        RespondentSumType respondentSumType;
-        switch (eventId) {
-            case ET3_RESPONSE :
-                respondentSumType = addPersonalDetailsToRespondent(caseData, respondent.getValue());
-                break;
-            case ET3_RESPONSE_EMPLOYMENT_DETAILS:
-                respondentSumType = addEmploymentDetailsToRespondent(caseData, respondent.getValue());
-                break;
-            case ET3_RESPONSE_CLAIM_DETAILS:
-                respondentSumType = addClaimDetailsToRespondent(caseData, respondent.getValue());
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid eventId: " + eventId);
-
-        }
+        RespondentSumType respondentSumType = switch (eventId) {
+            case ET3_RESPONSE -> addPersonalDetailsToRespondent(caseData, respondent.getValue());
+            case ET3_RESPONSE_EMPLOYMENT_DETAILS -> addEmploymentDetailsToRespondent(caseData, respondent.getValue());
+            case ET3_RESPONSE_CLAIM_DETAILS -> addClaimDetailsToRespondent(caseData, respondent.getValue());
+            default -> throw new IllegalArgumentException("Invalid eventId: " + eventId);
+        };
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
             if (respondentSelected.equals(respondentSumTypeItem.getValue().getRespondentName())) {
                 respondentSumTypeItem.setValue(respondentSumType);
@@ -478,6 +468,7 @@ public class Et3ResponseHelper {
 
     /**
      * Sends notification emails to Tribunal.
+     *
      * @param caseDetails Contains details about the case.
      * @return Map of Personalisation
      */
@@ -500,6 +491,7 @@ public class Et3ResponseHelper {
 
     /**
      * Loads the existing ET3 data onto the form if a resubmission is required.
+     *
      * @param caseData data for the case
      */
     public static void reloadDataOntoEt3(CaseData caseData) {
@@ -570,6 +562,7 @@ public class Et3ResponseHelper {
 
     /**
      * Reset the fields in the ET3 Response form event.
+     *
      * @param caseData data for the case
      */
     public static void resetEt3FormFields(CaseData caseData) {
@@ -628,17 +621,18 @@ public class Et3ResponseHelper {
 
     /**
      * Create a list of respondents for ET3 submission.
+     *
      * @param caseData casedata
      * @return a list of errors if any
      */
     public static List<String> et3SubmitRespondents(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
-            return List.of("No respondents found");
+            return List.of(NO_RESPONDENTS_FOUND);
         }
 
         List<RespondentSumTypeItem> validRespondents = caseData.getRespondentCollection().stream()
                 .filter(Et3ResponseHelper::checkRespondentSections)
-                .collect(Collectors.toList());
+                .toList();
 
         if (CollectionUtils.isEmpty(validRespondents)) {
             return List.of(ALL_RESPONDENTS_INCOMPLETE_SECTIONS);
@@ -662,6 +656,7 @@ public class Et3ResponseHelper {
     /**
      * Reloads the data from the respondent to the toplevel casedata to generate the ET3 for submission and attach
      * documents to document collection.
+     *
      * @param caseData casedata
      */
     public static void reloadSubmitOntoEt3(CaseData caseData) {

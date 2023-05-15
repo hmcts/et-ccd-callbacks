@@ -42,11 +42,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class Et3ResponseController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
-    private static final String PROCESSING_COMPLETE_HEADER = "<h1>ET3 application complete</h1>";
-    private static final String PROCESSING_COMPLETE_BODY =
-        "<h3>What happens next</h3>\r\n\r\nYou should receive confirmation from the tribunal office to process your"
-            + " application within 5 working days. If you have not heard from them within 5 days, "
-            + "contact the office directly.";
+    private static final String ET3_COMPLETE_HEADER = "<h1>ET3 application complete</h1>";
+    private static final String ET3_COMPLETE_BODY =
+            """
+                    <h3>What happens next</h3>\r
+                    \r
+                    You should receive confirmation from the tribunal office to process your application within 5
+                     working days. If you have not heard from them within 5 days, contact the office directly.""";
     private static final String SECTION_COMPLETE_BODY =
             "You may want to complete the rest of the ET3 Form using the links below"
             + "<br><a href=\"/cases/case-details/%s/trigger/et3Response/et3Response1\">ET3 - Respondent Details</a>"
@@ -77,8 +79,8 @@ public class Et3ResponseController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> initEt3Response(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -142,8 +144,8 @@ public class Et3ResponseController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> midEmploymentDates(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -211,8 +213,9 @@ public class Et3ResponseController {
 
     /**
      * Generates ET3 Response document and add the ET3 Fields to each respondent.
+     *
      * @param ccdRequest generic request from CCD
-     * @param userToken authentication token to verify the user
+     * @param userToken  authentication token to verify the user
      * @return Callback response entity with case data attached.
      */
     @PostMapping(value = "/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
@@ -226,8 +229,8 @@ public class Et3ResponseController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -236,7 +239,7 @@ public class Et3ResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DocumentInfo documentInfo = et3ResponseService.generateEt3ResponseDocument(caseData, userToken,
-            ccdRequest.getCaseDetails().getCaseTypeId());
+                ccdRequest.getCaseDetails().getCaseTypeId());
         et3ResponseService.saveEt3ResponseDocument(caseData, documentInfo);
         et3ResponseService.saveRelatedDocumentsToDocumentCollection(caseData);
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
@@ -247,8 +250,9 @@ public class Et3ResponseController {
 
     /**
      * Generates the confirmation page for the ET3 response journey, with instructions on what to do next.
+     *
      * @param ccdRequest generic request from CCD
-     * @param userToken authentication token to verify the user
+     * @param userToken  authentication token to verify the user
      * @return this will return and display a message to the user on the next steps.
      */
     @PostMapping(value = "/processingComplete", consumes = APPLICATION_JSON_VALUE)
@@ -262,8 +266,8 @@ public class Et3ResponseController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> processingComplete(
-        @RequestBody CCDRequest ccdRequest,
-        @RequestHeader(value = "Authorization") String userToken) {
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(value = "Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
@@ -271,10 +275,10 @@ public class Et3ResponseController {
         }
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
-            .data(ccdRequest.getCaseDetails().getCaseData())
-            .confirmation_header(PROCESSING_COMPLETE_HEADER)
-            .confirmation_body(PROCESSING_COMPLETE_BODY)
-            .build());
+                .data(ccdRequest.getCaseDetails().getCaseData())
+                .confirmation_header(ET3_COMPLETE_HEADER)
+                .confirmation_body(ET3_COMPLETE_BODY)
+                .build());
     }
 
     @PostMapping(value = "/startSubmitEt3", consumes = APPLICATION_JSON_VALUE)

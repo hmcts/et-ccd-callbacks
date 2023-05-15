@@ -52,7 +52,6 @@ public class NoticeOfChangeController {
         CaseData caseData = nocRespondentRepresentativeService.updateRepresentation(callbackRequest.getCaseDetails());
         caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
 
-
         callbackRequest.getCaseDetails().setCaseData(caseData);
 
         return ResponseEntity.ok(ccdCaseAssignment.applyNoc(callbackRequest, userToken));

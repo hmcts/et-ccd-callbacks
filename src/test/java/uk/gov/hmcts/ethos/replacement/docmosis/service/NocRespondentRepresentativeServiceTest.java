@@ -112,8 +112,6 @@ class NocRespondentRepresentativeServiceTest {
     @MockBean
     private NocCcdService nocCcdService;
     @MockBean
-    private EmailService emailService;
-    @MockBean
     private NocNotificationService nocNotificationService;
     @MockBean
     private CcdClient ccdClient;
@@ -135,8 +133,8 @@ class NocRespondentRepresentativeServiceTest {
 
         nocRespondentRepresentativeService =
             new NocRespondentRepresentativeService(noticeOfChangeFieldPopulator, converter, nocCcdService,
-                    adminUserService, nocRespondentHelper, emailService,
-                    nocNotificationService, ccdClient, ccdCaseAssignment, organisationClient, authTokenGenerator);
+                    adminUserService, nocRespondentHelper, nocNotificationService, ccdClient, ccdCaseAssignment,
+                    organisationClient, authTokenGenerator);
                     
         // Respondent
         caseData.setRespondentCollection(new ArrayList<>());

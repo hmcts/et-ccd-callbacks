@@ -275,19 +275,17 @@ public class NocRespondentRepresentativeService {
             RepresentedTypeR representativeDetails = representative.getValue();
 
             if (representativeDetails != null && YES.equals(representativeDetails.getMyHmctsYesNo())) {
-                // Representative's Organisation is missing Address
                 Organisation repOrg = representativeDetails.getRespondentOrganisation();
 
                 if (repOrg != null && repOrg.getOrganisationID() != null) {
-                    // get Organisation Details including Address
+                    // get organisation details
                     Optional<OrganisationsResponse> organisation =
                             organisationList
                                     .stream()
                                     .filter(o -> o.getOrganisationIdentifier().equals(repOrg.getOrganisationID()))
                                     .findFirst();
 
-                    // if found update representative's Organisation Address
-                    organisation.ifPresent(organisationsResponse -> updateAddress(organisationsResponse, representativeDetails));
+                    organisation.ifPresent(orgResponse -> updateRepDetails(orgResponse, representativeDetails));
                 }
             }
         }
@@ -295,11 +293,13 @@ public class NocRespondentRepresentativeService {
         return caseData;
     }
 
-    private void updateAddress(OrganisationsResponse ordRes, RepresentedTypeR representativeDetails) {
-        if (!CollectionUtils.isEmpty(ordRes.getContactInformation())) {
-            Address repAddress = representativeDetails.getRepresentativeAddress();
+    private void updateRepDetails(OrganisationsResponse orgRes, RepresentedTypeR repDetails) {
+        repDetails.setNameOfOrganisation(orgRes.getName());
+
+        if (!CollectionUtils.isEmpty(orgRes.getContactInformation())) {
+            Address repAddress = repDetails.getRepresentativeAddress();
             repAddress = repAddress == null ? new Address() : repAddress;
-            OrganisationAddress orgAddress = ordRes.getContactInformation().get(0);
+            OrganisationAddress orgAddress = orgRes.getContactInformation().get(0);
 
             // update Representative Address with Org Address
             repAddress.setAddressLine1(orgAddress.getAddressLine1());
@@ -310,7 +310,7 @@ public class NocRespondentRepresentativeService {
             repAddress.setCountry(orgAddress.getCountry());
             repAddress.setPostCode(orgAddress.getPostCode());
 
-            representativeDetails.setRepresentativeAddress(repAddress);
+            repDetails.setRepresentativeAddress(repAddress);
         }
     }
 }

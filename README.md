@@ -67,6 +67,12 @@ To run all unit tests:
 ./gradlew test
 ```
 
+### API tests (Functional)
+To run the Java-based API tests locally (you will need a running instance of the application):
+```bash
+./gradlew api
+```
+
 ### Coding Style Tests
 To run all checks (including unit tests):
 

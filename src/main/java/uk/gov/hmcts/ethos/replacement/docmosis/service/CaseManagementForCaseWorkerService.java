@@ -50,6 +50,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
 
 @Slf4j
 @Service("caseManagementForCaseWorkerService")
@@ -269,6 +270,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void midEventAmendHearing(CaseData caseData, List<String> errors) {
+        caseData.setListedDateInPastWarning(NO);
         if (!CollectionUtils.isEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                 if (!CollectionUtils.isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
@@ -276,9 +278,20 @@ public class CaseManagementForCaseWorkerService {
                             : hearingTypeItem.getValue().getHearingDateCollection()) {
                         addHearingsOnWeekendError(dateListedTypeItem, errors,
                                 hearingTypeItem.getValue().getHearingNumber());
+                        addHearingsInPastWarning(dateListedTypeItem, caseData);
                     }
                 }
             }
+        }
+    }
+
+    public void setScotlandAllocatedOffice(String caseTypeId, CaseData caseData) {
+        if (!SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            return;
+        }
+
+        if (caseData.getManagingOffice() != null && !UNASSIGNED_OFFICE.equals(caseData.getManagingOffice())) {
+            caseData.setAllocatedOffice(TribunalOffice.GLASGOW.getOfficeName());
         }
     }
 
@@ -290,6 +303,16 @@ public class CaseManagementForCaseWorkerService {
         if (SUNDAY.equals(dayOfWeek)
                 || SATURDAY.equals(dayOfWeek)) {
             errors.add(LISTED_DATE_ON_WEEKEND_MESSAGE + hearingNumber);
+        }
+    }
+
+    private void addHearingsInPastWarning(DateListedTypeItem dateListedTypeItem, CaseData caseData) {
+        LocalDate date = LocalDateTime.parse(
+                dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN).toLocalDate();
+        if ((Strings.isNullOrEmpty(dateListedTypeItem.getValue().getHearingStatus())
+                || HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus()))
+                && date.isBefore(LocalDate.now())) {
+            caseData.setListedDateInPastWarning(YES);
         }
     }
 

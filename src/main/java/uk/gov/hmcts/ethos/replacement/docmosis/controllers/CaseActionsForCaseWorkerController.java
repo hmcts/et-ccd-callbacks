@@ -81,7 +81,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
     "PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessivePublicCount", "PMD.ExcessiveClassLength",
     "PMD.ExcessiveImports", "PMD.CyclomaticComplexity"})
 public class CaseActionsForCaseWorkerController {
-
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String EVENT_FIELDS_VALIDATION = "Event fields validation: ";
@@ -266,7 +265,7 @@ public class CaseActionsForCaseWorkerController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        List<String> errors = eventValidationService.validateReceiptDate(caseData);
+        List<String> errors = eventValidationService.validateReceiptDate(ccdRequest.getCaseDetails());
 
         if (errors.isEmpty()) {
             DefaultValues defaultValues = getPostDefaultValues(ccdRequest.getCaseDetails());
@@ -282,6 +281,8 @@ public class CaseActionsForCaseWorkerController {
 
             if (ET1_ONLINE_CASE_SOURCE.equals(caseData.getCaseSource())) {
                 caseData.setPositionType(ET1_ONLINE_SUBMISSION_POSITION_TYPE);
+                caseManagementForCaseWorkerService.setScotlandAllocatedOffice(
+                    ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
             }
         }
 
@@ -343,7 +344,7 @@ public class CaseActionsForCaseWorkerController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        List<String> errors = eventValidationService.validateReceiptDate(caseData);
+        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
 
         if (!eventValidationService.validateCaseState(caseDetails)) {
             errors.add(caseData.getEthosCaseReference() + " Case has not been Accepted.");
@@ -468,9 +469,10 @@ public class CaseActionsForCaseWorkerController {
         List<String> errors = eventValidationService.validateRespRepNames(caseData);
 
         if (errors.isEmpty()) {
-            //add org policy and NOC elements
+            // add org policy and NOC elements
             caseData.setRepCollection(nocRespondentHelper.updateWithRespondentIds(caseData));
             caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+            caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
         }
 
         log.info(EVENT_FIELDS_VALIDATION + errors);

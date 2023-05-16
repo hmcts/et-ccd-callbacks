@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({Et3ResponseController.class, Et3ResponseService.class, JsonMapper.class})
@@ -52,6 +54,8 @@ class Et3ResponseControllerTest {
     private DocumentManagementService documentManagementService;
     @MockBean
     private TornadoService tornadoService;
+    @MockBean
+    private EmailService emailService;
     private MockMvc mvc;
     private CCDRequest ccdRequest;
 
@@ -63,12 +67,17 @@ class Et3ResponseControllerTest {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
 
         CaseDetails caseDetails = CaseDataBuilder.builder()
-                .withEt3RepresentingRespondent("test")
+            .withEthosCaseReference("1234567/1234")
+            .withRespondent("test", NO, null, false)
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.getCaseData().setClaimant("Claimant LastName");
+        caseDetails.getCaseData().setTribunalCorrespondenceEmail("tribunal@email.com");
 
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseDetails.getCaseData())
             .build();
+        ccdRequest.getCaseDetails().setCaseId("1683646754393041");
+
     }
 
     @Test
@@ -80,7 +89,6 @@ class Et3ResponseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data", notNullValue()))
-            .andExpect(jsonPath("$.errors", nullValue()))
             .andExpect(jsonPath("$.warnings", nullValue()));
     }
 

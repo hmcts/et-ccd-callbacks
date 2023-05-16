@@ -82,6 +82,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIVE_CASELOAD_REPOR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_CLOSED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
@@ -93,7 +94,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.UnusedPrivateMethod", "PMD.ExcessiveImports", "PMD.UnusedPrivateField",
     "PMD.LinguisticNaming", "PMD.TooManyMethods", "PMD.ExcessiveClassLength", "PMD.ExcessiveMethodLength",
-    "PMD.NcssCount"})
+    "PMD.NcssCount", "PMD.ExcessivePublicCount"})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ListingServiceTest {
 
@@ -467,6 +468,21 @@ public class ListingServiceTest {
         dateListedTypeItem.setValue(dateListedType);
         assertFalse(listingService.isListingVenueValid(listingDetails.getCaseData(),
                 dateListedTypeItem, ENGLANDWALES_CASE_TYPE_ID, "123"));
+    }
+
+    @Test
+    public void testVenueScotlandAllOffices() {
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate("2019-12-12T12:11:00.000");
+        dateListedType.setHearingVenueDayScotland("Glasgow");
+        dateListedType.setHearingGlasgow(new DynamicFixedListType("GlasgowVenue"));
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setId("123");
+        dateListedTypeItem.setValue(dateListedType);
+        listingDetails.getCaseData().setListingVenue(new DynamicFixedListType("All"));
+        listingDetails.getCaseData().setManagingOffice("All");
+        assertTrue(listingService.isListingVenueValid(listingDetails.getCaseData(),
+                dateListedTypeItem, SCOTLAND_CASE_TYPE_ID, "123"));
     }
 
     @Test
@@ -1022,6 +1038,7 @@ public class ListingServiceTest {
     @Test
     public void processHearingDocument() throws IOException {
         when(tornadoService.listingGeneration(anyString(), any(), anyString())).thenReturn(documentInfo);
+        listingDetails.getCaseData().setReportType(CASES_COMPLETED_REPORT);
         DocumentInfo documentInfo1 = listingService
                 .processHearingDocument(listingDetails.getCaseData(),
                         listingDetails.getCaseTypeId(), "authToken");
@@ -1390,7 +1407,7 @@ public class ListingServiceTest {
         listingDetails.getCaseData().setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(),
                 anyString(), anyString(), anyString())).thenReturn(submitEvents);
-        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken");
+        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken", "userName");
         assertEquals(result, listingDataResult.toString());
         assertEquals(TribunalOffice.LEEDS.getOfficeName(), listingDataResult
                 .getLocalReportsDetailHdr().getReportOffice());
@@ -1512,7 +1529,7 @@ public class ListingServiceTest {
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(),
                 anyString(), any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         submitEvents.get(0).getCaseData().setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
-        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken");
+        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken", "userName");
         assertEquals(result, listingDataResult.toString());
         assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), listingDataResult
                 .getLocalReportsDetailHdr().getReportOffice());
@@ -1538,7 +1555,7 @@ public class ListingServiceTest {
 
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(), anyString(),
                 anyString(), anyString())).thenReturn(submitEvents);
-        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken");
+        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken", "userName");
         assertTrue(CollectionUtils.isEmpty(listingDataResult.getLocalReportsDetail()));
         assertTrue(CollectionUtils.isEmpty(listingDataResult.getLocalReportsSummary2()));
         assertTrue(CollectionUtils.isEmpty(listingDataResult.getLocalReportsSummary()));
@@ -1697,7 +1714,7 @@ public class ListingServiceTest {
         listingDetails.getCaseData().setManagingOffice("Leeds");
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(),
                 anyString(), anyString(), anyString())).thenReturn(submitEvents);
-        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken");
+        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken", "userName");
         assertEquals(result, listingDataResult.toString());
     }
 
@@ -1803,7 +1820,7 @@ public class ListingServiceTest {
                 anyString(), anyString(), anyString())).thenReturn(submitEvents);
         submitEvents.get(0).getCaseData().setManagingOffice("Aberdeen");
         submitEvents.get(0).getCaseData().setPositionType(POSITION_TYPE_CASE_CLOSED);
-        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken");
+        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken", "userName");
         assertEquals(result, listingDataResult.toString());
         submitEvents.get(0).getCaseData().setPositionType("Awaiting ET3");
     }
@@ -1815,7 +1832,7 @@ public class ListingServiceTest {
         listingDetails.getCaseData().setManagingOffice(null);
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(),
                 anyString(), anyString(), anyString())).thenReturn(submitEvents);
-        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken");
+        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken", "userName");
         assertNotNull(listingDataResult.getLocalReportsDetailHdr());
         assertEquals(1, listingDataResult.getLocalReportsDetail().size());
     }
@@ -1827,7 +1844,7 @@ public class ListingServiceTest {
         listingDetails.getCaseData().setManagingOffice("Leeds");
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(),
                 anyString(), anyString(), anyString())).thenReturn(submitEvents);
-        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken");
+        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken", "userName");
         assertNotNull(listingDataResult.getLocalReportsDetailHdr());
         assertEquals(1, listingDataResult.getLocalReportsDetail().size());
     }
@@ -1840,7 +1857,7 @@ public class ListingServiceTest {
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(),
                 anyString(), anyString(), anyString())).thenReturn(submitEvents);
         submitEvents.get(0).getCaseData().setConciliationTrack(CONCILIATION_TRACK_FAST_TRACK);
-        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken");
+        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken", "userName");
         assertNotNull(listingDataResult.getLocalReportsDetailHdr());
         assertEquals(1, listingDataResult.getLocalReportsDetail().size());
         submitEvents.get(0).getCaseData().setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
@@ -1854,7 +1871,7 @@ public class ListingServiceTest {
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(),
                 anyString(), anyString(), anyString())).thenReturn(submitEvents);
         submitEvents.get(0).getCaseData().setConciliationTrack(CONCILIATION_TRACK_STANDARD_TRACK);
-        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken");
+        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken", "userName");
         assertNotNull(listingDataResult.getLocalReportsDetailHdr());
         assertEquals(1, listingDataResult.getLocalReportsDetail().size());
         submitEvents.get(0).getCaseData().setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
@@ -1868,7 +1885,7 @@ public class ListingServiceTest {
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(),
                 any(), anyString(), anyString(), anyString())).thenReturn(submitEvents);
         submitEvents.get(0).getCaseData().setConciliationTrack(CONCILIATION_TRACK_OPEN_TRACK);
-        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken");
+        ListingData listingDataResult = listingService.getDateRangeReport(listingDetails, "authToken", "userName");
         assertNotNull(listingDataResult.getLocalReportsDetailHdr());
         assertEquals(1, listingDataResult.getLocalReportsDetail().size());
         submitEvents.get(0).getCaseData().setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
@@ -1878,7 +1895,7 @@ public class ListingServiceTest {
     public void generateReportDataWithException() throws IOException {
         when(ccdClient.retrieveCasesGenericReportElasticSearch(anyString(), anyString(), any(),
                 anyString(), anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
-        listingService.getDateRangeReport(listingDetails, "authToken");
+        listingService.getDateRangeReport(listingDetails, "authToken", "userName");
     }
 
     @Test

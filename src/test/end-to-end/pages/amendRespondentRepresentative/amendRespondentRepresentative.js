@@ -31,9 +31,10 @@ module.exports = async function (myHMMCTSOrganisation = false) {
         I.see('Address')
         I.see('Enter a UK postcode');
         I.fillField('#repCollection_0_name_of_organisation', 'Tester Organisation');
+        I.wait(2);
         I.fillField('#repCollection_0_representative_reference', 'Tester Reference');
-        I.selectOption('ccd-field-write:nth-of-type(11) .form-control', 'Solicitor');
-
+        I.selectOption('#repCollection_0_representative_occupation', 'Solicitor');
+        I.wait(2);
         I.fillField('#repCollection_0_representative_address_representative_address_postcodeInput', 'BR1 4NN');
         I.click('Find address');
         I.wait(15);

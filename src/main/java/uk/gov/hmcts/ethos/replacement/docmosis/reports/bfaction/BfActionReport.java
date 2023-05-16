@@ -1,6 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.bfaction;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
@@ -11,15 +15,20 @@ import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItem;
 import uk.gov.hmcts.et.common.model.listing.items.BFDateTypeItemComparator;
 import uk.gov.hmcts.et.common.model.listing.types.BFDateType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
-
+import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
 
+@SuppressWarnings({"PMD.LawOfDemeter"})
+@Service
+@Slf4j
 public class BfActionReport {
-    public ListingData runReport(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
+
+    public BfActionReportData runReport(ListingDetails listingDetails,
+                                 List<SubmitEvent> submitEvents,
+                                 String userName) {
         BfActionReportData bfActionReportData = new BfActionReportData();
         ListingData caseData = listingDetails.getCaseData();
         bfActionReportData.setHearingDateType(caseData.getHearingDateType());
@@ -32,19 +41,31 @@ public class BfActionReport {
             bfDateTypeItems.sort(new BFDateTypeItemComparator());
             bfActionReportData.setBfDateCollection(bfDateTypeItems);
         }
-
         bfActionReportData.clearReportFields();
-        bfActionReportData.setReportType(BROUGHT_FORWARD_REPORT);
-        bfActionReportData.setDocumentName(BROUGHT_FORWARD_REPORT);
-
+        bfActionReportData.setReportType(Constants.BROUGHT_FORWARD_REPORT);
+        bfActionReportData.setDocumentName(Constants.BROUGHT_FORWARD_REPORT);
+        bfActionReportData.setReportPrintedOnDescription(
+                getReportedOnDetail(userName));
         String managingOffice = caseData.getManagingOffice();
-        bfActionReportData.setOffice(ReportHelper.getReportOffice(listingDetails.getCaseTypeId(), managingOffice));
         bfActionReportData.setManagingOffice(
                 ReportHelper.getReportOfficeForDisplay(listingDetails.getCaseTypeId(), managingOffice));
+        setPeriodDescription(bfActionReportData, listingDetails);
         bfActionReportData.setListingDate(caseData.getListingDate());
         bfActionReportData.setListingDateFrom(caseData.getListingDateFrom());
         bfActionReportData.setListingDateTo(caseData.getListingDateTo());
         return bfActionReportData;
+    }
+
+    private void setPeriodDescription(BfActionReportData bfActionReportData, ListingDetails listingDetails) {
+        ReportParams genericReportParams = ReportHelper.getListingDateRangeForSearch(listingDetails);
+        bfActionReportData.setReportPeriodDescription(ReportHelper.getReportListingDate(bfActionReportData,
+                genericReportParams.getDateFrom(),
+                genericReportParams.getDateTo(),
+                listingDetails.getCaseData().getHearingDateType()));
+    }
+
+    private String getReportedOnDetail(String userName) {
+        return "Reported on: " + UtilHelper.formatCurrentDate(LocalDate.now()) + "   By: " + userName;
     }
 
     private void addBfDateTypeItems(SubmitEvent submitEvent, ListingData listingData,
@@ -64,7 +85,7 @@ public class BfActionReport {
                                                     ListingData listingData, CaseData caseData) {
         BFActionType bfActionType = bfActionTypeItem.getValue();
         if (!isNullOrEmpty(bfActionType.getBfDate()) && isNullOrEmpty(bfActionType.getCleared())) {
-            String bfDate = ReportHelper.getFormattedLocalDate(bfActionType.getBfDate());
+            String bfDate = bfActionType.getBfDate();
             boolean isValidBfDate = ReportHelper.validateMatchingDate(listingData, bfDate);
 
             if (isValidBfDate) {
@@ -86,8 +107,8 @@ public class BfActionReport {
             bfDateType.setBroughtForwardAction(bfActionType.getCwActions());
         }
 
-        bfDateType.setBroughtForwardEnteredDate(bfActionType.getDateEntered());
-        bfDateType.setBroughtForwardDate(bfDate);
+        bfDateType.setBroughtForwardEnteredDate(ReportHelper.getFormattedLocalDate(bfActionType.getDateEntered()));
+        bfDateType.setBroughtForwardDate(ReportHelper.getFormattedLocalDate(bfDate));
 
         if (!isNullOrEmpty(bfActionType.getNotes())) {
             String bfReason = bfActionType.getNotes().replace("\n", ". ");

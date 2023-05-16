@@ -2,23 +2,22 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Locale.UK;
 
 @Slf4j
 @SuppressWarnings({"PMD.AvoidCatchingNPE"})
@@ -30,50 +29,17 @@ public final class NocNotificationHelper {
         // Access through static methods
     }
 
-    public static int getIndexOfSolicitor(CaseData caseData) {
-        String caseRoleId = caseData.getChangeOrganisationRequestField().getCaseRoleId().getSelectedCode();
-        SolicitorRole solicitorRole = SolicitorRole.from(caseRoleId).orElseThrow();
-        return solicitorRole.getIndex();
-    }
-
-    public static String getOldSolicitorEmail(CallbackRequest callbackRequest) {
-        try {
-            CaseData prevCaseData = callbackRequest.getCaseDetailsBefore().getCaseData();
-            return prevCaseData.getRepCollection()
-                    .get(getIndexOfSolicitor(prevCaseData))
-                    .getValue().getRepresentativeEmailAddress();
-        } catch (NullPointerException ex) {
-            return null;
-        }
-
-    }
-
-    public static String getNewSolicitorEmail(CallbackRequest callbackRequest) {
-        try {
-            CaseData oldCaseData = callbackRequest.getCaseDetailsBefore().getCaseData();
-            CaseData newDetails = callbackRequest.getCaseDetails().getCaseData();
-            return newDetails.getRepCollection()
-                    .get(getIndexOfSolicitor(oldCaseData))
-                    .getValue().getRepresentativeEmailAddress();
-        } catch (NullPointerException e) {
-            return null;
-        }
-
-    }
-
-    public static String getRespondentNameForNewSolicitor(CallbackRequest callbackRequest) {
+    public static String getRespondentNameForNewSolicitor(ChangeOrganisationRequest changeRequest,
+                                                          CaseData caseDataNew) {
         String respondentName = null;
         try {
-            CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
-            CaseData caseDetailsBefore = callbackRequest.getCaseDetailsBefore().getCaseData();
-            String selectedRole =
-                    caseDetailsBefore.getChangeOrganisationRequestField().getCaseRoleId()
+            String selectedRole = changeRequest.getCaseRoleId()
                             .getSelectedCode();
 
             SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
 
             respondentName =
-                    solicitorRole.getRepresentationItem(caseData).map(respondentSumTypeItem ->
+                    solicitorRole.getRepresentationItem(caseDataNew).map(respondentSumTypeItem ->
                             respondentSumTypeItem.getValue().getRespondentName()).orElseThrow();
         } catch (NullPointerException e) {
             log.warn("Failed to get RespondentNameForNewSolicitor");
@@ -81,14 +47,12 @@ public final class NocNotificationHelper {
         return isNullOrEmpty(respondentName) ? UNKNOWN : respondentName;
     }
 
-    public static RespondentSumType getRespondent(CallbackRequest callbackRequest, CaseData caseData,
+    public static RespondentSumType getRespondent(ChangeOrganisationRequest changeRequest, CaseData caseData,
                                                   NocRespondentHelper nocRespondentHelper) {
 
         try {
 
-            CaseData caseDataBefore = callbackRequest.getCaseDetailsBefore().getCaseData();
-            String selectedRole =
-                    caseDataBefore.getChangeOrganisationRequestField().getCaseRoleId().getSelectedCode();
+            String selectedRole = changeRequest.getCaseRoleId().getSelectedCode();
             SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
             RespondentSumTypeItem respondentSumTypeItem = solicitorRole.getRepresentationItem(caseData).orElseThrow();
             return nocRespondentHelper.getRespondent(respondentSumTypeItem.getValue().getRespondentName(), caseData);
@@ -98,11 +62,12 @@ public final class NocNotificationHelper {
 
     }
 
-    public static Map<String, String> buildPersonalisationWithPartyName(CaseData caseData, String partyName) {
+    public static Map<String, String> buildPersonalisationWithPartyName(CaseDetails caseDetails, String partyName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
-        addCommonValues(caseData, personalisation);
+        addCommonValues(caseDetails.getCaseData(), personalisation);
         personalisation.put("party_name", partyName);
+        personalisation.put("ccdId", caseDetails.getCaseId());
 
         return personalisation;
     }
@@ -114,23 +79,23 @@ public final class NocNotificationHelper {
         return personalisation;
     }
 
-    public static Map<String, String> buildRespondentPersonalisation(CaseData caseData, RespondentSumType respondent) {
+    public static Map<String, String> buildRespondentPersonalisation(CaseDetails detail, RespondentSumType respondent) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
+        CaseData caseData = detail.getCaseData();
         addCommonValues(caseData, personalisation);
         personalisation.put("respondent_name", respondent.getRespondentName());
+        personalisation.put("ccdId", detail.getCaseId());
+        personalisation.put("date", "Not set");
 
         String nextHearingDate = HearingsHelper.getEarliestFutureHearingDate(caseData.getHearingCollection());
 
-        if (nextHearingDate == null) {
-            personalisation.put("date", "Not set");
-        } else {
+        if (nextHearingDate != null) {
             try {
-                Date hearingStartDate =
-                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.UK).parse(nextHearingDate);
-                personalisation.put("date", new SimpleDateFormat("dd MMM yyyy", Locale.UK).format(hearingStartDate));
-            } catch (ParseException e) {
-                personalisation.put("date", "Not set");
+                Date hearingStartDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", UK).parse(nextHearingDate);
+                personalisation.put("date", new SimpleDateFormat("dd MMM yyyy", UK).format(hearingStartDate));
+            } catch (ParseException ignored) {
+                log.warn("Failed to parse nextHearingDate");
             }
         }
 
@@ -141,8 +106,7 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
-        personalisation.put("date",
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")));
+        personalisation.put("date", ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
         personalisation.put("tribunal", isNullOrEmpty(caseData.getTribunalAndOfficeLocation()) ? UNKNOWN :
                 caseData.getTribunalAndOfficeLocation());
 

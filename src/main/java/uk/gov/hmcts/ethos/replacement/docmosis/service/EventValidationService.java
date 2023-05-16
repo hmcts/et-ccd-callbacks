@@ -92,6 +92,12 @@ public class EventValidationService {
             SUBMITTED_STATE, ACCEPTED_STATE, REJECTED_STATE);
     public static final String DISPOSAL_DATE_IN_FUTURE = "Disposal Date cannot be a date in the future for "
             + "jurisdiction code %s.";
+
+    public static final String RECEIPT_DATE_LATER_THAN_REJECTED_ERROR_MESSAGE =
+            "Receipt date should not be later than rejected date";
+
+    public static final String DISPOSAL_DATE_BEFORE_RECEIPT_DATE = "Disposal Date cannot be before receipt date for "
+            + "jurisdiction code %s.";
     public static final String DISPOSAL_DATE_HEARING_DATE_MATCH = "The date entered does not match any of the "
         + "disposed hearing days on this case. Please check the hearing details"
         + " for jurisdiction code %s.";
@@ -102,13 +108,30 @@ public class EventValidationService {
     private static final List<String> NO_DISPOSAL =
         List.of(JURISDICTION_OUTCOME_NOT_ALLOCATED, JURISDICTION_OUTCOME_INPUT_IN_ERROR);
 
-    public List<String> validateReceiptDate(CaseData caseData) {
+    private boolean isReceiptDateEarlier(String date, String error, List<String> errors, LocalDate dateOfReceipt) {
+        if (Strings.isNullOrEmpty(date)) {
+            return false;
+        }
+        if (dateOfReceipt.isAfter(LocalDate.parse(date))) {
+            errors.add(error);
+            return true;
+        }
+        return false;
+    }
+
+    public List<String> validateReceiptDate(CaseDetails caseDetails) {
         List<String> errors = new ArrayList<>();
+        CaseData caseData = caseDetails.getCaseData();
         LocalDate dateOfReceipt = LocalDate.parse(caseData.getReceiptDate());
-        if (caseData.getPreAcceptCase() != null && !isNullOrEmpty(caseData.getPreAcceptCase().getDateAccepted())) {
-            LocalDate dateAccepted = LocalDate.parse(caseData.getPreAcceptCase().getDateAccepted());
-            if (dateOfReceipt.isAfter(dateAccepted)) {
-                errors.add(RECEIPT_DATE_LATER_THAN_ACCEPTED_ERROR_MESSAGE);
+        if (caseData.getPreAcceptCase() != null) {
+            if (ACCEPTED_STATE.equals(caseDetails.getState())
+                    && isReceiptDateEarlier(caseData.getPreAcceptCase().getDateAccepted(),
+                    RECEIPT_DATE_LATER_THAN_ACCEPTED_ERROR_MESSAGE, errors, dateOfReceipt)) {
+                return errors;
+            }
+            if (REJECTED_STATE.equals(caseDetails.getState())
+                    && isReceiptDateEarlier(caseData.getPreAcceptCase().getDateRejected(),
+                    RECEIPT_DATE_LATER_THAN_REJECTED_ERROR_MESSAGE, errors, dateOfReceipt)) {
                 return errors;
             }
         }
@@ -284,17 +307,25 @@ public class EventValidationService {
                                 caseData.getHearingCollection(),
                                 item.getValue().getDisposalDate(),
                                 errors, item.getValue().getJuridictionCodesList(),
-                                item.getValue().getJudgmentOutcome()));
+                                item.getValue().getJudgmentOutcome(), caseData.getReceiptDate()));
     }
 
     private void addInvalidDisposalDateError(List<HearingTypeItem> hearingTypeItems,
-                                             String disposalDate, List<String> errors, String jurCode, String outcome) {
+                                             String disposalDate,
+                                             List<String> errors,
+                                             String jurCode,
+                                             String outcome,
+                                             String receiptDate) {
 
         if (isNullOrEmpty(outcome) || NO_DISPOSAL.contains(outcome)) {
             return;
         }
 
         if (Strings.isNullOrEmpty(disposalDate) || isDisposalDateInFuture(disposalDate, errors, jurCode)) {
+            return;
+        }
+
+        if (isDisposalDateBeforeReceiptDate(disposalDate, errors, jurCode, receiptDate)) {
             return;
         }
 
@@ -307,6 +338,17 @@ public class EventValidationService {
         if (hearingTypeItem.isEmpty() || !YES.equals(hearingTypeItem.get().getValue().getHearingCaseDisposed())) {
             errors.add(String.format(DISPOSAL_DATE_HEARING_DATE_MATCH, jurCode));
         }
+    }
+
+    private boolean isDisposalDateBeforeReceiptDate(String disposalDate,
+                                                    List<String> errors,
+                                                    String jurCode,
+                                                    String receiptDate) {
+        if (LocalDate.parse(disposalDate).isBefore(LocalDate.parse(receiptDate))) {
+            errors.add(String.format(DISPOSAL_DATE_BEFORE_RECEIPT_DATE, jurCode));
+            return true;
+        }
+        return false;
     }
 
     private Optional<DateListedTypeItem> findHearingTypeItem(List<HearingTypeItem> hearingItems, String disposalDate) {
@@ -348,7 +390,7 @@ public class EventValidationService {
 
     private boolean isDisposalDateInFuture(String disposalDate, List<String> errors, String jurCode) {
 
-        //During day light saving times, the comparison won't work if we don't consider zones while comparing them
+        //During daylight saving times, the comparison won't work if we don't consider zones while comparing them
         // Azure has always UTC time but user's times change in summer and winters, we need to use ZonedDateTime.
         ZonedDateTime disposalDateTime = LocalDate.parse(disposalDate).atStartOfDay()
                 .atZone(ZoneId.of("Europe/London"));
@@ -364,7 +406,7 @@ public class EventValidationService {
     private boolean areDatesEqual(String disposalDate, String hearingDate)  {
         LocalDate disposalLocalDate = LocalDate.parse(disposalDate);
         LocalDate hearingLocalDate = LocalDateTime.parse(hearingDate).toLocalDate();
-        return disposalLocalDate.compareTo(hearingLocalDate) == 0;
+        return disposalLocalDate.isEqual(hearingLocalDate);
     }
 
     private void validateJurisdictionCodesExistenceInJudgement(CaseData caseData, List<String> errors) {

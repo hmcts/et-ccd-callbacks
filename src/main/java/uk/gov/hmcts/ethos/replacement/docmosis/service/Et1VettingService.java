@@ -178,7 +178,6 @@ public class Et1VettingService {
         IntWrapper acasCount = new IntWrapper(0);
 
         List<DocumentTypeItem> documentCollection = caseDetails.getCaseData().getDocumentCollection();
-        ClaimantRequestType claimantRequestType = caseDetails.getCaseData().getClaimantRequests();
         if (documentCollection != null) {
             et1Display = documentCollection
                     .stream()

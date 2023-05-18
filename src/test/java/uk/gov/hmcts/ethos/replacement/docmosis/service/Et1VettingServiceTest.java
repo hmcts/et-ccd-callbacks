@@ -40,7 +40,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.MANCHESTER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_OPEN;
 
-@SuppressWarnings({"PMD.LawOfDemeter", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.LawOfDemeter", "PMD.TooManyMethods", "PMD.ExcessiveImports", "PMD.MethodNamingConventions"})
 @ExtendWith(SpringExtension.class)
 class Et1VettingServiceTest {
 

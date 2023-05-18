@@ -47,16 +47,17 @@ public class Et3ResponseHelper {
     private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-00700.docx";
     private static final String OUTPUT_NAME = "ET3 Response.pdf";
     private static final String CLAIMANT_NAME_TABLE = "<pre> ET1 claimant name&#09&#09&#09&#09 %s</pre><hr>";
-    public static final String START_DATE_MUST_BE_IN_THE_PAST = "Start date must be in the past";
-    public static final String END_DATE_MUST_BE_AFTER_THE_START_DATE = "End date must be after the start date";
-    public static final String CHECKED = "■"; // U+25A0
-    public static final String UNCHECKED = "□"; // U+25A1
-    private static final String ET3_RESPONSE = "et3Response";
-    private static final String ET3_RESPONSE_EMPLOYMENT_DETAILS = "et3ResponseEmploymentDetails";
-    private static final String ET3_RESPONSE_CLAIM_DETAILS = "et3ResponseClaimDetails";
+    private static final String START_DATE_MUST_BE_IN_THE_PAST = "Start date must be in the past";
+    private static final String END_DATE_MUST_BE_AFTER_THE_START_DATE = "End date must be after the start date";
+    private static final String CHECKED = "■"; // U+25A0
+    private static final String UNCHECKED = "□"; // U+25A1
+    public static final String ET3_RESPONSE = "et3Response";
+    public static final String ET3_RESPONSE_EMPLOYMENT_DETAILS = "et3ResponseEmploymentDetails";
+    public static final String ET3_RESPONSE_DETAILS = "et3ResponseDetails";
     public static final String ALL_RESPONDENTS_INCOMPLETE_SECTIONS = "There are no respondents that can currently "
             + "submit an ET3 Form. Please make sure all 3 sections have been completed for a respondent";
-    private static final String NO_RESPONDENTS_FOUND = "No respondents found";
+    public static final String NO_RESPONDENTS_FOUND = "No respondents found";
+    private static final String INVALID_EVENT_ID = "Invalid eventId: ";
 
     private Et3ResponseHelper() {
         // Access through static methods
@@ -286,6 +287,9 @@ public class Et3ResponseHelper {
     }
 
     private static void addRepDetails(CaseData caseData, Et3ResponseData data) {
+        if (CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            return;
+        }
         Optional<RepresentedTypeRItem> representative = caseData.getRepCollection().stream().filter(
                 rep -> rep.getValue().getRespRepName().equals(
                         caseData.getEt3RepresentingRespondent().get(0).getValue().getDynamicList().getSelectedLabel()
@@ -339,6 +343,7 @@ public class Et3ResponseHelper {
         DynamicListTypeItem dynamicListTypeItem = new DynamicListTypeItem();
         dynamicListTypeItem.setValue(dynamicListType);
         caseData.setEt3RepresentingRespondent(List.of(dynamicListTypeItem));
+        caseData.setSubmitEt3Respondent(dynamicList);
         return new ArrayList<>();
     }
 
@@ -348,20 +353,32 @@ public class Et3ResponseHelper {
      * @param caseData data for the case
      * @return an error is the user has selected the same respondent multiple times
      */
-    public static List<String> validateRespondents(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getEt3RepresentingRespondent())) {
-            return List.of(NO_RESPONDENTS_FOUND);
+    public static List<String> validateRespondents(CaseData caseData, String eventId) {
+        switch (eventId) {
+            case ET3_RESPONSE -> {
+                if (caseData.getSubmitEt3Respondent() == null) {
+                    return List.of(NO_RESPONDENTS_FOUND);
+                }
+            }
+            case ET3_RESPONSE_DETAILS, ET3_RESPONSE_EMPLOYMENT_DETAILS -> {
+                if (CollectionUtils.isEmpty(caseData.getEt3RepresentingRespondent())) {
+                    return List.of(NO_RESPONDENTS_FOUND);
+                }
+
+                Set<String> respondentSet = new HashSet<>();
+                for (DynamicListTypeItem dynamicListTypeItem : caseData.getEt3RepresentingRespondent()) {
+                    respondentSet.add(String.valueOf(DynamicFixedListType.getSelectedLabel(
+                            dynamicListTypeItem.getValue().getDynamicList())));
+                }
+
+                if (respondentSet.size() != caseData.getEt3RepresentingRespondent().size()) {
+                    return List.of("Please do not choose the same respondent multiple times");
+                }
+            }
+            default -> throw new IllegalArgumentException(INVALID_EVENT_ID + eventId);
+
         }
 
-        Set<String> respondentSet = new HashSet<>();
-        for (DynamicListTypeItem dynamicListTypeItem : caseData.getEt3RepresentingRespondent()) {
-            respondentSet.add(String.valueOf(DynamicFixedListType.getSelectedLabel(
-                    dynamicListTypeItem.getValue().getDynamicList())));
-        }
-
-        if (respondentSet.size() != caseData.getEt3RepresentingRespondent().size()) {
-            return List.of("Please do not choose the same respondent multiple times");
-        }
         return new ArrayList<>();
     }
 
@@ -371,14 +388,15 @@ public class Et3ResponseHelper {
      * @param caseData data for the case
      */
     public static void addEt3DataToRespondent(CaseData caseData, String eventId) {
-        if (CollectionUtils.isEmpty(caseData.getEt3RepresentingRespondent())
-                || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
-            return;
-        }
-
         Set<String> respondentSet = new HashSet<>();
-        for (DynamicListTypeItem dynamicListTypeItem : caseData.getEt3RepresentingRespondent()) {
-            respondentSet.add(dynamicListTypeItem.getValue().getDynamicList().getSelectedLabel());
+        switch (eventId) {
+            case ET3_RESPONSE -> respondentSet.add(caseData.getSubmitEt3Respondent().getSelectedLabel());
+            case ET3_RESPONSE_DETAILS, ET3_RESPONSE_EMPLOYMENT_DETAILS -> {
+                for (DynamicListTypeItem dynamicListTypeItem : caseData.getEt3RepresentingRespondent()) {
+                    respondentSet.add(dynamicListTypeItem.getValue().getDynamicList().getSelectedLabel());
+                }
+            }
+            default -> throw new IllegalArgumentException(INVALID_EVENT_ID + eventId);
         }
 
         for (String respondentSelected : respondentSet) {
@@ -395,8 +413,8 @@ public class Et3ResponseHelper {
         RespondentSumType respondentSumType = switch (eventId) {
             case ET3_RESPONSE -> addPersonalDetailsToRespondent(caseData, respondent.getValue());
             case ET3_RESPONSE_EMPLOYMENT_DETAILS -> addEmploymentDetailsToRespondent(caseData, respondent.getValue());
-            case ET3_RESPONSE_CLAIM_DETAILS -> addClaimDetailsToRespondent(caseData, respondent.getValue());
-            default -> throw new IllegalArgumentException("Invalid eventId: " + eventId);
+            case ET3_RESPONSE_DETAILS -> addClaimDetailsToRespondent(caseData, respondent.getValue());
+            default -> throw new IllegalArgumentException(INVALID_EVENT_ID + eventId);
         };
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
             if (respondentSelected.equals(respondentSumTypeItem.getValue().getRespondentName())) {
@@ -494,14 +512,14 @@ public class Et3ResponseHelper {
      *
      * @param caseData data for the case
      */
-    public static void reloadDataOntoEt3(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getEt3RepresentingRespondent())
-                || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
-            return;
-        }
+    public static void reloadDataOntoEt3(CaseData caseData, String eventId) {
+        String selectedRespondent = switch (eventId) {
+            case ET3_RESPONSE -> caseData.getSubmitEt3Respondent().getSelectedLabel();
+            case ET3_RESPONSE_DETAILS, ET3_RESPONSE_EMPLOYMENT_DETAILS -> caseData.getEt3RepresentingRespondent()
+                    .get(0).getValue().getDynamicList().getSelectedLabel();
 
-        String selectedRespondent = caseData.getEt3RepresentingRespondent().get(0).getValue()
-                .getDynamicList().getSelectedLabel();
+            default -> throw new IllegalArgumentException(INVALID_EVENT_ID + eventId);
+        };
         Optional<RespondentSumTypeItem> respondent = caseData.getRespondentCollection().stream()
                 .filter(r -> selectedRespondent.equals(r.getValue().getRespondentName()))
                 .findFirst();
@@ -639,8 +657,6 @@ public class Et3ResponseHelper {
         }
         DynamicFixedListType dynamicList = DynamicFixedListType.from(
                 DynamicListHelper.createDynamicRespondentName(validRespondents));
-        DynamicListType dynamicListType = new DynamicListType();
-        dynamicListType.setDynamicList(dynamicList);
         caseData.setSubmitEt3Respondent(dynamicList);
         return new ArrayList<>();
     }

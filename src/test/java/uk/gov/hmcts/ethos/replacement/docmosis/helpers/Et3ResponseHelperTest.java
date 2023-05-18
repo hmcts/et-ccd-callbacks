@@ -31,8 +31,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ALL_RESPONDENTS_INCOMPLETE_SECTIONS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE_EMPLOYMENT_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.NO_RESPONDENTS_FOUND;
 
-@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming", "PMD.TooManyMethods"})
+@SuppressWarnings({"PMD.UseProperClassLoader", "PMD.LinguisticNaming", "PMD.TooManyMethods", "PMD.ExcessiveImports"})
 class Et3ResponseHelperTest {
 
     public static final String START_DATE_MUST_BE_IN_THE_PAST = "Start date must be in the past";
@@ -44,7 +48,8 @@ class Et3ResponseHelperTest {
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withRespondent("test", NO, null, false)
                 .withEt3RepresentingRespondent("test")
-            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+                .withSubmitEt3Respondent("test")
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         caseData = caseDetails.getCaseData();
 
@@ -174,7 +179,7 @@ class Et3ResponseHelperTest {
                 .getResource("et3ResponseDocument.json")).toURI())), UTF_8);
 
         JSONObject json = new JSONObject(expected);
-        JSONObject data = (JSONObject)json.get("data");
+        JSONObject data = (JSONObject) json.get("data");
 
         data.remove("repAddressLine1");
         data.remove("repAddressLine2");
@@ -195,16 +200,16 @@ class Et3ResponseHelperTest {
 
     @Test
     void validateRespondents_noErrors() {
-        List<String> errors = Et3ResponseHelper.validateRespondents(caseData);
+        List<String> errors = Et3ResponseHelper.validateRespondents(caseData, ET3_RESPONSE_DETAILS);
         assertThat(errors.isEmpty());
     }
 
     @Test
     void validateRespondents_noOption() {
         caseData.setEt3RepresentingRespondent(new ArrayList<>());
-        List<String> errors = Et3ResponseHelper.validateRespondents(caseData);
+        List<String> errors = Et3ResponseHelper.validateRespondents(caseData, ET3_RESPONSE_DETAILS);
         assertThat(errors, hasSize(1));
-        assertThat(errors.get(0)).isEqualTo("No respondents found");
+        assertThat(errors.get(0)).isEqualTo(NO_RESPONDENTS_FOUND);
     }
 
     @Test
@@ -213,9 +218,9 @@ class Et3ResponseHelperTest {
         caseData.setEt3ResponsePhone("1234");
         caseData.setEt3ResponseAcasAgree(YES);
         caseData.setEt3ResponseEmploymentCount("10");
-        Et3ResponseHelper.addEt3DataToRespondent(caseData, "et3Response");
-        Et3ResponseHelper.addEt3DataToRespondent(caseData, "et3ResponseEmploymentDetails");
-        Et3ResponseHelper.addEt3DataToRespondent(caseData, "et3ResponseClaimDetails");
+        Et3ResponseHelper.addEt3DataToRespondent(caseData, ET3_RESPONSE);
+        Et3ResponseHelper.addEt3DataToRespondent(caseData, ET3_RESPONSE_EMPLOYMENT_DETAILS);
+        Et3ResponseHelper.addEt3DataToRespondent(caseData, ET3_RESPONSE_DETAILS);
         RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
         assertThat(respondentSumType.getEt3ResponseIsClaimantNameCorrect()).isEqualTo(YES);
         assertThat(respondentSumType.getResponseRespondentPhone1()).isEqualTo("1234");
@@ -232,7 +237,7 @@ class Et3ResponseHelperTest {
         caseData.setRespondentCollection(null);
         List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
         assertThat(errors, hasSize(1));
-        assertThat(errors.get(0)).isEqualTo("No respondents found");
+        assertThat(errors.get(0)).isEqualTo(NO_RESPONDENTS_FOUND);
     }
 
     @Test

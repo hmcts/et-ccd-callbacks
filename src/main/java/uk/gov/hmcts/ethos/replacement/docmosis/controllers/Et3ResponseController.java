@@ -42,7 +42,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class Et3ResponseController {
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
-    private static final String ET3_COMPLETE_HEADER = "<h1>ET3 application complete</h1>";
+    private static final String ET3_COMPLETE_HEADER = "<h1>ET3 Response submitted</h1>";
     private static final String ET3_COMPLETE_BODY =
             """
                     <h3>What happens next</h3>\r
@@ -51,11 +51,11 @@ public class Et3ResponseController {
                      working days. If you have not heard from them within 5 days, contact the office directly.""";
     private static final String SECTION_COMPLETE_BODY =
             "You may want to complete the rest of the ET3 Form using the links below"
-            + "<br><a href=\"/cases/case-details/%s/trigger/et3Response/et3Response1\">ET3 - Respondent Details</a>"
-            + "<br><a href=\"/cases/case-details/%s/trigger/et3ResponseEmploymentDetails/et3ResponseEmploymentDetails1"
-            + "\">ET3 - Employment Details</a>"
-            + "<br><a href=\"/cases/case-details/%s/trigger/et3ResponseClaimDetails/et3ResponseClaimDetails1\">ET3 - "
-            + "Claim Details</a>";
+                    + "<br><a href=\"/cases/case-details/%s/trigger/et3Response/et3Response1\">ET3 - Respondent Details</a>"
+                    + "<br><a href=\"/cases/case-details/%s/trigger/et3ResponseEmploymentDetails/et3ResponseEmploymentDetails1"
+                    + "\">ET3 - Employment Details</a>"
+                    + "<br><a href=\"/cases/case-details/%s/trigger/et3ResponseDetails/et3ResponseDetails1\">ET3 - "
+                    + "Response Details</a>";
     private final VerifyTokenService verifyTokenService;
     private final Et3ResponseService et3ResponseService;
 
@@ -72,8 +72,7 @@ public class Et3ResponseController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
-                @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
@@ -100,10 +99,9 @@ public class Et3ResponseController {
     @Operation(summary = "validate dates are correct for employment")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CCDCallbackResponse.class))
-                }),
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
@@ -117,8 +115,8 @@ public class Et3ResponseController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = Et3ResponseHelper.validateRespondents(caseData);
-        Et3ResponseHelper.reloadDataOntoEt3(caseData);
+        List<String> errors = Et3ResponseHelper.validateRespondents(caseData, ccdRequest.getEventId());
+        Et3ResponseHelper.reloadDataOntoEt3(caseData, ccdRequest.getEventId());
 
         return getCallbackRespEntityErrors(errors, caseData);
     }
@@ -137,8 +135,7 @@ public class Et3ResponseController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
-                @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")

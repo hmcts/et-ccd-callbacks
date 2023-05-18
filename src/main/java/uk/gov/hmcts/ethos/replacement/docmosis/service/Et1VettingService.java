@@ -191,8 +191,9 @@ public class Et1VettingService {
                     .collect(Collectors.joining());
         }
         if (claimantRequestType != null && claimantRequestType.getClaimDescriptionDocument() != null) {
+            String documentBinaryUrl = claimantRequestType.getClaimDescriptionDocument().getDocumentBinaryUrl();
             et1Attachment = String.format(BEFORE_LABEL_ET1_ATTACHMENT,
-                    claimantRequestType.getClaimDescriptionDocument().getDocumentBinaryUrl(),
+                    documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/")),
                     claimantRequestType.getClaimDescriptionDocument().getDocumentFilename());
         }
 

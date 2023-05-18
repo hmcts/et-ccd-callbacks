@@ -15,7 +15,6 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.VettingJurCodesTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantRequestType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -542,7 +541,7 @@ class Et1VettingServiceTest {
         DocumentType documentType = new DocumentType();
         documentType.setTypeOfDocument(typeOfDocument);
         documentType.setUploadedDocument(new UploadedDocumentType());
-        if(typeOfDocument.equals(ET1_ATTACHMENT_DOC_TYPE)) {
+        if (typeOfDocument.equals(ET1_ATTACHMENT_DOC_TYPE)) {
             documentType.getUploadedDocument().setDocumentFilename(ET1_ATTACHMENT_NAME);
         }
         documentType.getUploadedDocument().setDocumentBinaryUrl("http://dm-store:8080" + binaryLink);
